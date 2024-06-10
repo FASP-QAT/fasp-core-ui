@@ -96,7 +96,10 @@ class CompareAndSelectScenario extends Component {
             actualConsumptionListForMonth: [],
             changed: false,
             dataChangedFlag: 0,
-            xAxisDisplayBy: 1
+            xAxisDisplayBy: 1,
+            yearArray: [],
+            consolidatedData: [],
+            collapsedExpandArr: []
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -119,7 +122,7 @@ class CompareAndSelectScenario extends Component {
      * @param {object} e - The event object containing information about the click event.
      */
     handleClickMonthBox2 = (e) => {
-        this.refs.pickAMonth2.show()
+        this.refs.pickRange.show()
     }
     /**
      * Handles the dismiss of the range picker component.
@@ -176,6 +179,46 @@ class CompareAndSelectScenario extends Component {
             this.buildJexcel();
         })
     }
+
+    /**
+         * This function is used to build the modeling validation data in tabular format
+         */
+    getData() {
+        var rangeValue = this.state.singleValue2;
+        let startDate;
+        let stopDate;
+        if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
+            startDate = rangeValue.from.year - 1 + '-' + rangeValue.from.month + '-01';
+            stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        } else if (this.state.xAxisDisplayBy > 8) {
+            startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            stopDate = rangeValue.to.year + 1 + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        } else {
+            startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        }
+        var monthList = [];
+        var curDate = startDate;
+        for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
+            curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+            monthList.push(curDate)
+        }
+        var dataArr = [];
+        var data = "";
+        if (this.state.xAxisDisplayBy != 1) {
+            let mL = this.state.xAxisDisplayBy == 9 ? monthList.length - 12 : monthList.length;
+            for (var j = 0; j < mL; j += 12) {
+                if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
+                    data = moment(monthList[j]).add(12, "months").format("YYYY");
+                } else {
+                    data = moment(monthList[j]).format("YYYY");
+                }
+                dataArr.push(data);
+            }
+        }
+        this.setState({ yearArray: dataArr })
+    }
+
     /**
      * Retrieves and processes data to be displayed based on the selected planning unit and region.
      * Updates component state with the retrieved data for rendering.
@@ -299,20 +342,22 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             loading: true
         })
+        this.getData();
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var columns = [];
-        columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
-        columns.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
+        var columns1 = [];
+        columns1.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
+        columns1.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
         var treeScenarioList = this.state.treeScenarioList;
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             if (treeScenarioList[tsl].type == "T") {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
             } else {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
             }
         }
         var data = [];
         var dataArr = [];
+        var collapsedExpandArr = [];
         var consumptionData = this.state.actualConsumptionList;
         var monthArrayListWithoutFormat = this.state.monthList;
         var actualConsumptionListForMonth = [];
@@ -403,16 +448,20 @@ class CompareAndSelectScenario extends Component {
             data[0] = monthArrayListWithoutFormat[m];
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
             data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
-            actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : null);
+            if (actualFilter.length > 0) {
+                actualConsumptionListForMonth.push({ year: moment(actualFilter[0].month).format("YYYY"), value: Number(Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) });
+            }
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                     data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
                     consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
+                    collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null })
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                     data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
                     consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
+                    collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null })
                 }
             }
             dataArr.push(data)
@@ -438,6 +487,25 @@ class CompareAndSelectScenario extends Component {
         var min = Math.min(...actualDiff.filter((c, index) => useForLowestError[index]))
         var treeScenarioList = this.state.treeScenarioList;
         for (var tsList = 0; tsList < treeScenarioList.length; tsList++) {
+            var collapsedExpandArray = [];
+            var actualTotalYear = [];
+            if (this.state.xAxisDisplayBy != 1) {
+                collapsedExpandArray = collapsedExpandArr.filter(ar => ar.id == treeScenarioList[tsList].id);
+                collapsedExpandArray = collapsedExpandArray.length > 0 && collapsedExpandArray.map(item => ({ year: item.year, actual: item.actual }));
+
+                var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
+                    const { year, actual } = current;
+                    if (!acc[year]) {
+                        acc[year] = { year, totalActual: 0 };
+                    }
+                    acc[year].totalActual += actual;
+                    return acc;
+                }, {});
+
+                // Convert the result to an array
+                actualTotalYear = Object.values(consolidatedData);
+            }
+
             finalData.push({
                 type: treeScenarioList[tsList].type,
                 id: treeScenarioList[tsList].id,
@@ -472,7 +540,8 @@ class CompareAndSelectScenario extends Component {
                                 totalArray[tsList] > higherThenConsumptionThreshold ? (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.aboveHighestConsumption') :
                                     i18n.t('static.supplyPlanFormula.na') :
                             i18n.t('static.supplyPlanFormula.na') :
-                        i18n.t('static.supplyPlanFormula.na')
+                        i18n.t('static.supplyPlanFormula.na'),
+                actualTotalYear: actualTotalYear
             })
         }
         var options = {
@@ -480,7 +549,7 @@ class CompareAndSelectScenario extends Component {
             columnDrag: false,
             colWidths: [0, 150, 150, 150, 100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
-            columns: columns,
+            columns: columns1,
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -506,25 +575,53 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             actualDiff: actualDiff,
             finalData: finalData,
-            useForLowestError: useForLowestError
+            useForLowestError: useForLowestError,
+            columns1: columns1
         }, () => {
             let treeScenarioList1 = this.state.treeScenarioList;
+            let yearArray = this.state.yearArray;
             let dataArray = [];
             let count = 0;
+            let dataCount = 0;
+
             for (var j = 0; j < treeScenarioList1.length; j++) {
                 data = [];
                 data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
                 data[1] = treeScenarioList1[j].checked;
                 data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                 data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
-                data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
-                data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
-                data[7] = finalData[j].compareToConsumptionForecast
-                data[8] = finalData[j].id
+                dataCount = 3;
+                if (this.state.xAxisDisplayBy != 1) {
+                    for (var i = 0; i < yearArray.length; i++) {
+                        dataCount = dataCount + 1;
+                        const obj = finalData[j].actualTotalYear.filter(r => Number(r.year) == yearArray[i])[0];
+                        data[dataCount] = `${treeScenarioList1[j].readonly ? "" : Number(obj.totalActual).toFixed(2)}`
+                    }
+                }
+                data[dataCount + 1] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
+                data[dataCount + 2] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
+                data[dataCount + 3] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
+                data[dataCount + 4] = finalData[j].compareToConsumptionForecast
+                data[dataCount + 5] = finalData[j].id
                 dataArray.push(data)
                 count++;
             }
+            let columns = [];
+            columns.push({ title: i18n.t('static.compareAndSelect.selectAsForecast'), type: 'radio', width: 80 });
+            columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 80 });
+            columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 100 });
+            columns.push({ title: i18n.t('static.consumption.forcast') + '<i class="fa fa-plus-square-o supplyPlanIcon"></i>', type: 'html', readOnly: true, width: 150, group: this.state.yearArray.length, state: false });
+            if (this.state.xAxisDisplayBy != 1) {
+                for (var i = 0; i < this.state.yearArray.length; i++) {
+                    columns.push({ title: this.state.yearArray[i], type: 'numeric', readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
+                }
+            }
+            columns.push({ type: 'numeric', title: i18n.t('static.compareAndSelect.totalForecast'), readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
+            columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastError'), readOnly: true, width: 100 });
+            columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastErrorMonths'), readOnly: true, width: 80 });
+            columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.compareToConsumptionForecast'), readOnly: true, width: 150 });
+            columns.push({ type: 'hidden', title: 'tree scenario id' });
+
             try {
                 jexcel.destroy(document.getElementById("table1"), true);
             } catch (error) {
@@ -534,59 +631,7 @@ class CompareAndSelectScenario extends Component {
                 data: data,
                 columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
-                columns: [
-                    {
-                        title: i18n.t('static.compareAndSelect.selectAsForecast'),
-                        type: 'radio',
-                        width: 80
-                    },
-                    {
-                        title: i18n.t('static.common.display?'),
-                        type: 'checkbox',
-                        width: 80
-                    },
-                    {
-                        title: i18n.t('static.equivalancyUnit.type'),
-                        type: 'text',
-                        readOnly: true,
-                        width: 100
-                    },
-                    {
-                        title: i18n.t('static.consumption.forcast') + '<i class="fa fa-plus-square-o supplyPlanIcon"></i>',
-                        type: 'html',
-                        readOnly: true,
-                        width: 150
-                    },
-                    {
-                        type: 'numeric',
-                        title: i18n.t('static.compareAndSelect.totalForecast'),
-                        readOnly: true,
-                        mask: '#,##0.00', decimal: '.',
-                        width: 100
-                    },
-                    {
-                        type: 'text',
-                        title: i18n.t('static.compareAndSelect.forecastError'),
-                        readOnly: true,
-                        width: 100
-                    },
-                    {
-                        type: 'text',
-                        title: i18n.t('static.compareAndSelect.forecastErrorMonths'),
-                        readOnly: true,
-                        width: 80
-                    },
-                    {
-                        type: 'text',
-                        title: i18n.t('static.compareAndSelect.compareToConsumptionForecast'),
-                        readOnly: true,
-                        width: 150
-                    },
-                    {
-                        type: 'hidden',
-                        title: 'tree scenario id',
-                    },
-                ],
+                columns: columns,
                 onload: this.loadedTable1,
                 onchange: this.changeTable1,
                 pagination: false,
@@ -612,6 +657,7 @@ class CompareAndSelectScenario extends Component {
                 dataEl: dataEl,
                 actualConsumptionListForMonth: actualConsumptionListForMonth,
                 consumptionDataForTree: consumptionDataForTree,
+                collapsedExpandArr: collapsedExpandArr,
                 totalArray: totalArray,
                 actualDiff: actualDiff,
                 totalActual: totalActual,
@@ -749,6 +795,11 @@ class CompareAndSelectScenario extends Component {
         columns.push(i18n.t('static.equivalancyUnit.type'));
         columns.push(i18n.t('static.consumption.forcast'));
         columns.push(i18n.t('static.compareAndSelect.selectAsForecast'));
+        if (this.state.xAxisDisplayBy != 1) {
+            for (var i = 0; i < this.state.yearArray.length; i++) {
+                columns.push(this.state.yearArray[i]);
+            }
+        }
         columns.push(i18n.t('static.compareAndSelect.totalForecast'));
         columns.push(i18n.t('static.compareAndSelect.forecastError'));
         columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths').replaceAll('#', '%23'));
@@ -756,22 +807,45 @@ class CompareAndSelectScenario extends Component {
         let headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)];
-        this.state.finalData.map(ele =>
-            A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
-            ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
-            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
-            !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
-            ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-            ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-            ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+
+        if (this.state.xAxisDisplayBy != 1) {
+
+            for (var i = 0; i < this.state.finalData.length; i++) {
+                var arr = [];
+                var ele = this.state.finalData[i];
+                arr.push(ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'))
+                arr.push(ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'))
+                arr.push(ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))
+                for (var j = 0; j < this.state.yearArray.length; j++) {
+                    var cal = ele.actualTotalYear.filter(c => c.year == this.state.yearArray[j])[0];
+                    arr.push(Number(cal.totalActual).toFixed(2));
+                }
+                arr.push(!ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "")
+                arr.push(ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'))
+                arr.push(ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'))
+                arr.push(ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                A.push(addDoubleQuoteToRowContent(arr));
+            }
+        } else {
+            this.state.finalData.map(ele =>
+                A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+                ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
+                ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+                !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
+                ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+                ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+                ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+        }
+
+
         headers = [];
-        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
+        this.state.columns1.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
         var C = []
         C.push([addDoubleQuoteToRowContent(headers)]);
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
-            this.state.columns.map((item, idx) => {
+            this.state.columns1.map((item, idx) => {
                 if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
@@ -962,19 +1036,48 @@ class CompareAndSelectScenario extends Component {
         col1.push(i18n.t('static.equivalancyUnit.type'));
         col1.push(i18n.t('static.consumption.forcast'));
         col1.push(i18n.t('static.compareAndSelect.selectAsForecast'));
+        if (this.state.xAxisDisplayBy != 1) {
+            for (var i = 0; i < this.state.yearArray.length; i++) {
+                col1.push(this.state.yearArray[i]);
+            }
+        }
         col1.push(i18n.t('static.compareAndSelect.totalForecast'));
         col1.push(i18n.t('static.compareAndSelect.forecastError'));
         col1.push(i18n.t('static.compareAndSelect.forecastErrorMonths'));
         col1.push(i18n.t('static.compareAndSelect.compareToConsumptionForecast'));
-        this.state.finalData.map(ele =>
-            dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
-            ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
-            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
-            formatter(ele.totalForecast, 0),
-            ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
-            ele.noOfMonths.toString(),
-            ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast])
-        )
+
+
+        if (this.state.xAxisDisplayBy != 1) {
+
+            for (var i = 0; i < this.state.finalData.length; i++) {
+                var arr = [];
+                var ele = this.state.finalData[i];
+                arr.push(ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))
+                arr.push(ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'))
+                arr.push(ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang))
+                arr.push(ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))
+                for (var j = 0; j < this.state.yearArray.length; j++) {
+                    var cal = ele.actualTotalYear.filter(c => c.year == this.state.yearArray[j])[0];
+                    arr.push(Number(cal.totalActual).toFixed(2));
+                }
+                arr.push(formatter(ele.totalForecast, 0))
+                arr.push(ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError)
+                arr.push(ele.noOfMonths.toString())
+                arr.push(ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast)
+                dataArr3.push(arr);
+            }
+        } else {
+            this.state.finalData.map(ele =>
+                dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+                ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
+                ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+                formatter(ele.totalForecast, 0),
+                ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
+                ele.noOfMonths.toString(),
+                ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast])
+            )
+        }
+        console.log("dataArr3", dataArr3)
         let data2 = dataArr3;
         let content1 = {
             margin: { top: 100, bottom: 50 },
@@ -983,12 +1086,12 @@ class CompareAndSelectScenario extends Component {
             body: data2,
             styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
             didParseCell: function (data) {
-                if (data.row.section != "head" && data.column.index == 7) {
+                if (data.row.section != "head" && data.column.index == col1.length - 1) {
                     if (this.state.finalData[data.row.index].compareToConsumptionForecastClass == "red") {
                         data.cell.styles.textColor = '#BA0C2F';
                     }
                 }
-                if (data.row.section != "head" && data.column.index == 5) {
+                if (data.row.section != "head" && data.column.index == (col1.length - 3)) {
                     if (this.state.finalData[data.row.index].isLowest) {
                         data.cell.styles.textColor = '#118b70';
                     }
@@ -999,12 +1102,12 @@ class CompareAndSelectScenario extends Component {
         doc.addPage();
         doc.addImage(canvasImg, 'png', 50, 100, 750, 260, 'CANVAS');
         var columns = [];
-        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        this.state.columns1.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
         var dataArr1 = [];
         this.state.dataEl.getJson(null, false).map(ele => {
             dataArr = [];
-            this.state.columns.map((item, idx) => {
+            this.state.columns1.map((item, idx) => {
                 if (item.type != 'hidden') {
                     if (item.type == 'numeric') {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
@@ -1169,6 +1272,7 @@ class CompareAndSelectScenario extends Component {
         var elInstance = instance.worksheets[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
+        var len = this.state.xAxisDisplayBy != 1 ? this.state.yearArray.length : 0;
         tr.children[1].classList.add('InfoTr');
         tr.children[1].title = i18n.t('static.tooltip.SelectAsForecast');
         tr.children[2].classList.add('InfoTr');
@@ -1177,43 +1281,59 @@ class CompareAndSelectScenario extends Component {
         tr.children[3].title = i18n.t('static.tooltip.CompareandSelectType');
         tr.children[4].classList.add('InfoTr');
         tr.children[4].title = i18n.t('static.tooltip.Forecst');
-        tr.children[5].title = i18n.t('static.common.forForecastPeriod') + " " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " " + i18n.t('static.jexcel.to') + " " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
-        tr.children[6].classList.add('InfoTr');
-        tr.children[6].title = i18n.t('static.tooltip.ForecastError');
-        tr.children[7].classList.add('InfoTr');
-        tr.children[7].title = i18n.t('static.tooltip.ForecastErrorMonthUsed');
-        tr.children[8].classList.add('InfoTr');
-        tr.children[8].title = i18n.t('static.tooltip.ComparetoConsumptionForecast');
+        tr.children[len + 5].title = i18n.t('static.common.forForecastPeriod') + " " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " " + i18n.t('static.jexcel.to') + " " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
+        tr.children[len + 6].classList.add('InfoTr');
+        tr.children[len + 6].title = i18n.t('static.tooltip.ForecastError');
+        tr.children[len + 7].classList.add('InfoTr');
+        tr.children[len + 7].title = i18n.t('static.tooltip.ForecastErrorMonthUsed');
+        tr.children[len + 8].classList.add('InfoTr');
+        tr.children[len + 8].title = i18n.t('static.tooltip.ComparetoConsumptionForecast');
         var json = elInstance.getJson(null, false);
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
+            var rowElement = elInstance.records;
             if (this.state.treeScenarioList[j].readonly) {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                    cell.classList.add('readonlyForecast');
-                    cell.classList.add('readonly');
+                for (var y = 0; y < rowElement[j].length; y++) {
+                    var ele = rowElement[j][y].element;
+                    ele.classList.add('readonlyForecast');
+                    ele.classList.add('readonly');
                 }
-            } else if (this.state.selectedTreeScenarioId == rowData[8]) {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                    cell.classList.add('selectedForecast');
+                // for (var c = 0; c < colArr.length; c++) {
+                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                //     cell.classList.add('readonlyForecast');
+                //     cell.classList.add('readonly');
+                // }
+            } else if (this.state.selectedTreeScenarioId == rowData[8 + len]) {
+                for (var y = 0; y < rowElement[j].length; y++) {
+                    var ele = rowElement[j][y].element;
+                    ele.classList.add('selectedForecast');
                 }
+                // for (var c = 0; c < colArr.length; c++) {
+                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                //     cell.classList.add('selectedForecast');
+                // }
             } else {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                    cell.classList.add('notSelectedForecast');
+                // for (var c = 0; c < colArr.length; c++) {
+                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                //     cell.classList.add('notSelectedForecast');
+                // }
+                for (var y = 0; y < rowElement[j].length; y++) {
+                    var ele = rowElement[j][y].element;
+                    ele.classList.add('notSelectedForecast');
                 }
             }
             if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
-                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                // var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                // cell.classList.add('lowestError');
+                var cell = elInstance.getCellFromCoords(rowElement[j].length - 4, j);
                 cell.classList.add('lowestError');
+
             } else {
-                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                var cell = elInstance.getCellFromCoords(rowElement[j].length - 4, j);
                 cell.classList.add('notLowestError');
             }
             if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
-                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                var cell = elInstance.getCellFromCoords(rowElement[j].length - 2, j);
                 cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? "compareAndSelectRed" : this.state.finalData[j].compareToConsumptionForecastClass);
             }
         }
@@ -1231,6 +1351,8 @@ class CompareAndSelectScenario extends Component {
             loading: true
         })
         var elInstance = instance;
+        elInstance.setColumnGroup(0, this.state.yearArray.length)
+
         if (x == 1) {
             var treeScenarioList = this.state.treeScenarioList;
             var index = this.state.treeScenarioList.findIndex(c => c.id == elInstance.getRowData(y)[8]);
@@ -1700,33 +1822,33 @@ class CompareAndSelectScenario extends Component {
         let displayBy = e.target.value;
         let val;
         if (displayBy == 1) {
-            val = this.state.rangeValue;
+            val = this.state.singleValue2;
         } else if (displayBy == 2) {
             val = {
                 from: {
-                    year: this.state.rangeValue.from.year,
+                    year: this.state.singleValue2.from.year,
                     month: 1,
                 },
                 to: {
-                    year: this.state.rangeValue.to.year,
+                    year: this.state.singleValue2.to.year,
                     month: 12,
                 }
             }
         } else {
             val = {
                 from: {
-                    year: this.state.rangeValue.from.year,
+                    year: this.state.singleValue2.from.year,
                     month: (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
                 },
                 to: {
-                    year: this.state.rangeValue.to.year,
+                    year: this.state.singleValue2.to.year,
                     month: (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12,
                 }
             }
         }
         this.setState({
             xAxisDisplayBy: displayBy,
-            rangeValue: val,
+            singleValue2: val,
             loading: false
         }, () => {
             this.buildJexcel()
@@ -1753,15 +1875,15 @@ class CompareAndSelectScenario extends Component {
             val = {
                 from: {
                     year: value[0].year(),
-                    month: this.state.rangeValue.from.month,
+                    month: this.state.singleValue2.from.month,
                 },
                 to: {
                     year: value[1].year(),
-                    month: this.state.rangeValue.to.month,
+                    month: this.state.singleValue2.to.month,
                 }
             }
         }
-        this.setState({ rangeValue: val }, () => {
+        this.setState({ singleValue2: val }, () => {
             this.buildJexcel()
         })
     }
@@ -1817,6 +1939,11 @@ class CompareAndSelectScenario extends Component {
                                 var month = xAxis1.split('-')[0];
                                 return month;
                             }
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : this.state.xAxisDisplayBy == 1 ? "" : i18n.t('static.modelingValidation.fiscalYear'),
+                            fontColor: 'black'
                         }
                     },
                     {
@@ -1881,6 +2008,19 @@ class CompareAndSelectScenario extends Component {
         if (this.state.showAllData) {
             var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
             var datasetsArr = [];
+            var consolidatedActualData = this.state.actualConsumptionListForMonth;
+            if (this.state.xAxisDisplayBy != 1) {
+                var a = consolidatedActualData.reduce((acc, current) => {
+                    const { year, value } = current;
+                    if (!acc[year]) {
+                        acc[year] = { year, value: 0 };
+                    }
+                    acc[year].value += Number(value);
+                    return acc;
+                }, {});
+                // Convert the result to an array
+                consolidatedActualData = Object.values(a);
+            }
             datasetsArr.push(
                 {
                     label: i18n.t('static.compareAndSelect.actuals'),
@@ -1896,10 +2036,29 @@ class CompareAndSelectScenario extends Component {
                     pointStyle: 'line',
                     pointRadius: 3,
                     showInLegend: true,
-                    data: this.state.actualConsumptionListForMonth
+                    data: consolidatedActualData.map(ele => ele != null ? (ele.value) : "")
                 }
             )
             this.state.treeScenarioList.filter(c => c.checked).map((item, idx) => {
+                var collapsedExpandArray = [];
+                // console.log("this.state.collapsedExpandArr", this.state.collapsedExpandArr)
+                if (this.state.xAxisDisplayBy != 1) {
+                    var collapsedExpandArray = this.state.collapsedExpandArr.filter(ar => ar.id == item.id);
+                    collapsedExpandArray = collapsedExpandArray.length > 0 && collapsedExpandArray.map(i => ({ year: i.year, actual: i.actual }));
+
+                    var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
+                        const { year, actual } = current;
+                        if (!acc[year]) {
+                            acc[year] = { year, totalActual: 0 };
+                        }
+                        acc[year].totalActual += actual;
+                        return acc;
+                    }, {});
+
+                    // Convert the result to an array
+                    collapsedExpandArray = Object.values(consolidatedData);
+                }
+                console.log("collapsedExpandArray", collapsedExpandArray)
                 datasetsArr.push(
                     {
                         label: item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang),
@@ -1916,14 +2075,43 @@ class CompareAndSelectScenario extends Component {
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
-                        data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))
+                        data: this.state.xAxisDisplayBy == 1 ?
+                            this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null)) :
+                            collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(2) : null))
                     }
                 )
             })
-            bar = {
-                labels: monthArrayList,
-                datasets: datasetsArr
-            };
+            // bar = {
+            //     labels: monthArrayList,
+            //     datasets: datasetsArr
+            // };
+            if (this.state.xAxisDisplayBy == 1) {
+                bar = {
+                    labels: monthArrayList,
+                    datasets: datasetsArr
+                };
+            } else {
+                if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
+                    let arr = [...new Set(this.state.monthList1.map(ele => moment(ele).add(12, 'months').format("YYYY")))];
+                    arr.pop();
+                    bar = {
+                        labels: arr,
+                        datasets: datasetsArr
+                    };
+                } else if (this.state.xAxisDisplayBy > 8) {
+                    let arr = [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY")))];
+                    arr.pop();
+                    bar = {
+                        labels: arr,
+                        datasets: datasetsArr
+                    };
+                } else {
+                    bar = {
+                        labels: [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY")))],
+                        datasets: datasetsArr
+                    };
+                }
+            }
         }
         const { forecastingUnitList } = this.state;
         let forecastingUnits = forecastingUnitList.length > 0
@@ -2119,13 +2307,13 @@ class CompareAndSelectScenario extends Component {
                                                     <div className="controls edit">
                                                         <Picker
                                                             ref="pickRange"
-                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                            value={rangeValue}
+                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                            value={this.state.singleValue2}
                                                             lang={pickerLang}
-                                                            key={JSON.stringify(rangeValue)}
-                                                            onDismiss={this.handleRangeDissmis}
+                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                            onDismiss={this.handleAMonthDissmis2}
                                                         >
-                                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
                                                         </Picker>
                                                     </div>
                                                 )}
@@ -2138,8 +2326,8 @@ class CompareAndSelectScenario extends Component {
                                                             name="date"
                                                             onChange={this.handleYearRangeChange}
                                                             value={[
-                                                                moment(rangeValue.from.year.toString()),
-                                                                moment(rangeValue.to.year.toString()),
+                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                moment(this.state.singleValue2.to.year.toString()),
                                                             ]}
                                                         />
                                                     </div>
@@ -2153,8 +2341,8 @@ class CompareAndSelectScenario extends Component {
                                                             name="date"
                                                             onChange={this.handleYearRangeChange}
                                                             value={[
-                                                                moment(rangeValue.from.year.toString()),
-                                                                moment(rangeValue.to.year.toString()),
+                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                moment(this.state.singleValue2.to.year.toString()),
                                                             ]}
                                                         />
                                                     </div>
@@ -2306,22 +2494,23 @@ class CompareAndSelectScenario extends Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="showForecastPeriod"
-                                                            name="showForecastPeriod"
-                                                            checked={this.state.showForecastPeriod}
-                                                            onClick={(e) => { this.setShowForecastPeriod(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                        </Label>
-                                                    </FormGroup>
-                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                    {this.state.xAxisDisplayBy == 1 &&
+                                                        <FormGroup className="col-md-2">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="showForecastPeriod"
+                                                                name="showForecastPeriod"
+                                                                checked={this.state.showForecastPeriod}
+                                                                onClick={(e) => { this.setShowForecastPeriod(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                            </Label>
+                                                        </FormGroup>}
+                                                    {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -2355,6 +2544,8 @@ class CompareAndSelectScenario extends Component {
                                                     <div className="col-md-12 pl-0 pr-0">
                                                         <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
+                                                        <p><input type="button" value="setColumnGroup(0,3)" id="btn1" />
+                                                            <input type="button" value="resetColumnGroup(0)" id="btn2" /></p>
                                                     </div>
                                                 </div>
                                             </Col>
