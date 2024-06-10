@@ -735,7 +735,10 @@ export default class BuildTree extends Component {
             levelReorderJexcelLoader: false,
             levelReorderEl: "",
             showReorderJexcel: false,
-            dropdownSources: {}
+            dropdownSources: {},
+            childrenOfList: [],
+            childrenOf: [],
+            isLevelChanged: false
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -887,6 +890,8 @@ export default class BuildTree extends Component {
         this.shiftNode = this.shiftNode.bind(this);
         this.updateReorderTable = this.updateReorderTable.bind(this);
         this.resetLevelReorder = this.resetLevelReorder.bind(this);
+        this.getChildrenOfList = this.getChildrenOfList.bind(this);
+        this.childrenOfChanged = this.childrenOfChanged.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -2104,6 +2109,7 @@ export default class BuildTree extends Component {
         var unit = "";
         var levelNo = "";
         var oldItems;
+        var cf = true;
         if (data != "") {
             oldItems = JSON.parse(JSON.stringify(this.state.curTreeObj.tree.flatList));
             var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
@@ -2116,26 +2122,51 @@ export default class BuildTree extends Component {
             this.setState({ oldItems })
         }
         if (data == "") {
-            let { curTreeObj } = this.state;
-            var items = curTreeObj.tree.flatList;
-            items = JSON.parse(JSON.stringify(this.state.oldItems));
-            curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+            if (this.state.isLevelChanged == true) {
+                cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    let { curTreeObj } = this.state;
+                    var items = curTreeObj.tree.flatList;
+                    items = JSON.parse(JSON.stringify(this.state.oldItems));
+                    curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                    this.setState({
+                        isLevelChanged: false,
+                        curTreeObj,
+                        items
+                    })
+                } else {
+                }
+            } else {
+                let { curTreeObj } = this.state;
+                var items = curTreeObj.tree.flatList;
+                items = JSON.parse(JSON.stringify(this.state.oldItems));
+                curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                this.setState({
+                    isLevelChanged: false,
+                    curTreeObj,
+                    items
+                })
+            }
+        }
+        if(data == "" && cf == false) {
             this.setState({
-                curTreeObj,
-                items
+                levelModal: true
+            })
+        } else {
+            this.setState({
+                levelModal: !this.state.levelModal,
+                levelName: name,
+                levelNo: levelNo,
+                levelUnit: unit,
+                showReorderJexcel: true,
+                childrenOf: []
+            }, () => {
+                setTimeout(() => {
+                    this.getChildrenOfList();
+                    this.buildLevelReorderJexcel();
+                }, 0)  
             })
         }
-        this.setState({
-            levelModal: !this.state.levelModal,
-            levelName: name,
-            levelNo: levelNo,
-            levelUnit: unit,
-            showReorderJexcel: true
-        }, () => {
-            setTimeout(() => {
-                this.buildLevelReorderJexcel();
-            }, 0)  
-        })
     }
     /**
      * Resets the reorder level
@@ -2146,8 +2177,47 @@ export default class BuildTree extends Component {
         items = JSON.parse(JSON.stringify(this.state.oldItems));
         curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
         this.setState({
+            isLevelChanged: false,
             curTreeObj,
             items
+        }, () => {
+            this.buildLevelReorderJexcel();
+        })
+    }
+    /**
+     * Function to get the list of all parents
+     */
+    getChildrenOfList() {
+        var levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
+        var dataArray = [];
+        let count = 0;
+        var oldParent = 0;
+        var newParent = 0;
+        for (var j = 0; j < levelNodes.length; j++) {
+            var data = {};
+            newParent = levelNodes[j].parent;
+            if(oldParent != newParent){
+                var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
+                oldParent = newParent;
+                data.label = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
+                data.value = oldParent;
+                dataArray[count] = data;
+                j--;
+                count++;
+            }
+        }
+        this.setState({
+            childrenOfList: dataArray,
+            childrenOf: dataArray
+        })
+    }
+    /**
+     * Updates the component state with the new parent ID for a level when the parent selection is changed.
+     * @param {*} e The event object representing the parent selection change event.
+     */
+    childrenOfChanged(e) {
+        this.setState({
+            childrenOf: e
         }, () => {
             this.buildLevelReorderJexcel();
         })
@@ -2156,7 +2226,12 @@ export default class BuildTree extends Component {
      * Builds jexcel table for node reordering on same level
      */
     buildLevelReorderJexcel() {
-        var levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
+        var levelNodes = [];
+        if(this.state.childrenOf.length > 0){
+            levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
+            let tempList = this.state.childrenOf.map(co => co.value);
+            levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
+        }
         var flatList = this.state.curTreeObj.tree.flatList;
         var dataArray = [];
         let count = 0;
@@ -2177,15 +2252,17 @@ export default class BuildTree extends Component {
                 data[1] = "Parent Node";
                 data[2] = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
                 data[3] = levelNodes[j].id;
+                data[4] = newParent;
                 dataArray[count] = data;
                 j--;
             } else {
                 dropdownSources[count] = [];
                 dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
                 data[0] = levelNodes[j].sortOrder;
-                data[1] = levelCount.toString();
+                data[1] = "Position "+levelCount.toString();
                 data[2] = levelNodes[j].payload.label.label_en;
                 data[3] = levelNodes[j].id;
+                data[4] = newParent;
                 dataArray[count] = data;
                 levelCount++;
             }
@@ -2215,7 +2292,7 @@ export default class BuildTree extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Node Position",
+                    title: "Node Position (L to R)",
                     type: 'text',
                     readOnly: false
                 },
@@ -2226,6 +2303,11 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: "Node Id",
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: "Parent Id",
                     type: 'hidden',
                     readOnly: true
                 },
@@ -2305,7 +2387,7 @@ export default class BuildTree extends Component {
         var rowDataNext = instance.getRowData(row+1);
         var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
         var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
-        if (col === 4 && rowData[1] != 'Parent Node' && showUpArrow) {
+        if (col === 5 && rowData[1] != 'Parent Node' && showUpArrow) {
             cell.innerHTML = '';
             const button = document.createElement('button');
             button.type = 'button';
@@ -2320,7 +2402,7 @@ export default class BuildTree extends Component {
             };
             cell.appendChild(button);
         }
-        if (col === 5 && rowData[1] != 'Parent Node' && showDownArrow) {
+        if (col === 6 && rowData[1] != 'Parent Node' && showDownArrow) {
             cell.innerHTML = '';
             const button = document.createElement('button');
             button.type = 'button';
@@ -2353,7 +2435,10 @@ export default class BuildTree extends Component {
         items[currNodeIndex] = temp;
         items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
         items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
-        this.setState({ items })
+        this.setState({ 
+            isLevelChanged: true, 
+            items
+        })
         this.buildLevelReorderJexcel();
     }
     /**
@@ -13030,6 +13115,18 @@ export default class BuildTree extends Component {
                                                     )
                                                 }, this)}
                                         </Input>
+                                    </FormGroup>
+                                    <p>Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.</p>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                                        <MultiSelect
+                                            id="childrenOf"
+                                            name="childrenOf"
+                                            bsSize="sm"
+                                            options={this.state.childrenOfList}
+                                            onChange={(e) => { this.childrenOfChanged(e) }}
+                                            value={this.state.childrenOf}
+                                        />
                                     </FormGroup>
                                     <FormGroup>
                                     {this.state.showReorderJexcel &&

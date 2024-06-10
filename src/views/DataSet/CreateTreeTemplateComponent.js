@@ -50,6 +50,7 @@ import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
 import CryptoJS from 'crypto-js'
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import DropdownService from '../../api/DropdownService';
+import { MultiSelect } from 'react-multi-select-component';
 // Localized entity name
 const entityname = 'Tree Template';
 const pickerLang = {
@@ -753,7 +754,10 @@ export default class CreateTreeTemplate extends Component {
             levelReorderJexcelLoader: false,
             levelReorderEl: "",
             showReorderJexcel: false,
-            dropdownSources: {}
+            dropdownSources: {},
+            childrenOfList: [],
+            childrenOf: [],
+            isLevelChanged: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -876,6 +880,8 @@ export default class CreateTreeTemplate extends Component {
         this.shiftNode = this.shiftNode.bind(this);
         this.updateReorderTable = this.updateReorderTable.bind(this);
         this.resetLevelReorder = this.resetLevelReorder.bind(this);
+        this.getChildrenOfList = this.getChildrenOfList.bind(this);
+        this.childrenOfChanged = this.childrenOfChanged.bind(this);
     }
     /**
        * Hides the message in div3 after 30 seconds.
@@ -903,6 +909,26 @@ export default class CreateTreeTemplate extends Component {
         } else {
             this.setState({
                 openAddNodeModal: false, cursorItem: 0, highlightItem: 0, isChanged: false, activeTab1: new Array(2).fill('1')
+            })
+        }
+    }
+    /**
+     * Handles the cancellation of level selection operation.
+     * If changes have been made, prompts the user for confirmation before canceling.
+     * Resets the state to its initial values if confirmed or if there are no changes.
+     */
+    cancelLevelClicked() {
+        if (this.state.isLevelChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    isLevelChanged: false
+                })
+            } else {
+            }
+        } else {
+            this.setState({
+                isLevelChanged: false
             })
         }
     }
@@ -1944,6 +1970,7 @@ export default class CreateTreeTemplate extends Component {
         var unit = "";
         var levelNo = "";
         var oldItems;
+        var cf = true;
         if (data != "") {
             oldItems = JSON.parse(JSON.stringify(this.state.treeTemplate.flatList));
             var treeLevelList = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList : [];
@@ -1956,26 +1983,51 @@ export default class CreateTreeTemplate extends Component {
             this.setState({ oldItems })
         }
         if (data == "") {
-            let { treeTemplate } = this.state;
-            var items = treeTemplate.flatList;
-            items = JSON.parse(JSON.stringify(this.state.oldItems));
-            treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+            if (this.state.isLevelChanged == true) {
+                cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+                if (cf == true) {
+                    let { treeTemplate } = this.state;
+                    var items = treeTemplate.flatList;
+                    items = JSON.parse(JSON.stringify(this.state.oldItems));
+                    treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                    this.setState({
+                        isLevelChanged: false,
+                        treeTemplate,
+                        items
+                    })
+                } else {
+                }
+            } else {
+                let { treeTemplate } = this.state;
+                var items = treeTemplate.flatList;
+                items = JSON.parse(JSON.stringify(this.state.oldItems));
+                treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                this.setState({
+                    isLevelChanged: false,
+                    treeTemplate,
+                    items
+                })
+            }
+        }
+        if(data == "" && cf == false) {
             this.setState({
-                treeTemplate,
-                items
+                levelModal: true
+            })
+        } else {
+            this.setState({
+                levelModal: !this.state.levelModal,
+                levelName: name,
+                levelNo: levelNo,
+                levelUnit: unit,
+                showReorderJexcel: true,
+                childrenOf: []
+            }, () => {
+                setTimeout(() => {
+                    this.getChildrenOfList();
+                    this.buildLevelReorderJexcel();
+                }, 0)  
             })
         }
-        this.setState({
-            levelModal: !this.state.levelModal,
-            levelName: name,
-            levelNo: levelNo,
-            levelUnit: unit,
-            showReorderJexcel: true
-        }, () => {
-            setTimeout(() => {
-                this.buildLevelReorderJexcel();
-            }, 0)  
-        })
     }
     /**
      * Resets the reorder level
@@ -1986,8 +2038,47 @@ export default class CreateTreeTemplate extends Component {
         items = JSON.parse(JSON.stringify(this.state.oldItems));
         treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
         this.setState({
+            isLevelChanged: false,
             treeTemplate,
             items
+        }, () => {
+            this.buildLevelReorderJexcel();
+        })
+    }
+    /**
+     * Function to get the list of all parents
+     */
+    getChildrenOfList() {
+        var levelNodes = this.state.treeTemplate.flatList.filter(m => m.level == this.state.levelNo);
+        var dataArray = [];
+        let count = 0;
+        var oldParent = 0;
+        var newParent = 0;
+        for (var j = 0; j < levelNodes.length; j++) {
+            var data = {};
+            newParent = levelNodes[j].parent;
+            if(oldParent != newParent){
+                var parentNode = this.state.treeTemplate.flatList.filter(m => m.id == levelNodes[j].parent);
+                oldParent = newParent;
+                data.label = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
+                data.value = oldParent;
+                dataArray[count] = data;
+                j--;
+                count++;
+            }
+        }
+        this.setState({
+            childrenOfList: dataArray,
+            childrenOf: dataArray
+        })
+    }
+    /**
+     * Updates the component state with the new parent ID for a level when the parent selection is changed.
+     * @param {*} e The event object representing the parent selection change event.
+     */
+    childrenOfChanged(e) {
+        this.setState({
+            childrenOf: e
         }, () => {
             this.buildLevelReorderJexcel();
         })
@@ -1996,7 +2087,12 @@ export default class CreateTreeTemplate extends Component {
      * Builds jexcel table for node reordering on same level
      */
     buildLevelReorderJexcel() {
-        var levelNodes = this.state.treeTemplate.flatList.filter(m => m.level == this.state.levelNo);
+        var levelNodes = [];
+        if(this.state.childrenOf.length > 0){
+            levelNodes = this.state.treeTemplate.flatList.filter(m => m.level == this.state.levelNo);
+            let tempList = this.state.childrenOf.map(co => co.value);
+            levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
+        }
         var flatList = this.state.treeTemplate.flatList;
         var dataArray = [];
         let count = 0;
@@ -2017,15 +2113,17 @@ export default class CreateTreeTemplate extends Component {
                 data[1] = "Parent Node";
                 data[2] = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
                 data[3] = levelNodes[j].id;
+                data[4] = newParent;
                 dataArray[count] = data;
                 j--;
             } else {
                 dropdownSources[count] = [];
                 dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
                 data[0] = levelNodes[j].sortOrder;
-                data[1] = levelCount.toString();
+                data[1] = "Position "+levelCount.toString();
                 data[2] = levelNodes[j].payload.label.label_en;
                 data[3] = levelNodes[j].id;
+                data[4] = newParent;
                 dataArray[count] = data;
                 levelCount++;
             }
@@ -2055,7 +2153,7 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Node Position",
+                    title: "Node Position (L to R)",
                     type: 'text',
                     readOnly: false
                 },
@@ -2066,6 +2164,11 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: "Node Id",
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: "Parent Id",
                     type: 'hidden',
                     readOnly: true
                 },
@@ -2145,7 +2248,7 @@ export default class CreateTreeTemplate extends Component {
         var rowDataNext = instance.getRowData(row+1);
         var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
         var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
-        if (col === 4 && rowData[1] != 'Parent Node' && showUpArrow) {
+        if (col === 5 && rowData[1] != 'Parent Node' && showUpArrow) {
             cell.innerHTML = '';
             const button = document.createElement('button');
             button.type = 'button';
@@ -2160,7 +2263,7 @@ export default class CreateTreeTemplate extends Component {
             };
             cell.appendChild(button);
         }
-        if (col === 5 && rowData[1] != 'Parent Node' && showDownArrow) {
+        if (col === 6 && rowData[1] != 'Parent Node' && showDownArrow) {
             cell.innerHTML = '';
             const button = document.createElement('button');
             button.type = 'button';
@@ -2193,7 +2296,10 @@ export default class CreateTreeTemplate extends Component {
         items[currNodeIndex] = temp;
         items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
         items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
-        this.setState({ items })
+        this.setState({ 
+            isLevelChanged: true, 
+            items
+        })
         this.buildLevelReorderJexcel();
     }
     /**
@@ -12312,7 +12418,7 @@ export default class CreateTreeTemplate extends Component {
                             setFieldTouched
                         }) => (
                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
-                                <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
+                                <ModalHeader toggle={(event) => {event.stopPropagation();this.levelClicked("")}} className="modalHeader">
                                     <strong>{i18n.t('static.tree.levelDetails')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
@@ -12352,6 +12458,18 @@ export default class CreateTreeTemplate extends Component {
                                                     )
                                                 }, this)}
                                         </Input>
+                                    </FormGroup>
+                                    <p>Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.</p>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">See children of</Label>
+                                        <MultiSelect
+                                            id="childrenOf"
+                                            name="childrenOf"
+                                            bsSize="sm"
+                                            options={this.state.childrenOfList}
+                                            onChange={(e) => { this.childrenOfChanged(e) }}
+                                            value={this.state.childrenOf}
+                                        />
                                     </FormGroup>
                                     <FormGroup>
                                     {this.state.showReorderJexcel &&
