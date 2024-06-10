@@ -882,6 +882,7 @@ export default class CreateTreeTemplate extends Component {
         this.resetLevelReorder = this.resetLevelReorder.bind(this);
         this.getChildrenOfList = this.getChildrenOfList.bind(this);
         this.childrenOfChanged = this.childrenOfChanged.bind(this);
+        this.levelDropdownChange = this.levelDropdownChange.bind(this);
     }
     /**
        * Hides the message in div3 after 30 seconds.
@@ -2015,7 +2016,7 @@ export default class CreateTreeTemplate extends Component {
             })
         } else {
             this.setState({
-                levelModal: !this.state.levelModal,
+                levelModal: data == "" || data.width ? !this.state.levelModal : true,
                 levelName: name,
                 levelNo: levelNo,
                 levelUnit: unit,
@@ -2028,6 +2029,19 @@ export default class CreateTreeTemplate extends Component {
                 }, 0)  
             })
         }
+    }
+    /**
+     * Updates the selected level
+     * @param {*} e The event object representing the level selection change event.
+     */
+    levelDropdownChange(e) {
+        var data = {
+            context: {
+                levels: []
+            }
+        };
+        data.context.levels.push(e.target.value);
+        this.levelClicked(data);
     }
     /**
      * Resets the reorder level
@@ -2173,13 +2187,13 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Action Up",
+                    title: "Shift Up",
                     type: 'text',
                     readOnly: true,
                     width: 50
                 },
                 {
-                    title: "Action Down",
+                    title: "Shift Down",
                     type: 'text',
                     readOnly: true,
                     width: 50
@@ -2409,7 +2423,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             levelModal: false,
             treeTemplate,
-            isTemplateChanged: true
+            isTemplateChanged: true,
+            isLevelChanged: false
         }, () => {
         });
     }
@@ -12422,6 +12437,26 @@ export default class CreateTreeTemplate extends Component {
                                     <strong>{i18n.t('static.tree.levelDetails')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelDropdown"
+                                            name="levelDropdown"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.levelDropdownChange(e) }}
+                                            value={this.state.levelNo}
+                                        >
+                                            {this.state.treeTemplate.levelList.length > 0
+                                                && this.state.treeTemplate.levelList.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.levelNo}>
+                                                            {item.label.label_en}
+                                                        </option>
+                                                    )
+                                                }, this)}
+                                        </Input>
+                                    </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
