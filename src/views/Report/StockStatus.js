@@ -1245,11 +1245,11 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               stack: 1,
                               backgroundColor: '#002f6c',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#002f6c',
+                              pointBackgroundColor: '#002f6c',
+                              pointBorderColor: '#002f6c',
+                              pointHoverBackgroundColor: '#002f6c',
+                              pointHoverBorderColor: '#002f6c',
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
@@ -1263,11 +1263,11 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               stack: 1,
                               backgroundColor: '#49A4A1',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#49A4A1',
+                              pointBackgroundColor: '#49A4A1',
+                              pointBorderColor: '#49A4A1',
+                              pointHoverBackgroundColor: '#49A4A1',
+                              pointHoverBorderColor: '#49A4A1',
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
@@ -1281,11 +1281,11 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               stack: 1,
                               backgroundColor: '#0067B9',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#0067B9',
+                              pointBackgroundColor: '#0067B9',
+                              pointBorderColor: '#0067B9',
+                              pointHoverBackgroundColor: '#0067B9',
+                              pointHoverBorderColor: '#0067B9',
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
@@ -1297,11 +1297,11 @@ class StockStatus extends Component {
                             {
                               label: i18n.t('static.supplyPlan.planned'),
                               backgroundColor: '#A7C6ED',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#A7C6ED',
+                              pointBackgroundColor: '#A7C6ED',
+                              pointBorderColor: '#A7C6ED',
+                              pointHoverBackgroundColor: '#A7C6ED',
+                              pointHoverBorderColor: '#A7C6ED',
                               yAxisID: 'A',
                               stack: 1,
                               data: data.map((item, index) => {
@@ -1654,11 +1654,11 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   stack: 1,
                   backgroundColor: '#002f6c',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#002f6c',
+                  pointBackgroundColor: '#002f6c',
+                  pointBorderColor: '#002f6c',
+                  pointHoverBackgroundColor: '#002f6c',
+                  pointHoverBorderColor: '#002f6c',
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
@@ -1672,11 +1672,11 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   stack: 1,
                   backgroundColor: '#49A4A1',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#49A4A1',
+                  pointBackgroundColor: '#49A4A1',
+                  pointBorderColor: '#49A4A1',
+                  pointHoverBackgroundColor: '#49A4A1',
+                  pointHoverBorderColor: '#49A4A1',
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
@@ -1690,11 +1690,11 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   stack: 1,
                   backgroundColor: '#0067B9',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#0067B9',
+                  pointBackgroundColor: '#0067B9',
+                  pointBorderColor: '#0067B9',
+                  pointHoverBackgroundColor: '#0067B9',
+                  pointHoverBorderColor: '#0067B9',
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
@@ -1706,11 +1706,11 @@ class StockStatus extends Component {
                 {
                   label: i18n.t('static.supplyPlan.planned'),
                   backgroundColor: '#A7C6ED',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#A7C6ED',
+                  pointBackgroundColor: '#A7C6ED',
+                  pointBorderColor: '#A7C6ED',
+                  pointHoverBackgroundColor: '#A7C6ED',
+                  pointHoverBorderColor: '#A7C6ED',
                   yAxisID: 'A',
                   stack: 1,
                   data: filteredPlanningUnitData.map((item, index) => {
@@ -2730,11 +2730,11 @@ class StockStatus extends Component {
         yAxisID: 'A',
         stack: 1,
         backgroundColor: '#002f6c',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#002f6c',
+        pointBackgroundColor: '#002f6c',
+        pointBorderColor: '#002f6c',
+        pointHoverBackgroundColor: '#002f6c',
+        pointHoverBorderColor: '#002f6c',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -2748,11 +2748,11 @@ class StockStatus extends Component {
         yAxisID: 'A',
         stack: 1,
         backgroundColor: '#49a4a1',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#49a4a1',
+        pointBackgroundColor: '#49a4a1',
+        pointBorderColor: '#49a4a1',
+        pointHoverBackgroundColor: '#49a4a1',
+        pointHoverBorderColor: '#49a4a1',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -2766,11 +2766,11 @@ class StockStatus extends Component {
         yAxisID: 'A',
         stack: 1,
         backgroundColor: '#0067B9',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#0067B9',
+        pointBackgroundColor: '#0067B9',
+        pointBorderColor: '#0067B9',
+        pointHoverBackgroundColor: '#0067B9',
+        pointHoverBorderColor: '#0067B9',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -2782,11 +2782,11 @@ class StockStatus extends Component {
       {
         label: i18n.t('static.supplyPlan.planned'),
         backgroundColor: '#A7C6ED',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#A7C6ED',
+        pointBackgroundColor: '#A7C6ED',
+        pointBorderColor: '#A7C6ED',
+        pointHoverBackgroundColor: '#A7C6ED',
+        pointHoverBorderColor: '#A7C6ED',
         yAxisID: 'A',
         stack: 1,
         data: this.state.stockStatusList.map((item, index) => {
