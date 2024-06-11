@@ -599,6 +599,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Saves extrapolation data in indexed DB
    */
   saveForecastConsumptionExtrapolation() {
+    var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
     this.setState({
       loading: true
     })
@@ -620,7 +621,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       extrapolationMethodRequest.onsuccess = function (event) {
         var transaction = db1.transaction(['datasetData'], 'readwrite');
         var datasetTransaction = transaction.objectStore('datasetData');
-        var datasetRequest = datasetTransaction.get(this.state.datasetId);
+        var datasetRequest = datasetTransaction.get(tempDatasetId);
         datasetRequest.onerror = function (event) {
         }.bind(this);
         datasetRequest.onsuccess = function (event) {
