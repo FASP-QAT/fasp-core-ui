@@ -666,13 +666,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 100, readOnly: true },
                                                     { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
                                                     { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
-                                                    { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 150 },
+                                                    { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 100 },
                                                     { type: 'autocomplete', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
                                                     { type: 'autocomplete', title: i18n.t('static.dashboard.currency'), source: currencyList, filter: this.filterCurrency, width: 120 },
                                                     { type: 'numeric', title: i18n.t('static.supplyPlan.pricePerPlanningUnit'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.productcost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
-                                                    { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 130, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 130, mask: '#,##.00', textEditor: true, decimal: '.' },
+                                                    { type: 'numeric', title: i18n.t('static.shipment.freightcost'), width: 170, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
+                                                    { type: 'numeric', readOnly: true, title: i18n.t('static.shipment.totalCost'), width: 170, mask: '#,##.00', textEditor: true, decimal: '.' },
                                                     { type: 'autocomplete', title: i18n.t('static.datasource.datasource'), source: dataSourceList, filter: this.filterDataSourceList, width: 150 },
                                                     { type: 'text', title: i18n.t('static.program.notes'), width: 400 },
                                                     {
@@ -1375,6 +1375,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[9].title = i18n.t('static.shipmentTooltip.localProcurementAgent');
         tr.children[12].title = i18n.t('static.shipmentTooltip.aru');
         tr.children[14].title = i18n.t('static.shipmentTooltip.conversionFactor');
+        tr.children[15].title = i18n.t('static.shipmentTooltip.orderQtyPU');
         tr.children[16].title = i18n.t('static.shipmentTooltip.emergencyShipment');
         tr.children[17].title = i18n.t('static.shipmentTooltip.fundingSource');
         tr.children[18].title = i18n.t('static.shipmentTooltip.budget');
@@ -1385,13 +1386,13 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImagePA');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImageShipmentARU');
         tr.children[13].classList.add('AsteriskTheadtrTd');
         tr.children[17].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[22].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[23].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[15].classList.add('AsteriskTheadtrTd');
+        tr.children[22].classList.add('InfoTrAsteriskTheadtrTdImageShipmentFreightCost');
+        tr.children[23].classList.add('InfoTrAsteriskTheadtrTdImageShipmentCost');
+        tr.children[15].classList.add('InfoTrAsteriskTheadtrTdImageShipmentARU');
         tr.children[19].classList.add('AsteriskTheadtrTd');
         tr.children[20].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[24].classList.add('AsteriskTheadtrTd');
