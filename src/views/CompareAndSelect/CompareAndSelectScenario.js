@@ -92,7 +92,9 @@ class CompareAndSelectScenario extends Component {
             treeScenarioList: [],
             actualConsumptionListForMonth: [],
             changed: false,
-            dataChangedFlag: 0
+            dataChangedFlag: 0,
+            minActualMonth:'',
+            maxActualMonth:''
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -195,11 +197,15 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             var count = 0;
             var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            var minActualMonth='';
+            var maxActualMonth='';
             if (selectedPlanningUnit[0].consuptionForecast.toString() == "true") {
                 for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
+                    minActualMonth=consumptionExtrapolation[ce].jsonProperties.startDate;
+                    maxActualMonth=consumptionExtrapolation[ce].jsonProperties.stopDate;
                     treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
                     colourArrayCount += 1;
                 }
@@ -270,7 +276,9 @@ class CompareAndSelectScenario extends Component {
                 singleValue2: rangeValue,
                 minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
                 showAllData: true,
-                loading: false
+                loading: false,
+                minActualMonth:minActualMonth,
+                maxActualMonth:maxActualMonth
             }, () => {
                 this.setMonth1List();
                 if (this.state.viewById == 1) {
@@ -314,9 +322,18 @@ class CompareAndSelectScenario extends Component {
         var consumptionDataForTree = [];
         var totalArray = [];
         var monthArrayForError = [];
-        if (consumptionData.length > 0) {
-            for(var i=0;i<consumptionData.length;i++){
-                monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+        if(this.state.minActualMonth==''){
+            if (consumptionData.length > 0) {
+                for(var i=0;i<consumptionData.length;i++){
+                    monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+                }
+            }
+        }else{
+            var createdDate=moment(this.state.minActualMonth).format("YYYY-MM-DD");
+            var minDate=moment(this.state.minActualMonth).format("YYYY-MM-DD");
+            for(var i=0;moment(createdDate).format("YYYY-MM")<moment(this.state.maxActualMonth).format("YYYY-MM");i++){
+                createdDate=moment(minDate).add(i,'months').format("YYYY-MM-DD");
+                monthArrayForError.push(createdDate);
             }
         }
         var multiplier = 1;
@@ -506,9 +523,7 @@ class CompareAndSelectScenario extends Component {
             let treeScenarioList1 = this.state.treeScenarioList;
             let dataArray = [];
             let count = 0;
-            console.log("totalActual Test@123",totalActual)
             for (var j = 0; j < treeScenarioList1.length; j++) {
-                console.log("Actual Diff Test@123",actualDiff[j]);
                 data = [];
                 data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
                 data[1] = treeScenarioList1[j].checked;
