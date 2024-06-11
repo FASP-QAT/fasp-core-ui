@@ -3057,7 +3057,7 @@ class EditSupplyPlanStatus extends Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-8">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls">
                                             <InputGroup>
