@@ -541,6 +541,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     handleRangeDissmis1(value) {
         this.setState({ rangeValue1: value }, () => {
             this.getDateDifference()
+            setTimeout(() => {
+                var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+                this.setState({
+                    movingAvgId: this.state.movingAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.movingAvgId : false,
+                    semiAvgId: this.state.semiAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.semiAvgId : false,
+                    linearRegressionId: this.state.linearRegressionData.length > 0 && this.state.monthsDiff >= 3 ? this.state.linearRegressionId : false,
+                    smoothingId: this.state.tesData.length > 0 && this.state.monthsDiff >= 24 ? this.state.smoothingId : false,
+                    arimaId: this.state.arimaData.length > 0 ? this.state.arimaId : false,
+                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
+                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                })
+            }, 0)
         })
     }
     /**
@@ -2058,21 +2073,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                     beta: beta,
                     gamma: gamma,
                     showData: true,
-                    movingAvgId: inputDataMovingAvg.length > 0 ? movingAvgId : false,
-                    semiAvgId: inputDataSemiAverage.length > 0 ? semiAvgId : false,
-                    linearRegressionId: inputDataLinearRegression.length > 0 ? linearRegressionId : false,
-                    smoothingId: inputDataTes.length > 0 ? smoothingId : false,
+                    movingAvgId: inputDataMovingAvg.length > 0 && this.state.monthsDiff >= 3 ? movingAvgId : false,
+                    semiAvgId: inputDataSemiAverage.length > 0 && this.state.monthsDiff >= 3 ? semiAvgId : false,
+                    linearRegressionId: inputDataLinearRegression.length > 0 && this.state.monthsDiff >= 3 ? linearRegressionId : false,
+                    smoothingId: inputDataTes.length > 0 && this.state.monthsDiff >= 24 ? smoothingId : false,
                     arimaId: inputDataArima.length > 0 ? arimaId : false,
                     movingAvgData: inputDataMovingAvg,
                     semiAvgData: inputDataSemiAverage,
                     linearRegressionData: inputDataLinearRegression,
                     tesData: inputDataTes,
                     arimaData: inputDataArima,
-                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 ? false : true,
-                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 ? false : true,
-                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2) ? false : true,
+                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
+                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
                     noDataMessage: "",
                     showDate: true,
                     minDate: minDate,
@@ -2113,11 +2128,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                         linearRegressionData: [],
                         tesData: [],
                         arimaData: [],
-                        movingAvgDisabled: true,
-                        semiAvgDisabled: true,
-                        linearRegressionDisabled: true,
-                        tesDisabled: true,
-                        arimaDisabled: true 
+                        movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                        semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                        linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
+                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
                     }, () => {
                         this.getDateDifference()
                     })
