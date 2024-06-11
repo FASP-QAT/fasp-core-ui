@@ -769,52 +769,44 @@ class AnnualShipmentCost extends Component {
             '"'
         );
         csvRow.push("");
-        this.state.fundingSourceLabels.map((ele) =>
-            csvRow.push(
-                '"' +
-                (
-                i18n.t("static.budget.fundingsource") +
-                " : " +
-                ele.toString()
-                ).replaceAll(" ", "%20") +
-                '"'
-            )
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.budget.fundingsource") +
+            " : " +
+            this.state.fundingSourceLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
         );
         csvRow.push("");
-        this.state.procurementAgentLabels.map((ele) =>
-            csvRow.push(
-                '"' +
-                (
-                i18n.t("static.procurementagent.procurementagent") +
-                " : " +
-                ele.toString()
-                ).replaceAll(" ", "%20") +
-                '"'
-            )
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.procurementagent.procurementagent") +
+            " : " +
+            this.state.procurementAgentLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
         );
         csvRow.push("");
-        this.state.planningUnitLabels.map((ele) =>
-            csvRow.push(
-                '"' +
-                (
-                i18n.t("static.planningunit.planningunit") +
-                " : " +
-                ele.toString()
-                ).replaceAll(" ", "%20") +
-                '"'
-            )
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.planningunit.planningunit") +
+            " : " +
+            this.state.planningUnitLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
         );
         csvRow.push("");
-        this.state.statusLabels.map((ele) =>
-            csvRow.push(
-                '"' +
-                (
-                i18n.t("static.common.status") +
-                " : " +
-                ele.toString()
-                ).replaceAll(" ", "%20") +
-                '"'
-            )
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.common.status") +
+            " : " +
+            this.state.statusLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
         );
         csvRow.push("");
         var B = [];
