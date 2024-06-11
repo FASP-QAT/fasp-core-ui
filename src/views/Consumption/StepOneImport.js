@@ -60,7 +60,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             getDatasetFilterList: [],
             selSource1: [],
             isChanged1: false,
-            filteredSupplyPlanProgramList: []
+            filteredSupplyPlanProgramList: [],
+            sourceList: []
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -80,6 +81,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.filterSupplyPlanPrograms = this.filterSupplyPlanPrograms.bind(this);
         this.addRow = this.addRow.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.versionChanged = this.versionChanged.bind(this);
     }
     /**
      * This function is triggered when this component is about to unmount
@@ -582,9 +584,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * @param {Array} source - The source array for autocomplete options (unused).
      * @returns {Array} - Returns an array of active countries.
      */
-    async dropdownFilter (instance, cell, c, r, source) {
+    async versionChanged (instance, cell, c, r, source) {
         var mylist = [];
-        var spProgramId = (this.state.supplyPlanVersionMapEl.getJson(null, false)[r])[c - 1];
+        var spProgramId = (this.state.supplyPlanVersionMapEl.getJson(null, false)[r])[c];
         console.log('dropdownFilter. sp Pgm: '+spProgramId);
 
         //fetch version list here
@@ -611,7 +613,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         mylist = filteredSpVersionList;
                         console.log('resp. filteredSpVersionList count: '+filteredSpVersionList.length);
                         console.log('resp. filteredSpVersionList: '+JSON.stringify(filteredSpVersionList));                        
-
+                        this.setState({sourceList: mylist})
                         // return filteredSpVersionList;
                         // this.updateColumnSource(filteredSpVersionList);
                 }).catch(
@@ -657,11 +659,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     }
                     );
                 console.log('if section',mylist);
-                return mylist;
+                
+                // return mylist;
         } 
         
         console.log('end of dropdownFilter()');
         // return mylist;
+    }
+
+    dropdownFilter (instance, cell, c, r, source) {
+        return this.state.sourceList;    
     }
 
     /**
@@ -710,6 +717,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             data: data,
             columnDrag: false,
             colWidths: [100, 100],
+            onchange: (instance, cell, x, y, value) => {
+                if (x == 1) { 
+                    this.versionChanged(instance, cell, x, y, value);
+                }
+            },
             columns: [
                 {
                     title: 'newRow',
@@ -729,13 +741,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion'),
                     type: 'autocomplete',
-                    source: [],
                     filter: this.dropdownFilter,
                     required: true,
-                    regex: {
-                        ex: /^\S+(?: \S+)*$/,
-                        text: i18n.t("static.message.spacetext")
-                    }
                 },
                 
                 // {
