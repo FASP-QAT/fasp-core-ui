@@ -59,7 +59,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             selectedForecastProgram: '',
             getDatasetFilterList: [],
             selSource1: [],
-            isChanged1: false
+            isChanged1: false,
+            filteredSupplyPlanProgramList: []
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -75,6 +76,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getTracerCategoryList = this.getTracerCategoryList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.getProgramPlanningUnit = this.getProgramPlanningUnit.bind(this);
+        this.buildJexcel2 = this.buildJexcel2.bind(this);
+        this.filterSupplyPlanPrograms = this.filterSupplyPlanPrograms.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.dropdownFilter = this.dropdownFilter.bind(this);
     }
     /**
      * This function is triggered when this component is about to unmount
@@ -89,8 +94,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
     componentDidUpdate = () => {
         if (this.state.isChanged1 == true) {
             window.onbeforeunload = () => true
+            // this.buildJexcel2();
         } else {
             window.onbeforeunload = undefined
+            // this.buildJexcel2();
         }
     }
     /**
@@ -241,6 +248,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     componentDidMount() {
         this.getPrograms();
+
+        //new code
+        
+        this.buildJexcel2();
     }
     /**
      * Reterives the forecast programs from indexed db
@@ -307,6 +318,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     datasetList1: datasetList1
                 }, () => {
                     this.getTracerCategoryList();
+                    this.filterForcastUnit();//to populate FP dropdown
                 })
                 this.props.updateStepOneData("datasetList", datasetList);
                 this.props.updateStepOneData("datasetList1", datasetList1);
@@ -560,6 +572,441 @@ export default class StepOneImportMapPlanningUnits extends Component {
             });
         }
     }
+
+    /**
+     * Function to filter supply plan version based on product category
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
+    async dropdownFilter (instance, cell, c, r, source) {
+        var mylist = [];
+        var spProgramId = (this.state.supplyPlanVersionMapEl.getJson(null, false)[r])[c - 1];
+        console.log('dropdownFilter. sp Pgm: '+spProgramId);
+
+        //fetch version list here
+        if (spProgramId != 0) {
+
+            await DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, spProgramId)
+                .then(response => {
+                        let newSource = (response.data.filter(function (x, i, a) {
+                            return a.indexOf(x) === i;
+                        })).reverse();
+
+                        //build json for dropdown
+                        let filteredSpVersionList = [];
+
+                        for (var i = 0; i < newSource.length; i++) {
+                            let versionNameStr = ((newSource[i].versionStatus.id == 2 && newSource[i].versionType.id == 2) ? newSource[i].versionId + '*' : newSource[i].versionId) +' ('+ (moment(newSource[i].createdDate).format(`MMM DD YYYY`)) + ')';
+                            var paJson = {
+                                name: versionNameStr,
+                                id: parseInt(newSource[i].versionId),
+                            }
+                            filteredSpVersionList[i] = paJson
+                        }
+
+                        mylist = filteredSpVersionList;
+                        console.log('resp. filteredSpVersionList count: '+filteredSpVersionList.length);
+                        console.log('resp. filteredSpVersionList: '+JSON.stringify(filteredSpVersionList));                        
+
+                        // return filteredSpVersionList;
+                        // this.updateColumnSource(filteredSpVersionList);
+                }).catch(
+                    error => {
+                        this.setState({
+                            programs: [], loading: false
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                    );
+                console.log('if section',mylist);
+                return mylist;
+        } 
+        
+        console.log('end of dropdownFilter()');
+        // return mylist;
+    }
+
+    /**
+   * Function to build a jexcel table.
+   * Constructs and initializes a jexcel table using the provided data and options.
+   */
+    buildJexcel2() {
+        var papuList = this.state.selSource;
+        var data = [];
+        var papuDataArr = [];
+        var count = 0;
+
+        data[0] = '';
+        data[1] = '';
+        papuDataArr[0] = data;
+        /*if (papuList.length != 0) {
+            for (var j = 0; j < papuList.length; j++) {
+                data = [];
+                data[0] = papuList[j].equivalencyUnitMappingId
+                data[1] = papuList[j].equivalencyUnit.equivalencyUnitId
+                data[2] = papuList[j].equivalencyUnit.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
+                data[3] = papuList[j].tracerCategory.id
+                data[4] = papuList[j].forecastingUnit.id
+                data[5] = papuList[j].unit.id
+                data[6] = papuList[j].convertToEu
+                data[7] = papuList[j].notes
+                data[8] = (papuList[j].program == null ? -1 : papuList[j].program.id)
+                data[9] = papuList[j].active
+                data[10] = papuList[j].lastModifiedBy.username;
+                data[11] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+                data[12] = 0;
+                data[13] = papuList[j].forecastingUnit.id
+                data[14] = (papuList[j].program == null ? -1 : papuList[j].program.id)
+                data[15] = 0;
+                data[16] = count;
+                papuDataArr[count] = data;
+                count++;
+            }
+        }*/
+        // if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
+        //     jexcel.destroy(document.getElementById("spProgramVersionTable"), true);
+        // }
+        jexcel.destroy(document.getElementById("spProgramVersionTable"), true);
+        var data = papuDataArr;
+        var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [100, 100],
+            columns: [
+                {
+                    title: 'newRow',
+                    type: 'hidden',
+                },
+                {
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram'),
+                    type: 'autocomplete',
+                    source: this.state.filteredSupplyPlanProgramList,
+                    filter: this.supplyPlanProgramsForDropdown,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t("static.message.spacetext")
+                    }
+                },
+                {
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion'),
+                    type: 'autocomplete',
+                    source: [],
+                    filter: this.dropdownFilter,
+                    required: true,
+                    regex: {
+                        ex: /^\S+(?: \S+)*$/,
+                        text: i18n.t("static.message.spacetext")
+                    }
+                },
+                
+                // {
+                //     title: 'isChange',
+                //     type: 'hidden'
+                // },
+                // {
+                //     title: 'forecastingUnitId',
+                //     type: 'hidden'
+                // },
+                // {
+                //     title: 'typeId',
+                //     type: 'hidden'
+                // },
+                // {
+                //     title: 'addNewRow',
+                //     type: 'hidden'
+                // },
+                // {
+                //     title: 'countVar',
+                //     type: 'hidden'
+                // }
+            ],
+            // onchangepage: this.onchangepage,
+            pagination: false,
+            filters: false,
+            search: false,
+            columnSorting: true,
+            wordWrap: true,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            // onchange: this.handleChange.bind(this),
+            copyCompatibility: true,
+            allowManualInsertRow: false,
+            parseFormulas: true,
+            // oneditionend: this.oneditionend,
+            // onload: this.loaded,
+            editable: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                if (y == null) {
+                } else {
+                    if (obj.options.allowInsertRow == true) {
+                            items.push({
+                                title: i18n.t('static.common.addRow'),
+                                onclick: function () {
+                                    var data = [];
+                                    data[0] = 1;//for new row
+                                    data[1] = "";
+                                    data[2] = "";                                    
+                                    obj.insertRow(data, parseInt(y));
+                                }.bind(this)
+                            });
+                    }
+                    if (obj.options.allowDeleteRow == true) {
+                        if (obj.getRowData(y)[0] == 1) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                    // this.setState({ countVar: this.state.countVar - 1 })
+                                }
+                            });
+                        }
+                    }
+                }
+                return items;
+            }.bind(this)
+        };
+        var table1Instance = jexcel(document.getElementById("spProgramVersionTable"), options);
+        this.el2 = table1Instance;
+        this.setState({
+            supplyPlanVersionMapEl: table1Instance,
+            // loading: false,
+            // countVar: count
+        })
+    }
+
+    handleChange(instance, cell, x, y, value) {
+        console.log('handleChange(): ');
+        var elInstance = instance;
+        var rowData = elInstance.getRowData(y);
+        var spProgramId = rowData[1];
+        console.log('spProgramId before if: '+spProgramId);
+        if (x == 1) { // Check if the changed cell is in the first column
+
+            console.log('spProgramId: '+spProgramId);
+
+            //fetch version list here
+            if (spProgramId != 0) {
+                this.setState({
+                    // versions: [],
+                }, () => {
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, spProgramId)
+                        .then(response => {
+                            this.setState({
+                                // versions: []
+                            }, () => {
+                                let newSource = (response.data.filter(function (x, i, a) {
+                                    return a.indexOf(x) === i;
+                                })).reverse();
+
+                                //build json for dropdown
+                                let filteredSpVersionList = [];
+                                // <option key={i} value={item.versionId}>
+                                //     {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                                // </option>
+                                
+
+                                for (var i = 0; i < newSource.length; i++) {
+                                    let versionNameStr = ((newSource[i].versionStatus.id == 2 && newSource[i].versionType.id == 2) ? newSource[i].versionId + '*' : newSource[i].versionId) +' ('+ (moment(newSource[i].createdDate).format(`MMM DD YYYY`)) + ')';
+                                    var paJson = {
+                                        name: versionNameStr,
+                                        id: parseInt(newSource[i].versionId),
+                                    }
+                                    filteredSpVersionList[i] = paJson
+                                }
+
+                                this.updateColumnSource(filteredSpVersionList);
+                                // this.setState({
+                                //     versions: newSource
+                                // }, () => { });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                });
+            } else {
+                this.setState({
+                    // versions: [],
+                }, () => { })
+            }
+
+            // try {
+            //     const response = await fetch(`your-api-url?program=${value}`);
+            //     const newSource = await response.json();
+
+            //     this.updateColumnSource(newSource);
+            // } catch (error) {
+            //     console.error("Error fetching data:", error);
+            // }
+        }
+    }
+
+    updateColumnSource(newSource) {
+        const table1Instance = this.el2;
+        console.log('table1Instance: '+table1Instance);
+        
+
+        if (table1Instance) {
+            // Get the existing data
+            const existingData = table1Instance.getData();
+
+            // Destroy the existing instance
+            // jexcel.destroy(document.getElementById("spProgramVersionTable"), true);
+
+            // Rebuild the table with the new source for the third column
+            /*var options = {
+                data: existingData,
+                columnDrag: false,
+                colWidths: [100, 100],
+                columns: [
+                    {
+                        title: 'equivalancyUnitMappingId',
+                        type: 'hidden',
+                    },
+                    {
+                        title: i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram'),
+                        type: 'autocomplete',
+                        source: this.state.filteredSupplyPlanProgramList,
+                        filter: this.supplyPlanProgramsForDropdown,
+                        required: true,
+                        regex: {
+                            ex: /^\S+(?: \S+)*$/,
+                            text: i18n.t("static.message.spacetext")
+                        }
+                    },
+                    {
+                        title: i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion'),
+                        type: 'autocomplete',
+                        source: newSource, // Updated source
+                        filter: false,
+                        required: true,
+                        regex: {
+                            ex: /^\S+(?: \S+)*$/,
+                            text: i18n.t("static.message.spacetext")
+                        }
+                    },
+                ],
+                pagination: false,
+                filters: false,
+                search: false,
+                columnSorting: true,
+                wordWrap: true,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: 'top',
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: true,
+                copyCompatibility: true,
+                allowManualInsertRow: false,
+                parseFormulas: true,
+                editable: true,
+                license: JEXCEL_PRO_KEY,
+                onchange: this.handleChange.bind(this), // Bind the handleChange method
+            };
+            var newTable1Instance = jexcel(document.getElementById("spProgramVersionTable"), options);
+            this.el2 = newTable1Instance;*/
+            // this.setState({ table1Instance: newTable1Instance });
+        }
+    
+    }
+
+    /**
+     * Function to add a new row to the jexcel table.
+     */
+    addRow = function () {
+        var data = [];
+        data[0] = 0;
+        data[1] = "";
+        data[2] = "";
+        // data[3] = "";
+        // data[4] = true;
+        // data[5] = 0;
+        // data[6] = 1;
+        this.el2.insertRow(data);
+    };
+
     /**
      * Function to build a jexcel table.
      * Constructs and initializes a jexcel table using the provided data and options.
@@ -773,7 +1220,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             selSource1: []
         }, () => {
             this.filterVersion();
-            this.filterForcastUnit();
+            // this.filterForcastUnit();
             this.filterData();
         })
     }
@@ -850,13 +1297,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * Filters the dataset list based on the selected program ID and updates the state accordingly.
      */
     filterForcastUnit = () => {
-        let programId = this.state.programId;
+        /*let programId = this.state.programId;
         if (programId != 0) {
-            const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
-            this.state.getDatasetFilterList = this.state.datasetList
-            console.log('this.state.datasetList size: '+ this.state.datasetList.length);
-            console.log('this.state.datasetList Forecast pgm: '+ JSON.stringify(this.state.datasetList));
-            var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
+            // const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
+            // this.state.getDatasetFilterList = this.state.datasetList
+            // console.log('this.state.datasetList size: '+ this.state.datasetList.length);
+            // console.log('this.state.datasetList Forecast pgm: '+ JSON.stringify(this.state.datasetList));
+            // var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
+
+            var datasetlist = this.state.datasetList;
             this.setState({
                 data: [],
             }, () => {
@@ -870,7 +1319,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 getDatasetFilterList: [],
             }, () => { })
-        }
+        }*/
+
+        var datasetlist = this.state.datasetList;
+        console.log(' FP datasetlist: '+JSON.stringify(datasetlist));
+            this.setState({
+                data: [],
+            }, () => {
+                this.setState({
+                    getDatasetFilterList: (datasetlist.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })).reverse()
+                }, () => { });
+            });
     }
     /**
      * Sets the version id in the component state on change and builds data accordingly.
@@ -1013,6 +1474,52 @@ export default class StepOneImportMapPlanningUnits extends Component {
         } else {
         }
     }
+
+    filterSupplyPlanPrograms = function (event) {
+        var forecastProgramId = event.target.value;
+        console.log('filterSupplyPlanPrograms() called. forecastProgramId: '+forecastProgramId);
+
+        if (forecastProgramId != 0) {
+            // const countryId = this.state.programs.filter(c => c.id == programId)[0].realmCountry.id;
+            // this.state.getDatasetFilterList = this.state.datasetList
+            // console.log('this.state.datasetList size: '+ this.state.datasetList.length);
+            // console.log('this.state.datasetList Forecast pgm: '+ JSON.stringify(this.state.datasetList));
+            // var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.realmCountryId == countryId);
+
+            let filteredSupplyPlanProgramList = [];
+            const countryId = this.state.datasetList.filter(c => c.programId == forecastProgramId)[0].realmCountry.realmCountryId;
+            var supplyPlanProgramList = this.state.programs.filter(c => c.realmCountry.id == countryId);
+            console.log('supplyPlanProgramList count: '+supplyPlanProgramList.length);
+
+            for (var i = 0; i < supplyPlanProgramList.length; i++) {
+                var paJson = {
+                    name: supplyPlanProgramList[i].code,
+                    id: parseInt(supplyPlanProgramList[i].id),
+                }
+                filteredSupplyPlanProgramList[i] = paJson
+            }
+
+            this.setState({
+                filteredSupplyPlanProgramList : filteredSupplyPlanProgramList
+            },() => {
+                console.log('filteredSupplyPlanProgramList: '+JSON.stringify(this.state.filteredSupplyPlanProgramList));
+            });
+        }
+    }
+    /**
+     * Function to filter version status based on version type
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
+    supplyPlanProgramsForDropdown = function (instance, cell, c, r, source) {
+        // var rowData = (this.state.dataEL.getJson(null, false)[r]);
+        return  this.state.filteredSupplyPlanProgramList;
+    }.bind(this);
+
     /**
      * Renders the import from QAT supply plan step one screen.
      * @returns {JSX.Element} - Import from QAT supply plan step one screen.
@@ -1024,7 +1531,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         });
         const { rangeValue } = this.state
         const { programs } = this.state;
-        console.log('programs [0]: '+JSON.stringify(programs[0]));
+        // console.log('programs [0]: '+JSON.stringify(programs[0]));
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
@@ -1106,7 +1613,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         name="forecastProgramId"
                                         id="forecastProgramId"
                                         bsSize="sm"
-                                        onChange={(e) => { this.setForecastProgramId(e); }}
+                                        onChange={(e) => { this.setForecastProgramId(e); this.filterSupplyPlanPrograms(e);}}
                                         value={this.state.forecastProgramId}
                                     >
                                         <option value="0">{i18n.t('static.common.select')}</option>
@@ -1132,6 +1639,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>
                     </div>
                 </div>
+
+                <div className="consumptionDataEntryTable">
+                    <div className="" id="spProgramVersionTable" style={{ display: this.state.loading ? "none" : "block", width: '60%'  }}>
+                    </div>
+                    <FormGroup>
+                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                    </FormGroup>
+                </div>
+
                 <div className="consumptionDataEntryTable">
                     <div id="mapPlanningUnit" className='TableWidth100' style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
                     </div>
