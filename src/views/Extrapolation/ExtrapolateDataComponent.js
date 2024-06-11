@@ -344,6 +344,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         var flag = event.target.checked ? 1 : 0
         if (flag) {
             this.setState({
+                planningUnitList: this.state.versionId.toString().includes('Local') ? this.state.planningUnitList : [],
+                regionList: this.state.versionId.toString().includes('Local') ? this.state.regionList : [],
+                forecastProgramId: this.state.versionId.toString().includes('Local') ? this.state.forecastProgramId : "",
                 onlyDownloadedProgram: true,
                 loading: false
             }, () => {

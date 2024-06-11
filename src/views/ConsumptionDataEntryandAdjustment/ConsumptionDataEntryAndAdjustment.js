@@ -149,7 +149,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       monthArray:[],
       versionId: -1,
       versions: [],
-      isDisabled: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
+      isDisabled: false,
+      onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -1945,6 +1946,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var flag = event.target.checked ? 1 : 0
     if (flag) {
         this.setState({
+            datasetId: this.state.versionId.toString().includes('Local') ? this.state.datasetId : "",
+            showSmallTable: this.state.versionId.toString().includes('Local') ? true : false,
             onlyDownloadedProgram: true,
             loading: false
         }, () => {
