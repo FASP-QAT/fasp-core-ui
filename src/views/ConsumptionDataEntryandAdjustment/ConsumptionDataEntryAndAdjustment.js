@@ -1272,6 +1272,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Saves forecast consumption data in indexed db
    */
   saveConsumptionList() {
+    var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
     this.setState({
       loading: true
     })
@@ -1289,7 +1290,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         db1 = e.target.result;
         var transaction = db1.transaction(['datasetData'], 'readwrite');
         var datasetTransaction = transaction.objectStore('datasetData');
-        var datasetRequest = datasetTransaction.get(this.state.datasetId);
+        var datasetRequest = datasetTransaction.get(tempDatasetId);
         datasetRequest.onerror = function (event) {
         }.bind(this);
         datasetRequest.onsuccess = function (event) {
@@ -1391,7 +1392,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             db1 = e.target.result;
             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+            var datasetDetailsRequest = datasetDetailsTransaction.get(tempDatasetId);
             datasetDetailsRequest.onsuccess = function (e) {
               var datasetDetailsRequestJson = datasetDetailsRequest.result;
               datasetDetailsRequestJson.changed = 1;
