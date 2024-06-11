@@ -3302,5 +3302,6 @@
     "static.shipmentTooltip.total":"PU Cost + Freight Cost",
     "static.unit.conversionMethod": "Conversion Method",
     "static.alternateReportingUnit.multiply": "Multiply",
-    "static.alternateReportingUnit.divide": "Divide"
+    "static.alternateReportingUnit.divide": "Divide",
+    "static.shipmentTooltip.orderQtyPU":"Order Qty (ARU) * Conversion Factor"
 }
