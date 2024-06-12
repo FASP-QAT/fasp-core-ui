@@ -738,7 +738,8 @@ export default class BuildTree extends Component {
             dropdownSources: {},
             childrenOfList: [],
             childrenOf: [],
-            isLevelChanged: false
+            isLevelChanged: false,
+            copyModal: false,
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -11939,7 +11940,10 @@ export default class BuildTree extends Component {
                                     <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
-                                            this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                            this.setState({
+                                                copyModal: true
+                                            })
+                                            // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
                                         }}>
                                         <i class="fa fa-clone" aria-hidden="true"></i>
                                     </button>
@@ -13096,6 +13100,163 @@ export default class BuildTree extends Component {
                                     <strong>{i18n.t('static.tree.levelDetails')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelDropdown"
+                                            name="levelDropdown"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.levelDropdownChange(e) }}
+                                            value={this.state.levelNo}
+                                        >
+                                            {this.state.curTreeObj.levelList.length > 0
+                                                && this.state.curTreeObj.levelList.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.levelNo}>
+                                                            {item.label.label_en}
+                                                        </option>
+                                                    )
+                                                }, this)}
+                                        </Input>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text"
+                                            id="levelName"
+                                            name="levelName"
+                                            required
+                                            valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
+                                            invalid={touched.levelName && !!errors.levelName}
+                                            onBlur={handleBlur}
+                                            onChange={(e) => { this.levelNameChanged(e); handleChange(e); }}
+                                            value={this.state.levelName}
+                                        ></Input>
+                                        <FormFeedback>{errors.levelName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelUnit"
+                                            name="levelUnit"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.levelUnitChange(e) }}
+                                            value={this.state.levelUnit}
+                                        >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {this.state.nodeUnitList.length > 0
+                                                && this.state.nodeUnitList.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.unitId}>
+                                                            {getLabelText(item.label, this.state.lang)}
+                                                        </option>
+                                                    )
+                                                }, this)}
+                                        </Input>
+                                    </FormGroup>
+                                    <p>Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.</p>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                                        <MultiSelect
+                                            id="childrenOf"
+                                            name="childrenOf"
+                                            bsSize="sm"
+                                            options={this.state.childrenOfList}
+                                            onChange={(e) => { this.childrenOfChanged(e) }}
+                                            value={this.state.childrenOf}
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                    {this.state.showReorderJexcel &&
+                                        <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                            <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                            </div>
+                                        </div>
+                                    }
+                                    </FormGroup>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <div className="mr-0">
+                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                    </div>
+                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetLevelReorder()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </Form>
+                        )} />
+            </Modal>
+            <Modal isOpen={this.state.copyModal}
+                className={'modal-md'}>
+                <Formik
+                    enableReinitialize={true}
+                    initialValues={{
+                        levelName: this.state.levelName
+                    }}
+                    validationSchema={validationSchemaLevel}
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.levelDeatilsSaved()
+                    }}
+                    render={
+                        ({
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched,
+                            handleReset,
+                            setFieldValue,
+                            setFieldTouched
+                        }) => (
+                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
+                                <ModalHeader toggle={() => this.setState({copyModal: false})} className="modalHeader">
+                                    <strong>Move/Copy Node</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 1 ? 'block' : 'none' }}>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" onClick={this.toggleWillClientsShareOnePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                        <FormGroup check inline>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="sharePlanningUnitTrue"
+                                                name="sharePlanningUnit"
+                                                value={true}
+                                                checked={true}
+                                                onChange={(e) => {
+                                                    this.dataChange(e)
+                                                }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio1">
+                                                {i18n.t('static.realm.yes')}
+                                            </Label>
+                                        </FormGroup>
+                                        <FormGroup check inline>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="sharePlanningUnitFalse"
+                                                name="sharePlanningUnit"
+                                                value={false}
+                                                checked={false}
+                                                onChange={(e) => {
+                                                    this.dataChange(e)
+                                                }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2">
+                                                {i18n.t('static.program.no')}
+                                            </Label>
+                                        </FormGroup>
+                                        <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
+                                    </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
                                         <Input
