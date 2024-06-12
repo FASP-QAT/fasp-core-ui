@@ -2057,6 +2057,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (this.state.arimaId && inputDataArima.length > 0) {
                     calculateError(inputDataArima, "arimaError", this);
                 }
+                let startDate = moment(rangeValue2.from.year + '-' + rangeValue2.from.month + '-01').format("YYYY-MM");
+                let endDate = moment(rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate()).format("YYYY-MM");
+                const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+                let tempMonthsDiff = Math.round(monthsDiff) + 1;
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     extrapolationNotes: (extrapolationNotes == "" || extrapolationNotes == undefined || extrapolationNotes == null) ? "" : extrapolationNotes,
@@ -2073,21 +2077,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                     beta: beta,
                     gamma: gamma,
                     showData: true,
-                    movingAvgId: inputDataMovingAvg.length > 0 && this.state.monthsDiff >= 3 ? movingAvgId : false,
-                    semiAvgId: inputDataSemiAverage.length > 0 && this.state.monthsDiff >= 3 ? semiAvgId : false,
-                    linearRegressionId: inputDataLinearRegression.length > 0 && this.state.monthsDiff >= 3 ? linearRegressionId : false,
-                    smoothingId: inputDataTes.length > 0 && this.state.monthsDiff >= 24 ? smoothingId : false,
+                    movingAvgId: inputDataMovingAvg.length > 0 && tempMonthsDiff >= 3 ? movingAvgId : false,
+                    semiAvgId: inputDataSemiAverage.length > 0 && tempMonthsDiff >= 3 ? semiAvgId : false,
+                    linearRegressionId: inputDataLinearRegression.length > 0 && tempMonthsDiff >= 3 ? linearRegressionId : false,
+                    smoothingId: inputDataTes.length > 0 && tempMonthsDiff >= 24 ? smoothingId : false,
                     arimaId: inputDataArima.length > 0 ? arimaId : false,
                     movingAvgData: inputDataMovingAvg,
                     semiAvgData: inputDataSemiAverage,
                     linearRegressionData: inputDataLinearRegression,
                     tesData: inputDataTes,
                     arimaData: inputDataArima,
-                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
+                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
                     noDataMessage: "",
                     showDate: true,
                     minDate: minDate,
@@ -2110,6 +2114,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                     startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                     endDate1 = moment.max((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
+                    let startDate = moment(Number(moment(startDate1).startOf('month').format("YYYY")) + '-' + Number(moment(startDate1).startOf('month').format("M")) + '-01').format("YYYY-MM");
+                    let endDate = moment(Number(moment(endDate1).startOf('month').format("YYYY")) + '-' + Number(moment(endDate1).startOf('month').format("M")) + '-' + new Date(Number(moment(endDate1).startOf('month').format("YYYY")), Number(moment(endDate1).startOf('month').format("M")), 0).getDate()).format("YYYY-MM");
+                    const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+                    let tempMonthsDiff = Math.round(monthsDiff) + 1;
                     actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                     this.setState({
                         rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
@@ -2128,11 +2136,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                         linearRegressionData: [],
                         tesData: [],
                         arimaData: [],
-                        movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                        semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                        linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
-                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                        movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                        semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                        linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
+                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
                     }, () => {
                         this.getDateDifference()
                     })
