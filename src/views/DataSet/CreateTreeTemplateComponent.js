@@ -12445,7 +12445,7 @@ export default class CreateTreeTemplate extends Component {
                                     <strong>{i18n.t('static.tree.levelDetails')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
-                                    {/* <FormGroup>
+                                    <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
                                         <Input
                                             type="select"
@@ -12464,7 +12464,7 @@ export default class CreateTreeTemplate extends Component {
                                                     )
                                                 }, this)}
                                         </Input>
-                                    </FormGroup> */}
+                                    </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
                                         <Input type="text"
