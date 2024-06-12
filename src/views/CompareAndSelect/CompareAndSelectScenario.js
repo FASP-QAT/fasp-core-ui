@@ -99,7 +99,8 @@ class CompareAndSelectScenario extends Component {
             xAxisDisplayBy: 1,
             yearArray: [],
             consolidatedData: [],
-            collapsedExpandArr: []
+            collapsedExpandArr: [],
+            expandCompressBtn: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -491,6 +492,7 @@ class CompareAndSelectScenario extends Component {
             var actualTotalYear = [];
             if (this.state.xAxisDisplayBy != 1) {
                 collapsedExpandArray = collapsedExpandArr.filter(ar => ar.id == treeScenarioList[tsList].id);
+
                 collapsedExpandArray = collapsedExpandArray.length > 0 && collapsedExpandArray.map(item => ({ year: item.year, actual: item.actual }));
 
                 var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
@@ -610,7 +612,7 @@ class CompareAndSelectScenario extends Component {
             columns.push({ title: i18n.t('static.compareAndSelect.selectAsForecast'), type: 'radio', width: 80 });
             columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 80 });
             columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 100 });
-            columns.push({ title: i18n.t('static.consumption.forcast') + '<i class="fa fa-plus-square-o supplyPlanIcon"></i>', type: 'html', readOnly: true, width: 150, group: this.state.yearArray.length, state: false });
+            columns.push({ title: i18n.t('static.consumption.forcast'), type: 'html', readOnly: true, width: 150 });
             if (this.state.xAxisDisplayBy != 1) {
                 for (var i = 0; i < this.state.yearArray.length; i++) {
                     columns.push({ title: this.state.yearArray[i], type: 'numeric', readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
@@ -668,7 +670,8 @@ class CompareAndSelectScenario extends Component {
                 higherThenConsumptionThresholdPU: higherThenConsumptionThresholdPU,
                 finalData: finalData,
                 loading: false,
-                columns: columns
+                columns: columns,
+                languageEl: languageEl
             })
         })
     }
@@ -1262,6 +1265,22 @@ class CompareAndSelectScenario extends Component {
             window.onbeforeunload = undefined
         }
     }
+
+    expandCompressFuntion = () => {
+        var e = this.state.languageEl;
+        var count = 4
+        if (this.state.expandCompressBtn) {
+            for (var i = 0; i < this.state.yearArray.length; i++) {
+                e.hideColumn(count + i);
+            }
+        } else {
+            for (var i = 0; i < this.state.yearArray.length; i++) {
+                e.showColumn(count + i);
+            }
+        }
+        this.setState({ expandCompressBtn: !this.state.expandCompressBtn });
+    }
+
     /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
@@ -1351,7 +1370,7 @@ class CompareAndSelectScenario extends Component {
             loading: true
         })
         var elInstance = instance;
-        elInstance.setColumnGroup(0, this.state.yearArray.length)
+        // elInstance.setColumnGroup(0, this.state.yearArray.length)
 
         if (x == 1) {
             var treeScenarioList = this.state.treeScenarioList;
@@ -1851,7 +1870,8 @@ class CompareAndSelectScenario extends Component {
             singleValue2: val,
             loading: false
         }, () => {
-            this.buildJexcel()
+            this.buildJexcel();
+            this.expandCompressFuntion();
         })
     }
     /**
@@ -2044,21 +2064,21 @@ class CompareAndSelectScenario extends Component {
                 // console.log("this.state.collapsedExpandArr", this.state.collapsedExpandArr)
                 if (this.state.xAxisDisplayBy != 1) {
                     var collapsedExpandArray = this.state.collapsedExpandArr.filter(ar => ar.id == item.id);
-                    collapsedExpandArray = collapsedExpandArray.length > 0 && collapsedExpandArray.map(i => ({ year: i.year, actual: i.actual }));
+                    if (collapsedExpandArray.length > 0) {
+                        collapsedExpandArray = collapsedExpandArray.map(i => ({ year: i.year, actual: i.actual }));
+                        var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
+                            const { year, actual } = current;
+                            if (!acc[year]) {
+                                acc[year] = { year, totalActual: 0 };
+                            }
+                            acc[year].totalActual += actual;
+                            return acc;
+                        }, {});
 
-                    var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
-                        const { year, actual } = current;
-                        if (!acc[year]) {
-                            acc[year] = { year, totalActual: 0 };
-                        }
-                        acc[year].totalActual += actual;
-                        return acc;
-                    }, {});
-
-                    // Convert the result to an array
-                    collapsedExpandArray = Object.values(consolidatedData);
+                        // Convert the result to an array
+                        collapsedExpandArray = Object.values(consolidatedData);
+                    }
                 }
-                console.log("collapsedExpandArray", collapsedExpandArray)
                 datasetsArr.push(
                     {
                         label: item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang),
@@ -2360,6 +2380,11 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
+                                            {this.state.xAxisDisplayBy != 1 &&
+                                                <div onClick={this.expandCompressFuntion}>
+                                                    {this.state.expandCompressBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                </div>
+                                            }
                                             <div className="RemoveStriped removeOddColor">
                                                 <div id="table1" className="compareAndSelect TableWidth100"></div>
                                             </div>
@@ -2544,8 +2569,6 @@ class CompareAndSelectScenario extends Component {
                                                     <div className="col-md-12 pl-0 pr-0">
                                                         <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                         </div>
-                                                        <p><input type="button" value="setColumnGroup(0,3)" id="btn1" />
-                                                            <input type="button" value="resetColumnGroup(0)" id="btn2" /></p>
                                                     </div>
                                                 </div>
                                             </Col>
