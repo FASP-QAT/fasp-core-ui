@@ -28,7 +28,8 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     flatList: datasetJson.flatList
                 },
                 scenarioList: [{
-                    id: 0
+                    id: 0,
+                    active: "false"
                 }]
             }
         ]
@@ -387,9 +388,9 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                         if (payload.nodeType.id == 4) {
-                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         } else {
-                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                            noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                         }
                                     }
                                     if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
@@ -561,7 +562,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             }
                                         } else {
                                             var noOfFUPatient;
-                                                noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                            noOfFUPatient = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
                                             noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                                         }
                                         if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
@@ -574,7 +575,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                         }
                                         noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (parentNodeNodeData.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
                                     } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
-                                            noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")/parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
+                                        noFURequired = parentNodeNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeNodeData.fuNode.noOfPersons.toString().replaceAll(",", "");
                                     }
                                     var puMultiplier = 0;
                                     if (!isTemplate) {
@@ -586,8 +587,8 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                     } else {
                                         puMultiplier = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                     }
-                                    calculatedValue = (calculatedValue / (noFURequired/puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
-                                    calculatedMmdValue = (calculatedMmdValue / (noFURequired/puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
+                                    calculatedValue = (calculatedValue / (noFURequired / puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
+                                    calculatedMmdValue = (calculatedMmdValue / (noFURequired / puMultiplier)) * nodeDataMapForScenario.puNode.puPerVisit;
                                 }
                             }
                             nodeDataList.push({
