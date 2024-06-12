@@ -3176,16 +3176,22 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             if (map.get("27") != -1) {
-                shipmentListAfterUpdate[parseInt(map.get("27"))].budget.id = map.get("17");
+                var index="";
+                if(map.get("2")>0){
+                    index=shipmentListAfterUpdate.findIndex(c=>c.shipmentId==map.get("2"));
+                }else{
+                    index=shipmentListAfterUpdate.findIndex(c=>c.index==parseInt(map.get("27")));
+                }
+                shipmentListAfterUpdate[index].budget.id = map.get("17");
                 var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
-                shipmentListAfterUpdate[parseInt(map.get("27"))].currency = c;
-                shipmentListAfterUpdate[parseInt(map.get("27"))].shipmentStatus.id = map.get("4");
-                shipmentListAfterUpdate[parseInt(map.get("27"))].accountFlag = map.get("0");
-                shipmentListAfterUpdate[parseInt(map.get("27"))].active = map.get("33");
+                shipmentListAfterUpdate[index].currency = c;
+                shipmentListAfterUpdate[index].shipmentStatus.id = map.get("4");
+                shipmentListAfterUpdate[index].accountFlag = map.get("0");
+                shipmentListAfterUpdate[index].active = map.get("33");
                 var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 var freightCost = elInstance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
-                shipmentListAfterUpdate[parseInt(map.get("27"))].productCost = productCost.toString().replaceAll("\,", "");
-                shipmentListAfterUpdate[parseInt(map.get("27"))].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
+                shipmentListAfterUpdate[index].productCost = productCost.toString().replaceAll("\,", "");
+                shipmentListAfterUpdate[index].freightCost = Number(freightCost.toString().replaceAll("\,", "")).toFixed(2);
             } else {
                 var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0]);
                 var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
@@ -3247,8 +3253,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    console.log("elInstance.getValueFromCoords(38, y, true) Test@123",elInstance.getValueFromCoords(39, y, true));
-                    console.log("W Test@123",elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                     if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(39, y, true)!=elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
