@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
 import image3 from '../../../assets/img/PEPFAR-logo.png';
-import imageHelp from '../../../assets/img/help-icon.png';
+import imageHelp from '../../../assets/img/help-icon-login.png';
 import i18n from '../../../i18n';
 import axios from 'axios';
 import { getDatabase } from "../../../CommonComponent/IndexedDbFunctions";
@@ -293,17 +293,7 @@ class Login extends Component {
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">
             <Row className="justify-content-center">
-              <Col className="float-right pr-5">
-                <div className='row align-items-center pt-1 pr-3 float-right'>
-                  <div className='col-md-12 col-sm-12'>
-                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')}>
-                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} /> 
-                      {i18n.t('static.ticket.header')}
-                    </a>
-                  </div>
-                </div>
-              </Col>
-              <Col className="col-md-1 float-right pr-5">
+              <Col className="float-right pr-5" style={{ width: '100%' }}>
                 <div className="float-right">
                   <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggle(0); }}>
                     <DropdownToggle caret className="en-btnlogin">
@@ -528,7 +518,7 @@ class Login extends Component {
                 </CardGroup>
                 <div className='row align-items-center'>
                   <div className='col-md-6 col-sm-6'>
-                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')}>
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
                       <img src={imageHelp} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} /> 
                       {i18n.t('static.ticket.header')}
                     </a>
