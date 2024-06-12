@@ -3042,7 +3042,7 @@ class EditSupplyPlanStatus extends Component {
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
                                 <div className="row">
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-2">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
                                             <Picker
@@ -3057,7 +3057,7 @@ class EditSupplyPlanStatus extends Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-8">
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls">
                                             <InputGroup>
