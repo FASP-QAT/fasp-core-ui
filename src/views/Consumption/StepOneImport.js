@@ -586,7 +586,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     async versionChanged (instance, cell, c, r, source) {
         var mylist = [];
-        var spProgramId = (this.state.supplyPlanVersionMapEl.getJson(null, false)[r])[c];
+        var spProgramId = (this.state.supplyPlanVersionMapEl.getJson(null, false)[r])[c-1];
         console.log('dropdownFilter. sp Pgm: '+spProgramId);
 
         //fetch version list here
@@ -668,7 +668,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     dropdownFilter (instance, cell, c, r, source) {
-        return this.state.sourceList;    
+        this.versionChanged(instance, cell, c, r, source);
+        return this.state.sourceList;
     }
 
     /**
@@ -718,9 +719,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             columnDrag: false,
             colWidths: [100, 100],
             onchange: (instance, cell, x, y, value) => {
-                if (x == 1) { 
-                    this.versionChanged(instance, cell, x, y, value);
-                }
+                // if (x == 1) { 
+                //     this.versionChanged(instance, cell, x, y, value);
+                // }
             },
             columns: [
                 {
@@ -741,6 +742,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion'),
                     type: 'autocomplete',
+                    source: this.state.sourceList,
                     filter: this.dropdownFilter,
                     required: true,
                 },
