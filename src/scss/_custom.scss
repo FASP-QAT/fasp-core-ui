@@ -1068,7 +1068,7 @@ label.arrow_label:after {
   text-align: right !important;
 }
 
-// listBudgetAlignThtd 
+// listBudgetAlignThtd
 .listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1) {
   text-align: center !important;
 }
@@ -1262,7 +1262,7 @@ label.arrow_label:after {
   height: 30px;
 }
 
-// Multiselect z-index going behind table 
+// Multiselect z-index going behind table
 .go2139093995 * {
   z-index: 30;
 }
@@ -1292,11 +1292,11 @@ label.arrow_label:after {
   //   position: relative;
   //    width: 3px;
   //    height: 100%;
-  //    color: #BA0C2F; 
+  //    color: #BA0C2F;
   //    top: 0px;
   //    left: 2px;
   //    cursor: col-resize;
-  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important;
   //  font-size: 14px;
 
   font-family: 'FontAwesome';
@@ -1304,7 +1304,7 @@ label.arrow_label:after {
   position: relative;
   width: 3px;
   height: 100%;
-  //  color: #BA0C2F; 
+  //  color: #BA0C2F;
   top: 0px;
   left: 2px;
   cursor: pointer;
@@ -1332,7 +1332,7 @@ label.arrow_label:after {
 
 // #consumptionDetailsTable>.jexcel_content>.jexcel > tbody > tr > td:nth-child(4)  {text-align: right;}
 //   #hideMe {
-//     -webkit-animation: cssAnimation 8s forwards; 
+//     -webkit-animation: cssAnimation 8s forwards;
 //     animation: cssAnimation 8s forwards;
 //     // display: block;
 // }
@@ -2830,7 +2830,7 @@ input::placeholder {
   margin-top: -1%;
 }
 
-///////Report react mutiselect checkbox 
+///////Report react mutiselect checkbox
 .css-1r4vtzz {
   padding: 0px 8px 5px 10px !important;
   margin: -2px 0px 0px -8px !important;
@@ -3924,7 +3924,7 @@ h6 {
   top: 50%;
 
   /* number background */
-  // background: #a1a5a1; 
+  // background: #a1a5a1;
   background: #697069;
   height: 21px;
   width: 21px;
@@ -4404,7 +4404,7 @@ h6 {
   color: #20a8d8;
 }
 
-//supply plan graph align with table 
+//supply plan graph align with table
 .graphwidth {
   width: 100% !important;
   max-width: 100% !important;
@@ -4431,7 +4431,7 @@ h6 {
 
 //   }
 //  }
-//  @media (min-width:2733px) and (max-width:4102px) 
+//  @media (min-width:2733px) and (max-width:4102px)
 //   {
 //     .graphwidth{
 //       width: 3237px!important;
@@ -4629,7 +4629,7 @@ h6 {
 .quantimedProgressbartext3 {
   // left: 16%;
   // left: 64.5%;
-  // transform: translateX(18%) scale(1);  
+  // transform: translateX(18%) scale(1);
   left: 50%;
   transform: translateX(-50%) scale(1);
 }
@@ -9677,7 +9677,7 @@ legend.scheduler-border {
 }
 
 .month-picker:focus {
-  // outline: none; 
+  // outline: none;
   outline: 4px dashed darkorange;
   border-color: #4dbd74;
   // box-shadow: 0 0 0 0.2rem rgb(77 189 116 / 25%);
@@ -10352,9 +10352,14 @@ legend.scheduler-border {
   height: 30px;
 }
 
-.mdTemplate .mdPhotoFrame .mdPhoto {
-  width: 25px;
-  height: 30px;
+
+.month-picker:focus {
+  // outline: none;
+  outline: 4px dashed darkorange;
+  border-color: #4dbd74;
+  // box-shadow: 0 0 0 0.2rem rgb(77 189 116 / 25%);
+  // border-color: #4dbd74;
+
 }
 
 .mdTemplate .mdTitle {
@@ -10516,7 +10521,7 @@ label.arrow_label:before {
 //    text-align: left !important;
 // }
 // .UsageTemplateTable .jexcel > thead > tr > td:nth-child(20) {
-//   display: none !important; 
+//   display: none !important;
 //   text-align: left !important;
 // }
 
@@ -10795,11 +10800,11 @@ label.arrow_label:before {
   //   position: relative;
   //    width: 3px;
   //    height: 100%;
-  //    color: #BA0C2F; 
+  //    color: #BA0C2F;
   //    top: 0px;
   //    left: 2px;
   //    cursor: col-resize;
-  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important;
   //  font-size: 14px;
 
   font-family: 'FontAwesome';
@@ -10807,7 +10812,7 @@ label.arrow_label:before {
   position: relative;
   width: 3px;
   height: 100%;
-  //  color: #BA0C2F; 
+  //  color: #BA0C2F;
   top: 0px;
   left: 2px;
   cursor: pointer;
@@ -11019,8 +11024,8 @@ label.arrow_label:before {
   width: 120px;
   min-width: 120px;
   z-index: 2 !important;
-  background: #fff;
-  
+  background: #fff!important;
+
 }
 .leftAlignTable1 .jss > thead > tr > td:nth-child(4), .leftAlignTable1 .jss > thead > tr > td:nth-child(4) {
   position: sticky;
@@ -11037,7 +11042,7 @@ label.arrow_label:before {
   min-width: 120px;
   z-index: 3 !important;
   background: #fff;
-  
+
 }
 // .leftAlignTable .jss>thead>tr>td:nth-child(2) {
 //   width: 120px !important;
