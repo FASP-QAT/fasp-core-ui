@@ -100,7 +100,7 @@ class CompareAndSelectScenario extends Component {
             yearArray: [],
             consolidatedData: [],
             collapsedExpandArr: [],
-            expandCompressBtn: false
+            expandCompressBtn: true
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -1871,7 +1871,7 @@ class CompareAndSelectScenario extends Component {
             loading: false
         }, () => {
             this.buildJexcel();
-            this.expandCompressFuntion();
+            // this.expandCompressFuntion();
         })
     }
     /**
@@ -2290,7 +2290,7 @@ class CompareAndSelectScenario extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.xAxisDisplay')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.tree.displayDate')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2381,7 +2381,7 @@ class CompareAndSelectScenario extends Component {
                                                 <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
                                             {this.state.xAxisDisplayBy != 1 &&
-                                                <div onClick={this.expandCompressFuntion}>
+                                                <div onClick={this.expandCompressFuntion} style={{ paddingLeft: '400px' }}>
                                                     {this.state.expandCompressBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                 </div>
                                             }
