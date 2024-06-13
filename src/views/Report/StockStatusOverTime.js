@@ -839,9 +839,9 @@ class StockStatusOverTime extends Component {
                                                 "program": this.state.programs,
                                                 "planningUnit": pu,
                                                 "stock": 0,
-                                                "consumptionQty": 0,
-                                                "mosPast": 0,
-                                                "mosFuture": 0,
+                                                "consumptionQty": '',
+                                                "mosPast": monthsInPastForAmc,
+                                                "mosFuture": monthsInFutureForAmc,
                                                 "amc": null,
                                                 // "amcMonthCount": 0,
                                                 "mos": null
