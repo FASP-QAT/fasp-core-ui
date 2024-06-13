@@ -149,7 +149,7 @@ class CompareAndSelectScenario extends Component {
     }
     /**
      * Sets the month list based on the selected range value or forecast period.
-     * If the forecast period is shown, it uses the forecast start and stop dates. 
+     * If the forecast period is shown, it uses the forecast start and stop dates.
      * If not, it calculates the month list based on the selected range value.
      */
     setMonth1List() {
@@ -2386,7 +2386,7 @@ class CompareAndSelectScenario extends Component {
                                                 </div>
                                             }
                                             <div className="RemoveStriped removeOddColor">
-                                                <div id="table1" className="compareAndSelect TableWidth100"></div>
+                                                <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                             </div>
                                             <br></br>
                                             <FormGroup className="col-md-12">
