@@ -128,25 +128,27 @@ class CompareAndSelectScenario extends Component {
         })
     }
     /**
-     * Sets the state to show or hide the forecast period based on the checked status of the target element.
+     * Sets the state to show or hide the forecast period and show fits based on the checked status of the target element.
      * @param {Event} e - The change event.
      * @returns {void}
      */
-    setShowForecastPeriod(e) {
-        this.setState({
-            showForecastPeriod: e.target.checked
-        }, () => {
-            this.setMonth1List()
-        })
-    }
-    /**
-     * Handles data change in the form.
-     * @param {Event} event - The change event.
-     */
-    setShowFits(e) {
-        this.setState({
-            showFits: e.target.checked
-        })
+    setShowForecastPeriodOrFits(e) {
+        var checked = e.target.checked;
+        if (e.target.name == "showForecastPeriod") {
+            this.setState({
+                showForecastPeriod: checked,
+                showFits: checked ? false : this.state.showFits
+            }, () => {
+                this.setMonth1List()
+            })
+        } else if (e.target.name == "showFits") {
+            this.setState({
+                showFits: checked,
+                showForecastPeriod: checked ? false : this.state.showForecastPeriod
+            }, () => {
+                this.setMonth1List()
+            })
+        }
     }
     /**
      * Sets the month list based on the selected range value or forecast period.
@@ -2160,19 +2162,36 @@ class CompareAndSelectScenario extends Component {
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="showForecastPeriod"
-                                                            name="showForecastPeriod"
-                                                            checked={this.state.showForecastPeriod}
-                                                            onClick={(e) => { this.setShowForecastPeriod(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                        </Label>
+                                                        <div className="pt-lg-2 col-md-12">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="showForecastPeriod"
+                                                                name="showForecastPeriod"
+                                                                checked={this.state.showForecastPeriod}
+                                                                onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                            </Label>
+                                                        </div>
+                                                        <div className="pt-lg-2 col-md-12">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="showFits"
+                                                                name="showFits"
+                                                                checked={this.state.showFits}
+                                                                onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                {i18n.t('static.extrapolations.showFits')}
+                                                            </Label>
+                                                        </div>
                                                     </FormGroup>
                                                     {!this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -2191,21 +2210,7 @@ class CompareAndSelectScenario extends Component {
                                                     </FormGroup>}
                                                 </div>
                                                 <div className={"row check inline pt-lg-3 pl-lg-3"}>
-                                                    <div className="pt-lg-2 col-md-12">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="showFits"
-                                                            name="showFits"
-                                                            checked={this.state.showFits}
-                                                            onClick={(e) => { this.setShowFits(e); }}
-                                                        />
-                                                        <Label
-                                                            className="form-check-label"
-                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>{i18n.t('static.extrapolations.showFits')}</b>
-                                                        </Label>
-                                                    </div>
+
                                                     {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
