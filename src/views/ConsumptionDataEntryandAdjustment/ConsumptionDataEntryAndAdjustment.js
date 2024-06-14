@@ -150,7 +150,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       versionId: -1,
       versions: [],
       isDisabled: false,
-      onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
+      onlyDownloadedProgram: false
     }
     this.loaded = this.loaded.bind(this);
     this.loadedJexcel = this.loadedJexcel.bind(this);
@@ -1554,6 +1554,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Calls getDatasetList function on component mount
    */
   componentDidMount() {
+    let hasRole = false;
+    AuthenticationService.getLoggedInUserRole().map(c => {
+      if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+        hasRole = true;
+      }
+    });
+    this.setState({ onlyDownloadedProgram: !hasRole })
     hideSecondComponent();
     ForecastingUnitService.getForecastingUnitListAll().then(response => {
       if (response.status == 200) {

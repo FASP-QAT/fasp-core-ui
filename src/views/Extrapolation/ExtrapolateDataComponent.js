@@ -296,7 +296,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             offlineTES: false,
             offlineArima: false,
             isDisabled: false,
-            onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
+            onlyDownloadedProgram: false
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -330,7 +330,13 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
-        this.setState({ loading: true })
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
+        this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
         var db1;
         getDatabase();
         this.getPrograms();
