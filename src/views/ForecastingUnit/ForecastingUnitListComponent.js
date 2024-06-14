@@ -52,6 +52,13 @@ export default class ForecastingUnitListComponent extends Component {
         let forecastingUnitListArray = [];
         let count = 0;
         for (var j = 0; j < forecastingUnitList.length; j++) {
+            if(forecastingUnitList[j].forecastingUnitId == 222){
+
+                console.log('forecastingUnitList[j].forecastingUnitId: '+forecastingUnitList[j].forecastingUnitId);
+                console.log('countOfSpPrograms: '+forecastingUnitList[j].countOfSpPrograms);
+                console.log('countOfFcPrograms: '+forecastingUnitList[j].countOfFcPrograms);
+            }
+
             data = [];
             data[0] = forecastingUnitList[j].forecastingUnitId
             data[1] = getLabelText(forecastingUnitList[j].realm.label, this.state.lang)
@@ -60,9 +67,10 @@ export default class ForecastingUnitListComponent extends Component {
             data[4] = getLabelText(forecastingUnitList[j].unit.label, this.state.lang)
             data[5] = getLabelText(forecastingUnitList[j].genericLabel, this.state.lang)
             data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId
-            data[7] = forecastingUnitList[j].lastModifiedBy.username;
-            data[8] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[9] = forecastingUnitList[j].active;
+            data[7] = forecastingUnitList[j].countOfSpPrograms + forecastingUnitList[j].countOfFcPrograms;
+            data[8] = forecastingUnitList[j].lastModifiedBy.username;
+            data[9] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[10] = forecastingUnitList[j].active;
             forecastingUnitListArray[count] = data;
             count++;
         }
@@ -101,6 +109,10 @@ export default class ForecastingUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.forecastingunit.forecastingunit'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.program.noOfProgramsUsingFU'),
                     type: 'text',
                 },
                 {
@@ -175,6 +187,7 @@ export default class ForecastingUnitListComponent extends Component {
         }
         ForecastingUnitService.getForecastingUnitListByProductCategoryAndTracerCategory(json)
             .then(response => {
+                console.log('forecastingUnitList[0]: '+JSON.stringify(response.data.filter(c => c.countOfSpPrograms > 29)[1]));
                 if (response.status == 200) {
                     this.setState({
                         forecastingUnitList: response.data,

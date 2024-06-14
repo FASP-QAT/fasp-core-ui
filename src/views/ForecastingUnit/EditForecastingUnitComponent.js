@@ -91,6 +91,8 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 },
             },
+            spProgramList: [],
+            fcProgramList: [],
             lang: localStorage.getItem('lang'),
             loading: true,
             units: []
@@ -187,10 +189,15 @@ export default class EditForecastingUnitComponent extends Component {
                 }
             }
         );
-        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+        // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+        ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
+            console.log('FU object: '+JSON.stringify(response.data));
             if (response.status == 200) {
                 this.setState({
-                    forecastingUnit: response.data, loading: false
+                    forecastingUnit: response.data.forecastingUnit,
+                    spProgramList: response.data.spProgramList,
+                    fcProgramList: response.data.fcProgramList,
+                    loading: false
                 });
                 this.buildJExcel();
             }
@@ -248,28 +255,32 @@ export default class EditForecastingUnitComponent extends Component {
      * Constructs and initializes a jexcel table using the provided data and options.
      */
     buildJExcel() {
-        // let realmCountryList = this.state.selRealmCountry;
+        let spProgramList = this.state.spProgramList;
+        let fcProgramList = this.state.fcProgramList;
         let programArray = [];
         let count = 0;
-        // for (var j = 0; j < realmCountryList.length; j++) {
-        //     data = [];
-        //     data[0] = realmCountryList[j].realmCountryId
-        //     data[1] = getLabelText(realmCountryList[j].realm.label, this.state.lang)
-        //     data[2] = getLabelText(realmCountryList[j].country.label, this.state.lang)
-        //     data[3] = getLabelText(realmCountryList[j].defaultCurrency.label, this.state.lang)
-        //     data[4] = realmCountryList[j].lastModifiedBy.username;
-        //     data[5] = (realmCountryList[j].lastModifiedDate ? moment(realmCountryList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-        //     data[6] = realmCountryList[j].active;
-        //     realmCountryArray[count] = data;
-        //     count++;
-        // }
-
-        //temp data for table
-        data = [];
-        data[0] = 'Program1';
-        data[1] = 'Program Type data';
-        data[2] = 'Active';
-        programArray[0] = data;
+        //Add sp programs in programArray
+        console.log('spProgramList count: '+spProgramList.length);
+        for (var j = 0; j < spProgramList.length; j++) {
+            data = [];
+            data[0] = spProgramList[j].code;
+            data[1] = 'Supply Planning';
+            data[2] = spProgramList[j].label.active? i18n.t('static.common.active') : i18n.t('static.common.disabled');
+            
+            programArray[count] = data;
+            count++;
+        }
+        //Add fc programs in programArray
+        console.log('fcProgramList count: '+fcProgramList.length);
+        for (var j = 0; j < fcProgramList.length; j++) {
+            data = [];
+            data[0] = fcProgramList[j].code;
+            data[1] = 'Forecasting';
+            data[2] = fcProgramList[j].label.active? i18n.t('static.common.active') : i18n.t('static.common.disabled');
+            
+            programArray[count] = data;
+            count++;
+        }        
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
