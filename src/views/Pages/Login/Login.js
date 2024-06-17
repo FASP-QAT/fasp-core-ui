@@ -11,12 +11,13 @@ import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
 import image3 from '../../../assets/img/PEPFAR-logo.png';
+import imageHelp from '../../../assets/img/help-icon-login.png';
 import i18n from '../../../i18n';
 import axios from 'axios';
 import { getDatabase } from "../../../CommonComponent/IndexedDbFunctions";
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../../CommonComponent/getLabelText';
-import { API_URL, APP_VERSION_REACT, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, SECRET_KEY } from '../../../Constants.js';
+import { API_URL, APP_VERSION_REACT, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, SECRET_KEY, QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../../Constants.js';
 import MasterSyncService from '../../../api/MasterSyncService.js';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
@@ -515,7 +516,17 @@ class Login extends Component {
                     </CardBody>
                   </div>
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
+                <div className='row align-items-center'>
+                  <div className='col-md-6 col-sm-6'>
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} /> 
+                      {" "+i18n.t('static.ticket.header')}
+                    </a>
+                  </div>
+                  <div className='col-md-6 col-sm-12'>
+                    <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
+                  </div>
+                </div>
               </Col>
               <Col xs="12" className="Login-bttom ">
                 <CardBody>
