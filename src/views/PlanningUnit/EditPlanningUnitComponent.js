@@ -66,6 +66,7 @@ export default class EditPlanningUnitComponent extends Component {
             },
             spProgramList: [],
             fcProgramList: [],
+            sortedProgramList: [],
             loading: true
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -141,10 +142,39 @@ export default class EditPlanningUnitComponent extends Component {
                     PlanningUnitService.getPlanningUnitByIdWithPrograms(this.props.match.params.planningUnitId).then(response => {
                         console.log('PU object: '+JSON.stringify(response.data));
                         if (response.status == 200) {
+                            //combine program list
+                            var combinedProgramList = [];
+                            //add spProgramList
+                            response.data.spProgramList.map(item => {
+                                var json = {
+                                    "code": item.code,
+                                    "module": "Supply Planning"
+                                }
+                                combinedProgramList.push(json);
+                            });
+
+                            //add fcProgramList
+                            response.data.fcProgramList.map(item => {
+                                var json = {
+                                    "code": item.code,
+                                    "module": "Forecasting"
+                                }
+                                combinedProgramList.push(json);
+                            });
+
+                            //sort here
+                            combinedProgramList.sort((a, b) => {
+                                return a.code > b.code ? 1 : -1;
+                            });
+
+                            console.log('combinedProgramList size: '+combinedProgramList.length);
+                            console.log('combinedProgramList : '+JSON.stringify(combinedProgramList));
+
                             this.setState({
                                 planningUnit: response.data.planningUnit,
                                 spProgramList: response.data.spProgramList,
                                 fcProgramList: response.data.fcProgramList,
+                                sortedProgramList: combinedProgramList,
                                 loading: false
                             });
                             this.buildJExcel();
@@ -252,10 +282,21 @@ export default class EditPlanningUnitComponent extends Component {
     buildJExcel() {
         let spProgramList = this.state.spProgramList;
         let fcProgramList = this.state.fcProgramList;
+        let sortedProgramList = this.state.sortedProgramList;
         let programArray = [];
         let count = 0;
+
+        for (var j = 0; j < sortedProgramList.length; j++) {
+            data = [];
+            data[0] = sortedProgramList[j].code;
+            data[1] = sortedProgramList[j].module;
+            data[2] = '';            
+            programArray[count] = data;
+            count++;
+        }
+
         //Add sp programs in programArray
-        console.log('spProgramList count: '+spProgramList.length);
+        /*console.log('spProgramList count: '+spProgramList.length);
         for (var j = 0; j < spProgramList.length; j++) {
             data = [];
             data[0] = spProgramList[j].code;
@@ -275,14 +316,7 @@ export default class EditPlanningUnitComponent extends Component {
             
             programArray[count] = data;
             count++;
-        }
-
-        //temp data for table
-        // data = [];
-        // data[0] = 'Program1';
-        // data[1] = 'Program Type data';
-        // data[2] = 'Active';
-        // programArray[0] = data;
+        }*/
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);

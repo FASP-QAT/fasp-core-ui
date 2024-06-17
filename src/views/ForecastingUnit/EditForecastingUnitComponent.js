@@ -93,6 +93,7 @@ export default class EditForecastingUnitComponent extends Component {
             },
             spProgramList: [],
             fcProgramList: [],
+            sortedProgramList: [],
             lang: localStorage.getItem('lang'),
             loading: true,
             units: []
@@ -193,10 +194,35 @@ export default class EditForecastingUnitComponent extends Component {
         ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
             console.log('FU object: '+JSON.stringify(response.data));
             if (response.status == 200) {
+                //combine program list
+                var combinedProgramList = [];
+                //add spProgramList to main list
+                response.data.spProgramList.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Supply Planning"
+                    }
+                    combinedProgramList.push(json);
+                });
+
+                //add fcProgramList to main list
+                response.data.fcProgramList.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Forecasting"
+                    }
+                    combinedProgramList.push(json);
+                });
+
+                //sorted combinedProgram array
+                combinedProgramList.sort((a, b) => {
+                    return a.code > b.code ? 1 : -1;
+                });
                 this.setState({
                     forecastingUnit: response.data.forecastingUnit,
                     spProgramList: response.data.spProgramList,
                     fcProgramList: response.data.fcProgramList,
+                    sortedProgramList: combinedProgramList,
                     loading: false
                 });
                 this.buildJExcel();
@@ -255,12 +281,23 @@ export default class EditForecastingUnitComponent extends Component {
      * Constructs and initializes a jexcel table using the provided data and options.
      */
     buildJExcel() {
-        let spProgramList = this.state.spProgramList;
-        let fcProgramList = this.state.fcProgramList;
+        // let spProgramList = this.state.spProgramList;
+        // let fcProgramList = this.state.fcProgramList;
+        let sortedProgramList = this.state.sortedProgramList;
         let programArray = [];
         let count = 0;
+
+        for (var j = 0; j < sortedProgramList.length; j++) {
+            data = [];
+            data[0] = sortedProgramList[j].code;
+            data[1] = sortedProgramList[j].module;
+            data[2] = '';            
+            programArray[count] = data;
+            count++;
+        }
+
         //Add sp programs in programArray
-        console.log('spProgramList count: '+spProgramList.length);
+        /*console.log('spProgramList count: '+spProgramList.length);
         for (var j = 0; j < spProgramList.length; j++) {
             data = [];
             data[0] = spProgramList[j].code;
@@ -280,7 +317,7 @@ export default class EditForecastingUnitComponent extends Component {
             
             programArray[count] = data;
             count++;
-        }        
+        }*/        
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
