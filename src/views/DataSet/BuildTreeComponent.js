@@ -12142,7 +12142,7 @@ export default class BuildTree extends Component {
                                                                         <Label
                                                                             className="form-check-label"
                                                                             check htmlFor="inline-radio2">
-                                                                            {i18n.t('static.common.disabled')}
+                                                                            {i18n.t('static.dataentry.inactive')}
                                                                         </Label>
                                                                     </FormGroup>
                                                                 </FormGroup>
@@ -12536,7 +12536,7 @@ export default class BuildTree extends Component {
                                 <Label
                                     className="form-check-label"
                                     check htmlFor="inline-radio2">
-                                    {i18n.t('static.common.disabled')}
+                                    {i18n.t('static.dataentry.inactive')}
                                 </Label>
                             </FormGroup>
                         </FormGroup>
