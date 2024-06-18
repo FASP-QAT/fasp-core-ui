@@ -157,7 +157,7 @@ class SupplierListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],

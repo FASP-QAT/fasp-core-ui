@@ -2931,7 +2931,7 @@ export default class ListTreeComponent extends Component {
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 <option value="true" selected>{i18n.t('static.common.active')}</option>
-                                                <option value="false">{i18n.t('static.common.disabled')}</option>
+                                                <option value="false">{i18n.t('static.dataentry.inactive')}</option>
                                             </Input>
                                         </InputGroup>
                                     </div>
@@ -3169,7 +3169,7 @@ export default class ListTreeComponent extends Component {
                                                                     <Label
                                                                         className="form-check-label"
                                                                         check htmlFor="inline-radio2">
-                                                                        {i18n.t('static.common.disabled')}
+                                                                        {i18n.t('static.dataentry.inactive')}
                                                                     </Label>
                                                                 </FormGroup>
                                                             </FormGroup>
