@@ -2645,21 +2645,26 @@ export default class BuildTree extends Component {
      * @returns True if validation passes, false otherwise.
      */
     validation1 = function () {
-
+        var validationFail = 0;
         var nodeTypeId = document.getElementById("nodeTypeId").value;
         var nodeTitle = document.getElementById("nodeTitle").value;
         var nodeValue = document.getElementById("nodeValue").value;
         var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
         var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
         if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
-            return false;
-        } else if (nodeTitle == "" || testTitle == false) {
-            return false;
-        } else if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
-            return false;
-        } else {
-            return true;
+            validationFail = 1;
+            document.getElementById("nodeUnitId").className = "form-control is-invalid"
         }
+        if (nodeTitle == "" || testTitle == false) {
+            validationFail = 1;
+            document.getElementById("nodeTitle").className = "form-control is-invalid"
+        }
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
+            validationFail = 1;
+            document.getElementById("nodeValue").className = "form-control is-invalid"
+        }
+        return validationFail > 0 ? false : true;
+
     }
 
     /**
