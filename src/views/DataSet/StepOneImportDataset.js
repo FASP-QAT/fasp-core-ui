@@ -66,28 +66,19 @@ export default class StepOneImport extends Component {
                             }) => (
                                 <Form noValidate name='simpleForm'>
                                     <FormGroup id="fileImportDiv">
-                                        <Col md="3">
+                                        <Col md="6" className='ml-2'>
                                             <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
                                         </Col>
-                                        <Col xs="12" md="4" className="custom-file">
-                                            <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" />
+                                        <Col xs="12" md="7" className="custom-file ml-3">
+                                            <Input type="file" className="custom-file-input" id="file-input" name="file-input" accept=".zip" disabled={this.props.items.progressPer == 100} />
                                             <label className="custom-file-label" id="file-input" data-browse={i18n.t('static.uploadfile.Browse')}>{i18n.t('static.chooseFile.chooseFile')}</label>
                                         </Col>
                                     </FormGroup>
                                     <div style={{ display: this.props.loading ? "none" : "block" }}></div>
-                                    <div style={{ display: this.props.loading ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-                                                <div class="spinner-border blue ml-4" role="status">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='StepCardFooter'>
+                                    {this.props.items.progressPer == 0 && <div className='StepCardFooter'>
                                         <Button type="button" id="fileImportButton" size="md" color="info" className="float-right mr-1" onClick={() => this.props.importFile()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                    </div>
+                                    </div>}
                                 </Form>
                             )} />
             </>
