@@ -279,7 +279,11 @@ export default class ExportProgram extends Component {
                                                                                 }
                                                                                 if (i == myResult.length - 1) {
                                                                                     zip.generateAsync({
-                                                                                        type: "blob"
+                                                                                        type: "blob",
+                                                                                        compression: 'DEFLATE', // Specify the compression method
+                                                                                        compressionOptions: {
+                                                                                            level: 9, // Specify the compression level (0-9), where 9 is the best compression
+                                                                                        },
                                                                                     }).then(function (content) {
                                                                                         FileSaver.saveAs(content, "download.zip");
                                                                                         let id = AuthenticationService.displayDashboardBasedOnRole();
