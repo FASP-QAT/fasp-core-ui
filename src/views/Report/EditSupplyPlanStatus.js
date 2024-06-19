@@ -3813,7 +3813,7 @@ class EditSupplyPlanStatus extends Component {
             data[5] = ""
             data[6] = problemList[j].planningUnit.id
             data[7] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[8] = problemList[j].problemCategory.id
+            data[8] = problemList[j].problemType.id == 1 ? problemList[j].problemCategory.id : (problemList[j].realmProblem.criticality.id == 1 ? 4 : (problemList[j].realmProblem.criticality.id == 2 ? 5 : 6))
             data[9] = getProblemDesc(problemList[j], this.state.lang)
             data[10] = getSuggestion(problemList[j], this.state.lang)
             data[11] = problemList[j].problemStatus.id
