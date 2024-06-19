@@ -543,8 +543,9 @@ export default class UpdateDataSourceComponent extends Component {
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
-                                                    <FormGroup check inline>
+                                                    <FormGroup className='form-check form-check-inline' style={{paddingLeft:'13%'}}>
                                                         <Input
+                                                            
                                                             className="form-check-input"
                                                             type="radio"
                                                             id="active1"
@@ -580,6 +581,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>
                                                         <Input
+                                                            
                                                             className="form-check-input"
                                                             type="radio"
                                                             id="active1"

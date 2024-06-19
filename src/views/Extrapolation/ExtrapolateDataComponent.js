@@ -611,6 +611,11 @@ export default class ExtrapolateDataComponent extends React.Component {
         var linearRegressionDataFilter = [];
         var tesDataFilter = [];
         var arimaDataFilter = [];
+        var movingAvgDataFilter = [];
+        var semiAvgDataFilter = [];
+        var linearRegressionDataFilter = [];
+        var tesDataFilter = [];
+        var arimaDataFilter = [];
         for (var j = 0; j < monthArrayPart2.length; j++) {
             data = [];
             data[0] = monthArrayPart2[j];

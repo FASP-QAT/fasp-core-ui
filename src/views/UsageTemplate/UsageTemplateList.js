@@ -750,7 +750,7 @@ class usageTemplate extends Component {
                         autocomplete: true,
                         remoteSearch: true,
                         onbeforesearch: function(instance, request) {
-                            if(this.state.tracerCategoryLoading == false){
+                            if(this.state.tracerCategoryLoading == false  && instance.search.length > 2){
                                 request.method = 'GET';                                
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -827,7 +827,8 @@ class usageTemplate extends Component {
                     width: '130',
                     textEditor: true, 
                     required: true,
-                    number: true,
+                    // number: true,
+                    decimal: '.',
                     minValue: {
                         value: 0,
                         text: i18n.t('static.planningUnitSetting.negativeValueNotAllowed')
@@ -2493,7 +2494,8 @@ class usageTemplate extends Component {
                 if (value == 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.program.validvaluetext'));   
+                    this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                    valid = false;   
                 }
                 if (!this.el.getValueFromCoords(10, y)) {
                     var col = ("L").concat(parseInt(y) + 1);

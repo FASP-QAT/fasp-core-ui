@@ -666,7 +666,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    '$ ' + (parseFloat(this.state.totalProductCost + (this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             }
@@ -947,7 +947,11 @@ class ForecastSummary extends Component {
                                 totalProductCost: totalProductCost,
                                 regDatasetJson: filteredProgram,
                                 regPlanningUnitList: planningUnitList,
-                                regRegionList: filteredProgram.regionList,
+                                regRegionList: filteredProgram.regionList.sort(function (a, b) {
+                                    a = a.label.label_en.toLowerCase();
+                                    b = b.label.label_en.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 tracerCategoryList: [...new Set(planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id)))]
                             }, () => {
                                 if (displayId == 2) {

@@ -1,12 +1,30 @@
+import { Formik } from 'formik';
 import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
-import { Button, Col, Container, FormGroup, Input, InputGroup, InputGroupAddon, Row } from 'reactstrap';
+import { Button, Col, Form, FormFeedback, Container, FormGroup, Input, InputGroup, InputGroupAddon, Row } from 'reactstrap';
 import { API_URL } from '../../../Constants';
 import JiraTikcetService from '../../../api/JiraTikcetService';
 import i18n from '../../../i18n';
 import AuthenticationService from '../../Common/AuthenticationService';
 import ErrorMessageBg from '../../../../src/assets/img/E1.png';
 import ErrorMessageImg from '../../../../src/assets/img/errorImg.png';
+import * as Yup from 'yup';
+// Initial values for form fields
+let initialValues = {
+  userComments: ''
+}
+/**
+ * Defines the validation schema for error page.
+ * @param {*} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
+const validationSchema = function (values) {
+  return Yup.object().shape({
+    userComments: Yup.string()
+      .required(i18n.t('static.label.fieldRequired'))
+  })
+}
+
 /**
  * Component to display any unknown error
  */
@@ -113,6 +131,22 @@ class PageError extends Component {
     );
   }
   /**
+       * Handles data change in the error details form.
+       * @param {Event} event - The change event.
+       */
+  dataChange(event) {
+    let { bugReport } = this.state
+    if (event.target.name === "userComments") {
+      bugReport.userComments = event.target.value
+    }
+    this.setState({
+      bugReport
+    }, (
+    ) => {
+    })
+  }
+
+  /**
    * Renders the Error page.
    * @returns {JSX.Element} - Error page.
    */
@@ -134,12 +168,51 @@ class PageError extends Component {
                   <Button color="primary" onClick={() => this.props.history.push(`/ApplicationDashboard/` + AuthenticationService.displayDashboardBasedOnRole())}>{i18n.t('static.errorPage.returnToDashboard')}</Button>
                 </InputGroupAddon>
               </InputGroup>
-              <FormGroup className='mt-4'>
-                <InputGroup>
-                  <Input type="textarea" id="userComments" name="userComments" placeholder={i18n.t('static.errorPage.userCommentPlaceholder')} />
-                </InputGroup>
-              </FormGroup>
-              <Button color="primary" onClick={() => this.submitBug(this.props)} className='mt-2'>{i18n.t('static.errorPage.raiseATicket')}</Button>
+              <Formik
+                enableReinitialize={true}
+                initialValues={{
+                  userComments: ''
+                }}
+                validationSchema={validationSchema}
+                onSubmit={(values, { setSubmitting, setErrors }) => {
+                  this.submitBug(this.props);
+                }}
+                render={
+                  ({
+                    values,
+                    errors,
+                    touched,
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    isSubmitting,
+                    isValid,
+                    setTouched,
+                    handleReset,
+                    setFieldValue,
+                    setFieldTouched
+                  }) => (
+                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm' autocomplete="off">
+                      <FormGroup className='mt-4'>
+                        {/* <InputGroup> */}
+                        <Input
+                          type="textarea"
+                          id="userComments"
+                          name="userComments"
+                          valid={!errors.userComments && this.state.bugReport.userComments != ''}
+                          invalid={touched.userComments && !!errors.userComments}
+                          placeholder={i18n.t('static.errorPage.userCommentPlaceholder')}
+                          onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                          onBlur={handleBlur} />
+                        <FormFeedback className="red">{errors.userComments}</FormFeedback>
+                        {/* </InputGroup> */}
+                      </FormGroup>
+                      <Button type="submit" color="primary" className='mt-2'>{i18n.t('static.errorPage.raiseATicket')}</Button>
+                      {/* <Button type="submit" color="primary" onClick={() => this.submitBug(this.props)} className='mt-2'>{i18n.t('static.errorPage.raiseATicket')}</Button> */}
+                    </Form>
+                  )}
+              />
+
             </Col>
           </Row>
         </Container>

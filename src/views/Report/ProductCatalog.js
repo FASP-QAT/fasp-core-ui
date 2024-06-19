@@ -480,11 +480,11 @@ class ProductCatalog extends Component {
                 ProductService.getProductCategoryListByProgram(realmId, programId)
                     .then(response => {
                         var list = response.data;
-                        list.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
-                            var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
+                        // list.sort((a, b) => {
+                        //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase();
+                        //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase();
+                        //     return itemLabelA > itemLabelB ? 1 : -1;
+                        // });
                         this.setState({
                             productCategories: list
                         })

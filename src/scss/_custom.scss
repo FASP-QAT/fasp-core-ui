@@ -522,7 +522,7 @@ label.arrow_label:after {
 
 // radio button
 .form-check {
-  padding-left: 1.25rem !important;
+  padding-left: 1.25rem;
 }
 
 // table dropdown footer
@@ -2522,6 +2522,10 @@ input::placeholder {
   transform: translateX(-63%) scale(1);
 }
 
+.progressbartext4Import {
+  left: 48%;
+  transform: translateX(-38%) scale(1);
+}
 
 @media only screen and (max-width: 1024px) {
   // .progressbartext1 {
@@ -10317,7 +10321,7 @@ legend.scheduler-border {
 .FreezePlaningUnitColumn1 .jss>thead>tr>td:nth-child(2) {
   width: 200px !important;
   left: 0 !important;
-  z-index: 4 !important;
+  z-index: 3 !important;
   position: sticky !important;
   //text-align: left !important;
 }
@@ -10335,7 +10339,7 @@ legend.scheduler-border {
   width: 300px !important;
   left:149px!important;
   // left: 90px !important;
-  z-index: 4 !important;
+  z-index: 3 !important;
   position: sticky !important;
 
 }
@@ -10344,7 +10348,7 @@ legend.scheduler-border {
   width: 300px !important;
   // left: 90px !important;
   left:149px!important;
-  z-index: 3 !important;
+  z-index: 2 !important;
   position: sticky !important;
   background: #fff;
 }
@@ -10688,25 +10692,25 @@ legend.scheduler-border {
 }
 
 .typing-en::before {
-  content: "Start typing to search";
+  content: "Type at least 3 characters to search";
   color: #a9a9a9;
   font-style: italic;
 }
 
 .typing-fr::before {
-  content: "Commencez à taper pour rechercher";
+  content: "Tapez au moins 3 caractères pour rechercher";
   color: #a9a9a9;
   font-style: italic;
 }
 
 .typing-sp::before {
-  content: "Empieza a escribir para buscar";
+  content: "Escribe al menos 3 caracteres para buscar";
   color: #a9a9a9;
   font-style: italic;
 }
 
 .typing-pr::before {
-  content: "Comece a digitar para pesquisar";
+  content: "Digite pelo menos 3 caracteres para pesquisar";
   color: #a9a9a9;
   font-style: italic;
 }
@@ -10826,4 +10830,31 @@ legend.scheduler-border {
 }
 .jss_container {
   width: 100%;
+}
+.DataentryTable .jss > thead > tr > td:nth-child(2) {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 4 !important;
+  position: sticky !important;
+}
+.DataentryTable .jss > tbody > tr > td:nth-child(2) {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  // background: #fff;
+}
+.errorBorder > div > div > fieldset {
+  border-color: #BA0C2F;
+}
+.StepCardFooter {
+  margin-bottom: -1.25rem;
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+  padding: 10px 20px;
+  background-color: #f7f7f7;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
