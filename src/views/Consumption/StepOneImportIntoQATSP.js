@@ -1075,7 +1075,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(2, y);
             if (value != -1 && value != -2 && value != -3) {
-                valid = checkValidation(this.el);
+                var budgetRegx = /^\S+(?: \S+)*$/;
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
                 var reg = /^\d{1,6}(\.\d{1,6})?$/;
@@ -1167,6 +1183,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var rowData = this.el.getRowData(i);
                 if (rowData[2] == "") {
                     this.el.setValueFromCoords(2, parseInt(i), -1, true);
+                    this.el.setStyle("D"+parseInt(i), "background-color", "transparent");
+                    this.el.setComments("D"+parseInt(i), "");
                 }
             }
         } else {
