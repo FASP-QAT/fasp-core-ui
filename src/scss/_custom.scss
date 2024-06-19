@@ -10991,7 +10991,7 @@ label.arrow_label:before {
 }
 
 .jss>tbody>tr>td {
-  white-space: pre-wrap;
+  white-space: pre-wrap !important;
   text-align: center !important;
 }
 
@@ -12792,6 +12792,6 @@ label.arrow_label:before {
 }
 
 .compareAndSelectCollapsecol .jss>tbody>tr>td {
-  // white-space: unset!important;
+  white-space: pre !important;
   text-align: center !important;
 }
