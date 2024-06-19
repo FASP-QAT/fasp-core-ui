@@ -123,7 +123,7 @@ export default class ListTreeComponent extends Component {
             beforeEndDateDisplay: '',
             allProcurementAgentList: [],
             planningUnitObjList: [],
-            onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_FORECAST_VIEWER') ? false : true
+            onlyDownloadedProgram: false
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -2384,6 +2384,13 @@ export default class ListTreeComponent extends Component {
         clearTimeout(this.timeout);
     }
     componentDidMount() {
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
+        this.setState({ onlyDownloadedProgram: !hasRole })
         this.hideFirstComponent();
         this.getPrograms();
         this.getTreeTemplateList();
