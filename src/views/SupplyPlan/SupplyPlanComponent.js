@@ -39,7 +39,7 @@ import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonCompone
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NONE_SELECTED_DATA_SOURCE_ID, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
@@ -266,7 +266,7 @@ export default class SupplyPlanComponent extends React.Component {
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
         localStorage.setItem("sesStartDate", JSON.stringify(value));
-        this.formSubmit(this.state.planningUnit, monthDifference);
+        this.formSubmit(this.state.planningUnit, monthDifference,1);
     }
     /**
      * This function is used to hide the messages that are there in div1 after 30 seconds
@@ -2701,12 +2701,12 @@ export default class SupplyPlanComponent extends React.Component {
      * @param {*} value This is the value of the planning unit
      * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
      */
-    formSubmit(value, monthCount) {
+    formSubmit(value, monthCount,doNotShowLoader) {
         if (value != "" && value != undefined ? value.value : 0 != 0) {
             this.setState({
                 planningUnitChange: true,
                 display: 'block',
-                loading: true
+                loading: doNotShowLoader==1?false:true
             })
         } else {
             this.setState({
@@ -3641,7 +3641,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit, monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount,1)
     }
     /**
      * This function is called when scroll to right is clicked on the supply plan table
@@ -3651,7 +3651,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit, monthCount)
+        this.formSubmit(this.state.planningUnit, monthCount,1)
     }
     /**
      * This function is called when scroll to left is clicked on the consumption table
@@ -3944,7 +3944,7 @@ export default class SupplyPlanComponent extends React.Component {
                 id: ""
             },
             dataSource: {
-                id: NONE_SELECTED_DATA_SOURCE_ID
+                id: QAT_SUGGESTED_DATA_SOURCE_ID
             },
             currency: {
                 currencyId: USD_CURRENCY_ID,
