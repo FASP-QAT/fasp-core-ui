@@ -2534,7 +2534,7 @@ export default class ListTreeComponent extends Component {
             }
         });
         this.setState({ onlyDownloadedProgram: !hasRole })
-        this.hideFirstComponent();
+        hideFirstComponent();
         this.getPrograms();
         this.getTreeTemplateList();
         this.getForecastMethodList();
