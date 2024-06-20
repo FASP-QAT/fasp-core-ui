@@ -26,7 +26,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import pdfIcon from '../../assets/img/pdf.png';
 import CryptoJS from 'crypto-js'
-import {MultiSelect} from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import Draggable from 'react-draggable';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
@@ -734,7 +734,7 @@ export default class BuildTree extends Component {
             currentNodeTypeId: "",
             deleteChildNodes: false,
             branchTemplateNotes: "",
-            calculateAllScenario:false,
+            calculateAllScenario: false,
             levelReorderJexcelLoader: false,
             levelReorderEl: "",
             showReorderJexcel: false,
@@ -2153,7 +2153,7 @@ export default class BuildTree extends Component {
                 })
             }
         }
-        if(data == "" && cf == false) {
+        if (data == "" && cf == false) {
             this.setState({
                 levelModal: true
             })
@@ -2169,7 +2169,7 @@ export default class BuildTree extends Component {
                 setTimeout(() => {
                     this.getChildrenOfList();
                     this.buildLevelReorderJexcel();
-                }, 0)  
+                }, 0)
             })
         }
     }
@@ -2214,7 +2214,7 @@ export default class BuildTree extends Component {
         for (var j = 0; j < levelNodes.length; j++) {
             var data = {};
             newParent = levelNodes[j].parent;
-            if(oldParent != newParent){
+            if (oldParent != newParent) {
                 var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
                 oldParent = newParent;
                 data.label = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
@@ -2245,7 +2245,7 @@ export default class BuildTree extends Component {
      */
     buildLevelReorderJexcel() {
         var levelNodes = [];
-        if(this.state.childrenOf.length > 0){
+        if (this.state.childrenOf.length > 0) {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
@@ -2260,9 +2260,9 @@ export default class BuildTree extends Component {
         for (var j = 0; j < levelNodes.length; j++) {
             data = [];
             newParent = levelNodes[j].parent;
-            if(oldParent != newParent){
+            if (oldParent != newParent) {
                 dropdownSources[count] = [];
-                dropdownSources[count].push({id: 0, name: "Parent Node"});
+                dropdownSources[count].push({ id: 0, name: "Parent Node" });
                 var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
                 levelCount = 1;
                 oldParent = newParent;
@@ -2275,9 +2275,9 @@ export default class BuildTree extends Component {
                 j--;
             } else {
                 dropdownSources[count] = [];
-                dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
+                dropdownSources[count].push({ id: levelCount, name: levelCount.toString() });
                 data[0] = levelNodes[j].sortOrder;
-                data[1] = "Position "+levelCount.toString();
+                data[1] = "Position " + levelCount.toString();
                 data[2] = levelNodes[j].payload.label.label_en;
                 data[3] = levelNodes[j].id;
                 data[4] = newParent;
@@ -2401,8 +2401,8 @@ export default class BuildTree extends Component {
      */
     updateReorderTable(instance, cell, col, row) {
         var rowData = instance.getRowData(row);
-        var rowDataPrev = instance.getRowData(row-1);
-        var rowDataNext = instance.getRowData(row+1);
+        var rowDataPrev = instance.getRowData(row - 1);
+        var rowDataNext = instance.getRowData(row + 1);
         var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
         var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
         if (col === 5 && rowData[1] != 'Parent Node' && showUpArrow) {
@@ -2453,8 +2453,8 @@ export default class BuildTree extends Component {
         items[currNodeIndex] = temp;
         items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
         items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
-        this.setState({ 
-            isLevelChanged: true, 
+        this.setState({
+            isLevelChanged: true,
             items
         })
         this.buildLevelReorderJexcel();
@@ -2494,8 +2494,8 @@ export default class BuildTree extends Component {
             items.forEach(item => {
                 if (item.oldSortOrder.includes(val.oldSortOrder)) {
                     var itemSplit = item.sortOrder.split(val.oldSortOrder);
-                    if(itemSplit.length > 1)
-                        item.sortOrder = val.newSortOrder+itemSplit[1];
+                    if (itemSplit.length > 1)
+                        item.sortOrder = val.newSortOrder + itemSplit[1];
                     else
                         item.sortOrder = val.newSortOrder;
                 }
@@ -2589,16 +2589,16 @@ export default class BuildTree extends Component {
         } else if (parentScenario.fuNode.usageType.id == 1) {
             puPerVisit = parseFloat(this.state.noFURequired / conversionFactor).toFixed(8);
         }
-        var scenarioList=this.state.scenarioList;
-        for(var i=0;i<scenarioList.length;i++){
-            try{
-        currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.puPerVisit = puPerVisit;
-        if (!isRefillMonth) {
-            currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.refillMonths = refillMonths;
+        var scenarioList = this.state.scenarioList;
+        for (var i = 0; i < scenarioList.length; i++) {
+            try {
+                currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.puPerVisit = puPerVisit;
+                if (!isRefillMonth) {
+                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].puNode.refillMonths = refillMonths;
+                }
+                currentScenario = currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0];
+            } catch (error) { }
         }
-        currentScenario = currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0];
-    }catch(error){}
-    }
         this.setState({ currentItemConfig, currentScenario });
     }
     /**
@@ -2718,12 +2718,12 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         if (this.state.autoCalculate) {
-            var scenarioId=this.state.selectedScenario;
-            if(this.state.calculateAllScenario){
-                scenarioId=-1;
+            var scenarioId = this.state.selectedScenario;
+            if (this.state.calculateAllScenario) {
+                scenarioId = -1;
             }
             this.setState({
-                calculateAllScenario:false
+                calculateAllScenario: false
             })
             calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, this.state.autoCalculate);
         } else {
@@ -2854,10 +2854,10 @@ export default class BuildTree extends Component {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                if(findNodeIndex!=-1){
+                if (findNodeIndex != -1) {
                     var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
                     (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[scenarioId])[0].dataValue) / 100;
-                }else{
+                } else {
                     items.splice(i, 1);
                 }
             }
@@ -3999,6 +3999,22 @@ export default class BuildTree extends Component {
             var cell = instance.worksheets[0].getCell("D1");
             cell.classList.add('readonly');
         }
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.momper.tooltip1');
+        tr.children[4].classList.add('InfoTr');
+        tr.children[4].title = i18n.t('static.momper.tooltip2');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[5].title = i18n.t('static.momper.tooltip3');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = i18n.t('static.momper.tooltip4');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.momper.tooltip5');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.momper.tooltip6');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[9].title = i18n.t('static.momper.tooltip7');
     }
     /**
      * Builds jexcel table for modeling in number node or aggregation
@@ -4351,7 +4367,7 @@ export default class BuildTree extends Component {
             }, () => {
                 if (this.state.momEl != "") {
                     this.buildMomJexcel();
-                } else if(this.state.momElPer != "") {
+                } else if (this.state.momElPer != "") {
                     this.buildMomJexcelPercent();
                 }
             });
@@ -4416,7 +4432,7 @@ export default class BuildTree extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.validation1() || this.state.isValidError.toString() == "false") {
+                        if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                             if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -4655,7 +4671,7 @@ export default class BuildTree extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -4668,7 +4684,7 @@ export default class BuildTree extends Component {
         } else {
             if (this.state.currentModelingType == 2) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
                 }
                 var startDate = this.state.currentCalculatorStartDate;
@@ -4682,7 +4698,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -4693,7 +4709,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -4876,7 +4892,7 @@ export default class BuildTree extends Component {
         }
         if (this.state.currentModelingType == 4) {
             var momValue = (parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference)).toFixed(4);
-            percentForOneMonth = parseFloat(((Math.pow((1+(getValue/100)),(1/monthDifference)))-1)*100).toFixed(4);
+            percentForOneMonth = parseFloat(((Math.pow((1 + (getValue / 100)), (1 / monthDifference))) - 1) * 100).toFixed(4);
         }
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
@@ -4890,7 +4906,7 @@ export default class BuildTree extends Component {
             }
         }
         this.setState({
-            currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
+            currentEndValue: (getValue != '' && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: getValue != '' ? momValue : '',
             currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
             percentForOneMonth
@@ -5797,8 +5813,8 @@ export default class BuildTree extends Component {
             this.setState({
                 modelingTabChanged: true
             })
-        }       
-        
+        }
+
     }.bind(this);
     /**
      * This function is used to format the table like add asterisk or info to the table headers
@@ -6478,15 +6494,15 @@ export default class BuildTree extends Component {
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
             isChanged: true,
-            calculateAllScenario:true
+            calculateAllScenario: true
         }, () => {
             if (regionIds != null) {
-                var scenarioList=this.state.scenarioList;
-                for(var i=0;i<scenarioList.length;i++){
-                    try{
-                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = regionIds.value;
-                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
-                    }catch(error){}
+                var scenarioList = this.state.scenarioList;
+                for (var i = 0; i < scenarioList.length; i++) {
+                    try {
+                        currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = regionIds.value;
+                        currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
+                    } catch (error) { }
                 }
                 if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
                     currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
@@ -6497,12 +6513,12 @@ export default class BuildTree extends Component {
                     this.filterUsageTemplateList(0, regionIds.value);
                 });
             } else {
-                var scenarioList=this.state.scenarioList;
-                for(var i=0;i<scenarioList.length;i++){
-                    try{
-                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = "";
-                    currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = "";
-                    }catch(error){}
+                var scenarioList = this.state.scenarioList;
+                for (var i = 0; i < scenarioList.length; i++) {
+                    try {
+                        currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.id = "";
+                        currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id][0].fuNode.forecastingUnit.label.label_en = "";
+                    } catch (error) { }
                 }
                 this.setState({ showFUValidation: true, planningUnitList: [] }, () => {
                     this.filterUsageTemplateList(0, 0);
@@ -8478,29 +8494,29 @@ export default class BuildTree extends Component {
         }
         if (event.target.name === "planningUnitId") {
             this.setState({
-                calculateAllScenario:true
+                calculateAllScenario: true
             })
             if (event.target.value != "") {
                 var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
-                var scenarioList=this.state.scenarioList;
-                for(var i=0;i<scenarioList.length;i++){
-                    try{
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = pu.unit.id;
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = event.target.value;
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = pu.multiplier;
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 1;
-                    }catch(error){}
+                var scenarioList = this.state.scenarioList;
+                for (var i = 0; i < scenarioList.length; i++) {
+                    try {
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = pu.unit.id;
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = event.target.value;
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = pu.multiplier;
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 1;
+                    } catch (error) { }
                 }
                 currentItemConfig.context.payload.label = JSON.parse(JSON.stringify(pu.label));
             } else {
-                var scenarioList=this.state.scenarioList;
-                for(var i=0;i<scenarioList.length;i++){
-                    try{
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = '';
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = '';
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = '';
-                    (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 0;
-                    }catch(error){}
+                var scenarioList = this.state.scenarioList;
+                for (var i = 0; i < scenarioList.length; i++) {
+                    try {
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.unit.id = '';
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.id = '';
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].puNode.planningUnit.multiplier = '';
+                        (currentItemConfig.context.payload.nodeDataMap[scenarioList[i].id])[0].isPUMappingCorrect = 0;
+                    } catch (error) { }
                 }
                 var label = {
                     label_en: '',
@@ -13305,12 +13321,12 @@ export default class BuildTree extends Component {
                                         />
                                     </FormGroup>
                                     <FormGroup>
-                                    {this.state.showReorderJexcel &&
-                                        <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                            <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                        {this.state.showReorderJexcel &&
+                                            <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                <div id="levelReorderJexcel" style={{ display: "block" }}>
+                                                </div>
                                             </div>
-                                        </div>
-                                    }
+                                        }
                                     </FormGroup>
                                 </ModalBody>
                                 <ModalFooter>

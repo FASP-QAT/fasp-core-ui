@@ -2938,23 +2938,9 @@ export default class CreateTreeTemplate extends Component {
                 seasonality: e.target.checked == true ? true : false
             }, () => {
                 if (this.state.momEl != "") {
-                    if (checked) {
-                        this.state.momEl.showColumn(3);
-                        this.state.momEl.showColumn(4);
-                        this.state.momEl.showColumn(5);
-                    } else {
-                        this.state.momEl.hideColumn(3);
-                        this.state.momEl.hideColumn(4);
-                        this.state.momEl.hideColumn(5);
-                    }
-                } else if (this.state.momElPer != "") {
-                    if (checked) {
-                        this.state.momElPer.showColumn(4);
-                        this.state.momElPer.showColumn(5);
-                    } else {
-                        this.state.momElPer.hideColumn(4);
-                        this.state.momElPer.hideColumn(5);
-                    }
+                    this.buildMomJexcel();
+                } else if(this.state.momElPer != "") {
+                    this.buildMomJexcelPercent();
                 }
             });
         }
@@ -3798,7 +3784,7 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.setState({
-            currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
+            currentEndValue: (getValue != '' && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: getValue != '' ? momValue : '',
             currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
             percentForOneMonth
@@ -4684,6 +4670,22 @@ export default class CreateTreeTemplate extends Component {
             var cell = instance.worksheets[0].getCell("D1");
             cell.classList.add('readonly');
         }
+        var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = "2";
+        tr.children[4].classList.add('InfoTr');
+        tr.children[4].title = "3";
+        tr.children[5].classList.add('InfoTr');
+        tr.children[5].title = "4";
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = "5";
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = "6";
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = "7";
+        tr.children[9].classList.add('InfoTr');
+        tr.children[9].title = "8";
     }
     /**
      * Builds jexcel table for modeling in number node or aggregation
