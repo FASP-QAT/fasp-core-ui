@@ -1062,7 +1062,7 @@ label.arrow_label:after {
   text-align: right !important;
 }
 
-// listBudgetAlignThtd 
+// listBudgetAlignThtd
 .listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1) {
   text-align: center !important;
 }
@@ -1256,7 +1256,7 @@ label.arrow_label:after {
   height: 30px;
 }
 
-// Multiselect z-index going behind table 
+// Multiselect z-index going behind table
 .go2139093995 * {
   z-index: 30;
 }
@@ -1286,11 +1286,11 @@ label.arrow_label:after {
   //   position: relative;
   //    width: 3px;
   //    height: 100%;
-  //    color: #BA0C2F; 
+  //    color: #BA0C2F;
   //    top: 0px;
   //    left: 2px;
   //    cursor: col-resize;
-  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important;
   //  font-size: 14px;
 
   font-family: 'FontAwesome';
@@ -1298,7 +1298,7 @@ label.arrow_label:after {
   position: relative;
   width: 3px;
   height: 100%;
-  //  color: #BA0C2F; 
+  //  color: #BA0C2F;
   top: 0px;
   left: 2px;
   cursor: pointer;
@@ -1326,7 +1326,7 @@ label.arrow_label:after {
 
 // #consumptionDetailsTable>.jexcel_content>.jexcel > tbody > tr > td:nth-child(4)  {text-align: right;}
 //   #hideMe {
-//     -webkit-animation: cssAnimation 8s forwards; 
+//     -webkit-animation: cssAnimation 8s forwards;
 //     animation: cssAnimation 8s forwards;
 //     // display: block;
 // }
@@ -2824,7 +2824,7 @@ input::placeholder {
   margin-top: -1%;
 }
 
-///////Report react mutiselect checkbox 
+///////Report react mutiselect checkbox
 .css-1r4vtzz {
   padding: 0px 8px 5px 10px !important;
   margin: -2px 0px 0px -8px !important;
@@ -3918,7 +3918,7 @@ h6 {
   top: 50%;
 
   /* number background */
-  // background: #a1a5a1; 
+  // background: #a1a5a1;
   background: #697069;
   height: 21px;
   width: 21px;
@@ -4392,7 +4392,7 @@ h6 {
   color: #20a8d8;
 }
 
-//supply plan graph align with table 
+//supply plan graph align with table
 .graphwidth {
   width: 100% !important;
   max-width: 100% !important;
@@ -4419,7 +4419,7 @@ h6 {
 
 //   }
 //  }
-//  @media (min-width:2733px) and (max-width:4102px) 
+//  @media (min-width:2733px) and (max-width:4102px)
 //   {
 //     .graphwidth{
 //       width: 3237px!important;
@@ -4617,7 +4617,7 @@ h6 {
 .quantimedProgressbartext3 {
   // left: 16%;
   // left: 64.5%;
-  // transform: translateX(18%) scale(1);  
+  // transform: translateX(18%) scale(1);
   left: 50%;
   transform: translateX(-50%) scale(1);
 }
@@ -8488,6 +8488,7 @@ legend.scheduler-border {
   max-width: 150px;
   /* left: 200px;*/
 }
+
 .fourthcolum {
   // position: sticky;
   // left: 128px;
@@ -8880,7 +8881,7 @@ legend.scheduler-border {
 }
 
 .month-picker:focus {
-  // outline: none; 
+  // outline: none;
   outline: 4px dashed darkorange;
   border-color: #4dbd74;
   // box-shadow: 0 0 0 0.2rem rgb(77 189 116 / 25%);
@@ -9055,7 +9056,7 @@ legend.scheduler-border {
 //    text-align: left !important;
 // }
 // .UsageTemplateTable .jexcel > thead > tr > td:nth-child(20) {
-//   display: none !important; 
+//   display: none !important;
 //   text-align: left !important;
 // }
 
@@ -9320,11 +9321,11 @@ legend.scheduler-border {
   //   position: relative;
   //    width: 3px;
   //    height: 100%;
-  //    color: #BA0C2F; 
+  //    color: #BA0C2F;
   //    top: 0px;
   //    left: 2px;
   //    cursor: col-resize;
-  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+  //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important;
   //  font-size: 14px;
 
   font-family: 'FontAwesome';
@@ -9332,7 +9333,7 @@ legend.scheduler-border {
   position: relative;
   width: 3px;
   height: 100%;
-  //  color: #BA0C2F; 
+  //  color: #BA0C2F;
   top: 0px;
   left: 2px;
   cursor: pointer;
@@ -9529,25 +9530,28 @@ legend.scheduler-border {
   max-width: none !important;
 }
 
-.leftAlignTable1 .jss > thead > tr > td:nth-child(3), .leftAlignTable1 .jss > thead > tr > td:nth-child(3) {
+.leftAlignTable1 .jss>thead>tr>td:nth-child(3),
+.leftAlignTable1 .jss>thead>tr>td:nth-child(3) {
   position: sticky;
   left: 0;
   width: 120px;
   min-width: 120px;
-  cursor: unset!important;
+  cursor: unset !important;
   z-index: 4 !important;
 }
 
-.leftAlignTable1 .jss_overflow > tbody > tr > td:nth-child(3) {
+.leftAlignTable1 .jss_overflow>tbody>tr>td:nth-child(3) {
   position: sticky;
   left: 0;
   width: 120px;
   min-width: 120px;
   z-index: 2 !important;
   background: #fff;
-  
+
 }
-.leftAlignTable1 .jss > thead > tr > td:nth-child(4), .leftAlignTable1 .jss > thead > tr > td:nth-child(4) {
+
+.leftAlignTable1 .jss>thead>tr>td:nth-child(4),
+.leftAlignTable1 .jss>thead>tr>td:nth-child(4) {
   position: sticky;
   left: 110px;
   width: 120px;
@@ -9555,15 +9559,16 @@ legend.scheduler-border {
   z-index: 4 !important;
 }
 
-.leftAlignTable1 .jss_overflow > tbody > tr > td:nth-child(4) {
+.leftAlignTable1 .jss_overflow>tbody>tr>td:nth-child(4) {
   position: sticky;
   left: 110px;
   width: 120px;
   min-width: 120px;
   z-index: 3 !important;
   background: #fff;
-  
+
 }
+
 // .leftAlignTable .jss>thead>tr>td:nth-child(2) {
 //   width: 120px !important;
 //   left: 0 !important;
@@ -10095,6 +10100,7 @@ legend.scheduler-border {
   position: absolute;
   right: 0px;
 }
+
 .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageARU::after {
   content: "";
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAASCAMAAACQGyXoAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAASlQTFRF////npu0f4q0j6bM7M/AVz5yHQBtIQB3RGC/37WZLwttNlq/usyzSwNtNB6s+f3///z1Sh5tLjiddIOTNQptPFjN+/er0wAezEHSv4N4KgCKg9n//dqPzQBn4c3I3wAv1pbe7XtVziS2gDtsQ2nh+v/JYQ1sU5Lv+sGP1B85wwBKywA6yxw6wwBE0kGtYRlsIA12SHrhRXPh7KGQ1h45wgAiwQBE02Cg/PX7cSRsSXzm/LNrxQAzzm6t3zZA1Y2n1AAoxACSoF9wIgB3a7L97qDe/v/y1wAd0mnf8cDv8LeYKQBtP13N3u37/v/65OW8UgBtNQCs7pqs+u76n2h0d3+rJgCBcrT4j2h6IQBtJQCBaqfp8eflb2KJMzFyIw12MTqKW3zD/P7/NhSGVQAAAMBJREFUeJxjYKAuYGRixiXFwsoGBOwcWCU5udjYuHl42dj4+DElBQSBGoWERYCkKFxQTFwCwpBkgwMpaYiQjKycvIKiEoipDBRWYVBVA0mrQ2Q1NLW0dXT1QEx9oKiBIUTWCGqwsYmpmbkFiGUJElaByFpBJK1tbO3sHRxBTCeErLMLVK+rm7sHgyeI5eXNxubj6+cfwMYWiPBJUDCUEQL0UGgo0Eth4diCIyIS7J+oaKyBxRATGxefkJiEXZJqAAAsLBYrUJJjawAAAABJRU5ErkJggg==') !important;
@@ -10187,7 +10193,7 @@ legend.scheduler-border {
 
 .jss_filters_options {
   height: auto !important;
-  max-height: 206px!important;
+  max-height: 206px !important;
 }
 
 .borderedBoxforformulae {
@@ -10337,7 +10343,7 @@ legend.scheduler-border {
 
 .FreezePlaningUnitColumn1 .jss>thead>tr>td:nth-child(3) {
   width: 300px !important;
-  left:149px!important;
+  left: 149px !important;
   // left: 90px !important;
   z-index: 3 !important;
   position: sticky !important;
@@ -10347,7 +10353,7 @@ legend.scheduler-border {
 .FreezePlaningUnitColumn1 .jss_overflow>tbody>tr>td:nth-child(3) {
   width: 300px !important;
   // left: 90px !important;
-  left:149px!important;
+  left: 149px !important;
   z-index: 2 !important;
   position: sticky !important;
   background: #fff;
@@ -10759,6 +10765,7 @@ legend.scheduler-border {
 .forecastErrorFistColumnWidth {
   min-width: 165px !important;
 }
+
 .jss>tbody>tr>td.lowestError {
   color: #118b70 !important;
 }
@@ -10776,21 +10783,23 @@ legend.scheduler-border {
 }
 
 // .ForcastColumnFreeze .jss>thead .jss_nested td:nth-child(2) {
-  .ForcastColumnFreeze .jss > thead .jss_nested td:nth-child(2){
-    position: sticky;
+.ForcastColumnFreeze .jss>thead .jss_nested td:nth-child(2) {
+  position: sticky;
   left: 0;
   width: 150px;
   min-width: 150px;
-  z-index: 2!important;
-  }
-  .ForcastColumnFreeze .jss>thead>tr>td.jss_filters_icon:nth-child(4){
-    position: sticky;
+  z-index: 2 !important;
+}
+
+.ForcastColumnFreeze .jss>thead>tr>td.jss_filters_icon:nth-child(4) {
+  position: sticky;
   left: 0;
   width: 150px;
   min-width: 150px;
-  z-index: 2!important;
-  }
-  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
+  z-index: 2 !important;
+}
+
+.ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4) {
   position: sticky;
   left: 0;
   width: 150px;
@@ -10798,55 +10807,65 @@ legend.scheduler-border {
   // top:65px!important;
 }
 
-.ForcastColumnFreeze .jss > thead{
+.ForcastColumnFreeze .jss>thead {
   z-index: 999;
 }
-.BorderTopForcastOutput{
-  border-top: 1px solid #c8ced3!important;
+
+.BorderTopForcastOutput {
+  border-top: 1px solid #c8ced3 !important;
 }
-.jss_container{
-  width: 100%;
-}
-@media screen and (min-width: 1025px) {
-  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
-    position: sticky;
-    left: 0;
-    width: 150px;
-    min-width: 150px;
-    // top:83px!important;
-  }
-}
-@media screen and (min-width: 1441px) {
-  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4){
-    position: sticky;
-    left: 0;
-    width: 150px;
-    min-width: 150px;
-    // top:83px!important;
-  }
-}
-.jss > tbody > tr > td.readonly.compareAndSelectRed {
-  color: #BA0C2F !important;
-}
+
 .jss_container {
   width: 100%;
 }
-.DataentryTable .jss > thead > tr > td:nth-child(2) {
+
+@media screen and (min-width: 1025px) {
+  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4) {
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    // top:83px!important;
+  }
+}
+
+@media screen and (min-width: 1441px) {
+  .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4) {
+    position: sticky;
+    left: 0;
+    width: 150px;
+    min-width: 150px;
+    // top:83px!important;
+  }
+}
+
+.jss>tbody>tr>td.readonly.compareAndSelectRed {
+  color: #BA0C2F !important;
+}
+
+.jss_container {
+  width: 100%;
+}
+
+.DataentryTable .jss>thead>tr>td:nth-child(2) {
   width: 200px !important;
   left: 0 !important;
   z-index: 4 !important;
   position: sticky !important;
 }
-.DataentryTable .jss > tbody > tr > td:nth-child(2) {
+
+.DataentryTable .jss>tbody>tr>td:nth-child(2) {
   width: 200px !important;
   left: 0 !important;
   z-index: 2 !important;
   position: sticky !important;
   // background: #fff;
 }
-.errorBorder > div > div > fieldset {
+
+.errorBorder>div>div>fieldset {
   border-color: #BA0C2F;
 }
+
 .StepCardFooter {
   margin-bottom: -1.25rem;
   margin-left: -1.25rem;
@@ -10857,4 +10876,9 @@ legend.scheduler-border {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.compareAndSelectCollapsecol .jss>tbody>tr>td {
+  white-space: pre !important;
+  text-align: center !important;
 }
