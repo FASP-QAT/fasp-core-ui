@@ -3593,19 +3593,19 @@ export default class BuildTree extends Component {
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].classList.add('InfoTr');
-        tr.children[3].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[3].title = i18n.t('static.momper.tooltip1');
         tr.children[4].classList.add('InfoTr');
-        tr.children[4].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[4].title = i18n.t('static.momper.tooltip2');
         tr.children[5].classList.add('InfoTr');
-        tr.children[5].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[5].title = i18n.t('static.momper.tooltip3');
         tr.children[6].classList.add('InfoTr');
-        tr.children[6].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[6].title = i18n.t('static.momper.tooltip4');
         tr.children[7].classList.add('InfoTr');
-        tr.children[7].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[7].title = i18n.t('static.momper.tooltip5');
         tr.children[8].classList.add('InfoTr');
-        tr.children[8].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[8].title = i18n.t('static.momper.tooltip6');
         tr.children[9].classList.add('InfoTr');
-        tr.children[9].title = i18n.t('static.tooltip.SelectAsForecast');
+        tr.children[9].title = i18n.t('static.momper.tooltip7');
     }
     /**
      * Builds jexcel table for modeling in number node or aggregation
