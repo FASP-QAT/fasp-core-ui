@@ -131,8 +131,8 @@ export default class EditPlanningUnitComponent extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -140,24 +140,28 @@ export default class EditPlanningUnitComponent extends Component {
                     })
                     // PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
                     PlanningUnitService.getPlanningUnitByIdWithPrograms(this.props.match.params.planningUnitId).then(response => {
-                        console.log('PU object: '+JSON.stringify(response.data));
+                        console.log('PU object: ' + JSON.stringify(response.data));
                         if (response.status == 200) {
                             //combine program list
                             var combinedProgramList = [];
-                            //add spProgramList
+                            var finalProgramList = [];
+
+                            //add spProgramList to main list
                             response.data.spProgramList.map(item => {
                                 var json = {
                                     "code": item.code,
-                                    "module": "Supply Planning"
+                                    "module": "Supply Planning",
+                                    "status": item.label.active
                                 }
                                 combinedProgramList.push(json);
                             });
 
-                            //add fcProgramList
+                            //add fcProgramList to main list
                             response.data.fcProgramList.map(item => {
                                 var json = {
                                     "code": item.code,
-                                    "module": "Forecasting"
+                                    "module": "Forecasting",
+                                    "status": item.label.active
                                 }
                                 combinedProgramList.push(json);
                             });
@@ -167,14 +171,29 @@ export default class EditPlanningUnitComponent extends Component {
                                 return a.code > b.code ? 1 : -1;
                             });
 
-                            console.log('combinedProgramList size: '+combinedProgramList.length);
-                            console.log('combinedProgramList : '+JSON.stringify(combinedProgramList));
+                            var inActivePrograms = [];
+                            //separate active & inactive progrmas
+                            combinedProgramList.map(item => {
+                                if (item.status == 1) {
+                                    finalProgramList.push(item);
+                                } else {
+                                    inActivePrograms.push(item);
+                                }
+                            });
+
+                            //merged active & inactive programs
+                            inActivePrograms.map(item => {
+                                finalProgramList.push(item);//add inactive programs to the end
+                            });
+
+                            console.log('response.data.spProgramList size: '+response.data.spProgramList.length);
+                            console.log('response.data.fcProgramList size : '+response.data.fcProgramList.length);
 
                             this.setState({
                                 planningUnit: response.data.planningUnit,
                                 spProgramList: response.data.spProgramList,
                                 fcProgramList: response.data.fcProgramList,
-                                sortedProgramList: combinedProgramList,
+                                sortedProgramList: finalProgramList,
                                 loading: false
                             });
                             this.buildJExcel();
@@ -280,8 +299,6 @@ export default class EditPlanningUnitComponent extends Component {
      * Constructs and initializes a jexcel table using the provided data and options.
      */
     buildJExcel() {
-        let spProgramList = this.state.spProgramList;
-        let fcProgramList = this.state.fcProgramList;
         let sortedProgramList = this.state.sortedProgramList;
         let programArray = [];
         let count = 0;
@@ -290,33 +307,10 @@ export default class EditPlanningUnitComponent extends Component {
             data = [];
             data[0] = sortedProgramList[j].code;
             data[1] = sortedProgramList[j].module;
-            data[2] = '';            
+            data[2] = sortedProgramList[j].status ? i18n.t('static.common.active') : i18n.t('static.common.disabled');
             programArray[count] = data;
             count++;
         }
-
-        //Add sp programs in programArray
-        /*console.log('spProgramList count: '+spProgramList.length);
-        for (var j = 0; j < spProgramList.length; j++) {
-            data = [];
-            data[0] = spProgramList[j].code;
-            data[1] = 'Supply Planning';
-            data[2] = spProgramList[j].label.active? i18n.t('static.common.active') : i18n.t('static.common.disabled');
-            
-            programArray[count] = data;
-            count++;
-        }
-        //Add fc programs in programArray
-        console.log('fcProgramList count: '+fcProgramList.length);
-        for (var j = 0; j < fcProgramList.length; j++) {
-            data = [];
-            data[0] = fcProgramList[j].code;
-            data[1] = 'Forecasting';
-            data[2] = fcProgramList[j].label.active? i18n.t('static.common.active') : i18n.t('static.common.disabled');
-            
-            programArray[count] = data;
-            count++;
-        }*/
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -327,27 +321,19 @@ export default class EditPlanningUnitComponent extends Component {
             colWidths: [100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                // {
-                //     title: 'realmCountryId',
-                //     type: 'hidden',
-                // },
-                // {
-                //     title: i18n.t('static.realm.realm'),
-                //     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                // },
                 {
                     title: i18n.t('static.program.programMaster'),
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.module'), 
+                    title: i18n.t('static.module'),
                     type: 'text',
                 },
-                {   
+                {
                     title: i18n.t('static.program.puStatus'),
                     type: 'text',
-                }                
-                
+                }
+
             ],
             editable: false,
             onload: loadedForNonEditableTables,
@@ -363,7 +349,7 @@ export default class EditPlanningUnitComponent extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY            
+            license: JEXCEL_PRO_KEY
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -499,22 +485,22 @@ export default class EditPlanningUnitComponent extends Component {
                                                     <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                        <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={(touched.label && !!errors.label) || !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.planningUnit.label.label_en}
-                                                            required
-                                                        >
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
+                                                    <Label htmlFor="label">{i18n.t('static.product.productName')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="label"
+                                                        id="label"
+                                                        bsSize="sm"
+                                                        valid={!errors.label}
+                                                        invalid={(touched.label && !!errors.label) || !!errors.label}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.planningUnit.label.label_en}
+                                                        required
+                                                    >
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                </FormGroup>
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.planningUnit.planningUnitOfMeasure')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input

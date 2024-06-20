@@ -151,78 +151,104 @@ export default class EditForecastingUnitComponent extends Component {
                 units: listArray
             })
         })
-        .catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
         // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
         ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
-            console.log('FU object: '+JSON.stringify(response.data));
+            console.log('FU object: ' + JSON.stringify(response.data));
             if (response.status == 200) {
                 //combine program list
                 var combinedProgramList = [];
+                var finalProgramList = [];
                 //add spProgramList to main list
+
+                let cnt1 = 0;
                 response.data.spProgramList.map(item => {
                     var json = {
                         "code": item.code,
-                        "module": "Supply Planning"
+                        "module": "Supply Planning",
+                        // "status": cnt1 == 0? 0 : item.label.active
+                        "status": item.label.active
                     }
                     combinedProgramList.push(json);
+                    // cnt1++;
                 });
 
                 //add fcProgramList to main list
+                cnt1 = 0;
                 response.data.fcProgramList.map(item => {
                     var json = {
                         "code": item.code,
-                        "module": "Forecasting"
+                        "module": "Forecasting",
+                        // "status": cnt1 == 0? 0 : item.label.active
+                        "status": item.label.active
                     }
                     combinedProgramList.push(json);
+                    // cnt1++;
                 });
 
                 //sorted combinedProgram array
                 combinedProgramList.sort((a, b) => {
                     return a.code > b.code ? 1 : -1;
                 });
+
+                var inActivePrograms = [];
+                //separate active & inactive progrmas
+                combinedProgramList.map(item => {
+                    if (item.status == 1) {
+                        finalProgramList.push(item);
+                    } else {
+                        inActivePrograms.push(item);
+                    }
+                });
+
+                //merged active & inactive programs
+                inActivePrograms.map(item => {
+                    finalProgramList.push(item);//add inactive programs to the end
+                });
+
                 this.setState({
                     forecastingUnit: response.data.forecastingUnit,
                     spProgramList: response.data.spProgramList,
                     fcProgramList: response.data.fcProgramList,
-                    sortedProgramList: combinedProgramList,
+                    sortedProgramList: finalProgramList,
                     loading: false
                 });
                 this.buildJExcel();
@@ -281,8 +307,6 @@ export default class EditForecastingUnitComponent extends Component {
      * Constructs and initializes a jexcel table using the provided data and options.
      */
     buildJExcel() {
-        // let spProgramList = this.state.spProgramList;
-        // let fcProgramList = this.state.fcProgramList;
         let sortedProgramList = this.state.sortedProgramList;
         let programArray = [];
         let count = 0;
@@ -291,33 +315,10 @@ export default class EditForecastingUnitComponent extends Component {
             data = [];
             data[0] = sortedProgramList[j].code;
             data[1] = sortedProgramList[j].module;
-            data[2] = '';            
+            data[2] = sortedProgramList[j].status ? i18n.t('static.common.active') : i18n.t('static.common.disabled');
             programArray[count] = data;
             count++;
         }
-
-        //Add sp programs in programArray
-        /*console.log('spProgramList count: '+spProgramList.length);
-        for (var j = 0; j < spProgramList.length; j++) {
-            data = [];
-            data[0] = spProgramList[j].code;
-            data[1] = 'Supply Planning';
-            data[2] = spProgramList[j].label.active? i18n.t('static.common.active') : i18n.t('static.common.disabled');
-            
-            programArray[count] = data;
-            count++;
-        }
-        //Add fc programs in programArray
-        console.log('fcProgramList count: '+fcProgramList.length);
-        for (var j = 0; j < fcProgramList.length; j++) {
-            data = [];
-            data[0] = fcProgramList[j].code;
-            data[1] = 'Forecasting';
-            data[2] = fcProgramList[j].label.active? i18n.t('static.common.active') : i18n.t('static.common.disabled');
-            
-            programArray[count] = data;
-            count++;
-        }*/        
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -328,14 +329,6 @@ export default class EditForecastingUnitComponent extends Component {
             colWidths: [100, 100, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
-                // {
-                //     title: 'realmCountryId',
-                //     type: 'hidden',
-                // },
-                // {
-                //     title: i18n.t('static.realm.realm'),
-                //     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
-                // },
                 {
                     title: i18n.t('static.program.programMaster'),
                     type: 'text',
@@ -345,10 +338,10 @@ export default class EditForecastingUnitComponent extends Component {
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.program.fuStatus'),
+                    title: i18n.t('static.common.status'),
                     type: 'text',
-                }                
-                
+                }
+
             ],
             editable: false,
             onload: loadedForNonEditableTables,
@@ -364,7 +357,7 @@ export default class EditForecastingUnitComponent extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY            
+            license: JEXCEL_PRO_KEY
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
