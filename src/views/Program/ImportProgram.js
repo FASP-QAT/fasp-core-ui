@@ -85,7 +85,7 @@ export default class ImportProgram extends Component {
      * Handles the completion of step one and updates the display to show step two.
      */
     finishedStepOne() {
-        this.setState({ progressPer: 100, loading: true });
+        this.setState({ progressPer: 100, loading: true, programId: this.state.programList });
         document.getElementById('stepTwoImport').style.display = 'block';
         this.refs.stepTwoChild.filterData();
     }
