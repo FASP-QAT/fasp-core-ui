@@ -11804,6 +11804,14 @@ export default class CreateTreeTemplate extends Component {
                                             }
                                             flatList.push(json);
                                         }
+                                        var flatListUnsorted = flatList;
+                                        var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+                                        var sortedArray = sortOrderArray.sort();
+                                        flatList = [];
+                                        for (var i = 0; i < sortedArray.length; i++) {
+                                            flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
+                                        }
+                                        console.log("Hello1",JSON.stringify(flatList))
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
                                             notes: template.notes,
