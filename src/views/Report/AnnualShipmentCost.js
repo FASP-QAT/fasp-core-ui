@@ -815,9 +815,9 @@ class AnnualShipmentCost extends Component {
             year.push(from);
         }
         var data = this.state.outPutList;
-        csvRow.push(i18n.t('static.procurementagent.procurementagent').replaceAll(" ", "%20"));
-        csvRow.push(i18n.t('static.fundingsource.fundingsource').replaceAll(" ", "%20"));
         var tempB = [];
+        tempB.push(i18n.t('static.procurementagent.procurementagent').replaceAll(" ", "%20"));
+        tempB.push(i18n.t('static.fundingsource.fundingsource').replaceAll(" ", "%20"));
         tempB.push(i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20"));
         for (var i = 0; i < year.length; i++) {
             tempB.push(year[i].toString());
@@ -834,8 +834,8 @@ class AnnualShipmentCost extends Component {
             )
             var values = Object.entries(record).map(([key, value]) => (value)
             )
-            B.push([record.procurementAgent.replaceAll(",", " ").replaceAll(" ", "%20")]);
-            B.push([record.fundingsource.replaceAll(",", " ").replaceAll(" ", "%20")]);
+            tempB.push(record.procurementAgent.replaceAll(",", " ").replaceAll(" ", "%20"));
+            tempB.push(record.fundingsource.replaceAll(",", " ").replaceAll(" ", "%20"));
             tempB.push(record.planningUnit.replaceAll(",", " ").replaceAll(" ", "%20"));
             
             var total = 0
@@ -858,17 +858,21 @@ class AnnualShipmentCost extends Component {
             if (j < data.length - 1) {
                 if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
                     tempB.push("Total");
+                    tempB.push("");
+                    tempB.push("");
                     var Gtotal = 0
                     for (var l = 0; l < totalAmount.length; l++) {
                         Gtotal = Number(Gtotal) + Number(totalAmount[l])
                         tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
                         totalAmount[l] = 0;
                     }
+                    B.push(tempB);
                 } else {
                 }
-                B.push(tempB);
             } if (j == data.length - 1) {
                 tempB.push("Total");
+                tempB.push("");
+                tempB.push("");
                 var Gtotal = 0
                 for (var l = 0; l < totalAmount.length; l++) {
                     Gtotal = Number(Gtotal) + Number(totalAmount[l])
@@ -878,7 +882,9 @@ class AnnualShipmentCost extends Component {
             }
         }
         tempB = [];
-        tempB.push(i18n.t('static.common.grandTotal'));
+        tempB.push(i18n.t('static.common.grandTotal').replaceAll(",", "").replaceAll(" ", "%20"));
+        tempB.push("");
+        tempB.push("");
         var Gtotal = 0
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             Gtotal = Gtotal + GrandTotalAmount[l]
@@ -887,9 +893,6 @@ class AnnualShipmentCost extends Component {
         B.push(tempB);
 
         for (var i = 0; i < B.length; i++) {
-            if(B[i][0] == "Total") {
-                csvRow.push("");
-            }
             csvRow.push(B[i].join(","));
             if(B[i][0] == "Total" || B[i][0] == i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20")) {
                 csvRow.push("");
