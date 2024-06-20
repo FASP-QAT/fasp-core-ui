@@ -96,6 +96,9 @@ class CompareAndSelectScenario extends Component {
             actualConsumptionListForMonth: [],
             changed: false,
             dataChangedFlag: 0,
+            showFits: false,
+            minActualMonth: '',
+            maxActualMonth: '',
             xAxisDisplayBy: 1,
             yearArray: [],
             consolidatedData: [],
@@ -136,16 +139,27 @@ class CompareAndSelectScenario extends Component {
         })
     }
     /**
-     * Sets the state to show or hide the forecast period based on the checked status of the target element.
+     * Sets the state to show or hide the forecast period and show fits based on the checked status of the target element.
      * @param {Event} e - The change event.
      * @returns {void}
      */
-    setShowForecastPeriod(e) {
-        this.setState({
-            showForecastPeriod: e.target.checked
-        }, () => {
-            this.setMonth1List()
-        })
+    setShowForecastPeriodOrFits(e) {
+        var checked = e.target.checked;
+        if (e.target.name == "showForecastPeriod") {
+            this.setState({
+                showForecastPeriod: checked,
+                showFits: checked ? false : this.state.showFits
+            }, () => {
+                this.setMonth1List()
+            })
+        } else if (e.target.name == "showFits") {
+            this.setState({
+                showFits: checked,
+                showForecastPeriod: checked ? false : this.state.showForecastPeriod
+            }, () => {
+                this.setMonth1List()
+            })
+        }
     }
     /**
      * Sets the month list based on the selected range value or forecast period.
@@ -244,11 +258,15 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             var count = 0;
             var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            var minActualMonth = '';
+            var maxActualMonth = '';
             if (selectedPlanningUnit[0].consuptionForecast.toString() == "true") {
                 for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
+                    minActualMonth = consumptionExtrapolation[ce].jsonProperties.startDate;
+                    maxActualMonth = consumptionExtrapolation[ce].jsonProperties.stopDate;
                     treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
                     colourArrayCount += 1;
                 }
@@ -257,7 +275,7 @@ class CompareAndSelectScenario extends Component {
                 for (var tl = 0; tl < treeList.length; tl++) {
                     var tree = treeList[tl];
                     var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
-                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
+                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList.filter(c => c.active.toString() == "true") : [];
                     for (var sl = 0; sl < scenarioList.length; sl++) {
                         try {
                             var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
@@ -319,7 +337,9 @@ class CompareAndSelectScenario extends Component {
                 singleValue2: rangeValue,
                 minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
                 showAllData: true,
-                loading: false
+                loading: false,
+                minActualMonth: minActualMonth,
+                maxActualMonth: maxActualMonth
             }, () => {
                 this.setMonth1List();
                 if (this.state.viewById == 1) {
@@ -2098,7 +2118,7 @@ class CompareAndSelectScenario extends Component {
                         pointRadius: 3,
                         showInLegend: true,
                         data: this.state.xAxisDisplayBy == 1 ?
-                            this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null)) :
+                            this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))) :
                             collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(2) : null))
                     }
                 )
@@ -2523,35 +2543,57 @@ class CompareAndSelectScenario extends Component {
                                                     </FormGroup>
                                                     {this.state.xAxisDisplayBy == 1 &&
                                                         <FormGroup className="col-md-2">
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                id="showForecastPeriod"
-                                                                name="showForecastPeriod"
-                                                                checked={this.state.showForecastPeriod}
-                                                                onClick={(e) => { this.setShowForecastPeriod(e); }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                            </Label>
+                                                            <div className="pt-lg-2 col-md-12">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="showForecastPeriod"
+                                                                    name="showForecastPeriod"
+                                                                    checked={this.state.showForecastPeriod}
+                                                                    onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                </Label>
+                                                            </div>
+                                                            <div className="pt-lg-2 col-md-12">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="showFits"
+                                                                    name="showFits"
+                                                                    checked={this.state.showFits}
+                                                                    onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    {i18n.t('static.extrapolations.showFits')}
+                                                                </Label>
+                                                            </div>
                                                         </FormGroup>}
-                                                    {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
-                                                            <Picker
-                                                                ref="pickAMonth2"
-                                                                years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                value={this.state.singleValue2}
-                                                                key={JSON.stringify(this.state.singleValue2)}
-                                                                lang={pickerLang}
-                                                                onDismiss={this.handleAMonthDissmis2}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>}
+                                                    {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
+                                                        <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                            <div className="controls edit">
+                                                                <Picker
+                                                                    ref="pickAMonth2"
+                                                                    years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                    value={this.state.singleValue2}
+                                                                    key={JSON.stringify(this.state.singleValue2)}
+                                                                    lang={pickerLang}
+                                                                    onDismiss={this.handleAMonthDissmis2}
+                                                                >
+                                                                    <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                                </Picker>
+                                                            </div>
+                                                        </FormGroup>
+                                                    }
+                                                </div>
+                                                <div className={"row check inline pt-lg-3 pl-lg-3"}>
+
                                                     {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
