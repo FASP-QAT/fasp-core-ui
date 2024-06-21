@@ -192,7 +192,9 @@ export default class EditForecastingUnitComponent extends Component {
             );
         // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
         ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
-            console.log('FU object: ' + JSON.stringify(response.data));
+            // console.log('FU object: ' + JSON.stringify(response.data));
+            console.log('\nFU spProgramList: ' + JSON.stringify(response.data.spProgramList));
+            console.log('\nFU fcProgramList: ' + JSON.stringify(response.data.fcProgramList));
             if (response.status == 200) {
                 //combine program list
                 var combinedProgramList = [];
