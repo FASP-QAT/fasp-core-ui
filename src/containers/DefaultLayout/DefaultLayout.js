@@ -40,6 +40,9 @@ const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationTy
 const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
 const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard/ApplicationDashboard.js'));
 const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
+const AddFunderType = React.lazy(() => import('../../views/FunderType/AddFunderTypeComponent'));
+const ListFunderType = React.lazy(() => import('../../views/FunderType/ListFunderTypeComponent'));
+const EditFunderType = React.lazy(() => import('../../views/FunderType/EditFunderTypeComponent'));
 const AddFundingSource = React.lazy(() => import('../../views/FundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('../../views/FundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('../../views/FundingSource/EditFundingSourceComponent'));
@@ -266,6 +269,10 @@ const routes = [
   { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationType.organisationType', component: EditOrganisationType },
+  { path: '/funderType/addFunderType', name: 'static.breadcrum.add', entityname: 'static.funderTypeHead.funderType', component: AddFunderType },
+  { path: '/funderType/listFunderType', exact: true, name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
+  { path: '/funderType/listFunderType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
+  { path: '/funderType/editFunderType/:procurementAgentTypeId', name: 'static.breadcrum.edit', entityname: 'static.funderTypeHead.funderType', component: EditFunderType },
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
@@ -1141,6 +1148,19 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
+
+                          {
+                            name: i18n.t('static.funderTypeHead.funderType'),
+                            icon: 'fa fa-bank',
+                            url: '/funderType/listFunderType',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+
                           {
                             name: i18n.t('static.fundingSourceHead.fundingSource'),
                             icon: 'fa fa-bank',
