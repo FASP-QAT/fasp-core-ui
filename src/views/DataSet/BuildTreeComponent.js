@@ -2581,7 +2581,7 @@ export default class BuildTree extends Component {
     }
     copyMoveChange(event) {
         let val;
-        let copyModalTree;
+        let copyModalTree = this.state.treeId;
         let copyModalParentLevel;
         let copyModalParentNode;
         let copyModalTreeList = [];
@@ -2604,6 +2604,7 @@ export default class BuildTree extends Component {
         }
         this.setState({
             copyModalData: val,
+            copyModalTree: copyModalTree,
             copyModalTreeList: copyModalTreeList,
             copyModalParentLevelList: copyModalParentLevelList,
             copyModalParentLevel: copyModalParentLevel,
@@ -2611,11 +2612,36 @@ export default class BuildTree extends Component {
             copyModalParentNode: copyModalParentNode
         })
     }
-    copyModalTreeChange() {
+    copyModalTreeChange(event) {
+        let copyModalTree = event.target.value;
+        let copyModalParentLevel;
+        let copyModalParentNode;
+        let copyModalTreeList = [];
+        let copyModalParentLevelList = [];
+        let copyModalParentNodeList = [];
 
+        copyModalTreeList = this.state.treeData;
+        copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
+        if(this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
+            copyModalParentLevel = this.state.copyModalNode.level-1;
+            copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
+            copyModalParentNode = this.state.copyModalNode.parent;
+        } else if(this.state.copyModalData == 2 || copyModalTree != this.state.treeId) {
+            copyModalParentLevel = "";
+            copyModalParentNode = "";
+            copyModalParentNodeList = [];
+        }
+        this.setState({
+            copyModalTree: copyModalTree,
+            copyModalTreeList: copyModalTreeList,
+            copyModalParentLevelList: copyModalParentLevelList,
+            copyModalParentLevel: copyModalParentLevel,
+            copyModalParentNodeList: copyModalParentNodeList,
+            copyModalParentNode: copyModalParentNode
+        })
     }
     copyModalParentLevelChange(e) {
-        let copyModalParentNodeList = this.state.curTreeObj.tree.flatList.filter(m => m.level == e.target.value);
+        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value);
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
@@ -13333,6 +13359,7 @@ export default class BuildTree extends Component {
                                             onChange={(e) => { this.copyModalTreeChange(e) }}
                                             value={this.state.copyModalTree}
                                         >
+                                            <option value="">Select</option>
                                             {this.state.treeData.length > 0
                                                 && this.state.treeData.map((item, i) => {
                                                     return (
