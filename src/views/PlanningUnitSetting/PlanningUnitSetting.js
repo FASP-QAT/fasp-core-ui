@@ -99,7 +99,8 @@ export default class PlanningUnitSetting extends Component {
             tempSortOrder: '',
             sortOrderLoading: true,
             tempPlanningUnitList: [],
-            dropdownList: []
+            dropdownList: [],
+            active:-1
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -189,13 +190,20 @@ export default class PlanningUnitSetting extends Component {
         })
         var rowData = elInstance.getRowData(y);
         var reg = /^0[0-9].*$/;
-        if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
-        if (x == 8 && reg.test(value)) {
-            elInstance.setValueFromCoords(8, y, Number(rowData[8]), true);
+        if (x == 9 && reg.test(value)) {
+            elInstance.setValueFromCoords(9, y, Number(rowData[9]), true);
         }
-        elInstance.setValueFromCoords(10, y, 1, true);
+        elInstance.setValueFromCoords(11, y, 1, true);
+        if(x == 1){
+            PlanningUnitService.getPlanningUnitById(rowData[1]).then(response => {
+                if (response.status == 200) {
+                    elInstance.setValueFromCoords(2, y, response.data.multiplier, true);
+                }
+            })
+        }
     }
     /**
      * This function is called when user pastes some data into the sheet
@@ -206,26 +214,26 @@ export default class PlanningUnitSetting extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
                 if (index == 0 || index === "" || index == null || index == undefined) {
-                    (instance).setValueFromCoords(9, data[i].y, true, true);
-                    (instance).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance).setValueFromCoords(10, data[i].y, true, true);
                     (instance).setValueFromCoords(11, data[i].y, 1, true);
-                    (instance).setValueFromCoords(12, data[i].y, {}, true);
-                    (instance).setValueFromCoords(13, data[i].y, 0, true);
-                    (instance).setValueFromCoords(14, data[i].y, true, true);
-                    (instance).setValueFromCoords(16, data[i].y, true, true);
+                    (instance).setValueFromCoords(12, data[i].y, 1, true);
+                    (instance).setValueFromCoords(13, data[i].y, {}, true);
+                    (instance).setValueFromCoords(14, data[i].y, 0, true);
+                    (instance).setValueFromCoords(15, data[i].y, true, true);
+                    (instance).setValueFromCoords(17, data[i].y, true, true);
                     z = data[i].y;
                 }
             }
             if (data[i].x == 0) {
-                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
                 if(index==0){
                     (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
                 }
             }
             if (data[i].x == 1) {
-                var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
                 if(index==0){
                 let temp = data[i].value.split(" | ");
                 let temp_obj = {
@@ -257,7 +265,7 @@ export default class PlanningUnitSetting extends Component {
 
         changed(instance, cell, x, y, value)
         
-        if (x == 7) {
+        if (x == 8) {
             if (value != -1 && value !== null && value !== '') {
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
@@ -269,10 +277,10 @@ export default class PlanningUnitSetting extends Component {
                             if (response.data.length > 0) {
                                 let obj = response.data[0].procurementAgentPriceList.filter(c => c.id == value)[0];
                                 if (typeof obj != 'undefined') {
-                                    this.el.setValueFromCoords(8, y, obj.price, true);
+                                    this.el.setValueFromCoords(9, y, obj.price, true);
                                 } else {
                                     let q = '';
-                                    q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+                                    q = (this.el.getValueFromCoords(9, y) != '' ? this.el.setValueFromCoords(9, y, '', true) : '');
                                 }
                             }
                         }
@@ -316,7 +324,7 @@ export default class PlanningUnitSetting extends Component {
                         }
                     );
                 }else{
-                    this.el.setValueFromCoords(8, y, '', true);   
+                    this.el.setValueFromCoords(9, y, '', true);   
                 }
             } else {
             }
@@ -324,13 +332,13 @@ export default class PlanningUnitSetting extends Component {
         if (x == 0) {
             let q = '';
             q = (this.el.getValueFromCoords(1, y) != '' ? this.el.setValueFromCoords(1, y, '', true) : '');
-            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
             q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+            q = (this.el.getValueFromCoords(9, y) != '' ? this.el.setValueFromCoords(9, y, '', true) : '');
         }
         if (x == 1) {
             let q = '';
-            q = (this.el.getValueFromCoords(7, y) != '' ? this.el.setValueFromCoords(7, y, '', true) : '');
             q = (this.el.getValueFromCoords(8, y) != '' ? this.el.setValueFromCoords(8, y, '', true) : '');
+            q = (this.el.getValueFromCoords(9, y) != '' ? this.el.setValueFromCoords(9, y, '', true) : '');
             this.el.getCell(("B").concat(parseInt(y) + 1)).classList.remove('typing-' + this.state.lang);
         }
 
@@ -347,28 +355,28 @@ export default class PlanningUnitSetting extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                    // this.el.setValueFromCoords(10, y, 1, true);
+                    // this.el.setValueFromCoords(11, y, 1, true);
                     i = -1;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    // this.el.setValueFromCoords(10, y, 1, true);
+                    // this.el.setValueFromCoords(11, y, 1, true);
                 }
             }
         }
 
 
         //procurement Agent
-        if (x == 7) {
+        if (x == 8) {
         }
-        if (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "") > 0 && this.el.getValue(`H${parseInt(y) + 1}`, true) == "") {
-            this.el.setValueFromCoords(7, y, -1, true);
+        if (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "") > 0 && this.el.getValue(`I${parseInt(y) + 1}`, true) == "") {
+            this.el.setValueFromCoords(8, y, -1, true);
         }
 
         this.setState({
             isChanged1: true,
         });
-        if (x == 11) {
+        if (x == 12) {
             this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
             this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
             if (value == 1 || value == "") {
@@ -381,6 +389,20 @@ export default class PlanningUnitSetting extends Component {
                 cell.classList.add('readonly');
                 var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
                 cell.classList.add('readonly');
+            }
+        }
+        if(x==17){
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']
+            if(this.el.getValueFromCoords(17, y).toString()=="true"){
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                }
             }
         }
     }
@@ -674,8 +696,8 @@ export default class PlanningUnitSetting extends Component {
                     localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
                     this.setState({
                         rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
-                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("N")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("N")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
                         beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
                         forecastProgramId: parseInt(programId),
                         forecastProgramVersionId: parseInt(versionId),
@@ -774,6 +796,13 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }.bind(this)
     }
+    setStatus(event){
+        this.setState({
+            active:event.target.value
+        },()=>{
+            this.filterData();
+        })
+    }
     /**
      * Filters the Planning Unit list according to the programId & builds the jexcel.
      */
@@ -782,6 +811,13 @@ export default class PlanningUnitSetting extends Component {
         if (forecastProgramId > 0) {
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             let planningUnitList = selectedForecastProgram.planningUnitList;
+            if(this.state.active!=-1){
+                if(this.state.active==1){
+                    planningUnitList=planningUnitList.filter(c=>c.active.toString()=="true");
+                }else{
+                    planningUnitList=planningUnitList.filter(c=>c.active.toString()=="false");
+                }
+            }
             planningUnitList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
                 var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
@@ -849,23 +885,24 @@ export default class PlanningUnitSetting extends Component {
                 name: outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
             };
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
-            data[1] = outPutList[j].planningUnit.id
-            data[2] = outPutList[j].consuptionForecast
-            data[3] = outPutList[j].treeForecast;
-            data[4] = outPutList[j].stock;
-            data[5] = outPutList[j].existingShipments;
-            data[6] = outPutList[j].monthsOfStock;
-            data[7] = (outPutList[j].price === "" || outPutList[j].price == null || outPutList[j].price == undefined) ? "" : (outPutList[j].procurementAgent == null || outPutList[j].procurementAgent == undefined ? -1 : outPutList[j].procurementAgent.id);
-            data[8] = outPutList[j].price;
-            data[9] = outPutList[j].programPlanningUnitId;
-            data[10] = 0;
+            data[1] = outPutList[j].planningUnit.id;
+            data[2] = outPutList[j].planningUnit.multiplier;
+            data[3] = outPutList[j].consuptionForecast
+            data[4] = outPutList[j].treeForecast;
+            data[5] = outPutList[j].stock;
+            data[6] = outPutList[j].existingShipments;
+            data[7] = outPutList[j].monthsOfStock;
+            data[8] = (outPutList[j].price === "" || outPutList[j].price == null || outPutList[j].price == undefined) ? "" : (outPutList[j].procurementAgent == null || outPutList[j].procurementAgent == undefined ? -1 : outPutList[j].procurementAgent.id);
+            data[9] = outPutList[j].price;
+            data[10] = outPutList[j].programPlanningUnitId;
             data[11] = 0;
-            data[12] = outPutList[j].selectedForecastMap;
-            data[13] = indexVar;
-            data[14] = outPutList[j].treeForecast;
-            data[15] = outPutList[j].planningUnitNotes;
-            data[16] = outPutList[j].active;
+            data[12] = 0;
+            data[13] = outPutList[j].selectedForecastMap;
+            data[14] = indexVar;
+            data[15] = outPutList[j].treeForecast;
+            data[16] = outPutList[j].planningUnitNotes;
             data[17] = outPutList[j].active;
+            data[18] = outPutList[j].active;
             outPutListArray[count] = data;
             count++;
             indexVar = indexVar + 1;
@@ -874,22 +911,23 @@ export default class PlanningUnitSetting extends Component {
             data = [];
             data[0] = -1;
             data[1] = "";
-            data[2] = true;
+            data[2] = "";
             data[3] = true;
-            data[4] = "";
+            data[4] = true;
             data[5] = "";
             data[6] = "";
             data[7] = "";
             data[8] = "";
-            data[9] = 0;
-            data[10] = 1;
+            data[9] = "";
+            data[10] = 0;
             data[11] = 1;
-            data[12] = {};
-            data[13] = 0;
-            data[14] = true;
-            data[15] = "";
-            data[16] = true;
+            data[12] = 1;
+            data[13] = {};
+            data[14] = 0;
+            data[15] = true;
+            data[16] = "";
             data[17] = true;
+            data[18] = true;
             outPutListArray[0] = data;
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -938,6 +976,13 @@ export default class PlanningUnitSetting extends Component {
                     width: '150',
                     required: true
                     // readOnly: true //1B
+                },
+                {
+                    title: i18n.t('static.conversion.ConversionFactorFUPU'),
+                    type: 'numeric',
+                    readOnly:true,
+                    mask: '#,##0.00', 
+                    decimal: '.'
                 },
                 {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
@@ -1112,7 +1157,7 @@ export default class PlanningUnitSetting extends Component {
                         }
                     }
                     if (obj.options.allowDeleteRow == true) {
-                        if (obj.getRowData(y)[11] == 1) {
+                        if (obj.getRowData(y)[12] == 1) {
                             items.push({
                                 title: i18n.t("static.common.deleterow"),
                                 onclick: function () {
@@ -1188,7 +1233,7 @@ export default class PlanningUnitSetting extends Component {
         var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
-            var programPlanningUnitId = rowData[11];
+            var programPlanningUnitId = rowData[12];
             elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
             elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
             if (programPlanningUnitId == 1) {
@@ -1201,6 +1246,18 @@ export default class PlanningUnitSetting extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+            }
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']
+            if(elInstance.getValueFromCoords(17, j).toString()=="true"){
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                }
             }
         }
     }
@@ -1218,16 +1275,16 @@ export default class PlanningUnitSetting extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[5].classList.add('InfoTr');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
         tr.children[8].classList.add('InfoTr');
-        tr.children[5].title = i18n.t('static.tooltip.Stock');
-        tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
-        tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
-        tr.children[8].title = i18n.t('static.tooltip.PriceType');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[6].title = i18n.t('static.tooltip.Stock');
+        tr.children[7].title = i18n.t('static.tooltip.ExistingShipments');
+        tr.children[8].title = i18n.t('static.tooltip.DesiredMonthsofStock');
+        tr.children[9].title = i18n.t('static.tooltip.PriceType');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var jsonLength;
@@ -1242,7 +1299,7 @@ export default class PlanningUnitSetting extends Component {
         }
         for (var j = 0; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
-            var programPlanningUnitId = rowData[11];
+            var programPlanningUnitId = rowData[12];
             elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
             elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
             if (programPlanningUnitId == 1) {
@@ -1255,6 +1312,19 @@ export default class PlanningUnitSetting extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+            }
+
+            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']
+            if(elInstance.getValueFromCoords(17, j).toString()=="true"){
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.remove('shipmentEntryDoNotInclude');
+                }
+            }else{
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.add('shipmentEntryDoNotInclude');
+                }
             }
         }
     }
@@ -1292,14 +1362,14 @@ export default class PlanningUnitSetting extends Component {
                             var map1 = new Map(Object.entries(tableJson[i]));
                             let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
                             let procurementAgentObj = "";
-                            if (parseInt(map1.get("7")) === -1) {
+                            if (parseInt(map1.get("8")) === -1) {
                                 procurementAgentObj = null
                             } else {
-                                procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                                procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("8")))[0];
                             }
-                            if (parseInt(map1.get("11")) == 1) {
+                            if (parseInt(map1.get("12")) == 1) {
                                 let tempJson = {
-                                    "programPlanningUnitId": parseInt(map1.get("9")),
+                                    "programPlanningUnitId": parseInt(map1.get("10")),
                                     "planningUnit": {
                                         "id": parseInt(map1.get("1")),
                                         "label": planningUnitObj.label,
@@ -1315,33 +1385,33 @@ export default class PlanningUnitSetting extends Component {
                                         },
                                         "idString": "" + parseInt(map1.get("1"))
                                     },
-                                    "consuptionForecast": map1.get("2"),
-                                    "treeForecast": map1.get("3"),
-                                    "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                    "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                    "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "consuptionForecast": map1.get("3"),
+                                    "treeForecast": map1.get("4"),
+                                    "stock": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "existingShipments": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "monthsOfStock": this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                                     "procurementAgent": (procurementAgentObj == null ? null : {
-                                        "id": parseInt(map1.get("7")),
+                                        "id": parseInt(map1.get("8")),
                                         "label": procurementAgentObj.label,
                                         "code": procurementAgentObj.code,
-                                        "idString": "" + parseInt(map1.get("7"))
+                                        "idString": "" + parseInt(map1.get("8"))
                                     }),
-                                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "price": this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                                     "higherThenConsumptionThreshold": null,
                                     "lowerThenConsumptionThreshold": null,
-                                    "planningUnitNotes": map1.get("15"),
-                                    "consumptionDataType": 2,
+                                    "planningUnitNotes": map1.get("16"),
+                                    "consumptionDataType": 3,
                                     "otherUnit": null,
-                                    "selectedForecastMap": map1.get("12"),
+                                    "selectedForecastMap": map1.get("13"),
                                     "createdBy": null,
                                     "createdDate": null,
-                                    "active": map1.get("16"),
+                                    "active": map1.get("17"),
                                 }
                                 planningUnitList.push(tempJson);
                             } else {
                                 let planningUnitobj1 = originalPlanningUnitList[indexVar];
                                 let tempJson = {
-                                    "programPlanningUnitId": parseInt(map1.get("9")),
+                                    "programPlanningUnitId": parseInt(map1.get("10")),
                                     "planningUnit": {
                                         "id": parseInt(map1.get("1")),
                                         "label": planningUnitObj.label,
@@ -1357,35 +1427,35 @@ export default class PlanningUnitSetting extends Component {
                                         },
                                         "idString": "" + parseInt(map1.get("1"))
                                     },
-                                    "consuptionForecast": map1.get("2"),
-                                    "treeForecast": map1.get("3"),
-                                    "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                    "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                    "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "consuptionForecast": map1.get("3"),
+                                    "treeForecast": map1.get("4"),
+                                    "stock": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "existingShipments": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "monthsOfStock": this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                                     "procurementAgent": (procurementAgentObj == null ? null : {
-                                        "id": parseInt(map1.get("7")),
+                                        "id": parseInt(map1.get("8")),
                                         "label": procurementAgentObj.label,
                                         "code": procurementAgentObj.code,
-                                        "idString": "" + parseInt(map1.get("7"))
+                                        "idString": "" + parseInt(map1.get("8"))
                                     }),
-                                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "price": this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                                     "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
                                     "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
-                                    "planningUnitNotes": map1.get("15"),
+                                    "planningUnitNotes": map1.get("16"),
                                     "consumptionDataType": planningUnitobj1.consumptionDataType,
                                     "otherUnit": planningUnitobj1.otherUnit,
-                                    "selectedForecastMap": map1.get("12"),
+                                    "selectedForecastMap": map1.get("13"),
                                     "createdBy": planningUnitobj1.createdBy,
                                     "createdDate": planningUnitobj1.createdDate,
-                                    "active": map1.get("16"),
+                                    "active": map1.get("17"),
                                 }
                                 planningUnitList.push(tempJson);
                                 indexVar = indexVar + 1;
                             }
-                            if (map1.get("3") == false && map1.get("14") == true) {
+                            if (map1.get("4") == false && map1.get("15") == true) {
                                 listOfDisablePuNode.push(parseInt(map1.get("1")));
                             }
-                            if (map1.get("16") == false && map1.get("17") == true) {
+                            if (map1.get("17") == false && map1.get("18") == true) {
                                 listOfDisablePuNode.push(parseInt(map1.get("1")));
                             }
                         }
@@ -1490,14 +1560,14 @@ export default class PlanningUnitSetting extends Component {
                     var map1 = new Map(Object.entries(tableJson[i]));
                     let planningUnitObj = originalPlanningUnitList.filter(c => c.planningUnit.Id == parseInt(map1.get("1")))[0];
                     let procurementAgentObj = "";
-                    if (parseInt(map1.get("7")) === -1) {
+                    if (parseInt(map1.get("8")) === -1) {
                         procurementAgentObj = null
                     } else {
-                        procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                        procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("8")))[0];
                     }
-                    if (parseInt(map1.get("11")) == 1) {
+                    if (parseInt(map1.get("12")) == 1) {
                         let tempJson = {
-                            "programPlanningUnitId": parseInt(map1.get("9")),
+                            "programPlanningUnitId": parseInt(map1.get("10")),
                             "planningUnit": {
                                 "id": parseInt(map1.get("1")),
                                 "label": planningUnitObj.label,
@@ -1513,63 +1583,63 @@ export default class PlanningUnitSetting extends Component {
                                 },
                                 "idString": "" + parseInt(map1.get("1"))
                             },
-                            "consuptionForecast": map1.get("2"),
-                            "treeForecast": map1.get("3"),
-                            "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                            "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                            "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "consuptionForecast": map1.get("3"),
+                            "treeForecast": map1.get("4"),
+                            "stock": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "existingShipments": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "monthsOfStock": this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                             "procurementAgent": (procurementAgentObj == null ? null : {
-                                "id": parseInt(map1.get("7")),
+                                "id": parseInt(map1.get("8")),
                                 "label": procurementAgentObj.label,
                                 "code": procurementAgentObj.code,
-                                "idString": "" + parseInt(map1.get("7"))
+                                "idString": "" + parseInt(map1.get("8"))
                             }),
-                            "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "price": this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                             "higherThenConsumptionThreshold": null,
                             "lowerThenConsumptionThreshold": null,
-                            "planningUnitNotes": map1.get("15"),
-                            "consumptionDataType": 2,
+                            "planningUnitNotes": map1.get("16"),
+                            "consumptionDataType": 3,
                             "otherUnit": null,
-                            "selectedForecastMap": map1.get("12"),
+                            "selectedForecastMap": map1.get("13"),
                             "createdBy": null,
                             "createdDate": null,
-                            "active": map1.get("16"),
+                            "active": map1.get("17"),
                         }
                         planningUnitList.push(tempJson);
                     } else {
                         let planningUnitobj1 = originalPlanningUnitList[indexVar];
                         let tempJson = {
-                            "programPlanningUnitId": parseInt(map1.get("9")),
+                            "programPlanningUnitId": parseInt(map1.get("10")),
                             "planningUnit": planningUnitobj1.planningUnit,
-                            "consuptionForecast": map1.get("2"),
-                            "treeForecast": map1.get("3"),
-                            "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                            "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                            "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "consuptionForecast": map1.get("3"),
+                            "treeForecast": map1.get("4"),
+                            "stock": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "existingShipments": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "monthsOfStock": this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                             "procurementAgent": (procurementAgentObj == null ? null : {
-                                "id": parseInt(map1.get("7")),
+                                "id": parseInt(map1.get("8")),
                                 "label": procurementAgentObj.label,
                                 "code": procurementAgentObj.code,
-                                "idString": "" + parseInt(map1.get("7"))
+                                "idString": "" + parseInt(map1.get("8"))
                             }),
-                            "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                            "price": this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                             "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
                             "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
-                            "planningUnitNotes": map1.get("15"),
+                            "planningUnitNotes": map1.get("16"),
                             "consumptionDataType": planningUnitobj1.consumptionDataType,
                             "otherUnit": planningUnitobj1.otherUnit,
-                            "selectedForecastMap": map1.get("12"),
+                            "selectedForecastMap": map1.get("13"),
                             "createdBy": planningUnitobj1.createdBy,
                             "createdDate": planningUnitobj1.createdDate,
-                            "active": map1.get("16"),
+                            "active": map1.get("17"),
                         }
                         planningUnitList.push(tempJson);
                         indexVar = indexVar + 1;
                     }
-                    if (map1.get("3") == false && map1.get("14") == true) {
+                    if (map1.get("4") == false && map1.get("15") == true) {
                         listOfDisablePuNode.push(parseInt(map1.get("1")));
                     }
-                    if (map1.get("16") == false && map1.get("17") == true) {
+                    if (map1.get("17") == false && map1.get("18") == true) {
                         listOfDisablePuNode.push(parseInt(map1.get("1")));
                     }
                 }
@@ -1820,8 +1890,8 @@ export default class PlanningUnitSetting extends Component {
                         this.setState(
                             {
                                 rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
-                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                                startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("N")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                                endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("N")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
                                 beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
                                 forecastProgramId: parseInt(programId),
                                 forecastProgramVersionId: parseInt(versionId),
@@ -1883,22 +1953,23 @@ export default class PlanningUnitSetting extends Component {
         var data = [];
         data[0] = -1;
         data[1] = "";
-        data[2] = true;
+        data[2] = "";
         data[3] = true;
-        data[4] = "";
+        data[4] = true;
         data[5] = "";
         data[6] = "";
         data[7] = "";
         data[8] = "";
-        data[9] = 0;
-        data[10] = 1;
+        data[9] = "";
+        data[10] = 0;
         data[11] = 1;
-        data[12] = {};
-        data[13] = 0;
-        data[14] = true;
-        data[15] = "";
-        data[16] = true;
+        data[12] = 1;
+        data[13] = {};
+        data[14] = 0;
+        data[15] = true;
+        data[16] = "";
         data[17] = true;
+        data[18] = true;
         this.el.insertRow(
             data,0,1
         );
@@ -1930,6 +2001,7 @@ export default class PlanningUnitSetting extends Component {
         let tableHeadTemp = [];
         tableHeadTemp.push(i18n.t('static.productCategory.productCategory').replaceAll(' ', '%20'));
         tableHeadTemp.push(i18n.t('static.dashboard.planningunitheader').replaceAll(' ', '%20'));
+        tableHeadTemp.push(i18n.t('static.conversion.ConversionFactorFUPU').replaceAll(' ', '%20'));
         tableHeadTemp.push((i18n.t('static.commitTree.consumptionForecast') + ' ?').replaceAll(' ', '%20'));
         tableHeadTemp.push((i18n.t('static.TreeForecast.TreeForecast') + ' ?').replaceAll(' ', '%20'));
         tableHeadTemp.push((i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')').replaceAll(' ', '%20'));
@@ -1940,7 +2012,7 @@ export default class PlanningUnitSetting extends Component {
         tableHeadTemp.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
         tableHeadTemp.push(i18n.t('static.common.active').replaceAll(' ', '%20'));
         A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
-        this.state.languageEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[2].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[3].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[4].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[15].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[16].toString() =="true" ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
+        this.state.languageEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''),ele[2].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[3].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[4].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[16].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[17].toString() =="true" ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -2059,6 +2131,25 @@ export default class PlanningUnitSetting extends Component {
                                                 >
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                 </Picker>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                            <div className="controls">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="active"
+                                                        id="active"
+                                                        bsSize="sm"
+                                                        onChange={(e) => {this.setStatus(e) }}
+                                                        value={this.state.active}
+                                                    >
+                                                        <option value="-1">{i18n.t('static.common.all')}</option>
+                                                        <option value="1">{i18n.t('static.common.active')}</option>
+                                                        <option value="0">{i18n.t('static.common.disabled')}</option>
+                                                    </Input>
+                                                </InputGroup>
                                             </div>
                                         </FormGroup>
                                     </div>
