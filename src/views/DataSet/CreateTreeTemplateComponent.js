@@ -10094,7 +10094,7 @@ export default class CreateTreeTemplate extends Component {
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
                                                                     <option key={i} value={item.planningUnitId}>
-                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId}
+                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId+ " ("+i18n.t("static.tree.conversionFUToPU")+" = "+item.multiplier+")"}
                                                                     </option>
                                                                 )
                                                             }, this)}

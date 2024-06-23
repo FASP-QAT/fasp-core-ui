@@ -505,6 +505,7 @@ class ForecastMetrics extends Component {
       data[2] = consumptions[j].message != null ? "" : roundN2(consumptions[j].forecastError);
       data[3] = consumptions[j].monthCount;
       data[4] = roundN2(consumptions[j].forecastError);
+      data[5] = consumptions[j].forecastErrorThreshold;
       consumptionArray[count] = data;
       count++;
     }
@@ -540,6 +541,10 @@ class ForecastMetrics extends Component {
           // title: 'A',
           // type: 'text',
           // visible: false
+        },
+        {
+          title: i18n.t('static.report.forecastErrorThreshold'),
+          type: 'hidden',
         },
       ],
       editable: false,
@@ -584,7 +589,7 @@ class ForecastMetrics extends Component {
     for (var j = 0; j < json.length; j++) {
       var rowData = elInstance.getRowData(j);
       var forecastError = rowData[4];
-      if (forecastError > 50) {
+      if (forecastError > rowData[5]) {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))

@@ -3317,5 +3317,9 @@
     "static.momper.tooltip4":"Enter any changes not captured by the modeling table or seasonality index. If the checkbox 'Manual change affects future month' is checked, this change will affect future months. If unchecked, this change will only affect the current month.",
     "static.momper.tooltip5":"The final % for this node = (% of Population (No Seasonality))*(1+Seasonality Index)+(Manual Change)",
     "static.momper.tooltip6":"This is the value of the parent node.",
-    "static.momper.tooltip7":"The forecasted value for this node = (% of Parent) * (Parent Value). In other words, it is is the product of the two previous columns."
+    "static.momper.tooltip7":"The forecasted value for this node = (% of Parent) * (Parent Value). In other words, it is is the product of the two previous columns.",
+    "static.pu.forecastErrorThresholdPercentage":"Forecast Error Threshold (%)",
+    "static.pu.puNotesTooltip":"Add notes about product phase in/out, data sources, primary funders. etc. Notes will be visible in Supply Plan Report and in Supply Plan Version and Review screen.",
+    "static.report.planningUnitNotes":"Planning Unit Notes",
+    "static.tree.conversionFUToPU":"FU:PU Conversion Factor"
 }
