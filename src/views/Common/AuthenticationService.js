@@ -499,7 +499,7 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/funderType/editFunderType/:procurementAgentTypeId":
+                    case "/funderType/editFunderType/:fundingSourceTypeId":
                         if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
                             return true;
                         }

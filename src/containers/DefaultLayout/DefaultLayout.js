@@ -272,7 +272,7 @@ const routes = [
   { path: '/funderType/addFunderType', name: 'static.breadcrum.add', entityname: 'static.funderTypeHead.funderType', component: AddFunderType },
   { path: '/funderType/listFunderType', exact: true, name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
   { path: '/funderType/listFunderType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
-  { path: '/funderType/editFunderType/:procurementAgentTypeId', name: 'static.breadcrum.edit', entityname: 'static.funderTypeHead.funderType', component: EditFunderType },
+  { path: '/funderType/editFunderType/:fundingSourceTypeId', name: 'static.breadcrum.edit', entityname: 'static.funderTypeHead.funderType', component: EditFunderType },
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
@@ -1148,7 +1148,6 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-
                           {
                             name: i18n.t('static.funderTypeHead.funderType'),
                             icon: 'fa fa-bank',
@@ -1160,7 +1159,6 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-
                           {
                             name: i18n.t('static.fundingSourceHead.fundingSource'),
                             icon: 'fa fa-bank',

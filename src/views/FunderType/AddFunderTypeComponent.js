@@ -10,6 +10,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 // Localized entity name
 const entityname = i18n.t('static.funderTypeHead.funderType')
 /**
@@ -21,10 +22,10 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-        procurementAgentTypeCode: Yup.string()
+        fundingSourceTypeCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.funderType.funderTypeCodeText')),
-        procurementAgentTypeName: Yup.string()
+        fundingSourceTypeName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.funderType.funderTypeNameText'))
     })
@@ -37,7 +38,7 @@ class AddFunderTypeComponent extends Component {
         super(props);
         this.state = {
             realms: [],
-            procurementAgentType: {
+            fundingSourceType: {
                 realm: {
                     realmId: '',
                     label: {
@@ -50,7 +51,7 @@ class AddFunderTypeComponent extends Component {
                 label: {
                     label_en: ''
                 },
-                procurementAgentTypeCode: '',
+                fundingSourceTypeCode: '',
             },
             message: '',
             lang: localStorage.getItem('lang'),
@@ -65,15 +66,15 @@ class AddFunderTypeComponent extends Component {
      * @param {Event} event - The change event.
      */
     dataChange(event) {
-        let { procurementAgentType } = this.state;
-        if (event.target.name == "procurementAgentTypeCode") {
-            procurementAgentType.procurementAgentTypeCode = event.target.value;
+        let { fundingSourceType } = this.state;
+        if (event.target.name == "fundingSourceTypeCode") {
+            fundingSourceType.fundingSourceTypeCode = event.target.value;
         }
-        if (event.target.name == "procurementAgentTypeName") {
-            procurementAgentType.label.label_en = event.target.value;
+        if (event.target.name == "fundingSourceTypeName") {
+            fundingSourceType.label.label_en = event.target.value;
         }
         this.setState({
-            procurementAgentType
+            fundingSourceType
         },
             () => { });
     };
@@ -142,11 +143,11 @@ class AddFunderTypeComponent extends Component {
             );
         let realmId = AuthenticationService.getRealmId();
         if (realmId != -1) {
-            let { procurementAgentType } = this.state;
-            procurementAgentType.realm.id = realmId;
+            let { fundingSourceType } = this.state;
+            fundingSourceType.realm.id = realmId;
             document.getElementById("realmId").disabled = true;
             this.setState({
-                procurementAgentType
+                fundingSourceType
             },
                 () => {
                 })
@@ -177,16 +178,16 @@ class AddFunderTypeComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={
                                     {
-                                        realmId: this.state.procurementAgentType.realm.id,
-                                        procurementAgentTypeCode: this.state.procurementAgentType.procurementAgentTypeCode,
-                                        procurementAgentTypeName: this.state.procurementAgentType.label.label_en,
+                                        realmId: this.state.fundingSourceType.realm.id,
+                                        fundingSourceTypeCode: this.state.fundingSourceType.fundingSourceTypeCode,
+                                        fundingSourceTypeName: this.state.fundingSourceType.label.label_en,
                                     }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    ProcurementAgentService.addProcurementAgentType(this.state.procurementAgentType)
+                                    FundingSourceService.addFundingSourceType(this.state.fundingSourceType)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/funderType/listFunderType/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -251,7 +252,7 @@ class AddFunderTypeComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementAgentTypeForm' autocomplete="off">
+                                        <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='fundingSourceTypeForm' autocomplete="off">
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
                                                     <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span className="red Reqasterisk">*</span></Label>
@@ -260,11 +261,11 @@ class AddFunderTypeComponent extends Component {
                                                         bsSize="sm"
                                                         name="realmId"
                                                         id="realmId"
-                                                        valid={!errors.realmId && this.state.procurementAgentType.realm.id != ''}
+                                                        valid={!errors.realmId && this.state.fundingSourceType.realm.id != ''}
                                                         invalid={touched.realmId && !!errors.realmId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        value={this.state.procurementAgentType.realm.id}
+                                                        value={this.state.fundingSourceType.realm.id}
                                                         required
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -276,33 +277,33 @@ class AddFunderTypeComponent extends Component {
                                                     <Label for="funderTypeName">{i18n.t('static.funderType.funderTypeName')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
                                                         bsSize="sm"
-                                                        name="procurementAgentTypeName"
-                                                        id="procurementAgentTypeName"
-                                                        valid={!errors.procurementAgentTypeName && this.state.procurementAgentType.label.label_en != ''}
-                                                        invalid={touched.procurementAgentTypeName && !!errors.procurementAgentTypeName}
+                                                        name="fundingSourceTypeName"
+                                                        id="fundingSourceTypeName"
+                                                        valid={!errors.fundingSourceTypeName && this.state.fundingSourceType.label.label_en != ''}
+                                                        invalid={touched.fundingSourceTypeName && !!errors.fundingSourceTypeName}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={(e) => { handleBlur(e); this.dataChange(e) }}
                                                         maxLength={255}
                                                         required
-                                                        value={Capitalize(this.state.procurementAgentType.label.label_en)}
+                                                        value={Capitalize(this.state.fundingSourceType.label.label_en)}
                                                     />
-                                                    <FormFeedback className="red">{errors.procurementAgentTypeName}</FormFeedback>
+                                                    <FormFeedback className="red">{errors.fundingSourceTypeName}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="procurementAgentTypeCode">{i18n.t('static.funderType.funderTypeCode')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="fundingSourceTypeCode">{i18n.t('static.funderType.funderTypeCode')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
                                                         bsSize="sm"
-                                                        name="procurementAgentTypeCode"
-                                                        id="procurementAgentTypeCode"
-                                                        valid={!errors.procurementAgentTypeCode && this.state.procurementAgentType.procurementAgentTypeCode != ''}
-                                                        invalid={touched.procurementAgentTypeCode && !!errors.procurementAgentTypeCode}
+                                                        name="fundingSourceTypeCode"
+                                                        id="fundingSourceTypeCode"
+                                                        valid={!errors.fundingSourceTypeCode && this.state.fundingSourceType.fundingSourceTypeCode != ''}
+                                                        invalid={touched.fundingSourceTypeCode && !!errors.fundingSourceTypeCode}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         required
                                                         maxLength={10}
-                                                        value={this.state.procurementAgentType.procurementAgentTypeCode}
+                                                        value={this.state.fundingSourceType.fundingSourceTypeCode}
                                                     />
-                                                    <FormFeedback className="red">{errors.procurementAgentTypeCode}</FormFeedback>
+                                                    <FormFeedback className="red">{errors.fundingSourceTypeCode}</FormFeedback>
                                                 </FormGroup>
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -340,11 +341,11 @@ class AddFunderTypeComponent extends Component {
      * Resets the procurement agent type details when reset button is clicked.
      */
     resetClicked() {
-        let { procurementAgentType } = this.state;
-        procurementAgentType.procurementAgentTypeCode = ''
-        procurementAgentType.label.label_en = ''
+        let { fundingSourceType } = this.state;
+        fundingSourceType.fundingSourceTypeCode = ''
+        fundingSourceType.label.label_en = ''
         this.setState({
-            procurementAgentType
+            fundingSourceType
         },
             () => { });
     }

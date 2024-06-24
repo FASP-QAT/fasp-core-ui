@@ -82,16 +82,18 @@ class FundingSourceListComponent extends Component {
         let fundingSourceList = this.state.selSource;
         let fundingSourceArray = [];
         let count = 0;
+        console.log('fundingSourceList[0]: '+JSON.stringify(fundingSourceList[0]));
         for (var j = 0; j < fundingSourceList.length; j++) {
             data = [];
             data[0] = fundingSourceList[j].fundingSourceId
             data[1] = getLabelText(fundingSourceList[j].realm.label, this.state.lang)
-            data[2] = getLabelText(fundingSourceList[j].label, this.state.lang)
-            data[3] = fundingSourceList[j].fundingSourceCode
-            data[4] = fundingSourceList[j].lastModifiedBy.username;
-            data[5] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[6] = fundingSourceList[j].allowedInBudget;
-            data[7] = fundingSourceList[j].active;
+            data[2] = fundingSourceList[j].fundingSourceType.code
+            data[3] = getLabelText(fundingSourceList[j].label, this.state.lang)
+            data[4] = fundingSourceList[j].fundingSourceCode
+            data[5] = fundingSourceList[j].lastModifiedBy.username;
+            data[6] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[7] = fundingSourceList[j].allowedInBudget;
+            data[8] = fundingSourceList[j].active;
             fundingSourceArray[count] = data;
             count++;
         }
@@ -111,6 +113,10 @@ class FundingSourceListComponent extends Component {
                 {
                     title: i18n.t('static.realm.realm'),
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
+                },
+                {
+                    title: i18n.t('static.funderType.funderTypeCode'),
+                    type: 'text',
                 },
                 {
                     title: i18n.t('static.fundingsource.fundingsource'),
