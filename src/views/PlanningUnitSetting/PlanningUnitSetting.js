@@ -696,8 +696,8 @@ export default class PlanningUnitSetting extends Component {
                     localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
                     this.setState({
                         rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("N")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
-                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("N")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                        startDateDisplay: (forecastStartDate == '' ? '' : months[Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
+                        endDateDisplay: (forecastStopDate == '' ? '' : months[Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDate, 'MMM-YYYY').startOf('month').format("YYYY"))),
                         beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
                         forecastProgramId: parseInt(programId),
                         forecastProgramVersionId: parseInt(versionId),
