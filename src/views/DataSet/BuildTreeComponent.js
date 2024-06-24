@@ -6913,7 +6913,7 @@ export default class BuildTree extends Component {
         })
         this.setState({
             items,
-            cursorItem: nodeId
+            // cursorItem: nodeId
         }, () => {
             this.calculateMOMData(itemConfig.parent, 2);
         });
@@ -8873,7 +8873,7 @@ export default class BuildTree extends Component {
         });
         return {
             items: result,
-            cursorItem: cursorParent
+            // cursorItem: cursorParent
         };
     }
     /**
