@@ -1639,7 +1639,7 @@ class AddUserComponent extends Component {
                             this.dataChange(e);
                           }}
                           onBlur={handleBlur}
-                          maxLength={25}
+                          maxLength={50}
                           required
                           value={this.state.user.username}
                         />
