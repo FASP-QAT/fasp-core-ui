@@ -3447,23 +3447,25 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3" style={{ marginTop: '30px' }}>
-                                        <div className="tab-ml-1 ml-lg-3">
-                                            <Input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                id="onlyDownloadedProgram"
-                                                name="onlyDownloadedProgram"
-                                                checked={this.state.onlyDownloadedProgram}
-                                                onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
-                                            />
-                                            <Label
-                                                className="form-check-label"
-                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                {i18n.t('static.common.onlyDownloadedProgram')}
-                                            </Label>
-                                        </div>
-                                    </FormGroup>
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                                        <FormGroup className="col-md-3" style={{ marginTop: '30px' }}>
+                                            <div className="tab-ml-1 ml-lg-3">
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="onlyDownloadedProgram"
+                                                    name="onlyDownloadedProgram"
+                                                    checked={this.state.onlyDownloadedProgram}
+                                                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    {i18n.t('static.common.onlyDownloadedProgram')}
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
+                                    }
                                     {this.state.forecastProgramId != 0 && this.state.showDate && <><FormGroup className="col-md-12">
                                         <h5>
                                             {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&

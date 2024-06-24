@@ -3364,23 +3364,25 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </FormGroup>
                           </div>
                           <div className="row">
-                            <FormGroup className="col-md-3 ">
-                              <div className="tab-ml-1 ml-lg-3">
-                                <Input
-                                  className="form-check-input"
-                                  type="checkbox"
-                                  id="onlyDownloadedProgram"
-                                  name="onlyDownloadedProgram"
-                                  checked={this.state.onlyDownloadedProgram}
-                                  onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
-                                />
-                                <Label
-                                  className="form-check-label"
-                                  check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                  {i18n.t('static.common.onlyDownloadedProgram')}
-                                </Label>
-                              </div>
-                            </FormGroup>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                              <FormGroup className="col-md-3 ">
+                                <div className="tab-ml-1 ml-lg-3">
+                                  <Input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id="onlyDownloadedProgram"
+                                    name="onlyDownloadedProgram"
+                                    checked={this.state.onlyDownloadedProgram}
+                                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                  />
+                                  <Label
+                                    className="form-check-label"
+                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                    {i18n.t('static.common.onlyDownloadedProgram')}
+                                  </Label>
+                                </div>
+                              </FormGroup>
+                            }
                             <FormGroup className="col-md-3">
                               <div className="tab-ml-1 ml-lg-3">
                                 <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.showInPlanningUnit} onChange={(e) => this.setShowInPlanningUnits(e)} />
