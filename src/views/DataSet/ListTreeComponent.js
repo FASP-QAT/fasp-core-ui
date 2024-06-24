@@ -2945,23 +2945,25 @@ export default class ListTreeComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        <FormGroup className="col-md-3" style={{ marginTop: '45px' }}>
-                            <div className="tab-ml-1 ml-lg-3">
-                                <Input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="onlyDownloadedProgram"
-                                    name="onlyDownloadedProgram"
-                                    checked={this.state.onlyDownloadedProgram}
-                                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
-                                />
-                                <Label
-                                    className="form-check-label"
-                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                    {i18n.t('static.common.onlyDownloadedProgram')}
-                                </Label>
-                            </div>
-                        </FormGroup>
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                            <FormGroup className="col-md-3" style={{ marginTop: '45px' }}>
+                                <div className="tab-ml-1 ml-lg-3">
+                                    <Input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="onlyDownloadedProgram"
+                                        name="onlyDownloadedProgram"
+                                        checked={this.state.onlyDownloadedProgram}
+                                        onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                    />
+                                    <Label
+                                        className="form-check-label"
+                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                        {i18n.t('static.common.onlyDownloadedProgram')}
+                                    </Label>
+                                </div>
+                            </FormGroup>
+                        }
                         <div className="listtreetable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
