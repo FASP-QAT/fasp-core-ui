@@ -905,6 +905,7 @@ export default class BuildTree extends Component {
         this.copyModalTreeChange = this.levelDropdownChange.bind(this);
         this.copyModalParentLevelChange = this.copyModalParentLevelChange.bind(this);
         this.copyModalParentNodeChange = this.copyModalParentNodeChange.bind(this);
+        this.copyMoveNode = this.copyMoveNode.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -6911,6 +6912,95 @@ export default class BuildTree extends Component {
         })
         this.setState({
             items,
+            cursorItem: nodeId
+        }, () => {
+            this.calculateMOMData(itemConfig.parent, 2);
+        });
+    }
+    copyMoveNode() {
+        // Selected Tree Id: this.state.copyModalTree
+        // Tree List: this.state.copyModalTreeList this.state.treeData
+        // Node selected: this.state.copyModalNode
+        // Current tree nodes: this.state.items  
+        var itemConfig = this.state.copyModalNode;
+        var items1 = this.state.items;
+        const { items } = this.state;
+        var updatedFlatList = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList;
+        var maxNodeDataId = this.getMaxNodeDataId();
+        var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
+        var childListArr = [];
+        var json;
+        var sortOrder = itemConfig.sortOrder;
+        var scenarioList = this.state.scenarioList;
+        var childListBasedOnScenarion = [];
+        for (let i = 0; i < childList.length; i++) {
+            var child = JSON.parse(JSON.stringify(childList[i]));
+            var maxNodeId = updatedFlatList.length > 0 ? Math.max(...updatedFlatList.map(o => o.id)) : 0;
+            var nodeId = parseInt(maxNodeId + 1);
+            if (sortOrder == child.sortOrder) {
+                child.payload.nodeId = nodeId;
+                child.parent = this.state.copyModalParentNode;
+                child.payload.parentNodeId = this.state.copyModalParentNode;
+                child.id = nodeId;
+                var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
+                var childList1 = items.filter(c => c.parent == itemConfig.parent);
+                var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
+                json = {
+                    oldId: itemConfig.id,
+                    newId: nodeId,
+                    oldSortOrder: itemConfig.sortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            } else {
+                var parentNode = childListArr.filter(x => x.oldId == child.parent)[0];
+                child.payload.nodeId = nodeId;
+                var oldId = child.id;
+                var oldSortOrder = child.sortOrder;
+                child.id = nodeId;
+                child.parent = parentNode.newId;
+                child.payload.parentNodeId = child.parent;
+                var parentSortOrder = parentNode.newSortOrder;
+                var childList1 = items.filter(c => c.parent == parentNode.newId);
+                var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
+                json = {
+                    oldId: oldId,
+                    newId: nodeId,
+                    oldSortOrder: oldSortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            }
+            if (scenarioList.length > 0) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    childListBasedOnScenarion.push({
+                        oldId: (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId,
+                        newId: maxNodeDataId
+                    });
+                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    maxNodeDataId++;
+                }
+            }
+            updatedFlatList.push(child);
+        }
+        childListArr.map(item => {
+            var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
+            if (indexItems != -1) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioList[i].id])[0].nodeDataModelingList;
+                    if (nodeDataModelingList.length > 0) {
+                        nodeDataModelingList.map((item1, c) => {
+                            var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                            item1.transferNodeDataId = newTransferId[0].newId;
+                        })
+                    }
+                }
+            }
+        })
+        this.setState({
+            // items,
             cursorItem: nodeId
         }, () => {
             this.calculateMOMData(itemConfig.parent, 2);
@@ -13287,12 +13377,9 @@ export default class BuildTree extends Component {
                 className={'modal-md'}>
                 <Formik
                     enableReinitialize={true}
-                    initialValues={{
-                        levelName: this.state.levelName
-                    }}
-                    validationSchema={validationSchemaLevel}
+                    // validationSchema={validationSchemaLevel}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        this.levelDeatilsSaved()
+                        this.copyMoveNode();
                     }}
                     render={
                         ({
@@ -13309,7 +13396,7 @@ export default class BuildTree extends Component {
                             setFieldValue,
                             setFieldTouched
                         }) => (
-                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
+                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='copyModalForm' autocomplete="off">
                                 <ModalHeader toggle={() => this.setState({copyModal: false})} className="modalHeader">
                                     <strong>Move/Copy Node</strong>
                                 </ModalHeader>
