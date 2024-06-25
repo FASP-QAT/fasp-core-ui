@@ -2451,37 +2451,37 @@ class CompareAndSelectScenario extends Component {
                                         </div>
                                     </div>
                                 </Form>
-                                <div class="pl-0 fixTableHeadSupplyPlan">
+                                <div class="pl-0 fixTableHeadCompareandselect">
                                     <div className="row">
                                         <div className="col-md-4">
                                             <div class="table-scroll">
-                                                <div class="table-wrap compareAndSelectPlanningUnitTable table-responsive ">
+                                                <div class="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
                                                     <Table className="table-bordered text-center overflowhide main-table " bordered size="sm">
                                                         <thead>
                                                             <tr>
                                                                 <th class="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th class="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.report.planningUnit')}</th>
-                                                                <th class="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.compareVersion.selectedForecast')}</th>
+                                                                <th class="compareAndSelectPlanningUnitTableTdWidth sticky-col first-col clone ">{i18n.t('static.report.planningUnit')}</th>
+                                                                <th>{i18n.t('static.compareVersion.selectedForecast')}</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {this.state.uniqueProductCategories.map(item => {
                                                                 return (<>
                                                                     <tr className="hoverTd">
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1 p"
                                                                             onClick={() => this.toggleAccordion(item.id)}
                                                                         >
                                                                             {this.state.consumptionUnitShowArr.includes(item.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                         </td>
                                                                         <td className="sticky-col first-col clone" align="left">{getLabelText(item.label, this.state.lang)}</td>
-                                                                        <td className="sticky-col first-col clone" align="left"></td>
+                                                                        <td></td>
                                                                     </tr>
                                                                     {this.state.planningUnitListForTable.map(p => {
                                                                         if (item.id == p.planningUnit.planningUnit.forecastingUnit.productCategory.id) {
                                                                             return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.id) ? "" : "none" }}>
                                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                 <td className="sticky-col first-col clone text-left hoverTd" onClick={() => this.setPlanningUnitId(p.planningUnit.planningUnit.id)}>{getLabelText(p.planningUnit.planningUnit.label, this.state.lang) + " | " + p.planningUnit.planningUnit.id}</td>
-                                                                                <td className="sticky-col">{p.selectedForecast == "" ? <div><i class="fa fa-exclamation-triangle"></i>{i18n.t("static.commitTree.noForecastSelected")}</div> : p.selectedForecast}</td>
+                                                                                <td>{p.selectedForecast == "" ? <div><i class="fa fa-exclamation-triangle"></i>{i18n.t("static.commitTree.noForecastSelected")}</div> : p.selectedForecast}</td>
                                                                             </tr>)
                                                                         }
                                                                     })}
