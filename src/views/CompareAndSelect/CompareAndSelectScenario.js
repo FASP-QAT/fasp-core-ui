@@ -386,9 +386,18 @@ class CompareAndSelectScenario extends Component {
             var consumptionDataForTree = [];
             var totalArray = [];
             var monthArrayForError = [];
-            if (consumptionData.length > 0) {
-                for (var i = 0; i < consumptionData.length; i++) {
-                    monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+            if(this.state.minActualMonth==''){
+                if (consumptionData.length > 0) {
+                    for(var i=0;i<consumptionData.length;i++){
+                        monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+                    }
+                }
+            }else{
+                var createdDate=moment(this.state.minActualMonth).format("YYYY-MM-DD");
+                var minDate=moment(this.state.minActualMonth).format("YYYY-MM-DD");
+                for(var i=0;moment(createdDate).format("YYYY-MM")<moment(this.state.maxActualMonth).format("YYYY-MM");i++){
+                    createdDate=moment(minDate).add(i,'months').format("YYYY-MM-DD");
+                    monthArrayForError.push(createdDate);
                 }
             }
             var multiplier = 1;
@@ -539,7 +548,7 @@ class CompareAndSelectScenario extends Component {
                     scenario: treeScenarioList[tsList].scenario,
                     totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(2),
                     isLowest: min == actualDiff[tsList] && useForLowestError[tsList] ? 1 : 0,
-                    forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 && useForLowestError[tsList] ? (((actualDiff[tsList]) / totalActual) * 100).toFixed(4) : "",
+                    forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 && useForLowestError[tsList] ? (((actualDiff[tsList]) / totalActual) ).toFixed(4) : "",
                     noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined && useForLowestError[tsList] ? countArray[tsList] + 1 : "",
                     compareToConsumptionForecastClass:
                         treeScenarioList[tsList].type == 'T' ?
@@ -622,7 +631,7 @@ class CompareAndSelectScenario extends Component {
                         }
                     }
                     data[dataCount + 1] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                    data[dataCount + 2] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
+                    data[dataCount + 2] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual)).toFixed(2), 0) : ""
                     data[dataCount + 3] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
                     data[dataCount + 4] = finalData[j].compareToConsumptionForecast
                     data[dataCount + 5] = finalData[j].id
