@@ -17,7 +17,8 @@ import {
     FormGroup, Input, InputGroup, Label,
     Modal,
     ModalBody,
-    ModalHeader
+    ModalHeader,
+    Table
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -103,7 +104,13 @@ class CompareAndSelectScenario extends Component {
             yearArray: [],
             consolidatedData: [],
             collapsedExpandArr: [],
-            expandCompressBtn: true
+            expandCompressBtn: true,
+            consumptionUnitShowArr: [],
+            uniqueProductCategories: [],
+            planningUnitListForTable: {
+                planningUnit: "",
+                selectedForecast: ""
+            }
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -731,14 +738,14 @@ class CompareAndSelectScenario extends Component {
         }
 
         if (cont == true) {
-            localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
+            localStorage.setItem("sesDatasetPlanningUnitId", e);
             this.setState({
                 dataChangedFlag: 0,
                 loading: true
             })
-            if (e.target.value > 0) {
-                var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e.target.value);
-                var planningUnitId = e.target.value;
+            if (e > 0) {
+                var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e);
+                var planningUnitId = e;
                 var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
                 var viewById = this.state.viewById;
                 this.setState({
@@ -1102,7 +1109,6 @@ class CompareAndSelectScenario extends Component {
                 ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast])
             )
         }
-        console.log("dataArr3", dataArr3)
         let data2 = dataArr3;
         let content1 = {
             margin: { top: 100, bottom: 50 },
@@ -1517,7 +1523,8 @@ class CompareAndSelectScenario extends Component {
             this.setState({ loading: true })
             this.setState({
                 datasetId: datasetId,
-                changed: false
+                changed: false,
+                consumptionUnitShowArr: []
             }, () => {
                 if (datasetId != "") {
                     localStorage.setItem("sesDatasetId", datasetId);
@@ -1589,6 +1596,26 @@ class CompareAndSelectScenario extends Component {
                         regionId = localStorage.getItem("sesDatasetRegionId");
                         regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
                     }
+                    var puList = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
+                    var planningUnitListForTable = []
+                    for (var p = 0; p < puList.length; p++) {
+                        var map = puList[p].selectedForecastMap[regionId];
+                        var selectedForecastString = "";
+                        if (map != undefined && map.consumptionExtrapolationId != null) {
+                            var c = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
+                            // getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang)
+                            selectedForecastString = getLabelText(c.extrapolationMethod.label, this.state.lang)
+                            planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
+                        } else if (map != undefined && map.scenarioId != null && map.treeId != null) {
+                            var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
+                            var s = t.scenarioList.filter(s => s.id == map.scenarioId)[0];
+                            selectedForecastString = getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang)
+                            planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
+                        } else {
+                            selectedForecastString = ""
+                            planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
+                        }
+                    }
                     this.setState({
                         datasetJson: datasetJson,
                         rangeValue: rangeValue,
@@ -1612,10 +1639,20 @@ class CompareAndSelectScenario extends Component {
                         forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
                         forecastStopDate: moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD"),
                         planningUnitId: planningUnitId,
+                        planningUnitListForTable: planningUnitListForTable,
                         loading: false
                     }, () => {
+                        var planningUnits = this.state.planningUnitList;
+                        // Extract unique product categories
+                        const categories = planningUnits.map(unit => unit.planningUnit.forecastingUnit.productCategory);
+
+                        const uniqueCategories = Array.from(new Set(categories.map(cat => cat.id)))
+                            .map(id => categories.find(cat => cat.id === id));
+                        this.setState({
+                            uniqueProductCategories: uniqueCategories
+                        })
                         if (planningUnitId != "") {
-                            this.setPlanningUnitId(event);
+                            this.setPlanningUnitId(event.target.value);
                         } else {
                             this.setState({
                                 planningUnitId: "",
@@ -1668,7 +1705,8 @@ class CompareAndSelectScenario extends Component {
 
         if (cont == true) {
             this.setState({
-                dataChangedFlag: 0
+                dataChangedFlag: 0,
+                consumptionUnitShowArr: []
             });
             localStorage.setItem("sesDatasetRegionId", event.target.value);
             var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
@@ -1854,6 +1892,27 @@ class CompareAndSelectScenario extends Component {
             showGuidance: !this.state.showGuidance
         })
     }
+
+    /**
+       * Toggles the accordion state for a specific consumption unit ID.
+       * @param {String} consumptionUnitId The ID of the consumption unit to toggle.
+       */
+    toggleAccordion(consumptionUnitId) {
+        var consumptionUnitShowArr = this.state.consumptionUnitShowArr;
+        if (consumptionUnitShowArr.includes(consumptionUnitId)) {
+            consumptionUnitShowArr = consumptionUnitShowArr.filter(c => c != consumptionUnitId);
+        } else {
+            consumptionUnitShowArr.push(consumptionUnitId)
+        }
+        this.setState({
+            consumptionUnitShowArr: consumptionUnitShowArr
+        }, () => {
+            // this.setState({
+            //     isTableLoaded: this.getTableDiv()
+            // })
+        })
+    }
+
     /**
      * This function is used to set the x axis display by value selected by the user
      * @param {*} e This is the event value
@@ -2083,7 +2142,6 @@ class CompareAndSelectScenario extends Component {
             )
             this.state.treeScenarioList.filter(c => c.checked).map((item, idx) => {
                 var collapsedExpandArray = [];
-                // console.log("this.state.collapsedExpandArr", this.state.collapsedExpandArr)
                 if (this.state.xAxisDisplayBy != 1) {
                     var collapsedExpandArray = this.state.collapsedExpandArr.filter(ar => ar.id == item.id);
                     if (collapsedExpandArray.length > 0) {
@@ -2292,7 +2350,7 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4">
+                                            {/* <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
@@ -2310,7 +2368,7 @@ class CompareAndSelectScenario extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.tree.displayDate')}</Label>
                                                 <div className="controls ">
@@ -2393,230 +2451,275 @@ class CompareAndSelectScenario extends Component {
                                         </div>
                                     </div>
                                 </Form>
-                                <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                    {this.state.showAllData &&
-                                        <>
-                                            <ul style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
-                                            <ul className="legendcommitversion">
-                                                <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
-                                                <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
-                                                <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
-                                            </ul><br />
-                                            {this.state.xAxisDisplayBy != 1 &&
-                                                <div onClick={this.expandCompressFuntion} style={{ paddingLeft: '400px' }}>
-                                                    {this.state.expandCompressBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                <div class="pl-0 fixTableHeadSupplyPlan">
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <div class="table-scroll">
+                                                <div class="table-wrap compareAndSelectPlanningUnitTable table-responsive ">
+                                                    <Table className="table-bordered text-center overflowhide main-table " bordered size="sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                <th class="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.report.planningUnit')}</th>
+                                                                <th class="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.compareVersion.selectedForecast')}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {this.state.uniqueProductCategories.map(item => {
+                                                                return (<>
+                                                                    <tr className="hoverTd">
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"
+                                                                            onClick={() => this.toggleAccordion(item.id)}
+                                                                        >
+                                                                            {this.state.consumptionUnitShowArr.includes(item.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                                        </td>
+                                                                        <td className="sticky-col first-col clone" align="left">{getLabelText(item.label, this.state.lang)}</td>
+                                                                        <td className="sticky-col first-col clone" align="left"></td>
+                                                                    </tr>
+                                                                    {this.state.planningUnitListForTable.map(p => {
+                                                                        if (item.id == p.planningUnit.planningUnit.forecastingUnit.productCategory.id) {
+                                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.id) ? "" : "none" }}>
+                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                                <td className="sticky-col first-col clone text-left hoverTd" onClick={() => this.setPlanningUnitId(p.planningUnit.planningUnit.id)}>{getLabelText(p.planningUnit.planningUnit.label, this.state.lang) + " | " + p.planningUnit.planningUnit.id}</td>
+                                                                                <td className="sticky-col">{p.selectedForecast == "" ? <div><i class="fa fa-exclamation-triangle"></i>{i18n.t("static.commitTree.noForecastSelected")}</div> : p.selectedForecast}</td>
+                                                                            </tr>)
+                                                                        }
+                                                                    })}
+                                                                </>)
+                                                            }
+                                                            )}
+                                                        </tbody>
+                                                    </Table>
                                                 </div>
-                                            }
-                                            <div className="RemoveStriped removeOddColor">
-                                                <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                             </div>
-                                            <br></br>
-                                            <FormGroup className="col-md-12">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="textarea"
-                                                            name="forecastNotes"
-                                                            id="forecastNotes"
-                                                            value={this.state.forecastNotes}
-                                                            onChange={(e) => { this.setForecastNotes(e); }}
-                                                            readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
-                                                            bsSize="sm"
-                                                        >
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <br></br>
-                                            <Col md="12 pl-0">
-                                                <div className="row">
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="viewById1"
-                                                                name="viewById"
-                                                                value={1}
-                                                                checked={this.state.viewById == 1}
-                                                                onChange={this.setViewById}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.report.planningUnit')}
-                                                            </Label>
-                                                        </FormGroup><br />
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="viewById2"
-                                                                name="viewById"
-                                                                value={2}
-                                                                checked={this.state.viewById == 2}
-                                                                onChange={this.setViewById}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.dashboard.forecastingunit')}
-                                                            </Label>
-                                                        </FormGroup><br />
-                                                        <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="viewById3"
-                                                                name="viewById"
-                                                                value={3}
-                                                                checked={this.state.viewById == 3}
-                                                                onChange={this.setViewById}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.equivalancyUnit.equivalancyUnit')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
-                                                                    bsSize="sm"
-                                                                    disabled={true}
-                                                                    onChange={(e) => this.setPlanningUnitId(e)}
-                                                                    value={this.state.planningUnitId}
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnits}
-                                                                </Input>
-                                                            </InputGroup>
+                                        </div>
+                                        <div className="col-md-8" style={{ display: this.state.loading ? "none" : "block" }}>
+                                            {this.state.showAllData &&
+                                                <>
+                                                    <ul style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
+                                                    <ul className="legendcommitversion">
+                                                        <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
+                                                        <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                        <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
+                                                    </ul><br />
+                                                    {this.state.xAxisDisplayBy != 1 &&
+                                                        <div onClick={this.expandCompressFuntion} style={{ paddingLeft: '400px' }}>
+                                                            {this.state.expandCompressBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                         </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="foreccastingUnitId"
-                                                                    id="forecastingUnitId"
-                                                                    value={this.state.forecastingUnitId}
-                                                                    disabled={true}
-                                                                    onChange={this.setForecastingUnit}
-                                                                    bsSize="sm"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {forecastingUnits}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                    name="equivalencyUnitId"
-                                                                    id="equivalencyUnitId"
-                                                                    value={this.state.equivalencyUnitId}
-                                                                    onChange={this.setEquivalencyUnit}
-                                                                    bsSize="sm"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {equivalencies}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    {this.state.xAxisDisplayBy == 1 &&
-                                                        <FormGroup className="col-md-2">
-                                                            <div className="pt-lg-2 col-md-12">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="showForecastPeriod"
-                                                                    name="showForecastPeriod"
-                                                                    checked={this.state.showForecastPeriod}
-                                                                    onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                                </Label>
-                                                            </div>
-                                                            <div className="pt-lg-2 col-md-12">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="showFits"
-                                                                    name="showFits"
-                                                                    checked={this.state.showFits}
-                                                                    onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    {i18n.t('static.extrapolations.showFits')}
-                                                                </Label>
-                                                            </div>
-                                                        </FormGroup>}
-                                                    {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
-                                                        <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                            <div className="controls edit">
-                                                                <Picker
-                                                                    ref="pickAMonth2"
-                                                                    years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                    value={this.state.singleValue2}
-                                                                    key={JSON.stringify(this.state.singleValue2)}
-                                                                    lang={pickerLang}
-                                                                    onDismiss={this.handleAMonthDissmis2}
-                                                                >
-                                                                    <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
-                                                                </Picker>
-                                                            </div>
-                                                        </FormGroup>
                                                     }
-                                                </div>
-                                                <div className={"row check inline pt-lg-3 pl-lg-3"}>
+                                                    <div className="RemoveStriped removeOddColor">
+                                                        <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
+                                                    </div>
+                                                    <br></br>
+                                                    <FormGroup className="col-md-12">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input
+                                                                    type="textarea"
+                                                                    name="forecastNotes"
+                                                                    id="forecastNotes"
+                                                                    value={this.state.forecastNotes}
+                                                                    onChange={(e) => { this.setForecastNotes(e); }}
+                                                                    readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
+                                                                    bsSize="sm"
+                                                                >
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <br></br>
+                                                    <Col md="12 pl-0">
+                                                        <div className="row">
+                                                            <FormGroup>
+                                                                <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById1"
+                                                                        name="viewById"
+                                                                        value={1}
+                                                                        checked={this.state.viewById == 1}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.report.planningUnit')}
+                                                                    </Label>
+                                                                </FormGroup><br />
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById2"
+                                                                        name="viewById"
+                                                                        value={2}
+                                                                        checked={this.state.viewById == 2}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.dashboard.forecastingunit')}
+                                                                    </Label>
+                                                                </FormGroup><br />
+                                                                <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById3"
+                                                                        name="viewById"
+                                                                        value={3}
+                                                                        checked={this.state.viewById == 3}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.equivalancyUnit.equivalancyUnit')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="planningUnitId"
+                                                                            id="planningUnitId"
+                                                                            bsSize="sm"
+                                                                            disabled={true}
+                                                                            // onChange={(e) => this.setPlanningUnitId(e)}
+                                                                            value={this.state.planningUnitId}
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {planningUnits}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="foreccastingUnitId"
+                                                                            id="forecastingUnitId"
+                                                                            value={this.state.forecastingUnitId}
+                                                                            disabled={true}
+                                                                            onChange={this.setForecastingUnit}
+                                                                            bsSize="sm"
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {forecastingUnits}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                            name="equivalencyUnitId"
+                                                                            id="equivalencyUnitId"
+                                                                            value={this.state.equivalencyUnitId}
+                                                                            onChange={this.setEquivalencyUnit}
+                                                                            bsSize="sm"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {equivalencies}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            {this.state.xAxisDisplayBy == 1 &&
+                                                                <FormGroup className="col-md-2">
+                                                                    <div className="pt-lg-2 col-md-12">
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="checkbox"
+                                                                            id="showForecastPeriod"
+                                                                            name="showForecastPeriod"
+                                                                            checked={this.state.showForecastPeriod}
+                                                                            onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                            {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                        </Label>
+                                                                    </div>
+                                                                    <div className="pt-lg-2 col-md-12">
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="checkbox"
+                                                                            id="showFits"
+                                                                            name="showFits"
+                                                                            checked={this.state.showFits}
+                                                                            onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                            {i18n.t('static.extrapolations.showFits')}
+                                                                        </Label>
+                                                                    </div>
+                                                                </FormGroup>}
+                                                            {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
+                                                                <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref="pickAMonth2"
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            lang={pickerLang}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                                        </Picker>
+                                                                    </div>
+                                                                </FormGroup>
+                                                            }
+                                                        </div>
+                                                        <div className={"row check inline pt-lg-3 pl-lg-3"}>
 
-                                                    {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
-                                                        <div className="col-md-12">
-                                                            <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                                <div>
+                                                            {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
+                                                                <div className="col-md-12">
+                                                                    <div className="chart-wrapper chart-graph-report">
+                                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                                        <div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-12">
+                                                                    <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                                        {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                                    </button>
+                                                                </div>
+                                                            </div>}
+                                                        </div>
+                                                        <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
+                                                            <div className="col-md-12 pl-0 pr-0">
+                                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-12">
-                                                            <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                                            </button>
-                                                        </div>
-                                                    </div>}
-                                                </div>
-                                                <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
-                                                    <div className="col-md-12 pl-0 pr-0">
-                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </Col>
-                                        </>}</div>
+                                                    </Col>
+                                                </>}
+                                        </div>
+                                    </div>
+                                </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
