@@ -356,7 +356,7 @@ class AddprogramPlanningUnit extends Component {
                                                         title: i18n.t('static.conversion.ConversionFactorFUPU'),
                                                         type: 'text',
                                                         readOnly: true,
-                                                        tooltip: i18n.t("static.tooltip.conversionFactor"),
+                                                        tooltip: i18n.t("static.tooltip.conversionFactorPU"),
                                                     },
                                                     {
                                                         title: i18n.t('static.programPU.planBasedOn'),

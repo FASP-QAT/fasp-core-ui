@@ -1284,7 +1284,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[7].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[8].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[9].title = i18n.t('static.tooltip.PriceType');
-        tr.children[3].title = i18n.t('static.tooltip.conversionFactor');
+        tr.children[3].title = i18n.t('static.tooltip.conversionFactorPU');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var jsonLength;
