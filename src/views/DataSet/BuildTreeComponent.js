@@ -2706,11 +2706,11 @@ export default class BuildTree extends Component {
      */
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
-        var items = this.state.items;
+        var items = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList;
         var nodeDataMap = [];
         var nodeDataMapIdArr = [];
         for (let i = 0; i < items.length; i++) {
-            var scenarioList = this.state.scenarioList;
+            var scenarioList = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList;;
             for (let j = 0; j < scenarioList.length; j++) {
                 if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
                     nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
@@ -2780,22 +2780,22 @@ export default class BuildTree extends Component {
      * @param {*} type Type of the node
      */
     calculateMOMData(nodeId, type) {
-        let { curTreeObj } = this.state;
+        let curTreeObj = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0];
         let { treeData } = this.state;
         let { dataSetObj } = this.state;
         var items = this.state.items;
         var programData = dataSetObj.programData;
         programData.treeList = treeData;
-        if (this.state.selectedScenario !== "") {
-            curTreeObj.tree.flatList = items;
-        }
-        curTreeObj.scenarioList = this.state.scenarioList;
+        // if (this.state.selectedScenario !== "") {
+        //     curTreeObj.tree.flatList = items;
+        // }
+        // curTreeObj.scenarioList = this.state.scenarioList;
         var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
         treeData[findTreeIndex] = curTreeObj;
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         if (this.state.autoCalculate) {
-            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false, false, this.state.autoCalculate);
+            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate);
         } else {
             this.setState({
                 loading: false,
@@ -6932,6 +6932,7 @@ export default class BuildTree extends Component {
         var json;
         var sortOrder = itemConfig.sortOrder;
         var scenarioList = this.state.scenarioList;
+        var scenarioListNew = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList;
         var childListBasedOnScenarion = [];
         for (let i = 0; i < childList.length; i++) {
             var child = JSON.parse(JSON.stringify(childList[i]));
@@ -6980,7 +6981,12 @@ export default class BuildTree extends Component {
                         newId: maxNodeDataId
                     });
                     (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    var tempData = child.payload.nodeDataMap[scenarioList[i].id];
+                    delete child.payload.nodeDataMap[scenarioList[i].id];
                     maxNodeDataId++;
+                    for (let j = 0; j < scenarioListNew.length; j++) {
+                        child.payload.nodeDataMap[scenarioListNew[j].id] = tempData;
+                    }
                 }
             }
             updatedFlatList.push(child);
@@ -6988,8 +6994,8 @@ export default class BuildTree extends Component {
         childListArr.map(item => {
             var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
-                for (let i = 0; i < scenarioList.length; i++) {
-                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioList[i].id])[0].nodeDataModelingList;
+                for (let i = 0; i < scenarioListNew.length; i++) {
+                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList;
                     if (nodeDataModelingList.length > 0) {
                         nodeDataModelingList.map((item1, c) => {
                             var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
@@ -7004,6 +7010,11 @@ export default class BuildTree extends Component {
             cursorItem: nodeId
         }, () => {
             this.calculateMOMData(itemConfig.parent, 2);
+            if(this.state.copyModalData == 2) {
+                setTimeout(() => {
+                    this.onRemoveButtonClick(itemConfig);
+                }, 0)
+            }
         });
     }
     /**
