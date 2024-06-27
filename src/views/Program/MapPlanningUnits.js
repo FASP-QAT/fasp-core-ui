@@ -773,10 +773,9 @@ export default class MapPlanningUnits extends Component {
                             },
                             {
                                 title: i18n.t('static.conversion.ConversionFactorFUPU'),
-                                type: 'numeric',
+                                type: 'text',
                                 readOnly:true,
-                                mask: '#,##0.00', 
-                                decimal: '.'
+                                tooltip: i18n.t("static.tooltip.conversionFactor"),
                             },
                             {
                                 title: i18n.t('static.programPU.planBasedOn'),
@@ -1171,7 +1170,7 @@ export default class MapPlanningUnits extends Component {
         }else if(x == 1){
             PlanningUnitService.getPlanningUnitById(rowData[1]).then(response => {
                 if (response.status == 200) {
-                    elInstance.setValueFromCoords(2, y, response.data.multiplier, true);
+                    elInstance.setValueFromCoords(2, y, (response.data.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                 }
             })
         }
@@ -1186,6 +1185,7 @@ export default class MapPlanningUnits extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
