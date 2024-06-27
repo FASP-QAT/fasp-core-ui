@@ -4963,6 +4963,9 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validationSchema={validationSchema}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.setState({
+                                    loading:true
+                                })
                                 ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
                                     .then(response => {
                                         let temp_version_status = 0;
@@ -4977,7 +4980,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var isAllCheckForReviewed = true;
                                                 for (var i = 0; i < json.length; i++) {
                                                     var map = new Map(Object.entries(json[i]));
-                                                    if (map.get("23") == 1) {
+                                                    if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id!=map.get("11") || this.state.problemList[i].reviewed.toString()!=map.get("21").toString() || map.get("22").toString()!="")) {
                                                         reviewedProblemList.push({
                                                             problemReportId: map.get("0"),
                                                             problemStatus: {
@@ -5028,13 +5031,16 @@ class EditSupplyPlanStatus extends Component {
                                                             if (this.state.program.currentVersion.versionStatus.id != 1) {
                                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                                             } else {
-                                                                document.getElementById("submitButton").disabled = false;
+                                                                try{
+                                                                    document.getElementById("submitButton").disabled = false;
+                                                                }catch(err){}
                                                                 this.setState({
                                                                     submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                                     submitColor: "green",
                                                                     problemReportChanged: 0,
                                                                     remainingDataChanged: 0,
-                                                                    loadSummaryTable:false
+                                                                    loadSummaryTable:false,
+                                                                    loading:false
 
                                                                     // isModalOpen: !this.state.isModalOpen,
                                                                 }, () => {
