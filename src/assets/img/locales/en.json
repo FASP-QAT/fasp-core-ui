@@ -3321,5 +3321,6 @@
     "static.pu.forecastErrorThresholdPercentage":"Forecast Error Threshold (%)",
     "static.pu.puNotesTooltip":"Add notes about product phase in/out, data sources, primary funders. etc. Notes will be visible in Supply Plan Report and in Supply Plan Version and Review screen.",
     "static.report.planningUnitNotes":"Planning Unit Notes",
-    "static.tree.conversionFUToPU":"FU:PU Conversion Factor"
+    "static.tree.conversionFUToPU":"FU:PU Conversion Factor",
+    "static.tooltip.conversionFactor":"For more details, go to Realm Level Masters > Products > Planning Units. If data looks incorrect, please submit a ticket in the QAT helpdesk."
 }
