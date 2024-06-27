@@ -53,7 +53,11 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
-                    scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                    if(!isTemplate){
+                        scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                    }else{
+                        scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                    }
                 }
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
