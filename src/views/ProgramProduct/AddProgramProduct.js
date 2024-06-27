@@ -260,7 +260,7 @@ class AddprogramPlanningUnit extends Component {
                                                     };
                                                     data[0] = myReasponse[j].productCategory.id;
                                                     data[1] = myReasponse[j].planningUnit.id;
-                                                    data[2] = myReasponse[j].multiplier;
+                                                    data[2] = (myReasponse[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                                                     data[3] = myReasponse[j].planBasedOn;
                                                     data[4] = myReasponse[j].reorderFrequencyInMonths;
                                                     data[5] = myReasponse[j].planBasedOn == 1 ? myReasponse[j].minMonthsOfStock : "";
@@ -354,10 +354,9 @@ class AddprogramPlanningUnit extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.conversion.ConversionFactorFUPU'),
-                                                        type: 'numeric',
+                                                        type: 'text',
                                                         readOnly: true,
-                                                        mask: '#,##0.00',
-                                                        decimal: '.'
+                                                        tooltip: i18n.t("static.tooltip.conversionFactor"),
                                                     },
                                                     {
                                                         title: i18n.t('static.programPU.planBasedOn'),
@@ -953,7 +952,7 @@ class AddprogramPlanningUnit extends Component {
         } else if (x == 1) {
             PlanningUnitService.getPlanningUnitById(rowData[1]).then(response => {
                 if (response.status == 200) {
-                    elInstance.setValueFromCoords(2, y, response.data.multiplier, true);
+                    elInstance.setValueFromCoords(2, y, (response.data.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                 }
             })
         }
@@ -1426,6 +1425,7 @@ class AddprogramPlanningUnit extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');

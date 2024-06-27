@@ -200,7 +200,7 @@ export default class PlanningUnitSetting extends Component {
         if(x == 1){
             PlanningUnitService.getPlanningUnitById(rowData[1]).then(response => {
                 if (response.status == 200) {
-                    elInstance.setValueFromCoords(2, y, response.data.multiplier, true);
+                    elInstance.setValueFromCoords(2, y, (response.data.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                 }
             })
         }
@@ -886,7 +886,7 @@ export default class PlanningUnitSetting extends Component {
             };
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id;
-            data[2] = outPutList[j].planningUnit.multiplier;
+            data[2] = (outPutList[j].planningUnit.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
             data[3] = outPutList[j].consuptionForecast
             data[4] = outPutList[j].treeForecast;
             data[5] = outPutList[j].stock;
@@ -979,10 +979,8 @@ export default class PlanningUnitSetting extends Component {
                 },
                 {
                     title: i18n.t('static.conversion.ConversionFactorFUPU'),
-                    type: 'numeric',
+                    type: 'text',
                     readOnly:true,
-                    mask: '#,##0.00', 
-                    decimal: '.'
                 },
                 {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
@@ -1275,6 +1273,7 @@ export default class PlanningUnitSetting extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('InfoTr');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('InfoTr');
@@ -1285,6 +1284,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[7].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[8].title = i18n.t('static.tooltip.DesiredMonthsofStock');
         tr.children[9].title = i18n.t('static.tooltip.PriceType');
+        tr.children[3].title = i18n.t('static.tooltip.conversionFactor');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         var jsonLength;
