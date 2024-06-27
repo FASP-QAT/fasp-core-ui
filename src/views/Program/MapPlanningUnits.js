@@ -1219,7 +1219,7 @@ export default class MapPlanningUnits extends Component {
                 planningUnit: {
                     id: map.get("1"),
                 },
-                reorderFrequencyInMonths: this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                reorderFrequencyInMonths: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 minMonthsOfStock: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 monthsInFutureForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 monthsInPastForAmc: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
