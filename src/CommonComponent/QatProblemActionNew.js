@@ -673,7 +673,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.consumptionDate <= myEndDate
                                                                                     && c.active.toString() == "true"
                                                                                     && c.region.id == regionList[r].regionId
-                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.consumptionQty!=0);
                                                                                 var index = problemActionList.findIndex(
                                                                                     c =>
                                                                                         c.region != null &&
