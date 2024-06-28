@@ -4676,16 +4676,26 @@ export default class CreateTreeTemplate extends Component {
         tr.children[3].title = i18n.t('static.momper.tooltip1');
         tr.children[4].classList.add('InfoTr');
         tr.children[4].title = i18n.t('static.momper.tooltip2');
-        tr.children[5].classList.add('InfoTr');
-        tr.children[5].title = i18n.t('static.momper.tooltip3');
-        tr.children[6].classList.add('InfoTr');
-        tr.children[6].title = i18n.t('static.momper.tooltip4');
-        tr.children[7].classList.add('InfoTr');
-        tr.children[7].title = i18n.t('static.momper.tooltip5');
-        tr.children[8].classList.add('InfoTr');
-        tr.children[8].title = i18n.t('static.momper.tooltip6');
-        tr.children[9].classList.add('InfoTr');
-        tr.children[9].title = i18n.t('static.momper.tooltip7');
+        if(tr.children[5]) {
+            tr.children[5].classList.add('InfoTr');
+            tr.children[5].title = i18n.t('static.momper.tooltip3');
+        }
+        if(tr.children[6]) {
+            tr.children[6].classList.add('InfoTr');
+            tr.children[6].title = i18n.t('static.momper.tooltip4');
+        }
+        if(tr.children[7]) {
+            tr.children[7].classList.add('InfoTr');
+            tr.children[7].title = i18n.t('static.momper.tooltip5');
+        }
+        if(tr.children[8]) {
+            tr.children[8].classList.add('InfoTr');
+            tr.children[8].title = i18n.t('static.momper.tooltip6');
+        }
+        if(tr.children[9]) {
+            tr.children[9].classList.add('InfoTr');
+            tr.children[9].title = i18n.t('static.momper.tooltip7');
+        }
     }
     /**
      * Builds jexcel table for modeling in number node or aggregation
