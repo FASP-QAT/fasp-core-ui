@@ -3100,7 +3100,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkOtherValidation = true;
         }
         var negativeBudget = 0;
-        var shipmentListAfterUpdate = this.props.items.shipmentListForSelectedPlanningUnitsUnfiltered.filter(c=>c.shipmentId>0 || c.index!=undefined);
+        var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered.filter(c=>c.shipmentId>0 || c.index!=undefined);
         var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
