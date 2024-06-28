@@ -25,6 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterCSV, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -122,7 +123,10 @@ class Budgets extends Component {
             fundingSources: [],
             programId: '',
             programValues: [],
-            jexcelDataEl: ""
+            jexcelDataEl: "",
+            fundingSourceTypes: [],
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: [],
         }
         this.formatDate = this.formatDate.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -148,6 +152,107 @@ class Budgets extends Component {
         this.refs.pickRange.show()
     }
     /**
+     * Retrieves the list of funding sources types.
+     */
+    getFundingSourceType = () => {
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+        //Fetch all funding source type list
+        FundingSourceService.getFundingSourceTypeListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    var fundingSourceTypeValues = [];
+                    // fundingSourceTypeLabels: [],
+
+                    // fundingSources.map(ele => {
+                    //     fundingSourceValues.push({ label: ele.code, value: ele.id })
+                    // })
+
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    var filteredfundingSourceTypes = listArray.filter(c => c.active == true && realmId == c.realm.id);
+                    console.log('filteredfundingSourceTypes: '+JSON.stringify(filteredfundingSourceTypes));
+
+                    filteredfundingSourceTypes.map(ele => {
+                        fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
+                    })
+
+                    this.setState({
+                        fundingSourceTypes: filteredfundingSourceTypes, loading: false,
+                        fundingSourceTypeValues: fundingSourceTypeValues,
+                        fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            // this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    this.setState({
+                        fundingSourceTypes: [], loading: false
+                    }, () => {
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+        fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+            fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+        }, () => {
+            // this.filterData()
+        })
+    }
+
+    /**
      * Retrieves the list of funding sources.
      */
     getFundingSource = () => {
@@ -156,6 +261,7 @@ class Budgets extends Component {
                 .then(response => {
                     var fundingSourceValues = [];
                     var fundingSources = response.data;
+                    console.log('fundingSources[0]: '+JSON.stringify(fundingSources[0]));
                     fundingSources.map(ele => {
                         fundingSourceValues.push({ label: ele.code, value: ele.id })
                     })
@@ -205,6 +311,7 @@ class Budgets extends Component {
      * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
      */
     handleFundingSourceChange = (fundingSourceIds) => {
+        console.log('fundingSourceIds: '+JSON.stringify(fundingSourceIds));
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -224,6 +331,8 @@ class Budgets extends Component {
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        this.state.fundingSourceTypeLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
@@ -283,15 +392,17 @@ class Budgets extends Component {
                         align: 'left'
                     })
                     var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 150, programText)
+                    doc.text(doc.internal.pageSize.width / 8, 105, programText)
+                    var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 120, fundingSourceTypeText)
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 150, fundingSourceText)
+                    doc.text(doc.internal.pageSize.width / 8, 135, fundingSourceText)
                 }
             }
         }
         const unit = "pt";
-        const size = "A4"; 
-        const orientation = "landscape"; 
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
@@ -481,7 +592,8 @@ class Budgets extends Component {
      * Calls the get programs and get funding source function on page load
      */
     componentDidMount() {
-        this.getPrograms()
+        this.getPrograms();
+        this.getFundingSourceType();
         this.getFundingSource();
     }
     /**
@@ -537,6 +649,7 @@ class Budgets extends Component {
                 )
             }, this);
         var budgets = this.state.selBudget.map((item, index) => (item.budget))
+        const { fundingSourceTypes } = this.state;
         const { fundingSources } = this.state;
         const { rangeValue } = this.state
         let data1 = []
@@ -715,6 +828,27 @@ class Budgets extends Component {
                                             value={this.state.programValues}
                                             onChange={(e) => { this.handleChangeProgram(e) }}
                                             options={programList && programList.length > 0 ? programList : []}
+                                            disabled={this.state.loading}
+                                        />
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3" >
+                                    <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="fundingSourceTypeId"
+                                            id="fundingSourceTypeId"
+                                            bsSize="md"
+                                            filterOptions={this.filterOptions}
+                                            value={this.state.fundingSourceTypeValues}
+                                            onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                                            options={fundingSourceTypes.length > 0
+                                                && fundingSourceTypes.map((item, i) => {
+                                                    return (
+                                                        { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                                    )
+                                                }, this)}
                                             disabled={this.state.loading}
                                         />
                                     </div>

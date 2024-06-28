@@ -778,6 +778,8 @@ class ShipmentGlobalView extends Component {
         } else {
             fundingSourceProcurementAgentIds = procurementAgentTypeIds;
         }
+        console.log('fundingSourceProcurementAgentIds: '+fundingSourceProcurementAgentIds);
+
         if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0))) {
             let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
             this.setState({

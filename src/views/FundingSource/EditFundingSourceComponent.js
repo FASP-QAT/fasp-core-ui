@@ -79,6 +79,7 @@ class EditFundingSourceComponent extends Component {
         //Fetches Funding source details by fundingSourceId
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
+                console.log('fundingSource: '+JSON.stringify(response.data));
                 this.setState({
                     fundingSource: response.data, loading: false
                 });

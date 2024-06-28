@@ -27,6 +27,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -72,7 +73,10 @@ class AnnualShipmentCost extends Component {
             message: '',
             programId: '',
             versionId: '',
-            loading: false
+            loading: false,
+            fundingSourceTypes: [],
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: [],
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -85,6 +89,7 @@ class AnnualShipmentCost extends Component {
         this.filterVersion = this.filterVersion.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
+        this.getFundingSourceType = this.getFundingSourceType.bind(this);
     }
     /**
      * Fetches data based on selected filters.
@@ -501,14 +506,20 @@ class AnnualShipmentCost extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
                         align: 'center'
                     })
+                    var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 130, fundingSourceTypeText)
+                    
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130, fundingSourceText)
+                    doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceTypeText.length * 10), fundingSourceText)
+                    
                     var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceText.length * 10), procurementAgentText)
+                    doc.text(doc.internal.pageSize.width / 8, 150 + (fundingSourceTypeText.length * 10) + (fundingSourceText.length * 10), procurementAgentText)
+                    
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 150 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), planningText)
+                    doc.text(doc.internal.pageSize.width / 8, 160 + (fundingSourceTypeText.length * 10) +(fundingSourceText.length * 10) + (procurementAgentText.length * 10), planningText)
+                    
                     var statustext = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.statusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 160 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10) + (planningText.length * 10), statustext)
+                    doc.text(doc.internal.pageSize.width / 8, 170 + (fundingSourceTypeText.length * 10) +(fundingSourceText.length * 10) + (procurementAgentText.length * 10) + (planningText.length * 10), statustext)
                 }
             }
         }
@@ -518,7 +529,7 @@ class AnnualShipmentCost extends Component {
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         var ystart = 200 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
-        ystart = ystart + 10;
+        ystart = ystart + 20;
         doc.setFontSize(9);
         doc.setTextColor("#002f6c");
         doc.setFont('helvetica', 'bold')
@@ -607,11 +618,11 @@ class AnnualShipmentCost extends Component {
                         doc.setFont('helvetica', 'normal')
                         if (yindex - 40 > doc.internal.pageSize.height - 110) {
                             doc.addPage();
-                            doc.text(formatter(values[n],0).toString(), initalvalue, 80, {
+                            doc.text(formatter(values[n], 0).toString(), initalvalue, 80, {
                                 align: 'left'
                             })
                         } else {
-                            doc.text(formatter(values[n],0).toString(), initalvalue, yindex - 0, {
+                            doc.text(formatter(values[n], 0).toString(), initalvalue, yindex - 0, {
                                 align: 'left'
                             })
                         }
@@ -622,11 +633,11 @@ class AnnualShipmentCost extends Component {
             if (yindex - 40 > doc.internal.pageSize.height - 110) {
                 doc.addPage();
                 yindex = 80;
-                doc.text(formatter(roundN2(total),0).toString(), initalvalue + index, 80, {
+                doc.text(formatter(roundN2(total), 0).toString(), initalvalue + index, 80, {
                     align: 'left',
                 });
             } else {
-                doc.text(formatter(roundN2(total),0).toString(), initalvalue + index, yindex - 0, {
+                doc.text(formatter(roundN2(total), 0).toString(), initalvalue + index, yindex - 0, {
                     align: 'left',
                 });
             }
@@ -651,7 +662,7 @@ class AnnualShipmentCost extends Component {
                     for (var l = 0; l < totalAmount.length; l++) {
                         initalvalue += index;
                         Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                        doc.text(formatter(roundN2(totalAmount[l]),0).toString(), initalvalue, yindex, {
+                        doc.text(formatter(roundN2(totalAmount[l]), 0).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
                         totalAmount[l] = 0;
@@ -676,7 +687,7 @@ class AnnualShipmentCost extends Component {
                 for (var l = 0; l < totalAmount.length; l++) {
                     initalvalue += index;
                     Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                    doc.text(formatter(roundN2(totalAmount[l]),0).toString(), initalvalue, yindex, {
+                    doc.text(formatter(roundN2(totalAmount[l]), 0).toString(), initalvalue, yindex, {
                         align: 'left'
                     })
                 }
@@ -700,11 +711,11 @@ class AnnualShipmentCost extends Component {
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             initalvalue += index;
             Gtotal = Gtotal + GrandTotalAmount[l]
-            doc.text(formatter(roundN2(GrandTotalAmount[l]),0).toString(), initalvalue, yindex, {
+            doc.text(formatter(roundN2(GrandTotalAmount[l]), 0).toString(), initalvalue, yindex, {
                 align: 'left'
             })
         }
-        doc.text(formatter(roundN2(Gtotal),0).toString(), initalvalue + index, yindex, {
+        doc.text(formatter(roundN2(Gtotal), 0).toString(), initalvalue + index, yindex, {
             align: 'left'
         });
         doc.setFontSize(8);
@@ -977,6 +988,106 @@ class AnnualShipmentCost extends Component {
                 }
             }
         });
+    }
+
+    /**
+     * Retrieves the list of funding sources types.
+     */
+    getFundingSourceType = () => {
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+        if (localStorage.getItem("sessionType") === 'Online') {
+            //Fetch all funding source type list
+            FundingSourceService.getFundingSourceTypeListAll()
+                .then(response => {
+                    if (response.status == 200) {
+                        var fundingSourceTypeValues = [];                  
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var filteredfundingSourceTypes = listArray.filter(c => c.active == true && realmId == c.realm.id);
+                        console.log('filteredfundingSourceTypes: '+JSON.stringify(filteredfundingSourceTypes));
+    
+                        filteredfundingSourceTypes.map(ele => {
+                            fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
+                        })
+    
+                        this.setState({
+                            fundingSourceTypes: filteredfundingSourceTypes, loading: false,
+                            fundingSourceTypeValues: fundingSourceTypeValues,
+                            fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                // this.hideSecondComponent();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        this.setState({
+                            fundingSourceTypes: [], loading: false
+                        }, () => {
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            //Offline
+            getDatabase();
+        }
+    }
+
+    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+        fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+            fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+        }, () => {
+            // this.filterData()
+        })
     }
     /**
      * Retrieves the list of funding sources.
@@ -1254,6 +1365,7 @@ class AnnualShipmentCost extends Component {
      */
     componentDidMount() {
         this.getPrograms();
+        this.getFundingSourceType();
         this.getFundingSourceList()
         this.getShipmentStatusList()
     }
@@ -1320,11 +1432,13 @@ class AnnualShipmentCost extends Component {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
         const { procurementAgents } = this.state;
-        
+
+        const { fundingSourceTypes } = this.state;
+
         const { fundingSources } = this.state;
-        
+
         const { shipmentStatuses } = this.state;
-        
+
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
@@ -1450,6 +1564,27 @@ class AnnualShipmentCost extends Component {
                                                     />
                                                 </div>
                                             </FormGroup>}
+                                            <FormGroup className="col-md-3" >
+                                                <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                                                <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect
+                                                        name="fundingSourceTypeId"
+                                                        id="fundingSourceTypeId"
+                                                        bsSize="md"
+                                                        // filterOptions={this.filterOptions}
+                                                        value={this.state.fundingSourceTypeValues}
+                                                        onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                                                        options={fundingSourceTypes.length > 0
+                                                            && fundingSourceTypes.map((item, i) => {
+                                                                return (
+                                                                    { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                                                )
+                                                            }, this)}
+                                                        disabled={this.state.loading}
+                                                    />
+                                                </div>
+                                            </FormGroup>
                                             <FormGroup className="col-md-3" id="fundingSourceDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>

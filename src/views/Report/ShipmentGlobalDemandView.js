@@ -483,6 +483,7 @@ class ShipmentGlobalDemandView extends Component {
                 this.setState({
                     message: '', loading: true
                 })
+                console.log('groupByProcurementAgentType: '+groupByProcurementAgentType);
                 var inputjson = {
                     realmId: realmId,
                     startDate: startDate,
