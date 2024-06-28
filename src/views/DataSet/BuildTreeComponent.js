@@ -2247,6 +2247,13 @@ export default class BuildTree extends Component {
         var levelNodes = [];
         if (this.state.childrenOf.length > 0) {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
+            var flatListUnsorted = this.state.curTreeObj.tree.flatList;
+            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+            var sortedArray = sortOrderArray.sort();
+            levelNodes = [];
+            for (var i = 0; i < sortedArray.length; i++) {
+                levelNodes.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
+            }
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
         }
