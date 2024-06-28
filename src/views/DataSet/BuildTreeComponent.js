@@ -2186,11 +2186,14 @@ export default class BuildTree extends Component {
      * Resets the reorder level
      */
     resetLevelReorder() {
+        this.getChildrenOfList();
         let { curTreeObj } = this.state;
         var items = curTreeObj.tree.flatList;
         items = JSON.parse(JSON.stringify(this.state.oldItems));
         curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
         this.setState({
+            levelName: curTreeObj.levelList.filter(m => m.levelNo == this.state.levelNo)[0].label.label_en,
+            levelUnit: curTreeObj.levelList.filter(m => m.levelNo == this.state.levelNo)[0].unit.id,
             isLevelChanged: false,
             curTreeObj,
             items
@@ -13160,7 +13163,7 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                     <p>Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.</p>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                                        <Label htmlFor="currencyId">See Children of</Label>
                                         <MultiSelect
                                             id="childrenOf"
                                             name="childrenOf"

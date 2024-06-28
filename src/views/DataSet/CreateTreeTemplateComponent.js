@@ -2047,11 +2047,14 @@ export default class CreateTreeTemplate extends Component {
      * Resets the reorder level
      */
     resetLevelReorder() {
+        this.getChildrenOfList();
         let { treeTemplate } = this.state;
         var items = treeTemplate.flatList;
         items = JSON.parse(JSON.stringify(this.state.oldItems));
         treeTemplate.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
         this.setState({
+            levelName: treeTemplate.levelList.filter(m => m.levelNo == this.state.levelNo)[0].label.label_en,
+            levelUnit: treeTemplate.levelList.filter(m => m.levelNo == this.state.levelNo)[0].unit.id,
             isLevelChanged: false,
             treeTemplate,
             items
@@ -12510,7 +12513,7 @@ export default class CreateTreeTemplate extends Component {
                                     </FormGroup>
                                     <p>Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.</p>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">See children of</Label>
+                                        <Label htmlFor="currencyId">See Children of</Label>
                                         <MultiSelect
                                             id="childrenOf"
                                             name="childrenOf"
