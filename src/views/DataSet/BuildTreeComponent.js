@@ -2779,32 +2779,42 @@ export default class BuildTree extends Component {
      * @param {*} nodeId Node Id for which the month on month should be built
      * @param {*} type Type of the node
      */
-    calculateMOMData(nodeId, type) {
-        let curTreeObj = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0];
-        let { treeData } = this.state;
-        let { dataSetObj } = this.state;
-        var items = this.state.items;
-        var programData = dataSetObj.programData;
-        programData.treeList = treeData;
-        // if (this.state.selectedScenario !== "") {
-        //     curTreeObj.tree.flatList = items;
-        // }
-        // curTreeObj.scenarioList = this.state.scenarioList;
-        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-        treeData[findTreeIndex] = curTreeObj;
-        programData.treeList = treeData;
-        dataSetObj.programData = programData;
-        if (this.state.autoCalculate) {
-            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate);
-        } else {
-            this.setState({
-                loading: false,
-                modelingJexcelLoader: false,
-                momJexcelLoader: false,
-                message1: "Data updated successfully"
-            }, () => {
-            })
-        }
+    calculateMOMData(nodeId, type, isCopy) {
+        return new Promise((resolve, reject) => {
+            let curTreeObj;
+            if(isCopy) {
+                curTreeObj = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0];
+            } else {
+                curTreeObj = this.state.curTreeObj;
+            }
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            var items = this.state.items;
+            var programData = dataSetObj.programData;
+            programData.treeList = treeData;
+            if(!isCopy) {
+                if (this.state.selectedScenario !== "") {
+                    curTreeObj.tree.flatList = items;
+                }
+                curTreeObj.scenarioList = this.state.scenarioList;
+            }
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+            programData.treeList = treeData;
+            dataSetObj.programData = programData;
+            if (this.state.autoCalculate) {
+                calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), curTreeObj.scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate);
+            } else {
+                this.setState({
+                    loading: false,
+                    modelingJexcelLoader: false,
+                    momJexcelLoader: false,
+                    message1: "Data updated successfully"
+                }, () => {
+                })
+            }
+            resolve();
+        });
     }
     /**
      * Fetches tracer category list from program data and updates state accordingly.
@@ -3416,7 +3426,7 @@ export default class BuildTree extends Component {
                                 this.handleAMonthDissmis3(this.state.singleValue2, 0);
                                 this.hideSecondComponent();
                                 if (flag) {
-                                    this.calculateMOMData(0, 2);
+                                    this.calculateMOMData(0, 2, false);
                                 }
                             });
                         }.bind(this)
@@ -4493,7 +4503,7 @@ export default class BuildTree extends Component {
                                 yearsOfTarget: "",
                                 actualOrTargetValueList: []
                             }, () => {
-                                this.calculateMOMData(this.state.currentItemConfig.context.id, 0);
+                                this.calculateMOMData(this.state.currentItemConfig.context.id, 0, false);
                             });
                         } else {
                             this.setState({
@@ -6289,7 +6299,7 @@ export default class BuildTree extends Component {
                             this.fetchTracerCategoryList(programData);
                             var tree = programData.treeList.filter(c => c.treeId == this.state.treeId)[0];
                             if (tree != null && tree.generateMom == 1) {
-                                this.calculateMOMData(0, 2);
+                                this.calculateMOMData(0, 2, false);
                             } else {
                                 this.setState({ loading: false })
                             }
@@ -6914,7 +6924,7 @@ export default class BuildTree extends Component {
             items,
             cursorItem: nodeId
         }, () => {
-            this.calculateMOMData(itemConfig.parent, 2);
+            this.calculateMOMData(itemConfig.parent, 2, true);
         });
     }
     copyMoveNode() {
@@ -7009,12 +7019,11 @@ export default class BuildTree extends Component {
             // items,
             cursorItem: nodeId
         }, () => {
-            this.calculateMOMData(itemConfig.parent, 2);
-            if(this.state.copyModalData == 2) {
-                setTimeout(() => {
+            this.calculateMOMData(itemConfig.parent, 2, true).then(() => {
+                if(this.state.copyModalData == 2) {
                     this.onRemoveButtonClick(itemConfig);
-                }, 0)
-            }
+                }
+            })
         });
     }
     /**
@@ -7434,7 +7443,7 @@ export default class BuildTree extends Component {
                 this.setState({
                     loading: true
                 })
-                this.calculateMOMData(0, 2);
+                this.calculateMOMData(0, 2, false);
             }
         })
     }
@@ -7841,7 +7850,7 @@ export default class BuildTree extends Component {
             branchTemplateId: "",
             missingPUList: []
         }, () => {
-            this.calculateMOMData(this.state.parentNodeIdForBranch, 2);
+            this.calculateMOMData(this.state.parentNodeIdForBranch, 2, false);
         });
     }
     /**
@@ -8714,7 +8723,7 @@ export default class BuildTree extends Component {
             curTreeObj
         }, () => {
             if (!itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
-                this.calculateMOMData(parent, 0);
+                this.calculateMOMData(parent, 0, false);
             } else {
                 this.setState({
                     loading: false
@@ -8816,7 +8825,7 @@ export default class BuildTree extends Component {
             if (itemConfig.context.payload.nodeType.id == 4) {
                 this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
             } else {
-                this.calculateMOMData(newItem.id, 0);
+                this.calculateMOMData(newItem.id, 0, false);
             }
         });
     }
@@ -8872,9 +8881,9 @@ export default class BuildTree extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
                 if (itemConfig.payload.nodeType.id == 2) {
-                    this.calculateMOMData(itemConfig.parent, 2);
+                    this.calculateMOMData(itemConfig.parent, 2, false);
                 } else {
-                    this.calculateMOMData(itemConfig.id, 2);
+                    this.calculateMOMData(itemConfig.id, 2, false);
                 }
             }, 0);
         });
@@ -9187,7 +9196,7 @@ export default class BuildTree extends Component {
             isSubmitClicked: false,
             curTreeObj
         }, () => {
-            this.calculateMOMData(currentItemConfig.context.id, 0);
+            this.calculateMOMData(currentItemConfig.context.id, 0, false);
         });
     }
     /**
