@@ -741,7 +741,16 @@ export default class BuildTree extends Component {
             dropdownSources: {},
             childrenOfList: [],
             childrenOf: [],
-            isLevelChanged: false
+            isLevelChanged: false,
+            copyModal: false,
+            copyModalNode: "",
+            copyModalData: "",
+            copyModalTree: "",
+            copyModalParentLevel: "",
+            copyModalParentNode: "",
+            copyModalTreeList: [],
+            copyModalParentLevelList: [],
+            copyModalParentNodeList: []
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -895,7 +904,11 @@ export default class BuildTree extends Component {
         this.resetLevelReorder = this.resetLevelReorder.bind(this);
         this.getChildrenOfList = this.getChildrenOfList.bind(this);
         this.childrenOfChanged = this.childrenOfChanged.bind(this);
-        this.levelDropdownChange = this.levelDropdownChange.bind(this);
+        this.levelDropdownChange = this.copyModalTreeChange.bind(this);
+        this.copyModalTreeChange = this.levelDropdownChange.bind(this);
+        this.copyModalParentLevelChange = this.copyModalParentLevelChange.bind(this);
+        this.copyModalParentNodeChange = this.copyModalParentNodeChange.bind(this);
+        this.copyMoveNode = this.copyMoveNode.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -2581,6 +2594,84 @@ export default class BuildTree extends Component {
             this.saveTreeData(false, false)
         });
     }
+    copyMoveChange(event) {
+        let val;
+        let copyModalTree = this.state.treeId;
+        let copyModalParentLevel;
+        let copyModalParentNode;
+        let copyModalTreeList = [];
+        let copyModalParentLevelList = [];
+        let copyModalParentNodeList = [];
+        let allowedNodeTypeList = []; 
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
+        if (event.target.name === "copyMove") {
+            val = event.target.id === "copyMoveTrue" ? 1 : 2;
+        }
+        copyModalTreeList = this.state.treeData;
+        copyModalParentLevelList = this.state.curTreeObj.levelList;
+        if(val == 1) {
+            copyModalParentLevel = this.state.copyModalNode.level-1;
+            copyModalParentNodeList = this.state.curTreeObj.tree.flatList.filter(m => m.level == copyModalParentLevel);
+            copyModalParentNode = this.state.copyModalNode.parent;
+        } else if(val == 2) {
+            copyModalParentLevel = "";
+            copyModalParentNode = "";
+            copyModalParentNodeList = [];
+        }
+        this.setState({
+            copyModalData: val,
+            copyModalTree: copyModalTree,
+            copyModalTreeList: copyModalTreeList,
+            copyModalParentLevelList: copyModalParentLevelList,
+            copyModalParentLevel: copyModalParentLevel,
+            copyModalParentNodeList: copyModalParentNodeList,
+            copyModalParentNode: copyModalParentNode
+        })
+    }
+    copyModalTreeChange(event) {
+        let copyModalTree = event.target.value;
+        let copyModalParentLevel;
+        let copyModalParentNode;
+        let copyModalTreeList = [];
+        let copyModalParentLevelList = [];
+        let copyModalParentNodeList = [];
+        let allowedNodeTypeList = []; 
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
+        copyModalTreeList = this.state.treeData;
+        copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
+        if(this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
+            copyModalParentLevel = this.state.copyModalNode.level-1;
+            copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
+            copyModalParentNode = this.state.copyModalNode.parent;
+        } else if(this.state.copyModalData == 2 || copyModalTree != this.state.treeId) {
+            copyModalParentLevel = "";
+            copyModalParentNode = "";
+            copyModalParentNodeList = [];
+        }
+        this.setState({
+            copyModalTree: copyModalTree,
+            copyModalTreeList: copyModalTreeList,
+            copyModalParentLevelList: copyModalParentLevelList,
+            copyModalParentLevel: copyModalParentLevel,
+            copyModalParentNodeList: copyModalParentNodeList,
+            copyModalParentNode: copyModalParentNode
+        })
+    }
+    copyModalParentLevelChange(e) {
+        let allowedNodeTypeList = [];
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
+        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
+        this.setState({
+            copyModalParentLevel: e.target.value,
+            copyModalParentNodeList: copyModalParentNodeList,
+            copyModalParentNode: ""
+        })
+    }
+    copyModalParentNodeChange(e) {
+        this.setState({
+            copyModalParentNode: e.target.value
+        })
+    }
     /**
      * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
      * Updates the PU per visit value in the current scenario's node data map.
@@ -2632,13 +2723,13 @@ export default class BuildTree extends Component {
      * Finds max node data Id
      * @returns Max node data Id
      */
-    getMaxNodeDataId() {
+    getMaxNodeDataId(isCopy) {
         var maxNodeDataId = 0;
-        var items = this.state.items;
+        var items = isCopy ? this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList : this.state.items;
         var nodeDataMap = [];
         var nodeDataMapIdArr = [];
         for (let i = 0; i < items.length; i++) {
-            var scenarioList = this.state.scenarioList;
+            var scenarioList = isCopy ? this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList : this.state.scenarioList;
             for (let j = 0; j < scenarioList.length; j++) {
                 if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
                     nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
@@ -2712,39 +2803,49 @@ export default class BuildTree extends Component {
      * @param {*} nodeId Node Id for which the month on month should be built
      * @param {*} type Type of the node
      */
-    calculateMOMData(nodeId, type) {
-        let { curTreeObj } = this.state;
-        let { treeData } = this.state;
-        let { dataSetObj } = this.state;
-        var items = this.state.items;
-        var programData = dataSetObj.programData;
-        programData.treeList = treeData;
-        if (this.state.selectedScenario !== "") {
-            curTreeObj.tree.flatList = items;
-        }
-        curTreeObj.scenarioList = this.state.scenarioList;
-        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-        treeData[findTreeIndex] = curTreeObj;
-        programData.treeList = treeData;
-        dataSetObj.programData = programData;
-        if (this.state.autoCalculate) {
-            var scenarioId = this.state.selectedScenario;
-            if (this.state.calculateAllScenario) {
-                scenarioId = -1;
+    calculateMOMData(nodeId, type, isCopy) {
+        return new Promise((resolve, reject) => {
+            let curTreeObj;
+            if(isCopy) {
+                curTreeObj = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0];
+            } else {
+                curTreeObj = this.state.curTreeObj;
             }
-            this.setState({
-                calculateAllScenario: false
-            })
-            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, this.state.autoCalculate);
-        } else {
-            this.setState({
-                loading: false,
-                modelingJexcelLoader: false,
-                momJexcelLoader: false,
-                message1: "Data updated successfully"
-            }, () => {
-            })
-        }
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            var items = this.state.items;
+            var programData = dataSetObj.programData;
+            programData.treeList = treeData;
+            if(!isCopy) {
+                if (this.state.selectedScenario !== "") {
+                    curTreeObj.tree.flatList = items;
+                }
+                curTreeObj.scenarioList = this.state.scenarioList;
+            }
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+            programData.treeList = treeData;
+            dataSetObj.programData = programData;
+            if (this.state.autoCalculate) {
+                var scenarioId = this.state.selectedScenario;
+                if (this.state.calculateAllScenario) {
+                    scenarioId = -1;
+                }
+                this.setState({
+                    calculateAllScenario: false
+                })
+                calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), curTreeObj.scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate);
+            } else {
+                this.setState({
+                    loading: false,
+                    modelingJexcelLoader: false,
+                    momJexcelLoader: false,
+                    message1: "Data updated successfully"
+                }, () => {
+                })
+            }
+            resolve();
+        });
     }
     /**
      * Fetches tracer category list from program data and updates state accordingly.
@@ -3362,7 +3463,7 @@ export default class BuildTree extends Component {
                                 this.handleAMonthDissmis3(this.state.singleValue2, 0);
                                 this.hideSecondComponent();
                                 if (flag) {
-                                    this.calculateMOMData(0, 2);
+                                    this.calculateMOMData(0, 2, false);
                                 }
                             });
                         }.bind(this)
@@ -4477,7 +4578,7 @@ export default class BuildTree extends Component {
                                 actualOrTargetValueList: [],
                                 modelingChangedOrAdded: false
                             }, () => {
-                                this.calculateMOMData(this.state.currentItemConfig.context.id, 0);
+                                this.calculateMOMData(this.state.currentItemConfig.context.id, 0, false);
                             });
                         } else {
                             this.setState({
@@ -6288,7 +6389,7 @@ export default class BuildTree extends Component {
                             this.fetchTracerCategoryList(programData);
                             var tree = programData.treeList.filter(c => c.treeId == this.state.treeId)[0];
                             if (tree != null && tree.generateMom == 1) {
-                                this.calculateMOMData(0, 2);
+                                this.calculateMOMData(0, 2, false);
                             } else {
                                 this.setState({ loading: false })
                             }
@@ -6850,7 +6951,7 @@ export default class BuildTree extends Component {
     duplicateNode(itemConfig) {
         var items1 = this.state.items;
         const { items } = this.state;
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(true);
         var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
         var childListArr = [];
         var json;
@@ -6925,7 +7026,106 @@ export default class BuildTree extends Component {
             items,
             // cursorItem: nodeId
         }, () => {
-            this.calculateMOMData(itemConfig.parent, 2);
+            this.calculateMOMData(itemConfig.parent, 2, true);
+        });
+    }
+    copyMoveNode() {
+        // Selected Tree Id: this.state.copyModalTree
+        // Tree List: this.state.copyModalTreeList this.state.treeData
+        // Node selected: this.state.copyModalNode
+        // Current tree nodes: this.state.items  
+        var itemConfig = this.state.copyModalNode;
+        var items1 = this.state.items;
+        const { items } = this.state;
+        var updatedFlatList = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList;
+        var maxNodeDataId = this.getMaxNodeDataId(true);
+        var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
+        var childListArr = [];
+        var json;
+        var sortOrder = itemConfig.sortOrder;
+        var scenarioList = this.state.scenarioList;
+        var scenarioListNew = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList;
+        var childListBasedOnScenarion = [];
+        for (let i = 0; i < childList.length; i++) {
+            var child = JSON.parse(JSON.stringify(childList[i]));
+            var maxNodeId = updatedFlatList.length > 0 ? Math.max(...updatedFlatList.map(o => o.id)) : 0;
+            var nodeId = parseInt(maxNodeId + 1);
+            if (sortOrder == child.sortOrder) {
+                child.payload.nodeId = nodeId;
+                child.parent = this.state.copyModalParentNode;
+                child.payload.parentNodeId = this.state.copyModalParentNode;
+                child.id = nodeId;
+                var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
+                var childList1 = items.filter(c => c.parent == itemConfig.parent);
+                var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
+                json = {
+                    oldId: itemConfig.id,
+                    newId: nodeId,
+                    oldSortOrder: itemConfig.sortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            } else {
+                var parentNode = childListArr.filter(x => x.oldId == child.parent)[0];
+                child.payload.nodeId = nodeId;
+                var oldId = child.id;
+                var oldSortOrder = child.sortOrder;
+                child.id = nodeId;
+                child.parent = parentNode.newId;
+                child.payload.parentNodeId = child.parent;
+                var parentSortOrder = parentNode.newSortOrder;
+                var childList1 = items.filter(c => c.parent == parentNode.newId);
+                var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
+                json = {
+                    oldId: oldId,
+                    newId: nodeId,
+                    oldSortOrder: oldSortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            }
+            if (scenarioList.length > 0) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    childListBasedOnScenarion.push({
+                        oldId: (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId,
+                        newId: maxNodeDataId
+                    });
+                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    var tempData = child.payload.nodeDataMap[scenarioList[i].id];
+                    delete child.payload.nodeDataMap[scenarioList[i].id];
+                    maxNodeDataId++;
+                    for (let j = 0; j < scenarioListNew.length; j++) {
+                        child.payload.nodeDataMap[scenarioListNew[j].id] = tempData;
+                    }
+                }
+            }
+            updatedFlatList.push(child);
+        }
+        childListArr.map(item => {
+            var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
+            if (indexItems != -1) {
+                for (let i = 0; i < scenarioListNew.length; i++) {
+                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList;
+                    if (nodeDataModelingList.length > 0) {
+                        nodeDataModelingList.map((item1, c) => {
+                            var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                            item1.transferNodeDataId = newTransferId[0].newId;
+                        })
+                    }
+                }
+            }
+        })
+        this.setState({
+            // items,
+            cursorItem: nodeId
+        }, () => {
+            this.calculateMOMData(itemConfig.parent, 2, true).then(() => {
+                if(this.state.copyModalData == 2) {
+                    this.onRemoveButtonClick(itemConfig);
+                }
+            })
         });
     }
     /**
@@ -7345,7 +7545,7 @@ export default class BuildTree extends Component {
                 this.setState({
                     loading: true
                 })
-                this.calculateMOMData(0, 2);
+                this.calculateMOMData(0, 2, false);
             }
         })
     }
@@ -7678,7 +7878,7 @@ export default class BuildTree extends Component {
         var tempArray = [];
         var tempJson = {};
         var tempTree = {};
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(false);
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var scenarioList = this.state.scenarioList;
         var nodeArr = [];
@@ -7752,7 +7952,7 @@ export default class BuildTree extends Component {
             branchTemplateId: "",
             missingPUList: []
         }, () => {
-            this.calculateMOMData(this.state.parentNodeIdForBranch, 2);
+            this.calculateMOMData(this.state.parentNodeIdForBranch, 2, false);
         });
     }
     /**
@@ -8611,7 +8811,7 @@ export default class BuildTree extends Component {
         newItem.payload.label = pu.label;
         newItem.payload.nodeType.id = 5;
         newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("01").slice(-2));
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId(false);
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = 100;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
@@ -8640,7 +8840,7 @@ export default class BuildTree extends Component {
                 var nodeDataMap = {};
                 tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
                 nodeDataMap = newItem.payload.nodeDataMap;
-                tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                tempArray[0].nodeDataId = this.getMaxNodeDataId(false);
                 nodeDataMap[scenarioList[i].id] = tempArray;
                 newItem.payload.nodeDataMap = nodeDataMap;
             }
@@ -8652,7 +8852,7 @@ export default class BuildTree extends Component {
             curTreeObj
         }, () => {
             if (!itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
-                this.calculateMOMData(parent, 0);
+                this.calculateMOMData(parent, 0, false);
             } else {
                 this.setState({
                     loading: false
@@ -8708,7 +8908,7 @@ export default class BuildTree extends Component {
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         var maxSortOrder = childList.length > 0 ? Math.max(...childList.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(false);
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
@@ -8754,7 +8954,7 @@ export default class BuildTree extends Component {
             if (itemConfig.context.payload.nodeType.id == 4) {
                 this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
             } else {
-                this.calculateMOMData(newItem.id, 0);
+                this.calculateMOMData(newItem.id, 0, false);
             }
         });
     }
@@ -8810,9 +9010,9 @@ export default class BuildTree extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
                 if (itemConfig.payload.nodeType.id == 2) {
-                    this.calculateMOMData(itemConfig.parent, 2);
+                    this.calculateMOMData(itemConfig.parent, 2, false);
                 } else {
-                    this.calculateMOMData(itemConfig.id, 2);
+                    this.calculateMOMData(itemConfig.id, 2, false);
                 }
             }, 0);
         });
@@ -9125,7 +9325,7 @@ export default class BuildTree extends Component {
             isSubmitClicked: false,
             curTreeObj
         }, () => {
-            this.calculateMOMData(currentItemConfig.context.id, 0);
+            this.calculateMOMData(currentItemConfig.context.id, 0, false);
         });
     }
     /**
@@ -12069,7 +12269,18 @@ export default class BuildTree extends Component {
                                     <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
-                                            this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                            this.setState({
+                                                copyModal: true,
+                                                copyModalData: "",
+                                                copyModalTree: "",
+                                                copyModalParentLevel: "",
+                                                copyModalParentNode: "",
+                                                copyModalTreeList: [],
+                                                copyModalParentLevelList: [],
+                                                copyModalParentNodeList: [],
+                                                copyModalNode: JSON.parse(JSON.stringify(itemConfig))
+                                            })
+                                            // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
                                         }}>
                                         <i class="fa fa-clone" aria-hidden="true"></i>
                                     </button>
@@ -13337,6 +13548,148 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </div>
                                         }
+                                    </FormGroup>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <div className="mr-0">
+                                        <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                    </div>
+                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetLevelReorder()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                </ModalFooter>
+                            </Form>
+                        )} />
+            </Modal>
+            <Modal isOpen={this.state.copyModal}
+                className={'modal-md'}>
+                <Formik
+                    enableReinitialize={true}
+                    // validationSchema={validationSchemaLevel}
+                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                        this.copyMoveNode();
+                    }}
+                    render={
+                        ({
+                            values,
+                            errors,
+                            touched,
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            isSubmitting,
+                            isValid,
+                            setTouched,
+                            handleReset,
+                            setFieldValue,
+                            setFieldTouched
+                        }) => (
+                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='copyModalForm' autocomplete="off">
+                                <ModalHeader toggle={() => this.setState({copyModal: false})} className="modalHeader">
+                                    <strong>Move/Copy Node</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <FormGroup>
+                                        <FormGroup check inline>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="copyMoveTrue"
+                                                name="copyMove"
+                                                value={1}
+                                                checked={this.state.copyModalData == 1 ? true : false}
+                                                onChange={(e) => {
+                                                    this.copyMoveChange(e)
+                                                }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio1">
+                                                Copy
+                                            </Label>
+                                        </FormGroup>
+                                        <FormGroup check inline>
+                                            <Input
+                                                className="form-check-input"
+                                                type="radio"
+                                                id="copyMoveFalse"
+                                                name="copyMove"
+                                                value={2}
+                                                checked={this.state.copyModalData == 2 ? true : false}
+                                                onChange={(e) => {
+                                                    this.copyMoveChange(e)
+                                                }}
+                                            />
+                                            <Label
+                                                className="form-check-label"
+                                                check htmlFor="inline-radio2">
+                                                Move
+                                            </Label>
+                                        </FormGroup>
+                                        <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">Tree Name</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelDropdown"
+                                            name="levelDropdown"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.copyModalTreeChange(e) }}
+                                            value={this.state.copyModalTree}
+                                        >
+                                            <option value="">Select</option>
+                                            {this.state.treeData.length > 0
+                                                && this.state.treeData.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.treeId}>
+                                                            {getLabelText(item.label, this.state.lang)}
+                                                        </option>
+                                                    )
+                                                }, this)
+                                            }
+                                        </Input>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">Parent Level</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelDropdown"
+                                            name="levelDropdown"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.copyModalParentLevelChange(e) }}
+                                            value={this.state.copyModalParentLevel}
+                                        >
+                                            <option value="">Select</option>
+                                            {this.state.copyModalParentLevelList.length > 0
+                                                && this.state.copyModalParentLevelList.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.levelNo}>
+                                                            {item.label.label_en}
+                                                        </option>
+                                                    )
+                                                }, this)}
+                                        </Input>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="currencyId">Parent Node</Label>
+                                        <Input
+                                            type="select"
+                                            id="levelDropdown"
+                                            name="levelDropdown"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.copyModalParentNodeChange(e) }}
+                                            value={this.state.copyModalParentNode}
+                                        >
+                                            <option value="">Select</option>
+                                            {this.state.copyModalParentNodeList.length > 0
+                                                && this.state.copyModalParentNodeList.map((item, i) => {
+                                                    return (
+                                                        <option key={i} value={item.id}>
+                                                            {item.payload.label.label_en}
+                                                        </option>
+                                                    )
+                                                }, this)}
+                                        </Input>
                                     </FormGroup>
                                 </ModalBody>
                                 <ModalFooter>
