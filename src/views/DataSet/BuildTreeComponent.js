@@ -2704,13 +2704,13 @@ export default class BuildTree extends Component {
      * Finds max node data Id
      * @returns Max node data Id
      */
-    getMaxNodeDataId() {
+    getMaxNodeDataId(isCopy) {
         var maxNodeDataId = 0;
-        var items = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList;
+        var items = isCopy ? this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList : this.state.items;
         var nodeDataMap = [];
         var nodeDataMapIdArr = [];
         for (let i = 0; i < items.length; i++) {
-            var scenarioList = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList;;
+            var scenarioList = isCopy ? this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].scenarioList : this.state.scenarioList;
             for (let j = 0; j < scenarioList.length; j++) {
                 if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
                     nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
@@ -6849,7 +6849,7 @@ export default class BuildTree extends Component {
     duplicateNode(itemConfig) {
         var items1 = this.state.items;
         const { items } = this.state;
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(true);
         var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
         var childListArr = [];
         var json;
@@ -6936,7 +6936,7 @@ export default class BuildTree extends Component {
         var items1 = this.state.items;
         const { items } = this.state;
         var updatedFlatList = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList;
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(true);
         var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
         var childListArr = [];
         var json;
@@ -7776,7 +7776,7 @@ export default class BuildTree extends Component {
         var tempArray = [];
         var tempJson = {};
         var tempTree = {};
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(false);
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var scenarioList = this.state.scenarioList;
         var nodeArr = [];
@@ -8682,7 +8682,7 @@ export default class BuildTree extends Component {
         newItem.payload.label = pu.label;
         newItem.payload.nodeType.id = 5;
         newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("01").slice(-2));
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId(false);
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = 100;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
@@ -8711,7 +8711,7 @@ export default class BuildTree extends Component {
                 var nodeDataMap = {};
                 tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
                 nodeDataMap = newItem.payload.nodeDataMap;
-                tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                tempArray[0].nodeDataId = this.getMaxNodeDataId(false);
                 nodeDataMap[scenarioList[i].id] = tempArray;
                 newItem.payload.nodeDataMap = nodeDataMap;
             }
@@ -8779,7 +8779,7 @@ export default class BuildTree extends Component {
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         var maxSortOrder = childList.length > 0 ? Math.max(...childList.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
-        var maxNodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId(false);
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
