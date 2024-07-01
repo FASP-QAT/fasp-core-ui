@@ -7,12 +7,14 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import DatasetService from '../../api/DatasetService';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.common.TreeTemplate"))
 let summaryText_2 = "Edit Tree Template"
 const initialValues = {
     summary: summaryText_1,
     templateName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
 /**
  * This const is used to define the validation schema for tree template ticket component
@@ -40,7 +42,8 @@ export default class EditTreeTemplateTicketComponent extends Component {
             treeTemplate: {
                 summary: summaryText_1,
                 templateName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -51,6 +54,7 @@ export default class EditTreeTemplateTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -152,6 +156,24 @@ export default class EditTreeTemplateTicketComponent extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { treeTemplate } = this.state;
+        treeTemplate.priority = newState;
+        this.setState(
+            {
+                treeTemplate
+            }, () => {
+                // console.log('priority - state : '+this.state.treeTemplate.priority);
+            }
+        );
+    }
+
     /**
      * This function is called when reset button is clicked to reset the tree template details
      */
@@ -159,6 +181,7 @@ export default class EditTreeTemplateTicketComponent extends Component {
         let { treeTemplate } = this.state;
         treeTemplate.templateName = '';
         treeTemplate.notes = '';
+        treeTemplate.priority = 3;
         this.setState({
             treeTemplate: treeTemplate,
             templateId: ''
@@ -311,6 +334,9 @@ export default class EditTreeTemplateTicketComponent extends Component {
                                             value={this.state.treeTemplate.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.treeTemplate.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

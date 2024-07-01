@@ -954,7 +954,7 @@ export default class InitialTicketPageComponent extends Component {
     return (
       <Dropdown nav  >
         {checkOnline==='Online' && <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{ width: '31px', height: '31px' }} />}
-        <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} backdrop="static">
+        <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} size='lg' backdrop="static">
           <AuthenticationServiceComponent history={this.props.history} />
                     <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
           <ModalBody className="pb-0">
