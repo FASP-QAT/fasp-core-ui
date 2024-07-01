@@ -295,7 +295,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             extrapolationNotes: null,
             offlineTES: false,
             offlineArima: false,
-            isDisabled: false
+            isDisabled: false,
+            onlyDownloadedProgram: false
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -314,6 +315,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setButtonFlag = this.setButtonFlag.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
+        this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
     }
     /**
      * Handles change for seasonality check box.
@@ -328,11 +330,42 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
-        this.setState({ loading: true })
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
+        this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
         var db1;
         getDatabase();
         this.getPrograms();
         this.getDateDifference();
+    }
+    /**
+     * Handles the change event of the diplaying only downloaded programs.
+     * @param {Object} event - The event object containing the checkbox state.
+     */
+    changeOnlyDownloadedProgram(event) {
+        var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                planningUnitList: this.state.versionId.toString().includes('Local') ? this.state.planningUnitList : [],
+                regionList: this.state.versionId.toString().includes('Local') ? this.state.regionList : [],
+                forecastProgramId: this.state.versionId.toString().includes('Local') ? this.state.forecastProgramId : "",
+                onlyDownloadedProgram: true,
+                loading: false
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedProgram: false,
+                loading: false
+            }, () => {
+                this.getPrograms();
+            })
+        }
     }
     /**
      * Retrieves list of all programs
@@ -384,7 +417,12 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({ loading: true })
         const lan = 'en';
         const { forecastProgramList } = this.state
-        var proList = forecastProgramList;
+        var proList;
+        if(this.state.onlyDownloadedProgram) {
+            proList = [];
+        } else {
+            proList = forecastProgramList;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -435,10 +473,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     f = 1;
                                 }
                             }
-                            if (f == 0) {
+                            if(this.state.onlyDownloadedProgram) {
                                 proList.push(forecastProgramJson)
                             } else {
-                                proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
+                                if (f == 0) {
+                                    proList.push(forecastProgramJson)
+                                } else if(f == 1) {
+                                    proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
+                                }
                             }
                             downloadedProgramData.push(forecastProgramJson);
                         }
@@ -3468,6 +3510,25 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                                        <FormGroup className="col-md-3" style={{ marginTop: '30px' }}>
+                                            <div className="tab-ml-1 ml-lg-3">
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="onlyDownloadedProgram"
+                                                    name="onlyDownloadedProgram"
+                                                    checked={this.state.onlyDownloadedProgram}
+                                                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    {i18n.t('static.common.onlyDownloadedProgram')}
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
+                                    }
                                     {this.state.forecastProgramId != 0 && this.state.showDate && <><FormGroup className="col-md-12">
                                         <h5>
                                             {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&
@@ -3478,7 +3539,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </FormGroup>
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
-                                            <div className="controls edit">
+                                            <div className="controls edit" style={{backgroundColor: this.state.isDisabled ? "#e5edf5" : "#fff"}}>
                                                 <Picker
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     ref={this.pickRange1}
@@ -3488,7 +3549,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     onDismiss={this.handleRangeDissmis1}
                                                     readOnly
                                                 >
-                                                    <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this._handleClickRangeBox1} />
+                                                    <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this.state.isDisabled ? "" : this._handleClickRangeBox1} />
                                                 </Picker>
                                             </div>
                                         </FormGroup>
