@@ -834,6 +834,16 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
+                                                                        }else{
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                            }
                                                                         }
                                                                         break;
                                                                     case 24:
@@ -1018,6 +1028,16 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
+                                                                            }
+                                                                        }else{
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
                                                                         break;
