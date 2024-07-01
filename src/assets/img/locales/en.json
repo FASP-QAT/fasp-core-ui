@@ -3247,5 +3247,10 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.extrapolation.bulkExtrapolation": "Bulk Extraploation",
+    "static.extrapolation.optimizeTES&ARIMA": "Optimize TES & ARIMA",
+    "static.extrapolation.missingTES&ARIMA": "Missing TES & ARIMA",
+    "static.extrapolation.extrapolateUsingDefaultParams": "Extrapolate using default parameters",
+    "static.extrapolation.extrapolateUsingOptimizedArimaAndTes": "Extrapolate with optimized ARIMA & TES"
 }
