@@ -10573,7 +10573,7 @@ export default class BuildTree extends Component {
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
-                                    <span>{i18n.t('static.modelingTable.note')}</span>
+                                    <span className='DarkThColr'>{i18n.t('static.modelingTable.note')}</span>
                                     <div className="calculatorimg calculatorTable consumptionDataEntryTable">
                                         <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                         </div>
@@ -12339,7 +12339,7 @@ export default class BuildTree extends Component {
                                             <div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-12">
-                                                        <p>{i18n.t('static.tree.branchTemplateNotes1') + " "}<b>{this.state.nodeTypeParentNode}</b>{" " + i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" " + i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" " + i18n.t('static.dataset.TreeTemplate')}</a>{" " + i18n.t('static.tree.branchTemplateNotes4')}</p>
+                                                        <p className='DarkThColr'>{i18n.t('static.tree.branchTemplateNotes1') + " "}<b>{this.state.nodeTypeParentNode}</b>{" " + i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" " + i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" " + i18n.t('static.dataset.TreeTemplate')}</a>{" " + i18n.t('static.tree.branchTemplateNotes4')}</p>
                                                         <div className="controls">
                                                             <Input
                                                                 type="select"

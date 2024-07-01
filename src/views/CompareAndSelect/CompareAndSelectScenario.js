@@ -1946,7 +1946,7 @@ class CompareAndSelectScenario extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <Label htmlFor="appendedInputButton" className='DarkThColr'>{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
                                                         ref="pickRange"
