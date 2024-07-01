@@ -1602,14 +1602,13 @@ class CompareAndSelectScenario extends Component {
                         var map = puList[p].selectedForecastMap[regionId];
                         var selectedForecastString = "";
                         if (map != undefined && map.consumptionExtrapolationId != null) {
-                            var c = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
-                            // getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang)
-                            selectedForecastString = getLabelText(c.extrapolationMethod.label, this.state.lang)
+                            var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
+                            selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
                             planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
                         } else if (map != undefined && map.scenarioId != null && map.treeId != null) {
                             var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
                             var s = t.scenarioList.filter(s => s.id == map.scenarioId)[0];
-                            selectedForecastString = getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang)
+                            selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
                             planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
                         } else {
                             selectedForecastString = ""
