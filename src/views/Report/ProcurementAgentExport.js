@@ -1612,7 +1612,7 @@ class ProcurementAgentExport extends Component {
                       c.receivedDate == null || c.receivedDate == ""
                         ? c.expectedDeliveryDate
                         : c.receivedDate
-                    ).isBetween(startDate, endDate, null, "[)")
+                    ).isBetween(startDate, endDate, null, "[]")
                   );
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
@@ -2004,7 +2004,7 @@ class ProcurementAgentExport extends Component {
                       c.receivedDate == null || c.receivedDate == ""
                         ? c.expectedDeliveryDate
                         : c.receivedDate
-                    ).isBetween(startDate, endDate, null, "[)")
+                    ).isBetween(startDate, endDate, null, "[]")
                   );
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
@@ -2371,7 +2371,7 @@ class ProcurementAgentExport extends Component {
                     c.receivedDate == null || c.receivedDate == ""
                       ? c.expectedDeliveryDate
                       : c.receivedDate
-                  ).isBetween(startDate, endDate, null, "[)")
+                  ).isBetween(startDate, endDate, null, "[]")
                 );
                 let data = [];
                 let planningUnitFilter = [];
