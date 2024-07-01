@@ -3402,7 +3402,7 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.setState({
-            currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
+            currentEndValue: (getValue != '' && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: getValue != '' ? momValue : '',
             currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
             percentForOneMonth
