@@ -5396,7 +5396,7 @@ export default class CreateTreeTemplate extends Component {
         })
         this.setState({
             items,
-            cursorItem: nodeId,
+            // cursorItem: nodeId,
             isTemplateChanged: true
         }, () => {
             this.calculateMOMData(0, 2);
@@ -7972,7 +7972,7 @@ export default class CreateTreeTemplate extends Component {
         });
         return {
             items: result,
-            cursorItem: cursorParent
+            // cursorItem: cursorParent
         };
     }
     /**
