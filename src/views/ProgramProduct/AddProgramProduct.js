@@ -58,7 +58,7 @@ class AddprogramPlanningUnit extends Component {
             tempSortOrder: '',
             sortOrderLoading: true,
             dropdownList: [],
-            active:-1
+            active:1
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -241,13 +241,14 @@ class AddprogramPlanningUnit extends Component {
                                                 return itemLabelA > itemLabelB ? 1 : -1;
                                             });
                                             var productDataArr = []
-                                            if(this.state.active!=-1){
-                                                if(this.state.active==1){
-                                                    myReasponse=myReasponse.filter(c=>c.active.toString()=="true");
-                                                }else{
-                                                    myReasponse=myReasponse.filter(c=>c.active.toString()=="false");
-                                                }
-                                            }
+                                            var productDataArr2 = []
+                                            // if(this.state.active!=-1){
+                                            //     if(this.state.active==1){
+                                            //         myReasponse=myReasponse.filter(c=>c.active.toString()=="true");
+                                            //     }else{
+                                            //         myReasponse=myReasponse.filter(c=>c.active.toString()=="false");
+                                            //     }
+                                            // }
                                             this.setState({ rows: myReasponse });
                                             var data = [];
                                             let dropdownList = this.state.dropdownList;
@@ -280,7 +281,11 @@ class AddprogramPlanningUnit extends Component {
                                                     data[19] = myReasponse[j].minMonthsOfStock;
                                                     data[20] = myReasponse[j].minQty;
                                                     data[21] = myReasponse[j].distributionLeadTime;
-                                                    productDataArr.push(data);
+                                                    if((this.state.active==0 && myReasponse[j].active.toString()=="false") || (this.state.active==1 && myReasponse[j].active.toString()=="true") || (this.state.active==-1)){
+                                                        productDataArr.push(data);
+                                                    }else{
+                                                        productDataArr2.push(data);
+                                                    }
                                                 }
                                             }
                                             if (productDataArr.length == 0) {
@@ -744,7 +749,7 @@ class AddprogramPlanningUnit extends Component {
                                             if (productDataArr.length == 0) {
                                                 this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
                                             }
-                                            this.setState({ mapPlanningUnitEl: elVar, loading: false });
+                                            this.setState({ mapPlanningUnitEl: elVar, loading: false,productDataArr2:productDataArr2 });
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode, loading: false, color: '#BA0C2F'
@@ -1009,7 +1014,7 @@ class AddprogramPlanningUnit extends Component {
      */
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null, false);
+        var json = this.el.getJson(null, false).concat(this.state.productDataArr2);
         valid = checkValidation(this.el)
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(17, y);
@@ -1109,7 +1114,7 @@ class AddprogramPlanningUnit extends Component {
         }
         else if (x == 1) {
             this.el.getCell(("B").concat(parseInt(y) + 1)).classList.remove('typing-' + this.state.lang);
-            var json = this.el.getJson(null, false);
+            var json = this.el.getJson(null, false).concat(this.state.productDataArr2);
             var col = ("B").concat(parseInt(y) + 1);
 
             var jsonLength = parseInt(json.length) - 1;

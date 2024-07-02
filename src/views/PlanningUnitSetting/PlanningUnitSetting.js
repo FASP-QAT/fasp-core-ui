@@ -100,7 +100,7 @@ export default class PlanningUnitSetting extends Component {
             sortOrderLoading: true,
             tempPlanningUnitList: [],
             dropdownList: [],
-            active:-1
+            active:1
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -145,7 +145,7 @@ export default class PlanningUnitSetting extends Component {
      */
     checkValidation() {
         var valid = true;
-        var json = this.el.getJson(null, false);
+        var json = this.el.getJson(null, false).concat(this.state.outPutListArray2);
         valid = checkValidation(this.el)
         for (var y = 0; y < json.length; y++) {
             //planning unit
@@ -344,7 +344,7 @@ export default class PlanningUnitSetting extends Component {
 
         //planning unit
         if (x == 1) {
-            var json = this.el.getJson(null, false);
+            var json = this.el.getJson(null, false).concat(this.state.outPutListArray2);
             var col = ("B").concat(parseInt(y) + 1);
             
             var jsonLength = parseInt(json.length) - 1;
@@ -811,13 +811,13 @@ export default class PlanningUnitSetting extends Component {
         if (forecastProgramId > 0) {
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             let planningUnitList = selectedForecastProgram.planningUnitList;
-            if(this.state.active!=-1){
-                if(this.state.active==1){
-                    planningUnitList=planningUnitList.filter(c=>c.active.toString()=="true");
-                }else{
-                    planningUnitList=planningUnitList.filter(c=>c.active.toString()=="false");
-                }
-            }
+            // if(this.state.active!=-1){
+            //     if(this.state.active==1){
+            //         planningUnitList=planningUnitList.filter(c=>c.active.toString()=="true");
+            //     }else{
+            //         planningUnitList=planningUnitList.filter(c=>c.active.toString()=="false");
+            //     }
+            // }
             planningUnitList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
                 var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
@@ -875,6 +875,7 @@ export default class PlanningUnitSetting extends Component {
     buildJExcel(addRowInJexcel) {
         let outPutList = this.state.selsource;
         let outPutListArray = [];
+        let outPutListArray2 = [];
         let count = 0;
         let indexVar = 1;
         let dropdownList = this.state.dropdownList;
@@ -903,7 +904,11 @@ export default class PlanningUnitSetting extends Component {
             data[16] = outPutList[j].planningUnitNotes;
             data[17] = outPutList[j].active;
             data[18] = outPutList[j].active;
-            outPutListArray[count] = data;
+            if((this.state.active==0 && outPutList[j].active.toString()=="false") || (this.state.active==1 && outPutList[j].active.toString()=="true") || (this.state.active==-1)){
+                outPutListArray.push(data);
+            }else{
+                outPutListArray2.push(data);
+            }
             count++;
             indexVar = indexVar + 1;
         }
@@ -1192,7 +1197,7 @@ export default class PlanningUnitSetting extends Component {
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, allowAdd: true, tempPlanningUnitList: dropdownList
+            languageEl: languageEl, loading: false, allowAdd: true, tempPlanningUnitList: dropdownList,outPutListArray2:outPutListArray2
         }, () => {
             if (addRowInJexcel) {
                 this.addRow();
@@ -1459,7 +1464,7 @@ export default class PlanningUnitSetting extends Component {
                                 listOfDisablePuNode.push(parseInt(map1.get("1")));
                             }
                         }
-                        programData.planningUnitList = planningUnitList;
+                        programData.planningUnitList = planningUnitList.concat(this.state.active!=-1?originalPlanningUnitList.filter(c=>this.state.active==1?c.active.toString()=="false":c.active.toString()=="true"):[]);
                         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                         program.programData = programData;
                         programs.push(program);
@@ -1643,7 +1648,7 @@ export default class PlanningUnitSetting extends Component {
                         listOfDisablePuNode.push(parseInt(map1.get("1")));
                     }
                 }
-                programData.planningUnitList = planningUnitList;
+                programData.planningUnitList = planningUnitList.concat(this.state.active!=-1?originalPlanningUnitList.filter(c=>this.state.active==1?c.active.toString()=="false":c.active.toString()=="true"):[]);
                 programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                 program.programData = programData;
                 programs.push(program);
