@@ -757,7 +757,8 @@ export default class CreateTreeTemplate extends Component {
             dropdownSources: {},
             childrenOfList: [],
             childrenOf: [],
-            isLevelChanged: false
+            isLevelChanged: false,
+            modelingTabChanged: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -3298,6 +3299,33 @@ export default class CreateTreeTemplate extends Component {
         });
     }
     /**
+     * Validation while creating number node and submitting data from modeling tab
+     */
+
+    validation1 = function () {
+        var validationFail = 0;
+        var nodeTypeId = document.getElementById("nodeTypeId").value;
+        var nodeTitle = document.getElementById("nodeTitle").value;
+        var nodeValue = document.getElementById("nodeValue").value;
+        var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
+        var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
+            validationFail = 1;
+            document.getElementById("nodeUnitId").className = "form-control is-invalid"
+        }
+        if (nodeTitle == "" || testTitle == false) {
+            validationFail = 1;
+            document.getElementById("nodeTitle").className = "form-control is-invalid"
+        }
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
+            validationFail = 1;
+            document.getElementById("nodeValue").className = "form-control is-invalid"
+        }
+        return validationFail > 0 ? false : true;
+
+    }
+    
+/**
      * Handles form submission of modeling data
      */
     formSubmit() {
@@ -3351,7 +3379,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -3373,7 +3401,8 @@ export default class CreateTreeTemplate extends Component {
                                 activeTab1: new Array(2).fill('2'),
                                 firstMonthOfTarget: "",
                                 yearsOfTarget: "",
-                                actualOrTargetValueList: []
+                                actualOrTargetValueList: [],
+                                modelingChangedOrAdded: false
                             }, () => {
                                 this.calculateMOMData(0, 0);
                             });
@@ -3385,8 +3414,13 @@ export default class CreateTreeTemplate extends Component {
                             });
                         }
                     } else {
-                        if (this.state.isValidError.toString() == "false") {
-                            this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                        if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
+                            this.setState({
+                                addNodeFlag: false,
+                                modelingChangedOrAdded: false
+                            }, () => {
+                                this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                            });
                         } else {
                             this.setState({
                                 modelingJexcelLoader: false
@@ -5417,9 +5451,11 @@ export default class CreateTreeTemplate extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changed = function (instance, cell, x, y, value) {
-        this.setState({
-            modelingChangedOrAdded: true
-        })
+        if (x != 9 && x != 11 && this.state.modelingChangedOrAdded == false) {
+            this.setState({
+                modelingChangedOrAdded: true
+            })
+        }
         if (x != 9 && x != 11 && this.state.modelingChanged == false) {
             this.setState({
                 modelingChanged: true
@@ -5580,6 +5616,11 @@ export default class CreateTreeTemplate extends Component {
         if (x != 11 && x != 9) {
             instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
+        }
+        if (!this.state.modelingTabChanged) {
+            this.setState({
+                modelingTabChanged: true
+            })
         }
     }.bind(this);
     /**
@@ -7701,13 +7742,15 @@ export default class CreateTreeTemplate extends Component {
                         showModelingJexcelNumber: true,
                         minMonth, maxMonth, filteredModelingType: modelingTypeListNew
                     }, () => {
-                        this.buildModelingJexcel();
+                        if (!this.state.modelingTabChanged)
+                            this.buildModelingJexcel();
                     })
                 } else {
                     this.setState({
                         showModelingJexcelNumber: true
                     }, () => {
-                        this.buildModelingJexcel();
+                        if (!this.state.modelingTabChanged)
+                            this.buildModelingJexcel();
                     })
                 }
                 this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
@@ -8492,7 +8535,8 @@ export default class CreateTreeTemplate extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id,
                 usageText: '',
-                currentNodeTypeId: data.context.payload.nodeType.id
+                currentNodeTypeId: data.context.payload.nodeType.id,
+                modelingTabChanged: false,
             }, () => {
                 if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
                     var itemConfig = data.context;
@@ -9239,23 +9283,27 @@ export default class CreateTreeTemplate extends Component {
                                 })
                             }
                             if (save) {
-                                if (!this.state.isSubmitClicked) {
-                                    this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged: true }, () => {
-                                        setTimeout(() => {
-                                            if (this.state.addNodeFlag) {
-                                                this.onAddButtonClick(this.state.currentItemConfig)
-                                            } else {
-                                                this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                            }
-                                            if (this.state.modelingChangedOrAdded) {
-                                                this.formSubmitLoader();
-                                            }
-                                            this.setState({
-                                                cursorItem: 0,
-                                                highlightItem: 0
-                                            })
-                                        }, 0);
-                                    })
+                                this.formSubmitLoader();
+                                if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
+                                    if (!this.state.isSubmitClicked) {
+                                        this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                            setTimeout(() => {
+                                                if (this.state.addNodeFlag) {
+                                                    this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                                                } else {
+                                                    this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                                }
+                                                this.setState({
+                                                    cursorItem: 0,
+                                                    highlightItem: 0,
+                                                    activeTab1: new Array(1).fill('1')
+                                                })
+                                            }, 0);
+                                        })
+                                        this.setState({ modelingTabChanged: false })
+                                    }
+                                } else {
+                                    this.setState({ activeTab1: new Array(1).fill('2') })
                                 }
                             }
                         }}
@@ -11540,6 +11588,7 @@ export default class CreateTreeTemplate extends Component {
                                         addNodeFlag: true,
                                         openAddNodeModal: true,
                                         modelingChangedOrAdded: false,
+                                        modelingTabChanged: false,
                                         currentItemConfig: {
                                             context: {
                                                 isVisible: '',
@@ -12399,14 +12448,16 @@ export default class CreateTreeTemplate extends Component {
                                 if (cf == true) {
                                     this.setState({
                                         openAddNodeModal: false, isChanged: false,
-                                        cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1')
+                                        cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1'),
+                                        modelingTabChanged: false
                                     })
                                 } else {
                                 }
                             } else {
                                 this.setState({
                                     openAddNodeModal: false, isChanged: false,
-                                    cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1')
+                                    cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1'),
+                                    modelingTabChanged: false
                                 })
                             }
                         }
