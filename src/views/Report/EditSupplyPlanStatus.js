@@ -3082,7 +3082,7 @@ class EditSupplyPlanStatus extends Component {
                                 <div className="table-responsive RemoveStriped">
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
@@ -3092,7 +3092,7 @@ class EditSupplyPlanStatus extends Component {
                                     </FormGroup>
                                     {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.planningUnitNotes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.planningUnitNotes")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitNotes")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>{this.state.planningUnitNotes}</span></li>
                                         </ul>
                                     </FormGroup>}
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>

@@ -3003,6 +3003,48 @@ class StockStatus extends Component {
                       this.state.stockStatusList.length > 0
                       &&
                       <div className="col-md-12 p-0">
+                        {this.state.stockStatusList.length > 0 && ppu != undefined &&
+                      <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
+                        <ul className="legendcommitversion list-group">
+                        <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>
+                              </span>
+                            </li>
+                          {this.state.stockStatusList[0].planBasedOn == 1 ? <>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.amcPastOrFuture")} : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.report.shelfLife")} : {ppu.shelfLife}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.minStockMos")} : {formatter(this.state.stockStatusList[0].minMos, 0)}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.reorderInterval")} : {ppu.reorderFrequencyInMonths}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
+                              </span>
+                            </li>
+                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
+                          </>}
+                        </ul>
+                        {this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes!=null && this.state.planningUnitNotes.length>0 && 
+                            <span  className="legendcommitversionText"><b>{i18n.t("static.report.planningUnitNotes")}</b><i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitNotes")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : {this.state.planningUnitNotes}</span>
+                        }
+                      </FormGroup>
+                  }
                         <div className="col-md-12">
                           <div className="chart-wrapper chart-graph-report">
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
@@ -3015,43 +3057,6 @@ class StockStatus extends Component {
                             })}
                           </div>
                         </div>
-                        {this.state.stockStatusList.length > 0 && ppu != undefined &&
-                      <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
-                        <ul className="legendcommitversion list-group">
-                          {this.state.stockStatusList[0].planBasedOn == 1 ? <>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                <b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                <b>{i18n.t("static.report.shelfLife")}</b> : {ppu.shelfLife}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                <b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {formatter(this.state.stockStatusList[0].minMos, 0)}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                <b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {ppu.reorderFrequencyInMonths}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                <b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.stockStatusList[0].maxMos}
-                              </span>
-                            </li>
-                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
-                          </>}
-                        </ul>
-                        {this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes!=null && this.state.planningUnitNotes.length>0 && 
-                            <span  className="legendcommitversionText"><b>{i18n.t("static.report.planningUnitNotes")}</b> : {this.state.planningUnitNotes}</span>
-                        }
-                      </FormGroup>
-                  }
                         <div className="col-md-12">
                           <button className="mr-1 mt-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                             {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
