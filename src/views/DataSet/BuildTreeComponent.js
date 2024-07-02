@@ -7093,11 +7093,13 @@ export default class BuildTree extends Component {
                         newId: maxNodeDataId
                     });
                     (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
-                    var tempData = child.payload.nodeDataMap[scenarioList[i].id];
-                    delete child.payload.nodeDataMap[scenarioList[i].id];
                     maxNodeDataId++;
-                    for (let j = 0; j < scenarioListNew.length; j++) {
-                        child.payload.nodeDataMap[scenarioListNew[j].id] = tempData;
+                    if(this.state.copyModalTree != this.state.treeId) {
+                        var tempData = child.payload.nodeDataMap[scenarioList[i].id];
+                        delete child.payload.nodeDataMap[scenarioList[i].id];
+                        for (let j = 0; j < scenarioListNew.length; j++) {
+                            child.payload.nodeDataMap[scenarioListNew[j].id] = tempData;
+                        }
                     }
                 }
             }
