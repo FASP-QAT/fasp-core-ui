@@ -674,6 +674,9 @@ export default class WhatIfReportComponent extends React.Component {
      * This function is used to save the supply plan after adding all the scenarios that user has added
      */
     saveSupplyPlan() {
+        this.setState({
+            planningUnitChange:false
+        })
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -738,7 +741,9 @@ export default class WhatIfReportComponent extends React.Component {
                                 percentage: '',
                                 removePlannedThatDoNotFollowLeadTime: false,
                                 monthsInPastForAmc: '',
-                                monthsInFutureForAmc: ''
+                                monthsInFutureForAmc: '',
+                                planningUnitChange:true,
+                                programModified:0
                             })
                         }.bind(this)
                     }.bind(this)

@@ -220,6 +220,7 @@ export default class ImportProgram extends Component {
                         }
                         if (count == 0) {
                             JSZip.loadAsync(file).then(function (zip) {
+                                var temp_j = 0;
                                 Object.keys(zip.files).forEach(function (filename) {
                                     zip.files[filename].async('string').then(function (fileData) {
                                         for (var j = 0; j < selectedPrgArr.length; j++) {
@@ -361,12 +362,15 @@ export default class ImportProgram extends Component {
                                                         var program3 = transaction3.objectStore('downloadedProgramData');
                                                         var addProgramDataRequest1 = program3.put(json1);
                                                         transaction3.oncomplete = function (event) {
-                                                            this.setState({
-                                                                message: i18n.t('static.program.dataimportsuccess'),
-                                                                loading: false
-                                                            })
-                                                            let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                                            temp_j++;
+                                                            if(temp_j == selectedPrgArr.length){
+                                                                this.setState({
+                                                                    message: i18n.t('static.program.dataimportsuccess'),
+                                                                    loading: false
+                                                                })
+                                                                let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                                            }
                                                             addProgramDataRequest1.onerror = function (event) {
                                                             };
                                                         }.bind(this)
@@ -385,6 +389,7 @@ export default class ImportProgram extends Component {
                                     {
                                         label: i18n.t('static.program.yes'),
                                         onClick: () => {
+                                            var temp_j = 0;
                                             JSZip.loadAsync(file).then(function (zip) {
                                                 Object.keys(zip.files).forEach(function (filename) {
                                                     zip.files[filename].async('string').then(function (fileData) {
@@ -516,6 +521,7 @@ export default class ImportProgram extends Component {
                                                                     programModified: programModified,
                                                                     readonly: readonly
                                                                 }
+                                                                temp_j++;
                                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
                                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(item);
@@ -524,18 +530,20 @@ export default class ImportProgram extends Component {
                                                                 var addProgramDataRequest1 = program3.put(json1);
                                                                 addProgramDataRequest1.onerror = function (event) {
                                                                 };
+                                                                if(temp_j == selectedPrgArr.length) {
+                                                                    this.setState({
+                                                                        message: i18n.t('static.program.dataimportsuccess'),
+                                                                        loading: false
+                                                                    })
+                                                                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                                    this.getPrograms();
+                                                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                                                }
                                                             }
                                                         }
-                                                    })
-                                                })
-                                            })
-                                            this.setState({
-                                                message: i18n.t('static.program.dataimportsuccess'),
-                                                loading: false
-                                            })
-                                            let id = AuthenticationService.displayDashboardBasedOnRole();
-                                            this.getPrograms();
-                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                                    }.bind(this))
+                                                }.bind(this))
+                                            }.bind(this))
                                         }
                                     },
                                     {
