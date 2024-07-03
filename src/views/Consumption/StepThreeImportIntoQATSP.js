@@ -868,7 +868,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                     </ul>
                 </div>
-                <p style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
+                <p className='DarkThColr' style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
                 <div className="consumptionDataEntryTable">
                     <div id="mapImport" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>

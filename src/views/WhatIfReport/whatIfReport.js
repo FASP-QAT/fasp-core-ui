@@ -5379,7 +5379,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="col-md-12 pt-1 pb-3 DarkThColr"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
                                 </div>

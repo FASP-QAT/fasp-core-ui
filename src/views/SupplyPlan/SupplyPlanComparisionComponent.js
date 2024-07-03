@@ -2602,7 +2602,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                    <div className="col-md-12 pt-1 DarkThColr"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                 </div>}
                         </div>
                     </div>

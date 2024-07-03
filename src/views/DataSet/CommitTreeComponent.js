@@ -2019,7 +2019,7 @@ export default class CommitTreeComponent extends React.Component {
                 if ((jsonData[c])[9] != 1) {
                     if (oldData[j] == latestData[j]) {
                         var col = (colArr[j]).concat(parseInt(c) + 1);
-                        elInstance.setStyle(col, "background-color", "#fff");
+                        elInstance.setStyle(col, "background-color", "transparent");
                     } else if (latestData[j] == downloadedData[j]) {
                         var col = (colArr[j]).concat(parseInt(c) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
@@ -2941,7 +2941,7 @@ export default class CommitTreeComponent extends React.Component {
                 <TabPane tabId="1">
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                            <Col md="12 pl-0 pr-lg-0" id="realmDiv" className='DarkThColr'>
                                 {i18n.t("static.commitVersion.goTo") + " "} <a href="/#/dataset/versionSettings" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.UpdateversionSettings.UpdateversionSettings")}</a>
                                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                                     <div style={{ width: '100%' }} id="versionSettingsDiv" />
@@ -2953,7 +2953,7 @@ export default class CommitTreeComponent extends React.Component {
                 <TabPane tabId="2">
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                            <Col md="12 pl-0 pr-lg-0" id="realmDiv" className='DarkThColr'>
                                 {i18n.t("static.commitVersion.goTo") + " "} <a href="/#/planningUnitSetting/listPlanningUnitSetting" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.commitVersion.updatePUSettings")}</a>
                                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                                     <div style={{ width: '100%' }} id="planningUnitDiv" />
@@ -2965,7 +2965,7 @@ export default class CommitTreeComponent extends React.Component {
                 <TabPane tabId="3">
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                            <Col md="12 pl-0 pr-lg-0" id="realmDiv" className='DarkThColr'>
                                 {i18n.t("static.commitVersion.goTo") + " "} <a href="/#/dataentry/consumptionDataEntryAndAdjustment/" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.commitTree.dataEntry&Adjustment")}</a>{" " + i18n.t("static.tree.or") + " "}<a href="/#/extrapolation/extrapolateData" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.ManageTree.Extrapolation")}</a>
                                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                                     <div style={{ width: '100%' }} id="consumptionDiv" />
@@ -2977,7 +2977,7 @@ export default class CommitTreeComponent extends React.Component {
                 <TabPane tabId="4">
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Col md="12 pl-0 pr-lg-0" id="realmDiv">
+                            <Col md="12 pl-0 pr-lg-0" id="realmDiv" className='DarkThColr'>
                                 {i18n.t("static.commitVersion.goTo") + " "} <a href="/#/dataset/listTree" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.common.managetree")}</a>
                                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                                     <div style={{ width: '100%' }} id="treeDiv" />
@@ -2989,7 +2989,7 @@ export default class CommitTreeComponent extends React.Component {
                 <TabPane tabId="5">
                     <Row>
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                            <Col md="12 pl-0" id="realmDiv">
+                            <Col md="12 pl-0" id="realmDiv" className='DarkThColr'>
                                 {i18n.t("static.commitVersion.goTo") + " "} <a href="/#/report/compareAndSelectScenario/" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.commitTree.compare&Select")}</a>{" " + i18n.t("static.tree.or") + " "}<a href="/#/forecastReport/forecastSummary/" target="_blank" style={{ "text-decoration": "underline" }}>{i18n.t("static.commitTree.forecastSummary")}</a>
                                 <div className="table-responsive RemoveStriped consumptionDataEntryTable">
                                     <div style={{ width: '100%' }} id="selectedForecastDiv" />
@@ -3237,7 +3237,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </div>
                                 </Col>
                             </Form>
-                            <div style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined !== "") ? 'block' : 'none' }}><b><div className="mb-2"> <span>{i18n.t('static.commitTree.note')}</span></div></b></div>
+                            <div style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined !== "") ? 'block' : 'none' }}><b><div className="mb-2"> <span className='DarkThColr'>{i18n.t('static.commitTree.note')}</span></div></b></div>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <Row style={{ display: (this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined) ? 'block' : 'none' }}>
                                     <Col xs="12" md="12" className="mb-4">

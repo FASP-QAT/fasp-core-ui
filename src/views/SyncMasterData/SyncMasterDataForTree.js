@@ -71,7 +71,7 @@ export default class SyncMasterDataForTree extends Component {
                                 <strong>{i18n.t('static.masterDataSync.masterDataSync')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <div className="text-center">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
+                                <div className="text-center DarkThColr">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
                                 <Progress value={this.state.syncedMasters} max={this.state.totalMasters} />
                             </CardBody>
                             <CardFooter id="retryButtonDiv">
