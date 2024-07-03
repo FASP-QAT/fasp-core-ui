@@ -497,7 +497,7 @@ class Login extends Component {
                                     onChange={(e) => { this.dataChangeCheckbox(e) }}
                                   />
                                   <Label
-                                    className="form-check-label ml-2"
+                                    className="form-check-label ml-2 darkModeclrblack"
                                     check htmlFor="inline-radio2">
                                     <b>{i18n.t('static.login.loginOnline')}</b>
                                   </Label>

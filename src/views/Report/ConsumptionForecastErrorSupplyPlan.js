@@ -2737,9 +2737,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     <div className="col-md-12">
                                         {this.state.show && this.state.dataList.length > 0 &&
                                             <div className="table-scroll">
-                                                <ul className="legendcommitversion">
-                                                    <li style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
-                                                </ul>
+                                               <ul className="legendcommitversion">
+                                                <li className='DarkThColr' style={{marginLeft:'40px'}}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
+                                                </ul> 
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>

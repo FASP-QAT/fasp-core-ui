@@ -3078,7 +3078,7 @@ class StockStatus extends Component {
                         </ul>
                       </FormGroup>
                   }
-                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
+                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-bordered text-center mt-2">
                     <thead>
                       <tr>
                         <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>
@@ -3157,7 +3157,7 @@ class StockStatus extends Component {
                             <td>
                               {formatter(roundAMC(this.state.stockStatusList[idx].amc, 0))}
                             </td>
-                            <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
+                            <td className='darkModeclrblack' style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
                               {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : formatter(roundAMC(this.state.stockStatusList[idx].maxStock, 0))}
                             </td>
                             <td>

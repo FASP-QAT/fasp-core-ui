@@ -2325,7 +2325,7 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4">
+                                            <FormGroup className="col-md-4 darkModePicker">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
@@ -2504,9 +2504,9 @@ class CompareAndSelectScenario extends Component {
                                         <div className="col-md-8" style={{ display: this.state.loading ? "none" : "block" }}>
                                             {this.state.showAllData &&
                                                 <>
-                                                    <ul style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
+                                                    <ul className='DarkThColr' style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
                                                     <ul className="legendcommitversion">
-                                                        <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
+                                                        <li className='DarkThColr'><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                                     </ul><br />

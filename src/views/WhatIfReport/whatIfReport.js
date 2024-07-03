@@ -4968,7 +4968,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
-                        <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }}>{i18n.t('static.whatIf.scenarioList')}</span>
+                        <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }} className='DarkThColr'>{i18n.t('static.whatIf.scenarioList')}</span>
                         <Row className="pt-3 pb-3 scenarioListDiv" >
                             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                 <Col md="12 pl-0" id="realmDiv">
@@ -5049,7 +5049,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                     {
                                                         this.state.openingBalanceArray.map(item1 => (
-                                                            <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
+                                                            <td align="right" className='darkModeclrblack'>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                         ))
                                                     }
                                                 </tr>
@@ -5334,7 +5334,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                     {
                                                         this.state.monthsOfStockArray.map(item1 => (
-                                                            <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                            <td align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                         ))
                                                     }
                                                 </tr>}
@@ -5384,7 +5384,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="col-md-12 pt-1 pb-3 DarkThColr"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
                                 </div>
@@ -6138,7 +6138,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     </ul>
                                 </FormGroup>
                                 <Row>
-                                    <Col xs="12" md="12" className="mb-4  mt-3 loadProgramHeight">
+                                <Col xs="12" md="12" className="mb-4  mt-3">
+                                    {/* <Col xs="12" md="12" className="mb-4  mt-3 loadProgramHeight"> */}
                                         <Nav tabs>
                                             <NavItem>
                                                 <NavLink

@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component} from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
+import DefaultHeaderDropdown from './containers/DefaultLayout//DefaultHeaderDropdown';
 import 'react-app-polyfill/stable';
 import { withTranslation } from "react-i18next";
 import './App.scss';
@@ -18,6 +19,8 @@ const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/Updat
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500/Page500.js'));
 const PageError = React.lazy(() => import('./views/Pages/PageError/PageError.js'));
+
+
 class App extends Component {
   componentDidMount() {
   }
@@ -47,6 +50,7 @@ class App extends Component {
         </React.Suspense>
       </HashRouter>
     );
+    
   }
 }
 export default withTranslation('translations')(App);

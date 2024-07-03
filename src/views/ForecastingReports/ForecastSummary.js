@@ -3239,8 +3239,7 @@ class ForecastSummary extends Component {
                             <div ref={ref}>
                                 <Col md="12" className="pl-lg-0">
                                     <div>
-                                        {/* <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p> */}
-                                        <p>{i18n.t("static.placeholder.forecastSummary")}</p>
+                                        <p className='DarkThColr'>{i18n.t("static.placeholder.forecastSummary")}</p>
                                     </div>
                                 </Col>
                                 <Form >
