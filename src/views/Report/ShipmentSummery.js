@@ -2123,7 +2123,7 @@ class ShipmentSummery extends Component {
                         code: procurementAgent[0].procurementAgentCode,
                       };
                     }
-                    var fundingSource = this.state.fundingSources.filter(
+                    var fundingSource = this.state.fundingSources.filter(//change here
                       (c) => c.id == planningUnitFilter[i].fundingSource.id
                     );
                     if (fundingSource.length > 0) {

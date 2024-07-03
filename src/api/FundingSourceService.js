@@ -38,6 +38,7 @@ class FundingSourceService {
         );
     }
     getFundingsourceTypeListByRealmId(realmId) {
+        console.log('api call realmId: '+realmId);
         return axios.get(`${API_URL}/api/fundingSourceType/realmId/${realmId}`, {
         });
     }

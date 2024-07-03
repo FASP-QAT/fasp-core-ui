@@ -914,6 +914,18 @@ class ProcurementAgentExport extends Component {
       );
     } else if (viewby == 2) {
       csvRow.push("");
+      this.state.fundingSourceTypeLabels.map((ele) =>
+        csvRow.push(
+          '"' +
+          (
+            i18n.t("static.funderTypeHead.funderType") +
+            " : " +
+            ele.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
+        )
+      );
+      csvRow.push("");
       this.state.fundingSourceLabels.map((ele) =>
         csvRow.push(
           '"' +
@@ -1147,16 +1159,20 @@ class ProcurementAgentExport extends Component {
               110,
               procurementAgentText
             );
-            poslen = 110 + procurementAgentText.length * 10;
+            poslen = 110 + procurementAgentText.length;
           } else if (viewby == 2) {
+            var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            doc.text(doc.internal.pageSize.width / 8, 110, fundingSourceTypeText);
+            poslen = 110 + fundingSourceTypeText.length + 20;
+
             var fundingSourceText = doc.splitTextToSize(
               i18n.t("static.budget.fundingsource") +
               " : " +
               this.state.fundingSourceLabels.join("; "),
               (doc.internal.pageSize.width * 3) / 4
             );
-            doc.text(doc.internal.pageSize.width / 8, 110, fundingSourceText);
-            poslen = 110 + fundingSourceText.length * 10;
+            doc.text(doc.internal.pageSize.width / 8, poslen, fundingSourceText);
+            poslen = poslen + fundingSourceText.length;
           } else {
             poslen = 90;
           }

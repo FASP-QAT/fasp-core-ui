@@ -158,8 +158,10 @@ class Budgets extends Component {
         //Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         //Fetch all funding source type list
-        FundingSourceService.getFundingSourceTypeListAll()
+        FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
             .then(response => {
+                console.log('fst size: ');
+                console.log('response.status: '+response.status);
                 if (response.status == 200) {
                     var fundingSourceTypeValues = [];
                     // fundingSourceTypeLabels: [],
@@ -167,6 +169,9 @@ class Budgets extends Component {
                     // fundingSources.map(ele => {
                     //     fundingSourceValues.push({ label: ele.code, value: ele.id })
                     // })
+
+                    
+                    console.log('fst [0]: '+listArray[0]);
 
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -196,6 +201,8 @@ class Budgets extends Component {
                 }
             }).catch(
                 error => {
+                    console.log('inside catch error: ');
+                    console.log('error.response.status: '+JSON.stringify(error.response.status));
                     this.setState({
                         fundingSourceTypes: [], loading: false
                     }, () => {
