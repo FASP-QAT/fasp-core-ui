@@ -6,8 +6,7 @@ import "jspdf-autotable";
 import moment from "moment";
 import React, { Component } from 'react';
 import { HorizontalBar, Pie } from 'react-chartjs-2';
-import Chart from "chart.js"
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import Chart from 'chart.js';
 import Picker from 'react-month-picker';
 import { MultiSelect } from 'react-multi-select-component';
 import {
@@ -184,53 +183,17 @@ const options1 = {
     }
 }
 const optionsPie = {
-    layout: {
-        padding: 20,
-    },
-    plugins: {
-        datalabels: {
-          color: '#fff',
-          formatter: (value, context) => {
-            const data = context.chart.data.datasets[0].data;
-            const total = data.reduce((acc, value) => acc + value, 0);
-            const percentage = ((value / total) * 100).toFixed(2);
-            if(percentage < 4){
-                return '';
-            } else {
-                return `${percentage}%`;
-            }
-          },
-          anchor: 'end',
-          align: 'start',
-          offset: -10,
-          borderWidth: 2,
-          borderColor: (context) => {
-            const data = context.chart.data.datasets[0].data;
-            const total = data.reduce((acc, value) => acc + value, 0);
-            const percentage = ((context.dataset.data[context.dataIndex] / total) * 100).toFixed(2);
-            if(percentage >= 4){
-                return 'white';
-            }
-          },
-          borderRadius: 25,
-          backgroundColor: (context) => {
-            const data = context.chart.data.datasets[0].data;
-            const total = data.reduce((acc, value) => acc + value, 0);
-            const percentage = ((context.dataset.data[context.dataIndex] / total) * 100).toFixed(2);
-            if(percentage >= 4){
-                return context.dataset.backgroundColor[context.dataIndex];
-            }
-          },
-          padding: 2,
-        },
-    },
     title: {
         display: true,
         text: i18n.t('static.fundingSourceHead.fundingSource'),
-        fontColor: 'black'
+        fontColor: 'black',
+        padding: 30
     },
     legend: {
-        position: 'bottom'
+        position: 'bottom',
+        labels: {
+            padding: 25
+        }
     },
     tooltips: {
         callbacks: {
@@ -869,6 +832,55 @@ class ShipmentGlobalDemandView extends Component {
      * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
      */
     componentDidMount() {
+        Chart.plugins.register({
+            afterDraw: function(chart) {
+              if (chart.config.type === 'pie') {
+                const ctx = chart.chart.ctx;
+                const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                  const meta = chart.getDatasetMeta(datasetIndex);
+                  if (!meta.hidden) {
+                    meta.data.forEach((element, index) => {
+                      // Draw the connecting lines
+                      ctx.save();
+                      const model = element._model;
+                      const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                      const startAngle = model.startAngle;
+                      const endAngle = model.endAngle;
+                      const midAngle = startAngle + (endAngle - startAngle) / 2;
+      
+                      const x = Math.cos(midAngle);
+                      const y = Math.sin(midAngle);
+      
+                      // Calculate the end point for the line
+                      const lineX = model.x + x * model.outerRadius;
+                      const lineY = model.y + y * model.outerRadius;
+                      const labelX = model.x + x * (model.outerRadius + 20);
+                      const labelY = model.y + y * (model.outerRadius + 20);
+      
+                      const label = chart.data.labels[index];
+                      const value = dataset.data[index];
+                      const percentage = ((value / total) * 100).toFixed(2) + '%';
+
+                      if(((value / total) * 100).toFixed(2) > 1) {
+                        ctx.beginPath();
+                        ctx.moveTo(model.x, model.y);
+                        ctx.lineTo(lineX, lineY);
+                        ctx.lineTo(labelX, labelY);
+                        ctx.strokeStyle = dataset.backgroundColor[index];
+                        ctx.stroke();                      
+                        ctx.textAlign = x >= 0 ? 'left' : 'right';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = dataset.backgroundColor[index];
+                        ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+20 : x < 0.5 ? labelX-20 : labelX, labelY);
+                        ctx.restore();
+                      }
+                    });
+                  }
+                });
+              }
+            },
+          });
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
             this.getFundingSource();
@@ -1837,10 +1849,10 @@ class ShipmentGlobalDemandView extends Component {
                                             this.state.fundingSourceSplit.length > 0 &&
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
-                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
                                                     /><br />
                                                 </div>
-                                                <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                                <h5 className="red text-center pt-5">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
                                         }
                                     </div>
