@@ -906,6 +906,7 @@ export default class BuildTree extends Component {
         this.copyModalParentLevelChange = this.copyModalParentLevelChange.bind(this);
         this.copyModalParentNodeChange = this.copyModalParentNodeChange.bind(this);
         this.copyMoveNode = this.copyMoveNode.bind(this);
+        this.resetCopyMoveModal = this.resetCopyMoveModal.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -6986,17 +6987,19 @@ export default class BuildTree extends Component {
             }
             if (scenarioList.length > 0) {
                 for (let i = 0; i < scenarioList.length; i++) {
-                    childListBasedOnScenarion.push({
-                        oldId: (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId,
-                        newId: maxNodeDataId
-                    });
-                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
-                    maxNodeDataId++;
-                    if(this.state.copyModalTree != this.state.treeId) {
-                        var tempData = child.payload.nodeDataMap[scenarioList[i].id];
-                        delete child.payload.nodeDataMap[scenarioList[i].id];
-                        for (let j = 0; j < scenarioListNew.length; j++) {
-                            child.payload.nodeDataMap[scenarioListNew[j].id] = tempData;
+                    if(scenarioList[i].id == this.state.selectedScenario){
+                        childListBasedOnScenarion.push({
+                            oldId: (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId,
+                            newId: maxNodeDataId
+                        });
+                        (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                        maxNodeDataId++;
+                        if(this.state.copyModalTree != this.state.treeId) {
+                            var tempData = child.payload.nodeDataMap[scenarioList[i].id];
+                            delete child.payload.nodeDataMap[scenarioList[i].id];
+                            for (let j = 0; j < scenarioListNew.length; j++) {
+                                child.payload.nodeDataMap[scenarioListNew[j].id] = tempData;
+                            }
                         }
                     }
                 }
@@ -7027,6 +7030,17 @@ export default class BuildTree extends Component {
                 }
             })
         });
+    }
+    resetCopyMoveModal() {
+        this.setState({
+            copyModalData: "",
+            copyModalTree: "",
+            copyModalTreeList: [],
+            copyModalParentLevelList: [],
+            copyModalParentLevel: "",
+            copyModalParentNodeList: [],
+            copyModalParentNode: ""
+        })
     }
     /**
      * Redirects to list tree template screen on cancel button clicked
@@ -13466,8 +13480,8 @@ export default class BuildTree extends Component {
                                         <Label htmlFor="currencyId">Tree Name</Label>
                                         <Input
                                             type="select"
-                                            id="levelDropdown"
-                                            name="levelDropdown"
+                                            id="treeDropdown"
+                                            name="treeDropdown"
                                             bsSize="sm"
                                             onChange={(e) => { this.copyModalTreeChange(e) }}
                                             value={this.state.copyModalTree}
@@ -13488,8 +13502,8 @@ export default class BuildTree extends Component {
                                         <Label htmlFor="currencyId">Parent Level</Label>
                                         <Input
                                             type="select"
-                                            id="levelDropdown"
-                                            name="levelDropdown"
+                                            id="parentLevelDropdown"
+                                            name="parentLevelDropdown"
                                             bsSize="sm"
                                             onChange={(e) => { this.copyModalParentLevelChange(e) }}
                                             value={this.state.copyModalParentLevel}
@@ -13509,8 +13523,8 @@ export default class BuildTree extends Component {
                                         <Label htmlFor="currencyId">Parent Node</Label>
                                         <Input
                                             type="select"
-                                            id="levelDropdown"
-                                            name="levelDropdown"
+                                            id="parentNodeDropdown"
+                                            name="parentNodeDropdown"
                                             bsSize="sm"
                                             onChange={(e) => { this.copyModalParentNodeChange(e) }}
                                             value={this.state.copyModalParentNode}
@@ -13531,8 +13545,8 @@ export default class BuildTree extends Component {
                                     <div className="mr-0">
                                         <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
-                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetLevelReorder()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetCopyMoveModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({copyModal: false})}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </Form>
                         )} />
