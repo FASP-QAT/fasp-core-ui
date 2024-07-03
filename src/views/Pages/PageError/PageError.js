@@ -9,9 +9,11 @@ import AuthenticationService from '../../Common/AuthenticationService';
 import ErrorMessageBg from '../../../../src/assets/img/E1.png';
 import ErrorMessageImg from '../../../../src/assets/img/errorImg.png';
 import * as Yup from 'yup';
+import TicketPriorityComponent from '../../Ticket/TicketPriorityComponent';
 // Initial values for form fields
 let initialValues = {
-  userComments: ''
+  userComments: '',
+  priority: 3
 }
 /**
  * Defines the validation schema for error page.
@@ -37,13 +39,15 @@ class PageError extends Component {
         description: '',
         file: '',
         attachFile: '',
-        userComments: ''
+        userComments: '',
+        priority: 3
       },
       message: '',
       loading: false
     }
     this.submitBug = this.submitBug.bind(this);
     this.toggleSmall = this.toggleSmall.bind(this);
+    this.updatePriority = this.updatePriority.bind(this);
   }
   /**
    * Toggle popup to display ticket created msg
@@ -147,6 +151,24 @@ class PageError extends Component {
   }
 
   /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+  updatePriority(newState){
+    console.log('priority - : '+newState);
+    let { bugReport } = this.state;
+    bugReport.priority = newState;
+    this.setState(
+        {
+          bugReport
+        }, () => {
+
+            console.log('priority - state : '+this.state.bugReport.priority);
+        }
+    );
+  }
+
+  /**
    * Renders the Error page.
    * @returns {JSX.Element} - Error page.
    */
@@ -171,7 +193,8 @@ class PageError extends Component {
               <Formik
                 enableReinitialize={true}
                 initialValues={{
-                  userComments: ''
+                  userComments: '',
+                  priority: 3
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -206,6 +229,9 @@ class PageError extends Component {
                           onBlur={handleBlur} />
                         <FormFeedback className="red">{errors.userComments}</FormFeedback>
                         {/* </InputGroup> */}
+                      </FormGroup>
+                      <FormGroup>
+                          <TicketPriorityComponent priority={this.state.bugReport.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                       </FormGroup>
                       <Button type="submit" color="primary" className='mt-2'>{i18n.t('static.errorPage.raiseATicket')}</Button>
                       {/* <Button type="submit" color="primary" onClick={() => this.submitBug(this.props)} className='mt-2'>{i18n.t('static.errorPage.raiseATicket')}</Button> */}
