@@ -3347,6 +3347,6 @@
     "static.report.planningUnitNotes":"Planning Unit Notes",
     "static.tree.conversionFUToPU":"FU:PU Conversion Factor",
     "static.tooltip.conversionFactorPU":"For more details, go to Realm Level Masters > Products > Planning Units. If data looks incorrect, please submit a ticket in the QAT helpdesk.",
-    "static.tooltip.planningUnitSettings":"Program Admins can update Planning Unit Settings under Program Management > Update Planning Unit.",
+    "static.tooltip.planningUnitSettings":"Program Admins can update Planning Unit Settings & Notes under Program Management > Update Planning Unit.",
     "static.tooltip.planningUnitNotes":"Program Admins can update Planning Unit Notes under Program Management > Update Planning Unit."
 }
