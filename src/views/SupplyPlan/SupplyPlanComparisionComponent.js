@@ -98,7 +98,8 @@ export default class SupplyPlanComponent extends React.Component {
             ledgerForBatch: [],
             showBatchSaveButton: false,
             shipmentQtyTotalForPopup: 0,
-            batchQtyTotalForPopup: 0
+            batchQtyTotalForPopup: 0,
+            planningUnitNotes:""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -915,7 +916,8 @@ export default class SupplyPlanComponent extends React.Component {
                     programJson: programJsonForPlanningUnit,
                     planBasedOn: programPlanningUnit.planBasedOn,
                     minQtyPpu: programPlanningUnit.minQty,
-                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
