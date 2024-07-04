@@ -264,6 +264,9 @@ export default class SupplyPlanComponent extends React.Component {
         } else {
             csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
+        if(this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0){
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + this.state.planningUnitNotes + '"'))
+        }
         csvRow.push('')
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             ("\'").concat(item.monthName).concat(" ").concat(item.monthYear)
@@ -404,6 +407,11 @@ export default class SupplyPlanComponent extends React.Component {
                             align: 'left'
                         })
                     }
+                    if(this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0){
+                        doc.text(i18n.t('static.program.notes') + ' : ' + this.state.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
+                          align: 'left'
+                        })
+                      }
                 }
             }
         }

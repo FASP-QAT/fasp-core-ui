@@ -521,6 +521,9 @@ export default class SupplyPlanComponent extends React.Component {
             } else {
                 csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + ele.distributionLeadTime + "\"")
             }
+            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+                csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ele.info.planningUnitNotes + '"'))
+            }
             csvRow.push('')
             A = [header]
             A.push(openningArr)
@@ -648,6 +651,11 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
             }
+            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+                doc.text(i18n.t('static.program.notes') + ' : ' + ele.info.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
+                  align: 'left'
+                })
+              }
             doc.setTextColor("#000");
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...ele.data.consumptionTotalData]
@@ -4555,7 +4563,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 coList: conList,
                                 shList: shiList,
                                 minStockMoSQty: minStockMoSQty,
-                                maxStockMoSQty: maxStockMoSQty
+                                maxStockMoSQty: maxStockMoSQty,
+                                planningUnitNotes:programPlanningUnit.notes
                             }
                             var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                             var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
