@@ -3307,5 +3307,8 @@
     "static.priority.lowDesc": "El problema es notable pero no crítico para las operaciones diarias y sería bueno solucionarlo eventualmente. (Afecta a una función no crítica para el negocio).",
     "static.unit.conversionMethod": "Método de conversión",
     "static.alternateReportingUnit.multiply": "Multiplicar",
-    "static.alternateReportingUnit.divide": "Dividir"
+    "static.alternateReportingUnit.divide": "Dividir",
+    "static.module":"Módulo",
+    "static.program.noOfProgramsUsingPU":"# Programas que usan PU",
+    "static.program.noOfProgramsUsingFU":"# Programas que usan FU"
 }
