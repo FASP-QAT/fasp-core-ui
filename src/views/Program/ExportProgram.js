@@ -20,6 +20,7 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import Minizip from 'minizip-asm.js';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -99,7 +100,7 @@ export default class ExportProgram extends Component {
      */
     formSubmit() {
         this.setState({ loading: true });
-        var zip = new JSZip();
+        const mz = new Minizip();
         var programId = this.state.programId;
         if (programId != "" && programId != undefined) {
             this.setState({
@@ -237,7 +238,8 @@ export default class ExportProgram extends Component {
                                                                                             var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                            // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1, { password: "123" });
                                                                                         } else {
                                                                                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
@@ -273,23 +275,31 @@ export default class ExportProgram extends Component {
                                                                                             dArray.programData = { generalData: programJson111, planningUnitDataList: planningUnitDataList1 };
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                                                                                            // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt, { password: "123" });
                                                                                         }
                                                                                     }
                                                                                 }
                                                                                 if (i == myResult.length - 1) {
-                                                                                    zip.generateAsync({
-                                                                                        type: "blob",
-                                                                                        compression: 'DEFLATE', // Specify the compression method
-                                                                                        compressionOptions: {
-                                                                                            level: 9, // Specify the compression level (0-9), where 9 is the best compression
-                                                                                        },
-                                                                                    }).then(function (content) {
-                                                                                        FileSaver.saveAs(content, "download.zip");
+                                                                                    // zip.generateAsync({
+                                                                                    //     type: "blob",
+                                                                                    //     compression: 'DEFLATE', // Specify the compression method
+                                                                                    //     compressionOptions: {
+                                                                                    //         level: 9, // Specify the compression level (0-9), where 9 is the best compression
+                                                                                    //     },
+                                                                                    // }).then(function (content) {
+                                                                                    //     FileSaver.saveAs(content, "download.zip");
+                                                                                        const zipBlob = new Blob([mz.zip()], { type: "application/zip" });
+                                                                                        const link = document.createElement('a');
+                                                                                        link.href = URL.createObjectURL(zipBlob);
+                                                                                        link.download = 'download.zip';
+                                                                                        document.body.appendChild(link);
+                                                                                        link.click();
+                                                                                        document.body.removeChild(link);
                                                                                         let id = AuthenticationService.displayDashboardBasedOnRole();
                                                                                         this.setState({ loading: false });
                                                                                         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
-                                                                                    }.bind(this));
+                                                                                    // }.bind(this));
                                                                                 }
                                                                             }
                                                                         }.bind(this)
