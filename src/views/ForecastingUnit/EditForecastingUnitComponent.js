@@ -193,38 +193,34 @@ export default class EditForecastingUnitComponent extends Component {
         // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
         ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
             // console.log('FU object: ' + JSON.stringify(response.data));
-            console.log('\nFU spProgramList: ' + JSON.stringify(response.data.spProgramList));
-            console.log('\nFU fcProgramList: ' + JSON.stringify(response.data.fcProgramList));
+            console.log('\nFU spProgramList Active size: ' + response.data.spProgramListActive.length);
+            console.log('\nFU spProgramList Disabled size: ' + response.data.spProgramListDisabled.length);
+            console.log('\nFU fcProgramListActive size: ' + response.data.fcProgramListActive.length);
+            console.log('\nFU fcProgramListDisabled size: ' + response.data.fcProgramListDisabled.length);
             if (response.status == 200) {
                 //combine program list
                 var combinedProgramList = [];
                 var finalProgramList = [];
+                
                 //add spProgramList to main list
-
-                let cnt1 = 0;
-                response.data.spProgramList.map(item => {
+                response.data.spProgramListActive.map(item => {
                     var json = {
                         "code": item.code,
                         "module": "Supply Planning",
-                        // "status": cnt1 == 0? 0 : item.label.active
-                        "status": item.label.active
+                        "status": 1
                     }
                     combinedProgramList.push(json);
-                    // cnt1++;
                 });
 
                 //add fcProgramList to main list
-                cnt1 = 0;
-                response.data.fcProgramList.map(item => {
+                response.data.fcProgramListActive.map(item => {
                     var json = {
                         "code": item.code,
                         "module": "Forecasting",
-                        // "status": cnt1 == 0? 0 : item.label.active
-                        "status": item.label.active
+                        "status": 1
                     }
                     combinedProgramList.push(json);
-                    // cnt1++;
-                });
+                });                
 
                 //sorted combinedProgram array
                 combinedProgramList.sort((a, b) => {
@@ -232,24 +228,38 @@ export default class EditForecastingUnitComponent extends Component {
                 });
 
                 var inActivePrograms = [];
-                //separate active & inactive progrmas
-                combinedProgramList.map(item => {
-                    if (item.status == 1) {
-                        finalProgramList.push(item);
-                    } else {
-                        inActivePrograms.push(item);
+                //add spProgramList disabled
+                response.data.spProgramListDisabled.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Supply Planning",
+                        "status": 0
                     }
+                    inActivePrograms.push(json);
+                });
+                //add fcProgramList disabled
+                response.data.fcProgramListDisabled.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Forecasting",
+                        "status": 0
+                    }
+                    inActivePrograms.push(json);
+                });
+                //sorted combinedProgram array
+                inActivePrograms.sort((a, b) => {
+                    return a.code > b.code ? 1 : -1;
                 });
 
                 //merged active & inactive programs
-                inActivePrograms.map(item => {
-                    finalProgramList.push(item);//add inactive programs to the end
-                });
+                finalProgramList = [...combinedProgramList, ...inActivePrograms];
+
+                console.log('forecastingUnit.active : '+ response.data.forecastingUnit.active);
 
                 this.setState({
                     forecastingUnit: response.data.forecastingUnit,
-                    spProgramList: response.data.spProgramList,
-                    fcProgramList: response.data.fcProgramList,
+                    // spProgramList: response.data.spProgramList,
+                    // fcProgramList: response.data.fcProgramList,
                     sortedProgramList: finalProgramList,
                     loading: false
                 });
