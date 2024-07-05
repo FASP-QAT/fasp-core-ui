@@ -192,16 +192,11 @@ export default class EditForecastingUnitComponent extends Component {
             );
         // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
         ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
-            // console.log('FU object: ' + JSON.stringify(response.data));
-            console.log('\nFU spProgramList Active size: ' + response.data.spProgramListActive.length);
-            console.log('\nFU spProgramList Disabled size: ' + response.data.spProgramListDisabled.length);
-            console.log('\nFU fcProgramListActive size: ' + response.data.fcProgramListActive.length);
-            console.log('\nFU fcProgramListDisabled size: ' + response.data.fcProgramListDisabled.length);
             if (response.status == 200) {
                 //combine program list
                 var combinedProgramList = [];
                 var finalProgramList = [];
-                
+
                 //add spProgramList to main list
                 response.data.spProgramListActive.map(item => {
                     var json = {
@@ -220,7 +215,7 @@ export default class EditForecastingUnitComponent extends Component {
                         "status": 1
                     }
                     combinedProgramList.push(json);
-                });                
+                });
 
                 //sorted combinedProgram array
                 combinedProgramList.sort((a, b) => {
@@ -253,9 +248,6 @@ export default class EditForecastingUnitComponent extends Component {
 
                 //merged active & inactive programs
                 finalProgramList = [...combinedProgramList, ...inActivePrograms];
-
-                console.log('forecastingUnit.active : '+ response.data.forecastingUnit.active);
-
                 this.setState({
                     forecastingUnit: response.data.forecastingUnit,
                     // spProgramList: response.data.spProgramList,

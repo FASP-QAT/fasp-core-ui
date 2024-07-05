@@ -69,8 +69,6 @@ export default class PlanningUnitListComponent extends Component {
             forecastingUnitId: forecastingUnitId
         }
         PlanningUnitService.getPlanningUnitByTracerCategoryProductCategoryAndForecastingUnit(json).then(response => {
-            // console.log('planningUnitList[0]: '+JSON.stringify(response.data.filter(c => c.countOfSpPrograms > 29)[2]));
-            console.log('planningUnitList obj: '+JSON.stringify(response.data.filter(c => c.planningUnitId == 2478)[0]));
             this.setState({
                 planningUnitList: response.data,
                 selSource: response.data,

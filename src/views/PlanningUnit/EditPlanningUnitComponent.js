@@ -140,11 +140,6 @@ export default class EditPlanningUnitComponent extends Component {
                     })
                     // PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
                     PlanningUnitService.getPlanningUnitByIdWithPrograms(this.props.match.params.planningUnitId).then(response => {
-                        // console.log('PU object: ' + JSON.stringify(response.data));
-                        console.log('\nFU spProgramList Active size: ' + response.data.spProgramListActive.length);
-                        console.log('\nFU spProgramList Disabled size: ' + response.data.spProgramListDisabled.length);
-                        console.log('\nFU fcProgramListActive size: ' + response.data.fcProgramListActive.length);
-                        console.log('\nFU fcProgramListDisabled size: ' + response.data.fcProgramListDisabled.length);
                         if (response.status == 200) {
                             //combine program list
                             var combinedProgramList = [];
@@ -201,8 +196,6 @@ export default class EditPlanningUnitComponent extends Component {
 
                             //merged active & inactive programs
                             finalProgramList = [...combinedProgramList, ...inActivePrograms];
-
-                            console.log('planningUnit.active : ' + response.data.planningUnit.active);
 
                             this.setState({
                                 planningUnit: response.data.planningUnit,
@@ -345,7 +338,7 @@ export default class EditPlanningUnitComponent extends Component {
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.program.puStatus'),
+                    title: i18n.t('static.common.status'),
                     type: 'text',
                 }
 

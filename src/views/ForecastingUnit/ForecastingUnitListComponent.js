@@ -51,14 +51,7 @@ export default class ForecastingUnitListComponent extends Component {
         let forecastingUnitList = this.state.selSource;
         let forecastingUnitListArray = [];
         let count = 0;
-        for (var j = 0; j < forecastingUnitList.length; j++) {
-            if(forecastingUnitList[j].forecastingUnitId == 222){
-
-                console.log('forecastingUnitList[j].forecastingUnitId: '+forecastingUnitList[j].forecastingUnitId);
-                console.log('countOfSpPrograms: '+forecastingUnitList[j].countOfSpPrograms);
-                console.log('countOfFcPrograms: '+forecastingUnitList[j].countOfFcPrograms);
-            }
-
+        for (var j = 0; j < forecastingUnitList.length; j++) {           
             data = [];
             data[0] = forecastingUnitList[j].forecastingUnitId
             data[1] = getLabelText(forecastingUnitList[j].realm.label, this.state.lang)
@@ -187,7 +180,6 @@ export default class ForecastingUnitListComponent extends Component {
         }
         ForecastingUnitService.getForecastingUnitListByProductCategoryAndTracerCategory(json)
             .then(response => {
-                console.log('forecastingUnitList[0]: '+JSON.stringify(response.data.filter(c => c.countOfSpPrograms > 29)[1]));
                 if (response.status == 200) {
                     this.setState({
                         forecastingUnitList: response.data,
