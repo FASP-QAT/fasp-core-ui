@@ -120,7 +120,8 @@ class Budgets extends Component {
             maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             fundingSourceValues: [],
             fundingSourceLabels: [],
-            fundingSources: [],
+            fundingSources: [],//contains filtered funding sources
+            fundingSourcesOriginal: [],
             programId: '',
             programValues: [],
             jexcelDataEl: "",
@@ -160,34 +161,21 @@ class Budgets extends Component {
         //Fetch all funding source type list
         FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
             .then(response => {
-                console.log('fst size: ');
-                console.log('response.status: '+response.status);
                 if (response.status == 200) {
                     var fundingSourceTypeValues = [];
-                    // fundingSourceTypeLabels: [],
+                    var fundingSourceTypes = response.data;
+                    fundingSourceTypes.sort(function (a, b) {
+                        a = a.fundingSourceTypeCode.toLowerCase();
+                        b = b.fundingSourceTypeCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
 
-                    // fundingSources.map(ele => {
-                    //     fundingSourceValues.push({ label: ele.code, value: ele.id })
-                    // })
-
-                    
-                    console.log('fst [0]: '+listArray[0]);
-
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    var filteredfundingSourceTypes = listArray.filter(c => c.active == true && realmId == c.realm.id);
-                    console.log('filteredfundingSourceTypes: '+JSON.stringify(filteredfundingSourceTypes));
-
-                    filteredfundingSourceTypes.map(ele => {
+                    fundingSourceTypes.map(ele => {
                         fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
                     })
 
                     this.setState({
-                        fundingSourceTypes: filteredfundingSourceTypes, loading: false,
+                        fundingSourceTypes: fundingSourceTypes, loading: false,
                         fundingSourceTypeValues: fundingSourceTypeValues,
                         fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
                     })
@@ -201,8 +189,6 @@ class Budgets extends Component {
                 }
             }).catch(
                 error => {
-                    console.log('inside catch error: ');
-                    console.log('error.response.status: '+JSON.stringify(error.response.status));
                     this.setState({
                         fundingSourceTypes: [], loading: false
                     }, () => {
@@ -255,7 +241,31 @@ class Budgets extends Component {
             fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
             fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
         }, () => {
-            // this.filterData()
+            var filteredFundingSourceArr = [];
+            var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+                for (var j = 0; j < fundingSources.length; j++) {
+                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+                        filteredFundingSourceArr.push(fundingSources[j]);
+                    }
+                }
+            }
+
+            if (filteredFundingSourceArr.length > 0) {
+                filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+                    a = a.code.toLowerCase();
+                    b = b.code.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+            }
+            this.setState({
+                fundingSources: filteredFundingSourceArr,
+                fundingSourceValues: [],
+                fundingSourceLabels: [],
+            }, () => {
+                this.filterData();
+            });
+
         })
     }
 
@@ -268,24 +278,25 @@ class Budgets extends Component {
                 .then(response => {
                     var fundingSourceValues = [];
                     var fundingSources = response.data;
-                    console.log('fundingSources[0]: '+JSON.stringify(fundingSources[0]));
                     fundingSources.map(ele => {
                         fundingSourceValues.push({ label: ele.code, value: ele.id })
                     })
+                    fundingSources.sort(function (a, b) {
+                        a = a.code.toLowerCase();
+                        b = b.code.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                     this.setState({
-                        fundingSources: fundingSources.sort(function (a, b) {
-                            a = a.code.toLowerCase();
-                            b = b.code.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }), loading: false,
-                        fundingSourceValues: fundingSourceValues,
+                        fundingSourcesOriginal: fundingSources, loading: false,
+                        fundingSources: fundingSources,
+                        fundingSourceValues: fundingSourceValues,//by default all fs will be selected
                         fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
                     })
                 }).catch(
                     error => {
                         this.setState({
-                            fundingSources: [], loading: false
+                            fundingSourcesOriginal: [], loading: false
                         }, () => {
                         })
                         if (error.message === "Network Error") {
@@ -318,7 +329,6 @@ class Budgets extends Component {
      * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
      */
     handleFundingSourceChange = (fundingSourceIds) => {
-        console.log('fundingSourceIds: '+JSON.stringify(fundingSourceIds));
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
         })
@@ -448,7 +458,7 @@ class Budgets extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString())
-        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSourcesOriginal.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             this.setState({ loading: true })
             var inputjson = { "programIds": programId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
@@ -659,6 +669,15 @@ class Budgets extends Component {
         const { fundingSourceTypes } = this.state;
         const { fundingSources } = this.state;
         const { rangeValue } = this.state
+
+        let fundingSourceListDD = fundingSources.length > 0 &&
+            fundingSources.map((item, i) => {
+                return {
+                    label: item.code,
+                    value: item.id,
+                };
+            }, this);
+
         let data1 = []
         let data2 = []
         let data3 = []
@@ -871,12 +890,11 @@ class Budgets extends Component {
                                             filterOptions={this.filterOptions}
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                            options={fundingSources.length > 0
-                                                && fundingSources.map((item, i) => {
-                                                    return (
-                                                        { label: item.code, value: item.id }
-                                                    )
-                                                }, this)}
+                                            options={
+                                                fundingSourceListDD && fundingSourceListDD.length > 0
+                                                    ? fundingSourceListDD
+                                                    : []
+                                            }
                                             disabled={this.state.loading}
                                         />
                                     </div>
