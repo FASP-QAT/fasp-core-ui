@@ -107,10 +107,9 @@ class CompareAndSelectScenario extends Component {
             expandCompressBtn: true,
             consumptionUnitShowArr: [],
             uniqueProductCategories: [],
-            planningUnitListForTable: {
-                planningUnit: "",
-                selectedForecast: ""
-            }
+            planningUnitListForTable: [],
+            expandCompressPUBtn: true,
+            showHidePU: true
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -646,9 +645,9 @@ class CompareAndSelectScenario extends Component {
                     count++;
                 }
                 let columns = [];
-                columns.push({ title: i18n.t('static.compareAndSelect.selectAsForecast'), type: 'radio', width: 80 });
-                columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 80 });
-                columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 100 });
+                columns.push({ title: i18n.t('static.common.select'), type: 'radio', width: 50 });
+                columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 50 });
+                columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 50 });
                 columns.push({ title: i18n.t('static.consumption.forcast'), type: 'html', readOnly: true, width: 150 });
                 if (this.state.xAxisDisplayBy != 1) {
                     for (var i = 0; i < this.state.yearArray.length; i++) {
@@ -656,7 +655,7 @@ class CompareAndSelectScenario extends Component {
                     }
                 }
                 columns.push({ type: 'numeric', title: i18n.t('static.compareAndSelect.totalForecast'), readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
-                columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastError'), readOnly: true, width: 100 });
+                columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastError'), readOnly: true, width: 80 });
                 columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastErrorMonths'), readOnly: true, width: 80 });
                 columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.compareToConsumptionForecast'), readOnly: true, width: 150 });
                 columns.push({ type: 'hidden', title: 'tree scenario id' });
@@ -835,7 +834,7 @@ class CompareAndSelectScenario extends Component {
         var columns = [];
         columns.push(i18n.t('static.equivalancyUnit.type'));
         columns.push(i18n.t('static.consumption.forcast'));
-        columns.push(i18n.t('static.compareAndSelect.selectAsForecast'));
+        columns.push(i18n.t('static.common.select'));
         if (this.state.xAxisDisplayBy != 1) {
             for (var i = 0; i < this.state.yearArray.length; i++) {
                 columns.push(this.state.yearArray[i]);
@@ -1076,7 +1075,7 @@ class CompareAndSelectScenario extends Component {
         col1.push(i18n.t('static.common.display?'));
         col1.push(i18n.t('static.equivalancyUnit.type'));
         col1.push(i18n.t('static.consumption.forcast'));
-        col1.push(i18n.t('static.compareAndSelect.selectAsForecast'));
+        col1.push(i18n.t('static.common.select'));
         if (this.state.xAxisDisplayBy != 1) {
             for (var i = 0; i < this.state.yearArray.length; i++) {
                 col1.push(this.state.yearArray[i]);
@@ -1303,6 +1302,9 @@ class CompareAndSelectScenario extends Component {
         }
     }
 
+    /**
+     * This function is used to expand and compress the year columns in table
+     */
     expandCompressFuntion = () => {
         var e = this.state.languageEl;
         var count = 4
@@ -1316,6 +1318,13 @@ class CompareAndSelectScenario extends Component {
             }
         }
         this.setState({ expandCompressBtn: !this.state.expandCompressBtn });
+    }
+
+    /**
+     * This function is used to expand and compress the planning unit table
+     */
+    expandCompressPUFuntion = () => {
+        this.setState({ expandCompressPUBtn: !this.state.expandCompressPUBtn, showHidePU: !this.state.showHidePU });
     }
 
     /**
@@ -1613,15 +1622,16 @@ class CompareAndSelectScenario extends Component {
                         if (map != undefined && map.consumptionExtrapolationId != null) {
                             var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
                             selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
-                            planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
+                            planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
                         } else if (map != undefined && map.scenarioId != null && map.treeId != null) {
                             var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
+                            console.log("============>", t)
                             var s = t.scenarioList.filter(s => s.id == map.scenarioId)[0];
                             selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
-                            planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
+                            planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
                         } else {
                             selectedForecastString = ""
-                            planningUnitListForTable.push({ planningUnit: puList[p], selectedForecast: selectedForecastString })
+                            planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
                         }
                     }
                     this.setState({
@@ -1639,6 +1649,7 @@ class CompareAndSelectScenario extends Component {
                             b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }.bind(this)),
+                        planningUnitListForTable: planningUnitListForTable,
                         forecastingUnitList: forecastingUnitList,
                         monthList: monthList,
                         monthList1: monthList1,
@@ -1647,18 +1658,8 @@ class CompareAndSelectScenario extends Component {
                         forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
                         forecastStopDate: moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD"),
                         planningUnitId: planningUnitId,
-                        planningUnitListForTable: planningUnitListForTable,
-                        loading: false
+                        loading: false,
                     }, () => {
-                        var planningUnits = this.state.planningUnitList;
-                        // Extract unique product categories
-                        const categories = planningUnits.map(unit => unit.planningUnit.forecastingUnit.productCategory);
-
-                        const uniqueCategories = Array.from(new Set(categories.map(cat => cat.id)))
-                            .map(id => categories.find(cat => cat.id === id));
-                        this.setState({
-                            uniqueProductCategories: uniqueCategories
-                        })
                         if (planningUnitId != "") {
                             this.setPlanningUnitId(event.target.value);
                         } else {
@@ -2459,49 +2460,39 @@ class CompareAndSelectScenario extends Component {
                                         </div>
                                     </div>
                                 </Form>
-                                <div class="pl-0 fixTableHeadCompareandselect">
+                                <div class="pl-0">
+                                    {this.state.datasetId != "" && this.state.regionId != "" &&
+                                        <div onClick={this.expandCompressPUFuntion} style={{ display: this.state.loading ? "none" : "block" }}>
+                                            {this.state.expandCompressPUBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                        </div>
+                                    }
                                     <div className="row">
-                                        <div className="col-md-4">
-                                            <div class="table-scroll">
-                                                <div class="table-wrap DataEntryTable table-responsive fixTableHeadSupplyPlan">
-                                                    <Table className="table-bordered text-center overflowhide main-table " bordered size="sm">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th class="compareAndSelectPlanningUnitTableTdWidth sticky-col first-col clone ">{i18n.t('static.report.planningUnit')}</th>
-                                                                <th>{i18n.t('static.compareVersion.selectedForecast')}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {this.state.uniqueProductCategories.map(item => {
-                                                                return (<>
-                                                                    <tr className="hoverTd">
-                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1 p"
-                                                                            onClick={() => this.toggleAccordion(item.id)}
-                                                                        >
-                                                                            {this.state.consumptionUnitShowArr.includes(item.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                        </td>
-                                                                        <td className="sticky-col first-col clone" align="left">{getLabelText(item.label, this.state.lang)}</td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    {this.state.planningUnitListForTable.map(p => {
-                                                                        if (item.id == p.planningUnit.planningUnit.forecastingUnit.productCategory.id) {
-                                                                            return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.id) ? "" : "none" }}>
-                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                                <td className="sticky-col first-col clone text-left hoverTd" onClick={() => this.setPlanningUnitId(p.planningUnit.planningUnit.id)}>{getLabelText(p.planningUnit.planningUnit.label, this.state.lang) + " | " + p.planningUnit.planningUnit.id}</td>
-                                                                                <td>{p.selectedForecast == "" ? <div><i class="fa fa-exclamation-triangle"></i>{i18n.t("static.commitTree.noForecastSelected")}</div> : p.selectedForecast}</td>
-                                                                            </tr>)
-                                                                        }
-                                                                    })}
-                                                                </>)
-                                                            }
-                                                            )}
-                                                        </tbody>
-                                                    </Table>
+                                        {this.state.datasetId != "" && this.state.regionId != "" && this.state.showHidePU &&
+                                            <div className="col-md-3" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <div class="table-scroll">
+                                                    <div class="table-wrap DataEntryTable table-responsive">
+                                                        <Table className="table-bordered text-center overflowhide main-table " bordered size="sm">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="compareAndSelectPlanningUnitTableTdWidth sticky-col first-col clone ">{i18n.t('static.report.planningUnit')}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {this.state.planningUnitListForTable.map((ele, index) => {
+                                                                    return (<>
+                                                                        <tr>
+                                                                            <td className="sticky-col first-col clone text-left hoverTd" onClick={() => this.setPlanningUnitId(ele.planningUnit.id)}>
+                                                                                {ele.selectedForecast == "" ? <i class="fa fa-exclamation-triangle" style={{ marginRight: "5px" }}></i> : ""}{getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id}</td>
+                                                                        </tr>
+                                                                    </>)
+                                                                })}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="col-md-8" style={{ display: this.state.loading ? "none" : "block" }}>
+                                        }
+                                        <div className={this.state.showHidePU ? "col-md-9" : "col-md-12"} style={{ display: this.state.loading ? "none" : "block" }}>
                                             {this.state.showAllData &&
                                                 <>
                                                     <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
