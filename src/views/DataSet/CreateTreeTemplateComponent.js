@@ -749,7 +749,8 @@ export default class CreateTreeTemplate extends Component {
             beforeEndDateDisplay: '',
             modelingChangedOrAdded: false,
             currentNodeTypeId: "",
-            deleteChildNodes: false
+            deleteChildNodes: false,
+            modelingTabChanged: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -2654,7 +2655,7 @@ export default class CreateTreeTemplate extends Component {
                     tree.flatList = items;
                     tree.lastModifiedBy = {
                         userId: AuthenticationService.getLoggedInUserId(),
-                        username:AuthenticationService.getLoggedInUsername()
+                        username: AuthenticationService.getLoggedInUsername()
                     };
                     tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     tree.createdBy = {
@@ -2912,6 +2913,33 @@ export default class CreateTreeTemplate extends Component {
             }
         });
     }
+
+    /**
+     * Validations for fields when submit from modeling tab
+     */
+    validation1 = function () {
+        var validationFail = 0;
+        var nodeTypeId = document.getElementById("nodeTypeId").value;
+        var nodeTitle = document.getElementById("nodeTitle").value;
+        var nodeValue = document.getElementById("nodeValue").value;
+        var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
+        var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
+            validationFail = 1;
+            document.getElementById("nodeUnitId").className = "form-control is-invalid"
+        }
+        if (nodeTitle == "" || testTitle == false) {
+            validationFail = 1;
+            document.getElementById("nodeTitle").className = "form-control is-invalid"
+        }
+        if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
+            validationFail = 1;
+            document.getElementById("nodeValue").className = "form-control is-invalid"
+        }
+        return validationFail > 0 ? false : true;
+
+    }
+
     /**
      * Handles form submission of modeling data
      */
@@ -2966,7 +2994,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     }
                     if (itemIndex1 != -1) {
-                        if (this.state.isValidError.toString() == "false") {
+                        if (this.validation1() && this.state.isValidError.toString() == "false") {
                             item.payload = this.state.currentItemConfig.context.payload;
                             if (dataArr.length > 0) {
                                 (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
@@ -2988,7 +3016,8 @@ export default class CreateTreeTemplate extends Component {
                                 activeTab1: new Array(2).fill('2'),
                                 firstMonthOfTarget: "",
                                 yearsOfTarget: "",
-                                actualOrTargetValueList: []
+                                actualOrTargetValueList: [],
+                                modelingChangedOrAdded: false
                             }, () => {
                                 this.calculateMOMData(0, 0);
                             });
@@ -3000,8 +3029,13 @@ export default class CreateTreeTemplate extends Component {
                             });
                         }
                     } else {
-                        if (this.state.isValidError.toString() == "false") {
-                            this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                        if (this.validation1() && (this.state.isValidError.toString() == "false" || document.getElementById('isValidError').value.toString() == 'false') && !this.state.addNodeError) {
+                            this.setState({
+                                addNodeFlag: false,
+                                modelingChangedOrAdded: false
+                            }, () => {
+                                this.onAddButtonClick(this.state.currentItemConfig, true, dataArr);
+                            });
                         } else {
                             this.setState({
                                 modelingJexcelLoader: false
@@ -3160,20 +3194,20 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange)) ? "" : parseFloat(this.state.currentCalculatedMomChange) < 0 ? parseFloat(this.state.currentCalculatedMomChange * -1).toFixed(4) : parseFloat(this.state.currentCalculatedMomChange), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, "", true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             }
         } else {
             if (this.state.currentModelingType == 2) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
                 }
                 var startDate = this.state.currentCalculatorStartDate;
@@ -3184,29 +3218,29 @@ export default class CreateTreeTemplate extends Component {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, "", true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, !isFinite(this.state.percentForOneMonth) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, "", true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData=="_T" || this.state.currentTransferData=="_F") {
+                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, !isFinite(this.state.percentForOneMonth) ? "" : parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex, isNaN(parseFloat(this.state.currentCalculatedMomChange).toFixed(4)) ? "" : parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, "", true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             }
         }
@@ -3388,7 +3422,7 @@ export default class CreateTreeTemplate extends Component {
         }
         if (this.state.currentModelingType == 4) {
             var momValue = ((parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference))).toFixed(4);
-            percentForOneMonth = parseFloat(((Math.pow((1+(getValue/100)),(1/monthDifference)))-1)*100).toFixed(4);
+            percentForOneMonth = parseFloat(((Math.pow((1 + (getValue / 100)), (1 / monthDifference))) - 1) * 100).toFixed(4);
         }
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue / monthDifference)).toFixed(4);
@@ -3402,7 +3436,7 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.setState({
-            currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
+            currentEndValue: (getValue != '' && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: getValue != '' ? momValue : '',
             currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
             percentForOneMonth
@@ -4076,7 +4110,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(K1==true,K1==1),E${parseInt(j)},J${parseInt(j)}),2)`
             data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
+            data[3] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}),2)`
             var momListParentForMonth = momListParent.filter(c => c.month == momList[j].month);
             data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -4287,7 +4321,7 @@ export default class CreateTreeTemplate extends Component {
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})))`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
-            data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
+            data[5] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0
             data[6] = `=(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1})`
             data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
             data[8] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
@@ -4983,9 +5017,11 @@ export default class CreateTreeTemplate extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changed = function (instance, cell, x, y, value) {
-        this.setState({
-            modelingChangedOrAdded: true
-        })
+        if (x != 9 && x != 11 && this.state.modelingChangedOrAdded == false) {
+            this.setState({
+                modelingChangedOrAdded: true
+            })
+        }
         if (x != 9 && x != 11 && this.state.modelingChanged == false) {
             this.setState({
                 modelingChanged: true
@@ -5146,6 +5182,11 @@ export default class CreateTreeTemplate extends Component {
         if (x != 11 && x != 9) {
             instance.setValueFromCoords(11, y, 1, true);
             this.setState({ isChanged: true });
+        }
+        if (!this.state.modelingTabChanged) {
+            this.setState({
+                modelingTabChanged: true
+            })
         }
     }.bind(this);
     /**
@@ -5396,7 +5437,7 @@ export default class CreateTreeTemplate extends Component {
         })
         this.setState({
             items,
-            cursorItem: nodeId,
+            // cursorItem: nodeId,
             isTemplateChanged: true
         }, () => {
             this.calculateMOMData(0, 2);
@@ -7267,13 +7308,15 @@ export default class CreateTreeTemplate extends Component {
                         showModelingJexcelNumber: true,
                         minMonth, maxMonth, filteredModelingType: modelingTypeListNew
                     }, () => {
-                        this.buildModelingJexcel();
+                        if (!this.state.modelingTabChanged)
+                            this.buildModelingJexcel();
                     })
                 } else {
                     this.setState({
                         showModelingJexcelNumber: true
                     }, () => {
-                        this.buildModelingJexcel();
+                        if (!this.state.modelingTabChanged)
+                            this.buildModelingJexcel();
                     })
                 }
                 this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
@@ -7945,7 +7988,7 @@ export default class CreateTreeTemplate extends Component {
     /**
      * Removes an item from the tree by its ID.
      * @param {number} id - ID of the item to be removed.
-     */ 
+     */
     onRemoveItem(id) {
         const { items } = this.state;
         this.setState(this.getDeletedItems(items, [id]));
@@ -7972,7 +8015,7 @@ export default class CreateTreeTemplate extends Component {
         });
         return {
             items: result,
-            cursorItem: cursorParent
+            // cursorItem: cursorParent
         };
     }
     /**
@@ -8058,7 +8101,8 @@ export default class CreateTreeTemplate extends Component {
                 highlightItem: item.id,
                 cursorItem: item.id,
                 usageText: '',
-                currentNodeTypeId: data.context.payload.nodeType.id
+                currentNodeTypeId: data.context.payload.nodeType.id,
+                modelingTabChanged: false,
             }, () => {
                 if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
                     var itemConfig = data.context;
@@ -8805,23 +8849,27 @@ export default class CreateTreeTemplate extends Component {
                                 })
                             }
                             if (save) {
-                                if (!this.state.isSubmitClicked) {
-                                    this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true, isTemplateChanged: true }, () => {
-                                        setTimeout(() => {
-                                            if (this.state.addNodeFlag) {
-                                                this.onAddButtonClick(this.state.currentItemConfig)
-                                            } else {
-                                                this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                            }
-                                            if (this.state.modelingChangedOrAdded) {
-                                                this.formSubmitLoader();
-                                            }
-                                            this.setState({
-                                                cursorItem: 0,
-                                                highlightItem: 0
-                                            })
-                                        }, 0);
-                                    })
+                                this.formSubmitLoader();
+                                if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
+                                    if (!this.state.isSubmitClicked) {
+                                        this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                            setTimeout(() => {
+                                                if (this.state.addNodeFlag) {
+                                                    this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                                                } else {
+                                                    this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                                }
+                                                this.setState({
+                                                    cursorItem: 0,
+                                                    highlightItem: 0,
+                                                    activeTab1: new Array(1).fill('1')
+                                                })
+                                            }, 0);
+                                        })
+                                        this.setState({ modelingTabChanged: false })
+                                    }
+                                } else {
+                                    this.setState({ activeTab1: new Array(1).fill('2') })
                                 }
                             }
                         }}
@@ -10447,7 +10495,7 @@ export default class CreateTreeTemplate extends Component {
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                                        this.setState({ showMomData: false,viewMonthlyData:true,isChanged:false })
+                                        this.setState({ showMomData: false, viewMonthlyData: true, isChanged: false })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {this.state.editable && this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
@@ -10516,7 +10564,7 @@ export default class CreateTreeTemplate extends Component {
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({
-                                            showMomDataPercent: false,isChanged: false,viewMonthlyData: true
+                                            showMomDataPercent: false, isChanged: false, viewMonthlyData: true
                                         });
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
                                     {this.state.editable && <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
@@ -11073,7 +11121,7 @@ export default class CreateTreeTemplate extends Component {
                                         levelUnitId = getLevelUnit[0].unit != null && getLevelUnit[0].unit.id != null ? getLevelUnit[0].unit.id : "";
                                     }
                                     this.setState({
-                                        currentNodeTypeId:"",
+                                        currentNodeTypeId: "",
                                         isValidError: true,
                                         isTemplateChanged: true,
                                         tempPlanningUnitId: '',
@@ -11091,6 +11139,7 @@ export default class CreateTreeTemplate extends Component {
                                         addNodeFlag: true,
                                         openAddNodeModal: true,
                                         modelingChangedOrAdded: false,
+                                        modelingTabChanged: false,
                                         currentItemConfig: {
                                             context: {
                                                 isVisible: '',
@@ -11943,14 +11992,16 @@ export default class CreateTreeTemplate extends Component {
                                 if (cf == true) {
                                     this.setState({
                                         openAddNodeModal: false, isChanged: false,
-                                        cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1')
+                                        cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1'),
+                                        modelingTabChanged: false
                                     })
                                 } else {
                                 }
                             } else {
                                 this.setState({
                                     openAddNodeModal: false, isChanged: false,
-                                    cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1')
+                                    cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1'),
+                                    modelingTabChanged: false
                                 })
                             }
                         }
