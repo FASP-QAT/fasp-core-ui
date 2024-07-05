@@ -59,6 +59,7 @@
     "jszip": "^3.2.2",
     "jwt-decode": "^2.2.0",
     "mathjs": "^10.0.2",
+    "minizip-asm.js": "^1.0.10",
     "moment": "^2.24.0",
     "pdfkit-nodejs-webpack": "0.0.2",
     "prop-types": "^15.7.2",
