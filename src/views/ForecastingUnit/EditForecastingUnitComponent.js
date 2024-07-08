@@ -3,13 +3,15 @@ import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL } from '../../Constants.js';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import ForecastingUnitService from '../../api/ForecastingUnitService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import UnitService from '../../api/UnitService.js';
 import AuthenticationService from '../Common/AuthenticationService';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import jexcel from 'jspreadsheet';
 import DropdownService from '../../api/DropdownService';
 import ProductService from '../../api/ProductService';
 // Localized entity name
@@ -97,6 +99,9 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 },
             },
+            spProgramList: [],
+            fcProgramList: [],
+            sortedProgramList: [],
             lang: localStorage.getItem('lang'),
             loading: true,
             units: []
@@ -104,6 +109,7 @@ export default class EditForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
     /**
      * Handles data change in the form.
@@ -192,13 +198,74 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 }
             );
-        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+        // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+        ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
             if (response.status == 200) {
+                //combine program list
+                var combinedProgramList = [];
+                var finalProgramList = [];
+
+                //add spProgramList to main list
+                response.data.spProgramListActive.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Supply Planning",
+                        "status": 1
+                    }
+                    combinedProgramList.push(json);
+                });
+
+                //add fcProgramList to main list
+                response.data.fcProgramListActive.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Forecasting",
+                        "status": 1
+                    }
+                    combinedProgramList.push(json);
+                });
+
+                //sorted combinedProgram array
+                combinedProgramList.sort((a, b) => {
+                    return a.code > b.code ? 1 : -1;
+                });
+
+                var inActivePrograms = [];
+                //add spProgramList disabled
+                response.data.spProgramListDisabled.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Supply Planning",
+                        "status": 0
+                    }
+                    inActivePrograms.push(json);
+                });
+                //add fcProgramList disabled
+                response.data.fcProgramListDisabled.map(item => {
+                    var json = {
+                        "code": item.code,
+                        "module": "Forecasting",
+                        "status": 0
+                    }
+                    inActivePrograms.push(json);
+                });
+                //sorted combinedProgram array
+                inActivePrograms.sort((a, b) => {
+                    return a.code > b.code ? 1 : -1;
+                });
+
+                //merged active & inactive programs
+                finalProgramList = [...combinedProgramList, ...inActivePrograms];
                 this.setState({
-                    forecastingUnit: response.data, loading: false
+                    forecastingUnit: response.data.forecastingUnit,
+                    // spProgramList: response.data.spProgramList,
+                    // fcProgramList: response.data.fcProgramList,
+                    sortedProgramList: finalProgramList,
+                    loading: false
                 }, () => {
                     this.getProductCategoryByRealmId()
                 });
+                this.buildJExcel();
             }
             else {
                 this.setState({
@@ -366,7 +433,72 @@ export default class EditForecastingUnitComponent extends Component {
                 productcategories: []
             })
         }
+    }    
+
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
+    buildJExcel() {
+        let sortedProgramList = this.state.sortedProgramList;
+        let programArray = [];
+        let count = 0;
+
+        for (var j = 0; j < sortedProgramList.length; j++) {
+            data = [];
+            data[0] = sortedProgramList[j].code;
+            data[1] = sortedProgramList[j].module;
+            data[2] = sortedProgramList[j].status ? i18n.t('static.common.active') : i18n.t('static.common.disabled');
+            programArray[count] = data;
+            count++;
+        }
+
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+        var data = programArray;
+        var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [100, 100, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: i18n.t('static.program.programMaster'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.module'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.common.status'),
+                    type: 'text',
+                }
+
+            ],
+            editable: false,
+            onload: loadedForNonEditableTables,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY
+        };
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
+        this.setState({
+            languageEl: languageEl, loading: false
+        })
     }
+
     /**
      * Renders the forecasting unit details form.
      * @returns {JSX.Element} - Forecasting unit details form.
@@ -559,7 +691,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         required />
                                                     <FormFeedback className="red">{errors.label}</FormFeedback>
                                                 </FormGroup>
-                                                <FormGroup>
+                                                <FormGroup>response
                                                     <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
                                                     <Input type="text"
                                                         name="genericLabel"
@@ -628,6 +760,8 @@ export default class EditForecastingUnitComponent extends Component {
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>
+                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                </div>
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

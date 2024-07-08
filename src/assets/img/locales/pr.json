@@ -3297,5 +3297,8 @@
     "static.tree.showInactive": "Mostrar inativo",
     "static.unit.conversionMethod": "Método de conversão",
     "static.alternateReportingUnit.multiply": "Multiplicar",
-    "static.alternateReportingUnit.divide": "Dividir"
+    "static.alternateReportingUnit.divide": "Dividir",
+    "static.module":"Módulo",
+    "static.program.noOfProgramsUsingPU":"# Programas usando PU",
+    "static.program.noOfProgramsUsingFU":"# Programas usando FU"
 }
