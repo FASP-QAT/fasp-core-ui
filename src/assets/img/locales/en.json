@@ -3351,5 +3351,11 @@
     "static.tooltip.planningUnitNotes":"Program Admins can update Planning Unit Notes under Program Management > Update Planning Unit.",
     "static.module":"Module",
     "static.program.noOfProgramsUsingPU":"# Programs using PU",
-    "static.program.noOfProgramsUsingFU":"# Programs using FU"
+    "static.program.noOfProgramsUsingFU":"# Programs using FU",
+    "static.tree.nodeltr":"Node Position (L to R)",
+    "static.tree.nodeName":"Node Name",
+    "static.tree.shiftUp":"Shift Up",
+    "static.tree.shiftDown":"Shift Down",
+    "static.tree.levelChangeNote":"Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.",
+    "static.tree.seeChildrenOf":"See Children of"
 }
