@@ -2172,17 +2172,17 @@ export default class CreateTreeTemplate extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.tree.monthStartNoSeasonality'),
+                    title: "Node Id",
                     type: 'hidden',
                     readOnly: true
                 },
                 {
-                    title: "Node Position (L to R)",
+                    title: i18n.t('static.tree.nodeltr'),
                     type: 'text',
                     readOnly: false
                 },
                 {
-                    title: "Node Name",
+                    title: i18n.t('static.tree.nodeName'),
                     type: 'text',
                     readOnly: true
                 },
@@ -2197,13 +2197,13 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: "Shift Up",
+                    title: i18n.t('static.tree.shiftUp'),
                     type: 'text',
                     readOnly: true,
                     width: 50
                 },
                 {
-                    title: "Shift Down",
+                    title: i18n.t('static.tree.shiftDown'),
                     type: 'text',
                     readOnly: true,
                     width: 50
@@ -12511,9 +12511,9 @@ export default class CreateTreeTemplate extends Component {
                                                 }, this)}
                                         </Input>
                                     </FormGroup>
-                                    <p>Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.</p>
+                                    <p>{i18n.t('static.tree.levelChangeNote')}</p>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">See Children of</Label>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
                                         <MultiSelect
                                             id="childrenOf"
                                             name="childrenOf"
