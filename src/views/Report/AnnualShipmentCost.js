@@ -97,7 +97,7 @@ class AnnualShipmentCost extends Component {
      */
     fetchData() {
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
-        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSourcesOriginal.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let shipmentStatusIds = this.state.statusValues.length == this.state.shipmentStatuses.length ? [] : this.state.statusValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         this.setState({
@@ -999,25 +999,19 @@ class AnnualShipmentCost extends Component {
         let realmId = AuthenticationService.getRealmId();
         if (localStorage.getItem("sessionType") === 'Online') {
             //Fetch all funding source type list
-            FundingSourceService.getFundingSourceTypeListAll()
+            FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
                 .then(response => {
                     if (response.status == 200) {
                         var fundingSourceTypeValues = [];
-                        var listArray = response.data;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        var filteredfundingSourceTypes = listArray.filter(c => c.active == true && realmId == c.realm.id);
-                        console.log('filteredfundingSourceTypes: ' + JSON.stringify(filteredfundingSourceTypes));
-
-                        // filteredfundingSourceTypes.map(ele => {
-                        //     fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
-                        // })
+                        var fundingSourceTypes = response.data;
+                        fundingSourceTypes.sort(function (a, b) {
+                            a = a.fundingSourceTypeCode.toLowerCase();
+                            b = b.fundingSourceTypeCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
 
                         this.setState({
-                            fundingSourceTypes: filteredfundingSourceTypes, loading: false,
+                            fundingSourceTypes: fundingSourceTypes, loading: false,
                             // fundingSourceTypeValues: fundingSourceTypeValues,
                             // fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
                         })
@@ -1073,10 +1067,7 @@ class AnnualShipmentCost extends Component {
                     }
                 );
         } else {
-            //Offline
-            // getDatabase();
-            // { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
-
+            //Offline           
             var db3;
             var fSourceTypeResult = [];
             getDatabase();
@@ -1089,16 +1080,7 @@ class AnnualShipmentCost extends Component {
                 fSourceTypeRequest.onerror = function (event) {
                 }.bind(this);
                 fSourceTypeRequest.onsuccess = function (event) {
-                    fSourceTypeResult = fSourceTypeRequest.result;
-
-                    /*for (var i = 0; i < fSourceTypeRequest.result.length; i++) {
-                        var arr = {
-                            id: fSourceTypeRequest.result[i].fundingSourceId,
-                            label: fSourceTypeRequest.result[i].label,
-                            code: fSourceTypeRequest.result[i].fundingSourceCode
-                        }
-                        fSourceTypeResult[i] = arr
-                    }*/
+                    fSourceTypeResult = fSourceTypeRequest.result.filter(c => c.realm.id == realmId);
                     this.setState({
                         fundingSourceTypes: fSourceTypeResult.sort(function (a, b) {
                             a = a.fundingSourceTypeCode.toLowerCase();
@@ -1122,10 +1104,26 @@ class AnnualShipmentCost extends Component {
             fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
         }, () => {
             // filter fundingSourcesOriginal list according to type
-            //sort the filter list & update in state
-            
+            //sort the filter list & update in state            
             var filteredFundingSourceArr = [];
-            filteredFundingSourceArr = this.state.fundingSourcesOriginal;//temp. change this
+            var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+            console.log('on fst change fundingSources[0]: ',fundingSources[0])
+            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+                for (var j = 0; j < fundingSources.length; j++) {
+                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+                        filteredFundingSourceArr.push(fundingSources[j]);
+                    }
+                }
+            }
+
+            if (filteredFundingSourceArr.length > 0) {
+                filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+                    a = a.code.toLowerCase();
+                    b = b.code.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+            }
+
             this.setState({
                 fundingSources: filteredFundingSourceArr,
                 fundingSourceValues: [],
@@ -1195,7 +1193,8 @@ class AnnualShipmentCost extends Component {
                         var arr = {
                             id: fSourceRequest.result[i].fundingSourceId,
                             label: fSourceRequest.result[i].label,
-                            code: fSourceRequest.result[i].fundingSourceCode
+                            code: fSourceRequest.result[i].fundingSourceCode,
+                            fundingSourceType: fSourceRequest.result[i].fundingSourceType
                         }
                         fSourceResult[i] = arr
                     }
