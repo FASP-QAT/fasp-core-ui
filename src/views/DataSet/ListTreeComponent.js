@@ -2494,6 +2494,16 @@ export default class ListTreeComponent extends Component {
                                     });
                                 }.bind(this)
                             });
+                            items.push({
+                                title: "Tree Table",
+                                onclick: function () {
+                                    var treeId = this.state.treeEl.getValueFromCoords(0, x);
+                                    var programId = this.state.treeEl.getValueFromCoords(8, x);
+                                    this.props.history.push({
+                                        pathname: `/dataSet/treeTable/tree/${treeId}/${programId}`,
+                                    });
+                                }.bind(this)
+                            });
                         }
                     }
                     return items;
