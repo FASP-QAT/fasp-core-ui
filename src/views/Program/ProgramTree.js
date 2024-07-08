@@ -54,7 +54,7 @@ class Program extends Component {
             loading: true,
             programList: [],
             minDate: { year: new Date().getFullYear() - 20, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() - 2, month: new Date().getMonth() + 1 },
             startDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
             isMonthSelected: false
         };
@@ -87,7 +87,6 @@ class Program extends Component {
      * @param {*} value This is the value that user has selected
      */
     handleRangeDissmis(value) {
-        console.log("hello",value)
         this.setState({ startDate: value });
     }
     /**
@@ -646,7 +645,7 @@ class Program extends Component {
                                 <FormGroup className="tab-ml-0 mb-md-3 ml-3">
                                     <Col md="12" >
                                         <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.isMonthSelected} onChange={(e) => this.changeIsMonthSelected(e)} />
-                                        <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.dataentry.showInPlanningUnits')}</Label>
+                                        <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.program.dateRange')}</Label>
                                     </Col>
                                 </FormGroup>
                                 {this.state.isMonthSelected && <FormGroup className="col-md-3">
@@ -934,7 +933,11 @@ class Program extends Component {
         }
         else {
             if (localStorage.getItem("sessionType") === 'Online') {
-                ProgramService.getAllProgramData(checkboxesChecked)
+                var inputJson = {
+                    'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
+                    'programVersionList': checkboxesChecked
+                }
+                ProgramService.getAllProgramData(inputJson)
                     .then(response => {
                         response.data = decompressJson(response.data);
                         var json = response.data;
