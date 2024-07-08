@@ -10166,7 +10166,7 @@ export default class BuildTree extends Component {
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
                                                                     <option key={i} value={item.id}>
-                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id}
+                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id+ " ("+i18n.t("static.tree.conversionFUToPU")+" = "+item.multiplier+")"}
                                                                     </option>
                                                                 )
                                                             }, this)}
