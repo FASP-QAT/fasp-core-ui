@@ -16,10 +16,11 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, ENCRYPTION_EXPORT_PASSWORD } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import Minizip from 'minizip-asm.js';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -101,7 +102,7 @@ export default class ExportDataset extends Component {
      */
     formSubmit() {
         this.setState({ loading: true });
-        var zip = new JSZip();
+        const mz = new Minizip();
         var programId = this.state.programId;
         if (programId != "" && programId != undefined) {
             this.setState({
@@ -243,10 +244,14 @@ export default class ExportDataset extends Component {
                                                                                                 myResult[i].readonly = 0;
                                                                                             }
                                                                                             if (isUnEncrepted) {
+                                                                                                var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJson1 = JSON.parse(programData);
+                                                                                                myResult[i].programData = programJson1;
                                                                                                 var txt = JSON.stringify(myResult[i]);
                                                                                                 var txt1 = "";
                                                                                                 var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                                zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                                mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1, { password: ENCRYPTION_EXPORT_PASSWORD });
                                                                                             } else {
                                                                                                 var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                                 var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
@@ -259,23 +264,21 @@ export default class ExportDataset extends Component {
                                                                                                 var txt = JSON.stringify(myResult[i]);
                                                                                                 var txt1 = ""
                                                                                                 var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                                zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                                                                                                mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt);
                                                                                             }
                                                                                         }
                                                                                     }
                                                                                     if (i == myResult.length - 1) {
-                                                                                        zip.generateAsync({
-                                                                                            type: "blob",
-                                                                                            compression: 'DEFLATE', // Specify the compression method
-                                                                                            compressionOptions: {
-                                                                                                level: 9, // Specify the compression level (0-9), where 9 is the best compression
-                                                                                            },
-                                                                                        }).then(function (content) {
-                                                                                            FileSaver.saveAs(content, "download.zip");
-                                                                                            let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                                                            this.setState({ loading: false });
-                                                                                            this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
-                                                                                        }.bind(this));
+                                                                                        const zipBlob = new Blob([mz.zip()], { type: "application/zip" });
+                                                                                        const link = document.createElement('a');
+                                                                                        link.href = URL.createObjectURL(zipBlob);
+                                                                                        link.download = 'download.zip';
+                                                                                        document.body.appendChild(link);
+                                                                                        link.click();
+                                                                                        document.body.removeChild(link);
+                                                                                        let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                                                        this.setState({ loading: false });
+                                                                                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
                                                                                     }
                                                                                 }
                                                                             }.bind(this)
