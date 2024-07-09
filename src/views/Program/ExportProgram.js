@@ -234,9 +234,6 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
                                                                                         myResult[i].readonly = programQPLResultFiltered.readonly;
                                                                                         if (isUnEncrepted) {
-                                                                                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                                                                                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                                                                                            var programNameLabel1 = JSON.parse(programNameLabel);
                                                                                             var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                                                                                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                                                             var programJson1 = JSON.parse(programData);
@@ -247,13 +244,9 @@ export default class ExportProgram extends Component {
                                                                                                 var programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
                                                                                                 planningUnitDataList[h].planningUnitData = programJsonForPlanningUnit;
                                                                                             }
-                                                                                            myResult[i].programName = programNameLabel1;
                                                                                             myResult[i].programData = { generalData: programJson1, planningUnitDataList: planningUnitDataList };
                                                                                             var txt = JSON.stringify(myResult[i]);
                                                                                             var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
-                                                                                            var bytes1 = CryptoJS.AES.decrypt(dArray.programName, SECRET_KEY);
-                                                                                            var programNameLabel1 = bytes1.toString(CryptoJS.enc.Utf8);
-                                                                                            var programNameLabel11 = JSON.parse(programNameLabel1);
                                                                                             var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData.generalData, SECRET_KEY);
                                                                                             var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
                                                                                             var programJson11 = JSON.parse(programData1);
@@ -264,7 +257,6 @@ export default class ExportProgram extends Component {
                                                                                                 var programJsonForPlanningUnit1 = JSON.parse(programDataForPlanningUnit1);
                                                                                                 planningUnitDataList1[h].planningUnitData = programJsonForPlanningUnit1;
                                                                                             }
-                                                                                            dArray.programName = programNameLabel11;
                                                                                             dArray.programData = { generalData: programJson11, planningUnitDataList: planningUnitDataList1 };
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")

@@ -137,3 +137,4 @@ export const PROGRAM_TYPE_SUPPLY_PLAN = 1
 export const PROGRAM_TYPE_DATASET = 2;
 export const COMPRESS_LIMIT_SIZE = 2;
 export const MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS=76;
+export const ENCRYPTION_EXPORT_PASSWORD="dgwsgdjwgyo3kjledhqwuigdwui";
