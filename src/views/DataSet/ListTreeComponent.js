@@ -2009,7 +2009,7 @@ export default class ListTreeComponent extends Component {
         let programId = this.state.datasetId;
         if (programId != 0) {
             const program = this.state.datasetList.filter(c => c.programId == programId)
-            if (program.length == 1) {
+            if (program.length > 0) {
                 if (localStorage.getItem('sessionType') === 'Online') {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
                         .then(response => {
