@@ -85,8 +85,7 @@ export default class ImportDataset extends Component {
      * Handles the completion of step one and updates the display to show step two.
      */
     finishedStepOne() {
-        this.setState({ progressPer: 100, loading: true });
-        document.getElementById('stepOneImport').style.display = 'none';
+        this.setState({ progressPer: 100, loading: true, programId: this.state.programList });
         document.getElementById('stepTwoImport').style.display = 'block';
         this.refs.stepTwoChild.filterData();
     }
@@ -174,7 +173,6 @@ export default class ImportDataset extends Component {
         bsCustomFileInput.init()
         this.setState({ loading: false })
         hideSecondComponent();
-        document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
     }
     /**
@@ -637,11 +635,11 @@ export default class ImportDataset extends Component {
                 <h5 style={{ color: "red" }} id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                    <Col sm={6} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody>
                                 <Row>
-                                    <Col sm={6} md={6}>
+                                    <Col sm={12} md={12}>
                                         <ProgressBar
                                             percent={this.state.progressPer}
                                             filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
@@ -671,7 +669,7 @@ export default class ImportDataset extends Component {
                                 <div className="d-sm-down-none progressbar mr-4">
                                     <ul>
                                         <li className="progressbartext1Import">{i18n.t('static.chooseFile.chooseFile')}</li>
-                                        <li className="progressbartext4Import">{i18n.t('static.common.selectProgram')}</li>
+                                        <li className="progressbartext3Import">{i18n.t('static.common.selectProgram')}</li>
                                     </ul>
                                 </div>
                                 <br></br>
@@ -704,5 +702,7 @@ export default class ImportDataset extends Component {
         this.state.programId = '';
         this.updateStepOneData("message", "");
         this.setState({ programId: '', message: '' });
+        document.getElementById('stepTwoImport').style.display = 'none';
+        this.previousToStepOne();
     }
 }
