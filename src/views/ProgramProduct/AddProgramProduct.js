@@ -725,14 +725,14 @@ class AddprogramPlanningUnit extends Component {
                                                         if (x) {
                                                         }
                                                         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
-                                                            let cordsValue = `${this.el.getValueFromCoords(15, y)}`;
+                                                            let cordsValue = `${this.el.getValueFromCoords(1, y)}`;
                                                             if (obj.options.allowInsertRow == true) {
                                                                 if (cordsValue.length != 0) {
                                                                     items.push({
                                                                         title: i18n.t('static.countrySpecificPrices.addCountrySpecificPrices'),
                                                                         onclick: function () {
                                                                             this.props.history.push({
-                                                                                pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(15, y)}/${programId}`,
+                                                                                pathname: `/programProduct/addCountrySpecificPrice/${this.el.getValueFromCoords(1, y)}/${programId}`,
                                                                             });
                                                                         }.bind(this)
                                                                     });
@@ -1575,6 +1575,7 @@ class AddprogramPlanningUnit extends Component {
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                     </div>
                                 </div>
+                                <h5>{i18n.t('static.updatePU.noteText1')} <a href="/#/programProduct/addCountrySpecificPrice">{i18n.t('static.countrySpecificPrices.countrySpecificPrices')}</a> {i18n.t("static.updatePU.noteText2")}</h5>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
