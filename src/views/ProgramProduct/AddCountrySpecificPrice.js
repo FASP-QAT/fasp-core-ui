@@ -904,6 +904,9 @@ class CountrySpecificPrices extends Component {
      * Function to handle form submission and save the data on server.
      */
     formSubmit = function () {
+        this.setState({
+            loading:true
+        })
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
@@ -1017,6 +1020,9 @@ class CountrySpecificPrices extends Component {
                     }
                 );
         } else {
+            this.setState({
+                loading:false
+            })
         }
     }
     /**
