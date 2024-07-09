@@ -12298,7 +12298,7 @@ export default class BuildTree extends Component {
                                             })
                                             // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
                                         }}>
-                                        <i class="fa fa-clone" aria-hidden="true"></i>
+                                        <i class="fa fa-paste" aria-hidden="true"></i>
                                     </button>
                                 }
                                 {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
