@@ -3332,5 +3332,12 @@
     "static.updatePPUPA.noteText1":"Note : If you want to update program specific specific details, go to",
     "static.updatePPUPA.noteText2":"screen",
     "static.updatePPUPA.atleastOneValue":"Enter atleast one of the value",
-    "static.message.ppupaAlreadyExists":"Program, planning unit and procurement agent mapping already exists"
+    "static.message.ppupaAlreadyExists":"Program, planning unit and procurement agent mapping already exists",
+    "static.tree.moveCopy":"Move/Copy Node",
+    "static.tree.copy":"Copy",
+    "static.tree.move":"Move",
+    "static.tree.parentLevel":"Parent Level",
+    "static.tree.parentNode":"Parent Node",
+    "static.tree.destination":"Destination",
+    "static.tree.moveCopyNote":"Note: The entire branch (including all child nodes) will be moved/copied"
 }
