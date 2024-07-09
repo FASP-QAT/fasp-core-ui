@@ -300,7 +300,9 @@ const routes = [
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
-  { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/1/:colour/:message', name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/:planningUnitId/:programId', name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
   { path: '/program/mapProcurementAgent/:programId', exact: true, name: 'static.integration.programIntegration', component: MapProcurementAgent },
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -1627,6 +1629,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-cubes',
                             attributes: {
                               hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') && this.state.activeTab == 2) ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.countrySpecificPrices.countrySpecificPrices'),
+                            url: '/programProduct/addCountrySpecificPrice',
+                            icon: 'fa fa-cubes',
+                            attributes: {
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
