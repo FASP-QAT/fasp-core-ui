@@ -3100,7 +3100,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkOtherValidation = true;
         }
         var negativeBudget = 0;
-        var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered;
+        var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered.filter(c=>c.shipmentId>0 || c.index!=undefined);
         var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
@@ -3176,8 +3176,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    console.log("elInstance.getValueFromCoords(38, y, true) Test@123",elInstance.getValueFromCoords(39, y, true));
-                    console.log("W Test@123",elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""))                    
                     if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true)!="SELECT" && elInstance.getValueFromCoords(17, y, true)!="Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(39, y, true)!=elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
