@@ -60,7 +60,8 @@ let initialValues = {
     procurementAgentIdSingle: '',
     fundingSourceIdSingle: '',
     monthsInFutureForAmc: '',
-    monthsInPastForAmc: ''
+    monthsInPastForAmc: '',
+    endValue:''
 }
 /**
  * This const is used to define the validation schema for scenario options
@@ -83,6 +84,18 @@ const validationSchema = function (values, t) {
                 ,
                 otherwise: Yup.string().notRequired()
             }),
+        needEndValueValidation: Yup.boolean(),
+        endValue: Yup.string()
+            .when("needEndValueValidation", {
+                is: val => {
+                    return document.getElementById("needEndValueValidation").value === "true";
+                },
+                then: Yup.string()
+                    .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
+                    .required(i18n.t('static.whatIf.validEndValue'))
+                ,
+                otherwise: Yup.string().notRequired()
+            }),    
         needAMCValidation: Yup.boolean(),
         monthsInPastForAmc: Yup.string()
             .when("needAMCValidation", {
@@ -205,6 +218,7 @@ export default class WhatIfReportComponent extends React.Component {
             expiredStockArr: [],
             scenarioId: '',
             percentage: '',
+            endValue:'',
             removePlannedThatDoNotFollowLeadTime: false,
             monthsInFutureForAmc: '',
             monthsInPastForAmc: '',
@@ -662,6 +676,7 @@ export default class WhatIfReportComponent extends React.Component {
                         rows: [],
                         scenarioId: '',
                         percentage: '',
+                        endValue:'',
                         removePlannedThatDoNotFollowLeadTime: false,
                         monthsInPastForAmc: '',
                         monthsInFutureForAmc: ''
@@ -739,6 +754,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 rows: [],
                                 scenarioId: '',
                                 percentage: '',
+                                endValue: '',
                                 removePlannedThatDoNotFollowLeadTime: false,
                                 monthsInPastForAmc: '',
                                 monthsInFutureForAmc: '',
@@ -764,18 +780,21 @@ export default class WhatIfReportComponent extends React.Component {
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             } else if (event.target.value == 3) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "contents";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             } else if (event.target.value == 7) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields2").style.display = "contents";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
                 var localProcurementLeadTime = ((this.state.programPlanningUnitList).filter(p => p.program.id == this.state.generalProgramJson.programId && p.planningUnit.id == this.state.planningUnitId))[0].localProcurementLeadTime;
                 var dt = new Date();
                 dt.setMonth(dt.getMonth() + localProcurementLeadTime);
@@ -800,21 +819,33 @@ export default class WhatIfReportComponent extends React.Component {
                 document.getElementById("scenariosFields3").style.display = "contents";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             } else if (event.target.value == 4) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "contents";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
+            }else if(event.target.value==9){
+                    document.getElementById("consumptionScenariosFields1").style.display = "none";
+                    document.getElementById("consumptionScenariosFields2").style.display = "contents";
+                    document.getElementById("scenariosFields2").style.display = "none";
+                    document.getElementById("scenariosFields3").style.display = "none";
+                    document.getElementById("scenariosFields4").style.display = "none";
+                    document.getElementById("endValueField").style.display = "contents";
             } else {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             }
         } else if (event.target.name === 'percentage') {
             this.setState({ percentage: event.target.value });
+        } else if (event.target.name === 'endValue') {
+            this.setState({ endValue: event.target.value });
         } else if (event.target.name === 'monthsInPastForAmc') {
             this.setState({ monthsInPastForAmc: event.target.value, monthsInPastForAMC: event.target.value });
         } else if (event.target.name === 'monthsInFutureForAmc') {
@@ -1433,6 +1464,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: "",
+                            endValue:"",
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                             scenarioChecked: true,
@@ -1447,13 +1479,14 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:'', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         this.setState({ programModified: true })
                         calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
                     }.bind(this)
@@ -1521,6 +1554,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
+                            endValue:'',
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                             scenarioChecked: true,
@@ -1535,12 +1569,13 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, },
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:'', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, },
                             () => {
                             })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
@@ -1611,6 +1646,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: this.state.percentage,
+                            endValue:'',
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                             scenarioChecked: true,
@@ -1625,10 +1661,11 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:'', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
@@ -1741,6 +1778,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: "",
+                            endValue:"",
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1753,10 +1791,11 @@ export default class WhatIfReportComponent extends React.Component {
                             monthsInPastForAmc: "",
                             removePlannedThatDoNotFollowLeadTime: this.state.removePlannedThatDoNotFollowLeadTime,
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:"", monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
@@ -1855,6 +1894,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: "",
+                            endValue:"",
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1867,10 +1907,11 @@ export default class WhatIfReportComponent extends React.Component {
                             monthsInPastForAmc: "",
                             removePlannedThatDoNotFollowLeadTime: false,
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:"", monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
@@ -1965,6 +2006,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: "",
+                            endValue:"",
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1977,10 +2019,11 @@ export default class WhatIfReportComponent extends React.Component {
                             monthsInPastForAmc: "",
                             removePlannedThatDoNotFollowLeadTime: false,
                         })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:"", monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
@@ -2042,6 +2085,7 @@ export default class WhatIfReportComponent extends React.Component {
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: "",
+                            endValue:"",
                             startDate: moment(startDate).format(DATE_FORMAT_CAP),
                             stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
                             scenarioChecked: true,
@@ -2056,10 +2100,11 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', procurementAgents: [], fundingSources: [], removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, percentage: '',endValue:"", monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', procurementAgents: [], fundingSources: [], removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
@@ -2071,6 +2116,7 @@ export default class WhatIfReportComponent extends React.Component {
                         scenarioId: this.state.scenarioId,
                         scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                         percentage: "",
+                        endValue:"",
                         startDate: "",
                         stopDate: "",
                         scenarioChecked: true,
@@ -2085,10 +2131,11 @@ export default class WhatIfReportComponent extends React.Component {
                     })
                     var dt = new Date();
                     dt.setMonth(dt.getMonth() - 10);
-                    this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green', monthsInFutureForAmc: '', monthsInFutureForAmc: '', removePlannedThatDoNotFollowLeadTime: false, })
+                    this.setState({ rows: this.state.rows, scenarioId: '', percentage: '',endValue:"", color: 'green', monthsInFutureForAmc: '', monthsInFutureForAmc: '', removePlannedThatDoNotFollowLeadTime: false, })
                     this.hideFirstComponent();
                     document.getElementById("consumptionScenariosFields1").style.display = "none";
                     document.getElementById("consumptionScenariosFields2").style.display = "none";
+                    document.getElementById("endValueField").style.display = "none";
                     document.getElementById("scenariosFields2").style.display = "none";
                     document.getElementById("scenariosFields3").style.display = "none";
                     document.getElementById("scenariosFields4").style.display = "none";
@@ -2185,6 +2232,7 @@ export default class WhatIfReportComponent extends React.Component {
         senheaders.push((i18n.t('static.common.startdate')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.common.stopdate')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.whatIf.percentage')).replaceAll(' ', '%20'))
+        senheaders.push((i18n.t('static.scenarioPlanning.endValue')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20'))
@@ -2197,6 +2245,7 @@ export default class WhatIfReportComponent extends React.Component {
                 (ele.startDate).replaceAll(' ', '%20'),
                 (ele.stopDate).replaceAll(' ', '%20'),
                 (ele.percentage).replaceAll(' ', '%20'),
+                (ele.endValue).replaceAll(' ', '%20'),
                 (ele.removePlannedThatDoNotFollowLeadTime).toString(),
                 (ele.monthsInPastForAmc).replaceAll(' ', '%20'),
                 (ele.monthsInFutureForAmc).replaceAll(' ', '%20'),
@@ -2341,6 +2390,7 @@ export default class WhatIfReportComponent extends React.Component {
         senHeaders.push(i18n.t('static.common.startdate'));
         senHeaders.push(i18n.t('static.common.stopdate'));
         senHeaders.push(i18n.t('static.whatIf.percentage'));
+        senHeaders.push(i18n.t('static.scenarioPlanning.endValue'));
         senHeaders.push(i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes'));
         senHeaders.push(i18n.t('static.report.mospast'));
         senHeaders.push(i18n.t('static.report.mosfuture'));
@@ -2351,6 +2401,7 @@ export default class WhatIfReportComponent extends React.Component {
             ele.startDate,
             ele.stopDate,
             ele.percentage,
+            ele.endValue,
             ele.removePlannedThatDoNotFollowLeadTime,
             ele.monthsInPastForAmc,
             ele.monthsInFutureForAmc,
@@ -4642,6 +4693,7 @@ export default class WhatIfReportComponent extends React.Component {
                             initialValues={{
                                 scenarioId: this.state.scenarioId,
                                 percentage: this.state.percentage,
+                                endValue:this.state.endValue,
                                 procurementAgentIdSingle: this.state.procurementAgentIdSingle,
                                 fundingSourceIdSingle: this.state.fundingSourceIdSingle,
                                 monthsInPastForAmc: this.state.monthsInPastForAmc,
@@ -4653,6 +4705,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 resetForm({
                                     scenarioId: '',
                                     percentage: '',
+                                    endValue:'',
                                     monthsInPastForAmc: '',
                                     monthsInFutureForAmc: '',
                                     removePlannedThatDoNotFollowLeadTime: false
@@ -4695,6 +4748,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
                                                         <option value="7">{i18n.t('static.scenarioPlanning.replanSupplyPlan')}</option>
                                                         {/* <option value="8">{i18n.t('static.scenarioPlanning.changeAMC')}</option> */}
+                                                        <option value="9">{i18n.t('static.scenarioPlanning.phaseInPhaseOut')}</option>
                                                     </Input>
                                                     <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                 </FormGroup>
@@ -4765,6 +4819,30 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                             </Picker>
                                                         </div>
+                                                    </FormGroup>
+                                                </div>
+                                                <Input
+                                                    type="hidden"
+                                                    name="needEndValueValidation"
+                                                    id="needEndValueValidation"
+                                                    value={(this.state.scenarioId == 9 ? true : false)}
+                                                />
+                                                <div id="endValueField" style={{ display: 'none' }}>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="select">{i18n.t('static.scenarioPlanning.endValue')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="endValue"
+                                                            id="endValue"
+                                                            bsSize="sm"
+                                                            valid={!errors.endValue && this.state.endValue != ''}
+                                                            invalid={touched.endValue && !!errors.endValue}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.endValue}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.endValue}</FormFeedback>
                                                     </FormGroup>
                                                 </div>
                                                 <div id="scenariosFields3" className="col-md-12" style={{ display: 'none' }}>
@@ -4980,6 +5058,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <th className="text-left">{i18n.t('static.common.startdate')}</th>
                                                 <th className="text-left">{i18n.t('static.common.stopdate')}</th>
                                                 <th className="text-left">{i18n.t('static.whatIf.percentage')}</th>
+                                                <th className="text-left">{i18n.t('static.scenarioPlanning.endValue')}</th>
                                                 <th className="text-left">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</th>
                                                 <th className="text-left">{i18n.t('static.report.mospast')}</th>
                                                 <th className="text-left">{i18n.t('static.report.mosfuture')}</th>
@@ -4996,6 +5075,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <td>{this.state.rows[idx].startDate != "" ? moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) : ""}</td>
                                                         <td>{this.state.rows[idx].stopDate != "" ? moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) : ""}</td>
                                                         <td>{this.state.rows[idx].percentage}</td>
+                                                        <td>{this.state.rows[idx].endValue}</td>
                                                         <td>{this.state.rows[idx].removePlannedThatDoNotFollowLeadTime.toString()}</td>
                                                         <td>{this.state.rows[idx].monthsInPastForAmc}</td>
                                                         <td>{this.state.rows[idx].monthsInFutureForAmc}</td>
