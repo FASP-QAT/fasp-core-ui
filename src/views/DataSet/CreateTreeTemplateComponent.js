@@ -11621,7 +11621,7 @@ export default class CreateTreeTemplate extends Component {
                                             })
                                             // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
                                         }}>
-                                        <i class="fa fa-clone" aria-hidden="true"></i>
+                                        <i class="fa fa-paste" aria-hidden="true"></i>
                                     </button>
                                 }
                                 {this.state.editable &&
