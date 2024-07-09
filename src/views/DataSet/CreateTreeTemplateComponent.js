@@ -12933,7 +12933,7 @@ export default class CreateTreeTemplate extends Component {
                         }) => (
                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='copyModalForm' autocomplete="off">
                                 <ModalHeader toggle={() => this.setState({copyModal: false})} className="modalHeader">
-                                    <strong>Move/Copy Node</strong>
+                                    <strong>{i18n.t('static.tree.moveCopy')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
                                     <FormGroup>
@@ -12952,7 +12952,7 @@ export default class CreateTreeTemplate extends Component {
                                             <Label
                                                 className="form-check-label"
                                                 check htmlFor="inline-radio1">
-                                                Copy
+                                                {i18n.t('static.tree.copy')}
                                             </Label>
                                         </FormGroup>
                                         <FormGroup check inline>
@@ -12970,13 +12970,14 @@ export default class CreateTreeTemplate extends Component {
                                             <Label
                                                 className="form-check-label"
                                                 check htmlFor="inline-radio2">
-                                                Move
+                                                {i18n.t('static.tree.move')}
                                             </Label>
                                         </FormGroup>
                                         <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
                                     </FormGroup>
+                                    <p>{i18n.t('static.tree.destination')}:</p>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Tree Name</Label>
+                                        <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
                                         <Input
                                             type="select"
                                             id="treeDropdown"
@@ -12985,7 +12986,7 @@ export default class CreateTreeTemplate extends Component {
                                             disabled={true}
                                             value={this.state.copyModalTree}
                                         >
-                                            <option value="">Select</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {this.state.treeTemplateList.length > 0
                                                 && this.state.treeTemplateList.map((item, i) => {
                                                     return (
@@ -12998,7 +12999,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Parent Level</Label>
+                                        <Label htmlFor="currencyId">{i18n.t('static.common.parentLevel')}</Label>
                                         <Input
                                             type="select"
                                             id="parentLevelDropdown"
@@ -13007,7 +13008,7 @@ export default class CreateTreeTemplate extends Component {
                                             onChange={(e) => { this.copyModalParentLevelChange(e) }}
                                             value={this.state.copyModalParentLevel}
                                         >
-                                            <option value="">Select</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {this.state.copyModalParentLevelList.length > 0
                                                 && this.state.copyModalParentLevelList.map((item, i) => {
                                                     return (
@@ -13019,7 +13020,7 @@ export default class CreateTreeTemplate extends Component {
                                         </Input>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label htmlFor="currencyId">Parent Node</Label>
+                                        <Label htmlFor="currencyId">{i18n.t('static.tree.parentNode')}</Label>
                                         <Input
                                             type="select"
                                             id="parentNodeDropdown"
@@ -13028,7 +13029,7 @@ export default class CreateTreeTemplate extends Component {
                                             onChange={(e) => { this.copyModalParentNodeChange(e) }}
                                             value={this.state.copyModalParentNode}
                                         >
-                                            <option value="">Select</option>
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {this.state.copyModalParentNodeList.length > 0
                                                 && this.state.copyModalParentNodeList.map((item, i) => {
                                                     return (
@@ -13039,6 +13040,7 @@ export default class CreateTreeTemplate extends Component {
                                                 }, this)}
                                         </Input>
                                     </FormGroup>
+                                    <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
