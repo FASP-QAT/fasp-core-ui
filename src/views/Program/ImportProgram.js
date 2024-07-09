@@ -24,7 +24,7 @@ import "../../../node_modules/react-step-progress-bar/styles.css";
 import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import getLabelText from '../../CommonComponent/getLabelText.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { ENCRYPTION_EXPORT_PASSWORD, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -32,6 +32,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import StepOneImport from '../DataSet/StepOneImportDataset';
 import StepTwoImport from '../DataSet/StepTwoImportDataset';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import Minizip from 'minizip-asm.js';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -67,7 +68,7 @@ export default class ImportProgram extends Component {
      */
     redirectToDashboard(color, msg) {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/'+color+'/' + msg)
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/' + color + '/' + msg)
     }
     /**
      * Updates the state with the provided key-value pair.
@@ -363,7 +364,7 @@ export default class ImportProgram extends Component {
                                                         var addProgramDataRequest1 = program3.put(json1);
                                                         transaction3.oncomplete = function (event) {
                                                             temp_j++;
-                                                            if(temp_j == selectedPrgArr.length){
+                                                            if (temp_j == selectedPrgArr.length) {
                                                                 this.setState({
                                                                     message: i18n.t('static.program.dataimportsuccess'),
                                                                     loading: false
@@ -530,7 +531,7 @@ export default class ImportProgram extends Component {
                                                                 var addProgramDataRequest1 = program3.put(json1);
                                                                 addProgramDataRequest1.onerror = function (event) {
                                                                 };
-                                                                if(temp_j == selectedPrgArr.length) {
+                                                                if (temp_j == selectedPrgArr.length) {
                                                                     this.setState({
                                                                         message: i18n.t('static.program.dataimportsuccess'),
                                                                         loading: false
@@ -584,60 +585,43 @@ export default class ImportProgram extends Component {
                 var fileName = file.name;
                 var fileExtenstion = fileName.split(".");
                 if (fileExtenstion[fileExtenstion.length - 1] == "zip") {
-                    const lan = 'en'
-                    JSZip.loadAsync(file).then(function (zip) {
-                        var i = 0;
-                        var fileName = []
-                        var programListArray = []
-                        var size = 0;
-                        Object.keys(zip.files).forEach(function (filename) {
-                            size++;
-                        })
-                        Object.keys(zip.files).forEach(function (filename) {
-                            zip.files[filename].async('string').then(function (fileData) {
-                                var programDataJson;
-                                try {
-                                    programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                    const lan = 'en';
+                    const password = ENCRYPTION_EXPORT_PASSWORD;
+                    const reader = new FileReader();
+                    var i = 0;
+                    var fileName = []
+                    var size = 0;
+                    reader.onload = (e) => {
+                        try {
+                            const zipData = new Uint8Array(e.target.result);
+                            const mz = new Minizip(zipData);
+                            const files = mz.list(); // Ensure to list files first
+                            const extractedFiles = [];
+                            files.forEach((fileInfo) => {
+                                size++;
+                                const fileDataList = mz.extract(fileInfo.filepath, { password });
+                                var fileData = new TextDecoder().decode(fileDataList)
+                                var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                                fileName[i] = {
+                                    value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.generalData.label), lan)) + "~v" + programDataJson.version
                                 }
-                                catch (err) {
-                                    this.setState({ message: i18n.t('static.program.zipfilereaderror'), loading: false },
-                                        () => {
-                                            hideSecondComponent();
-                                        })
-                                }
-                                var bytes = CryptoJS.AES.decrypt(programDataJson.programData.generalData, SECRET_KEY);
-                                var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-                                if (plaintext == "") {
-                                    this.setState({
-                                        message: i18n.t('static.program.zipfilereaderror'),
-                                        loading: false
-                                    })
-                                } else {
-                                    var programDataJsonDecrypted = JSON.parse(plaintext);
-                                    programDataJson.filename = filename;
-                                    fileName[i] = {
-                                        value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJson.version
-                                    }
-                                    programListArray[i] = programDataJson;
-                                    i++;
-                                    if (i === size) {
-                                        this.updateStepOneData("loading", false);
-                                        this.setState({
-                                            message: "",
-                                            programList: fileName,
-                                            programListArray: programListArray,
-                                            loading: false
-                                        }, () => {
-                                            this.finishedStepOne();
-                                        })
-                                    }
-                                }
-                            }.bind(this))
-                        }.bind(this))
-                    }.bind(this))
-                } else {
-                    this.setState({ loading: false })
-                    alert(i18n.t('static.program.selectzipfile'))
+                                i++;
+                            });
+                            this.updateStepOneData("loading", false);
+                            this.setState({
+                                message: "",
+                                programList: fileName,
+                                // programListArray: programListArray,
+                                loading: false
+                            }, () => {
+                                this.finishedStepOne();
+                            })
+                        } catch (error) {
+                            console.error('Extraction error:', error);
+                            alert('Failed to extract the zip file. Ensure the password is correct.');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
                 }
             }
         }

@@ -16,7 +16,7 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { ENCRYPTION_EXPORT_PASSWORD, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -234,12 +234,42 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
                                                                                         myResult[i].readonly = programQPLResultFiltered.readonly;
                                                                                         if (isUnEncrepted) {
+                                                                                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                                                                                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var programNameLabel1 = JSON.parse(programNameLabel);
+                                                                                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                                                                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var programJson1 = JSON.parse(programData);
+                                                                                            var planningUnitDataList = myResult[i].programData.planningUnitDataList;
+                                                                                            for (var h = 0; h < planningUnitDataList.length; h++) {
+                                                                                                var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitDataList[h].planningUnitData, SECRET_KEY);
+                                                                                                var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+                                                                                                planningUnitDataList[h].planningUnitData = programJsonForPlanningUnit;
+                                                                                            }
+                                                                                            myResult[i].programName = programNameLabel1;
+                                                                                            myResult[i].programData = { generalData: programJson1, planningUnitDataList: planningUnitDataList };
                                                                                             var txt = JSON.stringify(myResult[i]);
                                                                                             var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                            var bytes1 = CryptoJS.AES.decrypt(dArray.programName, SECRET_KEY);
+                                                                                            var programNameLabel1 = bytes1.toString(CryptoJS.enc.Utf8);
+                                                                                            var programNameLabel11 = JSON.parse(programNameLabel1);
+                                                                                            var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData.generalData, SECRET_KEY);
+                                                                                            var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                            var programJson11 = JSON.parse(programData1);
+                                                                                            var planningUnitDataList1 = dArray.programData.planningUnitDataList;
+                                                                                            for (var h = 0; h < planningUnitDataList1.length; h++) {
+                                                                                                var programDataForPlanningUnitBytes1 = CryptoJS.AES.decrypt(planningUnitDataList1[h].planningUnitData, SECRET_KEY);
+                                                                                                var programDataForPlanningUnit1 = programDataForPlanningUnitBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJsonForPlanningUnit1 = JSON.parse(programDataForPlanningUnit1);
+                                                                                                planningUnitDataList1[h].planningUnitData = programJsonForPlanningUnit1;
+                                                                                            }
+                                                                                            dArray.programName = programNameLabel11;
+                                                                                            dArray.programData = { generalData: programJson11, planningUnitDataList: planningUnitDataList1 };
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                             // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
-                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1, { password: "123" });
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1, { password: ENCRYPTION_EXPORT_PASSWORD });
                                                                                         } else {
                                                                                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
@@ -276,7 +306,7 @@ export default class ExportProgram extends Component {
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                             // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
-                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt, { password: "123" });
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt);
                                                                                         }
                                                                                     }
                                                                                 }
