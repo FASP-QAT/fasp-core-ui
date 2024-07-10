@@ -73,13 +73,15 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnitValues: [],
             planningUnitLabels: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
             // isEquUnitChecked:false,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 }
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            forecastErrorThreshold: 0,
+            showForecastThresholdLegend: false
         };
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
@@ -123,7 +125,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             planningUnits: [],
             planningUnitIds: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             forecastingUnitIds: [],
             matricsList: [],
             regions: [],
@@ -299,7 +301,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         versions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => {
@@ -314,7 +316,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         versions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => { this.consolidatedVersionList(programId) })
@@ -334,7 +336,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 versions: [],
                 planningUnits: [],
                 forecastingUnits: [],
-                allForecastingUnits:[],
+                allForecastingUnits: [],
                 show: false,
                 loading: false
             })
@@ -429,7 +431,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         regions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => {
@@ -446,7 +448,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         regions: [],
                         planningUnits: [],
                         forecastingUnits: [],
-                        allForecastingUnits:[],
+                        allForecastingUnits: [],
                         show: false,
                         loading: false
                     }, () => { this.consolidatedRegionList(programId) })
@@ -526,7 +528,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
      * @param {Object} e - Event data containing planning unit information.
      */
     setPlanningUnit(e) {
+        console.log(" 1 Test@123", e)
         if (this.state.yaxisEquUnit > 0) {
+            var forecastErrorThreshold = 0;
+            var showForecastThresholdLegend = false;
+            if (e.length == 1) {
+                forecastErrorThreshold = this.state.planningUnits.filter(c => c.planningUnit.id == e[0].value)[0].forecastErrorThreshold;
+                showForecastThresholdLegend = true;
+            }
             var selectedText = e.map(item => item.label);
             this.setState({
                 planningUnitIds: e,
@@ -534,13 +543,17 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 show: false,
                 dataList: [],
                 consumptionAdjForStockOutId: false,
-                loading: false
+                loading: false,
+                forecastErrorThreshold: forecastErrorThreshold,
+                showForecastThresholdLegend: showForecastThresholdLegend
             }, () => {
                 document.getElementById("consumptionAdjusted").checked = false;
                 this.fetchData();
             })
         } else {
+            console.log("2 Test@123", e.target.value)
             if (e.target.value != -1) {
+                var forecastErrorThreshold = this.state.planningUnits.filter(c => c.planningUnit.id == e.target.value)[0].forecastErrorThreshold;
                 this.setState({
                     planningUnitId: e.target.value,
                     planningUnitIds: [{ "label": document.getElementById("planningUnitId").selectedOptions[0].text, "value": e.target.value }],
@@ -548,7 +561,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     show: false,
                     dataList: [],
                     consumptionAdjForStockOutId: false,
-                    loading: false
+                    loading: false,
+                    forecastErrorThreshold: forecastErrorThreshold,
+                    showForecastThresholdLegend: true
                 }, () => {
                     document.getElementById("consumptionAdjusted").checked = false;
                     this.fetchData();
@@ -561,7 +576,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     show: false,
                     dataList: [],
                     consumptionAdjForStockOutId: false,
-                    loading: false
+                    loading: false,
+                    forecastErrorThreshold: 0,
+                    showForecastThresholdLegend: false
                 }, () => {
                     document.getElementById("consumptionAdjusted").checked = false;
                     this.fetchData();
@@ -592,7 +609,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         this.setState({
             planningUnits: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             show: false,
             loading: true
         }, () => {
@@ -672,7 +689,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 this.setState({
                                     planningUnits: newPlanningUnitList,
                                     forecastingUnits: newForecastingUnitList,
-                                    allForecastingUnits:forecastingUnitList1,
+                                    allForecastingUnits: forecastingUnitList1,
                                     planningUnitValues: newPlanningUnitList.map((item, i) => {
                                         return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
 
@@ -709,7 +726,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 this.setState({
                                     planningUnits: proList,
                                     forecastingUnits: forecastingUnitList1,
-                                    allForecastingUnits:forecastingUnitList1,
+                                    allForecastingUnits: forecastingUnitList1,
                                     planningUnitValues: proList.map((item, i) => {
                                         return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
                                     }, this),
@@ -796,7 +813,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
-                                allForecastingUnits:forecastingUnitList,
+                                allForecastingUnits: forecastingUnitList,
                                 planningUnitValues: newPlanningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
 
@@ -831,7 +848,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
-                                allForecastingUnits:forecastingUnitList,
+                                allForecastingUnits: forecastingUnitList,
                                 planningUnitValues: planningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.planningUnit.label, lang), value: item.planningUnit.id })
                                 }, this),
@@ -911,7 +928,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             dataList: [],
             planningUnits: [],
             forecastingUnits: [],
-            allForecastingUnits:[],
+            allForecastingUnits: [],
             loading: false
         }, () => {
             localStorage.setItem("sesVersionIdReport", this.state.versionId);
@@ -974,11 +991,25 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         if (this.state.yaxisEquUnit > 0) {
             // var forecastingUnitId = e.target.value;
             var selectedText = e.map(item => item.label);
+            var planningUnitList = [];
+            e.map(item => {
+                planningUnitList = planningUnitList.concat(this.state.planningUnits.filter(c => c.forecastingUnit.id == item.value))
+            });
+            var planningUnitSet = [...new Set(planningUnitList.map(ele => (ele.planningUnit.id)))]
+            var forecastErrorThreshold = 0;
+            var showForecastThresholdLegend = false;
+            if (planningUnitSet.length == 1) {
+                var listOfPus = this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitSet[0]);
+                forecastErrorThreshold = listOfPus[0].forecastErrorThreshold;
+                showForecastThresholdLegend = true
+            }
             this.setState({
                 forecastingUnitIds: e,
                 forecastingUnitLabels: selectedText,
                 dataList: [],
                 consumptionAdjForStockOutId: false,
+                forecastErrorThreshold: forecastErrorThreshold,
+                showForecastThresholdLegend: showForecastThresholdLegend,
                 loading: false
             }, () => {
                 document.getElementById("consumptionAdjusted").checked = false;
@@ -986,13 +1017,22 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             })
         } else {
             if (e.target.value != -1) {
+                var listOfPus = this.state.planningUnits.filter(c => c.forecastingUnit.id == e.target.value);
+                var forecastErrorThreshold = 0;
+                var showForecastThresholdLegend = false;
+                if (listOfPus.length == 1) {
+                    forecastErrorThreshold = listOfPus[0].forecastErrorThreshold;
+                    showForecastThresholdLegend = true
+                }
                 this.setState({
                     forecastingUnitId: e.target.value,
                     forecastingUnitIds: [{ "label": document.getElementById("forecastingUnitId").selectedOptions[0].text, "value": e.target.value }],
                     forecastingUnitLabels: [document.getElementById("forecastingUnitId").selectedOptions[0].text],
                     dataList: [],
                     consumptionAdjForStockOutId: false,
-                    loading: false
+                    loading: false,
+                    forecastErrorThreshold: forecastErrorThreshold,
+                    showForecastThresholdLegend: showForecastThresholdLegend
                 }, () => {
                     document.getElementById("consumptionAdjusted").checked = false;
                     this.fetchData();
@@ -1004,7 +1044,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     forecastingUnitLabels: [],
                     dataList: [],
                     consumptionAdjForStockOutId: false,
-                    loading: false
+                    loading: false,
+                    forecastErrorThreshold: 0,
+                    showForecastThresholdLegend: false
                 }, () => {
                     document.getElementById("consumptionAdjusted").checked = false;
                     this.fetchData();
@@ -1371,7 +1413,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var daysOfStockOut = "";
                                     actualConsumptionListForCurrentMonth.map(item => {
                                         if (consumptionAdjForStockOutId) {
-                                            if(noOfDays!=item.dayOfStockOut){
+                                            if (noOfDays != item.dayOfStockOut) {
                                                 actualQty = Number(actualQty) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
                                             }
                                             daysOfStockOut = item.dayOfStockOut;
@@ -1390,8 +1432,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     var sumOfActualQty = "";
                                     actualConsumptionListForLastXMonths.map(item => {
                                         if (consumptionAdjForStockOutId) {
-                                            if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
-                                            sumOfActualQty = Number(sumOfActualQty) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                            if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
+                                                sumOfActualQty = Number(sumOfActualQty) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                             }
                                         } else {
                                             sumOfActualQty = Number(sumOfActualQty) + Number(item.consumptionQty)
@@ -1405,8 +1447,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             var actualQtyForMic = "";
                                             actualConsumptionListForMic.map(item => {
                                                 if (consumptionAdjForStockOutId) {
-                                                    if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
-                                                    actualQtyForMic = Number(actualQtyForMic) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                                    if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
+                                                        actualQtyForMic = Number(actualQtyForMic) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                                     }
                                                 } else {
                                                     actualQtyForMic = Number(actualQtyForMic) + Number(item.consumptionQty)
@@ -1448,7 +1490,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var actualQtyAllRegion = "";
                                 actualConsumptionListForCurrentMonthAllRegion.map(item => {
                                     if (consumptionAdjForStockOutId) {
-                                        if(Number(noOfDays)!=Number(item.dayOfStockOut)){
+                                        if (Number(noOfDays) != Number(item.dayOfStockOut)) {
                                             actualQtyAllRegion = Number(actualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(noOfDays) - Number(item.dayOfStockOut))) * Number(noOfDays))
                                         }
                                     } else {
@@ -1466,7 +1508,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 var sumOfActualQtyAllRegion = "";
                                 actualConsumptionListForLastXMonthsAllRegion.map(item => {
                                     if (consumptionAdjForStockOutId) {
-                                        if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
+                                        if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
                                             sumOfActualQtyAllRegion = Number(sumOfActualQtyAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                         }
                                     } else {
@@ -1481,8 +1523,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                         var actualQtyForMicAllRegion = "";
                                         actualConsumptionListForMicAllRegion.map(item => {
                                             if (consumptionAdjForStockOutId) {
-                                                if(Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth())!=Number(item.dayOfStockOut)){
-                                                actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
+                                                if (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) != Number(item.dayOfStockOut)) {
+                                                    actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + (Number(Number(item.consumptionQty) / (Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()) - Number(item.dayOfStockOut))) * Number(moment(item.consumptionDate, "YYYY-MM").daysInMonth()))
                                                 }
                                             } else {
                                                 actualQtyForMicAllRegion = Number(actualQtyForMicAllRegion) + Number(item.consumptionQty)
@@ -1718,7 +1760,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             });
 
             // Region daysOfStockOut     
-            this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1 && 
+            this.state.consumptionAdjForStockOutId && this.state.viewById == 1 && this.state.planningUnitIds.length == 1 &&
                 this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
                     var datacsv = [];
                     var totalRegion = 0;
@@ -2347,7 +2389,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         while (rgx.test(x1)) {
                             x1 = x1.replace(rgx, '$1' + ',' + '$2');
                         }
-                        if (data.datasets[tooltipItem.datasetIndex].label == 'Error') {
+                        if (data.datasets[tooltipItem.datasetIndex].label == 'Error' || data.datasets[tooltipItem.datasetIndex].label == i18n.t('static.forecastErrorReport.forecastErrorThreshold')) {
                             return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2 + '%';
                         }
                         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
@@ -2388,7 +2430,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             }
             datasetListForGraph.push({
                 label: 'Error',
-                data: this.state.dataList.map(item => (item.errorPerc !== "" && item.errorPerc!=null ? (Number(item.errorPerc * 100).toFixed(2)) : null)),
+                data: this.state.dataList.map(item => (item.errorPerc !== "" && item.errorPerc != null ? (Number(item.errorPerc * 100).toFixed(2)) : null)),
                 type: 'line',
                 yAxisID: 'B',
                 // backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
@@ -2406,6 +2448,27 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 showInLegend: true,
                 pointRadius: 4,
             })
+            if (this.state.showForecastThresholdLegend) {
+                datasetListForGraph.push({
+                    label: i18n.t('static.forecastErrorReport.forecastErrorThreshold'),
+                    data: this.state.dataList.map(item => this.state.forecastErrorThreshold),
+                    type: 'line',
+                    yAxisID: 'B',
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    borderColor: '#BA0C2F',
+                    borderStyle: 'dotted',
+                    borderDash: [10, 10],
+                    fill: true,
+                    ticks: {
+                        fontSize: 2,
+                        fontColor: 'transparent',
+                    },
+                    lineTension: 0,
+                    pointStyle: 'line',
+                    pointRadius: 0,
+                    showInLegend: true,
+                })
+            }
 
             datasetListForGraph.push({
                 label: "Forecast",
@@ -2754,9 +2817,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                     <div className="col-md-12">
                                         {this.state.show && this.state.dataList.length > 0 &&
                                             <div className="table-scroll">
-                                               <ul className="legendcommitversion">
-                                                <li style={{marginLeft:'40px'}}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
-                                                </ul> 
+                                                <ul className="legendcommitversion">
+                                                    <li style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
+                                                    {this.state.showForecastThresholdLegend && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>}
+                                                </ul>
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>
@@ -2784,9 +2848,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                         let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
                                                                         regionErrorTotal += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
                                                                         regionErrorTotalCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
-                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : PercentageFormatter(errorDataRegionData[0].errorPerc * 100)) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
+                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (errorDataRegionData[0].errorPerc * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter(errorDataRegionData[0].errorPerc * 100)}</span>) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                     })}
-                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100) : 0}</b></td>
+                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? <span className={this.state.showForecastThresholdLegend && ((regionErrorTotal / regionErrorTotalCount) * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100)}</span> : 0}</b></td>
                                                                 </tr>
                                                                     {/* actual */}
                                                                     {this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
@@ -2853,9 +2917,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                                 let differenceRegionData = (differenceData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));
                                                                                 regionDifferenceTotal += (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 0 : isNaN(Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty)) ? 0 : Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty);
                                                                                 regionDifferenceTotalCount += (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 0 : 1;
-                                                                                return (<td style={{ color: (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 'black' : (((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'red' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? '' : (Number((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                                return (<td style={{ color: (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 'black' : (((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'black' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? '' : (Number((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                             })}
-                                                                            <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'red' : 'black' }}>{regionDifferenceTotalCount > 0 ? (Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                            <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'black' : 'black' }}>{regionDifferenceTotalCount > 0 ? (Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                                         </tr>)
                                                                     })}
                                                                 </>)
@@ -2868,9 +2932,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : data[0].errorPerc;
                                                                     countError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : 1;
-                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : PercentageFormatter(data[0].errorPerc * 100) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
+                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (data[0].errorPerc * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter(data[0].errorPerc * 100)}</span> : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? PercentageFormatter((totalError / countError) * 100) : 0}</b></td>
+                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? <span className={this.state.showForecastThresholdLegend && ((totalError / countError) * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter((totalError / countError) * 100)}</span> : 0}</b></td>
                                                             </tr>
                                                             {/* Actual */}
                                                             <tr>
@@ -2904,9 +2968,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalDifference += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : isNaN(Number(data[0].actualQty - data[0].forecastQty)) ? 0 : Number(data[0].actualQty - data[0].forecastQty);
                                                                     totalDifferenceCount += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : 1;
-                                                                    return (<td style={{ color: (data[0].actualQty === '' || data[0].actualQty == null) ? 'black' : (((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'red' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td style={{ color: (data[0].actualQty === '' || data[0].actualQty == null) ? 'black' : (((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'black' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone text-left" style={{ color: (totalDifference / totalDifferenceCount) < 0 ? 'red' : 'black' }}>{totalDifferenceCount > 0 ? (Number(totalDifference / totalDifferenceCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ color: (totalDifference / totalDifferenceCount) < 0 ? 'black' : 'black' }}>{totalDifferenceCount > 0 ? (Number(totalDifference / totalDifferenceCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                             </tr>
                                                         </tbody>
                                                     </Table>
