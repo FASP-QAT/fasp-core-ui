@@ -66,6 +66,7 @@ class CountrySpecificPrices extends Component {
             programValues: [],
             programLabels: [],
             planningUnitList: [],
+            planningUnitListJexcel: [],
             planningUnitValues: [],
             planningUnitLabels: [],
             active: 1,
@@ -111,6 +112,18 @@ class CountrySpecificPrices extends Component {
      */
     filterProgram = function (instance, cell, c, r, source) {
         return this.state.procurementAgentArr.filter(c => c.active.toString() == "true");
+    }.bind(this);
+    /**
+     * Function to filter active programs
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
+    filterProgramPU = function (instance, cell, c, r, source) {
+        return (this.state.planningUnitListJexcel.filter(c => c.programId == -1 || (c.programId==(this.el.getJson(null, false)[r])[0])));
     }.bind(this);
     /**
      * Function to build a jexcel table.
@@ -212,7 +225,7 @@ class CountrySpecificPrices extends Component {
         let programIds = this.state.programValues.map((ele) =>
             ele.value.toString()
         );
-        PlanningUnitService.getPlanningUnitByProgramIds(programIds)
+        PlanningUnitService.getProgramAndPlanningUnitForProgramList(programIds)
             .then(response => {
                 var planningUnitList = []
                 for (var i = 0; i < response.data.length; i++) {
@@ -220,6 +233,7 @@ class CountrySpecificPrices extends Component {
                     var puJson = {
                         planningUnitId: response.data[i].id,
                         label: response.data[i].label,
+                        programId:response.data[i].typeId
                     }
                     planningUnitList.push(puJson)
                     // }
@@ -247,7 +261,7 @@ class CountrySpecificPrices extends Component {
             }).catch(
                 error => {
                     this.setState({
-                        planningUnitList: [], loading: false
+                        planningUnitList: [], loading: false, planningUnitListJexcel:[]
                     }, () => {
                     })
                     if (error.message === "Network Error") {
@@ -474,10 +488,10 @@ class CountrySpecificPrices extends Component {
                 programList.push({ "id": programs[i].value, "name": programs[i].label })
             }
             var planningUnitList = [];
-            planningUnitList.push({ "id": "-1", "name": i18n.t('static.common.all') });
+            planningUnitList.push({ "id": "-1", "name": i18n.t('static.common.all'), "programId":"-1" });
             var planningUnits = this.state.planningUnitValues;
             for (var i = 0; i < planningUnits.length; i++) {
-                planningUnitList.push({ "id": planningUnits[i].value, "name": planningUnits[i].label })
+                planningUnitList.push({ "id": planningUnits[i].value, "name": planningUnits[i].label, "programId":planningUnits[i].programId })
             }
             var data = [];
             var papuDataArr = [];
@@ -554,6 +568,7 @@ class CountrySpecificPrices extends Component {
                         type: 'dropdown',
                         width: 150,
                         source: planningUnitList,
+                        filter: this.filterProgramPU,
                     },
                     {
                         title: i18n.t('static.report.procurementAgentName'),
@@ -825,12 +840,14 @@ class CountrySpecificPrices extends Component {
             this.el = jexcel(document.getElementById("paputableDiv"), options);
             this.setState({
                 loading: false,
-                papuDataArr2: papuDataArr2
+                papuDataArr2: papuDataArr2,
+                planningUnitListJexcel:planningUnitList
             })
         } else {
             this.setState({
                 loading: false,
-                rows: []
+                rows: [],
+                planningUnitListJexcel:[]
             });
             this.el = jexcel(document.getElementById("paputableDiv"), '');
             jexcel.destroy(document.getElementById("paputableDiv"), true);
@@ -1282,6 +1299,7 @@ class CountrySpecificPrices extends Component {
                     programValues: [],
                     programLabels: [],
                     planningUnitList: [],
+                    planningUnitListJexcel:[],
                     planningUnitValues: [],
                     planningUnitLabels: [],
                     changed: false
@@ -1505,7 +1523,7 @@ class CountrySpecificPrices extends Component {
         let planningUnits = planningUnitList.length > 0
             && planningUnitList.map((item, i) => {
                 return (
-                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId, programId:item.programId }
                 )
             }, this);
         return (
