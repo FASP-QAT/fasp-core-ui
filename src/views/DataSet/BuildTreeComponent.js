@@ -2260,16 +2260,19 @@ export default class BuildTree extends Component {
     /**
      * Builds jexcel table for node reordering on same level
      */
-    buildLevelReorderJexcel() {
+    buildLevelReorderJexcel(isShiftNode) {
         var levelNodes = [];
         if (this.state.childrenOf.length > 0) {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
-            var flatListUnsorted = this.state.curTreeObj.tree.flatList;
-            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
-            var sortedArray = sortOrderArray.sort();
-            levelNodes = [];
-            for (var i = 0; i < sortedArray.length; i++) {
-                levelNodes.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
+            levelNodes.sort((a, b) => a.parent - b.parent);
+            if(isShiftNode == undefined) {
+                var flatListUnsorted = this.state.curTreeObj.tree.flatList;
+                var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+                var sortedArray = sortOrderArray.sort();
+                levelNodes = [];
+                for (var i = 0; i < sortedArray.length; i++) {
+                    levelNodes.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
+                }
             }
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
@@ -2480,8 +2483,9 @@ export default class BuildTree extends Component {
         this.setState({
             isLevelChanged: true,
             items
+        }, () => {
+            this.buildLevelReorderJexcel(true);
         })
-        this.buildLevelReorderJexcel();
     }
     /**
      * Updates the component state with the new name for a level when the name input field is changed.
