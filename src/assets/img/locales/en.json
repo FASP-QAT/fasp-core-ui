@@ -3296,7 +3296,7 @@
     "static.tree.deleteScenario": "Delete Scenario",
     "static.tree.showOnlyActive": "Show Only Active",
     "static.tree.showInactive": "Show Inactive",
-    "static.import.doNoImportCheckbox":"Toggle do not import",
+    "static.import.doNoImportCheckbox":"Do not import all unmapped planning units",
     "static.shipment.budgetWarning1":"The budget",
     "static.shipment.budgetWarning2":") will be over budget by $",
     "static.shipment.budgetWarning3":"if you submit.",
