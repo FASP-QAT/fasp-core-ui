@@ -1526,14 +1526,15 @@ class AddprogramPlanningUnit extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
-                <div style={{ flexBasis: 'auto' }}>
+                {/* <div style={{ flexBasis: 'auto' }}> */}
                     <Card>
-                        <CardBody className="pb-lg-5">
+                        <CardBody className="pb-lg-5 pt-lg-1">
+                        <Col md="12 pl-0">
                             {this.state.programId != "" && this.state.programId != null && this.state.programId != undefined && this.state.programId != 0 && <img className='float-right mr-1' style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             <div className='row'>
-                                <FormGroup className="col-md-2">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -1549,9 +1550,9 @@ class AddprogramPlanningUnit extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-2" style={{"margin-left":"2rem"}}>
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -1569,7 +1570,8 @@ class AddprogramPlanningUnit extends Component {
                                     </div>
                                 </FormGroup>
                                 </div>
-                            <div >
+                                </Col>
+                            <div>
                                 <h4 className="red">{this.props.message}</h4>
                                 <div className="consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
@@ -1598,7 +1600,7 @@ class AddprogramPlanningUnit extends Component {
                             </FormGroup>
                         </CardFooter>
                     </Card>
-                </div>
+                {/* </div> */}
             </div>
         );
     }
