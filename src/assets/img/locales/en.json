@@ -3339,5 +3339,7 @@
     "static.tree.parentLevel":"Parent Level",
     "static.tree.parentNode":"Parent Node",
     "static.tree.destination":"Destination",
-    "static.tree.moveCopyNote":"Note: The entire branch (including all child nodes) will be moved/copied"
+    "static.tree.moveCopyNote":"Note: The entire branch (including all child nodes) will be moved/copied",
+    "static.forecastErrorReport.planningUnitAboveThreshold":"Planning Unit Error is above the Forecast Error Threshold",
+    "static.forecastErrorReport.forecastErrorThreshold":"Forecast Error Threshold"
 }
