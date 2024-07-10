@@ -2742,25 +2742,18 @@ class ProcurementAgentExport extends Component {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
       //Fetch all funding source type list
-      FundingSourceService.getFundingSourceTypeListAll()
+      FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
         .then(response => {
           if (response.status == 200) {
-            var fundingSourceTypeValues = [];
-            var listArray = response.data;
-            /*listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            var filteredfundingSourceTypes = listArray.filter(c => c.active == true && realmId == c.realm.id);
-            console.log('filteredfundingSourceTypes: ' + JSON.stringify(filteredfundingSourceTypes));
-
-            filteredfundingSourceTypes.map(ele => {
-              fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
-            })*/
+            var fundingSourceTypes = response.data;
+            fundingSourceTypes.sort(function (a, b) {
+              a = a.fundingSourceTypeCode.toLowerCase();
+              b = b.fundingSourceTypeCode.toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
 
             this.setState({
-              fundingSourceTypes: listArray, loading: false,
+              fundingSourceTypes: fundingSourceTypes, loading: false,
               // fundingSourceTypeValues: fundingSourceTypeValues,
               // fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
             }, () => {
@@ -2829,7 +2822,7 @@ class ProcurementAgentExport extends Component {
    * Consolidates the list of funding source type obtained from Server and local programs.
    */
   consolidatedFundingSourceTypeList = () => {
-    console.log('consolidatedFundingSourceTypeList () called...');
+    let realmId = AuthenticationService.getRealmId();
     const { fundingSourceTypes } = this.state;
     var fstList = fundingSourceTypes;
     var db1;
@@ -2844,7 +2837,7 @@ class ProcurementAgentExport extends Component {
       };
       getRequest.onsuccess = function (event) {
         var myResult = [];
-        myResult = getRequest.result;
+        myResult = getRequest.result.filter(c => c.realm.id == realmId);
         var userBytes = CryptoJS.AES.decrypt(
           localStorage.getItem("curUser"),
           SECRET_KEY
@@ -2857,7 +2850,6 @@ class ProcurementAgentExport extends Component {
               myResult[i].fundingSourceTypeId
             ) {
               f = 1;
-              console.log('local db matched fst: ', myResult[i]);
             }
           }
           var fstData = myResult[i];
@@ -2890,7 +2882,6 @@ class ProcurementAgentExport extends Component {
       var filteredFundingSourceArr = [];
       var fundingSources = this.state.fundingSources;
       for (var i = 0; i < fundingSourceTypeIds.length; i++) {
-        // console.log('fundingSourceTypeIds['+i+']: '+JSON.stringify(fundingSourceTypeIds[i]));
         for (var j = 0; j < fundingSources.length; j++) {
           if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
             filteredFundingSourceArr.push(fundingSources[j]);
@@ -2898,7 +2889,6 @@ class ProcurementAgentExport extends Component {
         }
       }
 
-      console.log('filteredFundingSourceArr len: ' + filteredFundingSourceArr.length);
       if (filteredFundingSourceArr.length > 0) {
         filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
           a = a.fundingSourceCode.toLowerCase();
@@ -2924,8 +2914,6 @@ class ProcurementAgentExport extends Component {
     if (localStorage.getItem("sessionType") === 'Online') {
       FundingSourceService.getFundingSourceListAll()
         .then((response) => {
-          console.log('fundingSources[0]:' + JSON.stringify(response.data[0]));
-          console.log('fundingSources arr len: ' + response.data.length);
           this.setState(
             {
               fundingSources: response.data,
@@ -2999,7 +2987,6 @@ class ProcurementAgentExport extends Component {
    * Consolidates the list of funding source obtained from Server and local programs.
    */
   consolidatedFundingSourceList = () => {
-    console.log('consolidatedFundingSourceList () called...');
     const { fundingSources } = this.state;
     var proList = fundingSources;
     var db1;

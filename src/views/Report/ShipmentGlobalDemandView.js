@@ -222,6 +222,7 @@ class ShipmentGlobalDemandView extends Component {
             programValues: [],
             shipmentStatuses: [],
             fundingSources: [],
+            fundingSourcesOriginal: [],
             programLabels: [],
             programs: [],
             countrys: [],
@@ -241,12 +242,17 @@ class ShipmentGlobalDemandView extends Component {
             loading: true,
             programLst: [],
             procurementAgentTypeId: false,
+            fundingSourceTypes: [],
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: [],
+            groupByFundingSourceType: false,
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPrograms = this.getPrograms.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.handleChange = this.handleChange.bind(this)
+        this.getFundingSourceType = this.getFundingSourceType.bind(this);
     }
     /**
      * Exports the data to a CSV file.
@@ -472,18 +478,21 @@ class ShipmentGlobalDemandView extends Component {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSourcesOriginal.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = AuthenticationService.getRealmId()
             let useApprovedVersion = document.getElementById("includeApprovedVersions").value
             let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
             let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+            let groupByFundingSourceType = document.getElementById("groupByFundingSourceType").value;
+            console.log('groupByFundingSourceType value = '+groupByFundingSourceType);
+            
             if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: '', loading: true
                 })
-                console.log('groupByProcurementAgentType: '+groupByProcurementAgentType);
+                console.log('groupByProcurementAgentType: ' + groupByProcurementAgentType);
                 var inputjson = {
                     realmId: realmId,
                     startDate: startDate,
@@ -494,10 +503,12 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceIds: fundingSourceIds,
                     shipmentStatusIds: shipmentStatusIds,
                     useApprovedSupplyPlanOnly: useApprovedVersion,
-                    groupByProcurementAgentType: groupByProcurementAgentType
+                    groupByProcurementAgentType: groupByProcurementAgentType,
+                    groupByFundingSourceType: groupByFundingSourceType
                 }
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
+                        console.log('response.data.fundingSourceSplit: ',response.data.fundingSourceSplit);
                         try {
                             var table1Headers = [];
                             table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
@@ -816,11 +827,13 @@ class ShipmentGlobalDemandView extends Component {
     componentDidMount() {
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
+            this.getFundingSourceType();
             this.getFundingSource();
             this.getShipmentStatusList();
         } else {
             this.setState({ loading: false })
             this.getPrograms();
+            this.getFundingSourceType();
             this.getFundingSource();
             this.getShipmentStatusList();
         }
@@ -902,7 +915,7 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitSplit: [],
             procurementAgentSplit: [],
             table1Headers: [],
-            programLst:[]
+            programLst: []
         }, () => {
             this.getPrograms();
         })
@@ -1001,6 +1014,181 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this)
         }
     }
+
+    /**
+   * Retrieves the list of funding sources types.
+   */
+    getFundingSourceType = () => {
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+        this.setState({ loading: true });
+        if (localStorage.getItem("sessionType") === 'Online') {
+            //Fetch all funding source type list
+            FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var fundingSourceTypes = response.data;
+                        fundingSourceTypes.sort(function (a, b) {
+                            a = a.fundingSourceTypeCode.toLowerCase();
+                            b = b.fundingSourceTypeCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+
+                        this.setState({
+                            fundingSourceTypes: fundingSourceTypes, loading: false,
+                            // fundingSourceTypeValues: fundingSourceTypeValues,
+                            // fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
+                        }, () => {
+                            this.consolidatedFundingSourceTypeList();
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.consolidatedFundingSourceTypeList();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        this.setState({
+                            fundingSourceTypes: [], loading: false
+                        }, () => {
+                            this.consolidatedFundingSourceTypeList();
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            //Offline
+            this.consolidatedFundingSourceTypeList();
+            this.setState({ loading: false });
+        }
+    }
+
+    /**
+     * Consolidates the list of funding source type obtained from Server and local programs.
+     */
+    consolidatedFundingSourceTypeList = () => {
+        let realmId = AuthenticationService.getRealmId();
+        const { fundingSourceTypes } = this.state;
+        var fstList = fundingSourceTypes;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(["fundingSourceType"], "readwrite");
+            var fundingSourceType = transaction.objectStore("fundingSourceType");
+            var getRequest = fundingSourceType.getAll();
+            getRequest.onerror = function (event) {
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result.filter(c => c.realm.id == realmId);
+                var userBytes = CryptoJS.AES.decrypt(
+                    localStorage.getItem("curUser"),
+                    SECRET_KEY
+                );
+                for (var i = 0; i < myResult.length; i++) {
+                    var f = 0;
+                    for (var k = 0; k < this.state.fundingSourceTypes.length; k++) {
+                        if (
+                            this.state.fundingSourceTypes[k].fundingSourceTypeId ==
+                            myResult[i].fundingSourceTypeId
+                        ) {
+                            f = 1;
+                        }
+                    }
+                    var fstData = myResult[i];
+                    if (f == 0) {
+                        fstList.push(fstData);
+                    }
+                }
+                var lang = this.state.lang;
+                var fundingSourceTypesCombined = fstList.sort(function (a, b) {
+                    a = a.fundingSourceTypeCode.toLowerCase();
+                    b = b.fundingSourceTypeCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+                this.setState({
+                    fundingSourceTypes: fundingSourceTypesCombined,
+                });
+            }.bind(this);
+        }.bind(this);
+    };
+
+    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+        fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+            fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+        }, () => {
+            var filteredFundingSourceArr = [];
+            var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+                for (var j = 0; j < fundingSources.length; j++) {
+                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+                        filteredFundingSourceArr.push(fundingSources[j]);
+                    }
+                }
+            }
+
+            if (filteredFundingSourceArr.length > 0) {
+                filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+                    a = a.fundingSourceCode.toLowerCase();
+                    b = b.fundingSourceCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+            }
+            this.setState({
+                fundingSources: filteredFundingSourceArr,
+                fundingSourceValues: [],
+                fundingSourceLabels: [],
+            }, () => {
+                this.fetchData();
+            });
+        })
+    }
+
+
     /**
      * Retrieves the list of funding sources.
      */
@@ -1009,12 +1197,12 @@ class ShipmentGlobalDemandView extends Component {
             FundingSourceService.getFundingSourceListAll()
                 .then(response => {
                     this.setState({
-                        fundingSources: response.data, loading: false
+                        fundingSourcesOriginal: response.data, loading: false
                     }, () => { this.consolidatedFundingSourceList() })
                 }).catch(
                     error => {
                         this.setState({
-                            fundingSources: []
+                            fundingSourcesOriginal: []
                         }, () => { this.consolidatedFundingSourceList() })
                         if (error.message === "Network Error") {
                             this.setState({
@@ -1061,8 +1249,8 @@ class ShipmentGlobalDemandView extends Component {
      * Consolidates the list of funding source obtained from Server and local programs.
      */
     consolidatedFundingSourceList = () => {
-        const { fundingSources } = this.state
-        var proList = fundingSources;
+        const { fundingSourcesOriginal } = this.state
+        var proList = fundingSourcesOriginal;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1080,8 +1268,8 @@ class ShipmentGlobalDemandView extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     var f = 0
-                    for (var k = 0; k < this.state.fundingSources.length; k++) {
-                        if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+                    for (var k = 0; k < this.state.fundingSourcesOriginal.length; k++) {
+                        if (this.state.fundingSourcesOriginal[k].fundingSourceId == myResult[i].fundingSourceId) {
                             f = 1;
                         }
                     }
@@ -1096,7 +1284,7 @@ class ShipmentGlobalDemandView extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    fundingSources: proList
+                    fundingSourcesOriginal: proList
                 })
             }.bind(this);
         }.bind(this);
@@ -1108,60 +1296,60 @@ class ShipmentGlobalDemandView extends Component {
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
-            if(newCountryList.length>0){
-            DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
-                .then(response => {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.code.toUpperCase();
-                        var itemLabelB = b.code.toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        programLst: listArray, loading: false
-                    })
-                }).catch(
-                    error => {
+            if (newCountryList.length > 0) {
+                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                    .then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.code.toUpperCase();
+                            var itemLabelB = b.code.toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            programLst: [], loading: false
+                            programLst: listArray, loading: false
                         })
-                        if (error.message === "Network Error") {
+                    }).catch(
+                        error => {
                             this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
+                                programLst: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
             }
         } else {
             this.consolidatedProgramList()
@@ -1469,8 +1657,33 @@ class ShipmentGlobalDemandView extends Component {
      */
     setProcurementAgentTypeId(e) {
         var procurementAgentTypeId = e.target.checked;
+        var groupByFundingSourceType = this.state.groupByFundingSourceType;
+        if(procurementAgentTypeId == true){
+            groupByFundingSourceType = false;
+        }
+        console.log('procurementAgentTypeId: '+procurementAgentTypeId);
         this.setState({
             procurementAgentTypeId: procurementAgentTypeId,
+            groupByFundingSourceType: groupByFundingSourceType,
+        }, () => {
+            this.fetchData();
+        })
+    }
+    /**
+     * Sets the group by funding source type flag based on the checkbox state.
+     * @param {object} e - The event object containing checkbox information.
+     */
+    setGroupByFundingSourceType(e) {
+        var groupByFundingSourceType = e.target.checked;
+        var procurementAgentTypeId = this.state.procurementAgentTypeId;
+        if(groupByFundingSourceType == true){
+            procurementAgentTypeId = false;
+        }
+        console.log('groupByFundingSourceType: '+groupByFundingSourceType);
+        console.log('procurementAgentTypeId...: '+procurementAgentTypeId);
+        this.setState({
+            groupByFundingSourceType: groupByFundingSourceType,
+            procurementAgentTypeId: procurementAgentTypeId
         }, () => {
             this.fetchData();
         })
@@ -1509,6 +1722,7 @@ class ShipmentGlobalDemandView extends Component {
                     { label: getLabelText(item.label, this.state.lang), value: item.id }
                 )
             }, this);
+        const { fundingSourceTypes } = this.state;
         const { fundingSources } = this.state;
         let fundingSourceList = [];
         fundingSourceList = fundingSources.length > 0
@@ -1697,6 +1911,27 @@ class ShipmentGlobalDemandView extends Component {
                                                 />
                                             </div>
                                         </FormGroup>
+                                        <FormGroup id="fundingSourceTypeDiv" className="col-md-3" style={{ zIndex: "1" }} >
+                                            <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect
+                                                    name="fundingSourceTypeId"
+                                                    id="fundingSourceTypeId"
+                                                    bsSize="md"
+                                                    // filterOptions={this.filterOptions}
+                                                    value={this.state.fundingSourceTypeValues}
+                                                    onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                                                    options={fundingSourceTypes.length > 0
+                                                        && fundingSourceTypes.map((item, i) => {
+                                                            return (
+                                                                { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                                            )
+                                                        }, this)}
+                                                    disabled={this.state.loading}
+                                                />
+                                            </div>
+                                        </FormGroup>
                                         <FormGroup className="col-md-3" id="fundingSourceDiv">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1761,6 +1996,26 @@ class ShipmentGlobalDemandView extends Component {
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                     <b>{i18n.t('static.shipment.groupByProcurementAgentType')}</b>
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="groupByFundingSourceType"
+                                                        name="groupByFundingSourceType"
+                                                        checked={this.state.groupByFundingSourceType}
+                                                        value={this.state.groupByFundingSourceType}
+                                                        onChange={(e) => { this.setGroupByFundingSourceType(e); }}
+                                                    />
+                                                </InputGroup>
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{i18n.t('static.shipment.groupByFundingSourceType')}</b>
                                                 </Label>
                                             </div>
                                         </FormGroup>
