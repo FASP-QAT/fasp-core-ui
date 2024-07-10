@@ -71,5 +71,9 @@ class PlanningUnitService {
         return axios.post(`${API_URL}/api/planningUnit/tracerCategory/productCategory/forecastingUnit`, json, {}
         );
     }
+    getProgramAndPlanningUnitForProgramList(json) {
+        return axios.post(`${API_URL}/api/programAndPlanningUnit/programs`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();
