@@ -564,7 +564,7 @@ export default class PlanningUnitListComponent extends Component {
                     tableHeadTemp.push(i18n.t('static.planningUnit.associatedForecastingUnit').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.planningUnitOfMeasure').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.labelMultiplier').replaceAll(' ', '%20'));
-                    tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingPU').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingPU').replaceAll('#', '%23').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));

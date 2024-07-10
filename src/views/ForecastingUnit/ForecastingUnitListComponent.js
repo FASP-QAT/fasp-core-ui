@@ -491,7 +491,7 @@ export default class ForecastingUnitListComponent extends Component {
                         tableHeadTemp.push(i18n.t('static.unit.unit').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.product.productgenericname').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.forecastingunit.forecastingunit').replaceAll(' ', '%20'));
-                        tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingFU').replaceAll(' ', '%20'));
+                        tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingFU').replaceAll('#', '%23').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));
