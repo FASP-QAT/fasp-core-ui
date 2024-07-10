@@ -31,7 +31,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import EquivalancyUnitService from "../../api/EquivalancyUnitService";
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import RealmCountryService from '../../api/RealmCountryService.js';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -66,19 +68,39 @@ class StockStatus extends Component {
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       programId: '',
-      versionId: '',
       planningUnitLabel: '',
       lang: localStorage.getItem('lang'),
       exportModal: false,
       planningUnitIdsExport: [],
       type: 0,
+      viewById: 1,
+      planningUnitId: "",
+      planningUnitIds: [],
+      forecastingUnitId: "",
+      forecastingUnitIds: [],
+      equivalencyUnitId: "",
+      consumptionData: [],
+      equivalencyUnitList: [],
+      programEquivalencyUnitList: [],
+      yaxisEquUnit: -1,
+      planningUnits: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      forecastingUnits: [],
+      allForecastingUnits: [],
+      forecastingUnitValues: [],
+      forecastingUnitLabels: [],
+      realmCountryPlanningUnits: [],
+      realmCountryPlanningUnitValues: [],
+      realmCountryPlanningUnitLabels: [],
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.programChange = this.programChange.bind(this);
-    this.versionChange = this.versionChange.bind(this);
     this.toggleExport = this.toggleExport.bind(this);
+    this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
+    this.yAxisChange = this.yAxisChange.bind(this);
   }
   /**
    * Handles the change event for the program selection.
@@ -88,37 +110,22 @@ class StockStatus extends Component {
   programChange(event) {
     this.setState({
       programId: event.target.value,
-      versionId: '',
       planningUnits: [],
       planningUnitsMulti: [],
       planningUnitLabel: "",
-      stockStatusList: []
+      stockStatusList: [],
+      forecastingUnits: [],
+      allForecastingUnits: [],
+      forecastingUnitIds: [],
+      matricsList: [],
+      viewById: 1,
+      planningUnitId: "",
+      forecastingUnitId: "",
+      equivalencyUnitId: "",
+      dataList: [],
     }, () => {
-      localStorage.setItem("sesVersionIdReport", '');
-      this.filterVersion();
+      this.getPlanningUnitAndForcastingUnit();
     })
-  }
-  /**
-   * Handles the change event for the version selection.
-   * If a version is selected, updates the state with the new version ID and triggers data filtering.
-   * If no version is selected, updates the state and triggers retrieval of planning units.
-   * @param {Event} event - The event object.
-   */
-  versionChange(event) {
-    if (this.state.versionId != '' || this.state.versionId != undefined) {
-      this.setState({
-        versionId: event.target.value
-      }, () => {
-        localStorage.setItem("sesVersionIdReport", this.state.versionId);
-        this.filterData();
-      })
-    } else {
-      this.setState({
-        versionId: event.target.value
-      }, () => {
-        this.getPlanningUnit();
-      })
-    }
   }
   /**
    * Toggles the value of the 'show' state variable.
@@ -146,8 +153,6 @@ class StockStatus extends Component {
     csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     var A = ""
@@ -263,18 +268,18 @@ class StockStatus extends Component {
           doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
           splittext = doc.splitTextToSize(i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
           doc.text(doc.internal.pageSize.width / 8, 60, splittext)
-          doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)), doc.internal.pageSize.width / 10, 80, {
+          doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")), doc.internal.pageSize.width / 10, 80, {
             align: 'left'
           })
         }
       }
     }
     const unit = "pt";
-    const size = "A4"; 
-    const orientation = "landscape"; 
+    const size = "A4";
+    const orientation = "landscape";
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(8);    
+    doc.setFontSize(8);
     var pageArray = [];
     var list = this.state.PlanningUnitDataForExport
     var count = 0;
@@ -529,1423 +534,46 @@ class StockStatus extends Component {
    */
   filterData() {
     let programId = document.getElementById("programId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
-    let versionId = document.getElementById("versionId").value;
+    let planningUnitIds = this.state.planningUnitIds.map(item => item.value.toString());
+    let forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value.toString());
+    let viewById = this.state.viewById;
+    let equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-    if (programId != 0 && versionId != 0 && planningUnitId != 0) {
-      if (versionId.includes('Local')) {
-        this.setState({ loading: true })
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-          this.setState({
-            message: i18n.t('static.program.errortext'),
-            loading: false
-          })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var version = (versionId.split('(')[0]).trim()
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          var program = `${programId}_v${version}_uId_${userId}`
-          var data = [];
-          var programRequest = programTransaction.get(program);
-          programRequest.onerror = function (event) {
-            this.setState({
-              loading: false
-            })
-          }.bind(this);
-          programRequest.onsuccess = function (event) {
-            var programDataJson = programRequest.result.programData;
-            var gprogramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
-            var gprogramData = gprogramDataBytes.toString(CryptoJS.enc.Utf8);
-            var gprogramJson = JSON.parse(gprogramData);
-            var linkedShipmentsList = gprogramJson.shipmentLinkingList != null ? gprogramJson.shipmentLinkingList : []
-            var planningUnitDataList = programDataJson.planningUnitDataList;
-            var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-            var programJson = {}
-            if (planningUnitDataIndex != -1) {
-              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-              programJson = JSON.parse(programData);
-            } else {
-              programJson = {
-                consumptionList: [],
-                inventoryList: [],
-                shipmentList: [],
-                batchInfoList: [],
-                supplyPlan: []
-              }
-            }
-            var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
-            var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-            var generalProgramJson = JSON.parse(generalProgramData);
-            var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
-            var realmTransaction = db1.transaction(['realm'], 'readwrite');
-            var realmOs = realmTransaction.objectStore('realm');
-            var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-            realmRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            realmRequest.onsuccess = function (event) {
-              var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
-              var dsOs = dsTransaction.objectStore('dataSource');
-              var dsRequest = dsOs.getAll();
-              dsRequest.onerror = function (event) {
-                this.setState({
-                  loading: false,
-                })
-                this.hideFirstComponent()
-              }.bind(this);
-              dsRequest.onsuccess = function (event) {
-                var dsResult = dsRequest.result;
-                var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
-                var fsOs = fsTransaction.objectStore('fundingSource');
-                var fsRequest = fsOs.getAll();
-                fsRequest.onerror = function (event) {
-                  this.setState({
-                    loading: false,
-                  })
-                  this.hideFirstComponent()
-                }.bind(this);
-                fsRequest.onsuccess = function (event) {
-                  var fsResult = fsRequest.result;
-                  var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                  var paOs = paTransaction.objectStore('procurementAgent');
-                  var paRequest = paOs.getAll();
-                  paRequest.onerror = function (event) {
-                    this.setState({
-                      loading: false,
-                    })
-                    this.hideFirstComponent()
-                  }.bind(this);
-                  paRequest.onsuccess = function (event) {
-                    var paResult = paRequest.result;
-                    var maxForMonths = 0;
-                    var realm = realmRequest.result;
-                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-                    if (DEFAULT_MIN_MONTHS_OF_STOCK > pu.minMonthsOfStock) {
-                      maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                    } else {
-                      maxForMonths = pu.minMonthsOfStock
-                    }
-                    var minStockMoS = parseInt(maxForMonths);
-                    var minForMonths = 0;
-                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                      minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                    } else {
-                      minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
-                    }
-                    var maxStockMoS = parseInt(minForMonths);
-                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                      maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-                    }
-                    var minForMonths = 0;
-                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + pu.reorderFrequencyInMonths)) {
-                      minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                    } else {
-                      minForMonths = (maxForMonths + pu.reorderFrequencyInMonths);
-                    }
-                    var maxStockMoS = parseInt(minForMonths);
-                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                      maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-                    }
-                    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-                    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                    var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
-                    var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
-                    var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
-                    var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
-                    var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
-                    inList.map((c, idx) => {
-                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
-                      if (dataSource.length > 0) {
-                        var simpleDsObject = {
-                          id: dataSource[0].dataSourceId,
-                          label: dataSource[0].label
-                        }
-                        inList[idx].dataSource = simpleDsObject;
-                      }
-                    })
-                    coList.map((c, idx) => {
-                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
-                      if (dataSource.length > 0) {
-                        var simpleDsObject = {
-                          id: dataSource[0].dataSourceId,
-                          label: dataSource[0].label
-                        }
-                        coList[idx].dataSource = simpleDsObject;
-                      }
-                    })
-                    shList.map((c, idx) => {
-                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
-                      if (dataSource.length > 0) {
-                        var simpleDsObject = {
-                          id: dataSource[0].dataSourceId,
-                          label: dataSource[0].label
-                        }
-                        shList[idx].dataSource = simpleDsObject;
-                      }
-                      for (var l = 0; l < linkedShipmentsList.length; l++) {
-                        if (shList[idx].parentShipmentId == linkedShipmentsList[l].parentShipmentId) {
-                          shList[idx].roNo = linkedShipmentsList[l].roNo
-                          shList[idx].roPrimeLineNo = linkedShipmentsList[l].roPrimeLineNo
-                        }
-                      }
-                    })
-                    this.setState({
-                      inList: inList,
-                      coList: coList,
-                      shList: shList
-                    })
-                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
-                    if (prevMonthSupplyPlan.length > 0) {
-                      this.setState({
-                        firstMonthRegionCount: prevMonthSupplyPlan[0].regionCount,
-                        firstMonthRegionCountForStock: prevMonthSupplyPlan[0].regionCountForStock,
-                      })
-                    } else {
-                      this.setState({
-                        firstMonthRegionCount: 1,
-                        firstMonthRegionCountForStock: 0,
-                      })
-                    }
-                    var monthstartfrom = this.state.rangeValue.from.month
-                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                      for (var month = monthstartfrom; month <= 12; month++) {
-                        var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                        var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                        var dt = dtstr
-                        var list = programJson.supplyPlan.filter(c => c.planningUnitId == planningUnitId && c.transDate == dt)
-                        if (list.length > 0) {
-                          var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-                          var totalShipmentQty = 0;
-                          shiplist.map((elt, idx) => {
-                            totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
-                            var fundingSource = fsResult.filter(fs => fs.fundingSourceId == elt.fundingSource.id);
-                            if (fundingSource.length > 0) {
-                              var simpleFSObject = {
-                                id: fundingSource[0].fundingSourceId,
-                                label: fundingSource[0].label,
-                                code: fundingSource[0].fundingSourceCode
-                              }
-                              shiplist[idx].fundingSource = simpleFSObject;
-                            }
-                            var procurementAgent = paResult.filter(pa => pa.procurementAgentId == elt.procurementAgent.id);
-                            if (procurementAgent.length > 0) {
-                              var simplePAObject = {
-                                id: procurementAgent[0].procurementAgentId,
-                                label: procurementAgent[0].label,
-                                code: procurementAgent[0].procurementAgentCode
-                              }
-                              shiplist[idx].procurementAgent = simplePAObject;
-                            }
-                          })
-                          var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalforecastConsumption = null;
-                          conList.map(elt => {
-                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
-                          })
-                          var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalActualConsumption = null;
-                          conListAct.map(elt => {
-                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
-                          })
-                          var json = {
-                            dt: new Date(from, month - 1),
-                            forecastedConsumptionQty: Number(totalforecastConsumption),
-                            actualConsumptionQty: list[0].actualFlag ? Number(totalActualConsumption) : null,
-                            actualConsumption: list[0].actualFlag,
-                            finalConsumptionQty: list[0].consumptionQty,
-                            shipmentQty: totalShipmentQty,
-                            shipmentInfo: shiplist,
-                            adjustment: list[0].adjustmentQty,
-                            closingBalance: list[0].closingBalance,
-                            openingBalance: list[0].openingBalance,
-                            mos: list[0].mos,
-                            amc: list[0].amc,
-                            minMos: minStockMoS,
-                            maxMos: maxStockMoS,
-                            expiredStock: list[0].expiredStock,
-                            unmetDemand: list[0].unmetDemand,
-                            regionCount: list[0].regionCount,
-                            regionCountForStock: list[0].regionCountForStock,
-                            nationalAdjustment: list[0].nationalAdjustment,
-                            minStock: list[0].minStock,
-                            distributionLeadTime: pu.distributionLeadTime,
-                            maxStock: list[0].maxStock,
-                            planBasedOn: pu.planBasedOn
-                          }
-                        } else {
-                          var json = {
-                            dt: new Date(from, month - 1),
-                            consumptionQty: 0,
-                            actualConsumption: false,
-                            actualConsumptionQty: null,
-                            shipmentQty: 0,
-                            shipmentInfo: [],
-                            adjustment: 0,
-                            closingBalance: 0,
-                            openingBalance: '',
-                            mos: '',
-                            amc: '',
-                            minMos: minStockMoS,
-                            maxMos: maxStockMoS,
-                            expiredStock: 0,
-                            unmetDemand: 0,
-                            regionCount: 1,
-                            regionCountForStock: 0,
-                            nationalAdjustment: 0,
-                            minStock: pu.minQty,
-                            maxStock: 0,
-                            planBasedOn: pu.planBasedOn,
-                            distributionLeadTime: pu.distributionLeadTime
-                          }
-                        }
-                        data.push(json)
-                        if (month == this.state.rangeValue.to.month && from == to) {
-                          this.setState({
-                            stockStatusList: data,
-                            message: '', loading: false
-                          })
-                          return;
-                        }
-                        this.setState({
-                          loading: false,
-                          planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text
-                        })
-                      }
-                      monthstartfrom = 1
-                    }
-                  }.bind(this)
-                }.bind(this)
-              }.bind(this)
-            }.bind(this)
-          }.bind(this)
-        }.bind(this)
-      } else {
-        this.setState({ loading: true })
-        var inputjson = {
-          "programId": programId,
-          "versionId": versionId,
-          "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
-          "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-          "planningUnitIds": [planningUnitId],
-          "allPlanningUnits": false
-        }
-        ReportService.getStockStatusData(inputjson)
-          .then(response => {
-            var inventoryList = [];
-            var consumptionList = [];
-            var shipmentList = [];
-            var responseData = response.data[0];
-            let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-            filteredResponseData.map(c => {
-              c.inventoryInfo.map(i => inventoryList.push(i))
-              c.consumptionInfo.map(ci => consumptionList.push(ci))
-              c.shipmentInfo.map(si => shipmentList.push(si))
-            }
-            );
-            this.setState({
-              firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
-              firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
-              stockStatusList: filteredResponseData,
-              message: '', loading: false,
-              planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
-              inList: inventoryList,
-              coList: consumptionList,
-              shList: shipmentList
-            })
-          }).catch(
-            error => {
-              this.setState({
-                stockStatusList: [], loading: false
-              })
-              if (error.message === "Network Error") {
-                this.setState({
-                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                  loading: false
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                      loading: false
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                      loading: false
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false
-                    });
-                    break;
-                }
-              }
-            }
-          );
-      }
-    } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
-    } else if (versionId == 0) {
-      this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
-    } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [], planningUnitLabel: '' });
-    }
-  }
-  /**
-   * Fetches the data for exporting it in CSV or PDF based on the planning units selected
-   * @param {*} report This is the type of the export. 1 for PDF and 2 for CSV
-   */
-  exportData = (report) => {
-    this.setState({
-      exportModal: false
-    })
-    let programId = document.getElementById("programId").value;
-    let versionId = document.getElementById("versionId").value;
-    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-    report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
-    var PlanningUnitDataForExport = [];
-    if (versionId.includes('Local')) {
-      this.setState({ loading: true })
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onerror = function (event) {
-        this.setState({
-          message: i18n.t('static.program.errortext'),
-          loading: false
-        })
-      }.bind(this);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var version = (versionId.split('(')[0]).trim()
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        var program = `${programId}_v${version}_uId_${userId}`
-        var programRequest = programTransaction.get(program);
-        programRequest.onerror = function (event) {
-          this.setState({
-            loading: false
-          })
-        }.bind(this);
-        programRequest.onsuccess = function (event) {
-          var programDataJson = programRequest.result.programData;
-          var planningUnitDataList = programDataJson.planningUnitDataList;
-          var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
-          var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-          var generalProgramJson = JSON.parse(generalProgramData);
-          var realmTransaction = db1.transaction(['realm'], 'readwrite');
-          var realmOs = realmTransaction.objectStore('realm');
-          var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
-          realmRequest.onerror = function (event) {
-            this.setState({
-              loading: false,
-            })
-            this.hideFirstComponent()
-          }.bind(this);
-          realmRequest.onsuccess = function (event) {
-            var dsTransaction = db1.transaction(['dataSource'], 'readwrite');
-            var dsOs = dsTransaction.objectStore('dataSource');
-            var dsRequest = dsOs.getAll();
-            dsRequest.onerror = function (event) {
-              this.setState({
-                loading: false,
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            dsRequest.onsuccess = function (event) {
-              var dsResult = dsRequest.result;
-              var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
-              var fsOs = fsTransaction.objectStore('fundingSource');
-              var fsRequest = fsOs.getAll();
-              fsRequest.onerror = function (event) {
-                this.setState({
-                  loading: false,
-                })
-                this.hideFirstComponent()
-              }.bind(this);
-              fsRequest.onsuccess = function (event) {
-                var fsResult = fsRequest.result;
-                var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                var paOs = paTransaction.objectStore('procurementAgent');
-                var paRequest = paOs.getAll();
-                paRequest.onerror = function (event) {
-                  this.setState({
-                    loading: false,
-                  })
-                  this.hideFirstComponent()
-                }.bind(this);
-                paRequest.onsuccess = function (event) {
-                  var paResult = paRequest.result;
-                  var pcnt = 0
-                  var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
-                    a = a.label.toLowerCase();
-                    b = b.label.toLowerCase();
-                    return a < b ? -1 : a > b ? 1 : 0;
-                  });
-                  sortedPlanningUnitData.map(pu => {
-                    var puFiltered = this.state.planningUnits.filter(c => c.planningUnit.id == pu.value)[0]
-                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == pu.value);
-                    var programJson = {}
-                    if (planningUnitDataIndex != -1) {
-                      var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == pu.value))[0];
-                      var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                      var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                      programJson = JSON.parse(programData);
-                    } else {
-                      programJson = {
-                        consumptionList: [],
-                        inventoryList: [],
-                        shipmentList: [],
-                        batchInfoList: [],
-                        supplyPlan: []
-                      }
-                    }
-                    var data = [];
-                    var monthstartfrom = this.state.rangeValue.from.month
-                    var maxForMonths = 0;
-                    var realm = realmRequest.result;
-                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-                    if (DEFAULT_MIN_MONTHS_OF_STOCK > puFiltered.minMonthsOfStock) {
-                      maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                    } else {
-                      maxForMonths = puFiltered.minMonthsOfStock
-                    }
-                    var minStockMoS = parseInt(maxForMonths);
-                    var minForMonths = 0;
-                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + puFiltered.reorderFrequencyInMonths)) {
-                      minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                    } else {
-                      minForMonths = (maxForMonths + puFiltered.reorderFrequencyInMonths);
-                    }
-                    var maxStockMoS = parseInt(minForMonths);
-                    if (maxStockMoS < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                      maxStockMoS = DEFAULT_MIN_MAX_MONTHS_OF_STOCK;
-                    }
-                    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-                    let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
-                    var prevMonthSupplyPlan = programJson.supplyPlan.filter(c => c.planningUnitId == pu.value && c.transDate == moment(startDate).subtract(1, 'months').format("YYYY-MM-DD"));
-                    var firstMonthRegionCount = 1;
-                    var firstMonthRegionCountForStock = 0;
-                    if (prevMonthSupplyPlan.length > 0) {
-                      firstMonthRegionCount = prevMonthSupplyPlan[0].regionCount;
-                      firstMonthRegionCountForStock = prevMonthSupplyPlan[0].regionCountForStock
-                    }
-                    var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
-                    var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value);
-                    var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
-                    var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
-                    var shList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (moment(c.receivedDate) >= startDate && moment(c.receivedDate) <= endDate) : (moment(c.expectedDeliveryDate) >= startDate && moment(c.expectedDeliveryDate) <= endDate)));
-                    inList.map((c, idx) => {
-                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
-                      if (dataSource.length > 0) {
-                        var simpleDsObject = {
-                          id: dataSource[0].dataSourceId,
-                          label: dataSource[0].label
-                        }
-                        inList[idx].dataSource = simpleDsObject;
-                      }
-                    })
-                    coList.map((c, idx) => {
-                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
-                      if (dataSource.length > 0) {
-                        var simpleDsObject = {
-                          id: dataSource[0].dataSourceId,
-                          label: dataSource[0].label
-                        }
-                        coList[idx].dataSource = simpleDsObject;
-                      }
-                    })
-                    shList.map((c, idx) => {
-                      var dataSource = dsResult.filter(d => d.dataSourceId == c.dataSource.id);
-                      if (dataSource.length > 0) {
-                        var simpleDsObject = {
-                          id: dataSource[0].dataSourceId,
-                          label: dataSource[0].label
-                        }
-                        shList[idx].dataSource = simpleDsObject;
-                      }
-                    })
-                    for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
-                      for (var month = monthstartfrom; month <= 12; month++) {
-                        var dtstr = from + "-" + String(month).padStart(2, '0') + "-01"
-                        var enddtStr = from + "-" + String(month).padStart(2, '0') + '-' + new Date(from, month, 0).getDate()
-                        var dt = dtstr
-                        var list = programJson.supplyPlan.filter(c => c.planningUnitId == pu.value && c.transDate == dt)
-                        if (list.length > 0) {
-                          var shiplist = shipmentList.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dt && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dt && c.receivedDate <= enddtStr))
-                          var totalShipmentQty = 0;
-                          shiplist.map((elt, idx) => {
-                            totalShipmentQty = totalShipmentQty + Number(elt.shipmentQty)
-                            var fundingSource = fsResult.filter(fs => fs.fundingSourceId == elt.fundingSource.id);
-                            if (fundingSource.length > 0) {
-                              var simpleFSObject = {
-                                id: fundingSource[0].fundingSourceId,
-                                label: fundingSource[0].label,
-                                code: fundingSource[0].fundingSourceCode
-                              }
-                              shiplist[idx].fundingSource = simpleFSObject;
-                            }
-                            var procurementAgent = paResult.filter(pa => pa.procurementAgentId == elt.procurementAgent.id);
-                            if (procurementAgent.length > 0) {
-                              var simplePAObject = {
-                                id: procurementAgent[0].procurementAgentId,
-                                label: procurementAgent[0].label,
-                                code: procurementAgent[0].procurementAgentCode
-                              }
-                              shiplist[idx].procurementAgent = simplePAObject;
-                            }
-                          })
-                          var conList = consumptionList.filter(c => c.actualFlag == false && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalforecastConsumption = null;
-                          conList.map(elt => {
-                            totalforecastConsumption = (totalforecastConsumption == null) ? elt.consumptionQty : totalforecastConsumption + elt.consumptionQty
-                          })
-                          var conListAct = consumptionList.filter(c => c.actualFlag == true && (c.consumptionDate >= dt && c.consumptionDate <= enddtStr))
-                          var totalActualConsumption = null;
-                          conListAct.map(elt => {
-                            totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
-                          })
-                          var json = {
-                            dt: new Date(from, month - 1),
-                            forecastedConsumptionQty: Number(totalforecastConsumption),
-                            actualConsumptionQty: totalActualConsumption != null ? Number(totalActualConsumption) : null,
-                            actualConsumption: list[0].actualFlag,
-                            finalConsumptionQty: list[0].consumptionQty,
-                            shipmentQty: totalShipmentQty,
-                            shipmentInfo: shiplist,
-                            adjustment: list[0].adjustmentQty,
-                            closingBalance: list[0].closingBalance,
-                            openingBalance: list[0].openingBalance,
-                            mos: list[0].mos,
-                            amc: list[0].amc,
-                            minMos: minStockMoS,
-                            maxMos: maxStockMoS,
-                            expiredStock: list[0].expiredStock,
-                            unmetDemand: list[0].unmetDemand,
-                            regionCount: list[0].regionCount,
-                            regionCountForStock: list[0].regionCountForStock,
-                            nationalAdjustment: list[0].nationalAdjustment,
-                            minStock: list[0].minStock,
-                            maxStock: list[0].maxStock,
-                            planBasedOn: puFiltered.planBasedOn,
-                            distributionLeadTime: puFiltered.distributionLeadTime
-                          }
-                        } else {
-                          var json = {
-                            dt: new Date(from, month - 1),
-                            consumptionQty: 0,
-                            actualConsumption: false,
-                            actualConsumptionQty: null,
-                            shipmentQty: 0,
-                            shipmentInfo: [],
-                            adjustment: 0,
-                            closingBalance: 0,
-                            openingBalance: '',
-                            mos: '',
-                            amc: '',
-                            minMos: minStockMoS,
-                            maxMos: maxStockMoS,
-                            expiredStock: 0,
-                            unmetDemand: 0,
-                            regionCount: 1,
-                            regionCountForStock: 0,
-                            nationalAdjustment: 0,
-                            minStock: puFiltered.minQty,
-                            distributionLeadTime: puFiltered.distributionLeadTime,
-                            maxStock: 0,
-                            planBasedOn: puFiltered.planBasedOn
-                          }
-                        }
-                        data.push(json)
-                        if (month == this.state.rangeValue.to.month && from == to) {
-                          month = 12
-                          let datasets = [
-                            {
-                              label: i18n.t('static.supplyplan.exipredStock'),
-                              yAxisID: 'A',
-                              type: 'line',
-                              stack: 7,
-                              data: data.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
-                              fill: false,
-                              borderColor: 'rgb(75, 192, 192)',
-                              tension: 0.1,
-                              showLine: false,
-                              pointStyle: 'triangle',
-                              pointBackgroundColor: '#ED8944',
-                              pointBorderColor: '#212721',
-                              pointRadius: 10
-                            },
-                            {
-                              type: "line",
-                              yAxisID: 'A',
-                              label: i18n.t('static.supplyPlan.consumption'),
-                              backgroundColor: 'transparent',
-                              borderColor: '#ba0c2f',
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              lineTension: 0,
-                              showInLegend: true,
-                              pointStyle: 'line',
-                              pointRadius: 0,
-                              yValueFormatString: "$#,##0",
-                              data: data.map((item, index) => (item.finalConsumptionQty))
-                            },
-                            {
-                              label: i18n.t('static.report.actualConsumption'),
-                              yAxisID: 'A',
-                              type: 'line',
-                              stack: 7,
-                              data: data.map((item, index) => (item.actualConsumptionQty)),
-                              fill: false,
-                              borderColor: 'rgb(75, 192, 192)',
-                              tension: 0.1,
-                              showLine: false,
-                              pointStyle: 'point',
-                              pointBackgroundColor: '#ba0c2f',
-                              pointBorderColor: '#ba0c2f',
-                              pointRadius: 3
-                            },
-                            {
-                              label: i18n.t('static.supplyPlan.delivered'),
-                              yAxisID: 'A',
-                              stack: 1,
-                              backgroundColor: '#002f6c',
-                              borderColor: '#002f6c',
-                              pointBackgroundColor: '#002f6c',
-                              pointBorderColor: '#002f6c',
-                              pointHoverBackgroundColor: '#002f6c',
-                              pointHoverBorderColor: '#002f6c',
-                              data: data.map((item, index) => {
-                                let count = 0;
-                                (item.shipmentInfo.map((ele, index) => {
-                                  ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
-                                }))
-                                return count
-                              })
-                            },
-                            {
-                              label: i18n.t('static.supplyPlan.shipped'),
-                              yAxisID: 'A',
-                              stack: 1,
-                              backgroundColor: '#49A4A1',
-                              borderColor: '#49A4A1',
-                              pointBackgroundColor: '#49A4A1',
-                              pointBorderColor: '#49A4A1',
-                              pointHoverBackgroundColor: '#49A4A1',
-                              pointHoverBorderColor: '#49A4A1',
-                              data: data.map((item, index) => {
-                                let count = 0;
-                                (item.shipmentInfo.map((ele, index) => {
-                                  (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
-                                }))
-                                return count
-                              })
-                            },
-                            {
-                              label: i18n.t('static.supplyPlan.approved'),
-                              yAxisID: 'A',
-                              stack: 1,
-                              backgroundColor: '#0067B9',
-                              borderColor: '#0067B9',
-                              pointBackgroundColor: '#0067B9',
-                              pointBorderColor: '#0067B9',
-                              pointHoverBackgroundColor: '#0067B9',
-                              pointHoverBorderColor: '#0067B9',
-                              data: data.map((item, index) => {
-                                let count = 0;
-                                (item.shipmentInfo.map((ele, index) => {
-                                  (ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
-                                }))
-                                return count
-                              })
-                            },
-                            {
-                              label: i18n.t('static.supplyPlan.planned'),
-                              backgroundColor: '#A7C6ED',
-                              borderColor: '#A7C6ED',
-                              pointBackgroundColor: '#A7C6ED',
-                              pointBorderColor: '#A7C6ED',
-                              pointHoverBackgroundColor: '#A7C6ED',
-                              pointHoverBorderColor: '#A7C6ED',
-                              yAxisID: 'A',
-                              stack: 1,
-                              data: data.map((item, index) => {
-                                let count = 0;
-                                (item.shipmentInfo.map((ele, index) => {
-                                  (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
-                                }))
-                                return count
-                              })
-                            },
-                            {
-                              label: i18n.t('static.report.stock'),
-                              yAxisID: 'A',
-                              type: 'line',
-                              borderColor: '#cfcdc9',
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              lineTension: 0,
-                              pointStyle: 'circle',
-                              pointRadius: 0,
-                              showInLegend: true,
-                              data: data.map((item, index) => (Number(item.closingBalance)))
-                            },
-                            {
-                              type: "line",
-                              yAxisID: data[0].planBasedOn == 1 ? 'B' : 'A',
-                              label: data[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
-                              backgroundColor: 'rgba(255,193,8,0.2)',
-                              borderColor: '#59cacc',
-                              borderStyle: 'dotted',
-                              borderDash: [10, 10],
-                              fill: '+1',
-                              backgroundColor: 'transparent',
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              showInLegend: true,
-                              pointStyle: 'line',
-                              pointRadius: 0,
-                              yValueFormatString: "$#,##0",
-                              lineTension: 0,
-                              data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.minMos : item.minStock))
-                            }
-                            , {
-                              type: "line",
-                              yAxisID: data[0].planBasedOn == 1 ? 'B' : 'A',
-                              label: data[0].planBasedOn == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
-                              backgroundColor: 'rgba(0,0,0,0)',
-                              borderColor: '#59cacc',
-                              borderStyle: 'dotted',
-                              backgroundColor: 'transparent',
-                              borderDash: [10, 10],
-                              fill: true,
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              lineTension: 0,
-                              pointStyle: 'line',
-                              pointRadius: 0,
-                              showInLegend: true,
-                              yValueFormatString: "$#,##0",
-                              data: data.map((item, index) => (data[0].planBasedOn == 1 ? item.maxMos : item.maxStock))
-                            }
-                          ];
-                          if (data.length > 0 && data[0].planBasedOn == 1) {
-                            datasets.push({
-                              type: "line",
-                              yAxisID: 'B',
-                              label: i18n.t('static.report.mos'),
-                              borderColor: '#118b70',
-                              backgroundColor: 'transparent',
-                              ticks: {
-                                fontSize: 2,
-                                fontColor: 'transparent',
-                              },
-                              lineTension: 0,
-                              showInLegend: true,
-                              pointStyle: 'line',
-                              pointRadius: 0,
-                              yValueFormatString: "$#,##0",
-                              data: data.map((item, index) => {
-                                if (item.mos != '') {
-                                  return Number(Math.round(item.mos * Math.pow(10, 1)) / Math.pow(10, 1)).toFixed(1);
-                                } else {
-                                  return ''
-                                }
-                              })
-                            })
-                          }
-                          var bar = {
-                            labels: data.map((item, index) => (moment(item.dt).format('MMM YY'))),
-                            datasets: datasets,
-                          };
-                          var chartOptions = {
-                            title: {
-                              display: true,
-                              text: (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + getLabelText(puFiltered.planningUnit.label, this.state.lang)
-                            },
-                            scales: {
-                              yAxes: data.length > 0 && data[0].planBasedOn == 1 ? [{
-                                id: 'A',
-                                position: 'left',
-                                scaleLabel: {
-                                  labelString: i18n.t('static.shipment.qty'),
-                                  display: true,
-                                  fontSize: "12",
-                                  fontColor: 'black'
-                                },
-                                ticks: {
-                                  beginAtZero: true,
-                                  fontColor: 'black',
-                                  callback: function (value) {
-                                    var cell1 = value
-                                    cell1 += '';
-                                    var x = cell1.split('.');
-                                    var x1 = x[0];
-                                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                                    var rgx = /(\d+)(\d{3})/;
-                                    while (rgx.test(x1)) {
-                                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                    }
-                                    return x1 + x2;
-                                  }
-                                }, gridLines: {
-                                  color: 'rgba(171,171,171,1)',
-                                  lineWidth: 0
-                                }
-                              }, {
-                                id: 'B',
-                                position: 'right',
-                                scaleLabel: {
-                                  labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                                  fontColor: 'black',
-                                  display: true,
-                                },
-                                ticks: {
-                                  beginAtZero: true,
-                                  fontColor: 'black',
-                                  callback: function (value) {
-                                    var cell1 = value
-                                    cell1 += '';
-                                    var x = cell1.split('.');
-                                    var x1 = x[0];
-                                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                                    var rgx = /(\d+)(\d{3})/;
-                                    while (rgx.test(x1)) {
-                                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                    }
-                                    return x1 + x2;
-                                  }
-                                },
-                                gridLines: {
-                                  color: 'rgba(171,171,171,1)',
-                                  lineWidth: 0
-                                }
-                              }] : [{
-                                id: 'A',
-                                position: 'left',
-                                scaleLabel: {
-                                  labelString: i18n.t('static.shipment.qty'),
-                                  display: true,
-                                  fontSize: "12",
-                                  fontColor: 'black'
-                                },
-                                ticks: {
-                                  beginAtZero: true,
-                                  fontColor: 'black',
-                                  callback: function (value) {
-                                    var cell1 = value
-                                    cell1 += '';
-                                    var x = cell1.split('.');
-                                    var x1 = x[0];
-                                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                                    var rgx = /(\d+)(\d{3})/;
-                                    while (rgx.test(x1)) {
-                                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                    }
-                                    return x1 + x2;
-                                  }
-                                }, gridLines: {
-                                  color: 'rgba(171,171,171,1)',
-                                  lineWidth: 0
-                                }
-                              }],
-                              xAxes: [{
-                                scaleLabel: {
-                                  display: true,
-                                  labelString: i18n.t('static.common.month'),
-                                  fontColor: 'black',
-                                  fontStyle: "normal",
-                                  fontSize: "12"
-                                },
-                                ticks: {
-                                  fontColor: 'black',
-                                  fontStyle: "normal",
-                                  fontSize: "12"
-                                },
-                                gridLines: {
-                                  color: 'rgba(171,171,171,1)',
-                                  lineWidth: 0
-                                }
-                              }]
-                            },
-                            tooltips: {
-                              enabled: false,
-                              custom: CustomTooltips,
-                              callbacks: {
-                                label: function (tooltipItem, data) {
-                                  let label = data.labels[tooltipItem.index];
-                                  let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                                  var cell1 = value
-                                  cell1 += '';
-                                  var x = cell1.split('.');
-                                  var x1 = x[0];
-                                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                                  var rgx = /(\d+)(\d{3})/;
-                                  while (rgx.test(x1)) {
-                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                  }
-                                  return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                                }
-                              }
-                            },
-                            maintainAspectRatio: false,
-                            legend: {
-                              display: true,
-                              position: 'bottom',
-                              labels: {
-                                usePointStyle: true,
-                                fontColor: 'black'
-                              }
-                            }
-                          }
-                          var planningUnitexport = {
-                            planningUnit: puFiltered.planningUnit,
-                            data: data,
-                            bar: bar,
-                            chartOptions: chartOptions,
-                            inList: inList,
-                            coList: coList,
-                            shList: shList,
-                            firstMonthRegionCount: firstMonthRegionCount,
-                            firstMonthRegionCountForStock: firstMonthRegionCountForStock
-                          }
-                          PlanningUnitDataForExport.push(planningUnitexport)
-                        }
-                      }
-                      monthstartfrom = 1
-                    }
-                    pcnt = pcnt + 1
-                    if (pcnt == sortedPlanningUnitData.length) {
-                      this.setState({
-                        PlanningUnitDataForExport: PlanningUnitDataForExport,
-                        loading: false
-                      }, () => {
-                        setTimeout(() => {
-                          if (report == 1) {
-                            this.exportPDF()
-                            document.getElementById("bars_div").style.display = 'none';
-                          } else {
-                            this.exportCSV()
-                          }
-                        }, 2000)
-                      })
-                    }
-                  })
-                }.bind(this)
-              }.bind(this)
-            }.bind(this)
-          }.bind(this)
-        }.bind(this)
-      }.bind(this)
-    }
-    else {
+    if (programId != 0 && ((planningUnitIds.length > 0 && viewById == 1) || (forecastingUnitIds.length > 0 && viewById == 2))) {
+
       this.setState({ loading: true })
       var inputjson = {
         "programId": programId,
-        "versionId": versionId,
         "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
         "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-        "planningUnitIds": [...new Set(this.state.planningUnitIdsExport.map(item => item.value))],
+        "planningUnitIds": planningUnitIds,
+        "allPlanningUnits": false
       }
       ReportService.getStockStatusData(inputjson)
         .then(response => {
-          var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
-            a = a.label.toLowerCase();
-            b = b.label.toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-          });
-          sortedPlanningUnitData.map(plannningUnitItem => {
-            var planningUnitItemFilter = response.data.filter(c => c[0].planningUnit.id == plannningUnitItem.value)[0];
-            let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredPlanningUnitData = planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
-            var bar = {
-              labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
-              datasets: [
-                {
-                  label: i18n.t('static.supplyplan.exipredStock'),
-                  yAxisID: 'A',
-                  type: 'line',
-                  stack: 7,
-                  data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
-                  fill: false,
-                  borderColor: 'rgb(75, 192, 192)',
-                  tension: 0.1,
-                  showLine: false,
-                  pointStyle: 'triangle',
-                  pointBackgroundColor: '#ED8944',
-                  pointBorderColor: '#212721',
-                  pointRadius: 10
-                },
-                {
-                  type: "line",
-                  yAxisID: 'A',
-                  label: i18n.t('static.supplyPlan.consumption'),
-                  backgroundColor: 'transparent',
-                  borderColor: '#ba0c2f',
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  lineTension: 0,
-                  showInLegend: true,
-                  pointStyle: 'line',
-                  pointRadius: 0,
-                  yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
-                },
-                {
-                  label: i18n.t('static.report.actualConsumption'),
-                  yAxisID: 'A',
-                  type: 'line',
-                  stack: 7,
-                  data: filteredPlanningUnitData.map((item, index) => (item.actualConsumptionQty)),
-                  fill: false,
-                  borderColor: 'rgb(75, 192, 192)',
-                  tension: 0.1,
-                  showLine: false,
-                  pointStyle: 'point',
-                  pointBackgroundColor: '#ba0c2f',
-                  pointBorderColor: '#ba0c2f',
-                  pointRadius: 3
-                },
-                {
-                  label: i18n.t('static.supplyPlan.delivered'),
-                  yAxisID: 'A',
-                  stack: 1,
-                  backgroundColor: '#002f6c',
-                  borderColor: '#002f6c',
-                  pointBackgroundColor: '#002f6c',
-                  pointBorderColor: '#002f6c',
-                  pointHoverBackgroundColor: '#002f6c',
-                  pointHoverBorderColor: '#002f6c',
-                  data: filteredPlanningUnitData.map((item, index) => {
-                    let count = 0;
-                    (item.shipmentInfo.map((ele, index) => {
-                      ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
-                    }))
-                    return count
-                  })
-                },
-                {
-                  label: i18n.t('static.supplyPlan.shipped'),
-                  yAxisID: 'A',
-                  stack: 1,
-                  backgroundColor: '#49A4A1',
-                  borderColor: '#49A4A1',
-                  pointBackgroundColor: '#49A4A1',
-                  pointBorderColor: '#49A4A1',
-                  pointHoverBackgroundColor: '#49A4A1',
-                  pointHoverBorderColor: '#49A4A1',
-                  data: filteredPlanningUnitData.map((item, index) => {
-                    let count = 0;
-                    (item.shipmentInfo.map((ele, index) => {
-                      (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
-                    }))
-                    return count
-                  })
-                },
-                {
-                  label: i18n.t('static.supplyPlan.approved'),
-                  yAxisID: 'A',
-                  stack: 1,
-                  backgroundColor: '#0067B9',
-                  borderColor: '#0067B9',
-                  pointBackgroundColor: '#0067B9',
-                  pointBorderColor: '#0067B9',
-                  pointHoverBackgroundColor: '#0067B9',
-                  pointHoverBorderColor: '#0067B9',
-                  data: filteredPlanningUnitData.map((item, index) => {
-                    let count = 0;
-                    (item.shipmentInfo.map((ele, index) => {
-                      (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
-                    }))
-                    return count
-                  })
-                },
-                {
-                  label: i18n.t('static.supplyPlan.planned'),
-                  backgroundColor: '#A7C6ED',
-                  borderColor: '#A7C6ED',
-                  pointBackgroundColor: '#A7C6ED',
-                  pointBorderColor: '#A7C6ED',
-                  pointHoverBackgroundColor: '#A7C6ED',
-                  pointHoverBorderColor: '#A7C6ED',
-                  yAxisID: 'A',
-                  stack: 1,
-                  data: filteredPlanningUnitData.map((item, index) => {
-                    let count = 0;
-                    (item.shipmentInfo.map((ele, index) => {
-                      (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
-                    }))
-                    return count
-                  })
-                },
-                {
-                  label: i18n.t('static.report.stock'),
-                  yAxisID: 'A',
-                  type: 'line',
-                  borderColor: '#cfcdc9',
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  lineTension: 0,
-                  pointStyle: 'circle',
-                  pointRadius: 0,
-                  showInLegend: true,
-                  data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
-                },
-                {
-                  type: "line",
-                  yAxisID: 'B',
-                  label: i18n.t('static.report.minmonth'),
-                  backgroundColor: 'rgba(255,193,8,0.2)',
-                  borderColor: '#59cacc',
-                  borderStyle: 'dotted',
-                  borderDash: [10, 10],
-                  fill: '+1',
-                  backgroundColor: 'transparent',
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  showInLegend: true,
-                  pointStyle: 'line',
-                  pointRadius: 0,
-                  yValueFormatString: "$#,##0",
-                  lineTension: 0,
-                  data: filteredPlanningUnitData.map((item, index) => (item.minMos))
-                }
-                , {
-                  type: "line",
-                  yAxisID: 'B',
-                  label: i18n.t('static.report.maxmonth'),
-                  backgroundColor: 'rgba(0,0,0,0)',
-                  borderColor: '#59cacc',
-                  borderStyle: 'dotted',
-                  backgroundColor: 'transparent',
-                  borderDash: [10, 10],
-                  fill: true,
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  lineTension: 0,
-                  pointStyle: 'line',
-                  pointRadius: 0,
-                  showInLegend: true,
-                  yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item, index) => (item.maxMos))
-                }
-                , {
-                  type: "line",
-                  yAxisID: 'B',
-                  label: i18n.t('static.report.mos'),
-                  borderColor: '#118b70',
-                  backgroundColor: 'transparent',
-                  ticks: {
-                    fontSize: 2,
-                    fontColor: 'transparent',
-                  },
-                  lineTension: 0,
-                  showInLegend: true,
-                  pointStyle: 'line',
-                  pointRadius: 0,
-                  yValueFormatString: "$#,##0",
-                  data: filteredPlanningUnitData.map((item, index) => (roundN(item.mos)))
-                }
-              ],
-            };
-            var chartOptions = {
-              title: {
-                display: true,
-                text: (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + getLabelText(planningUnitItemFilter[0].planningUnit.label, this.state.lang)
-              },
-              scales: {
-                yAxes: [{
-                  id: 'A',
-                  position: 'left',
-                  scaleLabel: {
-                    labelString: i18n.t('static.shipment.qty'),
-                    display: true,
-                    fontSize: "12",
-                    fontColor: 'black'
-                  },
-                  ticks: {
-                    beginAtZero: true,
-                    fontColor: 'black',
-                    callback: function (value) {
-                      var cell1 = value
-                      cell1 += '';
-                      var x = cell1.split('.');
-                      var x1 = x[0];
-                      var x2 = x.length > 1 ? '.' + x[1] : '';
-                      var rgx = /(\d+)(\d{3})/;
-                      while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                      }
-                      return x1 + x2;
-                    }
-                  }, gridLines: {
-                    color: 'rgba(171,171,171,1)',
-                    lineWidth: 0
-                  }
-                }, {
-                  id: 'B',
-                  position: 'right',
-                  scaleLabel: {
-                    labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                    fontColor: 'black',
-                    display: true,
-                  },
-                  ticks: {
-                    beginAtZero: true,
-                    fontColor: 'black',
-                    callback: function (value) {
-                      var cell1 = value
-                      cell1 += '';
-                      var x = cell1.split('.');
-                      var x1 = x[0];
-                      var x2 = x.length > 1 ? '.' + x[1] : '';
-                      var rgx = /(\d+)(\d{3})/;
-                      while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                      }
-                      return x1 + x2;
-                    }
-                  },
-                  gridLines: {
-                    color: 'rgba(171,171,171,1)',
-                    lineWidth: 0
-                  }
-                }],
-                xAxes: [{
-                  scaleLabel: {
-                    display: true,
-                    labelString: i18n.t('static.common.month'),
-                    fontColor: 'black',
-                    fontStyle: "normal",
-                    fontSize: "12"
-                  },
-                  ticks: {
-                    fontColor: 'black',
-                    fontStyle: "normal",
-                    fontSize: "12"
-                  },
-                  gridLines: {
-                    color: 'rgba(171,171,171,1)',
-                    lineWidth: 0
-                  }
-                }]
-              },
-              tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                  label: function (tooltipItem, data) {
-                    let label = data.labels[tooltipItem.index];
-                    let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                  }
-                }
-              },
-              maintainAspectRatio: false,
-              legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                  usePointStyle: true,
-                  fontColor: 'black'
-                }
-              }
-            }
-            var data = planningUnitItemFilter;
-            let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-            var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-            var planningUnit = planningUnitItemFilter[0].planningUnit
-            var conList = [];
-            var invList = [];
-            var shipList = [];
-            filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
-            filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
-            filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
-            var planningUnitexport = {
-              planningUnit: planningUnit,
-              firstMonthRegionCount: data.length > 0 ? data[0].regionCount : 1,
-              firstMonthRegionCountForStock: data.length > 0 ? data[0].regionCountForStock : 0,
-              data: filteredData,
-              bar: bar,
-              chartOptions: chartOptions,
-              inList: invList,
-              coList: conList,
-              shList: shipList,
-            }
-            PlanningUnitDataForExport.push(planningUnitexport)
-          })
+          var inventoryList = [];
+          var consumptionList = [];
+          var shipmentList = [];
+          var responseData = response.data[0];
+          let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+          var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+          filteredResponseData.map(c => {
+            c.inventoryInfo.map(i => inventoryList.push(i))
+            c.consumptionInfo.map(ci => consumptionList.push(ci))
+            c.shipmentInfo.map(si => shipmentList.push(si))
+          }
+          );
           this.setState({
-            PlanningUnitDataForExport: PlanningUnitDataForExport,
-            message: '', loading: false
-          }, () => {
-            setTimeout(() => {
-              if (report == 1) {
-                this.exportPDF()
-                document.getElementById("bars_div").style.display = 'none';
-              } else {
-                this.exportCSV()
-              }
-            }, 2000)
+            firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
+            firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
+            stockStatusList: filteredResponseData,
+            message: '', loading: false,
+            planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
+            inList: inventoryList,
+            coList: consumptionList,
+            shList: shipmentList
           })
-        }
-        ).catch(
+        }).catch(
           error => {
             this.setState({
               stockStatusList: [], loading: false
@@ -1987,7 +615,433 @@ class StockStatus extends Component {
             }
           }
         );
+
+    } else if (programId == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
+    } else {
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [], planningUnitLabel: '' });
     }
+  }
+  /**
+   * Fetches the data for exporting it in CSV or PDF based on the planning units selected
+   * @param {*} report This is the type of the export. 1 for PDF and 2 for CSV
+   */
+  exportData = (report) => {
+    this.setState({
+      exportModal: false
+    })
+    let programId = document.getElementById("programId").value;
+    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
+    var PlanningUnitDataForExport = [];
+    this.setState({ loading: true })
+    var inputjson = {
+      "programId": programId,
+      "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
+      "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+      "planningUnitIds": [...new Set(this.state.planningUnitIdsExport.map(item => item.value))],
+    }
+    ReportService.getStockStatusData(inputjson)
+      .then(response => {
+        var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
+          a = a.label.toLowerCase();
+          b = b.label.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+        sortedPlanningUnitData.map(plannningUnitItem => {
+          var planningUnitItemFilter = response.data.filter(c => c[0].planningUnit.id == plannningUnitItem.value)[0];
+          let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+          var filteredPlanningUnitData = planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
+          var bar = {
+            labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
+            datasets: [
+              {
+                label: i18n.t('static.supplyplan.exipredStock'),
+                yAxisID: 'A',
+                type: 'line',
+                stack: 7,
+                data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                showLine: false,
+                pointStyle: 'triangle',
+                pointBackgroundColor: '#ED8944',
+                pointBorderColor: '#212721',
+                pointRadius: 10
+              },
+              {
+                type: "line",
+                yAxisID: 'A',
+                label: i18n.t('static.supplyPlan.consumption'),
+                backgroundColor: 'transparent',
+                borderColor: '#ba0c2f',
+                ticks: {
+                  fontSize: 2,
+                  fontColor: 'transparent',
+                },
+                lineTension: 0,
+                showInLegend: true,
+                pointStyle: 'line',
+                pointRadius: 0,
+                yValueFormatString: "$#,##0",
+                data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
+              },
+              {
+                label: i18n.t('static.report.actualConsumption'),
+                yAxisID: 'A',
+                type: 'line',
+                stack: 7,
+                data: filteredPlanningUnitData.map((item, index) => (item.actualConsumptionQty)),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                showLine: false,
+                pointStyle: 'point',
+                pointBackgroundColor: '#ba0c2f',
+                pointBorderColor: '#ba0c2f',
+                pointRadius: 3
+              },
+              {
+                label: i18n.t('static.supplyPlan.delivered'),
+                yAxisID: 'A',
+                stack: 1,
+                backgroundColor: '#002f6c',
+                borderColor: '#002f6c',
+                pointBackgroundColor: '#002f6c',
+                pointBorderColor: '#002f6c',
+                pointHoverBackgroundColor: '#002f6c',
+                pointHoverBorderColor: '#002f6c',
+                data: filteredPlanningUnitData.map((item, index) => {
+                  let count = 0;
+                  (item.shipmentInfo.map((ele, index) => {
+                    ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+                  }))
+                  return count
+                })
+              },
+              {
+                label: i18n.t('static.supplyPlan.shipped'),
+                yAxisID: 'A',
+                stack: 1,
+                backgroundColor: '#49A4A1',
+                borderColor: '#49A4A1',
+                pointBackgroundColor: '#49A4A1',
+                pointBorderColor: '#49A4A1',
+                pointHoverBackgroundColor: '#49A4A1',
+                pointHoverBorderColor: '#49A4A1',
+                data: filteredPlanningUnitData.map((item, index) => {
+                  let count = 0;
+                  (item.shipmentInfo.map((ele, index) => {
+                    (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+                  }))
+                  return count
+                })
+              },
+              {
+                label: i18n.t('static.supplyPlan.approved'),
+                yAxisID: 'A',
+                stack: 1,
+                backgroundColor: '#0067B9',
+                borderColor: '#0067B9',
+                pointBackgroundColor: '#0067B9',
+                pointBorderColor: '#0067B9',
+                pointHoverBackgroundColor: '#0067B9',
+                pointHoverBorderColor: '#0067B9',
+                data: filteredPlanningUnitData.map((item, index) => {
+                  let count = 0;
+                  (item.shipmentInfo.map((ele, index) => {
+                    (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+                  }))
+                  return count
+                })
+              },
+              {
+                label: i18n.t('static.supplyPlan.planned'),
+                backgroundColor: '#A7C6ED',
+                borderColor: '#A7C6ED',
+                pointBackgroundColor: '#A7C6ED',
+                pointBorderColor: '#A7C6ED',
+                pointHoverBackgroundColor: '#A7C6ED',
+                pointHoverBorderColor: '#A7C6ED',
+                yAxisID: 'A',
+                stack: 1,
+                data: filteredPlanningUnitData.map((item, index) => {
+                  let count = 0;
+                  (item.shipmentInfo.map((ele, index) => {
+                    (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+                  }))
+                  return count
+                })
+              },
+              {
+                label: i18n.t('static.report.stock'),
+                yAxisID: 'A',
+                type: 'line',
+                borderColor: '#cfcdc9',
+                ticks: {
+                  fontSize: 2,
+                  fontColor: 'transparent',
+                },
+                lineTension: 0,
+                pointStyle: 'circle',
+                pointRadius: 0,
+                showInLegend: true,
+                data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
+              },
+              {
+                type: "line",
+                yAxisID: 'B',
+                label: i18n.t('static.report.minmonth'),
+                backgroundColor: 'rgba(255,193,8,0.2)',
+                borderColor: '#59cacc',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                fill: '+1',
+                backgroundColor: 'transparent',
+                ticks: {
+                  fontSize: 2,
+                  fontColor: 'transparent',
+                },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointRadius: 0,
+                yValueFormatString: "$#,##0",
+                lineTension: 0,
+                data: filteredPlanningUnitData.map((item, index) => (item.minMos))
+              }
+              , {
+                type: "line",
+                yAxisID: 'B',
+                label: i18n.t('static.report.maxmonth'),
+                backgroundColor: 'rgba(0,0,0,0)',
+                borderColor: '#59cacc',
+                borderStyle: 'dotted',
+                backgroundColor: 'transparent',
+                borderDash: [10, 10],
+                fill: true,
+                ticks: {
+                  fontSize: 2,
+                  fontColor: 'transparent',
+                },
+                lineTension: 0,
+                pointStyle: 'line',
+                pointRadius: 0,
+                showInLegend: true,
+                yValueFormatString: "$#,##0",
+                data: filteredPlanningUnitData.map((item, index) => (item.maxMos))
+              }
+              , {
+                type: "line",
+                yAxisID: 'B',
+                label: i18n.t('static.report.mos'),
+                borderColor: '#118b70',
+                backgroundColor: 'transparent',
+                ticks: {
+                  fontSize: 2,
+                  fontColor: 'transparent',
+                },
+                lineTension: 0,
+                showInLegend: true,
+                pointStyle: 'line',
+                pointRadius: 0,
+                yValueFormatString: "$#,##0",
+                data: filteredPlanningUnitData.map((item, index) => (roundN(item.mos)))
+              }
+            ],
+          };
+          var chartOptions = {
+            title: {
+              display: true,
+              text: (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")) + " - " + getLabelText(planningUnitItemFilter[0].planningUnit.label, this.state.lang)
+            },
+            scales: {
+              yAxes: [{
+                id: 'A',
+                position: 'left',
+                scaleLabel: {
+                  labelString: i18n.t('static.shipment.qty'),
+                  display: true,
+                  fontSize: "12",
+                  fontColor: 'black'
+                },
+                ticks: {
+                  beginAtZero: true,
+                  fontColor: 'black',
+                  callback: function (value) {
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+                  }
+                }, gridLines: {
+                  color: 'rgba(171,171,171,1)',
+                  lineWidth: 0
+                }
+              }, {
+                id: 'B',
+                position: 'right',
+                scaleLabel: {
+                  labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                  fontColor: 'black',
+                  display: true,
+                },
+                ticks: {
+                  beginAtZero: true,
+                  fontColor: 'black',
+                  callback: function (value) {
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+                  }
+                },
+                gridLines: {
+                  color: 'rgba(171,171,171,1)',
+                  lineWidth: 0
+                }
+              }],
+              xAxes: [{
+                scaleLabel: {
+                  display: true,
+                  labelString: i18n.t('static.common.month'),
+                  fontColor: 'black',
+                  fontStyle: "normal",
+                  fontSize: "12"
+                },
+                ticks: {
+                  fontColor: 'black',
+                  fontStyle: "normal",
+                  fontSize: "12"
+                },
+                gridLines: {
+                  color: 'rgba(171,171,171,1)',
+                  lineWidth: 0
+                }
+              }]
+            },
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips,
+              callbacks: {
+                label: function (tooltipItem, data) {
+                  let label = data.labels[tooltipItem.index];
+                  let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                  var cell1 = value
+                  cell1 += '';
+                  var x = cell1.split('.');
+                  var x1 = x[0];
+                  var x2 = x.length > 1 ? '.' + x[1] : '';
+                  var rgx = /(\d+)(\d{3})/;
+                  while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                  }
+                  return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                }
+              }
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                fontColor: 'black'
+              }
+            }
+          }
+          var data = planningUnitItemFilter;
+          let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+          var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+          var planningUnit = planningUnitItemFilter[0].planningUnit
+          var conList = [];
+          var invList = [];
+          var shipList = [];
+          filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
+          filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
+          filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
+          var planningUnitexport = {
+            planningUnit: planningUnit,
+            firstMonthRegionCount: data.length > 0 ? data[0].regionCount : 1,
+            firstMonthRegionCountForStock: data.length > 0 ? data[0].regionCountForStock : 0,
+            data: filteredData,
+            bar: bar,
+            chartOptions: chartOptions,
+            inList: invList,
+            coList: conList,
+            shList: shipList,
+          }
+          PlanningUnitDataForExport.push(planningUnitexport)
+        })
+        this.setState({
+          PlanningUnitDataForExport: PlanningUnitDataForExport,
+          message: '', loading: false
+        }, () => {
+          setTimeout(() => {
+            if (report == 1) {
+              this.exportPDF()
+              document.getElementById("bars_div").style.display = 'none';
+            } else {
+              this.exportCSV()
+            }
+          }, 2000)
+        })
+      }
+      ).catch(
+        error => {
+          this.setState({
+            stockStatusList: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+
   }
   /**
    * Retrieves the list of programs.
@@ -2009,12 +1063,12 @@ class StockStatus extends Component {
           this.setState({
             programs: proList, message: '',
             loading: false
-          }, () => { this.consolidatedProgramList() })
+          })
         }).catch(
           error => {
             this.setState({
               programs: [], loading: false
-            }, () => { this.consolidatedProgramList() })
+            })
             if (error.message === "Network Error") {
               this.setState({
                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -2054,327 +1108,471 @@ class StockStatus extends Component {
         );
     } else {
       this.setState({ loading: false })
-      this.consolidatedProgramList()
     }
-  }
-  /**
-   * Consolidates the list of programs obtained from Server and local programs.
-   */
-  consolidatedProgramList = () => {
-    const { programs } = this.state
-    var proList = programs;
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-      };
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            var f = 0
-            for (var k = 0; k < this.state.programs.length; k++) {
-              if (this.state.programs[k].programId == programData.programId) {
-                f = 1;
-              }
-            }
-            if (f == 0) {
-              proList.push(programData)
-            }
-          }
-        }
-        if (proList.length == 1) {
-          this.setState({
-            programs: proList.sort(function (a, b) {
-              a = a.programCode.toLowerCase();
-              b = b.programCode.toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
-            programId: proList[0].programId
-          }, () => {
-            this.filterVersion();
-          })
-        } else if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
-          this.setState({
-            programs: proList.sort(function (a, b) {
-              a = a.programCode.toLowerCase();
-              b = b.programCode.toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
-            programId: localStorage.getItem("sesProgramIdReport")
-          }, () => {
-            this.filterVersion();
-          })
-        } else {
-          this.setState({
-            programs: proList.sort(function (a, b) {
-              a = a.programCode.toLowerCase();
-              b = b.programCode.toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            })
-          })
-        }
-      }.bind(this);
-    }.bind(this);
-  }
-  /**
-   * Filters versions based on the selected program ID and updates the state accordingly.
-   * Sets the selected program ID in local storage.
-   * Fetches version list for the selected program and updates the state with the fetched versions.
-   * Handles error cases including network errors, session expiry, access denial, and other status codes.
-   */
-  filterVersion = () => {
-    let programId = this.state.programId;
-    if (programId != 0) {
-      localStorage.setItem("sesProgramIdReport", programId);
-      const program = this.state.programs.filter(c => c.programId == programId)
-      if (program.length == 1) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-          this.setState({
-            versions: []
-          }, () => {
-            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
-              .then(response => {
-                this.setState({
-                  versions: []
-                }, () => {
-                  this.setState({
-                    versions: (response.data.filter(function (x, i, a) {
-                      return a.indexOf(x) === i;
-                    }))
-                  }, () => {
-                    this.consolidatedVersionList(programId)
-                  });
-                });
-              }).catch(
-                error => {
-                  this.setState({
-                    programs: [], loading: false
-                  })
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                      loading: false
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-                      case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                          loading: false
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                          loading: false
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: 'static.unkownError',
-                          loading: false
-                        });
-                        break;
-                    }
-                  }
-                }
-              );
-          });
-        } else {
-          this.setState({
-            versions: []
-          }, () => { this.consolidatedVersionList(programId) })
-        }
-      } else {
-        this.setState({
-          versions: []
-        })
-      }
-    } else {
-      this.setState({
-        versions: []
-      })
-    }
-  }
-  /**
-   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
-   * Filters out duplicate versions and reverses the list.
-   * Sets the version list in the state and triggers fetching of planning units.
-   * Handles cases where a version is selected from local storage or the default version is selected.
-   * @param {number} programId - The ID of the selected program
-   */
-  consolidatedVersionList = (programId) => {
-    const { versions } = this.state
-    var verList = versions;
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var program = transaction.objectStore('programData');
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-      };
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId && myResult[i].programId == programId) {
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-            var programData = databytes.toString(CryptoJS.enc.Utf8)
-            var version = JSON.parse(programData).currentVersion
-            version.versionId = `${version.versionId} (Local)`
-            verList.push(version)
-          }
-        }
-        let versionList = verList.filter(function (x, i, a) {
-          return a.indexOf(x) === i;
-        });
-        versionList.reverse();
-        if (verList.length == 1) {
-          this.setState({
-            versions: versionList,
-            versionId: verList[0].versionId
-          }, () => {
-            this.getPlanningUnit();
-          })
-        } else if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
-          if (versionVar.length != 0) {
-            this.setState({
-              versions: versionList,
-              versionId: localStorage.getItem("sesVersionIdReport")
-            }, () => {
-              this.getPlanningUnit();
-            })
-          } else {
-            this.setState({
-              versions: versionList,
-              versionId: versionList[0].versionId
-            }, () => {
-              this.getPlanningUnit();
-            })
-          }
-        } else {
-          this.setState({
-            versions: versionList,
-            versionId: versionList[0].versionId
-          }, () => {
-            this.getPlanningUnit();
-          })
-        }
-      }.bind(this);
-    }.bind(this)
   }
   /**
    * Retrieves the list of planning units for a selected program and version.
    */
   getPlanningUnit = () => {
     let programId = document.getElementById("programId").value;
-    let versionId = document.getElementById("versionId").value;
     this.setState({
       planningUnits: [],
       planningUnitsMulti: [],
     }, () => {
-      if (versionId == 0) {
-        this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
-      } else {
-        localStorage.setItem("sesVersionIdReport", versionId);
-        if (versionId.includes('Local')) {
-          var db1;
-          getDatabase();
-          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-            var planningunitRequest = planningunitOs.getAll();
-            planningunitRequest.onerror = function (event) {
-            };
-            planningunitRequest.onsuccess = function (e) {
-              var myResult = [];
-              myResult = planningunitRequest.result;
-              var programId = (document.getElementById("programId").value).split("_")[0];
-              var proList = []
-              for (var i = 0; i < myResult.length; i++) {
-                if (myResult[i].program.id == programId && myResult[i].active == true) {
-                  proList[i] = myResult[i]
-                }
-              }
-              var planningUnitsMulti = [];
-              proList.sort(function (a, b) {
-                a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                return a < b ? -1 : a > b ? 1 : 0;
-              }).map(item => {
-                planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
-              })
-              var lang = this.state.lang;
-              this.setState({
-                planningUnits: proList.sort(function (a, b) {
-                  a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                  b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-                  return a < b ? -1 : a > b ? 1 : 0;
-                }), planningUnitsMulti: planningUnitsMulti, message: ''
-              }, () => {
-                this.filterData();
-              })
-            }.bind(this);
-          }.bind(this)
-        }
-        else {
-          ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-            var listArray = response.data;
-            var planningUnitsMulti = []
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); 
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); 
-              return itemLabelA > itemLabelB ? 1 : -1;
-            }).map(item => {
-              planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
-            });
+      ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
+        var listArray = response.data;
+        var planningUnitsMulti = []
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+          var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+          return itemLabelA > itemLabelB ? 1 : -1;
+        }).map(item => {
+          planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
+        });
+        this.setState({
+          planningUnits: listArray,
+          planningUnitsMulti: planningUnitsMulti,
+          message: ''
+        }, () => {
+          this.filterData();
+        })
+      }).catch(
+        error => {
+          this.setState({
+            planningUnits: [],
+            planningUnitsMulti: []
+          })
+          if (error.message === "Network Error") {
             this.setState({
-              planningUnits: listArray,
-              planningUnitsMulti: planningUnitsMulti,
-              message: ''
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+    });
+  }
+  /**
+    * Sets the planning unit based on the provided event data.
+    * @param {Object} e - Event data containing planning unit information.
+    */
+  setPlanningUnit(e) {
+    if (this.state.yaxisEquUnit > 0) {
+      var selectedText = e.map(item => item.label);
+      this.setState({
+        planningUnitIds: e,
+        planningUnitLabels: selectedText,
+        show: false,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false
+      }, () => {
+        document.getElementById("consumptionAdjusted").checked = false;
+        // this.fetchData();
+      })
+    } else {
+      if (e.target.value != -1) {
+        this.setState({
+          planningUnitId: e.target.value,
+          planningUnitIds: [{ "label": document.getElementById("planningUnitId").selectedOptions[0].text, "value": e.target.value }],
+          planningUnitLabels: [document.getElementById("planningUnitId").selectedOptions[0].text],
+          show: false,
+          dataList: [],
+          consumptionAdjForStockOutId: false,
+          loading: false
+        }, () => {
+          document.getElementById("consumptionAdjusted").checked = false;
+          // this.fetchData();
+        })
+      } else {
+        this.setState({
+          planningUnitId: e.target.value,
+          planningUnitIds: [],
+          planningUnitLabels: [],
+          show: false,
+          dataList: [],
+          consumptionAdjForStockOutId: false,
+          loading: false
+        }, () => {
+          document.getElementById("consumptionAdjusted").checked = false;
+          // this.fetchData();
+        })
+      }
+    }
+  }
+  /**
+  * Sets the y-axis equivalent unit ID and triggers data fetching.
+  * @param {Object} e - Event data containing the y-axis equivalent unit ID.
+  */
+  setYaxisEquUnitId(e) {
+    var yaxisEquUnit = e.target.value;
+    this.setState({
+      yaxisEquUnit: yaxisEquUnit,
+      loading: false
+    }, () => {
+      // this.fetchData();
+    })
+  }
+  /**
+  * Retrieves planning units and forecasting units based on the selected program and version, and updates the state accordingly.
+  */
+  getPlanningUnitAndForcastingUnit = () => {
+    let programId = [];
+    programId.push(document.getElementById("programId").value);
+    var lang = this.state.lang;
+    this.setState({
+      planningUnits: [],
+      forecastingUnits: [],
+      allForecastingUnits: [],
+      show: false,
+      loading: true
+    }, () => {
+
+      var proList = [];
+
+      // AuthenticationService.setupAxiosInterceptors();
+      RealmCountryService.getRealmCountryPlanningUnitByProgramId(programId).then(response => {
+        var listArray = response.data;
+        
+        var planingUnitList = listArray.map(c => c.planningUnit);
+        const ids = planingUnitList.map(o => o.id);
+        const planningUnitList1 = planingUnitList.filter(({ id }, index) => !ids.includes(id, index + 1));
+        planningUnitList1.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
+
+        listArray.sort((a, b) => {
+          var itemLabelA = getLabelText(a.label, lang).toUpperCase(); // ignore upper and lowercase
+          var itemLabelB = getLabelText(b.label, lang).toUpperCase(); // ignore upper and lowercase                   
+          return itemLabelA > itemLabelB ? 1 : -1;
+        });
+        let planningUnitList = planningUnitList1;
+        let realmCountryPlanningUnitList = listArray;
+
+        let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
+        
+        if (yaxisEquUnitId != -1) {//Yes
+
+          let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
+
+          let newRealmCountryPlanningUnitList = [];
+          let newPlanningUnitList = [];
+          for (var i = 0; i < planningUnitList.length; i++) {
+            let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].id);
+            if (temp.length > 0) {
+              newPlanningUnitList.push(planningUnitList[i]);
+            }
+          }
+
+          for (var i = 0; i < realmCountryPlanningUnitList.length; i++) {
+            let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].forecastingUnit.id);
+            if (temp.length > 0) {
+              newRealmCountryPlanningUnitList.push(realmCountryPlanningUnitList[i]);
+            }
+          }
+
+          var yaxisEquUnitt = document.getElementById("yaxisEquUnit");
+          var selectedText = yaxisEquUnitt.options[yaxisEquUnitt.selectedIndex].text;
+
+          newRealmCountryPlanningUnitList.sort(function (a, b) {
+            a = getLabelText(a.label, lang).toLowerCase();
+            b = getLabelText(b.label, lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          });
+
+          newPlanningUnitList.sort(function (a, b) {
+            a = getLabelText(a.label, lang).toLowerCase();
+            b = getLabelText(b.label, lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          })
+
+          this.setState({
+            realmCountryPlanningUnits: newRealmCountryPlanningUnitList,
+            planningUnits: newPlanningUnitList,
+            allPlanningUnits: planningUnitList,
+            realmCountryPlanningUnitValues: newRealmCountryPlanningUnitList.map((item, i) => {
+              return ({ label: item.label.label_en, value: item.realmCountryPlanningUnitId })
+
+            }, this),
+            realmCountryPlanningUnitLabels: newRealmCountryPlanningUnitList.map((item, i) => {
+              return (item.label.label_en)
+            }, this),
+            planningUnitValues: newPlanningUnitList.map((item, i) => {
+              return ({ label: getLabelText(item.label, lang), value: item.id })
+
+            }, this),
+            planningUnitLabels: newPlanningUnitList.map((item, i) => {
+              return (getLabelText(item.label, lang))
+            }, this),
+            equivalencyUnitLabel: selectedText,
+            filteredProgramEQList: filteredProgramEQList,
+            loading: false
+          }, () => {
+            this.getEquivalencyUnitData();
+            // this.fetchData();
+          })
+        } else {//NO
+          this.setState({
+            realmCountryPlanningUnits: realmCountryPlanningUnitList.sort(function (a, b) {
+              a = getLabelText(a.planningUnit.label, lang).toLowerCase();
+              b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            planningUnits: planningUnitList.sort(function (a, b) {
+              a = getLabelText(a.label, lang).toLowerCase();
+              b = getLabelText(b.label, lang).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            allPlanningUnits: planningUnitList,
+            realmCountryPlanningUnitValues: realmCountryPlanningUnitList.map((item, i) => {
+              return ({ label: item.label.label_en, value: item.realmCountryPlanningUnitId })
+            }, this),
+            realmCountryPlanningUnitLabels: realmCountryPlanningUnitList.map((item, i) => {
+              return (item.label.label_en)
+            }, this),
+            planningUnitValues: planningUnitList.map((item, i) => {
+              return ({ label: getLabelText(item.label, lang), value: item.id })
+            }, this),
+            planningUnitLabels: planningUnitList.map((item, i) => {
+              return (getLabelText(item.label, lang))
+            }, this),
+            equivalencyUnitLabel: '',
+            loading: false
+          }, () => {
+            this.getEquivalencyUnitData();
+            // this.fetchData();
+          })
+        }
+      }).catch(
+        error => {
+          this.setState({
+            planningUnits: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              // message: 'static.unkownError',
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+
+
+    });
+
+  }
+  /**
+   * Updates the selected view mode in the state and triggers actions to update the UI.
+   * @param {Object} e - The event object containing the selected view mode value.
+   */
+  setViewById(e) {
+    var viewById = e.target.value;
+    this.setState({
+      viewById: viewById,
+      consumptionData: [],
+      monthArrayList: [],
+      errorValues: [],
+      regionListFiltered: [],
+      show: false,
+      loading: false
+    }, () => {
+      if (viewById == 2) {
+        document.getElementById("forecastingUnitDiv").style.display = "block";
+        document.getElementById("planningUnitDiv").style.display = "none";
+        // this.fetchData();
+      } else {
+        document.getElementById("planningUnitDiv").style.display = "block";
+        document.getElementById("forecastingUnitDiv").style.display = "none";
+        // this.fetchData();
+      }
+    })
+  }
+  /**
+   * Updates the selected forecasting unit in the state and triggers actions to update the UI.
+   * @param {Object} e - The event object containing the selected forecasting unit value.
+   */
+  setForecastingUnit(e) {
+    if (this.state.yaxisEquUnit > 0) {
+      // var forecastingUnitId = e.target.value;
+      var selectedText = e.map(item => item.label);
+      this.setState({
+        forecastingUnitIds: e,
+        forecastingUnitLabels: selectedText,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false
+      }, () => {
+        document.getElementById("consumptionAdjusted").checked = false;
+        // this.fetchData();
+      })
+    } else {
+      if (e.target.value != -1) {
+        this.setState({
+          forecastingUnitId: e.target.value,
+          forecastingUnitIds: [{ "label": document.getElementById("forecastingUnitId").selectedOptions[0].text, "value": e.target.value }],
+          forecastingUnitLabels: [document.getElementById("forecastingUnitId").selectedOptions[0].text],
+          dataList: [],
+          consumptionAdjForStockOutId: false,
+          loading: false
+        }, () => {
+          document.getElementById("consumptionAdjusted").checked = false;
+          // this.fetchData();
+        })
+      } else {
+        this.setState({
+          forecastingUnitId: e.target.value,
+          forecastingUnitIds: [],
+          forecastingUnitLabels: [],
+          dataList: [],
+          consumptionAdjForStockOutId: false,
+          loading: false
+        }, () => {
+          document.getElementById("consumptionAdjusted").checked = false;
+          // this.fetchData();
+        })
+      }
+    }
+  }
+  /**
+   * Fetches equivalency unit data based on the selected program and version.
+   */
+  getEquivalencyUnitData() {
+    let programId = document.getElementById("programId").value;
+    this.setState({
+      loading: true
+    }, () => {
+      if (programId > 0) {
+        EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
+          if (response.status == 200) {
+            var listArray = response.data;
+
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+              var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+
+            var filteredEquList = []
+            for (var i = 0; i < listArray.length; i++) {
+              if (listArray[i].program != null) {
+                if (listArray[i].program.id == programId && listArray[i].active == true) {
+                  filteredEquList.push(listArray[i]);
+                }
+              } else {
+                filteredEquList.push(listArray[i]);
+              }
+            }
+
+            let fuList = this.state.allForecastingUnits;
+            let newList = [];
+            for (var i = 0; i < filteredEquList.length; i++) {
+              let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+              if (temp.length > 0) {
+                newList.push(filteredEquList[i]);
+              }
+            }
+
+            filteredEquList = newList;
+
+            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
+            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
+            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
+
+            var lang = this.state.lang;
+            this.setState({
+              equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
+                a = getLabelText(a.label, lang).toLowerCase();
+                b = getLabelText(b.label, lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+              }),
+              programEquivalencyUnitList: filteredEquList,
             }, () => {
-              this.filterData();
+              // this.fetchData();
             })
-          }).catch(
-            error => {
-              this.setState({
-                planningUnits: [],
-                planningUnitsMulti: []
+          } else {
+            this.setState({
+              message: response.data.messageCode, loading: false
+            },
+              () => {
+                hideSecondComponent();
               })
+          }
+
+        })
+          .catch(
+            error => {
               if (error.message === "Network Error") {
                 this.setState({
+                  // message: 'static.unkownError',
                   message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                  loading: false
+                  loading: false,
+                  color: "#BA0C2F",
                 });
               } else {
                 switch (error.response ? error.response.status : "") {
+
                   case 401:
                     this.props.history.push(`/login/static.message.sessionExpired`)
                     break;
@@ -2385,29 +1583,63 @@ class StockStatus extends Component {
                   case 404:
                   case 406:
                     this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
+                      message: error.response.data.messageCode,
+                      loading: false,
+                      color: "#BA0C2F",
                     });
                     break;
                   case 412:
                     this.setState({
-                      message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                      loading: false
+                      message: error.response.data.messageCode,
+                      loading: false,
+                      color: "#BA0C2F",
                     });
                     break;
                   default:
                     this.setState({
                       message: 'static.unkownError',
-                      loading: false
+                      loading: false,
+                      color: "#BA0C2F",
                     });
                     break;
                 }
               }
             }
           );
-        }
       }
-    });
+      this.setState({
+        loading: false
+      })
+    })
+  }
+  /**
+  * Handles the change event for the Y-axis equivalency unit.
+  * @param {object} e - The event object
+  */
+  yAxisChange(e) {
+    var yaxisEquUnit = e.target.value;
+    this.setState({
+      yaxisEquUnit: yaxisEquUnit,
+      planningUnits: [],
+      planningUnitIds: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      foreastingUnits: [],
+      forecastingUnitIds: [],
+      foreastingUnitValues: [],
+      foreastingUnitLabels: [],
+      planningUnitId: "",
+      forecastingUnitId: "",
+      dataList: [],
+      loading: false
+    }, () => {
+      if (yaxisEquUnit > 0) {//Yes
+        this.getPlanningUnitAndForcastingUnit();
+      } else {//NO
+        this.getPlanningUnitAndForcastingUnit();
+        // this.fetchData();
+      }
+    })
   }
   /**
    * Calls the get programs function on page load
@@ -2440,15 +1672,36 @@ class StockStatus extends Component {
    * @returns {JSX.Element} - Stock Status report table.
    */
   render() {
+    const { equivalencyUnitList } = this.state;
+    let equivalencyUnitList1 = equivalencyUnitList.length > 0
+      && equivalencyUnitList.map((item, i) => {
+        return (
+          <option key={i} value={item.equivalencyUnitId}>
+            {item.label.label_en}
+          </option>
+        )
+      }, this);
+
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnit.id}>
-            {getLabelText(item.planningUnit.label, this.state.lang)}
+          <option key={i} value={item.id}>
+            {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
+
+    const { realmCountryPlanningUnits } = this.state;
+    let realmCountryPlanningUnitList = realmCountryPlanningUnits.length > 0
+      && realmCountryPlanningUnits.map((item, i) => {
+        return (
+          <option key={i} value={item.realmCountryPlanningUnitId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
+
     const { programs } = this.state;
     let programList = programs.length > 0
       && programs.map((item, i) => {
@@ -2458,19 +1711,19 @@ class StockStatus extends Component {
           </option>
         )
       }, this);
-    const { versions } = this.state;
-    let versionList = versions.length > 0
-      && versions.map((item, i) => {
-        return (
-          <option key={i} value={item.versionId}>
-            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
-          </option>
-        )
-      }, this);
+
+    let puList = planningUnits.length > 0 && planningUnits.map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
+    }, this);
+
+    let rcpuList = realmCountryPlanningUnits.length > 0 && realmCountryPlanningUnits.map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.realmCountryPlanningUnitId, value: item.realmCountryPlanningUnitId })
+    }, this);
+
     const options = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")) + " - " + this.state.planningUnitLabel : entityname1
       },
       scales: {
         yAxes: [{
@@ -2555,20 +1808,20 @@ class StockStatus extends Component {
           label: function (tooltipItem, data) {
             if (tooltipItem.datasetIndex == 2) {
               return "";
-          } else {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            } else {
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
           }
         }
         , intersect: false
@@ -2586,7 +1839,7 @@ class StockStatus extends Component {
     const options1 = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")) + " - " + this.state.planningUnitLabel : entityname1
       },
       scales: {
         yAxes: [{
@@ -2638,7 +1891,7 @@ class StockStatus extends Component {
         }]
       },
       tooltips: {
-        mode:'nearest',
+        mode: 'nearest',
         intersect: false,
         // enabled: false,
         // custom: CustomTooltips,
@@ -2646,20 +1899,20 @@ class StockStatus extends Component {
           label: function (tooltipItem, data) {
             if (tooltipItem.datasetIndex == 2) {
               return "";
-          } else {
-            let label = data.labels[tooltipItem.index];
-            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            } else {
+              let label = data.labels[tooltipItem.index];
+              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
             }
-            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-          }
           }
         }
       },
@@ -2884,7 +2137,7 @@ class StockStatus extends Component {
       datasets: datasets,
     };
     const { rangeValue } = this.state
-    var ppu = (this.state.planningUnits.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0])
+    var ppu = (this.state.planningUnits.filter(c => c.id == document.getElementById("planningUnitId").value)[0])
     return (
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} />
@@ -2943,40 +2196,130 @@ class StockStatus extends Component {
                           </InputGroup>
                         </div>
                       </FormGroup>
-                      <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
-                        <div className="controls">
-                          <InputGroup>
-                            <Input
-                              type="select"
-                              name="versionId"
-                              id="versionId"
-                              bsSize="sm"
-                              onChange={(e) => { this.versionChange(e); }}
-                              value={this.state.versionId}
-                            >
-                              <option value="0">{i18n.t('static.common.select')}</option>
-                              {versionList}
-                            </Input>
-                          </InputGroup>
-                        </div>
-                      </FormGroup>
-                      <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                      <FormGroup className="col-md-3" id="equivelencyUnitDiv">
+                        <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
                         <div className="controls ">
                           <InputGroup>
                             <Input
                               type="select"
-                              name="planningUnitId"
-                              id="planningUnitId"
+                              name="yaxisEquUnit"
+                              id="yaxisEquUnit"
                               bsSize="sm"
-                              onChange={this.filterData}
+                              value={this.state.yaxisEquUnit}
+                              onChange={(e) => { this.yAxisChange(e); }}
+                            // onChange={(e) => { this.setYaxisEquUnitId(e); }}
+                            // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
-                              {planningUnitList}
+                              <option value="-1">{i18n.t('static.program.no')}</option>
+                              {equivalencyUnitList1}
                             </Input>
+
                           </InputGroup>
                         </div>
+                      </FormGroup>
+
+                      <FormGroup className="col-md-3">
+                        <FormGroup check inline>
+                          <Input
+                            type="radio"
+                            id="viewById"
+                            name="viewById"
+                            value={"1"}
+                            checked={this.state.viewById == 1}
+                            title={i18n.t('static.report.planningUnit')}
+                            onChange={this.setViewById}
+                          />
+                          <Label
+                            className="form-check-label"
+                            // check htmlFor="inline-radio1"
+                            title={i18n.t('static.report.planningUnit')}>
+                            {i18n.t('static.report.planningUnit')}
+                          </Label>
+                        </FormGroup>
+                        <FormGroup check inline>
+                          <Input
+                            type="radio"
+                            id="viewById"
+                            name="viewById"
+                            value={"2"}
+                            checked={this.state.viewById == 2}
+                            title={i18n.t('static.dashboard.forecastingunit')}
+                            onChange={this.setViewById}
+                          />
+                          <Label
+                            className="form-check-label"
+                            // check htmlFor="inline-radio1"
+                            title={i18n.t('static.dashboard.forecastingunit')}>
+                            {i18n.t('static.dashboard.forecastingunit')}
+                          </Label>
+                        </FormGroup>
+                        <FormGroup id="forecastingUnitDiv" style={{ display: "none" }}>
+                          <div className="controls">
+                            {this.state.yaxisEquUnit == -1 && <InputGroup>
+                              <Input
+                                type="select"
+                                name="forecastingUnitId"
+                                id="forecastingUnitId"
+                                value={this.state.forecastingUnitId}
+                                onChange={(e) => { this.setForecastingUnit(e); }}
+                                bsSize="sm"
+                                className="selectWrapText"
+                              >
+                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                {realmCountryPlanningUnits.length > 0
+                                  && realmCountryPlanningUnits.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.realmCountryPlanningUnitId}>
+                                        {item.label.label_en + ' | ' + item.realmCountryPlanningUnitId}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup>}
+                            {this.state.yaxisEquUnit != -1 && <MultiSelect
+                              bsSize="sm"
+                              name="forecastingUnitId"
+                              id="forecastingUnitId"
+                              value={this.state.forecastingUnitIds}
+                              onChange={(e) => { this.setForecastingUnit(e); }}
+                              options={rcpuList && rcpuList.length > 0 ? rcpuList : []}
+                            />}
+                          </div>
+                        </FormGroup>
+                        <FormGroup id="planningUnitDiv">
+                          <div className="controls">
+                            {this.state.yaxisEquUnit == -1 && <InputGroup>
+                              <Input
+                                type="select"
+                                name="planningUnitId"
+                                id="planningUnitId"
+                                bsSize="sm"
+                                //  onChange={this.fetchData}
+                                value={this.state.planningUnitId}
+                                onChange={(e) => { this.setPlanningUnit(e); }}
+                                className="selectWrapText"
+                              >
+                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                {planningUnits.length > 0
+                                  && planningUnits.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.id}>
+                                        {item.label.label_en + ' | ' + item.id}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup>}
+                            {this.state.yaxisEquUnit != -1 && <MultiSelect
+                              bsSize="sm"
+                              name="planningUnitId"
+                              id="planningUnitId"
+                              value={this.state.planningUnitIds}
+                              onChange={(e) => { this.setPlanningUnit(e); }}
+                              options={puList && puList.length > 0 ? puList : []}
+                            />}
+                          </div>
+                        </FormGroup>
                       </FormGroup>
                     </div>
                   </div>
