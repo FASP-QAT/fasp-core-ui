@@ -271,6 +271,9 @@ class ShipmentGlobalDemandView extends Component {
             this.state.planningUnitLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
             csvRow.push('')
+            this.state.fundingSourceTypeLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
             this.state.fundingSourceLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
             csvRow.push('')
@@ -280,6 +283,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
             csvRow.push('"' + (i18n.t('static.shipment.groupByProcurementAgentType') + ' : ' + (this.state.procurementAgentTypeId ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            // csvRow.push('')
+            // csvRow.push('"' + (i18n.t('static.shipment.groupByFundingSourceType') + ' : ' + (this.state.groupByFundingSourceType ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
         } else {
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
@@ -394,7 +399,19 @@ class ShipmentGlobalDemandView extends Component {
         doc.setTextColor("#002f6c");
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
+
+        var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        for (var i = 0; i < fundingSourceTypeText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            };
+            doc.text(doc.internal.pageSize.width / 8, y, fundingSourceTypeText[i]);
+            y = y + 10
+        }
+
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
         for (var i = 0; i < fundingSourceText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -750,7 +767,9 @@ class ShipmentGlobalDemandView extends Component {
                             var planningUnitSplit = result1.filter(function (itm, i, a) {
                                 return i == a.indexOf(itm);
                             });
+                            console.log('offline- shipmentStatusFilter: ',shipmentStatusFilter);
                             let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: (item.productCost * item.currency.conversionRateToUsd) + (item.freightCost * item.currency.conversionRateToUsd) } });
+                            console.log('\noffline- preFundingSourceSplit:',preFundingSourceSplit);
                             let fundingSourceSplit = Object.values(preFundingSourceSplit.reduce((a, { fundingSource, amount }) => {
                                 if (!a[fundingSource.id])
                                     a[fundingSource.id] = Object.assign({}, { fundingSource, amount });
