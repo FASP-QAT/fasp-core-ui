@@ -285,11 +285,11 @@ class CompareAndSelectScenario extends Component {
                 loading: false
             }, () => {
                 this.setMonth1List();
-                if (this.state.viewById == 1) {
-                    document.getElementById("planningUnitDiv").style.display = "block";
-                } else {
-                    document.getElementById("planningUnitDiv").style.display = "none";
-                }
+                // if (this.state.viewById == 1) {
+                //     document.getElementById("planningUnitDiv").style.display = "block";
+                // } else {
+                //     document.getElementById("planningUnitDiv").style.display = "none";
+                // }
                 this.scenarioOrderChanged(selectedTreeScenarioId)
             })
         } else {
@@ -690,11 +690,11 @@ class CompareAndSelectScenario extends Component {
                     if (planningUnitId > 0) {
                         this.showData();
                     }
-                    if ((viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById) == 3) {
-                        document.getElementById("equivalencyUnitDiv").style.display = "block";
-                    } else if (viewById == 3) {
-                        document.getElementById("equivalencyUnitDiv").style.display = "none";
-                    }
+                    // if ((viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById) == 3) {
+                    //     document.getElementById("equivalencyUnitDiv").style.display = "block";
+                    // } else if (viewById == 3) {
+                    //     document.getElementById("equivalencyUnitDiv").style.display = "none";
+                    // }
                 })
             } else {
                 this.setState({
@@ -1556,21 +1556,21 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             viewById: viewById,
         }, () => {
-            if (viewById == 1) {
-                document.getElementById("planningUnitDiv").style.display = "block";
-            } else {
-                document.getElementById("planningUnitDiv").style.display = "none";
-            }
-            if (viewById == 2) {
-                document.getElementById("forecastingUnitDiv").style.display = "block";
-            } else {
-                document.getElementById("forecastingUnitDiv").style.display = "none";
-            }
-            if (viewById == 3) {
-                document.getElementById("equivalencyUnitDiv").style.display = "block";
-            } else {
-                document.getElementById("equivalencyUnitDiv").style.display = "none";
-            }
+            // if (viewById == 1) {
+            //     document.getElementById("planningUnitDiv").style.display = "block";
+            // } else {
+            //     document.getElementById("planningUnitDiv").style.display = "none";
+            // }
+            // if (viewById == 2) {
+            //     document.getElementById("forecastingUnitDiv").style.display = "block";
+            // } else {
+            //     document.getElementById("forecastingUnitDiv").style.display = "none";
+            // }
+            // if (viewById == 3) {
+            //     document.getElementById("equivalencyUnitDiv").style.display = "block";
+            // } else {
+            //     document.getElementById("equivalencyUnitDiv").style.display = "none";
+            // }
             this.buildJexcel()
         })
     }
@@ -2051,7 +2051,7 @@ class CompareAndSelectScenario extends Component {
                                             <br></br>
                                             <Col md="12 pl-0">
                                                 <div className="row">
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-4">
                                                         <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
@@ -2102,66 +2102,8 @@ class CompareAndSelectScenario extends Component {
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
-                                                                    bsSize="sm"
-                                                                    disabled={true}
-                                                                    onChange={(e) => this.setPlanningUnitId(e)}
-                                                                    value={this.state.planningUnitId}
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnits}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="foreccastingUnitId"
-                                                                    id="forecastingUnitId"
-                                                                    value={this.state.forecastingUnitId}
-                                                                    disabled={true}
-                                                                    onChange={this.setForecastingUnit}
-                                                                    bsSize="sm"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {forecastingUnits}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                    name="equivalencyUnitId"
-                                                                    id="equivalencyUnitId"
-                                                                    value={this.state.equivalencyUnitId}
-                                                                    onChange={this.setEquivalencyUnit}
-                                                                    bsSize="sm"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {equivalencies}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-2">
+                                                    
+                                                    <FormGroup className="col-md-4">
                                                         <div className="pt-lg-2 col-md-12">
                                                             <Input
                                                                 className="form-check-input"
