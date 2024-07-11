@@ -2455,7 +2455,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     type: 'line',
                     yAxisID: 'B',
                     backgroundColor: 'rgba(0,0,0,0)',
-                    borderColor: '#BA0C2F',
+                    borderColor: '#59cacc',
                     borderStyle: 'dotted',
                     borderDash: [10, 10],
                     fill: true,
@@ -2820,6 +2820,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                 <ul className="legendcommitversion">
                                                     <li style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
                                                     {this.state.showForecastThresholdLegend && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>}
+                                                    {!this.state.showForecastThresholdLegend && <li><span className="legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThresholdNote')}</i></span></li>}
                                                 </ul>
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
