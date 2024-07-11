@@ -2604,7 +2604,7 @@ export default class CreateTreeTemplate extends Component {
                         items[findNodeIndex] = node;
                     }
                 }
-                this.setState({ items })
+                this.setState({ items,isChanged:false })
             }
             if (parameterName == 'type' && (value == 1 || value == 0)) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -8104,6 +8104,10 @@ export default class CreateTreeTemplate extends Component {
                 currentNodeTypeId: data.context.payload.nodeType.id,
                 modelingTabChanged: false,
             }, () => {
+                try {
+                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                } catch (err) {
+                }
                 if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
                     var itemConfig = data.context;
                     var items = this.state.items;
@@ -11114,6 +11118,16 @@ export default class CreateTreeTemplate extends Component {
                         {parseInt(itemConfig.payload.nodeType.id) != 5 && this.state.editable &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
+                                    this.setState({
+                                        modelingEl: "",
+                                        modelingTabChanged: false,
+                                        currentNodeTypeId: ""
+                                    }, () => {
+                                        try {
+                                            jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                        } catch (err) {
+                                        }
+                                    })
                                     event.stopPropagation();
                                     var getLevelUnit = this.state.treeTemplate.levelList != undefined ? this.state.treeTemplate.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
                                     var levelUnitId = ""
