@@ -491,7 +491,7 @@
     "static.formula.suggestedText4": " pantalla.",
     "static.formula.suggestedText7": "2. Si el Mes N está en ruptura (Stock final = 0), QAT siempre sugerirá un pedido",
     "static.formula.suggestedText6": "1. Si CMM = 0 o N/A para el Mes N, no se sugiere peiddo",
-    "static.extrapolations.showFits": "Mostrar estimaciones en meses con consumo real.",
+    "static.extrapolations.showFits": "Mostrar estimaciones en meses con consumo real",
     "static.dashboard.applicationmaster": "Datos maestros de la aplicación",
     "static.program.validstatus": "Seleccionar el status",
     "static.message.fundingSource.listNotFound": "No se encontró ninguna fuente de financiamiento",

@@ -490,7 +490,7 @@
     "static.formula.suggestedText4": " tela.",
     "static.formula.suggestedText7": "2. Se o mês N estiver esgotado (saldo final = 0), o QAT sempre sugerirá uma remessa",
     "static.formula.suggestedText6": "1. Se AMC = 0 ou N/A para o Mês N, nenhuma remessa sugerida",
-    "static.extrapolations.showFits": "Exiba previsões em meses com consumo real.",
+    "static.extrapolations.showFits": "Exiba previsões em meses com consumo real",
     "static.program.validstatus": "Selecione o status",
     "static.dashboard.applicationmaster": "Dados mestres do aplicativo",
     "static.message.fundingSource.listNotFound": "Nenhuma fonte de financiamento encontrada",
