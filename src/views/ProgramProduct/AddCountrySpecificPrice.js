@@ -123,7 +123,7 @@ class CountrySpecificPrices extends Component {
      * @returns {Array} - Returns an array of active countries.
      */
     filterProgramPU = function (instance, cell, c, r, source) {
-        return (this.state.planningUnitListJexcel.filter(c => c.programId == -1 || (c.programId==(this.el.getJson(null, false)[r])[0])));
+        return (this.state.planningUnitListJexcel.filter(c => c.programId == -1 || (c.programId == (this.el.getJson(null, false)[r])[0])));
     }.bind(this);
     /**
      * Function to build a jexcel table.
@@ -233,7 +233,7 @@ class CountrySpecificPrices extends Component {
                     var puJson = {
                         planningUnitId: response.data[i].id,
                         label: response.data[i].label,
-                        programId:response.data[i].typeId
+                        programId: response.data[i].typeId
                     }
                     planningUnitList.push(puJson)
                     // }
@@ -261,7 +261,7 @@ class CountrySpecificPrices extends Component {
             }).catch(
                 error => {
                     this.setState({
-                        planningUnitList: [], loading: false, planningUnitListJexcel:[]
+                        planningUnitList: [], loading: false, planningUnitListJexcel: []
                     }, () => {
                     })
                     if (error.message === "Network Error") {
@@ -315,6 +315,7 @@ class CountrySpecificPrices extends Component {
             );
     }
     filterData() {
+        if (this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0) {
         this.setState({
             loading: true
         })
@@ -473,6 +474,12 @@ class CountrySpecificPrices extends Component {
                     }
                 }
             );
+        }else{
+            try{
+                this.el = jexcel(document.getElementById("paputableDiv"), '');
+                jexcel.destroy(document.getElementById("paputableDiv"), true);
+            }catch(err){}
+        }
     }
     buildJexcel() {
         if (this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0) {
@@ -488,10 +495,10 @@ class CountrySpecificPrices extends Component {
                 programList.push({ "id": programs[i].value, "name": programs[i].label })
             }
             var planningUnitList = [];
-            planningUnitList.push({ "id": "-1", "name": i18n.t('static.common.all'), "programId":"-1" });
+            planningUnitList.push({ "id": "-1", "name": i18n.t('static.common.all'), "programId": "-1" });
             var planningUnits = this.state.planningUnitValues;
             for (var i = 0; i < planningUnits.length; i++) {
-                planningUnitList.push({ "id": planningUnits[i].value, "name": planningUnits[i].label, "programId":planningUnits[i].programId })
+                planningUnitList.push({ "id": planningUnits[i].value, "name": planningUnits[i].label, "programId": planningUnits[i].programId })
             }
             var data = [];
             var papuDataArr = [];
@@ -841,13 +848,13 @@ class CountrySpecificPrices extends Component {
             this.setState({
                 loading: false,
                 papuDataArr2: papuDataArr2,
-                planningUnitListJexcel:planningUnitList
+                planningUnitListJexcel: planningUnitList
             })
         } else {
             this.setState({
                 loading: false,
                 rows: [],
-                planningUnitListJexcel:[]
+                planningUnitListJexcel: []
             });
             this.el = jexcel(document.getElementById("paputableDiv"), '');
             jexcel.destroy(document.getElementById("paputableDiv"), true);
@@ -922,7 +929,7 @@ class CountrySpecificPrices extends Component {
      */
     formSubmit = function () {
         this.setState({
-            loading:true
+            loading: true
         })
         var validation = this.checkValidation();
         if (validation == true) {
@@ -1041,7 +1048,7 @@ class CountrySpecificPrices extends Component {
                 );
         } else {
             this.setState({
-                loading:false
+                loading: false
             })
         }
     }
@@ -1302,7 +1309,7 @@ class CountrySpecificPrices extends Component {
                     programValues: [],
                     programLabels: [],
                     planningUnitList: [],
-                    planningUnitListJexcel:[],
+                    planningUnitListJexcel: [],
                     planningUnitValues: [],
                     planningUnitLabels: [],
                     changed: false
@@ -1526,7 +1533,7 @@ class CountrySpecificPrices extends Component {
         let planningUnits = planningUnitList.length > 0
             && planningUnitList.map((item, i) => {
                 return (
-                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId, programId:item.programId }
+                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId, programId: item.programId }
                 )
             }, this);
         return (
@@ -1646,8 +1653,31 @@ class CountrySpecificPrices extends Component {
      * Redirects to the add program planning unit screen when cancel button is clicked.
      */
     cancelClicked() {
-        let programId = this.props.match.params.programId;
-        this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        var cont = false;
+        if (this.state.changed == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            let programId = this.props.match.params.programId;
+            if (programId != undefined && programId != "" && programId > 0) {
+                this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+            } else {
+                this.setState({
+                    changed: false,
+                    message: i18n.t("static.actionCancelled"),
+                    color: "red",
+                    loading:true
+                }, () => {
+                    this.buildJexcel()
+                })
+            }
+        }
     }
 }
 export default CountrySpecificPrices
