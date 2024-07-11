@@ -821,7 +821,7 @@ class CountrySpecificPrices extends Component {
                             });
                         }
                         if (obj.options.allowDeleteRow == true) {
-                            if (obj.getRowData(y)[18] == 0) {
+                            if (obj.getRowData(y)[17] == 0) {
                                 items.push({
                                     title: i18n.t("static.common.deleterow"),
                                     onclick: function () {
