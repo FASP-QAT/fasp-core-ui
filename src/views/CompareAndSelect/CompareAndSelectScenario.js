@@ -55,6 +55,7 @@ class CompareAndSelectScenario extends Component {
         super(props);
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
+        this.pickAMonth3 = React.createRef()
         this.state = {
             datasetList: [],
             planningUnitList: [],
@@ -90,6 +91,7 @@ class CompareAndSelectScenario extends Component {
             countArray: [],
             regionName: "",
             singleValue2: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            singleValue3: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showForecastPeriod: false,
             treeScenarioList: [],
@@ -124,6 +126,14 @@ class CompareAndSelectScenario extends Component {
      */
     handleClickMonthBox2 = (e) => {
         this.refs.pickRange.show()
+    }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
+    handleClickMonthBox3 = (e) => {
+        this.pickAMonth3.current.show()
     }
     /**
      * Handles the dismiss of the range picker component.
@@ -2243,7 +2253,7 @@ class CompareAndSelectScenario extends Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
                                                     <Picker
-                                                        ref="pickRange"
+                                                        // ref="pickRange"
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={this.state.rangeValue}
                                                         lang={pickerLang}
@@ -2541,14 +2551,14 @@ class CompareAndSelectScenario extends Component {
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
                                                             <Picker
-                                                                ref="pickAMonth2"
+                                                                ref={this.pickAMonth3}
                                                                 years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
                                                                 value={this.state.singleValue2}
                                                                 key={JSON.stringify(this.state.singleValue2)}
                                                                 lang={pickerLang}
                                                                 onDismiss={this.handleAMonthDissmis2}
                                                             >
-                                                                <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                                <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>}
