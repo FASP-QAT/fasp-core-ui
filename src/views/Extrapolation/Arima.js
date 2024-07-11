@@ -39,7 +39,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 if (page == "DataEntry") {
                     var arimaData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                     props.updateArimaData(arimaData);
-                } else if (page == "importFromQATSP") {
+                } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
                     var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateArimaData(arimaData);
                 } else {
@@ -51,7 +51,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
             if (page == "DataEntry") {
                 var arimaData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);
-            } else if (page == "importFromQATSP") {
+            } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
                 var arimaData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);
             } else {

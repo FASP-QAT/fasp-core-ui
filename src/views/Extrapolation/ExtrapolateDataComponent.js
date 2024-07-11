@@ -303,7 +303,12 @@ export default class ExtrapolateDataComponent extends React.Component {
             regionValues: [],
             planningUnitValues: [],
             isDisabled: false,
-            onlyDownloadedProgram: false
+            onlyDownloadedProgram: false,
+            jsonDataMovingAvg: [],
+            jsonDataSemiAverage: [],
+            jsonDataLinearRegression: [],
+            jsonDataTes: [],
+            jsonDataArima: [],
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -323,6 +328,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setVersionId = this.setVersionId.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
+        this.defaultSubmitForBulkExtrapolation = this.defaultSubmitForBulkExtrapolation.bind(this);
     }
     /**
      * Handles change for seasonality check box.
@@ -2339,6 +2345,441 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         }
     }
+
+    /**
+     * Default submit of all bulk extrapolation related modal
+     * @param {Object} id defines which submit has been clicked for
+     */
+    defaultSubmitForBulkExtrapolation(id) {
+        var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        console.log("defaultSubmitForBulkExtrapolation==", id, "==", this.state.regionValues, "==", this.state.planningUnitValues)
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+            var planningUnitBulkExtrapolationTransaction = transaction.objectStore('planningUnitBulkExtrapolation');
+            var planningUnitBulkExtrapolationRequest = planningUnitBulkExtrapolationTransaction.get(tempForecastProgramId);
+            planningUnitBulkExtrapolationRequest.onerror = function (event) {
+            }.bind(this);
+            planningUnitBulkExtrapolationRequest.onsuccess = function (event) {
+                var obj = {
+                    region: this.state.regionValues,
+                    planningUnit: this.state.planningUnitValues,
+                    programId: tempForecastProgramId
+                }
+                planningUnitBulkExtrapolationTransaction.put(obj);
+                //To Do Need to check which action is clicked or if its online or offline
+                this.ExtrapolatedParameters(this.state.regionValues, this.state.planningUnitValues);
+
+            }.bind(this);
+        }.bind(this);
+    }
+
+    /**
+     * Builds data for extrapolation and runs extrapolation methods
+     */
+    ExtrapolatedParameters(regionList, listOfPlanningUnits) {
+        var programData = this.state.datasetJson;
+        console.log("programData", programData)
+        if (listOfPlanningUnits.length > 0) {
+            this.setState({ loading: true })
+            var datasetJson = programData;
+            var count = 0;
+            for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
+                for (var i = 0; i < regionList.length; i++) {
+                    var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
+                    if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+                        let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                        let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                        let curDate = minDate;
+                        var inputDataMovingAvg = [];
+                        var inputDataSemiAverage = [];
+                        var inputDataLinearRegression = [];
+                        var inputDataTes = [];
+                        var inputDataArima = [];
+                        for (var j = 0; moment(curDate).format("YYYY-MM") < moment(maxDate).format("YYYY-MM"); j++) {
+                            curDate = moment(minDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
+                            var consumptionData = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
+                            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                        }
+                        var forecastMinDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+                        var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                        const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
+                        const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                            count++;
+                            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                        }
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                            count++;
+                            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                        }
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                            count++;
+                            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                        }
+                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
+                            count++;
+                            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                        }
+                        if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
+                            count++;
+                            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                        }
+                    }
+                }
+            }
+            this.setState({
+                count: count
+            })
+        }
+    }
+
+    /**
+     * Updates the moving average data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the moving average data set.
+     */
+    updateMovingAvgData(data) {
+        var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
+        jsonDataMovingAvg.push(data);
+        var countR = this.state.countRecived
+        this.setState({
+            jsonDataMovingAvg: jsonDataMovingAvg,
+            countRecived: countR + 1
+        }, () => {
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+    /**
+     * Updates the semi average data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the semi average data set.
+     */
+    updateSemiAveragesData(data) {
+        var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
+        jsonDataSemiAverage.push(data);
+        var countR = this.state.countRecived
+        this.setState({
+            jsonDataSemiAverage: jsonDataSemiAverage,
+            countRecived: countR + 1
+        }, () => {
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+    /**
+     * Updates the linear regression data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the linear regression data set.
+     */
+    updateLinearRegressionData(data) {
+        var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
+        jsonDataLinearRegression.push(data);
+        this.setState({
+            jsonDataLinearRegression: jsonDataLinearRegression,
+            countRecived: this.state.countRecived++
+        }, () => {
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+    /**
+     * Updates the TES data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the TES data set.
+     */
+    updateTESData(data) {
+        var jsonDataTes = this.state.jsonDataTes;
+        jsonDataTes.push(data);
+        this.setState({
+            jsonDataTes: jsonDataTes,
+            countRecived: this.state.countRecived++
+        }, () => {
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+    /**
+     * Updates the ARIMA data by adding the provided data to the existing state.
+     * @param {Object} data The data to be added to the ARIMA data set.
+     */
+    updateArimaData(data) {
+        var jsonDataArima = this.state.jsonDataArima;
+        jsonDataArima.push(data);
+        this.setState({
+            jsonDataArima: jsonDataArima,
+            countRecived: this.state.countRecived++
+        }, () => {
+            if (this.state.jsonDataMovingAvg.length
+                + this.state.jsonDataSemiAverage.length
+                + this.state.jsonDataLinearRegression.length
+                + this.state.jsonDataTes.length
+                + this.state.jsonDataArima.length
+                == this.state.count) {
+                this.saveForecastConsumptionExtrapolation();
+            }
+        })
+    }
+    /**
+     * Saves extrapolation data in indexed DB
+     */
+    saveForecastConsumptionExtrapolation() {
+        this.setState({
+            loading: true
+        })
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
+            var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
+            var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
+            extrapolationMethodRequest.onerror = function (event) {
+            }.bind(this);
+            extrapolationMethodRequest.onsuccess = function (event) {
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var datasetTransaction = transaction.objectStore('datasetData');
+                let forecastProgramVersionId = this.state.versionId;
+                let forecastProgramId = this.state.forecastProgramId;
+                var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+                var datasetRequest = datasetTransaction.get(tempForecastProgramId);
+                datasetRequest.onerror = function (event) {
+                }.bind(this);
+                datasetRequest.onsuccess = function (event) {
+                    var extrapolationMethodList = extrapolationMethodRequest.result;
+                    var myResult = datasetRequest.result;
+                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                    var datasetJson = JSON.parse(datasetData);
+                    var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+                    var listOfPlanningUnits = this.state.planningUnitValues;
+                    var regionList = this.state.regionValues;
+                    var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+                    for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
+                        for (var r = 0; r < regionList.length; r++) {
+                            console.log("consumptionExtrapolationList", consumptionExtrapolationList)
+                            var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)));
+                            var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                            var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
+                            var id = a > b ? a : b;
+                            var planningUnitObj = this.state.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu].value)[0];
+                            var regionObj = this.state.datasetJson.regionList.filter(c => c.regionId == regionList[r].value)[0];
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            var datasetJson = this.state.datasetJson;
+                            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value);
+                            var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                            var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                            var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
+                            if (jsonDataSemiAvgFilter.length > 0) {
+                                var jsonSemi = jsonDataSemiAvgFilter[0].data;
+                                var data = [];
+                                for (var i = 0; i < jsonSemi.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(4) : null, ci: null })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                                        "jsonProperties": {
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                            var data = [];
+                            var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataMovingFilter.length > 0) {
+                                var jsonDataMoving = jsonDataMovingFilter[0].data;
+                                for (var i = 0; i < jsonDataMoving.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(4) : null, ci: null })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                                        "jsonProperties": {
+                                            months: this.state.monthsForMovingAverage,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                            }
+                            id += 1;
+                            var data = [];
+                            var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataLinearFilter.length > 0) {
+                                var jsonDataLinear = jsonDataLinearFilter[0].data;
+                                for (var i = 0; i < jsonDataLinear.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(4) : null, ci: (jsonDataLinear[i].ci) })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                            var data = [];
+                            var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataTesFilter.length > 0) {
+                                var jsonDataTes = jsonDataTesFilter[0].data;
+                                for (var i = 0; i < jsonDataTes.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelId,
+                                            seasonality: this.state.noOfMonthsForASeason,
+                                            alpha: this.state.alpha,
+                                            beta: this.state.beta,
+                                            gamma: this.state.gamma,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                            var data = [];
+                            var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            if (jsonDataArimaFilter.length > 0) {
+                                var jsonDataArima = jsonDataArimaFilter[0].data;
+                                for (var i = 0; i < jsonDataArima.length; i++) {
+                                    data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
+                                }
+                                consumptionExtrapolationList.push(
+                                    {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdArima,
+                                            seasonality: this.state.seasonality,
+                                            p: this.state.p,
+                                            d: this.state.d,
+                                            q: this.state.q,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    })
+                                id += 1;
+                            }
+                        }
+                    }
+                    datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+                    datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                    myResult.programData = datasetData;
+                    var putRequest = datasetTransaction.put(myResult);
+                    this.setState({
+                        dataChanged: false
+                    })
+                    putRequest.onerror = function (event) {
+                    }.bind(this);
+                    putRequest.onsuccess = function (event) {
+                        this.setState({
+                            isChanged1: false
+                        })
+                        // localStorage.setItem("sesDatasetId", this.props.items.datasetList[0].id);
+                        this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment/` + 'green/' + i18n.t('static.message.importSuccess'))
+                    }.bind(this);
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
+
     /**
      * Toggles the value of the "show" state between true and false.
      */
@@ -3499,7 +3940,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
                                 </a>
                             }
-                            {this.state.forecastProgramId &&
+                            {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' &&
                                 <a className="card-header-action">
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
                                 </a>
@@ -4447,21 +4888,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <ModalFooter>
                                         {this.state.bulkExtrapolation && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.levelClicked("")}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
                                             </div>
                                         }
-                                        {this.state.bulkExtrapolation && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
+                                        {this.state.bulkExtrapolation && this.state.missingTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.levelClicked("")}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
                                             </div>
                                         }
                                         {this.state.optimizeTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.levelClicked("")}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(3)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
                                             </div>
                                         }
 
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.defaultSubmitForBulkExtrapolation(4)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </ModalFooter>
                                 </Form>
                             )} />

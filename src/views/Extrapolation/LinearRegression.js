@@ -115,19 +115,19 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             let ciL = y - cLevel;
             let ciU = y + cLevel;
             ciString = " : " + ciL + " : " + ciU;
-            output.push({ month:(x + 1),actual:null, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:cLevel})
-        }else{
-            output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:null})
+            output.push({ month: (x + 1), actual: null, forecast: y == 'NA' ? null : y > 0 ? y : 0, ci: cLevel })
+        } else {
+            output.push({ month: (x + 1), actual: inputData[x].actual, forecast: y == 'NA' ? null : y > 0 ? y : 0, ci: null })
         }
     }
-        if (page == "DataEntry") {
-            var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
-            props.updateLinearRegressionData(linearRegressionData);
-        }else if (page == "importFromQATSP") {
-            var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
-            props.updateLinearRegressionData(linearRegressionData);
-        } else {
-            props.updateState("linearRegressionData", output);
-            calculateError(output, "linearRegressionError", props);
-        }   
+    if (page == "DataEntry") {
+        var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+        props.updateLinearRegressionData(linearRegressionData);
+    } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
+        var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
+        props.updateLinearRegressionData(linearRegressionData);
+    } else {
+        props.updateState("linearRegressionData", output);
+        calculateError(output, "linearRegressionError", props);
+    }
 }

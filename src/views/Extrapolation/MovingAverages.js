@@ -1,5 +1,5 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
-export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props, page, regionId,planningUnitId) {
+export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props, page, regionId, planningUnitId) {
     const data = inputData;
     const monthsForMovingAverage = noOfMonths;
     const noOfMonthsForProjection = noOfProjectionMonths;
@@ -16,7 +16,7 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
     if (page == "DataEntry") {
         var movingAvgData = { "data": data, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
         props.updateMovingAvgData(movingAvgData);
-    }else if(page=="importFromQATSP"){
+    } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
         var movingAvgData = { "data": data, "PlanningUnitId": planningUnitId, "regionId": regionId }
         props.updateMovingAvgData(movingAvgData);
     } else {

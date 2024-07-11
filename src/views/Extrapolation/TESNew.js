@@ -2,7 +2,7 @@ import moment from "moment";
 import ExtrapolationService from "../../api/ExtrapolationService";
 import i18n from "../../i18n";
 import { calculateError } from "./ErrorCalculations";
-export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId,planningUnitId) {
+export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId, planningUnitId) {
     var startYear = moment(minStartDate).format("YYYY");
     var startMonth = moment(minStartDate).format("M");
     var decimal = (startMonth - 1) / 12;
@@ -38,7 +38,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 if (page == "DataEntry") {
                     var tesData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                     props.updateTESData(tesData);
-                } else if (page == "importFromQATSP") {
+                } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
                     var tesData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateTESData(tesData);
                 } else {
@@ -50,7 +50,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
             if (page == "DataEntry") {
                 var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateTESData(tesData);
-            } else if (page == "importFromQATSP") {
+            } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
                 var tesData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
                 props.updateTESData(tesData);
             } else {
