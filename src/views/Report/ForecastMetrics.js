@@ -607,7 +607,7 @@ class ForecastMetrics extends Component {
    */
   filterData() {
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-    let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());
     let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';
