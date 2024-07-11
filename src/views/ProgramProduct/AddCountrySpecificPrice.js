@@ -964,6 +964,9 @@ class CountrySpecificPrices extends Component {
                     if (response.status == "200") {
                         let programId = this.props.match.params.programId;
                         if (programId != undefined && programId != "" && programId > 0) {
+                            this.setState({
+                                changed: false
+                            })
                             this.props.history.push(`/programProduct/addProgramProduct/${programId}/` + 'green/' + 'Procurement Agent Prices added successfully')
                         } else {
                             this.setState({
