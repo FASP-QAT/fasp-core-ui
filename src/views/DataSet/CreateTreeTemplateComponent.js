@@ -4574,7 +4574,8 @@ export default class CreateTreeTemplate extends Component {
             data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`;
             data[4] = momList[j].manualChange!=null?parseFloat(momList[j].seasonalityPerc).toFixed(2):0;
             data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
-            data[6] = `=ROUND(IF((((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}<0,0,(((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}),4)`;
+            // data[6] = `=ROUND(IF((((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}<0,0,(((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}),4)`;
+            data[6] = `=ROUND((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(1+(E${parseInt(j) + 1})/100)+F${parseInt(j) + 1},4)`;
             var momListParentForMonth = momListParent.filter(c => c.month == momList[j].month);
             data[7] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((G${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*N${parseInt(j) + 1},2)` : `=ROUND((G${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},2)`;
@@ -4645,8 +4646,9 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.%of') + " " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : "") + " " + i18n.t('static.tree.monthStart'),
-                    type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false,
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
@@ -4663,16 +4665,18 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.seasonalityIndex'),
-                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    title: this.state.seasonality == true ? i18n.t('static.tree.seasonalityIndex') : 'A',
+                    type: 'numeric',
+                    visible: this.state.seasonality == true ? true : false,
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
                     readOnly: false
                 },
                 {
-                    title: i18n.t('static.tree.manualChange'),
-                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    title:  this.state.seasonality == true ? i18n.t('static.tree.manualChange') : 'A',
+                    type: 'numeric',
+                    visible: this.state.seasonality == true ? true : false,
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
@@ -4680,59 +4684,71 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
-                    type: this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level == 0 ? 'hidden' : 'numeric',
+                    type: 'numeric',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level == 0 ? false : true,
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
-                    type: this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level == 0 ? 'hidden' : 'numeric',
+                    type: 'numeric',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level == 0 ? false : true,
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'hidden' : 'numeric',
+                    type: 'numeric',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? false : true,
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: 'Node data id',
-                    type: 'hidden',
+                    title: 'A',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'hidden',
+                    type: 'numeric',
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? true : false,
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: 'Perc without manual change',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: 'Manual change',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: 'FU per month',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: 'Cycle',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: 'Diff',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: 'No of patients',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
                 {
                     title: 'Without Lag',
-                    type: 'hidden',
+                    type: 'text',
+                    visible: false
                 },
             ],
             text: {
