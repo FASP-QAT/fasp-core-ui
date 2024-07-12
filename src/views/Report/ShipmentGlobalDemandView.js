@@ -170,6 +170,7 @@ const options1 = {
 const optionsPie = {
     title: {
         display: true,
+        // text: document.getElementById("groupByFundingSourceType").value ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
         text: i18n.t('static.fundingSourceHead.fundingSource'),
         fontColor: 'black'
     },
@@ -2059,7 +2060,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
                                                     /><br />
                                                 </div>
-                                                <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                                <h5 className="red text-center">{this.state.groupByFundingSourceType? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
                                         }
                                     </div>
