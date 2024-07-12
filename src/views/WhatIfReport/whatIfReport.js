@@ -36,7 +36,7 @@ import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INTEGER_NO_REGEX, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_DATASOURCE_ID, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INTEGER_NO_REGEX, INTERPOLATE_DATA_SOURCE_ID, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
@@ -1431,7 +1431,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var consumptionJson = {
                                             consumptionId: 0,
                                             dataSource: {
-                                                id: QAT_DATASOURCE_ID
+                                                id: INTERPOLATE_DATA_SOURCE_ID
                                             },
                                             region: {
                                                 id: generalProgramJson.regionList[0].regionId
@@ -2415,7 +2415,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var consumptionJson = {
                                     consumptionId: 0,
                                     dataSource: {
-                                        id: QAT_DATASOURCE_ID
+                                        id: INTERPOLATE_DATA_SOURCE_ID
                                     },
                                     region: {
                                         id: generalProgramJson.regionList[0].regionId
@@ -5117,13 +5117,13 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
                                                         <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
+                                                        <option value="9">{i18n.t('static.scenarioPlanning.phaseInPhaseOut')}</option>
                                                         <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
                                                         <option value="4">{i18n.t('static.whatIf.removePlannedShipments')}</option>
                                                         <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
                                                         <option value="6">{i18n.t('static.whatIf.removeShippedShipmentsNotInLeadTimes')}</option>
                                                         <option value="7">{i18n.t('static.scenarioPlanning.replanSupplyPlan')}</option>
                                                         {/* <option value="8">{i18n.t('static.scenarioPlanning.changeAMC')}</option> */}
-                                                        <option value="9">{i18n.t('static.scenarioPlanning.phaseInPhaseOut')}</option>
                                                     </Input>
                                                     <FormFeedback className="red">{errors.scenarioId}</FormFeedback>
                                                 </FormGroup>
