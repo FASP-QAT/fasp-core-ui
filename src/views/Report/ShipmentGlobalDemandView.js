@@ -1852,7 +1852,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
                                                     /><br />
                                                 </div>
-                                                <h5 className="red text-center pt-5">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                                <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
+                                                <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
                                         }
                                     </div>
