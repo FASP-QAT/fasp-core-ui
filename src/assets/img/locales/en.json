@@ -3346,5 +3346,6 @@
     "static.scenarioPlanning.phaseInPhaseOut":"Forecast Phase In/Out Product",
     "static.scenarioPlanning.endValue":"End Value",
     "static.whatIf.validEndValue":"Enter End Value",
-    "static.whatIf.validStartValue":"Enter Start Value"
+    "static.whatIf.validStartValue":"Enter Start Value",
+    "static.shipmentOverview.pieChartNote":"Note: Percentage labels below 1% are not displayed"
 }
