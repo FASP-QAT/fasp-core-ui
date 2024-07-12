@@ -2435,7 +2435,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 yAxisID: 'B',
                 // backgroundColor: (this.state.yaxisEquUnit > 0 ? '#002F6C' : 'transparent'),
                 backgroundColor: 'transparent',
-                borderColor: '#EDB944',
+                borderColor: '#118b70',
                 borderStyle: 'dotted',
                 borderWidth: 5,
                 ticks: {
