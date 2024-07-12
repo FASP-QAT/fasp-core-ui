@@ -814,7 +814,14 @@ class AnnualShipmentCost extends Component {
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
             year.push(from);
         }
-        var data = this.state.outPutList;
+        var tempData = this.state.outPutList;
+        var data = tempData.sort((a, b) => {
+            if (a.PROCUREMENT_AGENT_ID === b.PROCUREMENT_AGENT_ID) {
+              return a.FUNDING_SOURCE_ID - b.FUNDING_SOURCE_ID;
+            } else {
+              return a.PROCUREMENT_AGENT_ID - b.PROCUREMENT_AGENT_ID;
+            }
+        });
         var tempB = [];
         tempB.push(i18n.t('static.procurementagent.procurementagent').replaceAll(" ", "%20"));
         tempB.push(i18n.t('static.fundingsource.fundingsource').replaceAll(" ", "%20"));
