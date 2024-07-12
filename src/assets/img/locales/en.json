@@ -3342,5 +3342,9 @@
     "static.tree.moveCopyNote":"Note: The entire branch (including all child nodes) will be moved/copied",
     "static.forecastErrorReport.planningUnitAboveThreshold":"Planning Unit Error is above the Forecast Error Threshold",
     "static.forecastErrorReport.forecastErrorThreshold":"Forecast Error Threshold",
-    "static.forecastErrorReport.planningUnitAboveThresholdNote":"Note: The Forecast Error Threshold values will not be highlighted red if viewing this report in Equivalency Units or multiple Forecasting Units/Planning Units"
+    "static.forecastErrorReport.planningUnitAboveThresholdNote":"Note: The Forecast Error Threshold values will not be highlighted red if viewing this report in Equivalency Units or multiple Forecasting Units/Planning Units",
+    "static.scenarioPlanning.phaseInPhaseOut":"Forecast Phase In/Out Product",
+    "static.scenarioPlanning.endValue":"End Value",
+    "static.whatIf.validEndValue":"Enter End Value",
+    "static.whatIf.validStartValue":"Enter Start Value"
 }
