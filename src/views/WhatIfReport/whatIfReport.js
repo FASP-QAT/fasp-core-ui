@@ -392,7 +392,7 @@ export default class WhatIfReportComponent extends React.Component {
         var planningUnitId = (document.getElementById("planningUnitId").value);
         var rangeValue = value;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false");
+        var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString()=="true");
         var startValue = "";
         startConsumptionRecord.map(c => {
             startValue = Number(startValue) + Number(c.consumptionQty);
@@ -855,7 +855,7 @@ export default class WhatIfReportComponent extends React.Component {
                 var planningUnitId = (document.getElementById("planningUnitId").value);
                 var rangeValue = this.state.rangeValue;
                 let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false");
+                var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString()=="true");
                 var startValue = "";
                 startConsumptionRecord.map(c => {
                     startValue = Number(startValue) + Number(c.consumptionQty);
