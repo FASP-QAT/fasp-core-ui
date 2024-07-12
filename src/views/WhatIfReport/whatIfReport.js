@@ -1417,6 +1417,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         consumptionList[index].lastModifiedDate = curDate;
                                         consumptionList[index].active = true;
                                         consumptionList[index].notes = "Source: Phase in/out scenario";
+                                        consumptionList[index].dataSource= {
+                                            id: INTERPOLATE_DATA_SOURCE_ID
+                                        };
                                     } else if (indexWithoutMultiplier1 != -1) {
                                         consumptionList[indexWithoutMultiplier1].consumptionQty = temp_consumptionQty;
                                         consumptionList[indexWithoutMultiplier1].consumptionRcpuQty = temp_consumptionQty;
@@ -1428,6 +1431,9 @@ export default class WhatIfReportComponent extends React.Component {
                                         };
                                         consumptionList[indexWithoutMultiplier1].multiplier = 1;
                                         consumptionList[indexWithoutMultiplier1].notes = "Source: Phase in/out scenario";
+                                        consumptionList[indexWithoutMultiplier1].dataSource= {
+                                            id: INTERPOLATE_DATA_SOURCE_ID
+                                        };
                                     } else {
                                         var consumptionJson = {
                                             consumptionId: 0,
@@ -2401,6 +2407,9 @@ export default class WhatIfReportComponent extends React.Component {
                                 consumptionList[index].lastModifiedDate = curDate;
                                 consumptionList[index].active = true;
                                 consumptionList[index].notes = "Source: Phase in/out scenario";
+                                consumptionList[index].dataSource= {
+                                    id: INTERPOLATE_DATA_SOURCE_ID
+                                };
                             } else if (indexWithoutMultiplier1 != -1) {
                                 consumptionList[indexWithoutMultiplier1].consumptionQty = temp_consumptionQty;
                                 consumptionList[indexWithoutMultiplier1].consumptionRcpuQty = temp_consumptionQty;
@@ -2412,6 +2421,9 @@ export default class WhatIfReportComponent extends React.Component {
                                 };
                                 consumptionList[indexWithoutMultiplier1].multiplier = 1;
                                 consumptionList[indexWithoutMultiplier1].notes = "Source: Phase in/out scenario";
+                                consumptionList[indexWithoutMultiplier1].dataSource= {
+                                    id: INTERPOLATE_DATA_SOURCE_ID
+                                };
                             } else {
                                 var consumptionJson = {
                                     consumptionId: 0,
