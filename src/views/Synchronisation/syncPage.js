@@ -1560,7 +1560,11 @@ export default class syncPage extends Component {
           } else {
             programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion });
           }
-          ProgramService.getAllProgramData(programRequestJson)
+          var inputJson={
+            'programVersionList':programRequestJson,
+            'cutOffDate':""
+          }
+          ProgramService.getAllProgramData(inputJson)
             .then(response => {
               if (response.status == 200) {
                 response.data = decompressJson(response.data);
@@ -4233,7 +4237,11 @@ export default class syncPage extends Component {
         checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
       }
     }
-    ProgramService.getAllProgramData(checkboxesChecked)
+    var inputJson={
+      'programVersionList':checkboxesChecked,
+      'cutOffDate':""
+    }
+    ProgramService.getAllProgramData(inputJson)
       .then(response => {
         response.data = decompressJson(response.data);
         var json = response.data;
