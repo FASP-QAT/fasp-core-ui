@@ -1,6 +1,8 @@
 import CryptoJS from 'crypto-js';
 import moment from "moment";
 import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import {
@@ -50,12 +52,51 @@ class Program extends Component {
             lang: localStorage.getItem('lang'),
             realmId: AuthenticationService.getRealmId(),
             loading: true,
-            programList: []
+            programList: [],
+            minDate: { year: new Date().getFullYear() - 20, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() - 2, month: new Date().getMonth() + 1 },
+            startDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
+            isMonthSelected: false
         };
+        this.pickRange = React.createRef();
         this.getPrograms = this.getPrograms.bind(this);
         this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+    }
+    /**
+     * Show Supply Planning date range picker
+     * @param {Event} e -  The click event.
+     */
+    _handleClickRangeBox(e) {
+        this.pickRange.current.show()
+    }
+    /**
+     * Handle date range change
+     * @param {*} value 
+     * @param {*} text 
+     * @param {*} listIndex 
+     */
+    handleRangeChange(value, text, listIndex) {
+    }
+    /**
+     * This function is used to update the date filter value
+     * @param {*} value This is the value that user has selected
+     */
+    handleRangeDissmis(value) {
+        this.setState({ startDate: value });
+    }
+    /**
+     * Sets the state to control the visibility of data in terms planning units.
+     * @param {Object} e Event object containing the checkbox state.
+     */
+    changeIsMonthSelected(e) {
+        this.setState({
+            isMonthSelected: e.target.checked
+        })
     }
     /**
      * Fetches more versions of a program from the server.
@@ -575,6 +616,14 @@ class Program extends Component {
      * @returns {JSX.Element} - Load Program screen.
      */
     render() {
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -593,6 +642,27 @@ class Program extends Component {
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody className="pb-lg-2 pt-lg-2">
+                                <FormGroup className="tab-ml-0 mb-md-3 ml-3">
+                                    <Col md="12" >
+                                        <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.isMonthSelected} onChange={(e) => this.changeIsMonthSelected(e)} />
+                                        <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.program.dateRange')}</Label>
+                                    </Col>
+                                </FormGroup>
+                                {this.state.isMonthSelected && <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <div className="controls edit">
+                                        <Picker
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                            ref={this.pickRange}
+                                            value={this.state.startDate}
+                                            lang={pickerLang}
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={makeText(this.state.startDate)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
+                                    </div>
+                                </FormGroup>}
                                 <div>
                                     <ul className="legendcommitversion pl-0" style={{ display: 'inline-flex' }}>
                                         <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.loadProgram.oldVersion')}</span></li>
@@ -863,7 +933,11 @@ class Program extends Component {
         }
         else {
             if (localStorage.getItem("sessionType") === 'Online') {
-                ProgramService.getAllProgramData(checkboxesChecked)
+                var inputJson = {
+                    'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
+                    'programVersionList': checkboxesChecked
+                }
+                ProgramService.getAllProgramData(inputJson)
                     .then(response => {
                         response.data = decompressJson(response.data);
                         var json = response.data;
