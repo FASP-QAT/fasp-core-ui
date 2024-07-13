@@ -1867,7 +1867,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var extrapolationNotes = null;
-            if (consumptionExtrapolationList.length > 1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+            if (consumptionExtrapolationList.length > 0 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                 this.setState({ loading: true })
                 var startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                 var minStartDate = startDate1;
