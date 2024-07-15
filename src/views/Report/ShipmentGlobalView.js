@@ -147,6 +147,9 @@ class ShipmentGlobalView extends Component {
         } else if (viewby == 3) {
             this.state.procurementAgentTypeLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.procurementagentType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        } else if (viewby == 4) {
+            this.state.fundingSourceTypeLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
         csvRow.push('')
         csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
@@ -274,6 +277,9 @@ class ShipmentGlobalView extends Component {
                     } else if (viewby == 3) {
                         var procurementAgentTypeText = doc.splitTextToSize((i18n.t('static.dashboard.procurementagentType') + ' : ' + this.state.procurementAgentTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, len, procurementAgentTypeText)
+                    } else if (viewby == 4) {
+                        var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, len, fundingSourceTypeText)
                     }
                 }
             }
