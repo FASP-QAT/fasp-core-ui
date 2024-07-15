@@ -1632,9 +1632,9 @@ class CountrySpecificPrices extends Component {
                                         </div>
                                     </FormGroup>
                                 </Row>
+                                <h5>{i18n.t('static.updatePPUPA.noteText1')} <a href="/#/programProduct/addProgramProduct">{i18n.t('static.Update.PlanningUnits')}</a> {i18n.t("static.updatePPUPA.noteText2")}</h5>
                                 <div id="paputableDiv" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
-                                <h5>{i18n.t('static.updatePPUPA.noteText1')} <a href="/#/programProduct/addProgramProduct">{i18n.t('static.Update.PlanningUnits')}</a> {i18n.t("static.updatePPUPA.noteText2")}</h5>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
