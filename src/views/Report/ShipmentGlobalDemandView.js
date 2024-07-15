@@ -841,39 +841,41 @@ class ShipmentGlobalDemandView extends Component {
                   const meta = chart.getDatasetMeta(datasetIndex);
                   if (!meta.hidden) {
                     meta.data.forEach((element, index) => {
-                      // Draw the connecting lines
-                      ctx.save();
-                      const model = element._model;
-                      const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
-                      const startAngle = model.startAngle;
-                      const endAngle = model.endAngle;
-                      const midAngle = startAngle + (endAngle - startAngle) / 2;
-      
-                      const x = Math.cos(midAngle);
-                      const y = Math.sin(midAngle);
-      
-                      // Calculate the end point for the line
-                      const lineX = model.x + x * model.outerRadius;
-                      const lineY = model.y + y * model.outerRadius;
-                      const labelX = model.x + x * (model.outerRadius + 10);
-                      const labelY = model.y + y * (model.outerRadius + 10);
-      
-                      const label = chart.data.labels[index];
-                      const value = dataset.data[index];
-                      const percentage = ((value / total) * 100).toFixed(2) + '%';
+                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                        // Draw the connecting lines
+                        ctx.save();
+                        const model = element._model;
+                        const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                        const startAngle = model.startAngle;
+                        const endAngle = model.endAngle;
+                        const midAngle = startAngle + (endAngle - startAngle) / 2;
+        
+                        const x = Math.cos(midAngle);
+                        const y = Math.sin(midAngle);
+        
+                        // Calculate the end point for the line
+                        const lineX = model.x + x * model.outerRadius;
+                        const lineY = model.y + y * model.outerRadius;
+                        const labelX = model.x + x * (model.outerRadius + 10);
+                        const labelY = model.y + y * (model.outerRadius + 10);
+        
+                        const label = chart.data.labels[index];
+                        const value = dataset.data[index];
+                        const percentage = ((value / total) * 100).toFixed(2) + '%';
 
-                      if(((value / total) * 100).toFixed(2) > 1) {
-                        ctx.beginPath();
-                        ctx.moveTo(model.x, model.y);
-                        ctx.lineTo(lineX, lineY);
-                        ctx.lineTo(labelX, labelY);
-                        ctx.strokeStyle = dataset.backgroundColor[index];
-                        ctx.stroke();                      
-                        ctx.textAlign = x >= 0 ? 'left' : 'right';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = dataset.backgroundColor[index];
-                        ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+20 : x < 0.5 ? labelX-20 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
-                        ctx.restore();
+                        if(((value / total) * 100).toFixed(2) > 2) {
+                            ctx.beginPath();
+                            ctx.moveTo(model.x, model.y);
+                            ctx.lineTo(lineX, lineY);
+                            ctx.lineTo(labelX, labelY);
+                            ctx.strokeStyle = dataset.backgroundColor[index];
+                            ctx.stroke();                      
+                            ctx.textAlign = x >= 0 ? 'left' : 'right';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = dataset.backgroundColor[index];
+                            ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+20 : x < 0.5 ? labelX-20 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
+                            ctx.restore();
+                        }
                       }
                     });
                   }
