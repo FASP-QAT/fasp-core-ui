@@ -187,6 +187,8 @@ class ShipmentGlobalView extends Component {
                 tempLabel = i18n.t('static.procurementagent.procurementagent');
             } else if (viewby == 3) {
                 tempLabel = i18n.t('static.dashboard.procurementagentType');
+            } else if (viewby == 4) {
+                tempLabel = i18n.t('static.funderTypeHead.funderType');
             }
             var B = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
             re = this.state.shipmentList;

@@ -167,7 +167,7 @@ const options1 = {
         }
     }
 }
-const optionsPie = {
+/*const optionsPie = {
     title: {
         display: true,
         // text: document.getElementById("groupByFundingSourceType").value ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
@@ -186,7 +186,7 @@ const optionsPie = {
             }
         }
     },
-}
+}*/
 /**
  * Component for Shipment Global Demand View Report.
  */
@@ -247,6 +247,7 @@ class ShipmentGlobalDemandView extends Component {
             fundingSourceTypeValues: [],
             fundingSourceTypeLabels: [],
             groupByFundingSourceType: false,
+            groupBy: 1
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -500,17 +501,16 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = AuthenticationService.getRealmId()
             let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-            let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
+            // let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
             let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
-            let groupByFundingSourceType = document.getElementById("groupByFundingSourceType").value;
-            console.log('groupByFundingSourceType value = '+groupByFundingSourceType);
+            let groupByProcurementAgentType = this.state.procurementAgentTypeId;
+            let groupByFundingSourceType = this.state.groupByFundingSourceType;
             
             if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: '', loading: true
                 })
-                console.log('groupByProcurementAgentType: ' + groupByProcurementAgentType);
                 var inputjson = {
                     realmId: realmId,
                     startDate: startDate,
@@ -526,7 +526,6 @@ class ShipmentGlobalDemandView extends Component {
                 }
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
-                        console.log('response.data.fundingSourceSplit: ',response.data.fundingSourceSplit);
                         try {
                             var table1Headers = [];
                             table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
@@ -768,9 +767,7 @@ class ShipmentGlobalDemandView extends Component {
                             var planningUnitSplit = result1.filter(function (itm, i, a) {
                                 return i == a.indexOf(itm);
                             });
-                            console.log('offline- shipmentStatusFilter: ',shipmentStatusFilter);
                             let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: (item.productCost * item.currency.conversionRateToUsd) + (item.freightCost * item.currency.conversionRateToUsd) } });
-                            console.log('\noffline- preFundingSourceSplit:',preFundingSourceSplit);
                             let fundingSourceSplit = Object.values(preFundingSourceSplit.reduce((a, { fundingSource, amount }) => {
                                 if (!a[fundingSource.id])
                                     a[fundingSource.id] = Object.assign({}, { fundingSource, amount });
@@ -1681,7 +1678,6 @@ class ShipmentGlobalDemandView extends Component {
         if(procurementAgentTypeId == true){
             groupByFundingSourceType = false;
         }
-        console.log('procurementAgentTypeId: '+procurementAgentTypeId);
         this.setState({
             procurementAgentTypeId: procurementAgentTypeId,
             groupByFundingSourceType: groupByFundingSourceType,
@@ -1699,8 +1695,6 @@ class ShipmentGlobalDemandView extends Component {
         if(groupByFundingSourceType == true){
             procurementAgentTypeId = false;
         }
-        console.log('groupByFundingSourceType: '+groupByFundingSourceType);
-        console.log('procurementAgentTypeId...: '+procurementAgentTypeId);
         this.setState({
             groupByFundingSourceType: groupByFundingSourceType,
             procurementAgentTypeId: procurementAgentTypeId
@@ -1708,6 +1702,30 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
+
+    setGroupByValues(e) {
+        var groupByValue = e.target.value;
+        var procurementAgentTypeId = this.state.procurementAgentTypeId;
+        var groupByFundingSourceType = this.state.groupByFundingSourceType;
+        if(groupByValue == 1) {//Procurement Agent Type
+            procurementAgentTypeId = true;
+            groupByFundingSourceType = false;
+        } else if(groupByValue == 2) {//Funding Source Type
+            groupByFundingSourceType = true;
+            procurementAgentTypeId = false;
+        } else {
+            groupByFundingSourceType = false;
+            procurementAgentTypeId = false;
+        }
+        this.setState({
+            groupByFundingSourceType: groupByFundingSourceType,
+            procurementAgentTypeId: procurementAgentTypeId,
+            groupBy: groupByValue
+        }, () => {
+            this.fetchData();
+        })
+    }
+
     /**
      * Renders the Shipment Global Demand View report table.
      * @returns {JSX.Element} - Shipment Global Demand View report table.
@@ -1806,6 +1824,27 @@ class ShipmentGlobalDemandView extends Component {
         }
         const { rangeValue } = this.state
         const checkOnline = localStorage.getItem('sessionType');
+
+        const optionsPie = {
+            title: {
+                display: true,
+                text: this.state.groupByFundingSourceType ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
+                fontColor: 'black'
+            },
+            legend: {
+                position: 'bottom'
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return data.labels[tooltipItems.index] +
+                            " : " + " $ " +
+                            (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
+                    }
+                }
+            },
+        }
+
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1999,7 +2038,25 @@ class ShipmentGlobalDemandView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="groupBy">{i18n.t('static.report.includeapproved')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="groupBy"
+                                                        id="groupBy"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.setGroupByValues(e); }}
+                                                    >
+                                                        <option value="0">{i18n.t('static.supplyPlan.none')}</option>
+                                                        <option value="1">{i18n.t('static.dashboard.procurementagentType')}</option>
+                                                        <option value="2">{i18n.t('static.funderTypeHead.funderType')}</option>
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        {/* <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -2018,8 +2075,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     <b>{i18n.t('static.shipment.groupByProcurementAgentType')}</b>
                                                 </Label>
                                             </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                        </FormGroup> */}
+                                        {/* <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -2038,7 +2095,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     <b>{i18n.t('static.shipment.groupByFundingSourceType')}</b>
                                                 </Label>
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup> */}
                                     </div>
                                 </div>
                             </Form>
