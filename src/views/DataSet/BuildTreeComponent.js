@@ -13733,7 +13733,7 @@ export default class BuildTree extends Component {
                                             <div className="red">{errors.treeDropdown}</div>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.parentLevel')}</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentLevel')}</Label>
                                             <Input
                                                 type="select"
                                                 id="parentLevelDropdown"
