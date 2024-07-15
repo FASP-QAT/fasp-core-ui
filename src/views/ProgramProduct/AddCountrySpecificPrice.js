@@ -111,7 +111,7 @@ class CountrySpecificPrices extends Component {
      * @returns {Array} - Returns an array of active countries.
      */
     filterProgram = function (instance, cell, c, r, source) {
-        return this.state.procurementAgentArr.filter(c => c.active.toString() == "true");
+        return this.state.procurementAgentArr.filter(c => c.active.toString() == "true" && (c.programList.filter(c => c.id == (this.el.getJson(null, false)[r])[0])).length > 0);
     }.bind(this);
     /**
      * Function to filter active programs
@@ -316,169 +316,170 @@ class CountrySpecificPrices extends Component {
     }
     filterData() {
         if (this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0) {
-        this.setState({
-            loading: true
-        })
-        var json = {
-            programIdList: this.state.programValues.map(ele => ele.value),
-            planningUnitIdList: this.state.planningUnitValues.map(ele => ele.value),
-        };
-        ProcurementAgentService.getCountrySpecificPricesList(json).then(response => {
-            if (response.status == 200) {
-                let myResponse = response.data;
-                if (myResponse.length > 0) {
-                    this.setState({ rows: myResponse });
-                }
-                ProcurementAgentService.getProcurementAgentListAll().then(response => {
-                    if (response.status == 200) {
-                        this.setState({
-                            procurementAgents: response.data,
-                        })
-                        const { procurementAgents } = this.state;
-                        let procurementAgentArr = [];
-                        if (procurementAgents.length > 0) {
-                            for (var i = 0; i < procurementAgents.length; i++) {
-                                var paJson = {
-                                    name: getLabelText(procurementAgents[i].label, this.state.lang),
-                                    id: parseInt(procurementAgents[i].procurementAgentId),
-                                    active: procurementAgents[i].active,
-                                    code: procurementAgents[i].procurementAgentCode,
-                                }
-                                procurementAgentArr[i] = paJson
-                            }
-                        }
-                        procurementAgentArr.sort(function (a, b) {
-                            var itemLabelA = a.name.toUpperCase();
-                            var itemLabelB = b.name.toUpperCase();
-                            if (itemLabelA < itemLabelB) {
-                                return -1;
-                            }
-                            if (itemLabelA > itemLabelB) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-                        this.setState({
-                            procurementAgentArr: procurementAgentArr,
-                        }, () => {
-                            this.buildJexcel();
-                        })
-
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode,
-                            color: "red"
-                        },
-                            () => {
-                                hideSecondComponent();
+            this.setState({
+                loading: true
+            })
+            var json = {
+                programIdList: this.state.programValues.map(ele => ele.value),
+                planningUnitIdList: this.state.planningUnitValues.map(ele => ele.value),
+            };
+            ProcurementAgentService.getCountrySpecificPricesList(json).then(response => {
+                if (response.status == 200) {
+                    let myResponse = response.data;
+                    if (myResponse.length > 0) {
+                        this.setState({ rows: myResponse });
+                    }
+                    ProcurementAgentService.getProcurementAgentListAll().then(response => {
+                        if (response.status == 200) {
+                            this.setState({
+                                procurementAgents: response.data,
                             })
-                    }
-                })
-                    .catch(
-                        error => {
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
+                            const { procurementAgents } = this.state;
+                            let procurementAgentArr = [];
+                            if (procurementAgents.length > 0) {
+                                for (var i = 0; i < procurementAgents.length; i++) {
+                                    var paJson = {
+                                        name: getLabelText(procurementAgents[i].label, this.state.lang),
+                                        id: parseInt(procurementAgents[i].procurementAgentId),
+                                        active: procurementAgents[i].active,
+                                        code: procurementAgents[i].procurementAgentCode,
+                                        programList: procurementAgents[i].programList
+                                    }
+                                    procurementAgentArr[i] = paJson
                                 }
                             }
+                            procurementAgentArr.sort(function (a, b) {
+                                var itemLabelA = a.name.toUpperCase();
+                                var itemLabelB = b.name.toUpperCase();
+                                if (itemLabelA < itemLabelB) {
+                                    return -1;
+                                }
+                                if (itemLabelA > itemLabelB) {
+                                    return 1;
+                                }
+                                return 0;
+                            });
+                            this.setState({
+                                procurementAgentArr: procurementAgentArr,
+                            }, () => {
+                                this.buildJexcel();
+                            })
+
+                        } else {
+                            this.setState({
+                                message: response.data.messageCode,
+                                color: "red"
+                            },
+                                () => {
+                                    hideSecondComponent();
+                                })
                         }
-                    );
-            } else {
-                this.setState({
-                    message: response.data.messageCode,
-                    color: "red"
-                },
-                    () => {
-                        hideSecondComponent();
                     })
-            }
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false,
-                            color: "red",
-                        }, () => {
-                            hideSecondComponent()
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false,
-                                    color: "red",
-                                }, () => {
-                                    hideSecondComponent()
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false,
-                                    color: "red",
-                                }, () => {
-                                    hideSecondComponent()
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false,
-                                    color: "red",
-                                }, () => {
-                                    hideSecondComponent()
-                                });
-                                break;
+                        .catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        color: "red"
+                    },
+                        () => {
+                            hideSecondComponent();
+                        })
+                }
+            })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false,
+                                color: "red",
+                            }, () => {
+                                hideSecondComponent()
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: "red",
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                        color: "red",
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: "red",
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-        }else{
-            try{
+                );
+        } else {
+            try {
                 this.el = jexcel(document.getElementById("paputableDiv"), '');
                 jexcel.destroy(document.getElementById("paputableDiv"), true);
-            }catch(err){}
+            } catch (err) { }
         }
     }
     buildJexcel() {
@@ -916,10 +917,30 @@ class CountrySpecificPrices extends Component {
                 var index = (instance).getValue(`Q${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(0, data[i].y, this.state.programPlanningUnit.program.label.label_en, true);
-                    (instance).setValueFromCoords(1, data[i].y, this.state.programPlanningUnit.planningUnit.label.label_en, true);
+                    // (instance).setValueFromCoords(1, data[i].y, this.state.programPlanningUnit.planningUnit.label.label_en, true);
                     (instance).setValueFromCoords(17, data[i].y, 0, true);
                     (instance).setValueFromCoords(18, data[i].y, 1, true);
                     z = data[i].y;
+                }
+            }
+            if (data[i].x == 1) {
+                var value = data[i].value;
+                var filterProgram = (this.state.planningUnitListJexcel.filter(c => c.programId == -1 || (c.programId == (this.el.getJson(null, false)[data[i].y])[0])));
+                var filterPU = filterProgram.filter(c => c.name == value || c.id == value);
+                if (filterPU.length > 0) {
+                    (instance).setValueFromCoords(1, data[i].y, value, true);
+                } else {
+                    (instance).setValueFromCoords(1, data[i].y, "", true);
+                }
+            }
+            if (data[i].x == 2) {
+                var value = data[i].value;
+                var filterProgram = this.state.procurementAgentArr.filter(c => c.active.toString() == "true" && (c.programList.filter(c => c.id == (this.el.getJson(null, false)[data[i].y])[0])).length > 0);
+                var filterPU = filterProgram.filter(c => c.name == value || c.id == value);
+                if (filterPU.length > 0) {
+                    (instance).setValueFromCoords(2, data[i].y, value, true);
+                } else {
+                    (instance).setValueFromCoords(2, data[i].y, "", true);
                 }
             }
         }
@@ -1252,10 +1273,12 @@ class CountrySpecificPrices extends Component {
                     }
                     valid = false;
                 } else {
-                    for (var i = 3; i < 15; i++) {
-                        var col = (colArr[i]).concat(parseInt(y) + 1);
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
+                    if (valid) {
+                        for (var i = 3; i < 15; i++) {
+                            var col = (colArr[i]).concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
                     }
                 }
             }
@@ -1533,7 +1556,7 @@ class CountrySpecificPrices extends Component {
         let planningUnits = planningUnitList.length > 0
             && planningUnitList.map((item, i) => {
                 return (
-                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId, programId: item.programId }
+                    { label: (getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId), value: item.planningUnitId, programId: item.programId }
                 )
             }, this);
         return (
@@ -1672,7 +1695,7 @@ class CountrySpecificPrices extends Component {
                     changed: false,
                     message: i18n.t("static.actionCancelled"),
                     color: "red",
-                    loading:true
+                    loading: true
                 }, () => {
                     this.buildJexcel()
                 })
