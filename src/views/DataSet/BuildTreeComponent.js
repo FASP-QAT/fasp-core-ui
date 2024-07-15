@@ -602,6 +602,8 @@ export default class BuildTree extends Component {
             usageTemplateListAll: [],
             usageTemplateId: '',
             usageText: '',
+            usageText1: '',
+            usageText2: '',
             noOfMonthsInUsagePeriod: '',
             tracerCategoryId: '',
             forecastingUnitList: [],
@@ -6758,6 +6760,8 @@ export default class BuildTree extends Component {
     getUsageText() {
         try {
             var usageText = '';
+            var usageText1 = '';
+            var usageText2 = '';
             var noOfPersons = '';
             var noOfForecastingUnitsPerPerson = '';
             var usageFrequency = '';
@@ -6788,11 +6792,17 @@ export default class BuildTree extends Component {
                     if (this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true) {
                         var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
                         usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s), " + " " + addCommas(usageFrequency) + " " + i18n.t('static.tree.timesPer') + " " + selectedText2.trim() + " " + i18n.t('static.tree.for') + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim();
+                        // usageText1 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText1.trim() + "(s) / " + selectedText2.trim();
+                        // usageText2 = "(= " + this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson + " " + selectedText1.trim() + "(s) " + " / "+ this.state.currentScenario.fuNode.usageFrequency + " " + selectedText2.trim() + " * " + (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth + " " + selectedText2.trim() + "/" + i18n.t('static.common.month') + ")";
                     } else {
                         usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
+                        // usageText1 = "In total " + i18n.t('static.usageTemplate.every') + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText1.trim() + "(s) / " + selectedText2.trim();
+                        // usageText2 = "(= " + this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson + " " + selectedText1.trim() + "(s) " + " / "+ this.state.currentScenario.fuNode.usageFrequency + " " + selectedText2.trim() + " * " + (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth + " " + selectedText2.trim() + "/" + i18n.t('static.common.month') + ")";
                     }
                 } else {
                     usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) " + i18n.t('static.usageTemplate.every') + " " + addCommas(usageFrequency) + " " + selectedText2.trim() + " indefinitely";
+                    // usageText1 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText1.trim() + "(s) / " + selectedText2.trim();
+                    // usageText2 = "(= " + this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson + " " + selectedText1.trim() + "(s) " + " / "+ this.state.currentScenario.fuNode.usageFrequency + " " + selectedText2.trim() + " * " + (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth + " " + selectedText2.trim() + "/" + i18n.t('static.common.month') + ")";
                 }
             } else {
                 if (this.state.currentScenario.puNode.planningUnit.id != null && this.state.currentScenario.puNode.planningUnit.id != "") {
@@ -6819,7 +6829,9 @@ export default class BuildTree extends Component {
         }
         finally {
             this.setState({
-                usageText
+                usageText,
+                usageText1,
+                usageText2
             }, () => {
             });
         }
@@ -10517,6 +10529,9 @@ export default class BuildTree extends Component {
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
                                     }
+                                    {/* {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        // <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText1}</b> {this.state.usageText2} </div>
+                                    } */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => {
                                             if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
