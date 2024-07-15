@@ -3329,7 +3329,7 @@
     "static.tree.seeChildrenOf":"See Children of",
     "static.updatePU.noteText1":"Note : If you want to update procurement agent specific details, go to",
     "static.updatePU.noteText2":"screen",
-    "static.updatePPUPA.noteText1":"Note : If you want to update program specific specific details, go to",
+    "static.updatePPUPA.noteText1":"Note : If you want to update program specific details, go to",
     "static.updatePPUPA.noteText2":"screen",
     "static.updatePPUPA.atleastOneValue":"Enter atleast one of the value",
     "static.message.ppupaAlreadyExists":"Program, planning unit and procurement agent mapping already exists",
