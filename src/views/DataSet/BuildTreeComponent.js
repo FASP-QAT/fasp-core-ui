@@ -327,6 +327,51 @@ const validationSchemaLevel = function (values) {
     })
 }
 /**
+ * Defines the validation schema for copy/move node.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
+const validationSchemaCopyMove = function (values) {
+    return Yup.object().shape({
+        copyMove: Yup.number()
+            .test('copyMove', 'Please select action',
+                function (value) {
+                    if (document.getElementById("copyMoveTrue").checked || document.getElementById("copyMoveFalse").checked) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }),
+        treeDropdown: Yup.string()
+            .test('treeDropdown', 'Please select tree',
+                function (value) {
+                    if (document.getElementById("treeDropdown").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        parentLevelDropdown: Yup.string()
+            .test('parentLevelDropdown', 'Please select parent level',
+                function (value) {
+                    if (document.getElementById("parentLevelDropdown").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        parentNodeDropdown: Yup.string()
+            .test('parentNodeDropdown', 'Please select parent node',
+                function (value) {
+                    if (document.getElementById("parentNodeDropdown").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+    })
+}
+/**
  * Formats a numerical value by adding commas as thousand separators and truncating to 8 decimal places.
  * @param {string|number} cell1 - The numerical value to be formatted.
  * @param {Object} row - The row object if applicable.
@@ -904,8 +949,8 @@ export default class BuildTree extends Component {
         this.resetLevelReorder = this.resetLevelReorder.bind(this);
         this.getChildrenOfList = this.getChildrenOfList.bind(this);
         this.childrenOfChanged = this.childrenOfChanged.bind(this);
-        this.levelDropdownChange = this.copyModalTreeChange.bind(this);
-        this.copyModalTreeChange = this.levelDropdownChange.bind(this);
+        this.levelDropdownChange = this.levelDropdownChange.bind(this);
+        this.copyModalTreeChange = this.copyModalTreeChange.bind(this);
         this.copyModalParentLevelChange = this.copyModalParentLevelChange.bind(this);
         this.copyModalParentNodeChange = this.copyModalParentNodeChange.bind(this);
         this.copyMoveNode = this.copyMoveNode.bind(this);
@@ -7135,6 +7180,9 @@ export default class BuildTree extends Component {
                 if(this.state.copyModalData == 2) {
                     this.onRemoveButtonClick(itemConfig);
                 }
+                this.setState({
+                    copyModal: false
+                })
             })
         });
     }
@@ -13585,7 +13633,7 @@ export default class BuildTree extends Component {
                 className={'modal-md'}>
                 <Formik
                     enableReinitialize={true}
-                    // validationSchema={validationSchemaLevel}
+                    validationSchema={validationSchemaCopyMove}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.copyMoveNode();
                     }}
@@ -13646,7 +13694,7 @@ export default class BuildTree extends Component {
                                                 {i18n.t('static.tree.move')}
                                             </Label>
                                         </FormGroup>
-                                        <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
+                                        <div className="red">{errors.copyMove}</div>
                                     </FormGroup>
                                     <p>{i18n.t('static.tree.destination')}:</p>
                                     <FormGroup>
@@ -13670,6 +13718,7 @@ export default class BuildTree extends Component {
                                                 }, this)
                                             }
                                         </Input>
+                                        <div className="red">{errors.treeDropdown}</div>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.common.parentLevel')}</Label>
@@ -13691,6 +13740,7 @@ export default class BuildTree extends Component {
                                                     )
                                                 }, this)}
                                         </Input>
+                                        <div className="red">{errors.parentLevelDropdown}</div>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="currencyId">{i18n.t('static.tree.parentNode')}</Label>
@@ -13712,6 +13762,7 @@ export default class BuildTree extends Component {
                                                     )
                                                 }, this)}
                                         </Input>
+                                        <div className="red">{errors.parentNodeDropdown}</div>
                                     </FormGroup>
                                     <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                 </ModalBody>
