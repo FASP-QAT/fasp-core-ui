@@ -946,8 +946,8 @@ export default class BuildTree extends Component {
         this.resetLevelReorder = this.resetLevelReorder.bind(this);
         this.getChildrenOfList = this.getChildrenOfList.bind(this);
         this.childrenOfChanged = this.childrenOfChanged.bind(this);
-        this.levelDropdownChange = this.copyModalTreeChange.bind(this);
-        this.copyModalTreeChange = this.levelDropdownChange.bind(this);
+        this.levelDropdownChange = this.levelDropdownChange.bind(this);
+        this.copyModalTreeChange = this.copyModalTreeChange.bind(this);
         this.copyModalParentLevelChange = this.copyModalParentLevelChange.bind(this);
         this.copyModalParentNodeChange = this.copyModalParentNodeChange.bind(this);
         this.copyMoveNode = this.copyMoveNode.bind(this);
