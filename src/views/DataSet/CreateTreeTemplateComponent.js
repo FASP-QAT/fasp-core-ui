@@ -13125,7 +13125,7 @@ export default class CreateTreeTemplate extends Component {
                                             />
                                             <Label
                                                 className="form-check-label"
-                                                check htmlFor="inline-radio1">
+                                                check htmlFor="copyMoveTrue">
                                                 {i18n.t('static.tree.copy')}
                                             </Label>
                                         </FormGroup>
@@ -13143,81 +13143,83 @@ export default class CreateTreeTemplate extends Component {
                                             />
                                             <Label
                                                 className="form-check-label"
-                                                check htmlFor="inline-radio2">
+                                                check htmlFor="copyMoveFalse">
                                                 {i18n.t('static.tree.move')}
                                             </Label>
                                         </FormGroup>
                                         <div className="red">{errors.copyMove}</div>
                                     </FormGroup>
-                                    <p>{i18n.t('static.tree.destination')}:</p>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
-                                        <Input
-                                            type="select"
-                                            id="treeDropdown"
-                                            name="treeDropdown"
-                                            bsSize="sm"
-                                            disabled={true}
-                                            value={this.state.copyModalTree}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {this.state.treeTemplateList.length > 0
-                                                && this.state.treeTemplateList.map((item, i) => {
-                                                    return (
-                                                        <option key={i} value={item.treeTemplateId}>
-                                                            {item.label.label_en}
-                                                        </option>
-                                                    )
-                                                }, this)
-                                            }
-                                        </Input>
-                                        <div className="red">{errors.treeDropdown}</div>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.common.parentLevel')}</Label>
-                                        <Input
-                                            type="select"
-                                            id="parentLevelDropdown"
-                                            name="parentLevelDropdown"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.copyModalParentLevelChange(e) }}
-                                            value={this.state.copyModalParentLevel}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {this.state.copyModalParentLevelList.length > 0
-                                                && this.state.copyModalParentLevelList.map((item, i) => {
-                                                    return (
-                                                        <option key={i} value={item.levelNo}>
-                                                            {item.label.label_en}
-                                                        </option>
-                                                    )
-                                                }, this)}
-                                        </Input>
-                                        <div className="red">{errors.parentLevelDropdown}</div>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.parentNode')}</Label>
-                                        <Input
-                                            type="select"
-                                            id="parentNodeDropdown"
-                                            name="parentNodeDropdown"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.copyModalParentNodeChange(e) }}
-                                            value={this.state.copyModalParentNode}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {this.state.copyModalParentNodeList.length > 0
-                                                && this.state.copyModalParentNodeList.map((item, i) => {
-                                                    return (
-                                                        <option key={i} value={item.id}>
-                                                            {item.payload.label.label_en}
-                                                        </option>
-                                                    )
-                                                }, this)}
-                                        </Input>
-                                        <div className="red">{errors.parentNodeDropdown}</div>
-                                    </FormGroup>
-                                    <p>{i18n.t('static.tree.moveCopyNote')}</p>
+                                    <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
+                                        <p>{i18n.t('static.tree.destination')}:</p>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
+                                            <Input
+                                                type="select"
+                                                id="treeDropdown"
+                                                name="treeDropdown"
+                                                bsSize="sm"
+                                                disabled={true}
+                                                value={this.state.copyModalTree}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {this.state.treeTemplateList.length > 0
+                                                    && this.state.treeTemplateList.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.treeTemplateId}>
+                                                                {item.label.label_en}
+                                                            </option>
+                                                        )
+                                                    }, this)
+                                                }
+                                            </Input>
+                                            <div className="red">{errors.treeDropdown}</div>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.parentLevel')}</Label>
+                                            <Input
+                                                type="select"
+                                                id="parentLevelDropdown"
+                                                name="parentLevelDropdown"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.copyModalParentLevelChange(e) }}
+                                                value={this.state.copyModalParentLevel}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {this.state.copyModalParentLevelList.length > 0
+                                                    && this.state.copyModalParentLevelList.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.levelNo}>
+                                                                {item.label.label_en}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                            <div className="red">{errors.parentLevelDropdown}</div>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentNode')}</Label>
+                                            <Input
+                                                type="select"
+                                                id="parentNodeDropdown"
+                                                name="parentNodeDropdown"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.copyModalParentNodeChange(e) }}
+                                                value={this.state.copyModalParentNode}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {this.state.copyModalParentNodeList.length > 0
+                                                    && this.state.copyModalParentNodeList.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.id}>
+                                                                {item.payload.label.label_en}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                            <div className="red">{errors.parentNodeDropdown}</div>
+                                        </FormGroup>
+                                        <p>{i18n.t('static.tree.moveCopyNote')}</p>
+                                    </div>
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
