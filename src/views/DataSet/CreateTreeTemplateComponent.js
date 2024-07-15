@@ -2109,7 +2109,7 @@ export default class CreateTreeTemplate extends Component {
             levelNodes = this.state.treeTemplate.flatList.filter(m => m.level == this.state.levelNo);
             levelNodes.sort((a, b) => a.parent - b.parent);
             if(isShiftNode == undefined) {
-                var flatListUnsorted = this.state.treeTemplate.flatList;
+                var flatListUnsorted = levelNodes;
                 var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
                 var sortedArray = sortOrderArray.sort();
                 levelNodes = [];
@@ -12458,83 +12458,94 @@ export default class CreateTreeTemplate extends Component {
                                     <strong>{i18n.t('static.tree.levelDetails')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
-                                        <Input
-                                            type="select"
-                                            id="levelDropdown"
-                                            name="levelDropdown"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.levelDropdownChange(e) }}
-                                            value={this.state.levelNo}
-                                        >
-                                            {this.state.treeTemplate.levelList.length > 0
-                                                && this.state.treeTemplate.levelList.map((item, i) => {
-                                                    return (
-                                                        <option key={i} value={item.levelNo}>
-                                                            {item.label.label_en}
-                                                        </option>
-                                                    )
-                                                }, this)}
-                                        </Input>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input type="text"
-                                            id="levelName"
-                                            name="levelName"
-                                            required
-                                            readOnly={!this.state.editable}
-                                            valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
-                                            invalid={touched.levelName && !!errors.levelName}
-                                            onBlur={handleBlur}
-                                            onChange={(e) => { this.levelNameChanged(e); handleChange(e); }}
-                                            value={this.state.levelName}
-                                        ></Input>
-                                        <FormFeedback>{errors.levelName}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
-                                        <Input
-                                            type="select"
-                                            id="levelUnit"
-                                            name="levelUnit"
-                                            bsSize="sm"
-                                            disabled={!this.state.editable}
-                                            onChange={(e) => { this.levelUnitChange(e) }}
-                                            value={this.state.levelUnit}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {this.state.nodeUnitList.length > 0
-                                                && this.state.nodeUnitList.map((item, i) => {
-                                                    return (
-                                                        <option key={i} value={item.unitId}>
-                                                            {getLabelText(item.label, this.state.lang)}
-                                                        </option>
-                                                    )
-                                                }, this)}
-                                        </Input>
-                                    </FormGroup>
-                                    <p>{i18n.t('static.tree.levelChangeNote')}</p>
-                                    <FormGroup>
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
-                                        <MultiSelect
-                                            id="childrenOf"
-                                            name="childrenOf"
-                                            bsSize="sm"
-                                            options={this.state.childrenOfList}
-                                            onChange={(e) => { this.childrenOfChanged(e) }}
-                                            value={this.state.childrenOf}
-                                        />
-                                    </FormGroup>
-                                    <FormGroup>
-                                    {this.state.showReorderJexcel &&
-                                        <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                            <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                <div class="spinner-border blue ml-4" role="status">
+                                                </div>
                                             </div>
                                         </div>
-                                    }
-                                    </FormGroup>
+                                    </div>
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
+                                            <Input
+                                                type="select"
+                                                id="levelDropdown"
+                                                name="levelDropdown"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.levelDropdownChange(e) }}
+                                                value={this.state.levelNo}
+                                            >
+                                                {this.state.treeTemplate.levelList.length > 0
+                                                    && this.state.treeTemplate.levelList.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.levelNo}>
+                                                                {item.label.label_en}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="levelName"
+                                                name="levelName"
+                                                required
+                                                readOnly={!this.state.editable}
+                                                valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
+                                                invalid={touched.levelName && !!errors.levelName}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { this.levelNameChanged(e); handleChange(e); }}
+                                                value={this.state.levelName}
+                                            ></Input>
+                                            <FormFeedback>{errors.levelName}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                                            <Input
+                                                type="select"
+                                                id="levelUnit"
+                                                name="levelUnit"
+                                                bsSize="sm"
+                                                disabled={!this.state.editable}
+                                                onChange={(e) => { this.levelUnitChange(e) }}
+                                                value={this.state.levelUnit}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {this.state.nodeUnitList.length > 0
+                                                    && this.state.nodeUnitList.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.unitId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                        </FormGroup>
+                                        <p>{i18n.t('static.tree.levelChangeNote')}</p>
+                                        <FormGroup>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
+                                            <MultiSelect
+                                                id="childrenOf"
+                                                name="childrenOf"
+                                                bsSize="sm"
+                                                options={this.state.childrenOfList}
+                                                onChange={(e) => { this.childrenOfChanged(e) }}
+                                                value={this.state.childrenOf}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                        {this.state.showReorderJexcel &&
+                                            <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                                </div>
+                                            </div>
+                                        }
+                                        </FormGroup>
+                                    </div>
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
