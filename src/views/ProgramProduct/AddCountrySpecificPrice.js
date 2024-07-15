@@ -1107,6 +1107,14 @@ class CountrySpecificPrices extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                var puValue = this.el.getValueFromCoords(1, y, true);
+                var filterProgram = (this.state.planningUnitListJexcel.filter(c => c.programId == -1 || (c.programId == value)));
+                var filterPU = filterProgram.filter(c => c.name == puValue || c.id == puValue);
+                if (filterPU.length > 0) {
+                    // (instance).setValueFromCoords(1, y, value, true);
+                } else {
+                    this.el.setValueFromCoords(1, y, "", true);
+                }
             }
         }
         if (x == 1) {
