@@ -871,9 +871,10 @@ class ShipmentGlobalDemandView extends Component {
                             ctx.strokeStyle = dataset.backgroundColor[index];
                             ctx.stroke();                      
                             ctx.textAlign = x >= 0 ? 'left' : 'right';
-                            ctx.textBaseline = 'middle';
+                            ctx.font = 'bold 12px Arial';
+                            // ctx.textBaseline = 'middle';
                             ctx.fillStyle = dataset.backgroundColor[index];
-                            ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+20 : x < 0.5 ? labelX-20 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
+                            ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+8 : x < 0.5 ? labelX-8 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
                             ctx.restore();
                         }
                       }
