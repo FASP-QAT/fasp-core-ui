@@ -2418,7 +2418,6 @@ class CompareAndSelectScenario extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
-                                                
                                             </FormGroup>
                                             <FormGroup className="col-md-3 pickerRangeBox">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
@@ -2653,7 +2652,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             {this.state.xAxisDisplayBy == 1 &&
-                                                                <FormGroup className="col-md-2">
+                                                                <FormGroup className="col-md-4">
                                                                     <div className="col-md-12">
                                                                         <Input
                                                                             className="form-check-input"
@@ -2686,11 +2685,11 @@ class CompareAndSelectScenario extends Component {
                                                                     </div>
                                                                 </FormGroup>}
                                                             {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
-                                                                <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                                <FormGroup className="col-md-4 compareAndSelectDatePicker">
                                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                                     <div className="controls edit">
                                                                         <Picker
-                                                                            ref="pickAMonth2"
+                                                                            ref="pickRange"
                                                                             years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
                                                                             value={this.state.singleValue2}
                                                                             key={JSON.stringify(this.state.singleValue2)}
