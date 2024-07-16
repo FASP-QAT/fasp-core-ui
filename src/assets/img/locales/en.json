@@ -305,7 +305,7 @@
     "static.user.validpasswordlength": "Password can be 30 characters max",
     "static.extrapolation.BeforeYou": "Before you use this screen, please ensure you have completed the",
     "static.supplyPlan.index": "Index",
-    "static.compareAndSelect.compareToConsumptionForecast": "Compare to Forecast",
+    "static.compareAndSelect.compareToConsumptionForecast": "Compare to Consumption Forecast(s)",
     "static.mt.programNotMatch": "Program does not match.",
     "static.fundingSource.selectFundingSource": "Select Funding Source",
     "static.loadDeleteProgram.loadDeleteProgram": "Download/Delete Program",
@@ -1029,7 +1029,7 @@
     "static.common.programAndProgram": "Program",
     "static.supplyPlan.maxQtyFormula6": "Max Qty = 26,176",
     "static.dataEntryAndAdjustments.ClickInterpolate": "Click the green \"Interpolate\" button in the middle right of the screen to search for periods where the consumption value is blank and replace them with an interpolated value. QAT interpolates by finding the nearest values on either side (before or after the blank), calculates the straight line in between them and uses that straight-line formula to calculate the value for the blank(s).",
-    "static.compareAndSelect.aboveHighestConsumption": "% above the highest forecast.",
+    "static.compareAndSelect.aboveHighestConsumption": "% above highest",
     "static.supplyPlan.artmisShipments": "PSM Shipment from ARTMIS",
     "static.mt.shipentDelivered": "Shipment is already delivered",
     "static.procurementagent.realm": "Realm",
@@ -3347,5 +3347,9 @@
     "static.scenarioPlanning.endValue":"End Value",
     "static.whatIf.validEndValue":"Enter End Value",
     "static.whatIf.validStartValue":"Enter Start Value",
-    "static.shipmentOverview.pieChartNote":"Note: Percentage labels below 2% are not displayed"
+    "static.shipmentOverview.pieChartNote":"Note: Percentage labels below 2% are not displayed",
+    "static.compareAndSelect.selectForecast": "Click Planning Unit to display details",
+    "static.compareAndSelect.forecastSelected": "Forecast selected.",
+    "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
+    "static.compareAndSelect.showPUPanel": "Show PU panel"
 }

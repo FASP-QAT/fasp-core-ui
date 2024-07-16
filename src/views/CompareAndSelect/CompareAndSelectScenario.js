@@ -637,7 +637,7 @@ class CompareAndSelectScenario extends Component {
                     data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
-                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
+                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
                     dataCount = 3;
                     if (this.state.xAxisDisplayBy != 1) {
                         for (var i = 0; i < yearArray.length; i++) {
@@ -692,7 +692,7 @@ class CompareAndSelectScenario extends Component {
                     copyCompatibility: true,
                     allowExport: false,
                     position: 'top',
-                    filters: true,
+                    filters: false,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
                         return false;
@@ -737,12 +737,33 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
+
+    // Function to remove 'compareAndSelectPU' class from all <tr> elements
+    removeSelectedClass() {
+        var allTrElements = document.querySelectorAll('.planingUnitClass');
+        allTrElements.forEach(function (tr) {
+            tr.classList.remove('compareAndSelectPU');
+        });
+    }
+
     /**
      * Sets the planning unit ID in the component state based on the selected value.
      * @param {object} e - The event object containing the selected value.
      * @returns {void}
      */
     setPlanningUnitId(e) {
+        var trElement = document.querySelector('.planingUnitId-' + e);
+        // Check if the element exists before adding the class
+        if (trElement) {
+            this.removeSelectedClass();
+            trElement.classList.add('compareAndSelectPU');
+        } else {
+            // var pu = localStorage.getItem("sesDatasetPlanningUnitId")
+            // var trElement1 = document.querySelector('.planingUnitId-' + pu);
+            // trElement1.classList.add('compareAndSelectPU');
+            console.log('Element not found');
+        }
+
         var cont = false;
         if (this.state.dataChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -1635,8 +1656,7 @@ class CompareAndSelectScenario extends Component {
                             planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
                         } else if (map != undefined && map.scenarioId != null && map.treeId != null) {
                             var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
-                            console.log("============>", t)
-                            var s = t.scenarioList.filter(s => s.id == map.scenarioId)[0];
+                            var s = t != undefined ? t.scenarioList.filter(s => s.id == map.scenarioId)[0] : undefined;
                             selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
                             planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
                         } else {
@@ -2369,25 +2389,6 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            {/* <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="planningUnitId"
-                                                            id="planningUnitId"
-                                                            bsSize="sm"
-                                                            onChange={(e) => this.setPlanningUnitId(e)}
-                                                            value={this.state.planningUnitId}
-                                                            className="selectWrapText"
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {planningUnits}
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup> */}
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.tree.displayDate')}</Label>
                                                 <div className="controls ">
@@ -2473,8 +2474,8 @@ class CompareAndSelectScenario extends Component {
                                 </Form>
                                 <div class="pl-0">
                                     {this.state.datasetId != "" && this.state.regionId != "" &&
-                                        <div onClick={this.expandCompressPUFuntion} style={{ display: this.state.loading ? "none" : "block" }}>
-                                            {this.state.expandCompressPUBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                        <div onClick={this.expandCompressPUFuntion} style={{ display: this.state.loading ? "none" : "block", height: "45px" }}>
+                                            {this.state.expandCompressPUBtn ? <div><i className="fa fa-minus-square-o supplyPlanIcon" ></i> <span>{i18n.t("static.compareAndSelect.selectForecast")}<br /> ✅ {i18n.t("static.compareAndSelect.forecastSelected")} <i class="fa fa-exclamation-triangle"></i> {i18n.t("static.compareAndSelect.forecastNotSelected")}</span></div> : <div><i className="fa fa-plus-square-o supplyPlanIcon" ></i>  <span>{i18n.t("static.compareAndSelect.showPUPanel")}</span></div>}
                                         </div>
                                     }
                                     <div className="row">
@@ -2492,8 +2493,9 @@ class CompareAndSelectScenario extends Component {
                                                                 {this.state.planningUnitListForTable.map((ele, index) => {
                                                                     return (<>
                                                                         <tr>
-                                                                            <td className="sticky-col first-col clone text-left hoverTd" onClick={() => this.setPlanningUnitId(ele.planningUnit.id)}>
-                                                                                {ele.selectedForecast == "" ? <i class="fa fa-exclamation-triangle" style={{ marginRight: "5px" }}></i> : ""}{getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id}</td>
+                                                                            <td className={"planingUnitId-" + ele.planningUnit.id + " planingUnitClass sticky-col first-col clone text-left hoverTd"} onClick={() => this.setPlanningUnitId(ele.planningUnit.id)}>
+                                                                                {ele.selectedForecast != "" ? <span>✅ </span> : <i class="fa fa-exclamation-triangle"></i>}{getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id}
+                                                                            </td>
                                                                         </tr>
                                                                     </>)
                                                                 })}
@@ -2508,7 +2510,7 @@ class CompareAndSelectScenario extends Component {
                                                 <>
                                                     <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
                                                     <ul className="legendcommitversion">
-                                                        <li className='DarkThColr'><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
+                                                        {/* <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li> */}
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                                     </ul><br />
@@ -2602,7 +2604,6 @@ class CompareAndSelectScenario extends Component {
                                                                             id="planningUnitId"
                                                                             bsSize="sm"
                                                                             disabled={true}
-                                                                            // onChange={(e) => this.setPlanningUnitId(e)}
                                                                             value={this.state.planningUnitId}
                                                                             className="selectWrapText removeDropdownArrow"
                                                                         >
