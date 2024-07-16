@@ -2654,7 +2654,7 @@ class CompareAndSelectScenario extends Component {
                                                             </FormGroup>
                                                             {this.state.xAxisDisplayBy == 1 &&
                                                                 <FormGroup className="col-md-2">
-                                                                    <div className="pt-lg-2 col-md-12">
+                                                                    <div className="col-md-12">
                                                                         <Input
                                                                             className="form-check-input"
                                                                             type="checkbox"
@@ -2669,7 +2669,7 @@ class CompareAndSelectScenario extends Component {
                                                                             {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
                                                                         </Label>
                                                                     </div>
-                                                                    <div className="pt-lg-2 col-md-12">
+                                                                    <div className="col-md-12">
                                                                         <Input
                                                                             className="form-check-input"
                                                                             type="checkbox"
