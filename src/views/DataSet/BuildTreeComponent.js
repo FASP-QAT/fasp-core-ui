@@ -2691,8 +2691,8 @@ export default class BuildTree extends Component {
     }
     copyModalParentLevelChange(e) {
         let allowedNodeTypeList = [];
-        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
-        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,

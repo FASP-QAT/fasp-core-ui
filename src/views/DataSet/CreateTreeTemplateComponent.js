@@ -2488,7 +2488,10 @@ export default class CreateTreeTemplate extends Component {
     }
     copyMoveChange(event) {
         let val;
-        let copyModalTree = this.state.treeTemplateId;
+        let copyModalTree = this.state.treeTemplateId == "" ? -1 : this.state.treeTemplateId;
+        if(copyModalTree == -1) {
+            document.getElementById("treeDropdown").value = -1;
+        }
         let copyModalParentLevel;
         let copyModalParentNode;
         let copyModalTreeList = [];
@@ -2522,8 +2525,8 @@ export default class CreateTreeTemplate extends Component {
     }
     copyModalParentLevelChange(e) {
         let allowedNodeTypeList = [];
-        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
-        let copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+        let copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
@@ -13026,7 +13029,7 @@ export default class CreateTreeTemplate extends Component {
                                     <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
                                         <p>{i18n.t('static.tree.destination')}:</p>
                                         <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.listTreeTemp.templateName')}</Label>
                                             <Input
                                                 type="select"
                                                 id="treeDropdown"
@@ -13036,6 +13039,7 @@ export default class CreateTreeTemplate extends Component {
                                                 value={this.state.copyModalTree}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
+                                                <option value="-1">{this.state.treeTemplate.label.label_en}</option>
                                                 {this.state.treeTemplateList.length > 0
                                                     && this.state.treeTemplateList.map((item, i) => {
                                                         return (
