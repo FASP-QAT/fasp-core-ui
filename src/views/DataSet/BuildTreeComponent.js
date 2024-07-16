@@ -650,6 +650,10 @@ export default class BuildTree extends Component {
             usageTemplateListAll: [],
             usageTemplateId: '',
             usageText: '',
+            usageText1: '',
+            usageText2: '',
+            usageText3: '',
+            usageText4: '',
             noOfMonthsInUsagePeriod: '',
             tracerCategoryId: '',
             forecastingUnitList: [],
@@ -7395,6 +7399,7 @@ export default class BuildTree extends Component {
         this.setState({
             noFURequired: (noFURequired != "" && noFURequired != 0 ? noFURequired : 0)
         }, () => {
+            this.getUsageText();
         });
     }
     /**
@@ -7462,6 +7467,10 @@ export default class BuildTree extends Component {
     getUsageText() {
         try {
             var usageText = '';
+            var usageText1 = '';
+            var usageText2 = '';
+            var usageText3 = '';
+            var usageText4 = '';
             var noOfPersons = '';
             var noOfForecastingUnitsPerPerson = '';
             var usageFrequency = '';
@@ -7491,12 +7500,23 @@ export default class BuildTree extends Component {
                 if (this.state.currentScenario.fuNode.usageType.id == 1) {
                     if (this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true) {
                         var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
-                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s), " + " " + addCommas(usageFrequency) + " " + i18n.t('static.tree.timesPer') + " " + selectedText2.trim() + " " + i18n.t('static.tree.for') + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim();
+                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s), " + " " + addCommas(usageFrequency) + " " + i18n.t('static.tree.timesPer').toLowerCase() + " " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.for').toLowerCase() + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim().toLowerCase();
+                        
+                        usageText3 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(noOfForecastingUnitsPerPerson / noOfPersons) + " " + selectedText1.trim().toLowerCase() + "(s)" + " " + i18n.t('static.tree.eachTime').toLowerCase();
+                        usageText4 = "(= " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) / " + addCommas(noOfPersons) + " " + selectedText.trim() + ")";
+                        
+                        usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(this.state.noFURequired) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                        usageText2 = "(= " + addCommas(noOfForecastingUnitsPerPerson / noOfPersons) + " " + selectedText1.trim().toLowerCase() + "(s) * " + addCommas(usageFrequency) + " " + i18n.t('static.tree.times').toLowerCase() + " / " + selectedText2.trim().toLowerCase() + " * " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim().toLowerCase() + ")";
+                        
                     } else {
-                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
+                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                        usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(noOfForecastingUnitsPerPerson / noOfPersons) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                        usageText2 = "(= " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ addCommas(noOfPersons) + " " + selectedText.trim().toLowerCase() + "(s) " + ")";
                     }
                 } else {
-                    usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) " + i18n.t('static.usageTemplate.every') + " " + addCommas(usageFrequency) + " " + selectedText2.trim() + " indefinitely";
+                    usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s) " + i18n.t('static.usageTemplate.every').toLowerCase() + " " + addCommas(usageFrequency) + " " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
+                    usageText1 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText1.trim().toLowerCase() + "(s) / " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
+                    usageText2 = "(= " + this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson + " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ this.state.currentScenario.fuNode.usageFrequency + " " + selectedText2.trim().toLowerCase() + " * " + (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth + " " + selectedText2.trim().toLowerCase() + "/" + i18n.t('static.common.month').toLowerCase() + ")";
                 }
             } else {
                 if (this.state.currentScenario.puNode.planningUnit.id != null && this.state.currentScenario.puNode.planningUnit.id != "") {
@@ -7523,7 +7543,11 @@ export default class BuildTree extends Component {
         }
         finally {
             this.setState({
-                usageText
+                usageText,
+                usageText1,
+                usageText2,
+                usageText3,
+                usageText4
             }, () => {
             });
         }
@@ -11198,42 +11222,16 @@ export default class BuildTree extends Component {
                                                     <FormFeedback className="red">{errors.usagePeriodIdCon}</FormFeedback>
                                                 </FormGroup>
                                             </>
-                                            <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
-                                                {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
-                                                    <table className="table table-bordered">
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson)}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            {this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" &&
-                                                                <td style={{ width: '50%' }}>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
-                                                            {this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId == "" &&
-                                                                <td style={{ width: '50%' }}></td>
-                                                            }
-                                                        </tr>
-                                                    </table>}
-                                                {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
-                                                    <table className="table table-bordered">
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}{"/ Time"}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient') + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
-                                                        </tr>
-                                                    </table>}
-                                            </div>
                                         </div>
                                     </div>
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+                                    }
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText3}</b> {this.state.usageText4} </div>
+                                    }
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText1}</b> {this.state.usageText2} </div>
                                     }
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => {

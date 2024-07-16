@@ -3351,5 +3351,9 @@
     "static.compareAndSelect.selectForecast": "Click Planning Unit to display details",
     "static.compareAndSelect.forecastSelected": "Forecast selected.",
     "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
-    "static.compareAndSelect.showPUPanel": "Show PU panel"
+    "static.compareAndSelect.showPUPanel": "Show PU panel",
+    "static.tree.times": "times",
+    "static.tree.inTotal": "In total, ",
+    "static.tree.eachTime": "each time",
+    "static.tree.indefinitely": "indefinitely"
 }
