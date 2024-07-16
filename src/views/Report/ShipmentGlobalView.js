@@ -1096,6 +1096,19 @@ class ShipmentGlobalView extends Component {
                 lab: [],
                 val: []
             });
+        } else if (viewby == 4 && this.state.fundingSourceTypeValues.length == 0) {
+            this.setState({
+                message: i18n.t('Select Funding Source Type'),
+                data: [],
+                shipmentList: [],
+                dateSplitList: [],
+                countrySplitList: [],
+                countryShipmentSplitList: [],
+                table1Headers: [],
+                table1Body: [],
+                lab: [],
+                val: []
+            });
         }
     }
     /**

@@ -1703,6 +1703,10 @@ class ShipmentGlobalDemandView extends Component {
         })
     }
 
+    /**
+     * Sets the group by & related flags to state based on the selected dropdown value.
+     * @param {object} e - The event object containing checkbox information.
+     */
     setGroupByValues(e) {
         var groupByValue = e.target.value;
         var procurementAgentTypeId = this.state.procurementAgentTypeId;
