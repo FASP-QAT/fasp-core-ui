@@ -10889,14 +10889,20 @@ legend.scheduler-border {
   padding: 6px 10px 5px 10px !important;
   background: #fff;
 }
-.fixTableHeadCompareandselect{
+
+.fixTableHeadCompareandselect {
   max-height: calc(100vh - 300px) !important;
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
 .compareAndSelectPlanningUnitTableTdWidth {
   overflow: hidden !important;
   min-width: 162px !important;
   word-wrap: break-word !important;
   z-index: 1;
+}
+
+.compareAndSelectPU {
+  background-color: #e5e5e5 !important;
 }
