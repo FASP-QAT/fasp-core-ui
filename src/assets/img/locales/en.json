@@ -3355,5 +3355,14 @@
     "static.tree.times": "times",
     "static.tree.inTotal": "In total, ",
     "static.tree.eachTime": "each time",
-    "static.tree.indefinitely": "indefinitely"
+    "static.tree.indefinitely": "indefinitely",
+    "static.funderTypeHead.funderType": "Funding Source Type",
+    "static.funderType.funderTypeName": "Funding Source Type Name",
+    "static.funderType.funderTypeCode": "Funding Source Type Display Name",
+    "static.funderType.funderTypeNameText": "Funding Source Type name is required",
+    "static.funderType.funderTypeCodeText": "Funding Source Type display name is required",
+    "static.shipment.groupByFundingSourceType": "Group by Funding Source Type",
+    "static.report.fundingSourceTypeUsdAmount": "* The funding source type amount is in USD",
+    "static.shipment.shipmentFundingSourceType": "Shipment Funding Source Type",
+    "static.shipment.selectFundingSourceType": "Select Funding Source Type"
 }
