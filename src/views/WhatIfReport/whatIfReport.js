@@ -36,7 +36,7 @@ import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INTEGER_NO_REGEX, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INTEGER_NO_REGEX, INTERPOLATE_DATA_SOURCE_ID, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
@@ -60,7 +60,9 @@ let initialValues = {
     procurementAgentIdSingle: '',
     fundingSourceIdSingle: '',
     monthsInFutureForAmc: '',
-    monthsInPastForAmc: ''
+    monthsInPastForAmc: '',
+    endValue: '',
+    startValue: ''
 }
 /**
  * This const is used to define the validation schema for scenario options
@@ -80,6 +82,29 @@ const validationSchema = function (values, t) {
                 then: Yup.string()
                     .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
                     .required(i18n.t('static.whatIf.validpercentage'))
+                ,
+                otherwise: Yup.string().notRequired()
+            }),
+        needEndValueValidation: Yup.boolean(),
+        endValue: Yup.string()
+            .when("needEndValueValidation", {
+                is: val => {
+                    return document.getElementById("needEndValueValidation").value === "true";
+                },
+                then: Yup.string()
+                    .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
+                    .required(i18n.t('static.whatIf.validEndValue'))
+                ,
+                otherwise: Yup.string().notRequired()
+            }),
+        startValue: Yup.string()
+            .when("needEndValueValidation", {
+                is: val => {
+                    return document.getElementById("needEndValueValidation").value === "true";
+                },
+                then: Yup.string()
+                    .matches(INTEGER_NO_REGEX, i18n.t('static.common.onlyIntegers'))
+                    .required(i18n.t('static.whatIf.validStartValue'))
                 ,
                 otherwise: Yup.string().notRequired()
             }),
@@ -205,6 +230,8 @@ export default class WhatIfReportComponent extends React.Component {
             expiredStockArr: [],
             scenarioId: '',
             percentage: '',
+            endValue: '',
+            startValue: '',
             removePlannedThatDoNotFollowLeadTime: false,
             monthsInFutureForAmc: '',
             monthsInPastForAmc: '',
@@ -249,7 +276,7 @@ export default class WhatIfReportComponent extends React.Component {
             shipmentQtyTotalForPopup: 0,
             batchQtyTotalForPopup: 0,
             activeTab: new Array(3).fill('1'),
-            takeDataFrom:"programData"
+            takeDataFrom: "programData"
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
@@ -354,14 +381,22 @@ export default class WhatIfReportComponent extends React.Component {
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.setState({ startDate: value, monthCount: monthDifference })
         localStorage.setItem("sesStartDate", JSON.stringify(value));
-        this.formSubmit(this.state.planningUnit, monthDifference,0,1);
+        this.formSubmit(this.state.planningUnit, monthDifference, 0, 1);
     }
     /**
      * This function is used to update the date filter value for which the specific scenario should be applied
      * @param {*} value  This is the value that user has selected
      */
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
+        var planningUnitId = (document.getElementById("planningUnitId").value);
+        var rangeValue = value;
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString()=="true");
+        var startValue = "";
+        startConsumptionRecord.map(c => {
+            startValue = Number(startValue) + Number(c.consumptionQty);
+        })
+        this.setState({ rangeValue: value, startValue: startValue })
     }
     /**
      * This function is used to set the procurement agent Ids that is selected for a particular scenario
@@ -662,6 +697,8 @@ export default class WhatIfReportComponent extends React.Component {
                         rows: [],
                         scenarioId: '',
                         percentage: '',
+                        endValue: '',
+                        startValue: '',
                         removePlannedThatDoNotFollowLeadTime: false,
                         monthsInPastForAmc: '',
                         monthsInFutureForAmc: ''
@@ -675,7 +712,7 @@ export default class WhatIfReportComponent extends React.Component {
      */
     saveSupplyPlan() {
         this.setState({
-            planningUnitChange:false
+            planningUnitChange: false
         })
         var db1;
         getDatabase();
@@ -739,11 +776,13 @@ export default class WhatIfReportComponent extends React.Component {
                                 rows: [],
                                 scenarioId: '',
                                 percentage: '',
+                                endValue: '',
+                                startValue: '',
                                 removePlannedThatDoNotFollowLeadTime: false,
                                 monthsInPastForAmc: '',
                                 monthsInFutureForAmc: '',
-                                planningUnitChange:true,
-                                programModified:0
+                                planningUnitChange: true,
+                                programModified: 0
                             })
                         }.bind(this)
                     }.bind(this)
@@ -764,18 +803,21 @@ export default class WhatIfReportComponent extends React.Component {
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             } else if (event.target.value == 3) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "contents";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             } else if (event.target.value == 7) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields2").style.display = "contents";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
                 var localProcurementLeadTime = ((this.state.programPlanningUnitList).filter(p => p.program.id == this.state.generalProgramJson.programId && p.planningUnit.id == this.state.planningUnitId))[0].localProcurementLeadTime;
                 var dt = new Date();
                 dt.setMonth(dt.getMonth() + localProcurementLeadTime);
@@ -800,34 +842,59 @@ export default class WhatIfReportComponent extends React.Component {
                 document.getElementById("scenariosFields3").style.display = "contents";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             } else if (event.target.value == 4) {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "contents";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
+            } else if (event.target.value == 9) {
+                var planningUnitId = (document.getElementById("planningUnitId").value);
+                var rangeValue = this.state.rangeValue;
+                let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString()=="true");
+                var startValue = "";
+                startConsumptionRecord.map(c => {
+                    startValue = Number(startValue) + Number(c.consumptionQty);
+                })
+                this.setState({
+                    startValue:startValue
+                })
+                document.getElementById("consumptionScenariosFields1").style.display = "none";
+                document.getElementById("consumptionScenariosFields2").style.display = "contents";
+                document.getElementById("scenariosFields2").style.display = "none";
+                document.getElementById("scenariosFields3").style.display = "none";
+                document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "contents";
             } else {
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields2").style.display = "none";
                 document.getElementById("scenariosFields3").style.display = "none";
                 document.getElementById("scenariosFields4").style.display = "none";
+                document.getElementById("endValueField").style.display = "none";
             }
         } else if (event.target.name === 'percentage') {
             this.setState({ percentage: event.target.value });
+        } else if (event.target.name === 'endValue') {
+            this.setState({ endValue: event.target.value });
+        } else if (event.target.name === 'startValue') {
+            this.setState({ startValue: event.target.value });
         } else if (event.target.name === 'monthsInPastForAmc') {
             this.setState({ monthsInPastForAmc: event.target.value, monthsInPastForAMC: event.target.value });
         } else if (event.target.name === 'monthsInFutureForAmc') {
             this.setState({ monthsInFutureForAmc: event.target.value, monthsInFutureForAMC: event.target.value });
-        }else if(event.target.name==='takeDataFrom'){
+        } else if (event.target.name === 'takeDataFrom') {
             this.setState({
-                loading:true,
-                takeDataFrom:event.target.value,
-                planningUnitChange:false
-            },()=>{
+                loading: true,
+                takeDataFrom: event.target.value,
+                planningUnitChange: false
+            }, () => {
                 this.setState({
-                    planningUnitChange:true,
-                    loading:false
+                    planningUnitChange: true,
+                    loading: false
                 })
             })
         }
@@ -866,178 +933,349 @@ export default class WhatIfReportComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false,
-                    color: "#BA0C2F"
-                })
-                this.hideFirstComponent()
+            var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+            var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+            var rcpuRequest = rcpuOs.getAll();
+            rcpuRequest.onerror = function (event) {
+                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "#BA0C2F");
+                this.props.hideFirstComponent();
             }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataJson = programRequest.result.programData;
-                var planningUnitDataList = programDataJson.planningUnitDataList;
-                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                var programJson = {}
-                if (planningUnitDataIndex != -1) {
-                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    programJson = JSON.parse(programData);
-                } else {
-                    programJson = {
-                        consumptionList: [],
-                        inventoryList: [],
-                        shipmentList: [],
-                        batchInfoList: [],
-                        supplyPlan: []
+            rcpuRequest.onsuccess = function (event) {
+                var rcpuResult = [];
+                rcpuResult = rcpuRequest.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "#BA0C2F"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataJson = programRequest.result.programData;
+                    var planningUnitDataList = programDataJson.planningUnitDataList;
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
                     }
-                }
-                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
-                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-                var generalProgramJson = JSON.parse(generalProgramData);
-                var rows = this.state.rows;
-                var minimumDate = moment(Date.now()).format("YYYY-MM-DD");
-                for (var r = 0; r < rows.length; r++) {
-                    if (rows[r].scenarioChecked) {
-                        if (rows[r].scenarioId == 3) {
-                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
-                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
-                            var shipmentList = programJson.shipmentList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
-                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
-                                minimumDate = minDate;
-                            }
-                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                                var index = 0;
-                                if (shipmentUnFundedList[i].shipmentId > 0) {
-                                    index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
-                                } else {
-                                    index = shipmentUnFundedList[i].index;
+                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalProgramJson = JSON.parse(generalProgramData);
+                    var rows = this.state.rows;
+                    var minimumDate = moment(Date.now()).format("YYYY-MM-DD");
+                    for (var r = 0; r < rows.length; r++) {
+                        if (rows[r].scenarioChecked) {
+                            if (rows[r].scenarioId == 3) {
+                                let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                                let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                                var shipmentList = programJson.shipmentList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
                                 }
-                                shipmentList[index].active = false;
-                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                var curUser = AuthenticationService.getLoggedInUserId();
-                                shipmentList[index].lastModifiedBy.userId = curUser;
-                                shipmentList[index].lastModifiedDate = curDate;
-                            }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: SHIPMENT_MODIFIED,
-                                date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
-                            })
-                            programJson.shipmentList = shipmentList;
-                            generalProgramJson.actionList = actionList;
-                        } else if (rows[r].scenarioId == 1) {
-                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
-                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
-                            var consumptionList = programJson.consumptionList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var consumptionFiltered = consumptionList.filter(c => c.active == true
-                                && c.planningUnit.id == planningUnitId
-                                && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
-                                && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
-                                && (c.actualFlag).toString() == "false"
-                            );
-                            var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
-                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
-                                minimumDate = minDate;
-                            }
-                            for (var i = 0; i < consumptionFiltered.length; i++) {
-                                var index = 0;
-                                if (consumptionFiltered[i].consumptionId > 0) {
-                                    index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
-                                } else {
-                                    index = consumptionList.findIndex(c =>
-                                        c.region.id == consumptionFiltered[i].region.id &&
-                                        c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
-                                        c.actualFlag == consumptionFiltered[i].actualFlag
-                                    );
+                                var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
+                                var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                                if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                    minimumDate = minDate;
                                 }
-                                consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
-                                consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
-                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                var curUser = AuthenticationService.getLoggedInUserId();
-                                consumptionList[index].lastModifiedBy.userId = curUser;
-                                consumptionList[index].lastModifiedDate = curDate;
-                            }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: FORECASTED_CONSUMPTION_MODIFIED,
-                                date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
-                            })
-                            programJson.consumptionList = consumptionList;
-                            generalProgramJson.actionList = actionList;
-                        } else if (rows[r].scenarioId == 2) {
-                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
-                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
-                            var consumptionList = programJson.consumptionList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var consumptionFiltered = consumptionList.filter(c => c.active == true
-                                && c.planningUnit.id == planningUnitId
-                                && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
-                                && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
-                                && (c.actualFlag).toString() == "false"
-                            );
-                            var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
-                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
-                                minimumDate = minDate;
-                            }
-                            for (var i = 0; i < consumptionFiltered.length; i++) {
-                                var index = 0;
-                                if (consumptionFiltered[i].consumptionId > 0) {
-                                    index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
-                                } else {
-                                    index = consumptionList.findIndex(c =>
-                                        c.region.id == consumptionFiltered[i].region.id &&
-                                        c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                        moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
-                                        c.actualFlag == consumptionFiltered[i].actualFlag
-                                    );
+                                for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                    var index = 0;
+                                    if (shipmentUnFundedList[i].shipmentId > 0) {
+                                        index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                    } else {
+                                        index = shipmentUnFundedList[i].index;
+                                    }
+                                    shipmentList[index].active = false;
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    shipmentList[index].lastModifiedBy.userId = curUser;
+                                    shipmentList[index].lastModifiedDate = curDate;
                                 }
-                                consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
-                                consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
-                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                var curUser = AuthenticationService.getLoggedInUserId();
-                                consumptionList[index].lastModifiedBy.userId = curUser;
-                                consumptionList[index].lastModifiedDate = curDate;
-                            }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: FORECASTED_CONSUMPTION_MODIFIED,
-                                date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
-                            })
-                            programJson.consumptionList = consumptionList;
-                            generalProgramJson.actionList = actionList;
-                        } else if (rows[r].scenarioId == 4) {
-                            var shipmentList = programJson.shipmentList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
-                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
-                                minimumDate = minDate;
-                            }
-                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                                if (rows[r].removePlannedThatDoNotFollowLeadTime) {
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.shipmentList = shipmentList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (rows[r].scenarioId == 1) {
+                                let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                                let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                                var consumptionList = programJson.consumptionList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var consumptionFiltered = consumptionList.filter(c => c.active == true
+                                    && c.planningUnit.id == planningUnitId
+                                    && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
+                                    && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
+                                    && (c.actualFlag).toString() == "false"
+                                );
+                                var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
+                                if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                    minimumDate = minDate;
+                                }
+                                for (var i = 0; i < consumptionFiltered.length; i++) {
+                                    var index = 0;
+                                    if (consumptionFiltered[i].consumptionId > 0) {
+                                        index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
+                                    } else {
+                                        index = consumptionList.findIndex(c =>
+                                            c.region.id == consumptionFiltered[i].region.id &&
+                                            c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
+                                            moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
+                                            c.actualFlag == consumptionFiltered[i].actualFlag
+                                        );
+                                    }
+                                    consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                                    consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    consumptionList[index].lastModifiedBy.userId = curUser;
+                                    consumptionList[index].lastModifiedDate = curDate;
+                                }
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: FORECASTED_CONSUMPTION_MODIFIED,
+                                    date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.consumptionList = consumptionList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (rows[r].scenarioId == 2) {
+                                let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                                let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                                var consumptionList = programJson.consumptionList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var consumptionFiltered = consumptionList.filter(c => c.active == true
+                                    && c.planningUnit.id == planningUnitId
+                                    && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
+                                    && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
+                                    && (c.actualFlag).toString() == "false"
+                                );
+                                var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
+                                if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                    minimumDate = minDate;
+                                }
+                                for (var i = 0; i < consumptionFiltered.length; i++) {
+                                    var index = 0;
+                                    if (consumptionFiltered[i].consumptionId > 0) {
+                                        index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
+                                    } else {
+                                        index = consumptionList.findIndex(c =>
+                                            c.region.id == consumptionFiltered[i].region.id &&
+                                            c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
+                                            moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
+                                            c.actualFlag == consumptionFiltered[i].actualFlag
+                                        );
+                                    }
+                                    consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                                    consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(rows[r].percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    consumptionList[index].lastModifiedBy.userId = curUser;
+                                    consumptionList[index].lastModifiedDate = curDate;
+                                }
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: FORECASTED_CONSUMPTION_MODIFIED,
+                                    date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.consumptionList = consumptionList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (rows[r].scenarioId == 4) {
+                                var shipmentList = programJson.shipmentList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
+                                var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                                if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                    minimumDate = minDate;
+                                }
+                                for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                    if (rows[r].removePlannedThatDoNotFollowLeadTime) {
+                                        var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                                        var submittedDate = shipmentUnFundedList[i].submittedDate;
+                                        var approvedDate = shipmentUnFundedList[i].approvedDate;
+                                        var shippedDate = shipmentUnFundedList[i].shippedDate;
+                                        var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                                        var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                                        if (shipmentUnFundedList[i].localProcurement) {
+                                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                            var leadTimesPerStatus = addLeadTimes / 5;
+                                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                            shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                            approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                            submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                            plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                        } else {
+                                            var ppUnit = papuResult;
+                                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                            }
+                                            var approvedToShippedLeadTime = "";
+                                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
+                                            }
+                                            var shippedToArrivedLeadTime = ""
+                                            if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                            } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                            } else {
+                                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                            }
+                                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        }
+                                        if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                            var index = 0;
+                                            if (shipmentUnFundedList[i].shipmentId > 0) {
+                                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                            } else {
+                                                index = shipmentUnFundedList[i].index;
+                                            }
+                                            shipmentList[index].accountFlag = 0;
+                                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                            var curUser = AuthenticationService.getLoggedInUserId();
+                                            shipmentList[index].lastModifiedBy.userId = curUser;
+                                            shipmentList[index].lastModifiedDate = curDate;
+                                        }
+                                    } else {
+                                        var index = 0;
+                                        if (shipmentUnFundedList[i].shipmentId > 0) {
+                                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                        } else {
+                                            index = shipmentUnFundedList[i].index;
+                                        }
+                                        shipmentList[index].accountFlag = 0;
+                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                        var curUser = AuthenticationService.getLoggedInUserId();
+                                        shipmentList[index].lastModifiedBy.userId = curUser;
+                                        shipmentList[index].lastModifiedDate = curDate;
+                                    }
+                                }
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.shipmentList = shipmentList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (rows[r].scenarioId == 5) {
+                                var shipmentList = programJson.shipmentList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                                var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                                if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                    minimumDate = minDate;
+                                }
+                                for (var i = 0; i < shipmentUnFundedList.length; i++) {
                                     var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                                    var plannedDate = shipmentUnFundedList[i].plannedDate;
+                                    var submittedDate = shipmentUnFundedList[i].submittedDate;
+                                    var approvedDate = shipmentUnFundedList[i].approvedDate;
+                                    var shippedDate = shipmentUnFundedList[i].shippedDate;
+                                    var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                                    var receivedDate = shipmentUnFundedList[i].receivedDate;
+                                    var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                                    if (shipmentUnFundedList[i].localProcurement) {
+                                        var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                        var leadTimesPerStatus = addLeadTimes / 5;
+                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                        shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                        approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                        submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                        plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                    } else {
+                                        var ppUnit = papuResult;
+                                        var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                        if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                            submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                        }
+                                        var approvedToShippedLeadTime = "";
+                                        approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                        if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                            approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
+                                        }
+                                        var shippedToArrivedLeadTime = ""
+                                        if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                            shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                        } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                            shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                        } else {
+                                            shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                        }
+                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    }
+                                    if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                        var index = 0;
+                                        if (shipmentUnFundedList[i].shipmentId > 0) {
+                                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                        } else {
+                                            index = shipmentUnFundedList[i].index;
+                                        }
+                                        shipmentList[index].accountFlag = 0;
+                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                        var curUser = AuthenticationService.getLoggedInUserId();
+                                        shipmentList[index].lastModifiedBy.userId = curUser;
+                                        shipmentList[index].lastModifiedDate = curDate;
+                                    }
+                                }
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.shipmentList = shipmentList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (rows[r].scenarioId == 6) {
+                                var shipmentList = programJson.shipmentList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                                var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                                if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
+                                    minimumDate = minDate;
+                                }
+                                for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                                    var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                                    var plannedDate = shipmentUnFundedList[i].plannedDate;
                                     var submittedDate = shipmentUnFundedList[i].submittedDate;
                                     var approvedDate = shipmentUnFundedList[i].approvedDate;
                                     var shippedDate = shipmentUnFundedList[i].shippedDate;
@@ -1084,120 +1322,587 @@ export default class WhatIfReportComponent extends React.Component {
                                             index = shipmentUnFundedList[i].index;
                                         }
                                         shipmentList[index].accountFlag = 0;
-                                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                        var curUser = AuthenticationService.getLoggedInUserId();
-                                        shipmentList[index].lastModifiedBy.userId = curUser;
-                                        shipmentList[index].lastModifiedDate = curDate;
                                     }
-                                } else {
+                                }
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.shipmentList = shipmentList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (rows[r].scenarioId == 7) {
+                                let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
+                                let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
+                                var rangeValue1 = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+                                this.setState({
+                                    scenarioId: rows[r].scenarioId,
+                                    procurementAgentIdSingle: rows[r].procurementAgentIdSingle,
+                                    fundingSourceIdSingle: rows[r].fundingSourceIdSingle,
+                                    budgetIdSingle: rows[r].budgetIdSingle,
+                                    procurementAgents: rows[r].procurementAgents,
+                                    fundingSources: rows[r].fundingSources,
+                                    rangeValue1: rangeValue1
+                                })
+                                var shipmentList = programJson.shipmentList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var procurementAgentIds = [...new Set(rows[r].procurementAgents.map(ele => ele.value))];
+                                var fundingSourceIds = [...new Set(rows[r].fundingSources.map(ele => ele.value))];
+                                var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id) && fundingSourceIds.includes(c.fundingSource.id));
+                                var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                                for (var i = 0; i < shipmentUnFundedList.length; i++) {
                                     var index = 0;
                                     if (shipmentUnFundedList[i].shipmentId > 0) {
                                         index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
                                     } else {
                                         index = shipmentUnFundedList[i].index;
                                     }
-                                    shipmentList[index].accountFlag = 0;
+                                    shipmentList[index].active = false;
                                     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
                                     shipmentList[index].lastModifiedDate = curDate;
                                 }
-                            }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: SHIPMENT_MODIFIED,
-                                date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
-                            })
-                            programJson.shipmentList = shipmentList;
-                            generalProgramJson.actionList = actionList;
-                        } else if (rows[r].scenarioId == 5) {
-                            var shipmentList = programJson.shipmentList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
-                                minimumDate = minDate;
-                            }
-                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                                var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
-                                var plannedDate = shipmentUnFundedList[i].plannedDate;
-                                var submittedDate = shipmentUnFundedList[i].submittedDate;
-                                var approvedDate = shipmentUnFundedList[i].approvedDate;
-                                var shippedDate = shipmentUnFundedList[i].shippedDate;
-                                var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                                var receivedDate = shipmentUnFundedList[i].receivedDate;
-                                var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
-                                if (shipmentUnFundedList[i].localProcurement) {
-                                    var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
-                                    var leadTimesPerStatus = addLeadTimes / 5;
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                    shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                    approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                    submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: SHIPMENT_MODIFIED,
+                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.shipmentList = shipmentList;
+                                generalProgramJson.actionList = actionList;
+                            } else if (this.state.scenarioId == 9) {
+                                var rangeValue = rows[r].rangeValue;
+                                let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                                let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                let startValue = Number(rows[r].startValue);
+                                let endValue = Number(rows[r].endValue);
+                                const start = moment(startDate);
+                                const end = moment(stopDate);
+                                const totalMonths = end.diff(start, 'months');
+                                const valueDifference = endValue - startValue;
+                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                var curUser = AuthenticationService.getLoggedInUserId();
+                                var rem = 0;
+                                var consumptionList = programJson.consumptionList;
+                                var actionList = generalProgramJson.actionList;
+                                if (actionList == undefined) {
+                                    actionList = []
+                                }
+                                var minDate = moment(startDate).format("YYYY-MM-DD");
+                                var interpolatedValues = [];
+                                for (let i = 0; i <= totalMonths; i++) {
+                                    const currentDate = start.clone().add(i, 'months');
+                                    const currentValue = Number(startValue + (valueDifference * (i / totalMonths))).toFixed(4);
+                                    rem = rem + Number(currentValue) % 1;
+                                    let temp_consumptionQty = Math.floor(currentValue)
+                                    if (rem >= 1) {
+                                        temp_consumptionQty += 1;
+                                        rem -= 1;
+                                    }
+                                    interpolatedValues.push({ date: currentDate.format('YYYY-MM-DD'), value: temp_consumptionQty });
+                                    var index = consumptionList.findIndex(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(currentDate).format('YYYY-MM')
+                                        && (c.actualFlag).toString() == "false" && c.multiplier == 1);
+                                    var indexWithoutMultiplier1 = consumptionList.findIndex(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == currentDate.format('YYYY-MM')
+                                        && (c.actualFlag).toString() == "false");
+                                    var remainingConsumptionRecords = consumptionList.filter((c, index1) => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == currentDate.format('YYYY-MM')
+                                        && (c.actualFlag).toString() == "false" && index1 != index && index1 != indexWithoutMultiplier1);
+                                    if (index != -1) {
+                                        consumptionList[index].consumptionQty = temp_consumptionQty;
+                                        consumptionList[index].consumptionRcpuQty = temp_consumptionQty;
+                                        consumptionList[index].lastModifiedBy.userId = curUser;
+                                        consumptionList[index].lastModifiedDate = curDate;
+                                        consumptionList[index].active = true;
+                                        consumptionList[index].notes = "Source: Phase in/out scenario";
+                                        consumptionList[index].dataSource= {
+                                            id: INTERPOLATE_DATA_SOURCE_ID
+                                        };
+                                    } else if (indexWithoutMultiplier1 != -1) {
+                                        consumptionList[indexWithoutMultiplier1].consumptionQty = temp_consumptionQty;
+                                        consumptionList[indexWithoutMultiplier1].consumptionRcpuQty = temp_consumptionQty;
+                                        consumptionList[indexWithoutMultiplier1].lastModifiedBy.userId = curUser;
+                                        consumptionList[indexWithoutMultiplier1].lastModifiedDate = curDate;
+                                        consumptionList[indexWithoutMultiplier1].active = true;
+                                        consumptionList[indexWithoutMultiplier1].realmCountryPlanningUnit = {
+                                            id: rcpuResult.filter(c => c.planningUnit.id == planningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                        };
+                                        consumptionList[indexWithoutMultiplier1].multiplier = 1;
+                                        consumptionList[indexWithoutMultiplier1].notes = "Source: Phase in/out scenario";
+                                        consumptionList[indexWithoutMultiplier1].dataSource= {
+                                            id: INTERPOLATE_DATA_SOURCE_ID
+                                        };
+                                    } else {
+                                        var consumptionJson = {
+                                            consumptionId: 0,
+                                            dataSource: {
+                                                id: INTERPOLATE_DATA_SOURCE_ID
+                                            },
+                                            region: {
+                                                id: generalProgramJson.regionList[0].regionId
+                                            },
+                                            consumptionDate: moment(currentDate).startOf('month').format("YYYY-MM-DD"),
+                                            consumptionRcpuQty: temp_consumptionQty,
+                                            consumptionQty: temp_consumptionQty,
+                                            dayOfStockOut: "",
+                                            active: true,
+                                            realmCountryPlanningUnit: {
+                                                id: rcpuResult.filter(c => c.planningUnit.id == planningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                            },
+                                            multiplier: 1,
+                                            planningUnit: {
+                                                id: planningUnitId
+                                            },
+                                            notes: "Source: Phase in/out scenario",
+                                            batchInfoList: [],
+                                            actualFlag: false,
+                                            createdBy: {
+                                                userId: curUser
+                                            },
+                                            createdDate: curDate,
+                                            lastModifiedBy: {
+                                                userId: curUser
+                                            },
+                                            lastModifiedDate: curDate
+                                        }
+                                        consumptionList.push(consumptionJson);
+                                    }
+                                    remainingConsumptionRecords.map(c => {
+                                        c.notes = "De-activated due to Phase in/out scenario";
+                                        c.active = false;
+                                    })
+                                }
+                                actionList.push({
+                                    planningUnitId: planningUnitId,
+                                    type: FORECASTED_CONSUMPTION_MODIFIED,
+                                    date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                                })
+                                programJson.consumptionList = consumptionList;
+                                generalProgramJson.actionList = actionList;
+                                if (planningUnitDataIndex != -1) {
+                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                 } else {
-                                    var ppUnit = papuResult;
-                                    var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
-                                    if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                        submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
-                                    }
-                                    var approvedToShippedLeadTime = "";
-                                    approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
-                                    if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                        approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
-                                    }
-                                    var shippedToArrivedLeadTime = ""
-                                    if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
-                                    } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
-                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
-                                    } else {
-                                        shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
-                                    }
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                 }
-                                if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                                    var index = 0;
-                                    if (shipmentUnFundedList[i].shipmentId > 0) {
-                                        index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
-                                    } else {
-                                        index = shipmentUnFundedList[i].index;
-                                    }
-                                    shipmentList[index].accountFlag = 0;
-                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                    var curUser = AuthenticationService.getLoggedInUserId();
-                                    shipmentList[index].lastModifiedBy.userId = curUser;
-                                    shipmentList[index].lastModifiedDate = curDate;
-                                }
+                                programDataJson.planningUnitDataList = planningUnitDataList;
+                                programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                                programRequest.result.programData = programDataJson;
+                                var putRequest = programTransaction.put(programRequest.result);
+                                putRequest.onerror = function (event) {
+                                    this.setState({
+                                        supplyPlanError: i18n.t('static.program.errortext'),
+                                        loading: false,
+                                        color: "#BA0C2F"
+                                    })
+                                    this.hideFirstComponent()
+                                }.bind(this);
+                                putRequest.onsuccess = function (event) {
+                                    this.state.rows.push({
+                                        scenarioId: this.state.scenarioId,
+                                        scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                        percentage: '',
+                                        endValue: this.state.endValue,
+                                        startValue: this.state.startValue,
+                                        startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                                        stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                                        scenarioChecked: true,
+                                        procurementAgents: [],
+                                        fundingSources: [],
+                                        procurementAgentIdSingle: "",
+                                        fundingSourceIdSingle: "",
+                                        budgetIdSingle: "",
+                                        monthsInFutureForAmc: "",
+                                        monthsInPastForAmc: "",
+                                        removePlannedThatDoNotFollowLeadTime: false,
+                                    })
+                                    var dt = new Date();
+                                    dt.setMonth(dt.getMonth() - 10);
+                                    this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: '', startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, },
+                                        () => {
+                                        })
+                                    this.hideFirstComponent();
+                                    document.getElementById("consumptionScenariosFields1").style.display = "none";
+                                    document.getElementById("consumptionScenariosFields2").style.display = "none";
+                                    document.getElementById("endValueField").style.display = "none";
+                                    document.getElementById("scenariosFields2").style.display = "none";
+                                    document.getElementById("scenariosFields3").style.display = "none";
+                                    document.getElementById("scenariosFields4").style.display = "none";
+                                    this.setState({ programModified: true })
+                                    calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                                }.bind(this)
                             }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: SHIPMENT_MODIFIED,
-                                date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
+                        }
+                    }
+                    var transaction1 = db1.transaction(['whatIfProgramData'], 'readwrite');
+                    var programTransaction1 = transaction1.objectStore('whatIfProgramData');
+                    if (planningUnitDataIndex != -1) {
+                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    } else {
+                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                    }
+                    programDataJson.planningUnitDataList = planningUnitDataList;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
+                    var putRequest1 = programTransaction1.put(programRequest.result);
+                    putRequest1.onerror = function (event) {
+                        this.setState({
+                            supplyPlanError: i18n.t('static.program.errortext'),
+                            loading: false,
+                            color: "#BA0C2F"
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    putRequest1.onsuccess = function (event) {
+                        document.getElementById("saveScenarioDiv").style.display = 'none';
+                        this.setState({
+                            programModified: 1
+                        })
+                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+    /**
+     * This function is called when a partcular scenario has to be applied
+     */
+    addRow() {
+        this.setState({ loading: true });
+        var db1;
+        var programId = (document.getElementById("programId").value);
+        var planningUnitId = (document.getElementById("planningUnitId").value);
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                supplyPlanError: i18n.t('static.program.errortext'),
+                loading: false,
+                color: "#BA0C2F"
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+            var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+            var rcpuRequest = rcpuOs.getAll();
+            rcpuRequest.onerror = function (event) {
+                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                this.props.updateState("color", "#BA0C2F");
+                this.props.hideFirstComponent();
+            }.bind(this);
+            rcpuRequest.onsuccess = function (event) {
+                var rcpuResult = [];
+                rcpuResult = rcpuRequest.result;
+                var transaction = db1.transaction(['whatIfProgramData'], 'readwrite');
+                var programTransaction = transaction.objectStore('whatIfProgramData');
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext'),
+                        loading: false,
+                        color: "#BA0C2F"
+                    })
+                    this.hideFirstComponent()
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataJson = programRequest.result.programData;
+                    var planningUnitDataList = programDataJson.planningUnitDataList;
+                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
+                    }
+                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalProgramJson = JSON.parse(generalProgramData);
+                    if (this.state.scenarioId == 3) {
+                        var rangeValue = this.state.rangeValue;
+                        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                        var shipmentList = programJson.shipmentList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
+                        var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                        for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                            var index = 0;
+                            if (shipmentUnFundedList[i].shipmentId > 0) {
+                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                            } else {
+                                index = shipmentUnFundedList[i].index;
+                            }
+                            shipmentList[index].active = false;
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            shipmentList[index].lastModifiedBy.userId = curUser;
+                            shipmentList[index].lastModifiedDate = curDate;
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: SHIPMENT_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.shipmentList = shipmentList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
                             })
-                            programJson.shipmentList = shipmentList;
-                            generalProgramJson.actionList = actionList;
-                        } else if (rows[r].scenarioId == 6) {
-                            var shipmentList = programJson.shipmentList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: "",
+                                endValue: "",
+                                startValue: "",
+                                startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                                stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            var dt = new Date();
+                            dt.setMonth(dt.getMonth() - 10);
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: '', startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 1) {
+                        var rangeValue = this.state.rangeValue;
+                        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                        var consumptionList = programJson.consumptionList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var consumptionFiltered = consumptionList.filter(c => c.active == true
+                            && c.planningUnit.id == planningUnitId
+                            && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
+                            && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
+                            && (c.actualFlag).toString() == "false"
+                        );
+                        var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
+                        for (var i = 0; i < consumptionFiltered.length; i++) {
+                            var index = 0;
+                            if (consumptionFiltered[i].consumptionId > 0) {
+                                index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
+                            } else {
+                                index = consumptionList.findIndex(c =>
+                                    c.region.id == consumptionFiltered[i].region.id &&
+                                    c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
+                                    moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
+                                    c.actualFlag == consumptionFiltered[i].actualFlag
+                                );
                             }
-                            var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                            if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
-                                minimumDate = minDate;
+                            consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                            consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            consumptionList[index].lastModifiedBy.userId = curUser;
+                            consumptionList[index].lastModifiedDate = curDate;
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: FORECASTED_CONSUMPTION_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.consumptionList = consumptionList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: this.state.percentage,
+                                endValue: '',
+                                startValue: '',
+                                startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                                stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            var dt = new Date();
+                            dt.setMonth(dt.getMonth() - 10);
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: '', startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, },
+                                () => {
+                                })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 2) {
+                        var rangeValue = this.state.rangeValue;
+                        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                        var consumptionList = programJson.consumptionList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var consumptionFiltered = consumptionList.filter(c => c.active == true
+                            && c.planningUnit.id == planningUnitId
+                            && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
+                            && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
+                            && (c.actualFlag).toString() == "false"
+                        );
+                        var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
+                        for (var i = 0; i < consumptionFiltered.length; i++) {
+                            var index = 0;
+                            if (consumptionFiltered[i].consumptionId > 0) {
+                                index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
+                            } else {
+                                index = consumptionList.findIndex(c =>
+                                    c.region.id == consumptionFiltered[i].region.id &&
+                                    c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
+                                    moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
+                                    c.actualFlag == consumptionFiltered[i].actualFlag
+                                );
                             }
-                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                            consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
+                            consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
+                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            var curUser = AuthenticationService.getLoggedInUserId();
+                            consumptionList[index].lastModifiedBy.userId = curUser;
+                            consumptionList[index].lastModifiedDate = curDate;
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: FORECASTED_CONSUMPTION_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.consumptionList = consumptionList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: this.state.percentage,
+                                endValue: '',
+                                startValue: '',
+                                startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                                stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            var dt = new Date();
+                            dt.setMonth(dt.getMonth() - 10);
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: '', startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 4) {
+                        var shipmentList = programJson.shipmentList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
+                        var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                        for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                            if (this.state.removePlannedThatDoNotFollowLeadTime) {
                                 var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
-                                var plannedDate = shipmentUnFundedList[i].plannedDate;
                                 var submittedDate = shipmentUnFundedList[i].submittedDate;
                                 var approvedDate = shipmentUnFundedList[i].approvedDate;
                                 var shippedDate = shipmentUnFundedList[i].shippedDate;
@@ -1244,408 +1949,207 @@ export default class WhatIfReportComponent extends React.Component {
                                         index = shipmentUnFundedList[i].index;
                                     }
                                     shipmentList[index].accountFlag = 0;
+                                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                    var curUser = AuthenticationService.getLoggedInUserId();
+                                    shipmentList[index].lastModifiedBy.userId = curUser;
+                                    shipmentList[index].lastModifiedDate = curDate;
                                 }
-                            }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: SHIPMENT_MODIFIED,
-                                date: moment(minimumDate).startOf('month').format("YYYY-MM-DD")
-                            })
-                            programJson.shipmentList = shipmentList;
-                            generalProgramJson.actionList = actionList;
-                        } else if (rows[r].scenarioId == 7) {
-                            let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
-                            let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
-                            var rangeValue1 = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
-                            this.setState({
-                                scenarioId: rows[r].scenarioId,
-                                procurementAgentIdSingle: rows[r].procurementAgentIdSingle,
-                                fundingSourceIdSingle: rows[r].fundingSourceIdSingle,
-                                budgetIdSingle: rows[r].budgetIdSingle,
-                                procurementAgents: rows[r].procurementAgents,
-                                fundingSources: rows[r].fundingSources,
-                                rangeValue1: rangeValue1
-                            })
-                            var shipmentList = programJson.shipmentList;
-                            var actionList = generalProgramJson.actionList;
-                            if (actionList == undefined) {
-                                actionList = []
-                            }
-                            var procurementAgentIds = [...new Set(rows[r].procurementAgents.map(ele => ele.value))];
-                            var fundingSourceIds = [...new Set(rows[r].fundingSources.map(ele => ele.value))];
-                            var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id) && fundingSourceIds.includes(c.fundingSource.id));
-                            var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                            for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                            } else {
                                 var index = 0;
                                 if (shipmentUnFundedList[i].shipmentId > 0) {
                                     index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
                                 } else {
                                     index = shipmentUnFundedList[i].index;
                                 }
-                                shipmentList[index].active = false;
+                                shipmentList[index].accountFlag = 0;
                                 var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 shipmentList[index].lastModifiedBy.userId = curUser;
                                 shipmentList[index].lastModifiedDate = curDate;
                             }
-                            actionList.push({
-                                planningUnitId: planningUnitId,
-                                type: SHIPMENT_MODIFIED,
-                                date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: SHIPMENT_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.shipmentList = shipmentList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
                             })
-                            programJson.shipmentList = shipmentList;
-                            generalProgramJson.actionList = actionList;
-                        }
-                    }
-                }
-                var transaction1 = db1.transaction(['whatIfProgramData'], 'readwrite');
-                var programTransaction1 = transaction1.objectStore('whatIfProgramData');
-                if (planningUnitDataIndex != -1) {
-                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                } else {
-                    planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                }
-                programDataJson.planningUnitDataList = planningUnitDataList;
-                programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                programRequest.result.programData = programDataJson;
-                var putRequest1 = programTransaction1.put(programRequest.result);
-                putRequest1.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext'),
-                        loading: false,
-                        color: "#BA0C2F"
-                    })
-                    this.hideFirstComponent()
-                }.bind(this);
-                putRequest1.onsuccess = function (event) {
-                    document.getElementById("saveScenarioDiv").style.display = 'none';
-                    this.setState({
-                        programModified: 1
-                    })
-                    calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minimumDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                }.bind(this)
-            }.bind(this)
-        }.bind(this)
-    }
-    /**
-     * This function is called when a partcular scenario has to be applied
-     */
-    addRow() {
-        this.setState({ loading: true });
-        var db1;
-        var programId = (document.getElementById("programId").value);
-        var planningUnitId = (document.getElementById("planningUnitId").value);
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext'),
-                loading: false,
-                color: "#BA0C2F"
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['whatIfProgramData'], 'readwrite');
-            var programTransaction = transaction.objectStore('whatIfProgramData');
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext'),
-                    loading: false,
-                    color: "#BA0C2F"
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataJson = programRequest.result.programData;
-                var planningUnitDataList = programDataJson.planningUnitDataList;
-                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                var programJson = {}
-                if (planningUnitDataIndex != -1) {
-                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    programJson = JSON.parse(programData);
-                } else {
-                    programJson = {
-                        consumptionList: [],
-                        inventoryList: [],
-                        shipmentList: [],
-                        batchInfoList: [],
-                        supplyPlan: []
-                    }
-                }
-                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
-                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-                var generalProgramJson = JSON.parse(generalProgramData);
-                if (this.state.scenarioId == 3) {
-                    var rangeValue = this.state.rangeValue;
-                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                    var shipmentList = programJson.shipmentList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
-                    var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var index = 0;
-                        if (shipmentUnFundedList[i].shipmentId > 0) {
-                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
-                        } else {
-                            index = shipmentUnFundedList[i].index;
-                        }
-                        shipmentList[index].active = false;
-                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        shipmentList[index].lastModifiedBy.userId = curUser;
-                        shipmentList[index].lastModifiedDate = curDate;
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: SHIPMENT_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.shipmentList = shipmentList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.state.rows.push({
-                            scenarioId: this.state.scenarioId,
-                            scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: "",
-                            startDate: moment(startDate).format(DATE_FORMAT_CAP),
-                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
-                            scenarioChecked: true,
-                            procurementAgents: [],
-                            fundingSources: [],
-                            procurementAgentIdSingle: "",
-                            fundingSourceIdSingle: "",
-                            budgetIdSingle: "",
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
-                            removePlannedThatDoNotFollowLeadTime: false,
-                        })
-                        var dt = new Date();
-                        dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
-                        this.hideFirstComponent();
-                        document.getElementById("consumptionScenariosFields1").style.display = "none";
-                        document.getElementById("consumptionScenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields3").style.display = "none";
-                        document.getElementById("scenariosFields4").style.display = "none";
-                        this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 1) {
-                    var rangeValue = this.state.rangeValue;
-                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                    var consumptionList = programJson.consumptionList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var consumptionFiltered = consumptionList.filter(c => c.active == true
-                        && c.planningUnit.id == planningUnitId
-                        && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
-                        && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
-                        && (c.actualFlag).toString() == "false"
-                    );
-                    var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
-                    for (var i = 0; i < consumptionFiltered.length; i++) {
-                        var index = 0;
-                        if (consumptionFiltered[i].consumptionId > 0) {
-                            index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
-                        } else {
-                            index = consumptionList.findIndex(c =>
-                                c.region.id == consumptionFiltered[i].region.id &&
-                                c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
-                                c.actualFlag == consumptionFiltered[i].actualFlag
-                            );
-                        }
-                        consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
-                        consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) + Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
-                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        consumptionList[index].lastModifiedBy.userId = curUser;
-                        consumptionList[index].lastModifiedDate = curDate;
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: FORECASTED_CONSUMPTION_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.consumptionList = consumptionList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.state.rows.push({
-                            scenarioId: this.state.scenarioId,
-                            scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
-                            startDate: moment(startDate).format(DATE_FORMAT_CAP),
-                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
-                            scenarioChecked: true,
-                            procurementAgents: [],
-                            fundingSources: [],
-                            procurementAgentIdSingle: "",
-                            fundingSourceIdSingle: "",
-                            budgetIdSingle: "",
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
-                            removePlannedThatDoNotFollowLeadTime: false,
-                        })
-                        var dt = new Date();
-                        dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, },
-                            () => {
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: "",
+                                endValue: "",
+                                startValue: '',
+                                startDate: "",
+                                stopDate: "",
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: this.state.removePlannedThatDoNotFollowLeadTime,
                             })
-                        this.hideFirstComponent();
-                        document.getElementById("consumptionScenariosFields1").style.display = "none";
-                        document.getElementById("consumptionScenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields3").style.display = "none";
-                        document.getElementById("scenariosFields4").style.display = "none";
-                        this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 2) {
-                    var rangeValue = this.state.rangeValue;
-                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                    var consumptionList = programJson.consumptionList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var consumptionFiltered = consumptionList.filter(c => c.active == true
-                        && c.planningUnit.id == planningUnitId
-                        && moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM")
-                        && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")
-                        && (c.actualFlag).toString() == "false"
-                    );
-                    var minDate = moment.min(consumptionFiltered.map(d => moment(d.consumptionDate)))
-                    for (var i = 0; i < consumptionFiltered.length; i++) {
-                        var index = 0;
-                        if (consumptionFiltered[i].consumptionId > 0) {
-                            index = consumptionList.findIndex(c => c.consumptionId == consumptionFiltered[i].consumptionId);
-                        } else {
-                            index = consumptionList.findIndex(c =>
-                                c.region.id == consumptionFiltered[i].region.id &&
-                                c.planningUnit.id == consumptionFiltered[i].planningUnit.id &&
-                                moment(c.consumptionDate).format("YYYY-MM") == moment(consumptionFiltered[i].consumptionDate).format("YYYY-MM") &&
-                                c.actualFlag == consumptionFiltered[i].actualFlag
-                            );
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: "", startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 5) {
+                        var shipmentList = programJson.shipmentList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
                         }
-                        consumptionList[index].consumptionQty = Math.round(Number(Number(consumptionFiltered[i].consumptionQty) - Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionQty))));
-                        consumptionList[index].consumptionRcpuQty = Math.round(Number(Number(consumptionFiltered[i].consumptionRcpuQty) - Number(((parseInt(this.state.percentage)) / 100) * Number(consumptionFiltered[i].consumptionRcpuQty))));
-                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        consumptionList[index].lastModifiedBy.userId = curUser;
-                        consumptionList[index].lastModifiedDate = curDate;
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: FORECASTED_CONSUMPTION_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.consumptionList = consumptionList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.state.rows.push({
-                            scenarioId: this.state.scenarioId,
-                            scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: this.state.percentage,
-                            startDate: moment(startDate).format(DATE_FORMAT_CAP),
-                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
-                            scenarioChecked: true,
-                            procurementAgents: [],
-                            fundingSources: [],
-                            procurementAgentIdSingle: "",
-                            fundingSourceIdSingle: "",
-                            budgetIdSingle: "",
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
-                            removePlannedThatDoNotFollowLeadTime: false,
-                        })
-                        var dt = new Date();
-                        dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
-                        this.hideFirstComponent();
-                        document.getElementById("consumptionScenariosFields1").style.display = "none";
-                        document.getElementById("consumptionScenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields3").style.display = "none";
-                        document.getElementById("scenariosFields4").style.display = "none";
-                        this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 4) {
-                    var shipmentList = programJson.shipmentList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
-                    var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        if (this.state.removePlannedThatDoNotFollowLeadTime) {
+                        var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
+                        var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                        for (var i = 0; i < shipmentUnFundedList.length; i++) {
                             var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                            var plannedDate = shipmentUnFundedList[i].plannedDate;
+                            var submittedDate = shipmentUnFundedList[i].submittedDate;
+                            var approvedDate = shipmentUnFundedList[i].approvedDate;
+                            var shippedDate = shipmentUnFundedList[i].shippedDate;
+                            var arrivedDate = shipmentUnFundedList[i].arrivedDate;
+                            var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
+                            if (shipmentUnFundedList[i].localProcurement) {
+                                var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                var leadTimesPerStatus = addLeadTimes / 5;
+                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                                plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
+                            } else {
+                                var ppUnit = papuResult;
+                                var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
+                                if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
+                                    submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                }
+                                var approvedToShippedLeadTime = "";
+                                approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
+                                if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
+                                    approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
+                                }
+                                var shippedToArrivedLeadTime = ""
+                                if (shipmentUnFundedList[i].shipmentMode == "Air") {
+                                    shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
+                                    shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                } else {
+                                    shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                }
+                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                            }
+                            if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
+                                var index = 0;
+                                if (shipmentUnFundedList[i].shipmentId > 0) {
+                                    index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
+                                } else {
+                                    index = shipmentUnFundedList[i].index;
+                                }
+                                shipmentList[index].accountFlag = 0;
+                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                var curUser = AuthenticationService.getLoggedInUserId();
+                                shipmentList[index].lastModifiedBy.userId = curUser;
+                                shipmentList[index].lastModifiedDate = curDate;
+                            }
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: SHIPMENT_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.shipmentList = shipmentList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: "",
+                                endValue: "",
+                                startValue: '',
+                                startDate: "",
+                                stopDate: "",
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: "", startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 6) {
+                        var shipmentList = programJson.shipmentList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
+                        var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                        for (var i = 0; i < shipmentUnFundedList.length; i++) {
+                            var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
+                            var plannedDate = shipmentUnFundedList[i].plannedDate;
                             var submittedDate = shipmentUnFundedList[i].submittedDate;
                             var approvedDate = shipmentUnFundedList[i].approvedDate;
                             var shippedDate = shipmentUnFundedList[i].shippedDate;
@@ -1692,55 +2196,151 @@ export default class WhatIfReportComponent extends React.Component {
                                     index = shipmentUnFundedList[i].index;
                                 }
                                 shipmentList[index].accountFlag = 0;
-                                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                                var curUser = AuthenticationService.getLoggedInUserId();
-                                shipmentList[index].lastModifiedBy.userId = curUser;
-                                shipmentList[index].lastModifiedDate = curDate;
                             }
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: SHIPMENT_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.shipmentList = shipmentList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: "",
+                                endValue: "",
+                                startValue: '',
+                                startDate: "",
+                                stopDate: "",
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: "", startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 7) {
+                        var rangeValue = this.state.rangeValue1;
+                        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                        var shipmentList = programJson.shipmentList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => Number(ele.value)))];
+                        var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => Number(ele.value)))];
+                        var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(Number(c.procurementAgent.id)) && fundingSourceIds.includes(Number(c.fundingSource.id)));
+                        var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
+                        for (var i = 0; i < shipmentUnFundedList.length; i++) {
                             var index = 0;
                             if (shipmentUnFundedList[i].shipmentId > 0) {
                                 index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
                             } else {
                                 index = shipmentUnFundedList[i].index;
                             }
-                            shipmentList[index].accountFlag = 0;
+                            shipmentList[index].active = false;
                             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             var curUser = AuthenticationService.getLoggedInUserId();
                             shipmentList[index].lastModifiedBy.userId = curUser;
                             shipmentList[index].lastModifiedDate = curDate;
                         }
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: SHIPMENT_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.shipmentList = shipmentList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: SHIPMENT_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                         })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        console.log("this.state.removePlannedThatDoNotFollowLeadTime Test@123", this.state.removePlannedThatDoNotFollowLeadTime)
+                        programJson.shipmentList = shipmentList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: "",
+                                endValue: "",
+                                startValue: '',
+                                startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                                stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                                scenarioChecked: true,
+                                procurementAgents: this.state.procurementAgents,
+                                fundingSources: this.state.fundingSources,
+                                procurementAgentIdSingle: this.state.procurementAgentIdSingle,
+                                fundingSourceIdSingle: this.state.fundingSourceIdSingle,
+                                budgetIdSingle: this.state.budgetIdSingle,
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            var dt = new Date();
+                            dt.setMonth(dt.getMonth() - 10);
+                            this.setState({ rows: this.state.rows, percentage: '', endValue: "", startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', procurementAgents: [], fundingSources: [], removePlannedThatDoNotFollowLeadTime: false, })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    } else if (this.state.scenarioId == 8) {
                         this.state.rows.push({
                             scenarioId: this.state.scenarioId,
                             scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
                             percentage: "",
+                            endValue: "",
+                            startValue: '',
                             startDate: "",
                             stopDate: "",
                             scenarioChecked: true,
@@ -1749,352 +2349,180 @@ export default class WhatIfReportComponent extends React.Component {
                             procurementAgentIdSingle: "",
                             fundingSourceIdSingle: "",
                             budgetIdSingle: "",
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
-                            removePlannedThatDoNotFollowLeadTime: this.state.removePlannedThatDoNotFollowLeadTime,
-                        })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
-                        this.hideFirstComponent();
-                        document.getElementById("consumptionScenariosFields1").style.display = "none";
-                        document.getElementById("consumptionScenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields3").style.display = "none";
-                        document.getElementById("scenariosFields4").style.display = "none";
-                        this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 5) {
-                    var shipmentList = programJson.shipmentList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
-                    var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
-                        var plannedDate = shipmentUnFundedList[i].plannedDate;
-                        var submittedDate = shipmentUnFundedList[i].submittedDate;
-                        var approvedDate = shipmentUnFundedList[i].approvedDate;
-                        var shippedDate = shipmentUnFundedList[i].shippedDate;
-                        var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                        var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
-                        if (shipmentUnFundedList[i].localProcurement) {
-                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
-                            var leadTimesPerStatus = addLeadTimes / 5;
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        } else {
-                            var ppUnit = papuResult;
-                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
-                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
-                            }
-                            var approvedToShippedLeadTime = "";
-                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
-                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
-                            }
-                            var shippedToArrivedLeadTime = ""
-                            if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
-                            } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
-                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
-                            } else {
-                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
-                            }
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        }
-                        if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                            var index = 0;
-                            if (shipmentUnFundedList[i].shipmentId > 0) {
-                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
-                            } else {
-                                index = shipmentUnFundedList[i].index;
-                            }
-                            shipmentList[index].accountFlag = 0;
-                            var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                            var curUser = AuthenticationService.getLoggedInUserId();
-                            shipmentList[index].lastModifiedBy.userId = curUser;
-                            shipmentList[index].lastModifiedDate = curDate;
-                        }
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: SHIPMENT_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.shipmentList = shipmentList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.state.rows.push({
-                            scenarioId: this.state.scenarioId,
-                            scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: "",
-                            startDate: "",
-                            stopDate: "",
-                            scenarioChecked: true,
-                            procurementAgents: [],
-                            fundingSources: [],
-                            procurementAgentIdSingle: "",
-                            fundingSourceIdSingle: "",
-                            budgetIdSingle: "",
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
-                            removePlannedThatDoNotFollowLeadTime: false,
-                        })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
-                        this.hideFirstComponent();
-                        document.getElementById("consumptionScenariosFields1").style.display = "none";
-                        document.getElementById("consumptionScenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields3").style.display = "none";
-                        document.getElementById("scenariosFields4").style.display = "none";
-                        this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 6) {
-                    var shipmentList = programJson.shipmentList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
-                    var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var papuResult = this.state.procurementAgentListForWhatIf.filter(c => c.procurementAgentId == shipmentUnFundedList[i].procurementAgent.id)[0];
-                        var plannedDate = shipmentUnFundedList[i].plannedDate;
-                        var submittedDate = shipmentUnFundedList[i].submittedDate;
-                        var approvedDate = shipmentUnFundedList[i].approvedDate;
-                        var shippedDate = shipmentUnFundedList[i].shippedDate;
-                        var arrivedDate = shipmentUnFundedList[i].arrivedDate;
-                        var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
-                        if (shipmentUnFundedList[i].localProcurement) {
-                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
-                            var leadTimesPerStatus = addLeadTimes / 5;
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
-                        } else {
-                            var ppUnit = papuResult;
-                            var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
-                            if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
-                                submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
-                            }
-                            var approvedToShippedLeadTime = "";
-                            approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
-                            if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
-                                approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
-                            }
-                            var shippedToArrivedLeadTime = ""
-                            if (shipmentUnFundedList[i].shipmentMode == "Air") {
-                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
-                            } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
-                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
-                            } else {
-                                shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
-                            }
-                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                        }
-                        if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
-                            var index = 0;
-                            if (shipmentUnFundedList[i].shipmentId > 0) {
-                                index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
-                            } else {
-                                index = shipmentUnFundedList[i].index;
-                            }
-                            shipmentList[index].accountFlag = 0;
-                        }
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: SHIPMENT_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.shipmentList = shipmentList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.state.rows.push({
-                            scenarioId: this.state.scenarioId,
-                            scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: "",
-                            startDate: "",
-                            stopDate: "",
-                            scenarioChecked: true,
-                            procurementAgents: [],
-                            fundingSources: [],
-                            procurementAgentIdSingle: "",
-                            fundingSourceIdSingle: "",
-                            budgetIdSingle: "",
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
-                            removePlannedThatDoNotFollowLeadTime: false,
-                        })
-                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, })
-                        this.hideFirstComponent();
-                        document.getElementById("consumptionScenariosFields1").style.display = "none";
-                        document.getElementById("consumptionScenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields2").style.display = "none";
-                        document.getElementById("scenariosFields3").style.display = "none";
-                        document.getElementById("scenariosFields4").style.display = "none";
-                        this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 7) {
-                    var rangeValue = this.state.rangeValue1;
-                    let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                    let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                    var shipmentList = programJson.shipmentList;
-                    var actionList = generalProgramJson.actionList;
-                    if (actionList == undefined) {
-                        actionList = []
-                    }
-                    var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => Number(ele.value)))];
-                    var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => Number(ele.value)))];
-                    var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(Number(c.procurementAgent.id)) && fundingSourceIds.includes(Number(c.fundingSource.id)));
-                    var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
-                    for (var i = 0; i < shipmentUnFundedList.length; i++) {
-                        var index = 0;
-                        if (shipmentUnFundedList[i].shipmentId > 0) {
-                            index = shipmentList.findIndex(c => c.shipmentId == shipmentUnFundedList[i].shipmentId);
-                        } else {
-                            index = shipmentUnFundedList[i].index;
-                        }
-                        shipmentList[index].active = false;
-                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        shipmentList[index].lastModifiedBy.userId = curUser;
-                        shipmentList[index].lastModifiedDate = curDate;
-                    }
-                    actionList.push({
-                        planningUnitId: planningUnitId,
-                        type: SHIPMENT_MODIFIED,
-                        date: moment(minDate).startOf('month').format("YYYY-MM-DD")
-                    })
-                    programJson.shipmentList = shipmentList;
-                    generalProgramJson.actionList = actionList;
-                    if (planningUnitDataIndex != -1) {
-                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    } else {
-                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                    }
-                    programDataJson.planningUnitDataList = planningUnitDataList;
-                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                    programRequest.result.programData = programDataJson;
-                    var putRequest = programTransaction.put(programRequest.result);
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext'),
-                            loading: false,
-                            color: "#BA0C2F"
-                        })
-                        this.hideFirstComponent()
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.state.rows.push({
-                            scenarioId: this.state.scenarioId,
-                            scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                            percentage: "",
-                            startDate: moment(startDate).format(DATE_FORMAT_CAP),
-                            stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
-                            scenarioChecked: true,
-                            procurementAgents: this.state.procurementAgents,
-                            fundingSources: this.state.fundingSources,
-                            procurementAgentIdSingle: this.state.procurementAgentIdSingle,
-                            fundingSourceIdSingle: this.state.fundingSourceIdSingle,
-                            budgetIdSingle: this.state.budgetIdSingle,
-                            monthsInFutureForAmc: "",
-                            monthsInPastForAmc: "",
+                            monthsInPastForAmc: this.state.monthsInPastForAmc,
+                            monthsInFutureForAmc: this.state.monthsInFutureForAmc,
                             removePlannedThatDoNotFollowLeadTime: false,
                         })
                         var dt = new Date();
                         dt.setMonth(dt.getMonth() - 10);
-                        this.setState({ rows: this.state.rows, percentage: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', procurementAgents: [], fundingSources: [], removePlannedThatDoNotFollowLeadTime: false, })
+                        this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: "", startValue: '', color: 'green', monthsInFutureForAmc: '', monthsInFutureForAmc: '', removePlannedThatDoNotFollowLeadTime: false, })
                         this.hideFirstComponent();
                         document.getElementById("consumptionScenariosFields1").style.display = "none";
                         document.getElementById("consumptionScenariosFields2").style.display = "none";
+                        document.getElementById("endValueField").style.display = "none";
                         document.getElementById("scenariosFields2").style.display = "none";
                         document.getElementById("scenariosFields3").style.display = "none";
                         document.getElementById("scenariosFields4").style.display = "none";
                         this.setState({ programModified: true })
-                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                    }.bind(this)
-                } else if (this.state.scenarioId == 8) {
-                    this.state.rows.push({
-                        scenarioId: this.state.scenarioId,
-                        scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
-                        percentage: "",
-                        startDate: "",
-                        stopDate: "",
-                        scenarioChecked: true,
-                        procurementAgents: [],
-                        fundingSources: [],
-                        procurementAgentIdSingle: "",
-                        fundingSourceIdSingle: "",
-                        budgetIdSingle: "",
-                        monthsInPastForAmc: this.state.monthsInPastForAmc,
-                        monthsInFutureForAmc: this.state.monthsInFutureForAmc,
-                        removePlannedThatDoNotFollowLeadTime: false,
-                    })
-                    var dt = new Date();
-                    dt.setMonth(dt.getMonth() - 10);
-                    this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', color: 'green', monthsInFutureForAmc: '', monthsInFutureForAmc: '', removePlannedThatDoNotFollowLeadTime: false, })
-                    this.hideFirstComponent();
-                    document.getElementById("consumptionScenariosFields1").style.display = "none";
-                    document.getElementById("consumptionScenariosFields2").style.display = "none";
-                    document.getElementById("scenariosFields2").style.display = "none";
-                    document.getElementById("scenariosFields3").style.display = "none";
-                    document.getElementById("scenariosFields4").style.display = "none";
-                    this.setState({ programModified: true })
-                    calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], null, '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
-                }
+                        calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], null, '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                    } else if (this.state.scenarioId == 9) {
+                        var rangeValue = this.state.rangeValue;
+                        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                        let startValue = Number(this.state.startValue);
+                        let endValue = Number(this.state.endValue);
+                        const start = moment(startDate);
+                        const end = moment(stopDate);
+                        const totalMonths = end.diff(start, 'months');
+                        const valueDifference = endValue - startValue;
+                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                        var curUser = AuthenticationService.getLoggedInUserId();
+                        var rem = 0;
+                        var consumptionList = programJson.consumptionList;
+                        var actionList = generalProgramJson.actionList;
+                        if (actionList == undefined) {
+                            actionList = []
+                        }
+                        var minDate = moment(startDate).format("YYYY-MM-DD");
+                        for (let i = 0; i <= totalMonths; i++) {
+                            const currentDate = start.clone().add(i, 'months');
+                            const currentValue = Number(startValue + (valueDifference * (i / totalMonths))).toFixed(4);
+                            rem = rem + Number(currentValue) % 1;
+                            let temp_consumptionQty = Math.floor(currentValue)
+                            if (rem >= 1) {
+                                temp_consumptionQty += 1;
+                                rem -= 1;
+                            }
+                            var index = consumptionList.findIndex(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(currentDate).format('YYYY-MM')
+                                && (c.actualFlag).toString() == "false" && c.multiplier == 1);
+                            var indexWithoutMultiplier1 = consumptionList.findIndex(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == currentDate.format('YYYY-MM')
+                                && (c.actualFlag).toString() == "false");
+                            var remainingConsumptionRecords = consumptionList.filter((c, index1) => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == currentDate.format('YYYY-MM')
+                                && (c.actualFlag).toString() == "false" && index1 != index && index1 != indexWithoutMultiplier1);
+                            if (index != -1) {
+                                consumptionList[index].consumptionQty = temp_consumptionQty;
+                                consumptionList[index].consumptionRcpuQty = temp_consumptionQty;
+                                consumptionList[index].lastModifiedBy.userId = curUser;
+                                consumptionList[index].lastModifiedDate = curDate;
+                                consumptionList[index].active = true;
+                                consumptionList[index].notes = "Source: Phase in/out scenario";
+                                consumptionList[index].dataSource= {
+                                    id: INTERPOLATE_DATA_SOURCE_ID
+                                };
+                            } else if (indexWithoutMultiplier1 != -1) {
+                                consumptionList[indexWithoutMultiplier1].consumptionQty = temp_consumptionQty;
+                                consumptionList[indexWithoutMultiplier1].consumptionRcpuQty = temp_consumptionQty;
+                                consumptionList[indexWithoutMultiplier1].lastModifiedBy.userId = curUser;
+                                consumptionList[indexWithoutMultiplier1].lastModifiedDate = curDate;
+                                consumptionList[indexWithoutMultiplier1].active = true;
+                                consumptionList[indexWithoutMultiplier1].realmCountryPlanningUnit = {
+                                    id: rcpuResult.filter(c => c.planningUnit.id == planningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                };
+                                consumptionList[indexWithoutMultiplier1].multiplier = 1;
+                                consumptionList[indexWithoutMultiplier1].notes = "Source: Phase in/out scenario";
+                                consumptionList[indexWithoutMultiplier1].dataSource= {
+                                    id: INTERPOLATE_DATA_SOURCE_ID
+                                };
+                            } else {
+                                var consumptionJson = {
+                                    consumptionId: 0,
+                                    dataSource: {
+                                        id: INTERPOLATE_DATA_SOURCE_ID
+                                    },
+                                    region: {
+                                        id: generalProgramJson.regionList[0].regionId
+                                    },
+                                    consumptionDate: moment(currentDate).startOf('month').format("YYYY-MM-DD"),
+                                    consumptionRcpuQty: temp_consumptionQty,
+                                    consumptionQty: temp_consumptionQty,
+                                    dayOfStockOut: "",
+                                    active: true,
+                                    realmCountryPlanningUnit: {
+                                        id: rcpuResult.filter(c => c.planningUnit.id == planningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                    },
+                                    multiplier: 1,
+                                    planningUnit: {
+                                        id: planningUnitId
+                                    },
+                                    notes: "Source: Phase in/out scenario",
+                                    batchInfoList: [],
+                                    actualFlag: false,
+                                    createdBy: {
+                                        userId: curUser
+                                    },
+                                    createdDate: curDate,
+                                    lastModifiedBy: {
+                                        userId: curUser
+                                    },
+                                    lastModifiedDate: curDate
+                                }
+                                consumptionList.push(consumptionJson);
+                            }
+                            remainingConsumptionRecords.map(c => {
+                                c.notes = "De-activated due to Phase in/out scenario";
+                                c.active = false;
+                            })
+                        }
+                        actionList.push({
+                            planningUnitId: planningUnitId,
+                            type: FORECASTED_CONSUMPTION_MODIFIED,
+                            date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                        })
+                        programJson.consumptionList = consumptionList;
+                        generalProgramJson.actionList = actionList;
+                        if (planningUnitDataIndex != -1) {
+                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        } else {
+                            planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                        }
+                        programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                        programRequest.result.programData = programDataJson;
+                        var putRequest = programTransaction.put(programRequest.result);
+                        putRequest.onerror = function (event) {
+                            this.setState({
+                                supplyPlanError: i18n.t('static.program.errortext'),
+                                loading: false,
+                                color: "#BA0C2F"
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        putRequest.onsuccess = function (event) {
+                            this.state.rows.push({
+                                scenarioId: this.state.scenarioId,
+                                scenarioName: document.getElementById('scenarioId').options[document.getElementById('scenarioId').selectedIndex].text,
+                                percentage: '',
+                                endValue: this.state.endValue,
+                                startValue: this.state.startValue,
+                                startDate: moment(startDate).format(DATE_FORMAT_CAP),
+                                stopDate: moment(stopDate).format(DATE_FORMAT_CAP),
+                                scenarioChecked: true,
+                                procurementAgents: [],
+                                fundingSources: [],
+                                procurementAgentIdSingle: "",
+                                fundingSourceIdSingle: "",
+                                budgetIdSingle: "",
+                                monthsInFutureForAmc: "",
+                                monthsInPastForAmc: "",
+                                removePlannedThatDoNotFollowLeadTime: false,
+                            })
+                            var dt = new Date();
+                            dt.setMonth(dt.getMonth() - 10);
+                            this.setState({ rows: this.state.rows, scenarioId: '', percentage: '', endValue: '', startValue: '', monthsInPastForAmc: '', monthsInFutureForAmc: '', color: 'green', removePlannedThatDoNotFollowLeadTime: false, },
+                                () => {
+                                })
+                            this.hideFirstComponent();
+                            document.getElementById("consumptionScenariosFields1").style.display = "none";
+                            document.getElementById("consumptionScenariosFields2").style.display = "none";
+                            document.getElementById("endValueField").style.display = "none";
+                            document.getElementById("scenariosFields2").style.display = "none";
+                            document.getElementById("scenariosFields3").style.display = "none";
+                            document.getElementById("scenariosFields4").style.display = "none";
+                            this.setState({ programModified: true })
+                            calculateSupplyPlan(document.getElementById("programId").value, document.getElementById("planningUnitId").value, 'whatIfProgramData', 'whatIf', this, [], moment(minDate).startOf('month').format("YYYY-MM-DD"), '', false, false, this.state.monthsInPastForAMC, this.state.monthsInFutureForAMC);
+                        }.bind(this)
+                    }
+                }.bind(this)
             }.bind(this)
         }.bind(this)
     }
@@ -2185,6 +2613,8 @@ export default class WhatIfReportComponent extends React.Component {
         senheaders.push((i18n.t('static.common.startdate')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.common.stopdate')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.whatIf.percentage')).replaceAll(' ', '%20'))
+        senheaders.push((i18n.t('static.tree.startValue')).replaceAll(' ', '%20'))
+        senheaders.push((i18n.t('static.scenarioPlanning.endValue')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.report.mospast')).replaceAll(' ', '%20'))
         senheaders.push((i18n.t('static.report.mosfuture')).replaceAll(' ', '%20'))
@@ -2197,6 +2627,8 @@ export default class WhatIfReportComponent extends React.Component {
                 (ele.startDate).replaceAll(' ', '%20'),
                 (ele.stopDate).replaceAll(' ', '%20'),
                 (ele.percentage).replaceAll(' ', '%20'),
+                (ele.startValue).replaceAll(' ', '%20'),
+                (ele.endValue).replaceAll(' ', '%20'),
                 (ele.removePlannedThatDoNotFollowLeadTime).toString(),
                 (ele.monthsInPastForAmc).replaceAll(' ', '%20'),
                 (ele.monthsInFutureForAmc).replaceAll(' ', '%20'),
@@ -2341,6 +2773,8 @@ export default class WhatIfReportComponent extends React.Component {
         senHeaders.push(i18n.t('static.common.startdate'));
         senHeaders.push(i18n.t('static.common.stopdate'));
         senHeaders.push(i18n.t('static.whatIf.percentage'));
+        senHeaders.push(i18n.t('static.tree.startValue'));
+        senHeaders.push(i18n.t('static.scenarioPlanning.endValue'));
         senHeaders.push(i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes'));
         senHeaders.push(i18n.t('static.report.mospast'));
         senHeaders.push(i18n.t('static.report.mosfuture'));
@@ -2351,6 +2785,8 @@ export default class WhatIfReportComponent extends React.Component {
             ele.startDate,
             ele.stopDate,
             ele.percentage,
+            ele.startValue,
+            ele.endValue,
             ele.removePlannedThatDoNotFollowLeadTime,
             ele.monthsInPastForAmc,
             ele.monthsInFutureForAmc,
@@ -2853,12 +3289,12 @@ export default class WhatIfReportComponent extends React.Component {
      * @param {*} value This is the value of the planning unit
      * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
      */
-    formSubmit(value, monthCount, updateAMCParameter,doNotShowLoader) {
+    formSubmit(value, monthCount, updateAMCParameter, doNotShowLoader) {
         if (value != "" && value != undefined ? value.value : 0 != 0) {
             this.setState({
                 planningUnitChange: true,
                 display: 'block',
-                loading: doNotShowLoader==1?false:true
+                loading: doNotShowLoader == 1 ? false : true
             })
         } else {
             this.setState({
@@ -3870,7 +4306,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit, monthCount,0,1)
+        this.formSubmit(this.state.planningUnit, monthCount, 0, 1)
     }
     /**
      * This function is called when scroll to right is clicked on the supply plan table
@@ -3880,7 +4316,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.setState({
             monthCount: monthCount
         })
-        this.formSubmit(this.state.planningUnit, monthCount,0,1)
+        this.formSubmit(this.state.planningUnit, monthCount, 0, 1)
     }
     /**
      * This function is called when scroll to left is clicked on the consumption table
@@ -4642,6 +5078,8 @@ export default class WhatIfReportComponent extends React.Component {
                             initialValues={{
                                 scenarioId: this.state.scenarioId,
                                 percentage: this.state.percentage,
+                                endValue: this.state.endValue,
+                                startValue: this.state.startValue,
                                 procurementAgentIdSingle: this.state.procurementAgentIdSingle,
                                 fundingSourceIdSingle: this.state.fundingSourceIdSingle,
                                 monthsInPastForAmc: this.state.monthsInPastForAmc,
@@ -4653,6 +5091,8 @@ export default class WhatIfReportComponent extends React.Component {
                                 resetForm({
                                     scenarioId: '',
                                     percentage: '',
+                                    endValue: '',
+                                    startValue: '',
                                     monthsInPastForAmc: '',
                                     monthsInFutureForAmc: '',
                                     removePlannedThatDoNotFollowLeadTime: false
@@ -4689,6 +5129,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <option value="">{i18n.t('static.common.select')}</option>
                                                         <option value="1">{i18n.t('static.whatIf.increaseConsumption')}</option>
                                                         <option value="2">{i18n.t('static.whatIf.decreaseConsumption')}</option>
+                                                        <option value="9">{i18n.t('static.scenarioPlanning.phaseInPhaseOut')}</option>
                                                         <option value="3">{i18n.t('static.whatIf.removeUnFundedShipments')}</option>
                                                         <option value="4">{i18n.t('static.whatIf.removePlannedShipments')}</option>
                                                         <option value="5">{i18n.t('static.whatIf.removeApprovedShipmentsNotInLeadTimes')}</option>
@@ -4765,6 +5206,46 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                             </Picker>
                                                         </div>
+                                                    </FormGroup>
+                                                </div>
+                                                <Input
+                                                    type="hidden"
+                                                    name="needEndValueValidation"
+                                                    id="needEndValueValidation"
+                                                    value={(this.state.scenarioId == 9 ? true : false)}
+                                                />
+                                                <div id="endValueField" style={{ display: 'none' }}>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="select">{i18n.t('static.tree.startValue')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="startValue"
+                                                            id="startValue"
+                                                            bsSize="sm"
+                                                            valid={!errors.startValue && this.state.startValue != ''}
+                                                            invalid={touched.startValue && !!errors.startValue}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.startValue}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.startValue}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="select">{i18n.t('static.scenarioPlanning.endValue')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="endValue"
+                                                            id="endValue"
+                                                            bsSize="sm"
+                                                            valid={!errors.endValue && this.state.endValue != ''}
+                                                            invalid={touched.endValue && !!errors.endValue}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.endValue}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.endValue}</FormFeedback>
                                                     </FormGroup>
                                                 </div>
                                                 <div id="scenariosFields3" className="col-md-12" style={{ display: 'none' }}>
@@ -4980,6 +5461,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <th className="text-left">{i18n.t('static.common.startdate')}</th>
                                                 <th className="text-left">{i18n.t('static.common.stopdate')}</th>
                                                 <th className="text-left">{i18n.t('static.whatIf.percentage')}</th>
+                                                <th className="text-left">{i18n.t('static.tree.startValue')}</th>
+                                                <th className="text-left">{i18n.t('static.scenarioPlanning.endValue')}</th>
                                                 <th className="text-left">{i18n.t('static.whatIf.removePlannedShipmentsNotInLeadTimes')}</th>
                                                 <th className="text-left">{i18n.t('static.report.mospast')}</th>
                                                 <th className="text-left">{i18n.t('static.report.mosfuture')}</th>
@@ -4996,6 +5479,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                         <td>{this.state.rows[idx].startDate != "" ? moment(this.state.rows[idx].startDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) : ""}</td>
                                                         <td>{this.state.rows[idx].stopDate != "" ? moment(this.state.rows[idx].stopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) : ""}</td>
                                                         <td>{this.state.rows[idx].percentage}</td>
+                                                        <td>{this.state.rows[idx].startValue}</td>
+                                                        <td>{this.state.rows[idx].endValue}</td>
                                                         <td>{this.state.rows[idx].removePlannedThatDoNotFollowLeadTime.toString()}</td>
                                                         <td>{this.state.rows[idx].monthsInPastForAmc}</td>
                                                         <td>{this.state.rows[idx].monthsInFutureForAmc}</td>
@@ -5988,7 +6473,6 @@ export default class WhatIfReportComponent extends React.Component {
          * @returns {void}
          */
     setRemovedPlanned(e) {
-        console.log("e.target.checked Test@123", e.target.checked);
         this.setState({
             removePlannedThatDoNotFollowLeadTime: e.target.checked
         }, () => {
