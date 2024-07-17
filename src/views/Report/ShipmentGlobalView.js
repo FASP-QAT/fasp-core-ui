@@ -310,7 +310,7 @@ class ShipmentGlobalView extends Component {
         let content1 = {
             margin: { top: 80, bottom: 50 },
             startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 550 / displaylabel.length, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 520 / displaylabel.length, halign: 'center' },
             columnStyles: {
             },
             html: '#mytable1',
@@ -881,11 +881,8 @@ class ShipmentGlobalView extends Component {
         } else if (viewby == 4){//for funding source type
             fundingSourceProcurementAgentIds = fundingSourcetypeIds;
         }
-        console.log('fundingSourceProcurementAgentIds: '+fundingSourceProcurementAgentIds);
-        console.log('this.state.fundingSourceTypeValues.length: '+this.state.fundingSourceTypeValues.length);
 
         if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0) || (viewby == 4 && this.state.fundingSourceTypeValues.length > 0))) {
-            console.log('inside if...');
             let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
             this.setState({
                 message: '',
@@ -1098,7 +1095,7 @@ class ShipmentGlobalView extends Component {
             });
         } else if (viewby == 4 && this.state.fundingSourceTypeValues.length == 0) {
             this.setState({
-                message: i18n.t('Select Funding Source Type'),
+                message: i18n.t('static.shipment.selectFundingSourceType'),
                 data: [],
                 shipmentList: [],
                 dateSplitList: [],
