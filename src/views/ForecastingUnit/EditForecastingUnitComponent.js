@@ -198,12 +198,8 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 }
             );
-<<<<<<< HEAD
-        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
-=======
         // ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
         ForecastingUnitService.getForcastingUnitByIdWithPrograms(this.props.match.params.forecastingUnitId).then(response => {
->>>>>>> QAT-3834
             if (response.status == 200) {
                 //combine program list
                 var combinedProgramList = [];
@@ -261,17 +257,13 @@ export default class EditForecastingUnitComponent extends Component {
                 //merged active & inactive programs
                 finalProgramList = [...combinedProgramList, ...inActivePrograms];
                 this.setState({
-<<<<<<< HEAD
-                    forecastingUnit: response.data, loading: false
-                }, () => {
-                    this.getProductCategoryByRealmId()
-=======
                     forecastingUnit: response.data.forecastingUnit,
                     // spProgramList: response.data.spProgramList,
                     // fcProgramList: response.data.fcProgramList,
                     sortedProgramList: finalProgramList,
                     loading: false
->>>>>>> QAT-3834
+                }, () => {
+                    this.getProductCategoryByRealmId()
                 });
                 this.buildJExcel();
             }
