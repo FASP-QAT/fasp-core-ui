@@ -2126,7 +2126,7 @@ class ShipmentGlobalDemandView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="groupBy">{i18n.t('static.report.includeapproved')}</Label>
+                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupBy')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
