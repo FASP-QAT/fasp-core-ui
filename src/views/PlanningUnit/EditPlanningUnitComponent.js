@@ -6,10 +6,12 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { API_URL } from '../../Constants.js';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import UnitService from '../../api/UnitService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import jexcel from 'jspreadsheet';
 // Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
 /**
@@ -62,6 +64,9 @@ export default class EditPlanningUnitComponent extends Component {
                     }
                 }
             },
+            spProgramList: [],
+            fcProgramList: [],
+            sortedProgramList: [],
             loading: true
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -69,6 +74,7 @@ export default class EditPlanningUnitComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         this.changeLoading = this.changeLoading.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
     /**
      * Updates the loading state of the component.
@@ -132,11 +138,73 @@ export default class EditPlanningUnitComponent extends Component {
                     this.setState({
                         units: listArray, loading: false
                     })
-                    PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
+                    // PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
+                    PlanningUnitService.getPlanningUnitByIdWithPrograms(this.props.match.params.planningUnitId).then(response => {
                         if (response.status == 200) {
-                            this.setState({
-                                planningUnit: response.data, loading: false
+                            //combine program list
+                            var combinedProgramList = [];
+                            var finalProgramList = [];
+
+                            //add spProgramList to main list
+                            response.data.spProgramListActive.map(item => {
+                                var json = {
+                                    "code": item.code,
+                                    "module": "Supply Planning",
+                                    "status": 1
+                                }
+                                combinedProgramList.push(json);
                             });
+
+                            //add fcProgramList to main list
+                            response.data.fcProgramListActive.map(item => {
+                                var json = {
+                                    "code": item.code,
+                                    "module": "Forecasting",
+                                    "status": 1
+                                }
+                                combinedProgramList.push(json);
+                            });
+
+                            //sorted combinedProgram array
+                            combinedProgramList.sort((a, b) => {
+                                return a.code > b.code ? 1 : -1;
+                            });
+
+                            var inActivePrograms = [];
+                            //add spProgramList disabled
+                            response.data.spProgramListDisabled.map(item => {
+                                var json = {
+                                    "code": item.code,
+                                    "module": "Supply Planning",
+                                    "status": 0
+                                }
+                                inActivePrograms.push(json);
+                            });
+                            //add fcProgramList disabled
+                            response.data.fcProgramListDisabled.map(item => {
+                                var json = {
+                                    "code": item.code,
+                                    "module": "Forecasting",
+                                    "status": 0
+                                }
+                                inActivePrograms.push(json);
+                            });
+                            //sorted combinedProgram array
+                            inActivePrograms.sort((a, b) => {
+                                return a.code > b.code ? 1 : -1;
+                            });
+
+                            //merged active & inactive programs
+                            finalProgramList = [...combinedProgramList, ...inActivePrograms];
+
+                            this.setState({
+                                planningUnit: response.data.planningUnit,
+                                // spProgramList: response.data.spProgramList,
+                                // fcProgramList: response.data.fcProgramList,
+                                sortedProgramList: finalProgramList,
+                                loading: false
+                            });
+                            this.buildJExcel();
                         } else {
                             this.setState({
                                 message: response.data.messageCode, loading: false
@@ -233,6 +301,71 @@ export default class EditPlanningUnitComponent extends Component {
                 }
             );
     }
+
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
+    buildJExcel() {
+        let sortedProgramList = this.state.sortedProgramList;
+        let programArray = [];
+        let count = 0;
+
+        for (var j = 0; j < sortedProgramList.length; j++) {
+            data = [];
+            data[0] = sortedProgramList[j].code;
+            data[1] = sortedProgramList[j].module;
+            data[2] = sortedProgramList[j].status ? i18n.t('static.common.active') : i18n.t('static.common.disabled');
+            programArray[count] = data;
+            count++;
+        }
+
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+        var data = programArray;
+        var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [100, 100, 100],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    title: i18n.t('static.program.programMaster'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.module'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.common.status'),
+                    type: 'text',
+                }
+
+            ],
+            editable: false,
+            onload: loadedForNonEditableTables,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY
+        };
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
+        this.setState({
+            languageEl: languageEl, loading: false
+        })
+    }
+
     /**
      * Renders the planning unit details form.
      * @returns {JSX.Element} - Planning unit details form.
@@ -438,6 +571,8 @@ export default class EditPlanningUnitComponent extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="unitId">{i18n.t('static.planningUnit.plannignUniteg')}</Label>
                                                 </FormGroup>
+                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                </div>
                                             </CardBody>
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
