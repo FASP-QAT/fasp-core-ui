@@ -635,6 +635,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 }
                             }
                         );
+                } else {
+                    this.props.updateStepOneData("loading", false);
                 }
             } else {
                 this.props.updateStepOneData("loading", false);
