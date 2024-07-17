@@ -60,6 +60,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import FundingSourceService from "../../api/FundingSourceService.js";
 const ref = React.createRef();
 const options = {
   title: {
@@ -201,7 +202,8 @@ class ShipmentSummery extends Component {
       loading: true,
       programId: "",
       versionId: "",
-      fundingSources: [],
+      fundingSources: [],//contains filtered funding sources
+      fundingSourcesOriginal: [],
       fundingSourceValues: [],
       fundingSourceLabels: [],
       budgets: [],
@@ -209,6 +211,9 @@ class ShipmentSummery extends Component {
       budgetLabels: [],
       filteredBudgetList: [],
       lang: localStorage.getItem("lang"),
+      fundingSourceTypes: [],
+      fundingSourceTypeValues: [],
+      fundingSourceTypeLabels: [],
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -219,6 +224,7 @@ class ShipmentSummery extends Component {
     this.buildJExcel = this.buildJExcel.bind(this);
     this.loaded = this.loaded.bind(this);
     this.selected = this.selected.bind(this);
+    this.getFundingSourceType = this.getFundingSourceType.bind(this);
   }
   /**
    * Exports the data to a CSV file.
@@ -262,6 +268,18 @@ class ShipmentSummery extends Component {
         '"' +
         (
           i18n.t("static.planningunit.planningunit") +
+          " : " +
+          ele.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
+      )
+    );
+    csvRow.push("");
+    this.state.fundingSourceTypeLabels.map((ele) =>
+      csvRow.push(
+        '"' +
+        (
+          i18n.t("static.funderTypeHead.funderType") +
           " : " +
           ele.toString()
         ).replaceAll(" ", "%20") +
@@ -521,21 +539,42 @@ class ShipmentSummery extends Component {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
     doc.setTextColor("#002f6c");
-    var y = 190;
+    // var y = 190;
+    var y = 170;
+
+    var fundingSourceTypeText = doc.splitTextToSize(
+      i18n.t("static.funderTypeHead.funderType") +
+      " : " +
+      this.state.fundingSourceTypeLabels.join("; "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceTypeText);
+    y = y + fundingSourceTypeText.length * 10 + 10;
+
     var fundingSourceText = doc.splitTextToSize(
       i18n.t("static.budget.fundingsource") +
       " : " +
       this.state.fundingSourceLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
-    doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+    // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+    for (var i = 0; i < fundingSourceText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 100;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+      y = y + 10;
+    }
+    y = y + 10;
+
     var budgetText = doc.splitTextToSize(
       i18n.t("static.budgetHead.budget") +
       " : " +
       this.state.budgetLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
-    y = y + 5;
+    // y = y + 5;
     for (var i = 0; i < budgetText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
@@ -544,7 +583,7 @@ class ShipmentSummery extends Component {
       doc.text(doc.internal.pageSize.width / 8, y, budgetText[i]);
       y = y + 10;
     }
-    y = y + 20;
+    y = y + 10;
     var planningText = doc.splitTextToSize(
       i18n.t("static.planningunit.planningunit") +
       " : " +
@@ -621,8 +660,8 @@ class ShipmentSummery extends Component {
       ele.budget.code,
       getLabelText(ele.shipmentStatus.label, this.state.lang),
       this.state.viewById == 1
-        ? formatter(ele.shipmentQty,0)
-        : formatter(Number(ele.shipmentQty) * ele.multiplier,0),
+        ? formatter(ele.shipmentQty, 0)
+        : formatter(Number(ele.shipmentQty) * ele.multiplier, 0),
       moment(ele.expectedDeliveryDate).format("YYYY-MM-DD"),
       ele.productCost
         .toFixed(2)
@@ -656,6 +695,141 @@ class ShipmentSummery extends Component {
     doc.save(i18n.t("static.report.shipmentDetailReport") + ".pdf");
   };
   /**
+     * Retrieves the list of funding sources types.
+     */
+  getFundingSourceType = () => {
+    //Fetch realmId
+    let realmId = AuthenticationService.getRealmId();
+    if (localStorage.getItem("sessionType") === 'Online') {
+      //Fetch funding source type list by realmId
+      FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+        .then(response => {
+          if (response.status == 200) {
+            var fundingSourceTypeValues = [];
+            var fundingSourceTypes = response.data;
+            fundingSourceTypes.sort(function (a, b) {
+              a = a.fundingSourceTypeCode.toLowerCase();
+              b = b.fundingSourceTypeCode.toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+
+            this.setState({
+              fundingSourceTypes: fundingSourceTypes, loading: false,
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode, loading: false
+            },
+              () => {
+                // this.hideSecondComponent();
+              })
+          }
+        }).catch(
+          error => {
+            this.setState({
+              fundingSourceTypes: [], loading: false
+            }, () => {
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
+      //offline
+      var db3;
+      var fSourceTypeResult = [];
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db3 = e.target.result;
+        var fSourceTypeTransaction = db3.transaction(['fundingSourceType'], 'readwrite');
+        var fSourceTypeOs = fSourceTypeTransaction.objectStore('fundingSourceType');
+        var fSourceTypeRequest = fSourceTypeOs.getAll();
+        fSourceTypeRequest.onerror = function (event) {
+        }.bind(this);
+        fSourceTypeRequest.onsuccess = function (event) {
+          fSourceTypeResult = fSourceTypeRequest.result.filter(c => c.realm.id == realmId);
+          this.setState({
+            fundingSourceTypes: fSourceTypeResult.sort(function (a, b) {
+              a = a.fundingSourceTypeCode.toLowerCase();
+              b = b.fundingSourceTypeCode.toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          });
+        }.bind(this)
+      }.bind(this)
+    }
+  }
+  handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+    fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+      fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+    }, () => {
+      var filteredFundingSourceArr = [];
+      var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+      for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+        for (var j = 0; j < fundingSources.length; j++) {
+          if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+            filteredFundingSourceArr.push(fundingSources[j]);
+          }
+        }
+      }
+
+      if (filteredFundingSourceArr.length > 0) {
+        filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+          a = a.code.toLowerCase();
+          b = b.code.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+      }
+      this.setState({
+        fundingSources: filteredFundingSourceArr,
+        fundingSourceValues: [],
+        fundingSourceLabels: [],
+      }, () => {
+        this.fetchData();
+      });
+
+    })
+  }
+  /**
    * Retrieves the list of funding sources.
    */
   getFundingSourceList() {
@@ -670,7 +844,7 @@ class ShipmentSummery extends Component {
           });
           this.setState(
             {
-              fundingSources: listArray,
+              fundingSourcesOriginal: listArray,
             },
             () => {
               this.getBudgetList();
@@ -679,7 +853,7 @@ class ShipmentSummery extends Component {
         })
         .catch((error) => {
           this.setState({
-            fundingSources: [],
+            fundingSourcesOriginal: [],
           });
           if (error.message === "Network Error") {
             this.setState({
@@ -731,12 +905,13 @@ class ShipmentSummery extends Component {
               id: fSourceResult[i].fundingSourceId,
               code: fSourceResult[i].fundingSourceCode,
               label: fSourceResult[i].label,
+              fundingSourceType: fSourceRequest.result[i].fundingSourceType
             };
             fundingSource[i] = arr;
           }
           this.setState(
             {
-              fundingSources: fundingSource.sort(function (a, b) {
+              fundingSourcesOriginal: fundingSource.sort(function (a, b) {
                 a = a.code.toLowerCase();
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
@@ -1053,7 +1228,7 @@ class ShipmentSummery extends Component {
         fundingSourceValues: [],
         fundingSourceLabels: [],
         filteredBudgetList: [],
-      },()=>{
+      }, () => {
         this.fetchData();
       })
     }
@@ -1876,6 +2051,7 @@ class ShipmentSummery extends Component {
   componentDidMount() {
     this.getPrograms();
     this.getFundingSourceList();
+    this.getFundingSourceType();
   }
   /**     
    * Sets the selected program ID selected by the user.
@@ -1947,7 +2123,7 @@ class ShipmentSummery extends Component {
         0
       ).getDate();
     let myFundingSourceIds =
-      this.state.fundingSourceValues.length == this.state.fundingSources.length
+      this.state.fundingSourceValues.length == this.state.fundingSourcesOriginal.length
         ? []
         : this.state.fundingSourceValues.map((ele) => ele.value);
     let myBudgetIds =
@@ -2583,9 +2759,18 @@ class ShipmentSummery extends Component {
           value: item.id,
         };
       }, this);
+    const { fundingSourceTypes } = this.state;
     const { fundingSources } = this.state;
     const { filteredBudgetList } = this.state;
     const { rangeValue } = this.state;
+
+    let fundingSourceListDD = fundingSources.length > 0 &&
+      fundingSources.map((item, i) => {
+        return {
+          label: item.code,
+          value: item.id,
+        };
+      }, this);
 
     const bar = {
       labels: this.state.shipmentDetailsMonthList.map((item, index) =>
@@ -2849,6 +3034,27 @@ class ShipmentSummery extends Component {
                           </InputGroup>
                         </div>
                       </FormGroup>
+                      <FormGroup className="col-md-3" >
+                        <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                        <div className="controls">
+                          <MultiSelect
+                            name="fundingSourceTypeId"
+                            id="fundingSourceTypeId"
+                            bsSize="md"
+                            // filterOptions={this.filterOptions}
+                            value={this.state.fundingSourceTypeValues}
+                            onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                            options={fundingSourceTypes.length > 0
+                              && fundingSourceTypes.map((item, i) => {
+                                return (
+                                  { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                )
+                              }, this)}
+                            disabled={this.state.loading}
+                          />
+                        </div>
+                      </FormGroup>
                       <FormGroup className="col-md-3" id="fundingSourceDiv">
                         <Label htmlFor="appendedInputButton">
                           {i18n.t("static.budget.fundingsource")}
@@ -2864,10 +3070,9 @@ class ShipmentSummery extends Component {
                               this.handleFundingSourceChange(e);
                             }}
                             options={
-                              fundingSources.length > 0 &&
-                              fundingSources.map((item, i) => {
-                                return { label: item.code, value: item.id };
-                              }, this)
+                              fundingSourceListDD && fundingSourceListDD.length > 0
+                                ? fundingSourceListDD
+                                : []
                             }
                             disabled={this.state.loading}
                             overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),

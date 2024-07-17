@@ -1,47 +1,41 @@
 import jexcel from 'jspreadsheet';
 import moment from 'moment';
 import React, { Component } from 'react';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
-import FundingSourceService from "../../api/FundingSourceService";
-import RealmService from '../../api/RealmService';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
+import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 // Localized entity name
-const entityname = i18n.t('static.fundingsource.fundingsource');
+const entityname = i18n.t('static.funderTypeHead.funderType')
 /**
- * Component for listing funding source details.
+ * Component for list of procurement agent type details.
  */
-class FundingSourceListComponent extends Component {
+class ListFunderTypeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             realms: [],
-            fundingSourceList: [],
+            fundingSourceTypeList: [],
             message: '',
-            selSource: [],
-            loading: true,
-            lang: localStorage.getItem('lang')
+            selFundingSourceType: [],
+            lang: localStorage.getItem('lang'),
+            // loading: true
+            loading: false
         }
-        this.addFundingSource = this.addFundingSource.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.buildJexcel = this.buildJexcel.bind(this);
-    }
-    /**
-     * Hides the message in div1 after 30 seconds.
-     */
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
+        this.addNewFunderType = this.addNewFunderType.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
     }
     /**
      * Clears the timeout when the component is unmounted.
@@ -50,64 +44,73 @@ class FundingSourceListComponent extends Component {
         clearTimeout(this.timeout);
     }
     /**
-     * Hides the message in div2 after 30 seconds.
+     * Redirects to the add procurement agent type screen.
      */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
+    addNewFunderType() {
+        this.props.history.push("/funderType/addFunderType");
     }
     /**
-     * Filters the funding source list according to the realmId & builds jexcel.
+     * Function to filter procurement agent types based on realm Id
      */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selSource = this.state.fundingSourceList.filter(c => c.realm.id == realmId)
+            const selFundingSourceType = this.state.fundingSourceTypeList.filter(c => c.realm.id == realmId)
             this.setState({
-                selSource
-            },
-                () => { this.buildJexcel() });
+                selFundingSourceType
+            }, () => {
+                this.buildJExcel();
+            });
         } else {
             this.setState({
-                selSource: this.state.fundingSourceList
-            },
-                () => { this.buildJexcel() });
+                selFundingSourceType: this.state.fundingSourceTypeList
+            }, () => {
+                this.buildJExcel();
+            });
         }
     }
     /**
-     * Builds the jexcel component to display funding source list.
+     * Builds the jexcel component to display procurement agent type list.
      */
-    buildJexcel() {
-        let fundingSourceList = this.state.selSource;
-        let fundingSourceArray = [];
+    buildJExcel() {
+        let fundingSourceTypeList = this.state.selFundingSourceType;
+        let fundingSourceTypeArray = [];
         let count = 0;
-        console.log('fundingSourceList[0]: '+JSON.stringify(fundingSourceList[0]));
-        for (var j = 0; j < fundingSourceList.length; j++) {
+        for (var j = 0; j < fundingSourceTypeList.length; j++) {
             data = [];
-            data[0] = fundingSourceList[j].fundingSourceId
-            data[1] = getLabelText(fundingSourceList[j].realm.label, this.state.lang)
-            data[2] = fundingSourceList[j].fundingSourceType.code
-            data[3] = getLabelText(fundingSourceList[j].label, this.state.lang)
-            data[4] = fundingSourceList[j].fundingSourceCode
-            data[5] = fundingSourceList[j].lastModifiedBy.username;
-            data[6] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[7] = fundingSourceList[j].allowedInBudget;
-            data[8] = fundingSourceList[j].active;
-            fundingSourceArray[count] = data;
+            data[0] = fundingSourceTypeList[j].fundingSourceTypeId
+            data[1] = getLabelText(fundingSourceTypeList[j].realm.label, this.state.lang)
+            data[2] = getLabelText(fundingSourceTypeList[j].label, this.state.lang)
+            data[3] = fundingSourceTypeList[j].fundingSourceTypeCode;
+            data[4] = fundingSourceTypeList[j].lastModifiedBy.username;
+            data[5] = (fundingSourceTypeList[j].lastModifiedDate ? moment(fundingSourceTypeList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[6] = fundingSourceTypeList[j].active;
+            fundingSourceTypeArray[count] = data;
             count++;
         }
+
+        //temp
+        // data = [];
+        // data[0] = 1
+        // data[1] = 'realm'
+        // data[2] = 'type name';
+        // data[3] = 'display name';
+        // data[4] = 'username';
+        // data[5] = '12-Jul-23';
+        // data[6] = true;
+        // procurementAgentTypeArray[0] = data;
+
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var json = [];
-        var data = fundingSourceArray;
+        var data = fundingSourceTypeArray;
         var options = {
             data: data,
             columnDrag: false,
+            colWidths: [0, 80, 100, 130, 80, 80, 80, 0, 80, 100, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'fundingSourceId',
+                    title: 'fundingSourceTypeId',
                     type: 'hidden',
                 },
                 {
@@ -115,16 +118,11 @@ class FundingSourceListComponent extends Component {
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                 },
                 {
-                    title: i18n.t('static.funderType.funderTypeCode'),
+                    title: i18n.t('static.funderType.funderTypeName'),
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.fundingsource.fundingsource'),
-                    type: 'text',
-                }
-                ,
-                {
-                    title: i18n.t('static.fundingsource.fundingsourceCode'),
+                    title: i18n.t('static.funderType.funderTypeCode'),
                     type: 'text',
                 },
                 {
@@ -134,30 +132,22 @@ class FundingSourceListComponent extends Component {
                 {
                     title: i18n.t('static.common.lastModifiedDate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT_SM }
-                },
-                {
-                    title: i18n.t('static.fundingSource.allowInBudget'),
-                    type: 'dropdown',
-                    source: [
-                        { id: true, name: i18n.t('static.program.yes') },
-                        { id: false, name: i18n.t('static.realm.no') }
-                    ]
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
                 },
                 {
                     type: 'dropdown',
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.dataentry.inactive') }
+                        { id: false, name: i18n.t('static.common.disabled') }
                     ]
                 },
             ],
-            onload: this.loaded,
+            editable: false,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            editable: false,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -171,62 +161,38 @@ class FundingSourceListComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return false;
-            }.bind(this),
+                var items = [];
+                return items;
+            }.bind(this)
         };
-        var fundingSourceEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = fundingSourceEl;
+        var languageEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = languageEl;
         this.setState({
-            fundingSourceEl: fundingSourceEl, loading: false
+            languageEl: languageEl, loading: false
         })
     }
     /**
-     * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
-     * @param {*} instance - This is the DOM Element where sheet is created
-     * @param {*} cell - This is the object of the DOM element
-     * @param {*} x - Row Number
-     * @param {*} y - Column Number
-     * @param {*} value - Cell Value
-     */
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
-    /**
-     * Redirects to the edit funding source screen on row click with fundingSourceId for editing.
-     * @param {*} instance - This is the DOM Element where sheet is created
-     * @param {*} cell - This is the object of the DOM element
-     * @param {*} x - Row Number
-     * @param {*} y - Column Number
-     * @param {*} value - Cell Value
-     * @param {Event} e - The selected event.
+     * Redirects to the edit procurement agent type screen on row click.
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
+                console.log('inside else in selected fun.');
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
+                    // console.log('created path: '+`/funderType/editFunderType/${this.el.getValueFromCoords(0, x)}`);
                     this.props.history.push({
-                        pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
+                        pathname: `/funderType/editFunderType/${this.el.getValueFromCoords(0, x)}`,
                     });
                 }
             }
         }
     }.bind(this);
     /**
-     * Redirects to the add funding source screen
-     * @param {*} fundingSource 
-     */
-    addFundingSource(fundingSource) {
-        this.props.history.push({
-            pathname: "/fundingSource/addFundingSource"
-        });
-    }
-    /**
-     * Fetches Realm list and Funding source list from the server and builds the jexcel component on component mount.
+     * Reterives realm and procurement agent type list on component mount
      */
     componentDidMount() {
-        this.hideFirstComponent();
-        //Fetch all realm list
+        hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -244,7 +210,7 @@ class FundingSourceListComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -287,21 +253,22 @@ class FundingSourceListComponent extends Component {
                     }
                 }
             );
-        //Fetch all funding source list
-        FundingSourceService.getFundingSourceListAll()
+            FundingSourceService.getFundingSourceTypeListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        fundingSourceList: response.data,
-                        selSource: response.data,
+                        fundingSourceTypeList: response.data,
+                        selFundingSourceType: response.data,
                     },
-                        () => { this.buildJexcel() })
+                        () => {
+                            this.buildJExcel();
+                        })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -344,16 +311,24 @@ class FundingSourceListComponent extends Component {
                     }
                 }
             );
+
+            // this.buildJExcel();
     }
     /**
-     * Renders the funding source list with filters.
-     * @returns {JSX.Element} - funding source list.
+     * Renders the procurement agent type list.
+     * @returns {JSX.Element} - Procurement agent type list.
      */
     render() {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
         });
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -363,29 +338,49 @@ class FundingSourceListComponent extends Component {
                     </option>
                 )
             }, this);
-        const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-                {i18n.t('static.common.result', { from, to, size })}
-            </span>
-        );
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.selFundingSourceType.length
+            }]
+        }
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "#BA0C2F" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewFunderType}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') &&
                             <Col md="3 pl-0">
-                                <FormGroup className="Selectdiv mt-md-2 mb-md-0 ">
+                                <FormGroup className="Selectdiv mt-md-2 mb-md-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -404,9 +399,7 @@ class FundingSourceListComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        <div className='consumptionDataEntryTable'>
-                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -423,4 +416,4 @@ class FundingSourceListComponent extends Component {
         );
     }
 }
-export default FundingSourceListComponent;
+export default ListFunderTypeComponent;
