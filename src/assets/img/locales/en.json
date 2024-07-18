@@ -3364,5 +3364,6 @@
     "static.shipment.groupByFundingSourceType": "Group by Funding Source Type",
     "static.report.fundingSourceTypeUsdAmount": "* The funding source type amount is in USD",
     "static.shipment.shipmentFundingSourceType": "Shipment Funding Source Type",
-    "static.shipment.selectFundingSourceType": "Select Funding Source Type"
+    "static.shipment.selectFundingSourceType": "Select Funding Source Type",
+    "static.shipment.groupBy": "Group By"
 }
