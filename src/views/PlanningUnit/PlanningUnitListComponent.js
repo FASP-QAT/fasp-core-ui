@@ -321,9 +321,10 @@ export default class PlanningUnitListComponent extends Component {
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
-            data[5] = planningUnitList[j].lastModifiedBy.username;
-            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[7] = planningUnitList[j].active;
+            data[5] = planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms;
+            data[6] = planningUnitList[j].lastModifiedBy.username;
+            data[7] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = planningUnitList[j].active;
             planningUnitArray[count] = data;
             count++;
         }
@@ -354,6 +355,10 @@ export default class PlanningUnitListComponent extends Component {
                 },
                 {
                     title: i18n.t('static.planningUnit.labelMultiplier'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.program.noOfProgramsUsingPU'),
                     type: 'text',
                 },
                 {
@@ -559,13 +564,14 @@ export default class PlanningUnitListComponent extends Component {
                     tableHeadTemp.push(i18n.t('static.planningUnit.associatedForecastingUnit').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.planningUnitOfMeasure').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.labelMultiplier').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingPU').replaceAll('#', '%23').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));
                     A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
                     planningUnitList = response.data;
                     for (var j = 0; j < planningUnitList.length; j++) {
-                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
+                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), (planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
                     }
                     for (var i = 0; i < A.length; i++) {
                         csvRow.push(A[i].join(","))

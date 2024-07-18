@@ -1900,9 +1900,9 @@ export default class PlanningUnitSetting extends Component {
         data[16] = true;
         data[17] = true;
         this.el.insertRow(
-            data
+            data,0,1
         );
-        this.el.getCell(("B").concat(parseInt(json.length) + 1)).classList.add('typing-' + this.state.lang);
+        this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
     };
     /**
      * Toggles program info popover
