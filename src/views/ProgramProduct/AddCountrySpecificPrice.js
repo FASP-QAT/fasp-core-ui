@@ -33,6 +33,10 @@ import { LOGO } from '../../CommonComponent/Logo.js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Prompt } from 'react-router';
+import AddCountrySpecificPriceEn from '../../../src/ShowGuidanceFiles/AddCountrySpecificPriceEn.html';
+import AddCountrySpecificPriceFr from '../../../src/ShowGuidanceFiles/AddCountrySpecificPriceFr.html';
+import AddCountrySpecificPriceSp from '../../../src/ShowGuidanceFiles/AddCountrySpecificPriceSp.html';
+import AddCountrySpecificPricePr from '../../../src/ShowGuidanceFiles/AddCountrySpecificPricePr.html';
 // Localized entity name
 const entityname = i18n.t('static.countrySpecificPrices.countrySpecificPrices')
 /**
@@ -1669,11 +1673,19 @@ class CountrySpecificPrices extends Component {
                             <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                         </ModalHeader>
                         <div>
-                            <ModalBody>
-                                <div>
-                                    <h3 className='ShowGuidanceHeading'>{i18n.t('static.countrySpecificPrices.countrySpecificPrices')} </h3>
-                                </div>
-                            </ModalBody>
+                            {/* <ModalBody> */}
+                                <ModalBody className="ModalBodyPadding">
+                                    <div dangerouslySetInnerHTML={{
+                                        __html: localStorage.getItem('lang') == 'en' ?
+                                            AddCountrySpecificPriceEn :
+                                            localStorage.getItem('lang') == 'fr' ?
+                                                AddCountrySpecificPriceFr :
+                                                localStorage.getItem('lang') == 'sp' ?
+                                                    AddCountrySpecificPriceSp :
+                                                    AddCountrySpecificPricePr
+                                    }} />
+                                </ModalBody>
+                            {/* </ModalBody> */}
                         </div>
                     </Modal>
                 </div>

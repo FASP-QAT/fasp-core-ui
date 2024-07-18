@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Managing Freight Costs, Lead Times, and Planning Unit Prices</title>
+    <style>
+        table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Managing Freight Costs, Lead Times, and Planning Unit Prices</h3>
+    <p>This screen allows you to manage specific details such as freight costs, lead times, and planning unit prices for procurement agents and planning units within your supply plan program.</p>
+
+    <h5><strong>Adding or Editing Rows</strong></h5>
+    <p>To add a row, follow these steps:</p>
+    <ul>
+        <li><strong>Program, Planning Unit, and Procurement Agent:</strong> Fill in these fields.</li>
+        <li><strong>Creating a Procurement Agent/Planning Unit Combination:</strong> Select options from both the planning unit and procurement agent columns.</li>
+        <li><strong>Procurement Agent-Specific Row Without Tying to a Planning Unit:</strong> Choose ‘All’ in the planning unit column.</li>
+        <li><strong>Freight costs, lead times, and unit price:</strong> At least one of the remaining columns must have a numeric value.</li>
+    </ul>
+
+    <h5><strong>Constraints and Rules</strong></h5>
+    <ul>
+        <li>Only one row is allowed per program/planning unit/procurement agent combination.</li>
+        <li>If a procurement agent row includes ‘All’ planning units, the unit price column will be non-editable.</li>
+    </ul>
+
+    <h5><strong>Usage in Supply Planning Module</strong></h5>
+    <p>These details will impact your supply planning module as follows:</p>
+    <ul>
+        <li><strong>Freight Percentages:</strong> Prioritized by program/procurement agent/planning unit settings and then program settings.</li>
+        <li><strong>Lead Times:</strong> Prioritized by program/procurement agent/planning unit settings, then realm level procurement agent settings, and finally program settings.</li>
+        <li><strong>Unit Prices:</strong> Prioritized by program/procurement agent/planning unit settings, then realm level procurement agent settings, and finally program settings.</li>
+    </ul>
+</body>
+</html>

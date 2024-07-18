@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Costos de Flete, Tiempos de Entrega y Precios de Unidades de Planificación</title>
+    <style>
+        table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Gestión de Costos de Flete, Tiempos de Entrega y Precios de Unidades de Planificación</h3>
+    <p>Esta pantalla le permite gestionar detalles específicos como costos de flete, tiempos de entrega y precios de unidades de planificación para agentes de adquisición y unidades de planificación dentro de su programa de planificación de suministros.</p>
+
+    <h5><strong>Agregar o Editar Filas</h5></strong>
+    <p>Para agregar una fila, siga estos pasos:</p>
+    <ul>
+        <li><strong>Programa, Unidad de Planificación y Agente de Adquisición:</strong> Llene estos campos.</li>
+        <li><strong>Crear una Combinación Agente de Adquisición/Unidad de Planificación:</strong> Seleccione opciones tanto de la columna unidad de planificación como de la columna agente de adquisición.</li>
+        <li><strong>Fila Específica del Agente de Adquisición Sin Vincular a una Unidad de Planificación:</strong> Elija ‘Todos’ en la columna unidad de planificación.</li>
+        <li><strong>Costos de flete, tiempos de entrega y precio unitario:</strong> Al menos una de las columnas restantes debe tener un valor numérico.</li>
+    </ul>
+
+    <h5><strong>Restricciones y Reglas</h5></strong>
+    <ul>
+        <li>Solo se permite una fila por combinación programa/unidad de planificación/agente de adquisición.</li>
+        <li>Si una fila de agente de adquisición incluye ‘Todos’ las unidades de planificación, la columna de precio unitario no será editable.</li>
+    </ul>
+
+    <h5><strong>Uso en el Módulo de Planificación de Suministros</h5></strong>
+    <p>Estos detalles impactarán su módulo de planificación de suministros de la siguiente manera:</p>
+    <ul>
+        <li><strong>Porcentajes de Flete:</strong> Priorizados por configuración de programa/agente de adquisición/unidad de planificación y luego por configuración del programa.</li>
+        <li><strong>Tiempos de Entrega:</strong> Priorizados por configuración de programa/agente de adquisición/unidad de planificación, luego por configuración de agente de adquisición a nivel de dominio y finalmente por configuración del programa.</li>
+        <li><strong>Precios Unitarios:</strong> Priorizados por configuración de programa/agente de adquisición/unidad de planificación, luego por configuración de agente de adquisición a nivel de dominio y finalmente por configuración del programa.</li>
+    </ul>
+</body>
+</html>
