@@ -3249,7 +3249,7 @@
     "static.common.node": "Node",
     "static.pipeline.pipelineConvertorLinux": "Linux.",
     "static.compareAndSelect.selectForecast": "Click Planning Unit to display details",
-    "static.compareAndSelect.forecastSelected": "Forecast selected.",
+    "static.compareAndSelect.forecastSelected": "Forecast selected",
     "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
-    "static.compareAndSelect.showPUPanel": "Show PU panel"
+    "static.compareAndSelect.showPUPanel": "Show Planning Unit panel"
 }

@@ -125,6 +125,7 @@ class CompareAndSelectScenario extends Component {
         this.loadedTable1 = this.loadedTable1.bind(this)
         this.changeTable1 = this.changeTable1.bind(this)
         this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
+        this.getPlanningUnitsForTable = this.getPlanningUnitsForTable.bind(this);
     }
     /**
      * Handles the click event on the range picker box.
@@ -347,6 +348,7 @@ class CompareAndSelectScenario extends Component {
                 minActualMonth: minActualMonth,
                 maxActualMonth: maxActualMonth
             }, () => {
+                this.getPlanningUnitsForTable(this.state.datasetJson, this.state.regionId)
                 this.setMonth1List();
                 if (this.state.viewById == 1) {
                     document.getElementById("planningUnitDiv").style.display = "block";
@@ -1530,6 +1532,37 @@ class CompareAndSelectScenario extends Component {
             }
         }
     }
+
+    /**
+    * Build the Planning unit list based on forecast selected or not
+    * @param {object} datasetJson - The datasetJson object containing the dataset json.
+    * @param {object} regionId - The regionId object containing the region ID value.
+    */
+    getPlanningUnitsForTable(datasetJson, regionId) {
+        var puList = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
+        var planningUnitListForTable = []
+        for (var p = 0; p < puList.length; p++) {
+            var map = puList[p].selectedForecastMap[regionId];
+            var selectedForecastString = "";
+            if (map != undefined && map.consumptionExtrapolationId > 0) {
+                var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
+                selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
+                planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
+            } else if (map != undefined && map.scenarioId > 0 && map.treeId > 0) {
+                var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
+                var s = t != undefined ? t.scenarioList.filter(s => s.id == map.scenarioId)[0] : undefined;
+                selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
+                planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
+            } else {
+                selectedForecastString = ""
+                planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
+            }
+        }
+        this.setState({
+            planningUnitListForTable: planningUnitListForTable
+        })
+    }
+
     /**
      * Sets the dataset ID and updates the component state with associated data.
      * @param {object} event - The event object containing the dataset ID value.
@@ -1626,25 +1659,7 @@ class CompareAndSelectScenario extends Component {
                         regionId = localStorage.getItem("sesDatasetRegionId");
                         regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
                     }
-                    var puList = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
-                    var planningUnitListForTable = []
-                    for (var p = 0; p < puList.length; p++) {
-                        var map = puList[p].selectedForecastMap[regionId];
-                        var selectedForecastString = "";
-                        if (map != undefined && map.consumptionExtrapolationId != null) {
-                            var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
-                            selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
-                            planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
-                        } else if (map != undefined && map.scenarioId != null && map.treeId != null) {
-                            var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
-                            var s = t != undefined ? t.scenarioList.filter(s => s.id == map.scenarioId)[0] : undefined;
-                            selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
-                            planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
-                        } else {
-                            selectedForecastString = ""
-                            planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
-                        }
-                    }
+                    this.getPlanningUnitsForTable(datasetJson, regionId);
                     this.setState({
                         datasetJson: datasetJson,
                         rangeValue: rangeValue,
@@ -1660,7 +1675,6 @@ class CompareAndSelectScenario extends Component {
                             b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }.bind(this)),
-                        planningUnitListForTable: planningUnitListForTable,
                         forecastingUnitList: forecastingUnitList,
                         monthList: monthList,
                         monthList1: monthList1,
@@ -2455,7 +2469,7 @@ class CompareAndSelectScenario extends Component {
                                 <div class="pl-0">
                                     {this.state.datasetId != "" && this.state.regionId != "" &&
                                         <div onClick={this.expandCompressPUFuntion} style={{ display: this.state.loading ? "none" : "block", height: "45px" }}>
-                                            {this.state.expandCompressPUBtn ? <div><i className="fa fa-minus-square-o supplyPlanIcon" ></i> <span>{i18n.t("static.compareAndSelect.selectForecast")}<br /> ✅ {i18n.t("static.compareAndSelect.forecastSelected")} <i class="fa fa-exclamation-triangle"></i> {i18n.t("static.compareAndSelect.forecastNotSelected")}</span></div> : <div><i className="fa fa-plus-square-o supplyPlanIcon" ></i>  <span>{i18n.t("static.compareAndSelect.showPUPanel")}</span></div>}
+                                            {this.state.expandCompressPUBtn ? <div><i className="fa fa-minus-square-o supplyPlanIcon" ></i> <span>{i18n.t("static.compareAndSelect.selectForecast")}<br /> ✅ {i18n.t("static.compareAndSelect.forecastSelected")} <i class="fa fa-exclamation-triangle"></i> {i18n.t("static.compareAndSelect.forecastNotSelected")}</span></div> : <div><i className="fa fa-plus-square-o supplyPlanIcon" ></i>  <span style={{ color: "#20a8d8" }}><b>{i18n.t("static.compareAndSelect.showPUPanel")}</b></span></div>}
                                         </div>
                                     }
                                     <div className="row">
@@ -2474,7 +2488,7 @@ class CompareAndSelectScenario extends Component {
                                                                     return (<>
                                                                         <tr>
                                                                             <td className={"planingUnitId-" + ele.planningUnit.id + " planingUnitClass sticky-col first-col clone text-left hoverTd"} onClick={() => this.setPlanningUnitId(ele.planningUnit.id)}>
-                                                                                {ele.selectedForecast != "" ? <span>✅ </span> : <i class="fa fa-exclamation-triangle"></i>}{getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id}
+                                                                                {ele.selectedForecast != "" ? <span>✅</span> : <i class="fa fa-exclamation-triangle"></i>}{" " + getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id}
                                                                             </td>
                                                                         </tr>
                                                                     </>)
@@ -2490,7 +2504,7 @@ class CompareAndSelectScenario extends Component {
                                                 <>
                                                     <ul style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
                                                     <ul className="legendcommitversion">
-                                                        {/* <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li> */}
+                                                        <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                                     </ul><br />
