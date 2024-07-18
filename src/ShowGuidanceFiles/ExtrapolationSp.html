@@ -58,14 +58,14 @@
 			 a corto plazo y es sensible a las tendencias. No es apropiado para datos 
 			 estacionales.
 		</li>
-		<li><b>Semi-Promedios:</b>Semi-promedio estima tendencias basadas en dos mitades de una 
-			serie. QAT divide los datos reales en dos partes iguales (mitades) y la media 
-			aritmética de los valores de cada parte (mitad) se calcula como los valores y de dos 
-			puntos en una línea. La pendiente de la línea de tendencia está determinada por 
-			la diferencia entre estos valores y a lo largo del tiempo, según lo definido por 
-			la diferencia de los puntos medios de las dos mitades de la serie, o valores x, de
-			 los puntos. Este método es sensible a las tendencias y útil para pronósticos a corto 
-			 y mediano plazo, pero no es apropiado para datos estacionales. 
+		<li><b>Semi-Promedios:</b>Estimaciones semipromedias de tendencias basadas en dos mitades de una serie. 
+			QAT divide los datos reales en dos partes iguales (mitades), pero en caso de que los datos de consumo 
+			real no sean de los meses pares, se excluye el punto medio y la media aritmética de los valores de 
+			cada parte (mitad) se calcula como los valores y de dos puntos sobre una recta. La pendiente de la línea 
+			de tendencia está determinada por la diferencia entre estos valores de y a lo largo del tiempo, según lo 
+			definido por la diferencia de los puntos medios de las dos mitades de la serie, o valores de x, de los puntos. 
+			Este método es sensible a las tendencias y útil para pronósticos a corto y mediano plazo, pero no es 
+			apropiado para datos estacionales.
 		</li>
 		<li><b>Regresión lineal:</b> La regresión lineal modela la relación entre dos variables 
 			ajustando una ecuación lineal a los datos observados. Intervalo de confianza :  

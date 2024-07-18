@@ -5077,6 +5077,8 @@ class EditSupplyPlanStatus extends Component {
                                 this.setState({
                                     loading:true
                                 })
+                                var validation = this.checkValidation();
+                                if(validation){
                                 ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
                                     .then(response => {
                                         let temp_version_status = 0;
@@ -5218,6 +5220,14 @@ class EditSupplyPlanStatus extends Component {
                                                     document.getElementById("submitButton").disabled = false;
                                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                                 }
+                                            }else{
+                                                this.setState({
+                                                    submitMessage: 'static.supplyPlan.validationFailed',
+                                                    submitColor: "red",
+                                                    loading: false
+                                                }, () => {
+                                                    this.hideMessageComponent()
+                                                });
                                             }
                                         } else {
                                             confirmAlert({
@@ -5277,6 +5287,15 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         }
                                     );
+                                }else{
+                                    this.setState({
+                                        submitMessage: 'static.supplyPlan.validationFailed',
+                                        submitColor: "red",
+                                        loading: false
+                                    }, () => {
+                                        this.hideMessageComponent()
+                                    });
+                                }
                             }}
                             render={
                                 ({
