@@ -2497,8 +2497,8 @@ export default class ListTreeComponent extends Component {
                             items.push({
                                 title: "Tree Table",
                                 onclick: function () {
-                                    var treeId = this.state.treeEl.getValueFromCoords(0, x);
-                                    var programId = this.state.treeEl.getValueFromCoords(8, x);
+                                    var treeId = this.state.treeEl.getValueFromCoords(0, y);
+                                    var programId = this.state.treeEl.getValueFromCoords(8, y);
                                     this.props.history.push({
                                         pathname: `/dataSet/treeTable/tree/${treeId}/${programId}`,
                                     });

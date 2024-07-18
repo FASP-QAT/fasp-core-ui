@@ -1315,13 +1315,54 @@ export default class TreeTable extends Component {
      * @param {*} cell This is the object of the DOM element
      */
     loadedTab1 = function (instance, cell, x, y, value) {
-        // jExcelLoadedFunction(instance, 1);
-        // if (instance.worksheets[0].getJson(null, false).length > 0) {
-        //     var cell = instance.worksheets[0].getCell("E1");
-        //     cell.classList.add('readonly');
-        //     var cell = instance.worksheets[0].getCell("F1");
-        //     cell.classList.add('readonly');
-        // }
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+        for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if(rowData[10] == 1) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if(rowData[10] == 2) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if(rowData[10] == 3) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
     }
     buildTab1Jexcel() {
         var treeArray = [];
@@ -1340,28 +1381,19 @@ export default class TreeTable extends Component {
             var level = items[i].level;
             var numberNode = items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2 ? false : true;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
+            
+            data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
+            data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
+            data[3] = items[i].payload.label.label_en;
+            data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId;
+            data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
+            data[6] = currentScenario.dataValue;
+            data[7] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
+            data[8] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : addCommasNodeValue(currentScenario.dataValue);
+            data[9] = currentScenario.notes;
+            data[10] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
+            data[11] = items[i].id;
 
-            if (i != 0) {
-                // var filteredList = this.state.items.filter(c => c.sortOrder > items[i].sortOrder && c.parent == items[i].parent);
-                // if (filteredList.length == 0) {
-                    
-                    data[1] = this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en;
-                    data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
-                    data[3] = items[i].payload.label.label_en;
-                    data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId;
-                    data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
-                    data[6] = currentScenario.dataValue;
-                    data[7] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
-                    data[8] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : addCommasNodeValue(currentScenario.dataValue);
-                    data[9] = currentScenario.notes
-                    
-                // }
-            } else {
-                data[1] = "";
-                data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
-                data[3] = items[i].payload.label.label_en;
-                data[4] = getLabelText(this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].label, this.state.lang);
-            }
             treeArray[count] = data;
             count++;
         }
@@ -1419,10 +1451,17 @@ export default class TreeTable extends Component {
                     {
                         title: i18n.t('static.common.notes'),
                         type: 'text',
+                    },
+                    {
+                        title: 'Node Type',
+                        type: 'hidden',
+                    },
+                    {
+                        title: 'Node Id',
+                        type: 'hidden',
                     }
                 ],
                 editable: true,
-                onload: this.loadedTab1,
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
                 columnSorting: true,
@@ -1438,6 +1477,25 @@ export default class TreeTable extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
+                onload: this.loadedTab1,
+                // onchange:
+                // onchangepage:
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    var rowData = obj.getRowData(y)
+                    if (y != null) {
+                        if (1 == 1) {
+                            items.push({
+                                title: "Go to Tree",
+                                onclick: function () {
+                                    localStorage.setItem("openNodeId", rowData[11]);
+                                    window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
+                                }.bind(this)
+                            });
+                        }
+                    }
+                    return items;
+                }.bind(this),
             };
             var treeTabl1El = jexcel(document.getElementById("tableDiv"), options);
             this.el = treeTabl1El;
@@ -2699,8 +2757,7 @@ export default class TreeTable extends Component {
      */
     componentDidMount() {
         this.setState({
-            treeId: this.props.match.params.treeId,
-            templateId: this.props.match.params.templateId
+            treeId: this.props.match.params.treeId
         }, () => {
             this.getUsagePeriodList();
             this.getForecastMethodList();
