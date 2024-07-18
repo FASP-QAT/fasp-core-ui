@@ -203,9 +203,12 @@ class CompareAndSelectScenario extends Component {
             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
             monthList.push(curDate);
         }
+        var rangeValue1 = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+
         this.setState({
             monthList1: monthList,
-            loading: false
+            loading: false,
+            singleValue2: rangeValue1
         }, () => {
             this.buildJexcel();
         })
@@ -2684,7 +2687,7 @@ class CompareAndSelectScenario extends Component {
                                                                         </Label>
                                                                     </div>
                                                                 </FormGroup>}
-                                                            {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
+                                                            {this.state.xAxisDisplayBy == 1 &&
                                                                 <FormGroup className="col-md-4 compareAndSelectDatePicker">
                                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                                     <div className="controls edit">
