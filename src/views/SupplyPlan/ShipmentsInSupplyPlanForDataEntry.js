@@ -2614,6 +2614,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
                 var freightCost = 0;
                 var planningUnitId = rowData[3];
+                if(planningUnitId!=""){
                 var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
                 var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
                 if (rowData[6] == 1) {
@@ -2663,6 +2664,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                 }
             }
+        }
             positiveValidation("U", y, elInstance);
         }
         if (x == 12) {
