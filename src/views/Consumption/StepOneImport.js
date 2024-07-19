@@ -724,30 +724,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         data[0] = '';
         data[1] = '';
         papuDataArr[0] = data;
-        /*if (papuList.length != 0) {
-            for (var j = 0; j < papuList.length; j++) {
-                data = [];
-                data[0] = papuList[j].equivalencyUnitMappingId
-                data[1] = papuList[j].equivalencyUnit.equivalencyUnitId
-                data[2] = papuList[j].equivalencyUnit.healthAreaList.map(a => a.id).toString().trim().replaceAll(',', ';')
-                data[3] = papuList[j].tracerCategory.id
-                data[4] = papuList[j].forecastingUnit.id
-                data[5] = papuList[j].unit.id
-                data[6] = papuList[j].convertToEu
-                data[7] = papuList[j].notes
-                data[8] = (papuList[j].program == null ? -1 : papuList[j].program.id)
-                data[9] = papuList[j].active
-                data[10] = papuList[j].lastModifiedBy.username;
-                data[11] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-                data[12] = 0;
-                data[13] = papuList[j].forecastingUnit.id
-                data[14] = (papuList[j].program == null ? -1 : papuList[j].program.id)
-                data[15] = 0;
-                data[16] = count;
-                papuDataArr[count] = data;
-                count++;
-            }
-        }*/
+        
         // if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
         //     jexcel.destroy(document.getElementById("spProgramVersionTable"), true);
         // }
@@ -757,11 +734,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             data: data,
             columnDrag: false,
             colWidths: [100, 100],
-            onchange: (instance, cell, x, y, value) => {
+            // onchange: (instance, cell, x, y, value) => {
                 // if (x == 1) { 
                 //     this.versionChanged(instance, cell, x, y, value);
                 // }
-            },
+            // },
             columns: [
                 {
                     title: 'newRow',
@@ -1056,14 +1033,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * Constructs and initializes a jexcel table using the provided data and options.
      */
     buildJexcel() {
-        var papuList = this.state.selSource;
+        var papuList = this.state.selSource; // planning unit list of SP program
         var data = [];
         var papuDataArr = [];
         let forecastPlanignUnitListForNotDuplicate = [];
         var count = 0;
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
-                let planningUnitObj = this.state.planningUnitList.filter(c => c.id == papuList[j].id)[0];
+                let planningUnitObj = this.state.planningUnitList.filter(c => c.id == papuList[j].id)[0]; // filter PU list of Forecast Program
                 data = [];
                 data[0] = getLabelText(papuList[j].forecastingUnit.tracerCategory.label, this.state.lang)
                 data[1] = papuList[j].id
@@ -1180,9 +1157,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
+                    console.log('\ny: '+y);
                     var elInstance = el;
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
+                    console.log('rowData: ',rowData);
+                    console.log('cell J: ',`J${parseInt(y) + 1}`);
+                    console.log('cell : ',elInstance.getCell(`J${parseInt(y) + 1}`));
                     var match = rowData[10];
                     if (match == 1 || rowData[1] == rowData[7]) {
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
