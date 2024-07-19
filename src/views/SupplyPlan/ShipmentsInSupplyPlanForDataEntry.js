@@ -3746,7 +3746,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            if (map.get("27") != -1) {
+            if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
                 var index = "";
                 if (map.get("2") > 0) {
                     index = shipmentListAfterUpdate.findIndex(c => c.shipmentId == map.get("2"));
@@ -4210,7 +4210,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                     }
                                     var puData = this.props.items.puData.filter(c => c.id == map.get("3"))[0];
                                     var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    if (map.get("27") != -1) {
+                                    if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
                                         shipmentDataList[parseInt(map.get("27"))].plannedDate = plannedDate;
                                         shipmentDataList[parseInt(map.get("27"))].submittedDate = submittedDate;
                                         shipmentDataList[parseInt(map.get("27"))].approvedDate = approvedDate;
