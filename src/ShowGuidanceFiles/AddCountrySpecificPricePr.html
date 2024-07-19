@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Custos de Frete, Prazos de Entrega e Preços das Unidades de Planejamento</title>
+    <style>
+        table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Gestão de Custos de Frete, Prazos de Entrega e Preços das Unidades de Planejamento</h3>
+    <p>Esta tela permite que você gerencie detalhes específicos, como custos de frete, prazos de entrega e preços das unidades de planejamento para agentes de compras e unidades de planejamento dentro do seu programa de planejamento de suprimentos.</p>
+
+    <h5><strong>Adicionando ou Editando Linhas</h5></strong>
+    <p>Para adicionar uma linha, siga estas etapas:</p>
+    <ul>
+        <li><strong>Programa, Unidade de Planejamento e Agente de Compras:</strong> Preencha esses campos.</li>
+        <li><strong>Criando uma Combinação de Agente de Compras/Unidade de Planejamento:</strong> Selecione opções tanto da unidade de planejamento quanto das colunas do agente de compras.</li>
+        <li><strong>Linha Específica do Agente de Compras Sem Vincular a uma Unidade de Planejamento:</strong> Escolha ‘Todos’ na coluna de unidade de planejamento.</li>
+        <li><strong>Custos de frete, prazos de entrega e preço unitário:</strong> Pelo menos uma das colunas restantes deve ter um valor numérico.</li>
+    </ul>
+
+    <h5><strong>Restrições e Regras</h5></strong>
+    <ul>
+        <li>Apenas uma linha é permitida por combinação de programa/unidade de planejamento/agente de compras.</li>
+        <li>Se uma linha de agente de compras incluir ‘Todos’ as unidades de planejamento, a coluna de preço unitário será não editável.</li>
+    </ul>
+
+    <h5><strong>Uso no Módulo de Planejamento de Suprimentos</h5></strong>
+    <p>Esses detalhes impactarão seu módulo de planejamento de suprimentos da seguinte maneira:</p>
+    <ul>
+        <li><strong>Percentuais de Frete:</strong> Priorizados pelas configurações de programa/agente de compras/unidade de planejamento e depois pelas configurações do programa.</li>
+        <li><strong>Prazos de Entrega:</strong> Priorizados pelas configurações de programa/agente de compras/unidade de planejamento, depois pelas configurações do agente de compras no nível do domínio e finalmente pelas configurações do programa.</li>
+        <li><strong>Preços Unitários:</strong> Priorizados pelas configurações de programa/agente de compras/unidade de planejamento, depois pelas configurações do agente de compras no nível do domínio e finalmente pelas configurações do programa.</li>
+    </ul>
+</body>
+</html>

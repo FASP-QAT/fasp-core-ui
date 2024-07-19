@@ -72,6 +72,7 @@ class StockStatus extends Component {
       exportModal: false,
       planningUnitIdsExport: [],
       type: 0,
+      planningUnitNotes:""
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -176,6 +177,9 @@ class StockStatus extends Component {
           csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
         }
         csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ' : ' + ppu.reorderFrequencyInMonths + '"'))
+        if(ppu.notes!=null && ppu.notes!=undefined && ppu.notes.length>0){
+          csvRow.push('"' + (i18n.t('static.report.planningUnitNotes').replaceAll(' ', '%20') + ' : ' + ppu.notes + '"'))
+        }
         csvRow.push("")
         const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
@@ -316,9 +320,14 @@ class StockStatus extends Component {
             align: 'left'
           })
         }
+        if(ppu1.notes!=null && ppu1.notes!=undefined && ppu1.notes.length>0){
+          doc.text(i18n.t('static.report.planningUnitNotes') + ' : ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
+            align: 'left'
+          })
+        }
         var canv = document.getElementById("cool-canvas" + count)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg1, 'png', 50, 150, 750, 300, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, 160, 750, 300, "a" + count, 'CANVAS')
         count++
         var height = doc.internal.pageSize.height;
         let otherdata =
@@ -530,6 +539,13 @@ class StockStatus extends Component {
   filterData() {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
+    console.log("Planning Unit Id Test@123",planningUnitId);
+    if(planningUnitId!="" && planningUnitId!=0){
+      console.log("this.state.planningUnits Test@123",this.state.planningUnits);
+        this.setState({
+          planningUnitNotes:this.state.planningUnits.filter(c=>c.planningUnit.id==planningUnitId)[0].notes
+        })
+    }
     let versionId = document.getElementById("versionId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
     if (programId != 0 && versionId != 0 && planningUnitId != 0) {
@@ -1244,11 +1260,11 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               stack: 1,
                               backgroundColor: '#002f6c',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#002f6c',
+                              pointBackgroundColor: '#002f6c',
+                              pointBorderColor: '#002f6c',
+                              pointHoverBackgroundColor: '#002f6c',
+                              pointHoverBorderColor: '#002f6c',
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
@@ -1262,11 +1278,11 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               stack: 1,
                               backgroundColor: '#49A4A1',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#49A4A1',
+                              pointBackgroundColor: '#49A4A1',
+                              pointBorderColor: '#49A4A1',
+                              pointHoverBackgroundColor: '#49A4A1',
+                              pointHoverBorderColor: '#49A4A1',
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
@@ -1280,11 +1296,11 @@ class StockStatus extends Component {
                               yAxisID: 'A',
                               stack: 1,
                               backgroundColor: '#0067B9',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#0067B9',
+                              pointBackgroundColor: '#0067B9',
+                              pointBorderColor: '#0067B9',
+                              pointHoverBackgroundColor: '#0067B9',
+                              pointHoverBorderColor: '#0067B9',
                               data: data.map((item, index) => {
                                 let count = 0;
                                 (item.shipmentInfo.map((ele, index) => {
@@ -1296,11 +1312,11 @@ class StockStatus extends Component {
                             {
                               label: i18n.t('static.supplyPlan.planned'),
                               backgroundColor: '#A7C6ED',
-                              borderColor: 'rgba(179,181,198,1)',
-                              pointBackgroundColor: 'rgba(179,181,198,1)',
-                              pointBorderColor: '#fff',
-                              pointHoverBackgroundColor: '#fff',
-                              pointHoverBorderColor: 'rgba(179,181,198,1)',
+                              borderColor: '#A7C6ED',
+                              pointBackgroundColor: '#A7C6ED',
+                              pointBorderColor: '#A7C6ED',
+                              pointHoverBackgroundColor: '#A7C6ED',
+                              pointHoverBorderColor: '#A7C6ED',
                               yAxisID: 'A',
                               stack: 1,
                               data: data.map((item, index) => {
@@ -1321,7 +1337,7 @@ class StockStatus extends Component {
                                 fontColor: 'transparent',
                               },
                               lineTension: 0,
-                              pointStyle: 'line',
+                              pointStyle: 'circle',
                               pointRadius: 0,
                               showInLegend: true,
                               data: data.map((item, index) => (Number(item.closingBalance)))
@@ -1653,11 +1669,11 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   stack: 1,
                   backgroundColor: '#002f6c',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#002f6c',
+                  pointBackgroundColor: '#002f6c',
+                  pointBorderColor: '#002f6c',
+                  pointHoverBackgroundColor: '#002f6c',
+                  pointHoverBorderColor: '#002f6c',
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
@@ -1671,11 +1687,11 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   stack: 1,
                   backgroundColor: '#49A4A1',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#49A4A1',
+                  pointBackgroundColor: '#49A4A1',
+                  pointBorderColor: '#49A4A1',
+                  pointHoverBackgroundColor: '#49A4A1',
+                  pointHoverBorderColor: '#49A4A1',
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
@@ -1689,11 +1705,11 @@ class StockStatus extends Component {
                   yAxisID: 'A',
                   stack: 1,
                   backgroundColor: '#0067B9',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#0067B9',
+                  pointBackgroundColor: '#0067B9',
+                  pointBorderColor: '#0067B9',
+                  pointHoverBackgroundColor: '#0067B9',
+                  pointHoverBorderColor: '#0067B9',
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
@@ -1705,11 +1721,11 @@ class StockStatus extends Component {
                 {
                   label: i18n.t('static.supplyPlan.planned'),
                   backgroundColor: '#A7C6ED',
-                  borderColor: 'rgba(179,181,198,1)',
-                  pointBackgroundColor: 'rgba(179,181,198,1)',
-                  pointBorderColor: '#fff',
-                  pointHoverBackgroundColor: '#fff',
-                  pointHoverBorderColor: 'rgba(179,181,198,1)',
+                  borderColor: '#A7C6ED',
+                  pointBackgroundColor: '#A7C6ED',
+                  pointBorderColor: '#A7C6ED',
+                  pointHoverBackgroundColor: '#A7C6ED',
+                  pointHoverBorderColor: '#A7C6ED',
                   yAxisID: 'A',
                   stack: 1,
                   data: filteredPlanningUnitData.map((item, index) => {
@@ -1730,7 +1746,7 @@ class StockStatus extends Component {
                     fontColor: 'transparent',
                   },
                   lineTension: 0,
-                  pointStyle: 'line',
+                  pointStyle: 'circle',
                   pointRadius: 0,
                   showInLegend: true,
                   data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
@@ -2729,11 +2745,11 @@ class StockStatus extends Component {
         yAxisID: 'A',
         stack: 1,
         backgroundColor: '#002f6c',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#002f6c',
+        pointBackgroundColor: '#002f6c',
+        pointBorderColor: '#002f6c',
+        pointHoverBackgroundColor: '#002f6c',
+        pointHoverBorderColor: '#002f6c',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -2747,11 +2763,11 @@ class StockStatus extends Component {
         yAxisID: 'A',
         stack: 1,
         backgroundColor: '#49a4a1',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#49a4a1',
+        pointBackgroundColor: '#49a4a1',
+        pointBorderColor: '#49a4a1',
+        pointHoverBackgroundColor: '#49a4a1',
+        pointHoverBorderColor: '#49a4a1',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -2765,11 +2781,11 @@ class StockStatus extends Component {
         yAxisID: 'A',
         stack: 1,
         backgroundColor: '#0067B9',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#0067B9',
+        pointBackgroundColor: '#0067B9',
+        pointBorderColor: '#0067B9',
+        pointHoverBackgroundColor: '#0067B9',
+        pointHoverBorderColor: '#0067B9',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -2781,11 +2797,11 @@ class StockStatus extends Component {
       {
         label: i18n.t('static.supplyPlan.planned'),
         backgroundColor: '#A7C6ED',
-        borderColor: 'rgba(179,181,198,1)',
-        pointBackgroundColor: 'rgba(179,181,198,1)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(179,181,198,1)',
+        borderColor: '#A7C6ED',
+        pointBackgroundColor: '#A7C6ED',
+        pointBorderColor: '#A7C6ED',
+        pointHoverBackgroundColor: '#A7C6ED',
+        pointHoverBorderColor: '#A7C6ED',
         yAxisID: 'A',
         stack: 1,
         data: this.state.stockStatusList.map((item, index) => {
@@ -2806,7 +2822,7 @@ class StockStatus extends Component {
           fontColor: 'transparent',
         },
         lineTension: 0,
-        pointStyle: 'line',
+        pointStyle: 'circle',
         pointRadius: 0,
         showInLegend: true,
         data: this.state.stockStatusList.map((item, index) => (item.closingBalance))
@@ -2987,29 +3003,14 @@ class StockStatus extends Component {
                       this.state.stockStatusList.length > 0
                       &&
                       <div className="col-md-12 p-0">
-                        <div className="col-md-12">
-                          <div className="chart-wrapper chart-graph-report">
-                            {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
-                            {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
-                          </div>
-                          <div id="bars_div" style={{ display: "none" }}>
-                            {this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
-                            })}
-                          </div>
-                        </div>
-                        <div className="col-md-12">
-                          <button className="mr-1 mt-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                          </button>
-                        </div>
-                      </div>}
-                  </div>
-                  {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
-                    <>
-                      <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                        {this.state.stockStatusList.length > 0 && ppu != undefined &&
+                      <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
+                        <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>
+                              </span>
+                            </li>
                           {this.state.stockStatusList[0].planBasedOn == 1 ? <>
                             <li><span className="redlegend "></span>
                               <span className="legendcommitversionText">
@@ -3036,10 +3037,34 @@ class StockStatus extends Component {
                                 {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
                               </span>
                             </li>
-                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
+                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
                           </>}
                         </ul>
+                        {this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes!=null && this.state.planningUnitNotes.length>0 && 
+                            <span  className="legendcommitversionText"><b>{i18n.t("static.report.planningUnitNotes")}</b><i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitNotes")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : {this.state.planningUnitNotes}</span>
+                        }
                       </FormGroup>
+                  }
+                        <div className="col-md-12">
+                          <div className="chart-wrapper chart-graph-report">
+                            {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
+                            {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
+                          </div>
+                          <div id="bars_div" style={{ display: "none" }}>
+                            {this.state.PlanningUnitDataForExport.map((ele, index) => {
+                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                            })}
+                          </div>
+                        </div>
+                        <div className="col-md-12">
+                          <button className="mr-1 mt-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                          </button>
+                        </div>
+                      </div>}
+                  </div>
+                      {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
                       <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
                           {
@@ -3051,7 +3076,6 @@ class StockStatus extends Component {
                           }
                         </ul>
                       </FormGroup>
-                    </>
                   }
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
                     <thead>

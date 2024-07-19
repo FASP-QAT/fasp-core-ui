@@ -233,7 +233,7 @@ class Budgets extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Number(ele.budgetAmt).toFixed(2), Number(ele.plannedBudgetAmt).toFixed(2), Number(ele.orderedBudgetAmt).toFixed(2), Number((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))).toFixed(2), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -491,7 +491,7 @@ class Budgets extends Component {
      */
     formatterValue = value => {
         if (value != null) {
-            return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            return Number(value).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
         }
     }
     /**
@@ -811,10 +811,10 @@ class Budgets extends Component {
                     { title: i18n.t('static.budget.budgetCode'), type: 'text' },
                     { title: i18n.t('static.budget.fundingsource'), type: 'text' },
                     { title: i18n.t('static.dashboard.currency'), type: 'text' },
-                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },
-                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },
-                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },
-                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },
+                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##.00', decimal: '.' },
+                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
+                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
+                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
                     { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },
                     { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },
                     { title: 'Budget Id', type: 'hidden' },

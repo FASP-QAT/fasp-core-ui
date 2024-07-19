@@ -7,6 +7,7 @@ import { API_URL, SPACE_REGEX, SPECIAL_CHARECTER_WITH_NUM } from '../../Constant
 import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.common.TreeTemplate"))
 let summaryText_2 = "Add Tree Template"
 /**
@@ -41,7 +42,8 @@ export default class TreeTemplateTicketComponent extends Component {
                 templateName: "",
                 details: "",
                 file: "",
-                attachFile: ""
+                attachFile: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -53,6 +55,7 @@ export default class TreeTemplateTicketComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -168,6 +171,7 @@ export default class TreeTemplateTicketComponent extends Component {
         treeTemplate.details = '';
         treeTemplate.file = '';
         treeTemplate.attachFile = '';
+        treeTemplate.priority = 3;
         this.setState({
             treeTemplate: treeTemplate,
             realmId: this.props.items.userRealmId
@@ -185,6 +189,23 @@ export default class TreeTemplateTicketComponent extends Component {
             return "";
         }
     }
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { treeTemplate } = this.state;
+        treeTemplate.priority = newState;
+        this.setState(
+            {
+                treeTemplate
+            }, () => {
+                // console.log('priority - state : '+this.state.treeTemplate.priority);
+            }
+        );
+    }
+
     /**
      * This is used to display the content
      * @returns This returns tree template details form
@@ -212,6 +233,7 @@ export default class TreeTemplateTicketComponent extends Component {
                             realmName: this.state.realmId,
                             templateName: this.state.treeTemplate.templateName,
                             details: this.state.treeTemplate.details,
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -376,6 +398,9 @@ export default class TreeTemplateTicketComponent extends Component {
                                         <div>
                                             <p>{i18n.t('static.ticket.filesuploadnote')}</p>
                                         </div>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.treeTemplate.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

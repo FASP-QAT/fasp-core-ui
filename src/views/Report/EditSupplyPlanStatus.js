@@ -213,7 +213,8 @@ class EditSupplyPlanStatus extends Component {
                 regionList: [],
                 problemStatusListForEdit: [],
                 shipmentQtyTotalForPopup: 0,
-                batchQtyTotalForPopup: 0
+                batchQtyTotalForPopup: 0,
+                planningUnitNotes:""
             },
             statuses: [],
             regionList: [],
@@ -1573,7 +1574,8 @@ class EditSupplyPlanStatus extends Component {
                     maxStockMoSQty: maxStockMoSQty,
                     planBasedOn: programPlanningUnit.planBasedOn,
                     minQtyPpu: programPlanningUnit.minQty,
-                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -2882,11 +2884,11 @@ class EditSupplyPlanStatus extends Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#002f6c',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#002f6c',
+                    pointBackgroundColor: '#002f6c',
+                    pointBorderColor: '#002f6c',
+                    pointHoverBackgroundColor: '#002f6c',
+                    pointHoverBorderColor: '#002f6c',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -2894,11 +2896,11 @@ class EditSupplyPlanStatus extends Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#49A4A1',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#49A4A1',
+                    pointBackgroundColor: '#49A4A1',
+                    pointBorderColor: '#49A4A1',
+                    pointHoverBackgroundColor: '#49A4A1',
+                    pointHoverBorderColor: '#49A4A1',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
                 },
                 {
@@ -2906,11 +2908,11 @@ class EditSupplyPlanStatus extends Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#0067B9',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#0067B9',
+                    pointBackgroundColor: '#0067B9',
+                    pointBorderColor: '#0067B9',
+                    pointHoverBackgroundColor: '#0067B9',
+                    pointHoverBorderColor: '#0067B9',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
                 },
                 {
@@ -2918,11 +2920,11 @@ class EditSupplyPlanStatus extends Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#6C6463',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#6C6463',
+                    pointBackgroundColor: '#6C6463',
+                    pointBorderColor: '#6C6463',
+                    pointHoverBackgroundColor: '#6C6463',
+                    pointHoverBorderColor: '#6C6463',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.onhold)),
                 },
                 {
@@ -2930,11 +2932,11 @@ class EditSupplyPlanStatus extends Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#A7C6ED',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#A7C6ED',
+                    pointBackgroundColor: '#A7C6ED',
+                    pointBorderColor: '#A7C6ED',
+                    pointHoverBackgroundColor: '#A7C6ED',
+                    pointHoverBorderColor: '#A7C6ED',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                 },
                 {
@@ -2949,7 +2951,7 @@ class EditSupplyPlanStatus extends Component {
                         fontColor: 'transparent',
                     },
                     lineTension: 0,
-                    pointStyle: 'line',
+                    pointStyle: 'circle',
                     pointRadius: 0,
                     showInLegend: true,
                     data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
@@ -3080,7 +3082,7 @@ class EditSupplyPlanStatus extends Component {
                                 <div className="table-responsive RemoveStriped">
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
@@ -3088,6 +3090,11 @@ class EditSupplyPlanStatus extends Component {
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
+                                    {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.planningUnitNotes")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitNotes")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>{this.state.planningUnitNotes}</span></li>
+                                        </ul>
+                                    </FormGroup>}
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
@@ -3813,7 +3820,7 @@ class EditSupplyPlanStatus extends Component {
             data[5] = ""
             data[6] = problemList[j].planningUnit.id
             data[7] = (problemList[j].dt != null) ? (moment(problemList[j].dt).format('MMM-YY')) : ''
-            data[8] = problemList[j].problemCategory.id
+            data[8] = problemList[j].problemType.id == 1 ? problemList[j].problemCategory.id : (problemList[j].realmProblem.criticality.id == 1 ? 4 : (problemList[j].realmProblem.criticality.id == 2 ? 5 : 6))
             data[9] = getProblemDesc(problemList[j], this.state.lang)
             data[10] = getSuggestion(problemList[j], this.state.lang)
             data[11] = problemList[j].problemStatus.id
@@ -4963,6 +4970,9 @@ class EditSupplyPlanStatus extends Component {
                             }}
                             validationSchema={validationSchema}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
+                                this.setState({
+                                    loading:true
+                                })
                                 ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
                                     .then(response => {
                                         let temp_version_status = 0;
@@ -4977,7 +4987,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var isAllCheckForReviewed = true;
                                                 for (var i = 0; i < json.length; i++) {
                                                     var map = new Map(Object.entries(json[i]));
-                                                    if (map.get("23") == 1) {
+                                                    if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id!=map.get("11") || this.state.problemList[i].reviewed.toString()!=map.get("21").toString() || map.get("22").toString()!="")) {
                                                         reviewedProblemList.push({
                                                             problemReportId: map.get("0"),
                                                             problemStatus: {
@@ -5028,13 +5038,16 @@ class EditSupplyPlanStatus extends Component {
                                                             if (this.state.program.currentVersion.versionStatus.id != 1) {
                                                                 this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
                                                             } else {
-                                                                document.getElementById("submitButton").disabled = false;
+                                                                try{
+                                                                    document.getElementById("submitButton").disabled = false;
+                                                                }catch(err){}
                                                                 this.setState({
                                                                     submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                                     submitColor: "green",
                                                                     problemReportChanged: 0,
                                                                     remainingDataChanged: 0,
-                                                                    loadSummaryTable:false
+                                                                    loadSummaryTable:false,
+                                                                    loading:false
 
                                                                     // isModalOpen: !this.state.isModalOpen,
                                                                 }, () => {
