@@ -3324,8 +3324,8 @@
     "static.tree.nodeName":"Node Name",
     "static.tree.shiftUp":"Shift Up",
     "static.tree.shiftDown":"Shift Down",
-    "static.tree.levelChangeNote":"Use numbers to indicate the desired node order from left to right.  Only nodes in this level are shown.",
-    "static.tree.seeChildrenOf":"See Children of",
+    "static.tree.levelChangeNote":"Use arrows to indicate the desired node order from left to right.  Only nodes in this level are shown.",
+    "static.tree.seeChildrenOf":"See children of",
     "static.updatePU.noteText1":"Note : If you want to update procurement agent specific details, go to",
     "static.updatePU.noteText2":"screen",
     "static.updatePPUPA.noteText1":"Note : If you want to update program specific details, go to",
@@ -3365,5 +3365,6 @@
     "static.shipment.shipmentFundingSourceType": "Shipment Funding Source Type",
     "static.shipment.selectFundingSourceType": "Select Funding Source Type",
     "static.shipment.groupBy": "Group By",
-    "static.funderType.funderTypeText": "Funding Source Type is required"
+    "static.funderType.funderTypeText": "Funding Source Type is required",
+    "static.tree.editLevelName": "Edit Level Name"
 }

@@ -2247,7 +2247,26 @@ export default class BuildTree extends Component {
             }
         };
         data.context.levels.push(e.target.value);
-        this.levelClicked(data);
+        var cf = true;
+        if (this.state.isLevelChanged == true) {
+            cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                let { curTreeObj } = this.state;
+                var items = curTreeObj.tree.flatList;
+                items = JSON.parse(JSON.stringify(this.state.oldItems));
+                curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                this.setState({
+                    isLevelChanged: false,
+                    curTreeObj,
+                    items
+                }, () => {
+                    this.levelClicked(data);
+                })
+            } else {
+            }
+        } else {
+            this.levelClicked(data);
+        }
     }
     /**
      * Resets the reorder level
@@ -2377,7 +2396,7 @@ export default class BuildTree extends Component {
         var options = {
             data: data,
             columnDrag: false,
-            colWidths: [50, 20, 80],
+            colWidths: [50, 80, 20, 20],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -2388,12 +2407,14 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.nodeltr'),
                     type: 'text',
-                    readOnly: false
+                    readOnly: false,
+                    width: 60
                 },
                 {
                     title: i18n.t('static.tree.nodeName'),
                     type: 'text',
-                    readOnly: true
+                    readOnly: true,
+                    width: 140
                 },
                 {
                     title: "Node Id",
@@ -2409,13 +2430,13 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.shiftUp'),
                     type: 'text',
                     readOnly: true,
-                    width: 50
+                    width: 25
                 },
                 {
                     title: i18n.t('static.tree.shiftDown'),
                     type: 'text',
                     readOnly: true,
-                    width: 50
+                    width: 25
                 },
             ],
             updateTable: this.updateReorderTable,
@@ -2527,10 +2548,15 @@ export default class BuildTree extends Component {
         var temp = items[prevNodeIndex];
         items[prevNodeIndex] = items[currNodeIndex];
         items[currNodeIndex] = temp;
-        items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
-        items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
-        this.setState({
-            isLevelChanged: true,
+        let pId = items.filter(f => f.id == currNode[0].id)[0].parent;
+        var pObj = items.filter(f => f.id == pId)[0];
+        let newItems = items.filter(f => f.parent == pId);
+        for(let i = 0; i < newItems.length; i++) {
+            var ns = items.findIndex(f => f.id == newItems[i].id);
+            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 10 ? '0'+(i+1) : i+1);
+        }
+        this.setState({ 
+            isLevelChanged: true, 
             items
         }, () => {
             this.buildLevelReorderJexcel(true);
@@ -2577,6 +2603,10 @@ export default class BuildTree extends Component {
                         item.sortOrder = val.newSortOrder;
                 }
             });
+        })
+        items.forEach(item => {
+            delete item.newSortOrder;
+            delete item.oldSortOrder;
         })
         if (levelListFiltered != -1) {
             if (this.state.levelName != "") {
@@ -13509,7 +13539,7 @@ export default class BuildTree extends Component {
                 </ModalFooter>
             </Modal>
             <Modal isOpen={this.state.levelModal}
-                className={'modal-md'}>
+                className={'modal-md modalWidthExpiredStock'}>
                 <Formik
                     enableReinitialize={true}
                     initialValues={{
@@ -13536,21 +13566,11 @@ export default class BuildTree extends Component {
                         }) => (
                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
                                 <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
-                                    <strong>{i18n.t('static.tree.levelDetails')}</strong>
-                                </ModalHeader>
-                                <ModalBody>
-                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                                <div class="spinner-border blue ml-4" role="status">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}>    
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.level')}</Label>
+                                    <Row className="align-items-center">
+                                        <Col sm="3">
+                                            <strong>{i18n.t('static.tree.levelDetails')}</strong>
+                                        </Col>
+                                        <Col>
                                             <Input
                                                 type="select"
                                                 id="levelDropdown"
@@ -13566,56 +13586,89 @@ export default class BuildTree extends Component {
                                                                 {item.label.label_en}
                                                             </option>
                                                         )
-                                                    }, this)}
+                                                    }, this)
+                                                }
                                             </Input>
+                                        </Col>
+                                    </Row>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                <div class="spinner-border blue ml-4" role="status">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}> 
+                                        <FormGroup>
+                                            <Row className="align-items-center">
+                                                <Col sm="3">
+                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
+                                                </Col>
+                                                <Col>
+                                                    <Input type="text"
+                                                        id="levelName"
+                                                        name="levelName"
+                                                        required
+                                                        style={{fontSize: '12px'}}
+                                                        valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
+                                                        invalid={touched.levelName && !!errors.levelName}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { this.levelNameChanged(e); handleChange(e); }}
+                                                        value={this.state.levelName}
+                                                    ></Input>
+                                                    <FormFeedback>{errors.levelName}</FormFeedback>
+                                                </Col>
+                                            </Row>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                id="levelName"
-                                                name="levelName"
-                                                required
-                                                valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
-                                                invalid={touched.levelName && !!errors.levelName}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { this.levelNameChanged(e); handleChange(e); }}
-                                                value={this.state.levelName}
-                                            ></Input>
-                                            <FormFeedback>{errors.levelName}</FormFeedback>
+                                            <Row className="align-items-center">
+                                                <Col sm="3">
+                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}</Label>
+                                                </Col>
+                                                <Col>
+                                                    <Input
+                                                        type="select"
+                                                        id="levelUnit"
+                                                        name="levelUnit"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.levelUnitChange(e) }}
+                                                        value={this.state.levelUnit}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.nodeUnitList.length > 0
+                                                            && this.state.nodeUnitList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.unitId}>
+                                                                        {getLabelText(item.label, this.state.lang)}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                </Col>
+                                            </Row>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
-                                            <Input
-                                                type="select"
-                                                id="levelUnit"
-                                                name="levelUnit"
-                                                bsSize="sm"
-                                                onChange={(e) => { this.levelUnitChange(e) }}
-                                                value={this.state.levelUnit}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.nodeUnitList.length > 0
-                                                    && this.state.nodeUnitList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.unitId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
+                                            <Row className="align-items-center">
+                                                <Col sm="3">
+                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
+                                                </Col>
+                                                <Col>
+                                                    <MultiSelect
+                                                        id="childrenOf"
+                                                        name="childrenOf"
+                                                        bsSize="sm"
+                                                        options={this.state.childrenOfList}
+                                                        onChange={(e) => { this.childrenOfChanged(e) }}
+                                                        value={this.state.childrenOf}
+                                                    />
+                                                </Col>
+                                            </Row>
                                         </FormGroup>
                                         <p>{i18n.t('static.tree.levelChangeNote')}</p>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
-                                            <MultiSelect
-                                                id="childrenOf"
-                                                name="childrenOf"
-                                                bsSize="sm"
-                                                options={this.state.childrenOfList}
-                                                onChange={(e) => { this.childrenOfChanged(e) }}
-                                                value={this.state.childrenOf}
-                                            />
-                                        </FormGroup>
                                         <FormGroup>
                                         {this.state.showReorderJexcel &&
                                             <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
