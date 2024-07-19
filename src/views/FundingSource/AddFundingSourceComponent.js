@@ -28,8 +28,7 @@ const validationSchema = function (values) {
     realmId: Yup.string()
       .required(i18n.t('static.common.realmtext')),
     fundingSourceTypeId: Yup.string()
-      // .required(i18n.t('static.procurementagent.procurementagenttypetext')),
-      .required('Funder Type is required'),
+      .required(i18n.t('static.funderType.funderTypeText')),
     fundingSource: Yup.string()
       .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
       .required(i18n.t('static.fundingsource.fundingsourcetext')),
@@ -295,7 +294,6 @@ class AddFundingSourceComponent extends Component {
       .then(response => {
         if (response.status == 200) {
           var listArray = response.data;
-          console.log('FundingSourceTypeListAll: ' + JSON.stringify(listArray));
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
             var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();

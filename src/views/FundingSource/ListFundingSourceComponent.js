@@ -82,7 +82,6 @@ class FundingSourceListComponent extends Component {
         let fundingSourceList = this.state.selSource;
         let fundingSourceArray = [];
         let count = 0;
-        console.log('fundingSourceList[0]: '+JSON.stringify(fundingSourceList[0]));
         for (var j = 0; j < fundingSourceList.length; j++) {
             data = [];
             data[0] = fundingSourceList[j].fundingSourceId
