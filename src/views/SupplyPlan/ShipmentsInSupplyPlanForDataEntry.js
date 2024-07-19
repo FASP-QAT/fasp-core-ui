@@ -2629,6 +2629,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
                 var freightCost = 0;
                 var planningUnitId = rowData[3];
+                if(planningUnitId!=""){
                 var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
                 var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
                 if (rowData[6] == 1) {
@@ -2678,6 +2679,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     elInstance.setValueFromCoords(21, y, freightCost.toFixed(2), true);
                 }
             }
+        }
             positiveValidation("U", y, elInstance);
         }
         if (x == 12) {
@@ -3759,7 +3761,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            if (map.get("27") != -1) {
+            if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
                 var index = "";
                 if (map.get("2") > 0) {
                     index = shipmentListAfterUpdate.findIndex(c => c.shipmentId == map.get("2"));
@@ -4223,7 +4225,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                     }
                                     var puData = this.props.items.puData.filter(c => c.id == map.get("3"))[0];
                                     var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(puData.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                                    if (map.get("27") != -1) {
+                                    if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
                                         shipmentDataList[parseInt(map.get("27"))].plannedDate = plannedDate;
                                         shipmentDataList[parseInt(map.get("27"))].submittedDate = submittedDate;
                                         shipmentDataList[parseInt(map.get("27"))].approvedDate = approvedDate;

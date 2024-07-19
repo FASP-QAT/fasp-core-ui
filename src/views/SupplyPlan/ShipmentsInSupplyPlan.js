@@ -3587,7 +3587,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         var budgetJson = [];
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            if (map.get("27") != -1) {
+            if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
                 shipmentListAfterUpdate[parseInt(map.get("27"))].budget.id = map.get("17");
                 var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
                 shipmentListAfterUpdate[parseInt(map.get("27"))].currency = c;
@@ -4033,7 +4033,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 submittedDate = null;
                             }
                             var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                            if (map.get("27") != -1) {
+                            if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
                                 shipmentDataList[parseInt(map.get("27"))].plannedDate = plannedDate;
                                 shipmentDataList[parseInt(map.get("27"))].submittedDate = submittedDate;
                                 shipmentDataList[parseInt(map.get("27"))].approvedDate = approvedDate;
