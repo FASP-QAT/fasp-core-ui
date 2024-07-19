@@ -111,7 +111,8 @@ class CompareAndSelectScenario extends Component {
             uniqueProductCategories: [],
             planningUnitListForTable: [],
             expandCompressPUBtn: true,
-            showHidePU: true
+            showHidePU: true,
+            actualMinDate: ""
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -170,8 +171,11 @@ class CompareAndSelectScenario extends Component {
                 this.setMonth1List()
             })
         } else if (e.target.name == "showFits") {
+            var stopDate = this.state.singleValue2.to.year + '-' + this.state.singleValue2.to.month + '-' + new Date(this.state.singleValue2.to.year, this.state.singleValue2.to.month, 0).getDate();
             this.setState({
                 showFits: checked,
+                minDate: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
+                singleValue2: { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
                 showForecastPeriod: checked ? false : this.state.showForecastPeriod
             }, () => {
                 this.setMonth1List()
@@ -356,6 +360,7 @@ class CompareAndSelectScenario extends Component {
                 forecastNotes: forecastNotes,
                 singleValue2: rangeValue,
                 minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
+                actualMinDate: actualMinDate,
                 showAllData: true,
                 loading: false,
                 minActualMonth: minActualMonth,
