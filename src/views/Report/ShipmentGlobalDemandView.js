@@ -1906,10 +1906,14 @@ class ShipmentGlobalDemandView extends Component {
             title: {
                 display: true,
                 text: this.state.groupByFundingSourceType ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
-                fontColor: 'black'
+                fontColor: 'black',
+                padding: 30
             },
             legend: {
-                position: 'bottom'
+                position: 'bottom',
+                labels: {
+                    padding: 25
+                }
             },
             tooltips: {
                 callbacks: {
