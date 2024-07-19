@@ -24,8 +24,7 @@ const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSourceTypeId: Yup.string()
-            // .required(i18n.t('static.procurementagent.procurementagenttypetext')),
-            .required('Funder Type is required'),
+        .required(i18n.t('static.funderType.funderTypeText')),
         fundingSource: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
@@ -79,7 +78,6 @@ class EditFundingSourceComponent extends Component {
         //Fetches Funding source details by fundingSourceId
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
             if (response.status == 200) {
-                console.log('fundingSource: '+JSON.stringify(response.data));
                 this.setState({
                     fundingSource: response.data, loading: false
                 });
@@ -265,7 +263,8 @@ class EditFundingSourceComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     fundingSource: this.state.fundingSource.label.label_en,
-                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode
+                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode,
+                                    fundingSourceTypeId: this.state.fundingSource.fundingSourceType.id
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
