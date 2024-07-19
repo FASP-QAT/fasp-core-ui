@@ -169,5 +169,8 @@ class ProgramService {
     getProgramListByProductCategoryIdList(productCategoryIds) {
         return axios.post(`${API_URL}/api/program/productCategoryList`, productCategoryIds, {});
     }
+    getProgramListAll() {
+        return axios.get(`${API_URL}/api/program/all`, {});
+    }
 }
 export default new ProgramService()

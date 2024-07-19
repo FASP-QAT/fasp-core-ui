@@ -82,6 +82,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.addRow = this.addRow.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.versionChanged = this.versionChanged.bind(this);
+        this.versionFilterNew = this.versionFilterNew.bind(this);
     }
     /**
      * This function is triggered when this component is about to unmount
@@ -332,10 +333,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     getPrograms() {
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        // DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        ProgramService.getProgramListAll()
             .then(response => {
+                // console.log('programListAll size: ',response.data.length);
+                // console.log('active programList size: ',response.data.filter(p => p.active == true ).length);
+                let programListAll = response.data.filter(p => p.active == true && p.realmCountry.realm.realmId ==  realmId);
+                console.log('filter programListAll size: ',programListAll.length);
+                console.log('programListAll[0]: ',programListAll[0]);
+                
+                programListAll = programListAll.sort(function (a, b) {
+                    a = a.programCode.toLowerCase();
+                    b = b.programCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+
                 this.setState({
-                    programs: response.data,
+                    programs: programListAll,
                     loading: false
                 }, () => {
                     this.getDatasetList();
@@ -414,9 +428,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
-            let selectedSupplyPlanProgram = this.state.programs.filter(c => c.id == programId)[0];
+            let selectedSupplyPlanProgram = this.state.programs.filter(c => c.programId == programId)[0];
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
-            if (selectedSupplyPlanProgram.realmCountry.id == selectedForecastProgram.realmCountry.realmCountryId) {
+            if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
                 this.props.updateStepOneData("loading", true);
                 this.props.updateStepOneData("programId", programId);
                 this.props.updateStepOneData("versionId", versionId);
@@ -669,7 +683,32 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     dropdownFilter (instance, cell, c, r, source) {
         this.versionChanged(instance, cell, c, r, source);
+        console.log('after versionChanged()');
         return this.state.sourceList;
+    }
+
+    versionFilterNew(instance, cell, c, r, source){
+        var myList = [];
+        var spProgramId = (this.state.supplyPlanVersionMapEl.getJson(null, false)[r])[c-1];
+        console.log('dropdownFilter. sp Pgm: '+spProgramId);
+
+        if(spProgramId != 0) {
+            var spProgram = this.state.programs.filter(c => c.programId == spProgramId)[0];
+            var versionList = [];
+            versionList = spProgram.versionList;
+            for (var i = 0; i < versionList.length; i++) {
+                // let versionNameStr = ((newSource[i].versionStatus.id == 2 && newSource[i].versionType.id == 2) ? newSource[i].versionId + '*' : newSource[i].versionId) +' ('+ (moment(newSource[i].createdDate).format(`MMM DD YYYY`)) + ')';
+                let versionNameStr = ((versionList[i].versionStatus.id == 2 && versionList[i].versionType.id == 2) ? versionList[i].versionId + '*' : versionList[i].versionId) +' ('+ (moment(versionList[i].createdDate).format(`MMM DD YYYY`)) + ')';
+                var paJson = {
+                    name: versionNameStr,
+                    id: parseInt(versionList[i].versionId),
+                }
+                myList[i] = paJson
+            }
+            myList.reverse();
+            console.log('myList size: ', myList.length);
+        }
+        return myList;
     }
 
     /**
@@ -742,8 +781,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion'),
                     type: 'autocomplete',
-                    source: this.state.sourceList,
-                    filter: this.dropdownFilter,
+                    source: [],
+                    filter: this.versionFilterNew,
                     required: true,
                 },
                 
@@ -1006,13 +1045,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     addRow = function () {
         var data = [];
-        data[0] = 0;
+        data[0] = 1;
         data[1] = "";
         data[2] = "";
-        // data[3] = "";
-        // data[4] = true;
-        // data[5] = 0;
-        // data[6] = 1;
         this.el2.insertRow(data);
     };
 
@@ -1497,13 +1532,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             let filteredSupplyPlanProgramList = [];
             const countryId = this.state.datasetList.filter(c => c.programId == forecastProgramId)[0].realmCountry.realmCountryId;
-            var supplyPlanProgramList = this.state.programs.filter(c => c.realmCountry.id == countryId);
+            var supplyPlanProgramList = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId);
             console.log('supplyPlanProgramList count: '+supplyPlanProgramList.length);
+            console.log('supplyPlanProgramList [0]]: ',supplyPlanProgramList[0]);
 
             for (var i = 0; i < supplyPlanProgramList.length; i++) {
                 var paJson = {
-                    name: supplyPlanProgramList[i].code,
-                    id: parseInt(supplyPlanProgramList[i].id),
+                    name: supplyPlanProgramList[i].programCode,
+                    id: parseInt(supplyPlanProgramList[i].programId),
                 }
                 filteredSupplyPlanProgramList[i] = paJson
             }
@@ -1544,8 +1580,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
-                    <option key={i} value={item.id}>
-                        {item.code}
+                    <option key={i} value={item.programId}>
+                        {item.programCode}
                     </option>
                 )
             }, this);
