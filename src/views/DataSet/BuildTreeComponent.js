@@ -2180,7 +2180,26 @@ export default class BuildTree extends Component {
             }
         };
         data.context.levels.push(e.target.value);
-        this.levelClicked(data);
+        var cf = true;
+        if (this.state.isLevelChanged == true) {
+            cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                let { curTreeObj } = this.state;
+                var items = curTreeObj.tree.flatList;
+                items = JSON.parse(JSON.stringify(this.state.oldItems));
+                curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                this.setState({
+                    isLevelChanged: false,
+                    curTreeObj,
+                    items
+                }, () => {
+                    this.levelClicked(data);
+                })
+            } else {
+            }
+        } else {
+            this.levelClicked(data);
+        }
     }
     /**
      * Resets the reorder level
@@ -2460,8 +2479,13 @@ export default class BuildTree extends Component {
         var temp = items[prevNodeIndex];
         items[prevNodeIndex] = items[currNodeIndex];
         items[currNodeIndex] = temp;
-        items[prevNodeIndex].newSortOrder = items[currNodeIndex].sortOrder;
-        items[currNodeIndex].newSortOrder = items[prevNodeIndex].sortOrder;
+        let pId = items.filter(f => f.id == currNode[0].id)[0].parent;
+        var pObj = items.filter(f => f.id == pId)[0];
+        let newItems = items.filter(f => f.parent == pId);
+        for(let i = 0; i < newItems.length; i++) {
+            var ns = items.findIndex(f => f.id == newItems[i].id);
+            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 10 ? '0'+(i+1) : i+1);
+        }
         this.setState({ 
             isLevelChanged: true, 
             items
@@ -2510,6 +2534,10 @@ export default class BuildTree extends Component {
                         item.sortOrder = val.newSortOrder;
                 }
             });
+        })
+        items.forEach(item => {
+            delete item.newSortOrder;
+            delete item.oldSortOrder;
         })
         if (levelListFiltered != -1) {
             if (this.state.levelName != "") {
