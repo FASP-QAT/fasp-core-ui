@@ -3366,5 +3366,6 @@
     "static.shipment.selectFundingSourceType": "Select Funding Source Type",
     "static.shipment.groupBy": "Group By",
     "static.funderType.funderTypeText": "Funding Source Type is required",
-    "static.tree.editLevelName": "Edit Level Name"
+    "static.tree.editLevelName": "Edit Level Name",
+    "static.dataentry.conversionFactorTooltip":"User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor"
 }
