@@ -87,9 +87,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (z != data[i].y) {
                 var index = (instance).getValue(`AB${parseInt(data[i].y) + 1}`, true);
                 (instance).setValueFromCoords(25, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
-                (instance).setValueFromCoords(20, data[i].y, `=ROUND(T${parseInt(data[i].y) + 1}*M${parseInt(data[i].y) + 1},2)`, true);
-                (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*N${parseInt(data[i].y) + 1},0)`, true);
-                (instance).setValueFromCoords(22, data[i].y, `=ROUND(ROUND(M${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},2)+V${parseInt(data[i].y) + 1},2)`, true);
+                (instance).setValueFromCoords(20, data[i].y, `=ROUND(T${parseInt(data[i].y) + 1}*O${parseInt(data[i].y) + 1},2)`, true);
+                (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*AO${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(22, data[i].y, `=ROUND(ROUND(O${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},2)+V${parseInt(data[i].y) + 1},2)`, true);
                 (instance).setValueFromCoords(2, false, false, true);
                 if (index === "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(1, data[i].y, false, true);
@@ -229,7 +229,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
                             label: rcpuResult[k].label,
-                            planningUnit: rcpuResult[k].planningUnit
+                            planningUnit: rcpuResult[k].planningUnit,
+                            conversionNumber:rcpuResult[k].conversionNumber,
+                            conversionMethod:rcpuResult[k].conversionMethod,
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -557,6 +559,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 data = [];
+                                                var rcpuForTable=realmCountryPlanningUnitList.filter(c=>c.id==shipmentList[j].realmCountryPlanningUnit.id);
                                                 data[0] = shipmentList[i].accountFlag;
                                                 data[1] = shipmentList[i].erpFlag;
                                                 data[2] = shipmentList[i].shipmentId;
@@ -570,8 +573,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[10] = shipmentList[i].primeLineNo;
                                                 data[11] = shipmentList[i].realmCountryPlanningUnit.id
                                                 data[12] = Math.round(shipmentList[i].shipmentRcpuQty);
-                                                data[13] = shipmentList[i].realmCountryPlanningUnit.multiplier;
-                                                data[14] = `=ROUND(M${parseInt(i) + 1}*N${parseInt(i) + 1},0)`
+                                                data[13] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                                                data[14] = `=ROUND(M${parseInt(i) + 1}*AO${parseInt(i) + 1},0)`
                                                 data[15] = isEmergencyOrder;
                                                 data[16] = shipmentList[i].fundingSource.id;
                                                 data[17] = shipmentList[i].budget.id==0?"":shipmentList[i].budget.id;
@@ -597,6 +600,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[37] = shipmentList[i].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS ? 1 : 0;
                                                 data[38] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;
                                                 data[39] = Number(Number(Number(Number(Math.round(Number(Number(Math.round(shipmentList[i].shipmentRcpuQty))*Number(shipmentList[i].realmCountryPlanningUnit.multiplier))))*Number(Number(shipmentList[i].rate).toFixed(2))).toFixed(2))+Number(Number(shipmentList[i].freightCost).toFixed(2))).toFixed(2);
+                                                data[40] = shipmentList[i].realmCountryPlanningUnit.multiplier;
                                                 shipmentsArr.push(data);
                                             }
                                             if (shipmentList.length == 0 && ((this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) || this.props.shipmentPage == "supplyPlan"|| this.props.shipmentPage == "whatIf")) {
@@ -614,8 +618,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[10] = "";
                                                 data[11] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
                                                 data[12] = 0;
-                                                data[13] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
-                                                data[14] = `=ROUND(M${parseInt(0) + 1}*N${parseInt(0) + 1},0)`;
+                                                data[13] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";
+                                                data[14] = `=ROUND(M${parseInt(0) + 1}*AO${parseInt(0) + 1},0)`;
                                                 data[15] = false;
                                                 data[16] = "";
                                                 data[17] = "";
@@ -641,6 +645,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[37] = 0;
                                                 data[38] = "";
                                                 data[39] = 0;
+                                                data[40] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
                                                 shipmentsArr[0] = data;
                                             }
                                             var options = {
@@ -663,7 +668,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: erpType, visible: erpVisible, title: erpVisible ? i18n.t('static.shipmentDataentry.procurementAgentPrimeLineNo') : "", width: 100, readOnly: true, autoCasting: false },
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
-                                                    { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.00000', decimal: '.', width: 100, readOnly: true },
+                                                    { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 100, readOnly: true },
                                                     { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
                                                     { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
                                                     { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 100 },
@@ -724,7 +729,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
-                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false }
+                                                    { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                                                 ],
                                                 onbeforepaste: function (instance, data, x, y) {
                                                     if (y != null) {
@@ -1317,8 +1323,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[10] = "";
         data[11] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
         data[12] = 0;
-        data[13] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
-        data[14] = `=ROUND(M${parseInt(json.length) + 1}*N${parseInt(json.length) + 1},0)`;
+        data[13] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";
+        data[14] = `=ROUND(M${parseInt(0) + 1}*AO${parseInt(0) + 1},0)`;
         data[15] = false;
         data[16] = "";
         data[17] = "";
@@ -1344,6 +1350,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[37] = 0;
         data[38] = "";
         data[39] = 0;
+        data[40] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
         obj.insertRow(data);
         obj.setValueFromCoords(2, json.length, 0, true);
         obj.setValueFromCoords(12, json.length, 0, true);
@@ -1465,7 +1472,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         tr.children[8].title = i18n.t('static.shipmentTooltip.procurementAgent');
         tr.children[9].title = i18n.t('static.shipmentTooltip.localProcurementAgent');
         tr.children[12].title = i18n.t('static.shipmentTooltip.aru');
-        tr.children[14].title = i18n.t('static.shipmentTooltip.conversionFactor');
+        tr.children[14].title = i18n.t('static.dataentry.conversionFactorTooltip');
         tr.children[15].title = i18n.t('static.shipmentTooltip.orderQtyPU');
         tr.children[16].title = i18n.t('static.shipmentTooltip.emergencyShipment');
         tr.children[17].title = i18n.t('static.shipmentTooltip.fundingSource');
@@ -2088,10 +2095,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         }
         if (x == 11) {
             elInstance.setValueFromCoords(13, y, "", true);
+            elInstance.setValueFromCoords(40, y, "", true);
             var valid = checkValidtion("text", "L", y, rowData[11], elInstance);
             if (valid == true) {
-                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11].toString().split(";")[0])[0]).multiplier;
-                elInstance.setValueFromCoords(13, y, multiplier, true);
+                var rcpuForTable = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[11].toString().split(";")[0])[0]);
+                elInstance.setValueFromCoords(13, y, (rcpuForTable.conversionMethod==1?"*":"/")+rcpuForTable.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                elInstance.setValueFromCoords(40, y, rcpuForTable.multiplier, true);
             }
             if (rowData[27] == -1 || rowData[27] === "" || rowData[27] == null || rowData[27] == undefined) {
             } else {
