@@ -287,6 +287,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: false,
             notesChanged: false,
             noDataMessage: "",
+            noDataMessage1: "",
             showFits: false,
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
@@ -3978,6 +3979,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     />
                                                                     <FormFeedback>{errors.qId}</FormFeedback>
                                                                 </div>
+                                                            </div>
+                                                            <div className="col-md-12 mt-2">
+                                                                <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
                                                             </div>
                                                         </div>
                                                     </div>

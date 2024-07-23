@@ -58,7 +58,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 props.updateState("loading", false);
                 props.updateState("dataChanged", true);
                 if (error.response.status == 500) {
-                    props.updateState("noDataMessage", i18n.t('static.extrapolation.error'));
+                    props.updateState("noDataMessage1", i18n.t('static.extrapolation.error'));
                 } else {
                     props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
                 }
