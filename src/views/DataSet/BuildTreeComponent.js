@@ -2890,10 +2890,13 @@ export default class BuildTree extends Component {
     calculateMOMData(nodeId, type, isCopy) {
         return new Promise((resolve, reject) => {
             let curTreeObj;
+            var items;
             if(isCopy) {
                 curTreeObj = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0];
+                items = curTreeObj.tree.flatList;
             } else {
                 curTreeObj = this.state.curTreeObj;
+                items = this.state.items;
             }
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
@@ -7211,11 +7214,13 @@ export default class BuildTree extends Component {
             cursorItem: nodeId
         }, () => {
             this.calculateMOMData(itemConfig.parent, 2, true).then(() => {
-                if(this.state.copyModalData == 2) {
-                    this.onRemoveButtonClick(itemConfig);
-                }
-                this.setState({
-                    copyModal: false
+                this.calculateMOMData(0, 2, false).then(() => {
+                    if(this.state.copyModalData == 2) {
+                        this.onRemoveButtonClick(itemConfig);
+                    }
+                    this.setState({
+                        copyModal: false
+                    })
                 })
             })
         });
