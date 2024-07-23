@@ -606,6 +606,7 @@ export default class BuildTree extends Component {
             usageText2: '',
             usageText3: '',
             usageText4: '',
+            usage2Convert: '',
             noOfMonthsInUsagePeriod: '',
             tracerCategoryId: '',
             forecastingUnitList: [],
