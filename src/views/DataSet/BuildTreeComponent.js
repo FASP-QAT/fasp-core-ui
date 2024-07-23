@@ -23,7 +23,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
 import pdfIcon from '../../assets/img/pdf.png';
 import CryptoJS from 'crypto-js'
 import { MultiSelect } from 'react-multi-select-component';
@@ -2363,19 +2363,19 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.shiftUp'),
                     type: 'text',
                     readOnly: true,
-                    width: 25
+                    width: 30
                 },
                 {
                     title: i18n.t('static.tree.shiftDown'),
                     type: 'text',
                     readOnly: true,
-                    width: 25
+                    width: 30
                 },
             ],
             updateTable: this.updateReorderTable,
             editable: true,
             onload: this.loadedLevelReorder,
-            pagination: localStorage.getItem("sesRecordCount"),
+            pagination: false,
             search: false,
             columnSorting: false,
             wordWrap: true,
@@ -2385,7 +2385,7 @@ export default class BuildTree extends Component {
             // onchange: this.changed1,
             copyCompatibility: true,
             allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            // paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: false,
             license: JEXCEL_PRO_KEY,
@@ -2409,7 +2409,7 @@ export default class BuildTree extends Component {
      * @param {*} cell This is the object of the DOM element
      */
     loadedLevelReorder = function (instance, cell) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionWithoutPagination(instance, 0);
         var json = instance.worksheets[0].getJson(null, false);
         var colArr = ["A", "B", "C"]
         for (var j = 0; j < json.length; j++) {
