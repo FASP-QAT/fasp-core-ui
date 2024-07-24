@@ -3367,5 +3367,6 @@
     "static.shipment.groupBy": "Group By",
     "static.funderType.funderTypeText": "Funding Source Type is required",
     "static.tree.editLevelName": "Edit Level Name",
-    "static.dataentry.conversionFactorTooltip":"User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor"
+    "static.dataentry.conversionFactorTooltip":"User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor",
+    "static.tooltip.levelReorderNodeUnit": "Displayed in the Y-axis in the Modeling Validation screen."
 }
