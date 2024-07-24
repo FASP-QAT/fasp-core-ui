@@ -2626,39 +2626,55 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
 
-                                                            {this.state.xAxisDisplayBy == 1 &&
-                                                                <FormGroup className="col-md-4">
-                                                                    <div className="col-md-12">
-                                                                        <Input
-                                                                            className="form-check-input"
-                                                                            type="checkbox"
-                                                                            id="showForecastPeriod"
-                                                                            name="showForecastPeriod"
-                                                                            checked={this.state.showForecastPeriod}
-                                                                            onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
-                                                                        />
-                                                                        <Label
-                                                                            className="form-check-label"
-                                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                            {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                                        </Label>
+                                                            <FormGroup className="col-md-4">
+                                                                <div className="col-md-12">
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="showForecastPeriod"
+                                                                        name="showForecastPeriod"
+                                                                        checked={this.state.showForecastPeriod}
+                                                                        onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                    </Label>
+                                                                </div>
+                                                                <div className="col-md-12">
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="showFits"
+                                                                        name="showFits"
+                                                                        checked={this.state.showFits}
+                                                                        onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        {i18n.t('static.extrapolations.showFits')}
+                                                                    </Label>
+                                                                </div>
+                                                            </FormGroup>
+                                                            {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
+                                                                <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref={this.pickAMonth3}
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            lang={pickerLang}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
+                                                                        </Picker>
                                                                     </div>
-                                                                    <div className="col-md-12">
-                                                                        <Input
-                                                                            className="form-check-input"
-                                                                            type="checkbox"
-                                                                            id="showFits"
-                                                                            name="showFits"
-                                                                            checked={this.state.showFits}
-                                                                            onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
-                                                                        />
-                                                                        <Label
-                                                                            className="form-check-label"
-                                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                            {i18n.t('static.extrapolations.showFits')}
-                                                                        </Label>
-                                                                    </div>
-                                                                </FormGroup>}
+                                                                </FormGroup>
+                                                            }
                                                             <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : ({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</Label>
                                                                 <div className="controls ">
@@ -2738,23 +2754,6 @@ class CompareAndSelectScenario extends Component {
                                                                     </div>
                                                                 )}
                                                             </FormGroup>
-                                                            {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
-                                                                <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                                    <div className="controls edit">
-                                                                        <Picker
-                                                                            ref={this.pickAMonth3}
-                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                            value={this.state.singleValue2}
-                                                                            key={JSON.stringify(this.state.singleValue2)}
-                                                                            lang={pickerLang}
-                                                                            onDismiss={this.handleAMonthDissmis2}
-                                                                        >
-                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
-                                                                        </Picker>
-                                                                    </div>
-                                                                </FormGroup>
-                                                            }
                                                         </div>
 
                                                         <div className={"row check inline pt-lg-3 pl-lg-3"}>
