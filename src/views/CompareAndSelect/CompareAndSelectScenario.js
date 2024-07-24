@@ -46,6 +46,32 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+
+const calculateSums = (data) => {
+    const yearSums = {};
+
+    data.forEach((row) => {
+        const date = new Date(row[0]);
+        const year = date.getFullYear();
+
+        // Ensure the year is present in the sums object
+        if (!yearSums[year]) {
+            yearSums[year] = new Array(row.length).fill(0);
+        }
+
+        // Start from the 2nd column (index 1) and sum each value
+        for (let i = 1; i < row.length; i++) {
+            const value = parseFloat(row[i]) || 0; // Convert to float and handle empty strings
+            yearSums[year][i] += value;
+        }
+    });
+    // Calculate the total of all columns for each year
+    for (const year in yearSums) {
+        const total = yearSums[year].reduce((sum, val) => sum + val, 0);
+        yearSums[year].push(total);
+    }
+    return yearSums;
+};
 // Localized entity name
 const entityname = i18n.t('static.dashboard.compareAndSelect')
 /**
@@ -129,6 +155,7 @@ class CompareAndSelectScenario extends Component {
         this.changeTable1 = this.changeTable1.bind(this)
         this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
         this.getPlanningUnitsForTable = this.getPlanningUnitsForTable.bind(this);
+        this.loadedCalendar = this.loadedCalendar.bind(this);
     }
     /**
      * Handles the click event on the range picker box.
@@ -392,19 +419,34 @@ class CompareAndSelectScenario extends Component {
             })
             this.getData();
             jexcel.destroy(document.getElementById("tableDiv"), true);
+            jexcel.destroy(document.getElementById("calendarTable"), true);
             var columns1 = [];
+            var calendarTableCol = [];
+            var calendarTableRowData = [];
+
+            calendarTableCol.push({ title: this.state.xAxisDisplayBy == 1 ? i18n.t('static.inventoryDate.inventoryReport') : this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : i18n.t('static.modelingValidation.fiscalYear'), type: 'text' });
+            calendarTableCol.push({ title: "", type: 'hidden' });
             columns1.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
             columns1.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
             var treeScenarioList = this.state.treeScenarioList;
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                    if (treeScenarioList[tsl].checked) {
+                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                    }
                 } else {
                     columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                    if (treeScenarioList[tsl].checked) {
+                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                    }
                 }
             }
+            calendarTableCol.push({ title: i18n.t('static.supplyPlan.total'), type: 'numeric', mask: '#,##.00' });
             var data = [];
+            var data1 = [];
             var dataArr = [];
+            var dataArr1 = [];
             var collapsedExpandArr = [];
             var consumptionData = this.state.actualConsumptionList;
             var monthArrayListWithoutFormat = this.state.monthList;
@@ -502,7 +544,10 @@ class CompareAndSelectScenario extends Component {
             var actualMultiplier = 1;
             for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
                 data = [];
+                data1 = [];
+
                 data[0] = monthArrayListWithoutFormat[m];
+                data1[0] = monthArrayListWithoutFormat[m];
                 var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                 data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
                 if (actualFilter.length > 0) {
@@ -520,9 +565,28 @@ class CompareAndSelectScenario extends Component {
                         consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
                         collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null })
                     }
+                    if (treeScenarioList[tsl].checked) {
+                        if (treeScenarioList[tsl].type == "T") {
+                            var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
+                            data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                        } else {
+                            var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
+                            data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                        }
+                    }
                 }
                 dataArr.push(data)
+                dataArr1.push(data1)
             }
+            var originalData = calculateSums(dataArr1);
+            // Convert the object to an array
+            const transformedData = Object.keys(originalData).map((year, index) => ({
+                [index]: [parseInt(year), ...originalData[year]]
+            }));
+
+            // Flatten the array of objects into a single object
+            calendarTableRowData = Object.assign({}, ...transformedData);
+
             var higherThenConsumptionThreshold = 0;
             var lowerThenConsumptionThreshold = 0;
             var higherThenConsumptionThresholdPU = 0;
@@ -544,26 +608,6 @@ class CompareAndSelectScenario extends Component {
             var min = Math.min(...actualDiff.filter((c, index) => useForLowestError[index]))
             var treeScenarioList = this.state.treeScenarioList;
             for (var tsList = 0; tsList < treeScenarioList.length; tsList++) {
-                var collapsedExpandArray = [];
-                var actualTotalYear = [];
-                if (this.state.xAxisDisplayBy != 1) {
-                    collapsedExpandArray = collapsedExpandArr.filter(ar => ar.id == treeScenarioList[tsList].id);
-
-                    collapsedExpandArray = collapsedExpandArray.length > 0 && collapsedExpandArray.map(item => ({ year: item.year, actual: item.actual }));
-
-                    var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
-                        const { year, actual } = current;
-                        if (!acc[year]) {
-                            acc[year] = { year, totalActual: 0 };
-                        }
-                        acc[year].totalActual += actual;
-                        return acc;
-                    }, {});
-
-                    // Convert the result to an array
-                    actualTotalYear = Object.values(consolidatedData);
-                }
-
                 finalData.push({
                     type: treeScenarioList[tsList].type,
                     id: treeScenarioList[tsList].id,
@@ -599,7 +643,7 @@ class CompareAndSelectScenario extends Component {
                                         i18n.t('static.supplyPlanFormula.na') :
                                 i18n.t('static.supplyPlanFormula.na') :
                             i18n.t('static.supplyPlanFormula.na'),
-                    actualTotalYear: actualTotalYear
+                    // actualTotalYear: actualTotalYear
                 })
             }
             var options = {
@@ -637,30 +681,19 @@ class CompareAndSelectScenario extends Component {
                 columns1: columns1
             }, () => {
                 let treeScenarioList1 = this.state.treeScenarioList;
-                let yearArray = this.state.yearArray;
                 let dataArray = [];
                 let count = 0;
-                let dataCount = 0;
-
                 for (var j = 0; j < treeScenarioList1.length; j++) {
                     data = [];
                     data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
-                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
-                    dataCount = 3;
-                    if (this.state.xAxisDisplayBy != 1) {
-                        for (var i = 0; i < yearArray.length; i++) {
-                            dataCount = dataCount + 1;
-                            const obj = finalData[j].actualTotalYear.filter(r => Number(r.year) == yearArray[i])[0];
-                            data[dataCount] = `${treeScenarioList1[j].readonly ? "" : Number(obj.totalActual).toFixed(2)}`
-                        }
-                    }
-                    data[dataCount + 1] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
-                    data[dataCount + 2] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual)).toFixed(2), 0) : ""
-                    data[dataCount + 3] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
-                    data[dataCount + 4] = finalData[j].compareToConsumptionForecast
-                    data[dataCount + 5] = finalData[j].id
+                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
+                    data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
+                    data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
+                    data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
+                    data[7] = finalData[j].compareToConsumptionForecast
+                    data[8] = finalData[j].id
                     dataArray.push(data)
                     count++;
                 }
@@ -669,11 +702,6 @@ class CompareAndSelectScenario extends Component {
                 columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 50 });
                 columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 50 });
                 columns.push({ title: i18n.t('static.consumption.forcast'), type: 'html', readOnly: true, width: 150 });
-                if (this.state.xAxisDisplayBy != 1) {
-                    for (var i = 0; i < this.state.yearArray.length; i++) {
-                        columns.push({ title: this.state.yearArray[i], type: 'numeric', readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
-                    }
-                }
                 columns.push({ type: 'numeric', title: i18n.t('static.compareAndSelect.totalForecast'), readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
                 columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastError'), readOnly: true, width: 80 });
                 columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastErrorMonths'), readOnly: true, width: 80 });
@@ -682,8 +710,38 @@ class CompareAndSelectScenario extends Component {
 
                 try {
                     jexcel.destroy(document.getElementById("table1"), true);
+                    jexcel.destroy(document.getElementById("calendarTable"), true);
+
                 } catch (error) {
                 }
+                var calendarOptions = {
+                    data: calendarTableRowData,
+                    columnDrag: false,
+                    colHeaderClasses: ["Reqasterisk"],
+                    columns: calendarTableCol,
+                    onload: this.loadedCalendar,
+                    pagination: false,
+                    search: false,
+                    defaultColWidth: 120,
+                    columnSorting: false,
+                    editable: false,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    copyCompatibility: true,
+                    allowExport: false,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: 'top',
+                    filters: false,
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return [];
+                    }.bind(this),
+                };
+                var calendarDataEl = jexcel(document.getElementById("calendarTable"), calendarOptions);
+                this.el = calendarDataEl;
+
                 var data = dataArray;
                 var options = {
                     data: data,
@@ -727,7 +785,8 @@ class CompareAndSelectScenario extends Component {
                     finalData: finalData,
                     loading: false,
                     columns: columns,
-                    languageEl: languageEl
+                    languageEl: languageEl,
+                    calendarDataEl: calendarDataEl
                 })
             })
         }
@@ -875,12 +934,7 @@ class CompareAndSelectScenario extends Component {
         var columns = [];
         columns.push(i18n.t('static.equivalancyUnit.type'));
         columns.push(i18n.t('static.consumption.forcast'));
-        columns.push(i18n.t('static.common.select'));
-        if (this.state.xAxisDisplayBy != 1) {
-            for (var i = 0; i < this.state.yearArray.length; i++) {
-                columns.push(this.state.yearArray[i]);
-            }
-        }
+        columns.push(i18n.t('static.compareAndSelect.selectAsForecast'));
         columns.push(i18n.t('static.compareAndSelect.totalForecast'));
         columns.push(i18n.t('static.compareAndSelect.forecastError'));
         columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths').replaceAll('#', '%23'));
@@ -889,36 +943,37 @@ class CompareAndSelectScenario extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)];
 
+        this.state.finalData.map(ele =>
+            A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+            ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
+            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
+            ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+            ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+            ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+
         if (this.state.xAxisDisplayBy != 1) {
-
-            for (var i = 0; i < this.state.finalData.length; i++) {
-                var arr = [];
-                var ele = this.state.finalData[i];
-                arr.push(ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'))
-                arr.push(ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'))
-                arr.push(ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))
-                for (var j = 0; j < this.state.yearArray.length; j++) {
-                    var cal = ele.actualTotalYear.filter(c => c.year == this.state.yearArray[j])[0];
-                    arr.push(Number(cal.totalActual).toFixed(2));
-                }
-                arr.push(!ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "")
-                arr.push(ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'))
-                arr.push(ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'))
-                arr.push(ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
-                A.push(addDoubleQuoteToRowContent(arr));
+            headers = [];
+            var C1 = []
+            let calendarColumns = this.state.calendarDataEl.options.columns.filter(c => c.type != "hidden")
+            let calendarColumnsArr = [];
+            for (var i = 0; i < calendarColumns.length; i++) {
+                calendarColumnsArr.push(calendarColumns[i].title);
             }
-        } else {
-            this.state.finalData.map(ele =>
-                A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
-                ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
-                ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
-                !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
-                ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-                ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-                ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+            calendarColumnsArr.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+            C1.push([addDoubleQuoteToRowContent(headers)]);
+
+            var B1 = []
+            Object.values(this.state.calendarDataEl.options.data).map(ele => {
+                B1 = [];
+                this.state.calendarDataEl.options.columns.map((item, idx) => {
+                    if (item.type != 'hidden') {
+                        B1.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23'));
+                    }
+                })
+                C1.push(addDoubleQuoteToRowContent(B1));
+            })
         }
-
-
         headers = [];
         this.state.columns1.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
         var C = []
@@ -945,6 +1000,13 @@ class CompareAndSelectScenario extends Component {
         })
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
+        }
+        csvRow.push('');
+        csvRow.push('');
+        if (this.state.xAxisDisplayBy != 1) {
+            for (var i = 0; i < C1.length; i++) {
+                csvRow.push(C1[i].join(","))
+            }
         }
         csvRow.push('');
         csvRow.push('');
@@ -1116,48 +1178,21 @@ class CompareAndSelectScenario extends Component {
         col1.push(i18n.t('static.common.display?'));
         col1.push(i18n.t('static.equivalancyUnit.type'));
         col1.push(i18n.t('static.consumption.forcast'));
-        col1.push(i18n.t('static.common.select'));
-        if (this.state.xAxisDisplayBy != 1) {
-            for (var i = 0; i < this.state.yearArray.length; i++) {
-                col1.push(this.state.yearArray[i]);
-            }
-        }
+        col1.push(i18n.t('static.compareAndSelect.selectAsForecast'));
         col1.push(i18n.t('static.compareAndSelect.totalForecast'));
         col1.push(i18n.t('static.compareAndSelect.forecastError'));
         col1.push(i18n.t('static.compareAndSelect.forecastErrorMonths'));
         col1.push(i18n.t('static.compareAndSelect.compareToConsumptionForecast'));
 
-
-        if (this.state.xAxisDisplayBy != 1) {
-
-            for (var i = 0; i < this.state.finalData.length; i++) {
-                var arr = [];
-                var ele = this.state.finalData[i];
-                arr.push(ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))
-                arr.push(ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'))
-                arr.push(ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang))
-                arr.push(ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))
-                for (var j = 0; j < this.state.yearArray.length; j++) {
-                    var cal = ele.actualTotalYear.filter(c => c.year == this.state.yearArray[j])[0];
-                    arr.push(Number(cal.totalActual).toFixed(2));
-                }
-                arr.push(formatter(ele.totalForecast, 0))
-                arr.push(ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError)
-                arr.push(ele.noOfMonths.toString())
-                arr.push(ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast)
-                dataArr3.push(arr);
-            }
-        } else {
-            this.state.finalData.map(ele =>
-                dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
-                ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
-                ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
-                formatter(ele.totalForecast, 0),
-                ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
-                ele.noOfMonths.toString(),
-                ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast])
-            )
-        }
+        this.state.finalData.map(ele =>
+            dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+            ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
+            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            formatter(ele.totalForecast, 0),
+            ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
+            ele.noOfMonths.toString(),
+            ele.compareToConsumptionForecast != i18n.t('static.supplyPlanFormula.na') ? formatter(ele.compareToConsumptionForecast, 0) : ele.compareToConsumptionForecast])
+        )
         let data2 = dataArr3;
         let content1 = {
             margin: { top: 100, bottom: 50 },
@@ -1181,6 +1216,26 @@ class CompareAndSelectScenario extends Component {
         doc.autoTable(content1);
         doc.addPage();
         doc.addImage(canvasImg, 'png', 50, 100, 750, 260, 'CANVAS');
+        if (this.state.xAxisDisplayBy != 1) {
+            let calendarColumns = this.state.calendarDataEl.options.columns.filter(c => c.type != "hidden")
+            // Convert object to array while skipping the second cell data
+            const calendarData = Object.values(this.state.calendarDataEl.options.data).map(arr => [arr[0], arr[2], arr[3]]);
+
+            let calendarColumnsArr = [];
+            for (var i = 0; i < calendarColumns.length; i++) {
+                calendarColumnsArr.push(calendarColumns[i].title);
+            }
+            doc.addPage()
+            startYtable = 100
+            let calendarContent = {
+                margin: { top: 100, bottom: 50 },
+                startY: startYtable,
+                head: [calendarColumnsArr],
+                body: calendarData,
+                styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            };
+            doc.autoTable(calendarContent);
+        }
         var columns = [];
         this.state.columns1.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
@@ -1378,7 +1433,6 @@ class CompareAndSelectScenario extends Component {
         var elInstance = instance.worksheets[0];
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
-        var len = this.state.xAxisDisplayBy != 1 ? this.state.yearArray.length : 0;
         tr.children[1].classList.add('InfoTr');
         tr.children[1].title = i18n.t('static.tooltip.SelectAsForecast');
         tr.children[2].classList.add('InfoTr');
@@ -1387,59 +1441,43 @@ class CompareAndSelectScenario extends Component {
         tr.children[3].title = i18n.t('static.tooltip.CompareandSelectType');
         tr.children[4].classList.add('InfoTr');
         tr.children[4].title = i18n.t('static.tooltip.Forecst');
-        tr.children[len + 5].title = i18n.t('static.common.forForecastPeriod') + " " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " " + i18n.t('static.jexcel.to') + " " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
-        tr.children[len + 6].classList.add('InfoTr');
-        tr.children[len + 6].title = i18n.t('static.tooltip.ForecastError');
-        tr.children[len + 7].classList.add('InfoTr');
-        tr.children[len + 7].title = i18n.t('static.tooltip.ForecastErrorMonthUsed');
-        tr.children[len + 8].classList.add('InfoTr');
-        tr.children[len + 8].title = i18n.t('static.tooltip.ComparetoConsumptionForecast');
+        tr.children[5].title = i18n.t('static.common.forForecastPeriod') + " " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " " + i18n.t('static.jexcel.to') + " " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = i18n.t('static.tooltip.ForecastError');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.tooltip.ForecastErrorMonthUsed');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.tooltip.ComparetoConsumptionForecast');
         var json = elInstance.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
-            var rowElement = elInstance.records;
             if (this.state.treeScenarioList[j].readonly) {
-                for (var y = 0; y < rowElement[j].length; y++) {
-                    var ele = rowElement[j][y].element;
-                    ele.classList.add('readonlyForecast');
-                    ele.classList.add('readonly');
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.add('readonlyForecast');
+                    cell.classList.add('readonly');
                 }
-                // for (var c = 0; c < colArr.length; c++) {
-                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                //     cell.classList.add('readonlyForecast');
-                //     cell.classList.add('readonly');
-                // }
-            } else if (this.state.selectedTreeScenarioId == rowData[8 + len]) {
-                for (var y = 0; y < rowElement[j].length; y++) {
-                    var ele = rowElement[j][y].element;
-                    ele.classList.add('selectedForecast');
+            } else if (this.state.selectedTreeScenarioId == rowData[8]) {
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.add('selectedForecast');
                 }
-                // for (var c = 0; c < colArr.length; c++) {
-                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                //     cell.classList.add('selectedForecast');
-                // }
             } else {
-                // for (var c = 0; c < colArr.length; c++) {
-                //     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                //     cell.classList.add('notSelectedForecast');
-                // }
-                for (var y = 0; y < rowElement[j].length; y++) {
-                    var ele = rowElement[j][y].element;
-                    ele.classList.add('notSelectedForecast');
+                for (var c = 0; c < colArr.length; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                    cell.classList.add('notSelectedForecast');
                 }
             }
             if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
-                // var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                // cell.classList.add('lowestError');
-                var cell = elInstance.getCellFromCoords(rowElement[j].length - 4, j);
+                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
                 cell.classList.add('lowestError');
-
             } else {
-                var cell = elInstance.getCellFromCoords(rowElement[j].length - 4, j);
+                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
                 cell.classList.add('notLowestError');
             }
             if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
-                var cell = elInstance.getCellFromCoords(rowElement[j].length - 2, j);
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
                 cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? "compareAndSelectRed" : this.state.finalData[j].compareToConsumptionForecastClass);
             }
         }
@@ -1479,6 +1517,15 @@ class CompareAndSelectScenario extends Component {
             })
         }
     }
+    /**
+         * This function is used to format the table like add asterisk or info to the table headers
+         * @param {*} instance This is the DOM Element where sheet is created
+         * @param {*} cell This is the object of the DOM element
+         */
+    loadedCalendar = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+    }
+
     /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
@@ -2360,7 +2407,7 @@ class CompareAndSelectScenario extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <FormGroup className="col-md-4">
+                                            <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -2376,21 +2423,6 @@ class CompareAndSelectScenario extends Component {
                                                             {datasets}
                                                         </Input>
                                                     </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-4 darkModePicker">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                <div className="controls edit">
-                                                    <Picker
-                                                        // ref="pickRange"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={this.state.rangeValue}
-                                                        lang={pickerLang}
-                                                        readOnly
-                                                        className="disabledColor"
-                                                    >
-                                                        <MonthBox value={makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)} />
-                                                    </Picker>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
@@ -2410,85 +2442,6 @@ class CompareAndSelectScenario extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.tree.displayDate')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="xAxisDisplayBy"
-                                                            id="xAxisDisplayBy"
-                                                            bsSize="sm"
-                                                            value={this.state.xAxisDisplayBy}
-                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
-                                                        >
-                                                            <option value="1">{i18n.t('static.ManageTree.Month')}</option>
-                                                            <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
-                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
-                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
-                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
-                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
-                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
-                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
-                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
-                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
-                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
-                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
-                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-3 pickerRangeBox">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
-                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
-                                                </Label>
-                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
-                                                    <div className="controls edit">
-                                                        <Picker
-                                                            ref={this.pickAMonth3}
-                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                            value={this.state.singleValue2}
-                                                            lang={pickerLang}
-                                                            key={JSON.stringify(this.state.singleValue2)}
-                                                            onDismiss={this.handleAMonthDissmis2}
-                                                        >
-                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
-                                                        </Picker>
-                                                    </div>
-                                                )}
-                                                {(this.state.xAxisDisplayBy == 2) && (
-                                                    <div className="controls box">
-                                                        <RangePicker
-                                                            picker="year"
-                                                            allowClear={false}
-                                                            id="date"
-                                                            name="date"
-                                                            onChange={this.handleYearRangeChange}
-                                                            value={[
-                                                                moment(this.state.singleValue2.from.year.toString()),
-                                                                moment(this.state.singleValue2.to.year.toString()),
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                )}
-                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
-                                                    <div className="controls box">
-                                                        <RangePicker
-                                                            picker="year"
-                                                            allowClear={false}
-                                                            id="date"
-                                                            name="date"
-                                                            onChange={this.handleYearRangeChange}
-                                                            value={[
-                                                                moment(this.state.singleValue2.from.year.toString()),
-                                                                moment(this.state.singleValue2.to.year.toString()),
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                )}
                                             </FormGroup>
                                         </div>
                                     </div>
@@ -2740,15 +2693,134 @@ class CompareAndSelectScenario extends Component {
                                                                     </button>
                                                                 </div>
                                                             </div>}
-                                                        </div>
-                                                        <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
-                                                            <div className="col-md-12 pl-0 pr-0">
-                                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                            {this.state.xAxisDisplayBy == 1 &&
+                                                                <FormGroup className="col-md-2">
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="showForecastPeriod"
+                                                                        name="showForecastPeriod"
+                                                                        checked={this.state.showForecastPeriod}
+                                                                        onClick={(e) => { this.setShowForecastPeriod(e); }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                    </Label>
+                                                                </FormGroup>}
+                                                            <FormGroup className="col-md-3">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : ({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="xAxisDisplayBy"
+                                                                            id="xAxisDisplayBy"
+                                                                            bsSize="sm"
+                                                                            value={this.state.xAxisDisplayBy}
+                                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
+                                                                        >
+                                                                            <option value="1">{i18n.t('static.ManageTree.Month')}</option>
+                                                                            <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
+                                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
+                                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
+                                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
+                                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
+                                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
+                                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
+                                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
+                                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
+                                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
+                                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
+                                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
+                                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
+                                                                        </Input>
+                                                                    </InputGroup>
                                                                 </div>
-                                                            </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-3 pickerRangeBox">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                                </Label>
+                                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref="pickRange"
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            lang={pickerLang}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                                        </Picker>
+                                                                    </div>
+                                                                )}
+                                                                {(this.state.xAxisDisplayBy == 2) && (
+                                                                    <div className="controls box">
+                                                                        <RangePicker
+                                                                            picker="year"
+                                                                            allowClear={false}
+                                                                            id="date"
+                                                                            name="date"
+                                                                            onChange={this.handleYearRangeChange}
+                                                                            value={[
+                                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                                moment(this.state.singleValue2.to.year.toString()),
+                                                                            ]}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
+                                                                    <div className="controls box">
+                                                                        <RangePicker
+                                                                            picker="year"
+                                                                            allowClear={false}
+                                                                            id="date"
+                                                                            name="date"
+                                                                            onChange={this.handleYearRangeChange}
+                                                                            value={[
+                                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                                moment(this.state.singleValue2.to.year.toString()),
+                                                                            ]}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </FormGroup>
+                                                            {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                <div className="controls edit">
+                                                                    <Picker
+                                                                        ref={this.pickAMonth3}
+                                                                        years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                        value={this.state.singleValue2}
+                                                                        key={JSON.stringify(this.state.singleValue2)}
+                                                                        lang={pickerLang}
+                                                                        onDismiss={this.handleAMonthDissmis2}
+                                                                    >
+                                                                        <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
+                                                                    </Picker>
+                                                                </div>
+                                                                <div style={{ display: this.state.show ? "block" : "none" }}>
+                                                                    <div className="row">
+                                                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
+                                                                            <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="row">
+                                                                        <div className="col-md-12 pl-0 pr-0">
+                                                                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </FormGroup>}
                                                         </div>
                                                     </Col>
-                                                </>}
+                                                </>
+                                            }
                                         </div>
                                     </div>
                                 </div>
