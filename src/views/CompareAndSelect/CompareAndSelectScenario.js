@@ -1559,7 +1559,11 @@ class CompareAndSelectScenario extends Component {
             }
         }
         this.setState({
-            planningUnitListForTable: planningUnitListForTable
+            planningUnitListForTable: planningUnitListForTable.sort(function (a, b) {
+                a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this))
         })
     }
 
