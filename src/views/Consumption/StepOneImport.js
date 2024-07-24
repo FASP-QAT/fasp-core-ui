@@ -61,7 +61,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             selSource1: [],
             isChanged1: false,
             filteredSupplyPlanProgramList: [],
-            sourceList: []
+            sourceList: [],
+            versionList: []
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -84,6 +85,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.versionChanged = this.versionChanged.bind(this);
         this.versionFilterNew = this.versionFilterNew.bind(this);
         this.changed2 = this.changed2.bind(this);
+        this.checkValidationTable1 = this.checkValidationTable1.bind(this);
     }
     /**
      * This function is triggered when this component is about to unmount
@@ -440,7 +442,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * Reterives planning unit list based on program and version Id
      */
     filterData() {
-        console.log('filterData() called');
+        console.log('\nfilterData() called');
 
         let forecastProgramId = document.getElementById("forecastProgramId").value;
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -456,8 +458,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 console.log('for i: ',i);
                 console.log('count: ',count);
                 var map1 = new Map(Object.entries(tableJson[i]));
-                
+                // console.log('tableJson['+i+']: ',tableJson[i]);
+                // console.log('map1: ',map1);
+
                 let programId = parseInt(map1.get("1"));
+                let programCode = '';
+                try {
+                    programCode = this.state.filteredSupplyPlanProgramList.filter(c => c.id == programId)[0].name;                    
+                } catch (error) {
+                    
+                }
+                console.log('program obj: ',programCode);
+                let programJson = {
+                    programId: programId,
+                    programCode: programCode
+                };
                 let versionId = parseInt(map1.get("2"));
 
                 // console.log('sp programId: '+parseInt(map1.get("1")));
@@ -480,7 +495,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 if (response.status == 200) {
                                     console.log('after service resp. i: ',i);
                                     console.log('resp. for PU list received for programId: ',programId);
-                                    programPlanningUnitListTemp.push({ programId: programId, puList: response.data });
+                                    programPlanningUnitListTemp.push({ program: programJson, puList: response.data });
                                     this.setState({
                                         programPlanningUnitList: programPlanningUnitListTemp,
                                         selSource: programPlanningUnitListTemp,
@@ -810,7 +825,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion'),
                     type: 'autocomplete',
-                    source: [],
+                    source: this.state.versionList,
                     filter: this.versionFilterNew,
                     required: true,
                 },
@@ -906,9 +921,104 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     changed2 = function (instance, cell, x, y, value) {
         console.log('changed2() called: ');
-        if (x == 2) {
+        changed(instance, cell, x, y, value);
+        if (x == 1) {
+            this.el2.setValueFromCoords(2, y, '', true);//clear spVerion dropdown
+
+            // this.setState({
+            //     versionList: [],
+            // })
+        }
+
+        var validation = this.checkValidationTable1();
+        console.log('validation tbl1 : ',validation);
+        if (validation == true) {
             this.filterData();
         }
+
+        // if (x == 2) {
+        //     this.filterData();
+        // }
+    }
+
+    /**
+     * Function to check validation of the jexcel table of supply plan program & version.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
+    checkValidationTable1 = function () {
+        var valid = true;
+        var json = this.el2.getJson(null, false);
+        // valid = checkValidation(this.el);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.el2.getValueFromCoords(1, y);//for sp program dropdown
+            
+            
+            if (value == '') {
+                var col = ("B").concat(parseInt(y) + 1);
+                this.el2.setStyle(col, "background-color", "transparent");
+                this.el2.setStyle(col, "background-color", "yellow");
+                this.el2.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+                
+            } else if(this.el2.getValueFromCoords(2, y) == '') { //for sp version dropdown
+                var col = ("C").concat(parseInt(y) + 1);
+                this.el2.setStyle(col, "background-color", "transparent");
+                this.el2.setStyle(col, "background-color", "yellow");
+                this.el2.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+
+            } else {
+                //for sp program dropdown duplicate check
+                console.log('i json.length - 1: ',json.length - 1);
+                
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    console.log('i : ',i);
+                    console.log('y : ',y);
+                    var col = ("B").concat(parseInt(i) + 1);
+                    var map = new Map(Object.entries(json[i]));
+                    var spProgramValue = map.get("1");
+                    if (spProgramValue == value && y != i && i > y) {
+                        this.el2.setStyle(col, "background-color", "transparent");
+                        this.el2.setStyle(col, "background-color", "yellow");
+                        this.el2.setComments(col, "Supply Plan Program already exists");
+                        i = -1;
+                        valid = false;
+                    } else {
+                        this.el2.setStyle(col, "background-color", "transparent");
+                        this.el2.setComments(col, "");
+                    }
+                }
+            }
+
+                /*var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
+                var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
+                        valid = false;
+                    } else {
+                        if (isNaN(Number.parseInt(value)) || value <= 0) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                }*/
+            
+        }
+        return valid;
     }
 
     handleChange(instance, cell, x, y, value) {
@@ -1113,13 +1223,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var puList = papuList[j].puList;
 
                 console.log('\n ['+j+'] puList.length: ',puList.length);
+
                 for(var k = 0; k < puList.length; k++) {
                     console.log('puList id: ',puList[k].id);
 
                     data = [];
                     let planningUnitObj = this.state.planningUnitList.filter(c => c.id == puList[k].id)[0]; // filter PU list of Forecast Program
                     if(k == 0) {
-                        data[0] = 'Tracer Cat '+(j+1);
+                        data[0] = papuList[j].program.programCode;
                         data[1] = '';
                         data[2] = '';
                         data[3] = '';
@@ -1261,7 +1372,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    console.log('\ny: '+y);
+                    // console.log('\ny: '+y);
                     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
                     var elInstance = el;
                     elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
@@ -1269,6 +1380,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     // console.log('rowData: ',rowData);
                     // console.log('cell J: ',`J${parseInt(y) + 1}`);
                     // console.log('cell : ',elInstance.getCell(`J${parseInt(y) + 1}`));
+
+
+                    // console.log('rowData[12]: ',rowData[12]);
+                    if (rowData[12] == 1) {
+                        // var columnsCount = el.getHeaders().length;
+                        // console.log('columnsCount: ',columnsCount);
+                        for (var col = 0; col < colArr.length; col++) {
+                            elInstance.getCell((colArr[col]).concat(parseInt(y) + 1)).classList.add('regionBold');
+                            // el.setStyle(y, col, 'class', 'regionBold');
+                            // elInstance.setStyle((colArr[col]).concat(parseInt(y) + 1), "background-color", "yellow");
+                        }
+
+                        //make Forecast Planning Unit readonly
+                        var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+                    }
+
                     var match = rowData[10];
                     if (match == 1 || rowData[1] == rowData[7]) {
                         var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
@@ -1289,15 +1417,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     } else {
                     }
 
-                    console.log('rowData[12]: ',rowData[12]);
-                    if (rowData[12] == 1) {
-                        // var columnsCount = el.getHeaders().length;
-                        // console.log('columnsCount: ',columnsCount);
-                        for (var col = 0; col < colArr.length; col++) {
-                            // el.setStyle(y, col, 'class', 'regionBold');
-                            elInstance.setStyle((colArr[col]).concat(parseInt(y) + 1), "background-color", "yellow");
-                        }
-                    }
+                    
                 }
             }.bind(this),
             pagination: 5000000,
@@ -1488,6 +1608,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * @param {Object} event The event object containing information about the selected forecast program ID.
      */
     setForecastProgramId(event) {
+        jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
+        jexcel.destroy(document.getElementById("spProgramVersionTable"), true);
+        this.buildJexcel2();
+        
         var forecastProgramId = event.target.value;
         if (forecastProgramId != "" && forecastProgramId != 0) {
             var sel = document.getElementById("forecastProgramId");
@@ -1645,6 +1769,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             },() => {
                 console.log('filteredSupplyPlanProgramList: '+JSON.stringify(this.state.filteredSupplyPlanProgramList));
             });
+        } else {
+            this.setState({
+                filteredSupplyPlanProgramList : []
+            });
         }
     }
     /**
@@ -1789,7 +1917,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     </FormGroup>
                 </div>
 
-                <div className="consumptionDataEntryTable">
+                <div className="consumptionDataEntryTable datdEntryRow">
                     <div id="mapPlanningUnit" className='TableWidth100' style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
                     </div>
                     <FormGroup>
