@@ -493,6 +493,7 @@ export default class BuildTree extends Component {
             popoverOpenSenariotree: false,
             popoverOpenNodeType: false,
             popoverOpenNodeTitle: false,
+            popoverNodeUnit: false,
             hideFUPUNode: false,
             hidePUNode: false,
             viewMonthlyData: true,
@@ -893,6 +894,7 @@ export default class BuildTree extends Component {
         this.getChildrenOfList = this.getChildrenOfList.bind(this);
         this.childrenOfChanged = this.childrenOfChanged.bind(this);
         this.levelDropdownChange = this.levelDropdownChange.bind(this);
+        this.toggleTooltipNodeUnit = this.toggleTooltipNodeUnit.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -2252,11 +2254,38 @@ export default class BuildTree extends Component {
      * @param {*} e The event object representing the parent selection change event.
      */
     childrenOfChanged(e) {
-        this.setState({
-            childrenOf: e
-        }, () => {
-            this.buildLevelReorderJexcel();
-        })
+        var cf = true;
+        if (this.state.isLevelChanged == true) {
+            cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                let { curTreeObj } = this.state;
+                var items = curTreeObj.tree.flatList;
+                items = JSON.parse(JSON.stringify(this.state.oldItems));
+                curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+                this.setState({
+                    childrenOf: e,
+                    isLevelChanged: false,
+                    curTreeObj,
+                    items
+                }, () => {
+                    this.buildLevelReorderJexcel();
+                })
+            } else {
+            }
+        } else {
+            let { curTreeObj } = this.state;
+            var items = curTreeObj.tree.flatList;
+            items = JSON.parse(JSON.stringify(this.state.oldItems));
+            curTreeObj.tree.flatList = JSON.parse(JSON.stringify(this.state.oldItems));
+            this.setState({
+                childrenOf: e,
+                isLevelChanged: false,
+                curTreeObj,
+                items
+            }, () => {
+                this.buildLevelReorderJexcel();
+            })
+        }
     }
     /**
      * Builds jexcel table for node reordering on same level
@@ -2345,7 +2374,7 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.nodeName'),
                     type: 'text',
                     readOnly: true,
-                    width: 140
+                    width: 120
                 },
                 {
                     title: "Node Id",
@@ -2361,13 +2390,13 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.shiftUp'),
                     type: 'text',
                     readOnly: true,
-                    width: 30
+                    width: 40
                 },
                 {
                     title: i18n.t('static.tree.shiftDown'),
                     type: 'text',
                     readOnly: true,
-                    width: 30
+                    width: 40
                 },
             ],
             updateTable: this.updateReorderTable,
@@ -3167,6 +3196,14 @@ export default class BuildTree extends Component {
     toggleTooltipAuto() {
         this.setState({
             popoverTooltipAuto: !this.state.popoverTooltipAuto,
+        });
+    }
+    /**
+     * Toggle node unit
+     */
+    toggleTooltipNodeUnit() {
+        this.setState({
+            popoverNodeUnit: !this.state.popoverNodeUnit,
         });
     }
     /**
@@ -13196,7 +13233,14 @@ export default class BuildTree extends Component {
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}</Label>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverNodeUnit} target="PopoverNodeUnit" trigger="hover" toggle={() => this.toggleTooltipNodeUnit()}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.levelReorderNodeUnit')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
+                                                        <i class="fa fa-info-circle icons pl-lg-2" id="PopoverNodeUnit" onClick={() => this.toggleTooltipNodeUnit()} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                    </Label>
                                                 </Col>
                                                 <Col>
                                                     <Input
