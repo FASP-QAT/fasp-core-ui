@@ -86,6 +86,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.versionFilterNew = this.versionFilterNew.bind(this);
         this.changed2 = this.changed2.bind(this);
         this.checkValidationTable1 = this.checkValidationTable1.bind(this);
+        this.callFilterData = this.callFilterData.bind(this);
     }
     /**
      * This function is triggered when this component is about to unmount
@@ -893,8 +894,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 title: i18n.t("static.common.deleterow"),
                                 onclick: function () {
                                     obj.deleteRow(parseInt(y));
-                                    // this.setState({ countVar: this.state.countVar - 1 })
-                                }
+                                    this.callFilterData();//build table 2
+                                }.bind(this)
                             });
                         }
                     }
@@ -930,15 +931,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
             // })
         }
 
-        var validation = this.checkValidationTable1();
-        console.log('validation tbl1 : ',validation);
-        if (validation == true) {
-            this.filterData();
-        }
+        this.callFilterData();
 
         // if (x == 2) {
         //     this.filterData();
         // }
+    }
+
+    callFilterData() {
+        var validation = this.checkValidationTable1();
+        console.log('validation tbl1 : ',validation);
+        if (validation == true) {
+            this.filterData();//build table 2
+        }
     }
 
     /**
@@ -969,12 +974,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             } else {
                 //for sp program dropdown duplicate check
-                console.log('i json.length - 1: ',json.length - 1);
+                // console.log('i json.length - 1: ',json.length - 1);
+                var col = ("B").concat(parseInt(y) + 1);
                 
                 for (var i = (json.length - 1); i >= 0; i--) {
-                    console.log('i : ',i);
-                    console.log('y : ',y);
-                    var col = ("B").concat(parseInt(i) + 1);
+                    // console.log('i : ',i);
+                    // console.log('y : ',y);
                     var map = new Map(Object.entries(json[i]));
                     var spProgramValue = map.get("1");
                     if (spProgramValue == value && y != i && i > y) {
@@ -1655,8 +1660,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         valid = checkValidation(this.el);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
+            var isProgramHeader = this.el.getValueFromCoords(12, y);
+            console.log('y: '+y+', checkValidation value: ',value);
+            console.log('isProgramHeader: ',isProgramHeader);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
-            if (value != -1) {
+            if (value != -1 && isProgramHeader != 1) {
                 var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == value)[0];
                 var col = ("H").concat(parseInt(y) + 1);
                 if (tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
@@ -1715,6 +1723,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     formSubmit = function () {
         var validation = this.checkValidation();
+        console.log('formSubmit() validation: ',validation);
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
