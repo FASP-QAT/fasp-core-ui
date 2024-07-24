@@ -2191,15 +2191,13 @@ export default class CreateTreeTemplate extends Component {
         if(this.state.childrenOf.length > 0){
             levelNodes = this.state.treeTemplate.flatList.filter(m => m.level == this.state.levelNo);
             levelNodes.sort((a, b) => a.parent - b.parent);
-            if(isShiftNode == undefined) {
                 var flatListUnsorted = levelNodes;
                 var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
                 var sortedArray = sortOrderArray.sort();
                 levelNodes = [];
                 for (var i = 0; i < sortedArray.length; i++) {
-                    levelNodes.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
+                    levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
                 }
-            }
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
         }
