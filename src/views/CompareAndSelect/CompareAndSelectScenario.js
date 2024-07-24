@@ -2479,297 +2479,298 @@ class CompareAndSelectScenario extends Component {
                                                 </div>
                                             </div>
                                         }
-                                    </div>
-                                    <div className={this.state.showHidePU ? "col-md-9" : "col-md-12"} style={{ display: this.state.loading ? "none" : "block" }}>
-                                        {this.state.showAllData &&
-                                            <>
-                                                <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
-                                                <ul className="legendcommitversion">
-                                                    <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
-                                                    <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
-                                                    <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
-                                                </ul><br />
-                                                <div className="RemoveStriped removeOddColor">
-                                                    <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
-                                                </div>
-                                                <br></br>
-                                                <FormGroup className="col-md-12">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                                    <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="textarea"
-                                                                name="forecastNotes"
-                                                                id="forecastNotes"
-                                                                value={this.state.forecastNotes}
-                                                                onChange={(e) => { this.setForecastNotes(e); }}
-                                                                readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
-                                                                bsSize="sm"
-                                                            >
-                                                            </Input>
-                                                        </InputGroup>
+                                        <div className={this.state.showHidePU ? "col-md-9" : "col-md-12"} style={{ display: this.state.loading ? "none" : "block" }}>
+                                            {this.state.showAllData &&
+                                                <>
+                                                    <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
+                                                    <ul className="legendcommitversion">
+                                                        <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
+                                                        <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                        <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
+                                                    </ul><br />
+                                                    <div className="RemoveStriped removeOddColor">
+                                                        <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                                     </div>
-                                                </FormGroup>
-                                                <br></br>
-                                                <Col md="12 pl-0">
-                                                    <div className="row">
-                                                        <FormGroup>
-                                                            <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
-                                                            <FormGroup check inline>
+                                                    <br></br>
+                                                    <FormGroup className="col-md-12">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
                                                                 <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="viewById1"
-                                                                    name="viewById"
-                                                                    value={1}
-                                                                    checked={this.state.viewById == 1}
-                                                                    onChange={this.setViewById}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-active1">
-                                                                    {i18n.t('static.report.planningUnit')}
-                                                                </Label>
-                                                            </FormGroup><br />
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="viewById2"
-                                                                    name="viewById"
-                                                                    value={2}
-                                                                    checked={this.state.viewById == 2}
-                                                                    onChange={this.setViewById}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-active1">
-                                                                    {i18n.t('static.dashboard.forecastingunit')}
-                                                                </Label>
-                                                            </FormGroup><br />
-                                                            <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="viewById3"
-                                                                    name="viewById"
-                                                                    value={3}
-                                                                    checked={this.state.viewById == 3}
-                                                                    onChange={this.setViewById}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-active1">
-                                                                    {i18n.t('static.equivalancyUnit.equivalancyUnit')}
-                                                                </Label>
+                                                                    type="textarea"
+                                                                    name="forecastNotes"
+                                                                    id="forecastNotes"
+                                                                    value={this.state.forecastNotes}
+                                                                    onChange={(e) => { this.setForecastNotes(e); }}
+                                                                    readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
+                                                                    bsSize="sm"
+                                                                >
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <br></br>
+                                                    <Col md="12 pl-0">
+                                                        <div className="row">
+                                                            <FormGroup>
+                                                                <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById1"
+                                                                        name="viewById"
+                                                                        value={1}
+                                                                        checked={this.state.viewById == 1}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.report.planningUnit')}
+                                                                    </Label>
+                                                                </FormGroup><br />
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById2"
+                                                                        name="viewById"
+                                                                        value={2}
+                                                                        checked={this.state.viewById == 2}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.dashboard.forecastingunit')}
+                                                                    </Label>
+                                                                </FormGroup><br />
+                                                                <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById3"
+                                                                        name="viewById"
+                                                                        value={3}
+                                                                        checked={this.state.viewById == 3}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.equivalancyUnit.equivalancyUnit')}
+                                                                    </Label>
+                                                                </FormGroup>
                                                             </FormGroup>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="planningUnitId"
-                                                                        id="planningUnitId"
-                                                                        bsSize="sm"
-                                                                        disabled={true}
-                                                                        value={this.state.planningUnitId}
-                                                                        className="selectWrapText removeDropdownArrow"
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {planningUnits}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="foreccastingUnitId"
-                                                                        id="forecastingUnitId"
-                                                                        value={this.state.forecastingUnitId}
-                                                                        disabled={true}
-                                                                        onChange={this.setForecastingUnit}
-                                                                        bsSize="sm"
-                                                                        className="selectWrapText removeDropdownArrow"
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {forecastingUnits}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        className="selectWrapText removeDropdownArrow"
-                                                                        name="equivalencyUnitId"
-                                                                        id="equivalencyUnitId"
-                                                                        value={this.state.equivalencyUnitId}
-                                                                        onChange={this.setEquivalencyUnit}
-                                                                        bsSize="sm"
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {equivalencies}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <div className={"row check inline pt-lg-3 pl-lg-3"}>
+                                                            <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="planningUnitId"
+                                                                            id="planningUnitId"
+                                                                            bsSize="sm"
+                                                                            disabled={true}
+                                                                            value={this.state.planningUnitId}
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {planningUnits}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="foreccastingUnitId"
+                                                                            id="forecastingUnitId"
+                                                                            value={this.state.forecastingUnitId}
+                                                                            disabled={true}
+                                                                            onChange={this.setForecastingUnit}
+                                                                            bsSize="sm"
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {forecastingUnits}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                            name="equivalencyUnitId"
+                                                                            id="equivalencyUnitId"
+                                                                            value={this.state.equivalencyUnitId}
+                                                                            onChange={this.setEquivalencyUnit}
+                                                                            bsSize="sm"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {equivalencies}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
 
-                                                            {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
-                                                                <div className="col-md-12">
-                                                                    <div className="chart-wrapper chart-graph-report">
-                                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                                        <div>
+                                                            {this.state.xAxisDisplayBy == 1 &&
+                                                                <FormGroup className="col-md-2">
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="showForecastPeriod"
+                                                                        name="showForecastPeriod"
+                                                                        checked={this.state.showForecastPeriod}
+                                                                        onClick={(e) => { this.setShowForecastPeriod(e); }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            }
+                                                            <FormGroup className="col-md-3">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : ({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="xAxisDisplayBy"
+                                                                            id="xAxisDisplayBy"
+                                                                            bsSize="sm"
+                                                                            value={this.state.xAxisDisplayBy}
+                                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
+                                                                        >
+                                                                            <option value="1">{i18n.t('static.ManageTree.Month')}</option>
+                                                                            <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
+                                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
+                                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
+                                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
+                                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
+                                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
+                                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
+                                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
+                                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
+                                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
+                                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
+                                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
+                                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-3 pickerRangeBox">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                                </Label>
+                                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref="pickRange"
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            lang={pickerLang}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                                        </Picker>
+                                                                    </div>
+                                                                )}
+                                                                {(this.state.xAxisDisplayBy == 2) && (
+                                                                    <div className="controls box">
+                                                                        <RangePicker
+                                                                            picker="year"
+                                                                            allowClear={false}
+                                                                            id="date"
+                                                                            name="date"
+                                                                            onChange={this.handleYearRangeChange}
+                                                                            value={[
+                                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                                moment(this.state.singleValue2.to.year.toString()),
+                                                                            ]}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
+                                                                    <div className="controls box">
+                                                                        <RangePicker
+                                                                            picker="year"
+                                                                            allowClear={false}
+                                                                            id="date"
+                                                                            name="date"
+                                                                            onChange={this.handleYearRangeChange}
+                                                                            value={[
+                                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                                moment(this.state.singleValue2.to.year.toString()),
+                                                                            ]}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </FormGroup>
+                                                            {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
+                                                                <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref={this.pickAMonth3}
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            lang={pickerLang}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
+                                                                        </Picker>
+                                                                    </div>
+                                                                </FormGroup>
+                                                            }
+                                                            <div className={"row check inline pt-lg-3 pl-lg-3"}>
+
+                                                                {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
+                                                                    <div className="col-md-12">
+                                                                        <div className="chart-wrapper chart-graph-report">
+                                                                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                                            <div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="col-md-12">
+                                                                        <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>}
+                                                            </div>
+                                                            <div style={{ display: this.state.show ? "block" : "none" }}>
+                                                                <div className="row">
+                                                                    <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
+                                                                        <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div className="col-md-12">
-                                                                    <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                                        {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                                                    </button>
-                                                                </div>
-                                                            </div>}
-                                                        </div>
-                                                        {this.state.xAxisDisplayBy == 1 &&
-                                                            <FormGroup className="col-md-2">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="showForecastPeriod"
-                                                                    name="showForecastPeriod"
-                                                                    checked={this.state.showForecastPeriod}
-                                                                    onClick={(e) => { this.setShowForecastPeriod(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                                </Label>
-                                                            </FormGroup>
-                                                        }
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : ({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="xAxisDisplayBy"
-                                                                        id="xAxisDisplayBy"
-                                                                        bsSize="sm"
-                                                                        value={this.state.xAxisDisplayBy}
-                                                                        onChange={(e) => { this.setXAxisDisplayBy(e); }}
-                                                                    >
-                                                                        <option value="1">{i18n.t('static.ManageTree.Month')}</option>
-                                                                        <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
-                                                                        <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                                        <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
-                                                                        <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
-                                                                        <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
-                                                                        <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
-                                                                        <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
-                                                                        <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
-                                                                        <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
-                                                                        <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
-                                                                        <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
-                                                                        <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
-                                                                        <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3 pickerRangeBox">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
-                                                                <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
-                                                            </Label>
-                                                            {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
-                                                                <div className="controls edit">
-                                                                    <Picker
-                                                                        ref="pickRange"
-                                                                        years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                        value={this.state.singleValue2}
-                                                                        lang={pickerLang}
-                                                                        key={JSON.stringify(this.state.singleValue2)}
-                                                                        onDismiss={this.handleAMonthDissmis2}
-                                                                    >
-                                                                        <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
-                                                                    </Picker>
-                                                                </div>
-                                                            )}
-                                                            {(this.state.xAxisDisplayBy == 2) && (
-                                                                <div className="controls box">
-                                                                    <RangePicker
-                                                                        picker="year"
-                                                                        allowClear={false}
-                                                                        id="date"
-                                                                        name="date"
-                                                                        onChange={this.handleYearRangeChange}
-                                                                        value={[
-                                                                            moment(this.state.singleValue2.from.year.toString()),
-                                                                            moment(this.state.singleValue2.to.year.toString()),
-                                                                        ]}
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                            {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
-                                                                <div className="controls box">
-                                                                    <RangePicker
-                                                                        picker="year"
-                                                                        allowClear={false}
-                                                                        id="date"
-                                                                        name="date"
-                                                                        onChange={this.handleYearRangeChange}
-                                                                        value={[
-                                                                            moment(this.state.singleValue2.from.year.toString()),
-                                                                            moment(this.state.singleValue2.to.year.toString()),
-                                                                        ]}
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </FormGroup>
-                                                        {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
-                                                            <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                                <div className="controls edit">
-                                                                    <Picker
-                                                                        ref={this.pickAMonth3}
-                                                                        years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                        value={this.state.singleValue2}
-                                                                        key={JSON.stringify(this.state.singleValue2)}
-                                                                        lang={pickerLang}
-                                                                        onDismiss={this.handleAMonthDissmis2}
-                                                                    >
-                                                                        <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
-                                                                    </Picker>
-                                                                </div>
-                                                            </FormGroup>
-                                                        }
-                                                        <div style={{ display: this.state.show ? "block" : "none" }}>
-                                                            <div className="row">
-                                                                <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
-                                                                    <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="row">
-                                                                <div className="col-md-12 pl-0 pr-0">
-                                                                    <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                                <div className="row">
+                                                                    <div className="col-md-12 pl-0 pr-0">
+                                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </Col>
-                                            </>
-                                        }
+                                                    </Col>
+                                                </>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
