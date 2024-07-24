@@ -2623,22 +2623,38 @@ class CompareAndSelectScenario extends Component {
                                                             </FormGroup>
 
                                                             {this.state.xAxisDisplayBy == 1 &&
-                                                                <FormGroup className="col-md-2">
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="showForecastPeriod"
-                                                                        name="showForecastPeriod"
-                                                                        checked={this.state.showForecastPeriod}
-                                                                        onClick={(e) => { this.setShowForecastPeriod(e); }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                        {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                                    </Label>
-                                                                </FormGroup>
-                                                            }
+                                                                <FormGroup className="col-md-4">
+                                                                    <div className="col-md-12">
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="checkbox"
+                                                                            id="showForecastPeriod"
+                                                                            name="showForecastPeriod"
+                                                                            checked={this.state.showForecastPeriod}
+                                                                            onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                            {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                        </Label>
+                                                                    </div>
+                                                                    <div className="col-md-12">
+                                                                        <Input
+                                                                            className="form-check-input"
+                                                                            type="checkbox"
+                                                                            id="showFits"
+                                                                            name="showFits"
+                                                                            checked={this.state.showFits}
+                                                                            onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                        />
+                                                                        <Label
+                                                                            className="form-check-label"
+                                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                            {i18n.t('static.extrapolations.showFits')}
+                                                                        </Label>
+                                                                    </div>
+                                                                </FormGroup>}
                                                             <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : ({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</Label>
                                                                 <div className="controls ">
@@ -2735,34 +2751,35 @@ class CompareAndSelectScenario extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             }
-                                                            <div className={"row check inline pt-lg-3 pl-lg-3"}>
+                                                        </div>
 
-                                                                {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
-                                                                    <div className="col-md-12">
-                                                                        <div className="chart-wrapper chart-graph-report">
-                                                                            <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                                            <div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="col-md-12">
-                                                                        <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                                            {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                                                        </button>
-                                                                    </div>
-                                                                </div>}
-                                                            </div>
-                                                            <div style={{ display: this.state.show ? "block" : "none" }}>
-                                                                <div className="row">
-                                                                    <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
-                                                                        <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
+                                                        <div className={"row check inline pt-lg-3 pl-lg-3"}>
+
+                                                            {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
+                                                                <div className="col-md-12">
+                                                                    <div className="chart-wrapper chart-graph-report">
+                                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                                        <div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div className="row">
-                                                                    <div className="col-md-12 pl-0 pr-0">
-                                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
-                                                                        </div>
+                                                                <div className="col-md-12">
+                                                                    <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                                        {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                                    </button>
+                                                                </div>
+                                                            </div>}
+                                                        </div>
+                                                        <div style={{ display: this.state.show ? "block" : "none" }}>
+                                                            <div className="row">
+                                                                <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
+                                                                    <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row">
+                                                                <div className="col-md-12 pl-0 pr-0">
+                                                                    <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                                                     </div>
                                                                 </div>
                                                             </div>
