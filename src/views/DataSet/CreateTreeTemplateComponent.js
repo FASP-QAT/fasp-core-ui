@@ -3127,7 +3127,7 @@ export default class CreateTreeTemplate extends Component {
             }, () => {
                 if (this.state.momEl != "") {
                     this.buildMomJexcel();
-                } else if(this.state.momElPer != "") {
+                } else if (this.state.momElPer != "") {
                     this.buildMomJexcelPercent();
                 }
             });
@@ -4691,8 +4691,8 @@ export default class CreateTreeTemplate extends Component {
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(OR(M1==true,M1==1),G${parseInt(j)},L${parseInt(j)}),2)`
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`;
-            data[4] = momList[j].manualChange!=null?parseFloat(momList[j].seasonalityPerc).toFixed(2):0;
-            data[5] = momList[j].manualChange!=null?parseFloat(momList[j].manualChange).toFixed(2):0
+            data[4] = momList[j].manualChange != null ? parseFloat(momList[j].seasonalityPerc).toFixed(2) : 0;
+            data[5] = momList[j].manualChange != null ? parseFloat(momList[j].manualChange).toFixed(2) : 0
             // data[6] = `=ROUND(IF((((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}<0,0,(((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(IF(E${parseInt(j) + 1}==0,1,E${parseInt(j) + 1})))/(IF(E${parseInt(j) + 1}==0,1,100)))+F${parseInt(j) + 1}),4)`;
             data[6] = `=ROUND((B${parseInt(j) + 1}+C${parseInt(j) + 1})*(1+(E${parseInt(j) + 1})/100)+F${parseInt(j) + 1},4)`;
             var momListParentForMonth = momListParent.filter(c => c.month == momList[j].month);
@@ -4793,7 +4793,7 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: false
                 },
                 {
-                    title:  this.state.seasonality == true ? i18n.t('static.tree.manualChange') : 'A',
+                    title: this.state.seasonality == true ? i18n.t('static.tree.manualChange') : 'A',
                     type: 'numeric',
                     visible: this.state.seasonality == true ? true : false,
                     disabledMaskOnEdition: true,
@@ -4924,23 +4924,23 @@ export default class CreateTreeTemplate extends Component {
         tr.children[3].title = i18n.t('static.momper.tooltip1');
         tr.children[4].classList.add('InfoTr');
         tr.children[4].title = i18n.t('static.momper.tooltip2');
-        if(tr.children[5]) {
+        if (tr.children[5]) {
             tr.children[5].classList.add('InfoTr');
             tr.children[5].title = i18n.t('static.momper.tooltip3');
         }
-        if(tr.children[6]) {
+        if (tr.children[6]) {
             tr.children[6].classList.add('InfoTr');
             tr.children[6].title = i18n.t('static.momper.tooltip4');
         }
-        if(tr.children[7]) {
+        if (tr.children[7]) {
             tr.children[7].classList.add('InfoTr');
             tr.children[7].title = i18n.t('static.momper.tooltip5');
         }
-        if(tr.children[8]) {
+        if (tr.children[8]) {
             tr.children[8].classList.add('InfoTr');
             tr.children[8].title = i18n.t('static.momper.tooltip6');
         }
-        if(tr.children[9]) {
+        if (tr.children[9]) {
             tr.children[9].classList.add('InfoTr');
             tr.children[9].title = i18n.t('static.momper.tooltip7');
         }
@@ -5450,7 +5450,7 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             modelingEl: modelingEl
         }, () => {
-            this.filterScalingDataByMonth(this.state.monthId);
+            this.filterScalingDataByMonth(this.state.scalingMonth);
         }
         );
     }
