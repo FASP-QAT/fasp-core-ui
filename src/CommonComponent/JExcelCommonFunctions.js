@@ -574,6 +574,9 @@ export function checkValidation(worksheets) {
                     columnValid = false;
                 }
             }
+            if(y == 0) {
+                console.log('columnValid: ',columnValid);
+            }
             if (columns[c].number === true && columnValid != false && value != "") {
                 if (isNaN(parseInt(value))) {
                     worksheets.setStyle(col, "background-color", "transparent");

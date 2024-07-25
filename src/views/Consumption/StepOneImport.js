@@ -1236,16 +1236,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     let planningUnitObj = this.state.planningUnitList.filter(c => c.id == puList[k].id)[0]; // filter PU list of Forecast Program
                     if(k == 0) {
                         data[0] = papuList[j].program.programCode;
-                        data[1] = '';
-                        data[2] = '';
-                        data[3] = '';
-                        data[4] = '';
-                        data[5] = '';
-                        data[6] = '';
-                        data[7] = '';
-                        data[8] = '';
-                        data[9] = '';
-                        data[10] = '';
+                        data[1] = '0';
+                        data[2] = '0';
+                        data[3] = '0';
+                        data[4] = '0';
+                        data[5] = '0';
+                        data[6] = '0';
+                        data[7] = '0';
+                        data[8] = '0';
+                        data[9] = '0';
+                        data[10] = '0';
                         data[11] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.id : "";
                         data[12] = 1;
                         papuDataArr[count] = data;
@@ -1658,11 +1658,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         valid = checkValidation(this.el);
+        console.log('checkValidation->  valid: ',valid);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             var isProgramHeader = this.el.getValueFromCoords(12, y);
-            console.log('y: '+y+', checkValidation value: ',value);
-            console.log('isProgramHeader: ',isProgramHeader);
+            // console.log('y: '+y+', checkValidation value: ',value);
+            // console.log('isProgramHeader: ',isProgramHeader);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
             if (value != -1 && isProgramHeader != 1) {
                 var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == value)[0];
