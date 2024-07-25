@@ -135,19 +135,21 @@ class CompareAndSelectScenario extends Component {
      */
     setShowForecastPeriodOrFits(e) {
         var checked = e.target.checked;
+        var stopDate = this.state.singleValue2.to.year + '-' + this.state.singleValue2.to.month + '-' + new Date(this.state.singleValue2.to.year, this.state.singleValue2.to.month, 0).getDate();
         if (e.target.name == "showForecastPeriod") {
             this.setState({
                 showForecastPeriod: checked,
-                showFits: checked ? false : this.state.showFits
+                showFits: checked ? false : this.state.showFits,
+                minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
+                singleValue2: checked ? this.state.singleValue2 : { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
             }, () => {
                 this.setMonth1List()
             })
         } else if (e.target.name == "showFits") {
-            var stopDate = this.state.singleValue2.to.year + '-' + this.state.singleValue2.to.month + '-' + new Date(this.state.singleValue2.to.year, this.state.singleValue2.to.month, 0).getDate();
             this.setState({
                 showFits: checked,
-                minDate: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
-                singleValue2: { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+                minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
+                singleValue2: checked ? this.state.singleValue2 : { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
                 showForecastPeriod: checked ? false : this.state.showForecastPeriod
             }, () => {
                 this.setMonth1List()
