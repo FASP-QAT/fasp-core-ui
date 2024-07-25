@@ -202,8 +202,8 @@ class ShipmentSummery extends Component {
       loading: true,
       programId: "",
       versionId: "",
-      fundingSources: [],//contains filtered funding sources
-      fundingSourcesOriginal: [],
+      fundingSources: [],
+      // fundingSourcesOriginal: [],//implemented for funding source type changes
       fundingSourceValues: [],
       fundingSourceLabels: [],
       budgets: [],
@@ -274,18 +274,18 @@ class ShipmentSummery extends Component {
         '"'
       )
     );
-    csvRow.push("");
-    this.state.fundingSourceTypeLabels.map((ele) =>
-      csvRow.push(
-        '"' +
-        (
-          i18n.t("static.funderTypeHead.funderType") +
-          " : " +
-          ele.toString()
-        ).replaceAll(" ", "%20") +
-        '"'
-      )
-    );
+    // csvRow.push("");
+    // this.state.fundingSourceTypeLabels.map((ele) =>
+    //   csvRow.push(
+    //     '"' +
+    //     (
+    //       i18n.t("static.funderTypeHead.funderType") +
+    //       " : " +
+    //       ele.toString()
+    //     ).replaceAll(" ", "%20") +
+    //     '"'
+    //   )
+    // );
     csvRow.push("");
     this.state.fundingSourceLabels.map((ele) =>
       csvRow.push(
@@ -542,14 +542,14 @@ class ShipmentSummery extends Component {
     // var y = 190;
     var y = 170;
 
-    var fundingSourceTypeText = doc.splitTextToSize(
-      i18n.t("static.funderTypeHead.funderType") +
-      " : " +
-      this.state.fundingSourceTypeLabels.join("; "),
-      (doc.internal.pageSize.width * 3) / 4
-    );
-    doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceTypeText);
-    y = y + fundingSourceTypeText.length * 10 + 10;
+    // var fundingSourceTypeText = doc.splitTextToSize(
+    //   i18n.t("static.funderTypeHead.funderType") +
+    //   " : " +
+    //   this.state.fundingSourceTypeLabels.join("; "),
+    //   (doc.internal.pageSize.width * 3) / 4
+    // );
+    // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceTypeText);
+    // y = y + fundingSourceTypeText.length * 10 + 10;
 
     var fundingSourceText = doc.splitTextToSize(
       i18n.t("static.budget.fundingsource") +
@@ -793,42 +793,44 @@ class ShipmentSummery extends Component {
       }.bind(this)
     }
   }
-  handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
 
-    fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
-      return parseInt(a.value) - parseInt(b.value);
-    })
-    this.setState({
-      fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
-      fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
-    }, () => {
-      var filteredFundingSourceArr = [];
-      var fundingSources = this.state.fundingSourcesOriginal;//original fs list
-      for (var i = 0; i < fundingSourceTypeIds.length; i++) {
-        for (var j = 0; j < fundingSources.length; j++) {
-          if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
-            filteredFundingSourceArr.push(fundingSources[j]);
-          }
-        }
-      }
+  // handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
 
-      if (filteredFundingSourceArr.length > 0) {
-        filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
-          a = a.code.toLowerCase();
-          b = b.code.toLowerCase();
-          return a < b ? -1 : a > b ? 1 : 0;
-        });
-      }
-      this.setState({
-        fundingSources: filteredFundingSourceArr,
-        fundingSourceValues: [],
-        fundingSourceLabels: [],
-      }, () => {
-        this.fetchData();
-      });
+  //   fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+  //     return parseInt(a.value) - parseInt(b.value);
+  //   })
+  //   this.setState({
+  //     fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+  //     fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+  //   }, () => {
+  //     var filteredFundingSourceArr = [];
+  //     var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+  //     for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+  //       for (var j = 0; j < fundingSources.length; j++) {
+  //         if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+  //           filteredFundingSourceArr.push(fundingSources[j]);
+  //         }
+  //       }
+  //     }
 
-    })
-  }
+  //     if (filteredFundingSourceArr.length > 0) {
+  //       filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+  //         a = a.code.toLowerCase();
+  //         b = b.code.toLowerCase();
+  //         return a < b ? -1 : a > b ? 1 : 0;
+  //       });
+  //     }
+  //     this.setState({
+  //       fundingSources: filteredFundingSourceArr,
+  //       fundingSourceValues: [],
+  //       fundingSourceLabels: [],
+  //     }, () => {
+  //       this.fetchData();
+  //     });
+
+  //   })
+  // }
+
   /**
    * Retrieves the list of funding sources.
    */
@@ -844,7 +846,7 @@ class ShipmentSummery extends Component {
           });
           this.setState(
             {
-              fundingSourcesOriginal: listArray,
+              fundingSources: listArray,
             },
             () => {
               this.getBudgetList();
@@ -853,7 +855,7 @@ class ShipmentSummery extends Component {
         })
         .catch((error) => {
           this.setState({
-            fundingSourcesOriginal: [],
+            fundingSources: [],
           });
           if (error.message === "Network Error") {
             this.setState({
@@ -911,7 +913,7 @@ class ShipmentSummery extends Component {
           }
           this.setState(
             {
-              fundingSourcesOriginal: fundingSource.sort(function (a, b) {
+              fundingSources: fundingSource.sort(function (a, b) {
                 a = a.code.toLowerCase();
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
@@ -2123,7 +2125,7 @@ class ShipmentSummery extends Component {
         0
       ).getDate();
     let myFundingSourceIds =
-      this.state.fundingSourceValues.length == this.state.fundingSourcesOriginal.length
+      this.state.fundingSourceValues.length == this.state.fundingSources.length
         ? []
         : this.state.fundingSourceValues.map((ele) => ele.value);
     let myBudgetIds =
@@ -2759,7 +2761,7 @@ class ShipmentSummery extends Component {
           value: item.id,
         };
       }, this);
-    const { fundingSourceTypes } = this.state;
+    // const { fundingSourceTypes } = this.state;
     const { fundingSources } = this.state;
     const { filteredBudgetList } = this.state;
     const { rangeValue } = this.state;
@@ -3034,7 +3036,7 @@ class ShipmentSummery extends Component {
                           </InputGroup>
                         </div>
                       </FormGroup>
-                      <FormGroup className="col-md-3" >
+                      {/* <FormGroup className="col-md-3" >
                         <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
@@ -3054,7 +3056,7 @@ class ShipmentSummery extends Component {
                             disabled={this.state.loading}
                           />
                         </div>
-                      </FormGroup>
+                      </FormGroup> */}
                       <FormGroup className="col-md-3" id="fundingSourceDiv">
                         <Label htmlFor="appendedInputButton">
                           {i18n.t("static.budget.fundingsource")}
