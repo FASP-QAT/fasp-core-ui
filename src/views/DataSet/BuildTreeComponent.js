@@ -7003,7 +7003,7 @@ export default class BuildTree extends Component {
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
-                var childList1 = items.filter(c => c.parent == itemConfig.parent);
+                var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == this.state.copyModalParentNode) : items.filter(c => c.parent == this.state.copyModalParentNode);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
                 child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
                 json = {
@@ -7022,7 +7022,7 @@ export default class BuildTree extends Component {
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
                 var parentSortOrder = parentNode.newSortOrder;
-                var childList1 = items.filter(c => c.parent == parentNode.newId);
+                var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == parentNode.newId) : items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
                 child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(maxSortOrder) + 1)).slice(-2));
                 json = {
@@ -7054,6 +7054,7 @@ export default class BuildTree extends Component {
             }
             updatedFlatList.push(child);
         }
+        console.log("Hello",updatedFlatList)
         childListArr.map(item => {
             var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
