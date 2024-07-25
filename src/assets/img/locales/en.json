@@ -1267,7 +1267,7 @@
     "static.chooseFile.chooseFile": "Select File",
     "static.common.onlinealerttext": "You must be online to conduct this operation",
     "static.procurementAgent.UnitPerPalletEuro1": "Unit Per Pallet (EURO1)",
-    "static.countrySpecificPrices.countrySpecificPrices": "Program/Procurement Agent Prices",
+    "static.countrySpecificPrices.countrySpecificPrices": "Program/Procurement Agent Info",
     "static.procurementAgent.UnitPerPalletEuro2": "Unit Per Pallet (EURO2)",
     "static.shipmentTooltip.budget": "Each shipment beyond the planned stage requires a budget. Add or update budget information in the Budget screen",
     "static.unitType.unitTypeName": "Unit type name",
