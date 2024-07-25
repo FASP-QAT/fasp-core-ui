@@ -3368,5 +3368,9 @@
     "static.funderType.funderTypeText": "Funding Source Type is required",
     "static.tree.editLevelName": "Edit Level Name",
     "static.dataentry.conversionFactorTooltip":"User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor",
-    "static.tooltip.levelReorderNodeUnit": "Displayed in the Y-axis in the Modeling Validation screen."
+    "static.tooltip.levelReorderNodeUnit": "Displayed in the Y-axis in the Modeling Validation screen.",
+    "static.spvr.resetQPL":"Reset QPL",
+    "static.common.changetheme":"Change Theme",
+    "static.common.lighttheme":"Light Theme",
+    "static.common.darktheme":"Dark Theme"
 }
