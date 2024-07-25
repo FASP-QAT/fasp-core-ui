@@ -169,5 +169,9 @@ class ProgramService {
     getProgramListByProductCategoryIdList(productCategoryIds) {
         return axios.post(`${API_URL}/api/program/productCategoryList`, productCategoryIds, {});
     }
+    resetQPL(json) {
+        return axios.put(`${API_URL}/api/programVersion/resetProblem`, json, {}
+        );
+    }
 }
 export default new ProgramService()
