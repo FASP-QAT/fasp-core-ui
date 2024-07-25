@@ -293,6 +293,7 @@ class ProcurementAgentExport extends Component {
       )
         .then((response) => {
           var listArray = response.data;
+          console.log('procurementAgents[0]: ',listArray[0]);
           var listArrays = [];
           for (var i = 0; i < listArray.length; i++) {
             var arr = {
@@ -1351,6 +1352,7 @@ class ProcurementAgentExport extends Component {
     let shipmentCostArray = [];
     let count = 0;
     let viewby = this.state.viewby;
+    console.log('shipmentCosttList[0]: ',shipmentCosttList[0]);
     for (var j = 0; j < shipmentCosttList.length; j++) {
       data = [];
       data[0] =
