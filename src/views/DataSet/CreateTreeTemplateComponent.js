@@ -2509,9 +2509,19 @@ export default class CreateTreeTemplate extends Component {
             copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevel);
             copyModalParentNode = this.state.copyModalNode.parent;
         } else if(val == 2) {
-            copyModalParentLevel = "";
-            copyModalParentNode = "";
-            copyModalParentNodeList = [];
+            if(copyModalParentLevelList.length == 1) {
+                copyModalParentLevel = copyModalParentLevelList[0].levelNo;
+                copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevel);
+                if(copyModalParentNodeList.length == 1) {
+                    copyModalParentNode = copyModalParentNodeList[0].id;
+                } else {
+                    copyModalParentNode = "";
+                }
+            } else {
+                copyModalParentLevel = "";
+                copyModalParentNode = "";
+                copyModalParentNodeList = [];
+            }
         }
         this.setState({
             copyModalData: val,
@@ -2521,6 +2531,8 @@ export default class CreateTreeTemplate extends Component {
             copyModalParentLevel: copyModalParentLevel,
             copyModalParentNodeList: copyModalParentNodeList,
             copyModalParentNode: copyModalParentNode
+        }, () => {
+            validationSchemaCopyMove();
         })
     }
     copyModalParentLevelChange(e) {
@@ -2530,7 +2542,7 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
-            copyModalParentNode: ""
+            copyModalParentNode: copyModalParentNodeList.length == 1 ? copyModalParentNodeList[0].id : ""
         })
     }
     copyModalParentNodeChange(e) {
@@ -12988,9 +13000,9 @@ export default class CreateTreeTemplate extends Component {
                                 </ModalHeader>
                                 <ModalBody>
                                     <FormGroup>
-                                        <FormGroup check inline>
+                                        <FormGroup check inline className="pl-0">
                                             <Input
-                                                className="form-check-input"
+                                                className="form-check-input ml-0"
                                                 type="radio"
                                                 id="copyMoveTrue"
                                                 name="copyMove"
@@ -13001,7 +13013,7 @@ export default class CreateTreeTemplate extends Component {
                                                 }}
                                             />
                                             <Label
-                                                className="form-check-label"
+                                                className="form-check-label login-text"
                                                 check htmlFor="copyMoveTrue">
                                                 {i18n.t('static.tree.copy')}
                                             </Label>
@@ -13019,12 +13031,17 @@ export default class CreateTreeTemplate extends Component {
                                                 }}
                                             />
                                             <Label
-                                                className="form-check-label"
+                                                className="form-check-label login-text"
                                                 check htmlFor="copyMoveFalse">
                                                 {i18n.t('static.tree.move')}
                                             </Label>
                                         </FormGroup>
                                         <div className="red">{errors.copyMove}</div>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label className="form-check-label">
+                                            Node name: {this.state.copyModalNode.payload.label.label_en} 
+                                        </Label>
                                     </FormGroup>
                                     <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
                                         <p>{i18n.t('static.tree.destination')}:</p>
@@ -13037,6 +13054,9 @@ export default class CreateTreeTemplate extends Component {
                                                 bsSize="sm"
                                                 disabled={true}
                                                 value={this.state.copyModalTree}
+                                                valid={!errors.treeDropdown && this.state.copyModalTree != ''}
+                                                invalid={touched.treeDropdown && !!errors.treeDropdown}
+                                                onBlur={handleBlur}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 <option value="-1">{this.state.treeTemplate.label.label_en}</option>
@@ -13061,6 +13081,9 @@ export default class CreateTreeTemplate extends Component {
                                                 bsSize="sm"
                                                 onChange={(e) => { this.copyModalParentLevelChange(e) }}
                                                 value={this.state.copyModalParentLevel}
+                                                valid={!errors.parentLevelDropdown && (this.state.copyModalParentLevel != '' || parseInt(this.state.copyModalParentLevel) == 0)}
+                                                invalid={(this.state.copyModalParentLevel == '' && parseInt(this.state.copyModalParentLevel) != 0) || !!errors.parentLevelDropdown}
+                                                onBlur={handleBlur}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {this.state.copyModalParentLevelList.length > 0
@@ -13083,6 +13106,9 @@ export default class CreateTreeTemplate extends Component {
                                                 bsSize="sm"
                                                 onChange={(e) => { this.copyModalParentNodeChange(e) }}
                                                 value={this.state.copyModalParentNode}
+                                                valid={!errors.parentNodeDropdown && (this.state.copyModalParentNode != '' || parseInt(this.state.copyModalParentNode) == 0)}
+                                                invalid={(parseInt(this.state.copyModalParentNode) != 0 && this.state.copyModalParentNode == '') || !!errors.parentNodeDropdown}
+                                                onBlur={handleBlur}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {this.state.copyModalParentNodeList.length > 0
