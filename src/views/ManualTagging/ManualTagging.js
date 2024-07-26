@@ -3251,7 +3251,7 @@ export default class ManualTagging extends Component {
             var rcpuList = [];
             response1.data.map(c => {
                 rcpuList.push({
-                    name: getLabelText(c.label, this.state.lang),
+                    name: getLabelText(c.label, this.state.lang).toString().trim(),
                     id: c.realmCountryPlanningUnitId,
                     multiplier: c.multiplier,
                     active: c.active,
@@ -3300,7 +3300,7 @@ export default class ManualTagging extends Component {
                     data[12] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                     data[5] = manualTaggingList[j].expectedDeliveryDate
                     data[6] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].erpShipmentStatus : ""
-                    data[8] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatRealmCountryPlanningUnit.label, this.state.lang) : getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang)
+                    data[8] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatRealmCountryPlanningUnit.label, this.state.lang).toString().trim() : getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang).toString().trim()
                     data[9] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
                     data[31] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
                     data[11] = `=ROUND(AG${parseInt(j) + 1}*AJ${parseInt(j) + 1}*AF${parseInt(j) + 1},0)`;
@@ -4100,7 +4100,7 @@ export default class ManualTagging extends Component {
                             var rcpuList = [];
                             response1.data.map(c => {
                                 rcpuList.push({
-                                    name: getLabelText(c.label, this.state.lang),
+                                    name: getLabelText(c.label, this.state.lang).toString().trim(),
                                     id: c.realmCountryPlanningUnitId,
                                     multiplier: c.multiplier,
                                     active: c.active,
