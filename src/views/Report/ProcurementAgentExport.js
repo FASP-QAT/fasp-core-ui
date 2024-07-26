@@ -1371,7 +1371,10 @@ class ProcurementAgentExport extends Component {
         viewby == 1
           ? shipmentCosttList[j].procurementAgent.code
           : viewby == 2
-            ? shipmentCosttList[j].fundingSource.code
+            ? getLabelText(
+              shipmentCosttList[j].fundingSource.fundingSourceType.label,
+              this.state.lang
+            )
             : {};
       data[2] = getLabelText(
         shipmentCosttList[j].planningUnit.label,
@@ -1405,7 +1408,7 @@ class ProcurementAgentExport extends Component {
         type: "text",
       };
       obj2 = {
-        title: i18n.t("static.fundingsource.fundingsourceCode"),
+        title: i18n.t("static.funderTypeHead.funderType"),
         type: "text",
       };
     } else {
@@ -2003,6 +2006,8 @@ class ProcurementAgentExport extends Component {
                     (c.active == true || c.active == "true") &&
                     (c.accountFlag == true || c.accountFlag == "true")
                 );
+                console.log('for viewBy fs shipmentList[0]: ',activeFilter[0]);//not getting funding source type obj in fs obj
+
                 let isPlannedShipment = [];
                 if (isPlannedShipmentId == 1) {
                   isPlannedShipment = activeFilter.filter(
@@ -2060,6 +2065,7 @@ class ProcurementAgentExport extends Component {
                         id: fundingSource[0].fundingSourceId,
                         label: fundingSource[0].label,
                         code: fundingSource[0].fundingSourceCode,
+                        fundingSourceType: fundingSource[0].fundingSourceType
                       };
                     }
                     let json = {
