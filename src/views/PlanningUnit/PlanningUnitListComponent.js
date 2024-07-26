@@ -518,7 +518,25 @@ export default class PlanningUnitListComponent extends Component {
     toggleExport() {
         this.setState({
             exportModal: !this.state.exportModal,
+            productCategoryIdExport:document.getElementById("productCategoryId").value,
+            tracerCategoryIdExport:document.getElementById("tracerCategoryId").value,
+            forecastingUnitIdExport:document.getElementById("forecastingUnitId").value  
         })
+    }
+    dataChange(e){
+        if(e.target.name=="productCategoryIdExport"){
+            this.setState({
+                "productCategoryIdExport":e.target.value
+            })
+        }else if(e.target.name=="tracerCategoryIdExport"){
+            this.setState({
+                "tracerCategoryIdExport":e.target.value
+            })
+        }else if(e.target.name=="forecastingUnitIdExport"){
+            this.setState({
+                "forecastingUnitIdExport":e.target.value
+            })
+        }
     }
     /**
      * This function is used to get planning unit list and export that list into csv file
@@ -827,7 +845,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="productCategoryIdExport"
                                                 id="productCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.productCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {productCategoryList}
                                             </Input>
@@ -843,7 +862,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="tracerCategoryIdExport"
                                                 id="tracerCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.tracerCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {tracercategoryList}
@@ -860,7 +880,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="forecastingUnitIdExport"
                                                 id="forecastingUnitIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.forecastingUnitIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {forecastingUnitList}
