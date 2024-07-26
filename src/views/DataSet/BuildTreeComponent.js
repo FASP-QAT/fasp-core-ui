@@ -8079,6 +8079,7 @@ export default class BuildTree extends Component {
             }
             fuNode.usageType = usageType;
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
+            this.getUsageText();
         }
         if (event.target.name === "planningUnitIdFU") {
             this.setState({ tempPlanningUnitId: event.target.value });
