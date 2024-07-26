@@ -20,7 +20,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { decompressJson, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_SM, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
 import DatasetService from '../../api/DatasetService.js';
 import DropdownService from '../../api/DropdownService';
 import PlanningUnitService from '../../api/PlanningUnitService';
@@ -127,7 +127,8 @@ export default class ListTreeComponent extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: '',
             allProcurementAgentList: [],
-            planningUnitObjList: []
+            planningUnitObjList: [],
+            onlyDownloadedProgram: false
         }
         this.buildJexcel = this.buildJexcel.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
@@ -151,6 +152,7 @@ export default class ListTreeComponent extends Component {
         this.changed = this.changed.bind(this);  
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this); 
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
+        this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
       }
       /**
        * Hides the message in div3 after 30 seconds.
@@ -271,7 +273,8 @@ export default class ListTreeComponent extends Component {
                     }
                     tree.flatList = items;
                     tree.lastModifiedBy = {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username: AuthenticationService.getLoggedInUsername()
                     };
                     tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     tree.createdBy = {
@@ -1529,7 +1532,7 @@ export default class ListTreeComponent extends Component {
                         "label_fr": null,
                         "label_pr": null
                     };
-                    treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId() };
+                    treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(),username:AuthenticationService.getLoggedInUsername() };
                     treeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
                     treeObj.createdBy = { userId: AuthenticationService.getLoggedInUserId() };
                     treeObj.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
@@ -1585,7 +1588,8 @@ export default class ListTreeComponent extends Component {
                     regionList: this.state.regionList,
                     levelList: treeTemplate.levelList,
                     lastModifiedBy: {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username:AuthenticationService.getLoggedInUsername()
                     },
                     lastModifiedDate: moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     createdBy: {
@@ -1691,7 +1695,8 @@ export default class ListTreeComponent extends Component {
                         }
                     }],
                     lastModifiedBy: {
-                        userId: AuthenticationService.getLoggedInUserId()
+                        userId: AuthenticationService.getLoggedInUserId(),
+                        username:AuthenticationService.getLoggedInUsername()
                     },
                     lastModifiedDate: moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     createdBy: {
@@ -1750,7 +1755,7 @@ export default class ListTreeComponent extends Component {
                 "label_fr": null,
                 "label_pr": null
             }
-            treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId() };
+            treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(),username:AuthenticationService.getLoggedInUsername() };
             treeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
             treeObj.createdBy = { userId: AuthenticationService.getLoggedInUserId() };
             treeObj.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -1860,7 +1865,12 @@ export default class ListTreeComponent extends Component {
         this.setState({ loading: true })
         const lan = 'en';
         const { datasetList } = this.state
-        var proList = datasetList;
+        var proList;
+        if(this.state.onlyDownloadedProgram) {
+            proList = [];
+        } else {
+            proList = datasetList;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1899,8 +1909,12 @@ export default class ListTreeComponent extends Component {
                                     f = 1;
                                 }
                             }
-                            if (f == 0) {
+                            if(this.state.onlyDownloadedProgram) {
                                 proList.push(programData)
+                            } else {
+                                if (f == 0) {
+                                    proList.push(programData)
+                                }
                             }
                             downloadedProgramData.push(programData);
                         }
@@ -1995,7 +2009,7 @@ export default class ListTreeComponent extends Component {
         let programId = this.state.datasetId;
         if (programId != 0) {
             const program = this.state.datasetList.filter(c => c.programId == programId)
-            if (program.length == 1) {
+            if (program.length > 0) {
                 if (localStorage.getItem('sessionType') === 'Online') {
                     DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
                         .then(response => {
@@ -2314,9 +2328,11 @@ export default class ListTreeComponent extends Component {
                     data[7] = programList.programId
                     data[8] = programList.programId + "_v" + programList.currentVersion.versionId + "_uId_" + userId
                     data[9] = programList.version
-                    data[10] = treeList[k].active
-                    data[11] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
-                    data[12] = JSON.stringify(treeList[k].forecastMethod);
+                    data[10] = treeList[k].lastModifiedBy.username
+                    data[11] = moment(treeList[k].lastModifiedDate).format("YYYY-MM-DD")
+                    data[12] = treeList[k].active
+                    data[13] = this.state.versionId.toString().includes("(Local)") ? 1 : 2
+                    data[14] = JSON.stringify(treeList[k].forecastMethod);
                     if (selStatus != "") {
                         if (tempSelStatus == treeList[k].active) {
                             treeArray[count] = data;
@@ -2382,12 +2398,22 @@ export default class ListTreeComponent extends Component {
                         type: 'hidden',
                     },
                     {
-                        type: 'dropdown',
-                        title: i18n.t('static.common.status'),
-                        source: [
-                            { id: true, name: i18n.t('static.common.active') },
-                            { id: false, name: i18n.t('static.common.disabled') }
-                        ]
+                        title: i18n.t('static.common.lastModifiedBy'),
+                        type: 'text',
+                    },
+                    {
+                        title: i18n.t('static.common.lastModifiedDate'),
+                        type: 'calendar',
+                        options: { format: JEXCEL_DATE_FORMAT_SM }
+                    },
+                    {
+                        type: 'checkbox',
+                        title: i18n.t('static.common.active'),
+                        width:60
+                        // source: [
+                        //     { id: true, name: i18n.t('static.common.active') },
+                        //     { id: false, name: i18n.t('static.common.disabled') }
+                        // ]
                     },
                     {
                         type: 'hidden'
@@ -2448,7 +2474,7 @@ export default class ListTreeComponent extends Component {
                                         isModalOpen: !this.state.isModalOpen,
                                         treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
                                         active: true,
-                                        forecastMethod: JSON.parse(this.state.treeEl.getValueFromCoords(12, y)),
+                                        forecastMethod: JSON.parse(this.state.treeEl.getValueFromCoords(14, y)),
                                         regionId: '',
                                         regionList: [],
                                         regionValues: [],
@@ -2501,6 +2527,13 @@ export default class ListTreeComponent extends Component {
      * Calls getPrograms,getTreeTemplateList,getForecastMethodList and procurementAgentList functions on component mount
      */
     componentDidMount() {
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
+        this.setState({ onlyDownloadedProgram: !hasRole })
         hideFirstComponent();
         this.getPrograms();
         this.getTreeTemplateList();
@@ -2508,8 +2541,31 @@ export default class ListTreeComponent extends Component {
         this.procurementAgentList();
     }
     /**
-     * Toggle modal for copy or delete tree
+     * Handles the change event of the diplaying only downloaded programs.
+     * @param {Object} event - The event object containing the checkbox state.
      */
+    changeOnlyDownloadedProgram(event) {
+        var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedProgram: true,
+                datasetId: '',
+                loading: false
+            }, () => {
+                this.getPrograms();
+                this.buildJexcel();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedProgram: false,
+                datasetId: '',
+                loading: false
+            }, () => {
+                this.getPrograms();
+                this.buildJexcel();
+            })
+        }
+    }
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -2592,7 +2648,7 @@ export default class ListTreeComponent extends Component {
                 if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
                     var treeId = this.state.treeEl.getValueFromCoords(0, x);
                     var programId = this.state.treeEl.getValueFromCoords(8, x);
-                    var isLocal = this.state.treeEl.getValueFromCoords(11, x);
+                    var isLocal = this.state.treeEl.getValueFromCoords(13, x);
                     if (isLocal == 1) {
                         this.props.history.push({
                             pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
@@ -2885,6 +2941,25 @@ export default class ListTreeComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                            <FormGroup className="col-md-3" style={{ marginTop: '45px' }}>
+                                <div className="tab-ml-1 ml-lg-3">
+                                    <Input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="onlyDownloadedProgram"
+                                        name="onlyDownloadedProgram"
+                                        checked={this.state.onlyDownloadedProgram}
+                                        onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                    />
+                                    <Label
+                                        className="form-check-label"
+                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                        {i18n.t('static.common.onlyDownloadedProgram')}
+                                    </Label>
+                                </div>
+                            </FormGroup>
+                        }
                         <div className="listtreetable consumptionDataEntryTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>

@@ -9,6 +9,7 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import ProgramService from '../../api/ProgramService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 const summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
 const summaryText_2 = "Add Data Source"
 const initialValues = {
@@ -17,7 +18,8 @@ const initialValues = {
     programName: "",
     dataSourceType: "",
     dataSourceName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
 /**
  * This const is used to define the validation schema for datasource ticket component
@@ -53,7 +55,8 @@ export default class DataSourceTicketComponent extends Component {
                 programName: "",
                 dataSourceType: "",
                 dataSourceName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -70,6 +73,7 @@ export default class DataSourceTicketComponent extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
     /**
      * This function is called when some data in the form is changed
@@ -294,6 +298,22 @@ export default class DataSourceTicketComponent extends Component {
         }
     }
     /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { dataSource } = this.state;
+        dataSource.priority = newState;
+        this.setState(
+            {
+                dataSource
+            }, () => {
+                // console.log('priority - state : '+this.state.dataSource.priority);
+            }
+        );
+    }
+    /**
      * This function is used to hide the messages that are there in div2 after 30 seconds
      */
     hideSecondComponent() {
@@ -311,6 +331,7 @@ export default class DataSourceTicketComponent extends Component {
         dataSource.dataSourceType = '';
         dataSource.dataSourceName = '';
         dataSource.notes = '';
+        dataSource.priority = 3;
         this.setState({
             dataSource: dataSource,
             realmId: this.props.items.userRealmId,
@@ -363,7 +384,8 @@ export default class DataSourceTicketComponent extends Component {
                             programName: "",
                             dataSourceType: "",
                             dataSourceName: "",
-                            notes: ""
+                            notes: "",
+                            priority: 3
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -527,6 +549,9 @@ export default class DataSourceTicketComponent extends Component {
                                             value={this.state.dataSource.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.dataSource.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
