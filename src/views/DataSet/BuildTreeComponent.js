@@ -2356,7 +2356,7 @@ export default class BuildTree extends Component {
         var options = {
             data: data,
             columnDrag: false,
-            colWidths: [50, 80, 20, 20],
+            colWidths: [60, 80, 20, 20],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -2368,7 +2368,7 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.nodeltr'),
                     type: 'text',
                     readOnly: false,
-                    width: 60
+                    width: 70
                 },
                 {
                     title: i18n.t('static.tree.nodeName'),
@@ -13219,7 +13219,7 @@ export default class BuildTree extends Component {
                                                         id="levelName"
                                                         name="levelName"
                                                         required
-                                                        style={{fontSize: '12px'}}
+                                                        bsSize="sm"
                                                         valid={!errors.levelName && this.state.levelName != null ? this.state.levelName : '' != ''}
                                                         invalid={touched.levelName && !!errors.levelName}
                                                         onBlur={handleBlur}
