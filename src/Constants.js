@@ -138,3 +138,4 @@ export const PROGRAM_TYPE_DATASET = 2;
 export const COMPRESS_LIMIT_SIZE = 2;
 export const MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS=76;
 export const INTERPOLATE_DATA_SOURCE_ID=4;
+export const ENCRYPTION_EXPORT_PASSWORD="dgwsgdjwgyo3kjledhqwuigdwui";

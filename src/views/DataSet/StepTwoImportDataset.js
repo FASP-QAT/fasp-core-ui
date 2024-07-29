@@ -77,7 +77,7 @@ export default class StepTwoImport extends Component {
                                 handleBlur,
                             }) => (
                                 <Form noValidate name='simpleForm1'>
-                                    <FormGroup id="programIdDiv" className="col-md-4">
+                                    <FormGroup id="programIdDiv" className="col-md-7">
                                         <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                         <Select
                                             bsSize="sm"
