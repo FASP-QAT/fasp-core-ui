@@ -454,6 +454,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if(tableJson.length > 0) {
             let programPlanningUnitListTemp = [];
             //itterate table 1 
+            let selectedSpProgramIdArr = [];
             let count = 1;//used this as for loop is working asynchronous
             for (var i = 0; i < tableJson.length; i++) {
                 console.log('for i: ',i);
@@ -463,6 +464,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 // console.log('map1: ',map1);
 
                 let programId = parseInt(map1.get("1"));
+                selectedSpProgramIdArr.push(programId);//to use in step2
                 let programCode = '';
                 try {
                     programCode = this.state.filteredSupplyPlanProgramList.filter(c => c.id == programId)[0].name;                    
@@ -569,7 +571,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     }
                 }
             }
-
+            //update selectedSpProgramIdArr in props
+            this.props.updateStepOneData("selectedSpProgramIdArr", selectedSpProgramIdArr);
         } 
         // else if (programId == 0) {
         //     this.setState({
@@ -1764,7 +1767,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             const countryId = this.state.datasetList.filter(c => c.programId == forecastProgramId)[0].realmCountry.realmCountryId;
             var supplyPlanProgramList = this.state.programs.filter(c => c.realmCountry.realmCountryId == countryId);
             console.log('supplyPlanProgramList count: '+supplyPlanProgramList.length);
-            console.log('supplyPlanProgramList [0]]: ',supplyPlanProgramList[0]);
+            console.log('supplyPlanProgramList: ',supplyPlanProgramList);
 
             for (var i = 0; i < supplyPlanProgramList.length; i++) {
                 var paJson = {
