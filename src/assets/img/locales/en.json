@@ -3288,5 +3288,8 @@
     "static.pipeline.pipelineConvertorLinux": "Linux.",
     "static.unit.conversionMethod": "Conversion Method",
     "static.alternateReportingUnit.multiply": "Multiply",
-    "static.alternateReportingUnit.divide": "Divide"
+    "static.alternateReportingUnit.divide": "Divide",
+    "static.tree.deleteScenario": "Delete Scenario",
+    "static.tree.showOnlyActive": "Show Only Active",
+    "static.tree.showInactive": "Show Inactive"
 }

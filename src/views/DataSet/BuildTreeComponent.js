@@ -578,6 +578,8 @@ export default class BuildTree extends Component {
             selectedScenario: '',
             selectedScenarioLabel: '',
             scenarioList: [],
+            // allScenarioList: [],
+            showOnlyActive: true,
             regionList: [],
             curTreeObj: {
                 forecastMethod: { id: "" },
@@ -3712,9 +3714,12 @@ export default class BuildTree extends Component {
      *                        - 1: Add new scenario
      *                        - 2: Edit existing scenario
      *                        - 3: Delete scenario
+     *                        - 4: Show and Hide Active/Inactive scenario
      */
     openScenarioModal(type) {
         var scenarioId = this.state.selectedScenario;
+        console.log("scenarioId", scenarioId)
+
         this.setState({
             scenarioActionType: type,
             showDiv1: false
@@ -3730,6 +3735,24 @@ export default class BuildTree extends Component {
                 } else {
                     alert("Please select scenario first.")
                 }
+            } else if (type == 4) {
+                if (scenarioId != "") {
+                    var scenario11 = this.state.scenarioList.filter(x => x.id == scenarioId)[0];
+                    if (!this.state.showOnlyActive && scenario11.active.toString() == "false") {
+                        this.setState({
+                            items: [],
+                            selectedScenario: "",
+                        })
+                    }
+                } else {
+                    this.setState({
+                        items: [],
+                        selectedScenario: "",
+                    })
+                }
+                this.setState({
+                    showOnlyActive: !this.state.showOnlyActive
+                })
             } else {
                 var scenario = {
                     label: {
@@ -6674,7 +6697,8 @@ export default class BuildTree extends Component {
             curTreeObj.tree.flatList = curTreeObj1;
             this.setState({
                 curTreeObj,
-                scenarioList: curTreeObj.scenarioList.filter(x => x.active == true),
+                scenarioList: curTreeObj.scenarioList,
+                // allScenarioList: curTreeObj.scenarioList,
                 regionValues
             }, () => {
                 if (curTreeObj.scenarioList.length == 1) {
@@ -7986,7 +8010,13 @@ export default class BuildTree extends Component {
         var scenarioId;
         var temNodeDataMap = [];
         var result = scenarioList.filter(x => x.label.label_en.trim() == scenario.label.label_en.trim());
-        if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3) {
+        var activeScenarios = scenarioList.filter(x => x.active.toString() == "true");
+        var activeScenarios1 = activeScenarios.length > 1 ? activeScenarios.filter(x => x.id == scenario.id) : [];
+        var isActive = (type == 2 && scenario.active.toString() == "false" && activeScenarios1.length == 0) ? 1 : 0;
+
+        if (isActive) {
+            alert("You must have at least one active scenario.");
+        } else if ((type == 1 && result.length == 0) || (type == 2 && ((result.length == 1 && scenario.id == result[0].id) || result.length == 0)) || type == 3 || type == 4) {
             if (type == 1) {
                 var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
                 var minScenarioId = Math.min(...scenarioList.map(o => o.id));
@@ -8026,6 +8056,10 @@ export default class BuildTree extends Component {
                 var findNodeIndex = scenarioList.findIndex(n => n.id == scenarioId);
                 if (type == 2) {
                     scenarioList[findNodeIndex] = this.state.scenario;
+                    if (this.state.showOnlyActive && scenario.active.toString() == "false") {
+                        items = [];
+                        scenarioId = '';
+                    }
                 } else if (type == 3) {
                     items = [];
                     scenarioId = '';
@@ -8039,7 +8073,8 @@ export default class BuildTree extends Component {
                 curTreeObj,
                 items,
                 selectedScenario: scenarioId,
-                scenarioList: scenarioList.filter(x => x.active == true),
+                // allScenarioList: scenarioList,
+                scenarioList: scenarioList,
                 openAddScenarioModal: false,
                 isScenarioChanged: true
             }, () => {
@@ -8233,6 +8268,9 @@ export default class BuildTree extends Component {
         }
         if (event.target.name === "scenarioDesc") {
             scenario.notes = event.target.value;
+        }
+        if (event.target.name === "active") {
+            scenario.active = event.target.id === "activeTrueScenario" ? true : false;
         }
         this.setState({
             idScenarioChanged: true,
@@ -11951,12 +11989,13 @@ export default class BuildTree extends Component {
                     </option>
                 )
             }, this);
-        const { scenarioList } = this.state;
+        var { scenarioList } = this.state;
+        scenarioList = this.state.showOnlyActive ? scenarioList.filter(x => x.active == true) : scenarioList
         let scenarios = scenarioList.length > 0
             && scenarioList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}{(item.active.toString() == "false" ? " (Inactive)" : "")}
                     </option>
                 )
             }, this);
@@ -12495,9 +12534,10 @@ export default class BuildTree extends Component {
                                                                                 <i class="fa fa-cog icons" data-bind="label" id="searchLabel" title=""></i>
                                                                             </DropdownToggle>
                                                                             <DropdownMenu right className="MarginLeftDropdown">
-                                                                                <DropdownItem onClick={() => { this.openScenarioModal(1) }}>Add Scenario</DropdownItem>
-                                                                                <DropdownItem onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</DropdownItem>
-                                                                                <DropdownItem onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</DropdownItem>
+                                                                                <DropdownItem onClick={() => { this.openScenarioModal(1) }}>{i18n.t('static.tree.addScenario')}</DropdownItem>
+                                                                                <DropdownItem onClick={() => { this.openScenarioModal(2) }}>{i18n.t("static.tree.editScenario")}</DropdownItem>
+                                                                                <DropdownItem onClick={() => { this.openScenarioModal(3) }}>{i18n.t("static.tree.deleteScenario")}</DropdownItem>
+                                                                                <DropdownItem onClick={() => { this.openScenarioModal(4) }}>{!this.state.showOnlyActive ? i18n.t("static.tree.showOnlyActive") : i18n.t("static.tree.showInactive")}</DropdownItem>
                                                                             </DropdownMenu>
                                                                         </ButtonDropdown>
                                                                     </InputGroupText>
@@ -12651,7 +12691,7 @@ export default class BuildTree extends Component {
                                                                         <Label
                                                                             className="form-check-label"
                                                                             check htmlFor="inline-radio2">
-                                                                            {i18n.t('static.common.disabled')}
+                                                                            {i18n.t('static.dataentry.inactive')}
                                                                         </Label>
                                                                     </FormGroup>
                                                                 </FormGroup>
@@ -13045,7 +13085,7 @@ export default class BuildTree extends Component {
                                 <Label
                                     className="form-check-label"
                                     check htmlFor="inline-radio2">
-                                    {i18n.t('static.common.disabled')}
+                                    {i18n.t('static.dataentry.inactive')}
                                 </Label>
                             </FormGroup>
                         </FormGroup>
@@ -13112,9 +13152,45 @@ export default class BuildTree extends Component {
                                                 value={this.state.scenario.notes}
                                             ></Input>
                                         </FormGroup>
+                                        {this.state.scenarioActionType == 2 && <FormGroup>
+                                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                            <FormGroup check inline>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="activeTrueScenario"
+                                                    name="active"
+                                                    value={true}
+                                                    checked={this.state.scenario.active === true}
+                                                    onChange={(e) => { this.scenarioChange(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio1">
+                                                    {i18n.t('static.common.active')}
+                                                </Label>
+                                            </FormGroup>
+                                            <FormGroup check inline>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="activeFalseScenario"
+                                                    name="active"
+                                                    value={false}
+                                                    checked={this.state.scenario.active === false}
+                                                    onChange={(e) => { this.scenarioChange(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2">
+                                                    {i18n.t('static.dataentry.inactive')}
+                                                </Label>
+                                            </FormGroup>
+                                        </FormGroup>
+                                        }
                                         <FormGroup className="col-md-6 pt-lg-4 float-right">
                                             <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={this.openScenarioModal}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                            <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                            <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i> {this.state.scenarioActionType == 1 ? i18n.t('static.common.submit') : i18n.t('static.common.update')}</Button>
                                         </FormGroup>
                                     </Form>
                                 )} />
