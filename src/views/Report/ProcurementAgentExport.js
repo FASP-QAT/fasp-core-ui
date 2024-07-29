@@ -293,7 +293,6 @@ class ProcurementAgentExport extends Component {
       )
         .then((response) => {
           var listArray = response.data;
-          console.log('procurementAgents[0]: ',listArray[0]);
           var listArrays = [];
           for (var i = 0; i < listArray.length; i++) {
             var arr = {
@@ -1029,7 +1028,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.fundingSource.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            ele.fundingSource.code.replaceAll(",", " ").replaceAll(" ", "%20"),
+            getLabelText(ele.fundingSourceType.label, this.state.lang).replaceAll(",", " ").replaceAll(" ", "%20"),
             ele.planningUnit.id,
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
@@ -1263,7 +1262,7 @@ class ProcurementAgentExport extends Component {
       });
       data = this.state.data.map((ele) => [
         getLabelText(ele.fundingSource.label, this.state.lang),
-        ele.fundingSource.code,
+        getLabelText(ele.fundingSourceType.label, this.state.lang),
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
         ele.qty.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
@@ -1352,7 +1351,6 @@ class ProcurementAgentExport extends Component {
     let shipmentCostArray = [];
     let count = 0;
     let viewby = this.state.viewby;
-    console.log('shipmentCosttList[0]: ',shipmentCosttList[0]);
     for (var j = 0; j < shipmentCosttList.length; j++) {
       data = [];
       data[0] =
@@ -1371,7 +1369,10 @@ class ProcurementAgentExport extends Component {
         viewby == 1
           ? shipmentCosttList[j].procurementAgent.code
           : viewby == 2
-            ? shipmentCosttList[j].fundingSource.code
+            ? getLabelText(
+              shipmentCosttList[j].fundingSourceType.label,
+              this.state.lang
+            )
             : {};
       data[2] = getLabelText(
         shipmentCosttList[j].planningUnit.label,
@@ -1405,7 +1406,7 @@ class ProcurementAgentExport extends Component {
         type: "text",
       };
       obj2 = {
-        title: i18n.t("static.fundingsource.fundingsourceCode"),
+        title: i18n.t("static.funderTypeHead.funderType"),
         type: "text",
       };
     } else {
@@ -2059,7 +2060,7 @@ class ProcurementAgentExport extends Component {
                       var simpleFSObject = {
                         id: fundingSource[0].fundingSourceId,
                         label: fundingSource[0].label,
-                        code: fundingSource[0].fundingSourceCode,
+                        code: fundingSource[0].fundingSourceCode,                        
                       };
                     }
                     let json = {
@@ -2069,6 +2070,7 @@ class ProcurementAgentExport extends Component {
                         fundingSource.length > 0
                           ? simpleFSObject
                           : planningUnitFilter[j].fundingSource,
+                      fundingSourceType: fundingSource[0].fundingSourceType,
                       planningUnit:
                         planningUnit.length > 0
                           ? planningUnit[0].planningUnit
@@ -2141,6 +2143,7 @@ class ProcurementAgentExport extends Component {
                       shipmentId: pupaFilterdata[0].shipmentId,
                       procurementAgent: pupaFilterdata[0].procurementAgent,
                       fundingSource: pupaFilterdata[0].fundingSource,
+                      fundingSourceType: pupaFilterdata[0].fundingSourceType,
                       planningUnit: pupaFilterdata[0].planningUnit,
                       qty: qty,
                       productCost: productCost,
@@ -3102,7 +3105,7 @@ class ProcurementAgentExport extends Component {
         text: i18n.t("static.budget.fundingsource"),
       };
       obj2 = {
-        text: i18n.t("static.fundingsource.fundingsourceCode"),
+        text: i18n.t("static.funderTypeHead.funderType"),
       };
     } else {
       obj1 = {
