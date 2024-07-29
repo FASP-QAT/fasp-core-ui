@@ -20,7 +20,8 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "q": Number(q),
         "n": Number(noOfProjectionMonths),
         "seasonality": seasonality,
-        "level": Number(confidenceLevel)
+        "level": Number(confidenceLevel),
+        "optimize": page == "bulkExtrapolation" ? props.state.optimizeTESAndARIMAExtrapolation : false
     }
     ExtrapolationService.arima(json)
         .then(response => {

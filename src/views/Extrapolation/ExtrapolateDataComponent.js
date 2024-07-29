@@ -309,6 +309,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             jsonDataLinearRegression: [],
             jsonDataTes: [],
             jsonDataArima: [],
+            message: "",
+            optimizeTESAndARIMAExtrapolation: false
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -2352,7 +2354,7 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     defaultSubmitForBulkExtrapolation(id) {
         var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
-        console.log("defaultSubmitForBulkExtrapolation==", id, "==", this.state.regionValues, "==", this.state.planningUnitValues)
+        this.setState({ optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false })
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -2382,7 +2384,6 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     ExtrapolatedParameters(regionList, listOfPlanningUnits) {
         var programData = this.state.datasetJson;
-        console.log("programData", programData)
         if (listOfPlanningUnits.length > 0) {
             this.setState({ loading: true })
             var datasetJson = programData;
@@ -2459,7 +2460,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                this.saveForecastConsumptionExtrapolation();
+                this.saveForecastConsumptionBulkExtrapolation();
             }
         })
     }
@@ -2481,7 +2482,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                this.saveForecastConsumptionExtrapolation();
+                this.saveForecastConsumptionBulkExtrapolation();
             }
         })
     }
@@ -2502,7 +2503,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                this.saveForecastConsumptionExtrapolation();
+                this.saveForecastConsumptionBulkExtrapolation();
             }
         })
     }
@@ -2523,7 +2524,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                this.saveForecastConsumptionExtrapolation();
+                this.saveForecastConsumptionBulkExtrapolation();
             }
         })
     }
@@ -2544,14 +2545,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                this.saveForecastConsumptionExtrapolation();
+                this.saveForecastConsumptionBulkExtrapolation();
             }
         })
     }
     /**
-     * Saves extrapolation data in indexed DB
+     * Saves extrapolation data in indexed DB for Bulk Extrapolation
      */
-    saveForecastConsumptionExtrapolation() {
+    saveForecastConsumptionBulkExtrapolation() {
         this.setState({
             loading: true
         })
@@ -2574,8 +2575,6 @@ export default class ExtrapolateDataComponent extends React.Component {
             extrapolationMethodRequest.onsuccess = function (event) {
                 var transaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetTransaction = transaction.objectStore('datasetData');
-                let forecastProgramVersionId = this.state.versionId;
-                let forecastProgramId = this.state.forecastProgramId;
                 var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
                 var datasetRequest = datasetTransaction.get(tempForecastProgramId);
                 datasetRequest.onerror = function (event) {
@@ -2592,12 +2591,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                     var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
                     for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                         for (var r = 0; r < regionList.length; r++) {
-                            console.log("consumptionExtrapolationList", consumptionExtrapolationList)
                             var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)));
                             var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                             var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
                             var id = a > b ? a : b;
-                            var planningUnitObj = this.state.planningUnitList.filter(c => c.id == listOfPlanningUnits[pu].value)[0];
+                            var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value)[0].planningUnit;
                             var regionObj = this.state.datasetJson.regionList.filter(c => c.regionId == regionList[r].value)[0];
                             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             var curUser = AuthenticationService.getLoggedInUserId();
@@ -2634,7 +2632,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 id += 1;
                             }
                             var data = [];
-                            var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            var jsonDataMovingFilter = this.state.jsonDataMovingAvg.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                             if (jsonDataMovingFilter.length > 0) {
                                 var jsonDataMoving = jsonDataMovingFilter[0].data;
                                 for (var i = 0; i < jsonDataMoving.length; i++) {
@@ -2663,7 +2661,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             }
                             id += 1;
                             var data = [];
-                            var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                             if (jsonDataLinearFilter.length > 0) {
                                 var jsonDataLinear = jsonDataLinearFilter[0].data;
                                 for (var i = 0; i < jsonDataLinear.length; i++) {
@@ -2692,7 +2690,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 id += 1;
                             }
                             var data = [];
-                            var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                             if (jsonDataTesFilter.length > 0) {
                                 var jsonDataTes = jsonDataTesFilter[0].data;
                                 for (var i = 0; i < jsonDataTes.length; i++) {
@@ -2725,7 +2723,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 id += 1;
                             }
                             var data = [];
-                            var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu] && c.regionId == regionList[r])
+                            var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                             if (jsonDataArimaFilter.length > 0) {
                                 var jsonDataArima = jsonDataArimaFilter[0].data;
                                 for (var i = 0; i < jsonDataArima.length; i++) {
@@ -2773,7 +2771,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                             isChanged1: false
                         })
                         // localStorage.setItem("sesDatasetId", this.props.items.datasetList[0].id);
-                        this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment/` + 'green/' + i18n.t('static.message.importSuccess'))
+                        // window.location.reload();
+                        // this.props.history.push(`/Extrapolation/extrapolateData/` + 'green/' + i18n.t('static.extrapolation.bulkExtrapolationSuccess'))
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
@@ -3923,7 +3922,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                     when={this.state.dataChanged}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
-                <h5 className={"green"} id="div1">{this.state.message}</h5>
+                {/* <h5 className={"green"} id="div1">{this.state.message}</h5> */}
+                <h5 className={this.state.messageColor} id="div1">{this.state.message}</h5>
+                <h5 className={this.props.match.params.color} id="div2">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+
                 <Card>
                     <div className="card-header-actions">
                         <div className="Card-header-reporticon">
@@ -4891,7 +4893,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
                                             </div>
                                         }
-                                        {this.state.bulkExtrapolation && this.state.missingTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
+                                        {(this.state.bulkExtrapolation || this.state.missingTESAndARIMA) && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
                                                 <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
                                             </div>

@@ -19,7 +19,8 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         "beta": Number(betaParam),
         "gamma": Number(gammaParam),
         "n": Number(noOfProjectionMonths),
-        "level": Number(confidenceLevel)
+        "level": Number(confidenceLevel),
+        "optimize": page == "bulkExtrapolation" ? props.state.optimizeTESAndARIMAExtrapolation : false
     }
     ExtrapolationService.tes(json)
         .then(response => {
