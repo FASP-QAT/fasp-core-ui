@@ -3834,7 +3834,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(39, y, true) != elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
+                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" 
+                    // && elInstance.getValueFromCoords(39, y, true) != elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
+                    ) {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17"));
@@ -4075,12 +4077,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             }
         }
         if (negativeBudget > 0 && valid == true) {
-            var message = "";
-            for (var i = 0; i < budgetJson.length; i++) {
-                message = message.concat(i18n.t("static.shipment.budgetWarning1")).concat(" ").concat(getLabelText(budgetJson[i].budget.label, this.state.lang)).concat(" (").concat(budgetJson[i].budget.name).concat(i18n.t("static.shipment.budgetWarning2")).concat(formatter(budgetJson[i].amount, 0)).concat(" ").concat(i18n.t("static.shipment.budgetWarning3")).concat("\n");
-            }
-            message = message.concat(i18n.t("static.shipment.budgetWarning4"));
-            var cf = window.confirm(message);
+            var cf = window.confirm(i18n.t("static.shipmentDetails.warningBudget"));
             if (cf == true) {
                 return valid;
             } else {
