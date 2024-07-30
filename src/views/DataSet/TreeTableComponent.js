@@ -778,6 +778,11 @@ export default class TreeTable extends Component {
         this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
         this.buildTab1Jexcel = this.buildTab1Jexcel.bind(this);
         this.buildTab2Jexcel = this.buildTab2Jexcel.bind(this);
+        this.updateTab1Data = this.updateTab1Data.bind(this);
+        this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
+        this.updateState = this.updateState.bind(this);
+        this.saveTreeData = this.saveTreeData.bind(this);
+        this.onChangeTab1Data = this.onChangeTab1Data.bind(this);
     }
     /**
      * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
@@ -1310,6 +1315,260 @@ export default class TreeTable extends Component {
         }.bind(this);
     }
     /**
+     * Updates a specific parameter in the component state and triggers additional actions based on the updated parameter.
+     * @param {string} parameterName - The name of the parameter to be updated.
+     * @param {*} value - The new value of the parameter.
+     */
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        }, () => {
+            var items = this.state.items;
+            if (parameterName == 'currentItemConfig') {
+                if (value.context.id == "" || value.context.id == null) {
+                    this.onAddButtonClick(this.state.currentItemConfig, false, null);
+                } else {
+                    var findNodeIndex = items.findIndex(n => n.id == value.context.id);
+                    items[findNodeIndex] = value.context;
+                    this.setState({ items }, () => {
+                        this.saveTreeData(true, false);
+                    })
+                }
+            }
+            if (parameterName == 'nodeId' && (value != null && value != 0)) {
+                var nodeDataMomList = this.state.nodeDataMomList;
+                if (nodeDataMomList.length > 0) {
+                    for (let i = 0; i < nodeDataMomList.length; i++) {
+                        var nodeId = nodeDataMomList[i].nodeId;
+                        var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                        var node = items.filter(n => n.id == nodeId)[0];
+                        (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
+                        var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                        items[findNodeIndex] = node;
+                    }
+                }
+                this.setState({ items })
+            }
+            if (parameterName == 'type' && (value == 0 || value == 1) && (!this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].hasOwnProperty("extrapolation") || this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true")) {
+                // if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                //     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                //         if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                //             this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                //         }
+                //         if (value == 1 || (value == 0 && this.state.showMomData)) {
+                //             this.buildMomJexcel();
+                //         }
+                //     });
+                // } else {
+                //     this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                //         if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                //             this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                //         }
+                //         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
+                //             this.buildMomJexcelPercent();
+                //         }
+                //     });
+                // }
+            }
+            if (parameterName == "nodeDataMomList") {
+                this.saveTreeData(false, false);
+            }
+        })
+    }
+    /**
+     * Function to update the node info in json
+     * @param {*} currentItemConfig The item configuration object that needs to be updated
+     */
+    updateNodeInfoInJson(currentItemConfig) {
+        var nodes = this.state.items;
+        if (currentItemConfig.context.level == 0 && currentItemConfig.context.newTree) {
+            currentItemConfig.context.newTree = false;
+        }
+        if (currentItemConfig.context.payload.nodeType.id == 4) {
+            var tracerCategoryId = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id;
+            if (tracerCategoryId == "" || tracerCategoryId == undefined || tracerCategoryId == null) {
+                var fu = this.state.forecastingUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id);
+                if (fu.length > 0) {
+                    (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = fu[0].tracerCategory.id;
+                }
+            }
+        }
+        if (this.state.deleteChildNodes) {
+            var childNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+            childNodes.map(item => {
+                nodes = nodes.filter(c => !c.sortOrder.startsWith(item.sortOrder))
+            })
+        }
+        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+        nodes[findNodeIndex] = currentItemConfig.context;
+        if (currentItemConfig.context.payload.nodeType.id == 4) {
+            var puNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+            for (var puN = 0; puN < puNodes.length; puN++) {
+                var refillMonths = "";
+                var puPerVisit = "";
+                if (puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode != null) {
+                    var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
+                    var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
+                    var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
+                    if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                        var refillMonths = 1;
+                        puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
+                        puNode.refillMonths = refillMonths;
+                        puNode.puPerVisit = puPerVisit;
+                    } else {
+                        puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
+                        puNode.puPerVisit = puPerVisit;
+                    }
+                    nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
+                }
+            }
+        }
+        const { curTreeObj } = this.state;
+        var treeLevelList = curTreeObj.levelList;
+        if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
+            var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
+            if (levelListFiltered != -1) {
+                var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
+                var label = {}
+                if (unitId != "" && unitId != null) {
+                    label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+                }
+                treeLevelList[levelListFiltered].unit = {
+                    id: unitId != "" && unitId != null ? parseInt(unitId) : null,
+                    label: label
+                }
+            }
+            curTreeObj.levelList = treeLevelList;
+        }
+        this.setState({
+            items: nodes,
+            isSubmitClicked: false,
+            curTreeObj
+        }, () => {
+            this.calculateMOMData(currentItemConfig.context.id, 0);
+        });
+    }
+    /**
+     * Saves the updated tree data to the database.
+     * @param {boolean} flag - Flag indicating whether to perform additional actions after saving the tree data.
+     * @param {boolean} collapseFlag - Flag indicating whether to collapse the component while saving the tree data.
+     */
+    saveTreeData(flag, collapseFlag) {
+        this.setState({ loading: collapseFlag ? false : true }, () => {
+            var curTreeObj = this.state.curTreeObj;
+            curTreeObj.generateMom = 0;
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            var items = this.state.items;
+            for (let i = 0; i < items.length; i++) {
+                var item = items[i];
+                if (item.payload.nodeType.id == 4 || item.payload.nodeType.id == 5) {
+                    item.isVisible = true;
+                }
+            }
+            let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
+            var programData = tempProgram.programData;
+            programData.treeList = treeData;
+            curTreeObj.scenarioList = this.state.scenarioList;
+            if (items.length > 0) {
+                curTreeObj.tree.flatList = items;
+            }
+            curTreeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+            if (curTreeObj.lastModifiedBy != undefined) {
+                curTreeObj.lastModifiedBy.userId = AuthenticationService.getLoggedInUserId();
+                curTreeObj.lastModifiedBy.username = AuthenticationService.getLoggedInUsername();
+            } else {
+                curTreeObj.lastModifiedBy = {
+                    "userId": AuthenticationService.getLoggedInUserId(),
+                    "username": AuthenticationService.getLoggedInUsername()
+                }
+            }
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+            programData.treeList = treeData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            tempProgram.programData = programData;
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideSecondComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                var programRequest = programTransaction.put(tempProgram);
+                transaction.oncomplete = function (event) {
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.programId);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        programQPLDetailsRequest1.onsuccess = function (event) {
+                            this.setState({
+                                loading: false,
+                                message: i18n.t("static.mt.dataUpdateSuccess"),
+                                color: "green",
+                                isChanged: false,
+                                isTreeDataChanged: false,
+                                isScenarioChanged: false
+                            }, () => {
+                                for (let i = 0; i < items.length; i++) {
+                                    var item = items[i];
+                                    if (this.state.hideFUPUNode) {
+                                        if (item.payload.nodeType.id == 4 || item.payload.nodeType.id == 5) {
+                                            item.isVisible = false;
+                                        }
+                                    } else if (this.state.hidePUNode && item.payload.nodeType.id == 5) {
+                                        item.isVisible = false;
+                                    }
+                                }
+                                this.handleAMonthDissmis3(this.state.singleValue2, 0);
+                                this.hideSecondComponent();
+                                if (flag) {
+                                    this.calculateMOMData(0, 2);
+                                }
+                            });
+                        }.bind(this)
+                        programQPLDetailsRequest1.onerror = function (event) {
+                            this.setState({
+                                loading: false,
+                                message: 'Error occured.',
+                                color: "red",
+                            });
+                        }.bind(this)
+                    }.bind(this);
+                    datasetDetailsRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false,
+                            message: 'Error occured.',
+                            color: "red",
+                        }, () => {
+                            this.hideSecondComponent();
+                        });
+                    }.bind(this)
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                }.bind(this);
+            }.bind(this);
+        });
+    }
+    /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
      * @param {*} cell This is the object of the DOM element
@@ -1364,6 +1623,9 @@ export default class TreeTable extends Component {
             }
         }
     }
+    onChangeTab1Data = function (instance, cell, x, y, value) {
+        this.el.setValueFromCoords(12, y, 1, true);
+    }
     buildTab1Jexcel() {
         var treeArray = [];
         var count = 0;
@@ -1393,6 +1655,7 @@ export default class TreeTable extends Component {
             data[9] = currentScenario.notes;
             data[10] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
             data[11] = items[i].id;
+            data[12] = "";
 
             treeArray[count] = data;
             count++;
@@ -1459,6 +1722,10 @@ export default class TreeTable extends Component {
                     {
                         title: 'Node Id',
                         type: 'hidden',
+                    },
+                    {
+                        title: 'Is Changed',
+                        type: 'hidden',
                     }
                 ],
                 editable: true,
@@ -1478,7 +1745,7 @@ export default class TreeTable extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 onload: this.loadedTab1,
-                // onchange:
+                onchange: this.onChangeTab1Data,
                 // onchangepage:
                 contextMenu: function (obj, x, y, e) {
                     var items = [];
@@ -1511,6 +1778,93 @@ export default class TreeTable extends Component {
             this.el = jexcel(document.getElementById("tableDiv"), '');
             jexcel.destroy(document.getElementById("tableDiv"), true);
         }
+    }
+    updateTab1Data() {
+        this.setState({
+            // momJexcelLoader: true
+        }, () => {
+            setTimeout(() => {
+                var json = this.state.treeTabl1El.getJson(null, false);
+                var items = this.state.items;
+                for(var i = 0; i < json.length; i++){
+                    if(json[i][12] == 1){
+                    let curItem = {
+                        context: ''
+                    };
+                    curItem.context = items.filter(c => c.id == json[i][11])[0];
+                    curItem.context.payload.label.label_en = json[i][3];
+                    curItem.context.payload.nodeUnit.id = json[i][4];
+                    // var nodeUnit = document.getElementById("nodeUnitId");
+                    // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
+                    // var label = {
+                    //     label_en: selectedText,
+                    //     label_fr: '',
+                    //     label_sp: '',
+                    //     label_pr: ''
+                    // }
+                    // curItem.context.payload.nodeUnit.label = label;
+                    if(json[i][10] == 3){
+                        var value = json[i][6];
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
+                        this.state.currentScenario.dataValue = value;
+                        this.calculateParentValueFromMOM((curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
+                    }
+                    if(json[i][10] == 2){
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                    }
+                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][9];
+                    this.getNotes();
+                    this.setState({
+                        currentItemConfig: curItem
+                    }, () => {
+                        this.updateNodeInfoInJson(curItem)
+                    })
+                    }
+                }
+                
+                // var save = false;
+                // if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
+                //     var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
+                //     if (cf == true) {
+                //         save = true;
+                //         this.setState({
+                //             deleteChildNodes: true
+                //         })
+                //     } else {
+                //     }
+                // } else {
+                //     save = true;
+                //     this.setState({
+                //         deleteChildNodes: false
+                //     })
+                // }
+                // if (save) {
+                //     this.formSubmitLoader();
+                //     if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
+                //         if (!this.state.isSubmitClicked) {
+                //             this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                //                 setTimeout(() => {
+                //                     if (this.state.addNodeFlag) {
+                //                         this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                //                     } else {
+                //                         this.updateNodeInfoInJson(this.state.currentItemConfig)
+                //                     }
+                //                     this.setState({
+                //                         cursorItem: 0,
+                //                         highlightItem: 0,
+                //                         activeTab1: new Array(1).fill('1')
+                //                     })
+                //                 }, 0);
+                //             })
+                //             this.setState({ modelingTabChanged: false })
+                //         }
+                //     } else {
+                //         this.setState({ activeTab1: new Array(1).fill('2') })
+                //     }
+                // }
+            }, 0)
+        })
     }
     buildTab2Jexcel() {
         var treeArray = [];
@@ -3301,11 +3655,19 @@ export default class TreeTable extends Component {
         return (
             <>
                 <TabPane tabId="1">
-                    <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                    </div>
+                    <div className="col-md-12 pr-lg-0">
+                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                            this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
+                        }}>
+                            <i className="fa fa-times"></i> {'Close'}</Button>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>
                 </TabPane>
                 <TabPane tabId="2">
-                    <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
                 </TabPane >
             </>
