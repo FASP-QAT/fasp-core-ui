@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { API_URL } from '../Constants.js';
 class ForecastingUnitService {
@@ -39,6 +40,14 @@ class ForecastingUnitService {
     }
     getForecastingUnitByIds(json) {
         return axios.post(`${API_URL}/api/forecastingUnit/byIds`, json, {}
+        );
+    }
+    getForecastingUnitListByProductCategoryAndTracerCategory(json){
+        return axios.post(`${API_URL}/api/forecastingUnit/tracerCategory/productCategory`, json, {}
+        );
+    }
+    getForcastingUnitByIdWithPrograms(forecastingUnitId) {
+        return axios.get(`${API_URL}/api/forecastingUnit/${forecastingUnitId}/withPrograms`, {}
         );
     }
 }

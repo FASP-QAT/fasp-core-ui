@@ -38,7 +38,7 @@ const validationSchema = function (values) {
         organisationCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.common.displayName'))
-            .max(4, i18n.t('static.organisation.organisationcodemax4digittext')),
+            .max(10, i18n.t('static.organisation.organisationcodemax10digittext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         organisationTypeId: Yup.string()
@@ -627,7 +627,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2">
-                                                            {i18n.t('static.common.disabled')}
+                                                            {i18n.t('static.dataentry.inactive')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>

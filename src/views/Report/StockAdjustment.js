@@ -770,7 +770,7 @@ class StockAdjustmentComponent extends Component {
                                             program: programJson,
                                             inventoryDate: ele.inventoryDate,
                                             planningUnit: planningUnit.length > 0 ? planningUnit[0].planningUnit : ele.planningUnit,
-                                            stockAdjustemntQty: ele.adjustmentQty,
+                                            stockAdjustemntQty: Math.round(Number(ele.adjustmentQty)*Number(ele.multiplier)),
                                             lastModifiedBy: generalProgramJson.currentVersion.lastModifiedBy,
                                             lastModifiedDate: generalProgramJson.currentVersion.lastModifiedDate,
                                             notes: ele.notes,

@@ -49,7 +49,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*G${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*Q${parseInt(data[i].y) + 1},0)`, true);
                 var index = (instance).getValue(`M${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(11, data[i].y, "", true);
@@ -157,7 +157,9 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             id: rcpuResult[k].realmCountryPlanningUnitId,
                             multiplier: rcpuResult[k].multiplier,
                             active: rcpuResult[k].active,
-                            label: rcpuResult[k].label
+                            label: rcpuResult[k].label,
+                            conversionNumber:rcpuResult[k].conversionNumber,
+                            conversionMethod:rcpuResult[k].conversionMethod,
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -243,6 +245,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     var regionList = (this.props.items.regionList);
                     consumptionList = consumptionList.sort(function (a, b) { return ((new Date(a.consumptionDate) - new Date(b.consumptionDate)) || (a.region.id - b.region.id) || (a.realmCountryPlanningUnit.id - b.realmCountryPlanningUnit.id)) })
                     for (var j = 0; j < consumptionList.length; j++) {
+                        var rcpuForTable=realmCountryPlanningUnitList.filter(c=>c.id==consumptionList[j].realmCountryPlanningUnit.id);
                         data = [];
                         var consumptionFlag = 1;
                         if (consumptionList[j].actualFlag == false) {
@@ -254,8 +257,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[3] = consumptionList[j].dataSource.id; 
                         data[4] = consumptionList[j].realmCountryPlanningUnit.id; 
                         data[5] = Math.round(consumptionList[j].consumptionRcpuQty); 
-                        data[6] = consumptionList[j].multiplier; 
-                        data[7] = `=ROUND(F${parseInt(j) + 1}*G${parseInt(j) + 1},0)`; 
+                        data[6] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                        data[7] = `=ROUND(F${parseInt(j) + 1}*Q${parseInt(j) + 1},0)`; 
                         data[8] = consumptionList[j].dayOfStockOut;
                         if (consumptionList[j].notes === null || ((consumptionList[j].notes) == "NULL")) {
                             data[9] = "";
@@ -274,6 +277,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[13] = 0;
                         data[14] = 0;
                         data[15] = consumptionList[j].consumptionId;
+                        data[16] = consumptionList[j].multiplier; 
                         consumptionDataArr[j] = data;
                     }
                     if (consumptionList.length == 0 && consumptionEditable) {
@@ -289,8 +293,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[3] = ""; 
                         data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
                         data[5] = ""; 
-                        data[6] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; 
-                        data[7] = `=ROUND(F${parseInt(0) + 1}*G${parseInt(0) + 1},0)`; 
+                        data[6] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
+                        data[7] = `=ROUND(F${parseInt(0) + 1}*Q${parseInt(0) + 1},0)`; 
                         data[8] = "";
                         data[9] = "";
                         data[10] = true;
@@ -299,6 +303,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[13] = 1;
                         data[14] = 0;
                         data[15] = 0;
+                        data[16] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
                         consumptionDataArr[0] = data;
                     }
                     var options = {
@@ -311,7 +316,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             { title: i18n.t('static.inventory.dataSource'), type: 'autocomplete', source: dataSourceList, width: 120, filter: this.filterDataSourceBasedOnConsumptionType },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                             { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 90, readOnly: true },
                             { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
                             { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
@@ -329,7 +334,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 width: 0, readOnly: true, autoCasting: false
                             },
                             { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
-                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false }
+                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
+                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                         ],
                         pagination: paginationOption,
                         onformulachain: this.formulaChanged,
@@ -688,8 +694,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[3] = ""; 
         data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
         data[5] = ""; 
-        data[6] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; 
-        data[7] = `=ROUND(F${parseInt(json.length) + 1}*G${parseInt(json.length) + 1},0)`; 
+        data[6] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
+        data[7] = `=ROUND(F${parseInt(json.length) + 1}*Q${parseInt(json.length) + 1},0)`; 
         data[8] = "";
         data[9] = "";
         data[10] = true;
@@ -698,6 +704,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[13] = 1;
         data[14] = 0;
         data[15] = 0;
+        data[16] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
         obj.insertRow(data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -741,6 +748,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.dataentry.conversionFactorTooltip')
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength;
@@ -1115,10 +1124,12 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         if (x == 4) {
             elInstance.setValueFromCoords(6, y, "", true);
+            elInstance.setValueFromCoords(16, y, "", true);
             var valid = checkValidtion("text", "E", y, rowData[4], elInstance);
             if (valid == true) {
-                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[4].toString().split(";")[0])[0]).multiplier;
-                elInstance.setValueFromCoords(6, y, multiplier, true);
+                var rcpuForTable = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[4].toString().split(";")[0])[0]);
+                elInstance.setValueFromCoords(6, y, (rcpuForTable.conversionMethod==1?"*":"/")+rcpuForTable.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                elInstance.setValueFromCoords(16, y, rcpuForTable.multiplier, true);
             }
         }
         if (x == 5) {
@@ -1648,7 +1659,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             consumptionDataList[parseInt(map.get("12"))].dataSource.label = dataSourceLabel;
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.id = map.get("4");
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label;
-                            consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("6");
+                            consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("16");
                             consumptionDataList[parseInt(map.get("12"))].consumptionRcpuQty = (elInstance.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("12"))].consumptionQty = (elInstance.getValue(`H${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("12"))].dayOfStockOut = (elInstance.getValue(`I${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
@@ -1688,7 +1699,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     id: map.get("4"),
                                     label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label
                                 },
-                                multiplier: map.get("6"),
+                                multiplier: map.get("16"),
                                 planningUnit: {
                                     id: planningUnitId,
                                     label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == planningUnitId)[0]).planningUnit.label
