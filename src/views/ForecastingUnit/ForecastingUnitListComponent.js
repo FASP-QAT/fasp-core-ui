@@ -122,7 +122,7 @@ export default class ForecastingUnitListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -451,7 +451,21 @@ export default class ForecastingUnitListComponent extends Component {
     toggleExport() {
         this.setState({
             exportModal: !this.state.exportModal,
+            productCategoryIdExport:document.getElementById("productCategoryId").value,
+            tracerCategoryIdExport:document.getElementById("tracerCategoryId").value
+        },()=>{
         })
+    }
+    dataChange(e){
+        if(e.target.name=="productCategoryIdExport"){
+            this.setState({
+                "productCategoryIdExport":e.target.value
+            })
+        }else if(e.target.name=="tracerCategoryIdExport"){
+            this.setState({
+                "tracerCategoryIdExport":e.target.value
+            })
+        }
     }
     /**
      * This function is used to get forecasting unit list and export that list into csv file
@@ -718,7 +732,8 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="productCategoryIdExport"
                                                 id="productCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.productCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {/* <option value="">{i18n.t('static.common.select')}</option> */}
                                                 {productCategoryList}
@@ -735,7 +750,8 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="tracerCategoryIdExport"
                                                 id="tracerCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.tracerCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {/* <option value="">{i18n.t('static.common.select')}</option> */}
                                                 <option value="">{i18n.t('static.common.all')}</option>
