@@ -810,6 +810,25 @@ body {
     color: #e4e5e6 !important;
     background: transparent !important;
   }
+}
+.Select.is-searchable.is-focused.is-open > .Select-control{
+  background: #000!important;
+}
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 1rem;
+  color: #e4e5e6;
+  background: #23282c;
+  border-top: 1px solid #2a303d;
+}
+.footerlink {
+  color: #e4e5e6;
+}
+.card {
+  background-color: #212631;
+  border: 1px solid #323a49;
 
   .table td span {
     padding: 0.75rem;
@@ -1045,6 +1064,144 @@ body {
 ::placeholder {
   color: #7a7e7a !important;
 }
+.btn-transparent {
+  color: #e4e5e6 !important;
+  background-color: transparent;
+}
+.dropdown-menu{
+  background-color: #212631;
+  border: 1px solid #2a303d;
+}
+.dropdown-item {
+  color: #e4e5e6;
+  font-size: 13px;
+  border-bottom: 1px solid #2a303d;
+}
+.dropdown-header {
+  padding: 8px 20px;
+  background: #212721;
+  border-bottom: 1px solid #2a303d;
+  color: #e4e5e6;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+  color: #e4e5e6;
+  text-decoration: none;
+  background-color: #212721;
+}
+.react-confirm-alert-body {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 400px;
+  padding: 30px;
+  text-align: left;
+  background: #2a303d;
+  border-radius: 10px;
+  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+  color: #e4e5e6!important;
+}
+.TextTittle {
+  color: #e4e5e6 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.TextTittle {
+  color: #e4e5e6 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.TextCont p {
+  font-size: 16px;
+  font-weight: 500;
+  color: #e4e5e6;
+}
+.carousel-indicators li {
+  background-color: #e4e5e6 !important;
+}
+.text-count {
+  font-size: 16px;
+  font-weight: 500;
+  color: #e4e5e6;
+}
+.ProblemListTableBorder .jss > thead > tr > td {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a !important;
+}
+.ProblemListDashboardBorder .table-borderedproblemListDashboar th, .table-borderedproblemListDashboar td {
+  border-right: 1px solid #4d515a !important;
+  border-bottom: 1px solid #4d515a !important;
+}
+.ProblemListDashboardBorder .table-borderedproblemListDashboar {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a;
+  border-collapse: inherit !important;
+  text-indent: initial !important;
+  border-spacing: 0px !important;
+}
+.ProblemListTableBorder .jss > tbody > tr > td {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid #4d515a !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
+.jss > thead > tr > td {
+  background-color: #212631 !important;
+  color: #e4e5e6 !important;
+  font-weight: bold;
+  font-style: normal !important;
+}
+.jss>thead>tr>td {
+  border-top: 1px solid #4d515a;
+  border-left: 1px solid #4d515a;
+  border-right: 1px solid #4d515a;
+  border-bottom: 1px solid transparent;
+  background-color: #f3f3f3;
+  padding: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-repeat: no-repeat;
+  background-position: center right 0;
+  line-height: 1em;
+  text-align: center;
+}
+.jss {
+  border-collapse: separate;
+  table-layout: fixed;
+  white-space: nowrap;
+  empty-cells: show;
+  border: 0;
+  background-color: transparent;
+  width: 0;
+  outline: 0;
+  border-top: 0;
+  border-left: 1px solid #4d515a;
+  border-right: 1px solid #4d515a;
+  border-bottom: 1px solid #4d515a;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}
+.jss_search {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  width: 130px;
+  background-color: #212631;
+  background-clip: padding-box;
+  border: 1px solid #2a303d;
+  color: #e4e5e6;
+}
 
 select>.Select-control .Select-value,
 .Select-placeholder {
@@ -1096,6 +1253,19 @@ select>.Select-control .Select-value,
   position: relative;
   display: inline-block;
   background: #fff;
+}
+.jss>tbody>tr>td {
+  border-top: 1px solid #4d515a!important;
+  border-left: 1px solid #4d515a!important;
+  border-right: 1px solid #4d515a!important;
+  border-bottom: 1px solid transparent;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  min-height: 23px;
+  text-align: center;
+  white-space: pre;
+  // color: #000;
 }
 
 label.tree_label {
@@ -1410,6 +1580,10 @@ label.arrow_label:after {
   font-size: 15px;
   position: absolute;
   margin-left: 3px;
+  }
+.table-bordered th, .table-bordered td {
+  border: 1px solid #4d515a;
+  // color: #e4e5e6;
 }
 
 .page-link {
@@ -1739,6 +1913,16 @@ label.arrow_label:after {
 }
 
 .updateTextwhitebtn .btn-info {
+.countZero {
+  background-color: #d9d9d9; /* Gray background */
+  color: #000; /* White text */
+}
+
+// .darkModeclrblack{
+//   color: #000;
+// }
+
+.formulastext {
   color: #fff !important;
 }
 
@@ -1764,6 +1948,9 @@ label.arrow_label:after {
 
 .jexcel>tbody>tr>td.readonly.shipmentEntryEmergency {
   color: #BA0C2F !important;
+  }
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #373c46;
 }
 
 .jss>tbody>tr>td.readonly.shipmentEntryEmergency {
@@ -1883,11 +2070,105 @@ label.arrow_label:after {
 .shipmentEmergencyAccount {
   color: #BA0C2F !important;
   background-color: #FFF !important;
+  }
+.table .table-borderedproblemListDashboar tr td:first-child{
+  color:#e4e5e6;
+}
+.showdatabtn {
+  margin-top: 10px;
+}
+.fixTableHead1 {
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: auto;
+  border-top: 1px solid #4d515a;
+}
+.infoIconStockStatus::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+  position: relative;
+  width: 3px;
+  height: 100%;
+  top: 0px;
+  left: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #e4e5e6;
+}
+.chart-graph-report {
+  height: 400px;
+  margin-bottom: 15px;
+}
+#hideLegendDiv{
+  color: #e4e5e6;
+}
+.Firstcolum {
+  width: 120px;
+  left: 0;
+  z-index: 2;
+  /* width: 100px; */
+  /* min-width: 100px; */
+  /* max-width: 100px; */
+}
+.sticky-col {
+  position: sticky;
+  position: -webkit-sticky;
+}
+.Secondcolum {
+  width: 150px;
+  left: 51px;
+  z-index: 3;
+  min-width: 150px;
+  max-width: 150px;
+}
+.Thirdcolum {
+  left: 200px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+.fourthcolum {
+  left: 399px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+// .Select-menu-outer{
+//   background-color: #000!important;
+//   color: #e4e5e6; 
+// }
+// .hoverTd {
+//   background-color: #e5e5e5;
+//   color: #000 !important;
+//   cursor: pointer;
+// }
+// .TableColorL td{
+//   color: #000;
+// }
 }
 
 .shipmentNotEmergencyNotAccount {
   color: #000 !important;
   background-color: #D3D3D3 !important;
+  }
+.countZero {
+  background-color: #d9d9d9; /* Gray background */
+  color: #000; /* White text */
+}
+
+::placeholder {
+  color: #7a7e7a !important;
 }
 
 .shipmentNotEmergencyAccount {
@@ -2005,6 +2286,14 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-menu {
   text-align: center !important;
 }
+.tree_custom {
+  display: block;
+  background: #eee;
+  padding: 1em;
+  border-radius: 0.3em;
+}                                  m,
+// }
+// }
 
 .react-bs-table-sizePerPage-dropdown .dropdown-item:hover {
   background-color: #ef6e12e8;
@@ -11427,6 +11716,17 @@ legend.scheduler-border {
   height: 100%;
   left: -1px;
   top: -1px;
+  left: 399px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  // position: -webkit-sticky;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px;*/
 }
 
 .smTemplate .smTitle {

@@ -105,10 +105,12 @@ export default class ProblemListDashboardComponent extends React.Component {
                                     <td><b>{c.name}</b></td>
                                     {this.state.problemCategoryListFiltered.map(pc => {
                                         var count = this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory.id == pc.id)[0].count;
-                                        return (<td className='darkModeclrblack' style={{ backgroundColor: count == 0 ? '#d9d9d9' : "" }}>{count}</td>)
+                                        return (
+                                        <td className={count == 0 ? 'countZero' : ''}>{count}
+                                        </td>)
                                     })
                                     }
-                                    <td style={{ backgroundColor: (this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count) == 0 ? '#d9d9d9' : "" }}><b>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count}</b></td>
+                                    <td style={{ backgroundColor: (this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count) == 0 ? 'countZero' : "" }}><b>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count}</b></td>
                                 </tr>
                             ))
                         }
