@@ -10,7 +10,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 /**
@@ -27,6 +27,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             selSource2: [],
             isChanged1: false,
             selectedSupplyPlanPrograms: [],
+            forecastPgmRegionListDD: []
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -55,6 +56,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
      */
     formSubmit = function () {
         var validation = this.checkValidation();
+        console.log('onSubmit. validation: ',validation);
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
@@ -86,6 +88,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
+            var value = this.el.getValueFromCoords(4, y);//for sp program dropdown
+            if(value == 1){
+                continue;
+            }
+
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
@@ -105,6 +112,29 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
+
+            var col = ("C").concat(parseInt(y) + 1);
+            // var value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString();
+            var value = this.el.getValueFromCoords(2, y);
+            console.log('cv value: ',value);
+            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            if (value == "") {
+                console.log('inside if: ');
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else if(isNaN(parseInt(value)) || !(reg.test(value))) {
+                console.log('inside else if: ');
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+                valid = false;
+            } else {
+                console.log('inside else. valid: ');
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
         }
         return valid;
     }
@@ -118,6 +148,25 @@ export default class StepTwoImportMapPlanningUnits extends Component {
      */
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
+        if(x == 2) {//% of SP
+            var col = ("C").concat(parseInt(y) + 1);
+            // var value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString();
+            var value = this.el.getValueFromCoords(2, y);
+            var reg = JEXCEL_DECIMAL_NO_REGEX;
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else if(isNaN(parseInt(value)) || !(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
         if (x == 3) {
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("D").concat(parseInt(y) + 1);
@@ -126,14 +175,16 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (!(budgetRegx.test(value))) {
+                /*if (!(budgetRegx.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.spacetext'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                }
+                }*/
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
     }
@@ -161,12 +212,28 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         
         let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
         console.log('selectedForecastProgramObj step 2: ',selectedForecastProgramObj);
+        let forecastProgramRegionList = selectedForecastProgramObj.regionList;
+        //create regionList for dropdown
+        let forecastPgmRegionListDD = [];
+        for (var i = 0; i < forecastProgramRegionList.length; i++) {
+            var paJson = {
+                name: getLabelText(forecastProgramRegionList[i].label, this.state.lang),
+                id: parseInt(forecastProgramRegionList[i].regionId),
+            }
+            forecastPgmRegionListDD[i] = paJson;
+        }
+        forecastPgmRegionListDD.unshift({
+            name: i18n.t('static.quantimed.doNotImport'),
+            id: -1            
+        });
+
         this.setState({
             // programRegionList: selectedProgramObj.regionList, //currently not in use
-            forecastProgramRegionList: selectedForecastProgramObj.regionList,
+            forecastProgramRegionList: forecastProgramRegionList,
             // selSource: selectedProgramObj.regionList,
             selectedSupplyPlanPrograms: selectedPrograms,
-            selectedForecastProgram: selectedForecastProgramObj
+            selectedForecastProgram: selectedForecastProgramObj,
+            forecastPgmRegionListDD: forecastPgmRegionListDD
         },
             () => {
                 this.buildJexcel();
@@ -201,10 +268,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     data[2] = '';
                     let match = this.state.forecastProgramRegionList.filter(c => c.regionId == regionList[k].regionId);
                     if (match.length > 0) {                        
-                        data[3] = 1
+                        data[3] = match[0].regionId;
                     } else {
                         // data[2] = 0
-                        data[3] = 3
+                        data[3] = '';
                     }
                     data[4] = 0;
                     papuDataArr[count] = data;
@@ -213,6 +280,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 }
             }
         }
+        this.el = jexcel(document.getElementById("spProgramVersionTable"), '');
+        jexcel.destroy(document.getElementById("spProgramVersionTable"), true);
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
         this.el = jexcel(document.getElementById("mapRegion"), '');
@@ -251,12 +320,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 {
                     title: i18n.t('static.import.forecastRegionFor') + ' ' + this.state.selectedForecastProgram.programCode,
                     type: 'dropdown',
-                    source: [
-                        { id: 1, name: i18n.t('static.importFromQATSupplyPlan.Import') },
-                        { id: 2, name: i18n.t('static.quantimed.doNotImport') },
-                        { id: 3, name: i18n.t('static.importFromQATSupplyPlan.noRegionToImportInto') },
-                    ],
-                    filter: this.filterImport
+                    // source: [
+                    //     { id: 1, name: i18n.t('static.importFromQATSupplyPlan.Import') },
+                    //     { id: 2, name: i18n.t('static.quantimed.doNotImport') },
+                    //     { id: 3, name: i18n.t('static.importFromQATSupplyPlan.noRegionToImportInto') },
+                    // ],
+                    source: this.state.forecastPgmRegionListDD,
+                    filter: this.forecastPgmRegionListFilter
                 },
                 {
                     title: 'isProgramCodeHeader',
@@ -287,14 +357,14 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
                     //old code below
                     // for do not import option to heighllight as red color
-                    /*var importRegion = rowData[3];
-                    if (importRegion == 2) {
+                    var importRegion = rowData[3];
+                    if (importRegion == -1) {
                         elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
                         elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
                         elInstance.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
                     } else {
-                    }*/
+                    }
                     // var isRegionInForecast = rowData[2];
                     // if (isRegionInForecast == false) {
                     //     var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
@@ -339,6 +409,14 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         ];
         return mylist;
     }.bind(this)
+
+    /**
+     * Build options for forecast program region dropdown
+     */
+    forecastPgmRegionListFilter = function (instance, cell, c, r, source) {
+        return this.state.forecastPgmRegionListDD;
+    }.bind(this);
+
     /**
      * Renders the import from QAT supply plan step two screen.
      * @returns {JSX.Element} - Import from QAT supply plan step two screen.
