@@ -842,6 +842,22 @@ body {
     border: 1px solid #2a303d;
   }
 
+  .jss>tbody>tr>td.readonly.shipmentEntryDoNotInclude {
+    background-color: #8C8985 !important;
+  }
+
+  .jss>tbody>tr>td.doNotImport {
+    background-color: #f48282 !important;
+  }
+
+  .jss>tbody>tr>td.readonly.doNotImport {
+    background-color: #f48282 !important;
+  }
+
+  .jexcel>tbody>tr>td.readonly.shipmentErp {
+    background-color: #CFCDC9 !important;
+  }
+
   .bg-white {
     background-color: #23282c !important;
   }
@@ -13025,6 +13041,11 @@ label.arrow_label:before {
   border-top: 0px !important;
   border-right: 0px !important;
   border-left: 0px !important;
+}
+
+.jss_filters_options {
+  height: auto !important;
+  max-height: 206px !important;
 }
 
 .DataEntryTable .PaddingLeftIndent {

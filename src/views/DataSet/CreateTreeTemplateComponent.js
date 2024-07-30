@@ -802,6 +802,7 @@ export default class CreateTreeTemplate extends Component {
             modelingChangedOrAdded: false,
             currentNodeTypeId: "",
             deleteChildNodes: false,
+            modelingTabChanged: false,
             levelReorderJexcelLoader: false,
             levelReorderEl: "",
             showReorderJexcel: false,
