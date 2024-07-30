@@ -149,7 +149,7 @@ class CompareAndSelectScenario extends Component {
             this.setState({
                 showFits: checked,
                 minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
-                singleValue2: checked ? this.state.singleValue2 : { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+                singleValue2: { from: { year: Number(moment(checked ? this.state.minDate : this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(checked ? this.state.minDate : this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
                 showForecastPeriod: checked ? false : this.state.showForecastPeriod
             }, () => {
                 this.setMonth1List()
