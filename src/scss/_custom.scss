@@ -31,6 +31,9 @@ body {
     color: #e4e5e6 !important;
     text-align: justify;
 }
+.Select.is-searchable.is-focused.is-open > .Select-control{
+  background: #000!important;
+}
 .app-footer {
   display: flex;
   flex-wrap: wrap;
@@ -107,6 +110,32 @@ body {
   font-weight: 500;
   color: #e4e5e6;
 }
+.ProblemListTableBorder .jss > thead > tr > td {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a !important;
+}
+.ProblemListDashboardBorder .table-borderedproblemListDashboar th, .table-borderedproblemListDashboar td {
+  border-right: 1px solid #4d515a !important;
+  border-bottom: 1px solid #4d515a !important;
+}
+.ProblemListDashboardBorder .table-borderedproblemListDashboar {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a;
+  border-collapse: inherit !important;
+  text-indent: initial !important;
+  border-spacing: 0px !important;
+}
+.ProblemListTableBorder .jss > tbody > tr > td {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid #4d515a !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
 .jss > thead > tr > td {
   background-color: #212631 !important;
   color: #e4e5e6 !important;
@@ -114,9 +143,9 @@ body {
   font-style: normal !important;
 }
 .jss>thead>tr>td {
-  border-top: 1px solid #2a303d;
-  border-left: 1px solid #2a303d;
-  border-right: 1px solid #2a303d;
+  border-top: 1px solid #4d515a;
+  border-left: 1px solid #4d515a;
+  border-right: 1px solid #4d515a;
   border-bottom: 1px solid transparent;
   background-color: #f3f3f3;
   padding: 6px;
@@ -142,9 +171,9 @@ body {
   width: 0;
   outline: 0;
   border-top: 0;
-  border-left: 1px solid #2a303d;
-  border-right: 1px solid #2a303d;
-  border-bottom: 1px solid #2a303d;
+  border-left: 1px solid #4d515a;
+  border-right: 1px solid #4d515a;
+  border-bottom: 1px solid #4d515a;
   margin-right: 2px;
   margin-bottom: 2px;
 }
@@ -201,9 +230,9 @@ body {
   color: #e4e5e6;
 }
 .jss>tbody>tr>td {
-  border-top: 1px solid #2a303d;
-  border-left: 1px solid #2a303d;
-  border-right: 1px solid #2a303d;
+  border-top: 1px solid #4d515a!important;
+  border-left: 1px solid #4d515a!important;
+  border-right: 1px solid #4d515a!important;
   border-bottom: 1px solid transparent;
   box-sizing: border-box;
   padding: 4px;
@@ -397,7 +426,7 @@ label.arrow_label:before {
   color: #e4e5e6;
 }
 .table-bordered th, .table-bordered td {
-  border: 1px solid #2a303d;
+  border: 1px solid #4d515a;
   // color: #e4e5e6;
 }
 .table {
@@ -693,9 +722,15 @@ select>.Select-control .Select-value,
   top: 0;
   left: 22px;
 }
-.darkModeclrblack{
-  color: #000;
+
+.countZero {
+  background-color: #d9d9d9; /* Gray background */
+  color: #000; /* White text */
 }
+
+// .darkModeclrblack{
+//   color: #000;
+// }
 
 .formulastext {
   color: #fff !important;
@@ -722,7 +757,7 @@ select>.Select-control .Select-value,
   border-top: 1px solid #2a303d;
 }
 .table-striped tbody tr:nth-of-type(odd) {
-  background-color: #23282c;
+  background-color: #373c46;
 }
 .ant-picker-input > input {
   position: relative;
@@ -857,6 +892,83 @@ select>.Select-control .Select-value,
   font-weight: 600;
   font-size: 19px;
 }
+.table .table-borderedproblemListDashboar tr td:first-child{
+  color:#e4e5e6;
+}
+.showdatabtn {
+  margin-top: 10px;
+}
+.fixTableHead1 {
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: auto;
+  border-top: 1px solid #4d515a;
+}
+.infoIconStockStatus::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+  position: relative;
+  width: 3px;
+  height: 100%;
+  top: 0px;
+  left: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #e4e5e6;
+}
+.chart-graph-report {
+  height: 400px;
+  margin-bottom: 15px;
+}
+#hideLegendDiv{
+  color: #e4e5e6;
+}
+.Firstcolum {
+  width: 120px;
+  left: 0;
+  z-index: 2;
+  /* width: 100px; */
+  /* min-width: 100px; */
+  /* max-width: 100px; */
+}
+.sticky-col {
+  position: sticky;
+  position: -webkit-sticky;
+}
+.Secondcolum {
+  width: 150px;
+  left: 51px;
+  z-index: 3;
+  min-width: 150px;
+  max-width: 150px;
+}
+.Thirdcolum {
+  left: 200px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+.fourthcolum {
+  left: 399px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+// .Select-menu-outer{
+//   background-color: #000!important;
+//   color: #e4e5e6; 
+// }
 // .hoverTd {
 //   background-color: #e5e5e5;
 //   color: #000 !important;
@@ -867,6 +979,11 @@ select>.Select-control .Select-value,
 // }
 }
 /*Dark mode end*/
+
+.countZero {
+  background-color: #d9d9d9; /* Gray background */
+  color: #000; /* White text */
+}
 
 ::placeholder {
   color: #7a7e7a !important;
@@ -1015,7 +1132,9 @@ label.tree_label:after {
   background: #eee;
   padding: 1em;
   border-radius: 0.3em;
-}
+}                                  m,
+// }
+// }
 
 #showtick {
   display: block;
@@ -9356,7 +9475,7 @@ legend.scheduler-border {
   // left: 128px;
   // z-index: 999;
 
-  left: 291px;
+  left: 399px;
   z-index: 4;
   /* z-index: 999; */
   width: 200px;
