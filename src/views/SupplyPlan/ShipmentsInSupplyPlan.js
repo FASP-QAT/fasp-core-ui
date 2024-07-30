@@ -559,7 +559,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                                 data = [];
-                                                var rcpuForTable=realmCountryPlanningUnitList.filter(c=>c.id==shipmentList[j].realmCountryPlanningUnit.id);
+                                                var rcpuForTable=realmCountryPlanningUnitList.filter(c=>c.id==shipmentList[i].realmCountryPlanningUnit.id);
                                                 data[0] = shipmentList[i].accountFlag;
                                                 data[1] = shipmentList[i].erpFlag;
                                                 data[2] = shipmentList[i].shipmentId;
@@ -3592,11 +3592,10 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             checkOtherValidation = true;
         }
         var negativeBudget = 0;
-        var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered.filter(c=>c.shipmentId>0 || c.index!=undefined);
-        var budgetJson = [];
+        var shipmentListAfterUpdate = this.props.items.shipmentListUnFiltered;
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
-            if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
+            if (map.get("27") != -1) {
                 shipmentListAfterUpdate[parseInt(map.get("27"))].budget.id = map.get("17");
                 var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
                 shipmentListAfterUpdate[parseInt(map.get("27"))].currency = c;
@@ -3668,9 +3667,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true)!="SELECT" && elInstance.getValueFromCoords(17, y, true)!="Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" 
-                    // && elInstance.getValueFromCoords(39, y, true)!=elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
-                    ) {
+                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true)!="SELECT" && elInstance.getValueFromCoords(17, y, true)!="Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false") {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                         var shipmentList = shipmentListAfterUpdate.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.budget.id == map.get("17"));
@@ -3684,13 +3681,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
                         var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
                         if (availableBudgetAmount < 0) {
-                            if (budgetJson.findIndex(c => c.budget.id == budget.id) == -1) {
-                                budgetJson.push({
-                                    budget: budget,
-                                    amount: Number(0 - Number(availableBudgetAmount)).toFixed(2),
-                                    shipmentList: shipmentList.filter(c=>[...new Set(json.map(ele => ele[2]))].includes(c.shipmentId))
-                                })
-                            }
                             negativeBudget = negativeBudget + 1;
                             inValid("R", y, i18n.t('static.label.noFundsAvailable'), elInstance);
                         } else {
@@ -4039,7 +4029,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 submittedDate = null;
                             }
                             var expiryDate = moment(receivedDate != "" && receivedDate != null && receivedDate != "Invalid date" ? receivedDate : expectedDeliveryDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
-                            if (map.get("27") != -1 && map.get("27") != "" && map.get("27") != null && map.get("27") != undefined) {
+                            if (map.get("27") != -1) {
                                 shipmentDataList[parseInt(map.get("27"))].plannedDate = plannedDate;
                                 shipmentDataList[parseInt(map.get("27"))].submittedDate = submittedDate;
                                 shipmentDataList[parseInt(map.get("27"))].approvedDate = approvedDate;
