@@ -14,14 +14,6 @@ import UserService from "../../api/UserService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
-const customStyles = {
-    option: (base, { data, isDisabled, isFocused, isSelected }) => {
-    return {
-      ...base,
-      backgroundColor: isFocused ? "red" : "blue",
-    };
-  }
-};
 // Initial values for form fields
 let initialValues = {
     realmId: '',
@@ -543,7 +535,7 @@ export default class EditOrganisationComponent extends Component {
                                                 <FormGroup className="Selectcontrol-bdrNone">
                                                     <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                     <Select
-                                                    styles={customStyles}
+                                                    // styles={customStyles}
                                                         bsSize="sm"
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
                                                             { 'is-valid': !errors.realmCountryId },
@@ -637,7 +629,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2">
-                                                            {i18n.t('static.common.disabled')}
+                                                            {i18n.t('static.dataentry.inactive')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>
