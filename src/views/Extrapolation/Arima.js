@@ -3,6 +3,7 @@ import ExtrapolationService from "../../api/ExtrapolationService";
 import i18n from "../../i18n";
 import { calculateError } from "./ErrorCalculations";
 export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality, page, regionId, planningUnitId) {
+    console.log("inside arima")
     var startYear = moment(minStartDate).format("YYYY");
     var startMonth = moment(minStartDate).format("M");
     var decimal = (startMonth - 1) / 12;

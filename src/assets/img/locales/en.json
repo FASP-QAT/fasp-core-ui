@@ -3253,5 +3253,6 @@
     "static.extrapolation.missingTES&ARIMA": "Missing TES & ARIMA",
     "static.extrapolation.extrapolateUsingDefaultParams": "Extrapolate using default parameters",
     "static.extrapolation.extrapolateUsingOptimizedArimaAndTes": "Extrapolate with optimized ARIMA & TES",
-    "static.extrapolation.bulkExtrapolationSuccess": "Bulk Extraploation done successfully"
+    "static.extrapolation.bulkExtrapolationSuccess": "Bulk Extraploation done successfully",
+    "static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams": "Extrapolate ARIMA & TES using default parameters"
 }

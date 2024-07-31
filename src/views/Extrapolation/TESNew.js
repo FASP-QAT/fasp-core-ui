@@ -3,6 +3,8 @@ import ExtrapolationService from "../../api/ExtrapolationService";
 import i18n from "../../i18n";
 import { calculateError } from "./ErrorCalculations";
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, page, regionId, planningUnitId) {
+    console.log("inside tes")
+
     var startYear = moment(minStartDate).format("YYYY");
     var startMonth = moment(minStartDate).format("M");
     var decimal = (startMonth - 1) / 12;

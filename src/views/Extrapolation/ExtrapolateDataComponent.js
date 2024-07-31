@@ -330,7 +330,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setVersionId = this.setVersionId.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
         this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
-        this.defaultSubmitForBulkExtrapolation = this.defaultSubmitForBulkExtrapolation.bind(this);
+        this.addPUForArimaAndTesWhileOffline = this.addPUForArimaAndTesWhileOffline.bind(this);
     }
     /**
      * Handles change for seasonality check box.
@@ -2349,12 +2349,10 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     /**
-     * Default submit of all bulk extrapolation related modal
-     * @param {Object} id defines which submit has been clicked for
+     * Add PUs in local storage that were not extrapolated with ARIMA & TES while offline.
      */
-    defaultSubmitForBulkExtrapolation(id) {
+    addPUForArimaAndTesWhileOffline(regionObj, puObj) {
         var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
-        this.setState({ optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false })
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -2367,13 +2365,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this);
             planningUnitBulkExtrapolationRequest.onsuccess = function (event) {
                 var obj = {
-                    region: this.state.regionValues,
-                    planningUnit: this.state.planningUnitValues,
+                    region: regionObj,
+                    planningUnit: puObj,
                     programId: tempForecastProgramId
                 }
                 planningUnitBulkExtrapolationTransaction.put(obj);
-                //To Do Need to check which action is clicked or if its online or offline
-                this.ExtrapolatedParameters(this.state.regionValues, this.state.planningUnitValues);
 
             }.bind(this);
         }.bind(this);
@@ -2381,9 +2377,14 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     /**
      * Builds data for extrapolation and runs extrapolation methods
+     * @param {Object} id defines which submit has been clicked on
      */
-    ExtrapolatedParameters(regionList, listOfPlanningUnits) {
+    ExtrapolatedParameters(id) {
+        var regionList = this.state.regionValues;
+        var listOfPlanningUnits = this.state.planningUnitValues;
         var programData = this.state.datasetJson;
+        var puObj = [];
+        var regionObj = []
         if (listOfPlanningUnits.length > 0) {
             this.setState({ loading: true })
             var datasetJson = programData;
@@ -2413,28 +2414,61 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
                         const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
                         const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
-                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-                            count++;
-                            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                        }
-                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-                            count++;
-                            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                        }
-                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
-                            count++;
-                            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                        }
-                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
-                            count++;
-                            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                        }
-                        if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
-                            count++;
-                            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                        if (id == 2 || id == 3) {//Optimise TES and ARIMA
+                            this.setState({ optimizeTESAndARIMAExtrapolation: true })
+                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
+                                count++;
+                                calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
+                                count++;
+                                calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                        } else if (id == 5) {//Extrapolate ARIMA & TES using default parameters
+                            this.setState({ optimizeTESAndARIMAExtrapolation: false })
+                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
+                                count++;
+                                calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
+                                count++;
+                                calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                        } else {//Extrapolate all methods using default parameters
+                            this.setState({ optimizeTESAndARIMAExtrapolation: false })
+                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                count++;
+                                calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                count++;
+                                calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                count++;
+                                calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
+                                count++;
+                                calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
+                                count++;
+                                calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                            }
+                            if (localStorage.getItem("sessionType") === "Offline" && (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 || ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)))) {
+                                if (!regionObj.includes(regionList[i].value)) {
+                                    // Add the value to the array if it's not present
+                                    regionObj.push(regionList[i].value)
+                                }
+                                puObj.push(listOfPlanningUnits[pu].value)
+                            }
                         }
                     }
                 }
+            }
+            if (regionObj != "" && puObj != "") {
+                this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
             }
             this.setState({
                 count: count
@@ -2772,7 +2806,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         })
                         // localStorage.setItem("sesDatasetId", this.props.items.datasetList[0].id);
                         // window.location.reload();
-                        // this.props.history.push(`/Extrapolation/extrapolateData/` + 'green/' + i18n.t('static.extrapolation.bulkExtrapolationSuccess'))
+                        this.props.history.push(`/Extrapolation/extrapolateData/` + 'green/' + i18n.t('static.extrapolation.bulkExtrapolationSuccess'))
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
@@ -4890,21 +4924,26 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <ModalFooter>
                                         {this.state.bulkExtrapolation && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
                                             </div>
                                         }
-                                        {(this.state.bulkExtrapolation || this.state.missingTESAndARIMA) && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
+                                        {localStorage.getItem('sessionType') === 'Online' && (this.state.bulkExtrapolation || this.state.missingTESAndARIMA) && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
                                             </div>
                                         }
                                         {this.state.optimizeTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.defaultSubmitForBulkExtrapolation(3)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(3)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
+                                            </div>
+                                        }
+                                        {localStorage.getItem('sessionType') === 'Online' && this.state.missingTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
+                                            <div className="mr-0">
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(5)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
                                             </div>
                                         }
 
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.defaultSubmitForBulkExtrapolation(4)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.ExtrapolatedParameters(4)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </ModalFooter>
                                 </Form>
                             )} />

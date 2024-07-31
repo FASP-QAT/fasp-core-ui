@@ -1,5 +1,7 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props, page, regionId, planningUnitId) {
+    console.log("inside moving avg")
+
     const data = inputData;
     const monthsForMovingAverage = noOfMonths;
     const noOfMonthsForProjection = noOfProjectionMonths;

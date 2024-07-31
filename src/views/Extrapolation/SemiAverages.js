@@ -2,6 +2,8 @@ import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 let m = 0;
 let c = 0;
 export function calculateSemiAverages(inputData, noOfProjectionMonths, props, page, regionId, planningUnitId) {
+    console.log("inside semi avg")
+
     const data = inputData;
     const noOfMonthsForProjection = noOfProjectionMonths;
     let actualMonths = 0;
