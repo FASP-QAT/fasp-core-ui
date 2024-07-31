@@ -434,9 +434,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
                                                 }
                                             } else {
-                                                totalValue = noFURequired * calculatedValue;
+                                                if(i < noFURequired) {
+                                                    totalValue = i * calculatedValue;
+                                                } else {
+                                                    totalValue = noFURequired * calculatedValue;
+                                                }
                                             }
                                         }
+                                        console.log("Hello1",convertToMonth,"-",noOfMonthsInUsagePeriod,"-",i,"-",totalValue,"-",noFURequired,"-",calculatedValue)
                                         calculatedValue = totalValue;
                                         calculatedValueForLag.push(calculatedValue);
                                         var lag = nodeDataMapForScenario.fuNode.lagInMonths;
@@ -618,6 +623,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     nodeId: flatList[fl].id,
                                     nodeDataMomList: nodeDataList
                                 })
+                                console.log("Hello",allNodeDataList)
                                 nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                                 nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                             }
