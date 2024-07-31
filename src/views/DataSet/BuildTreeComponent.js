@@ -2582,7 +2582,7 @@ export default class BuildTree extends Component {
         let newItems = items.filter(f => f.parent == pId);
         for(let i = 0; i < newItems.length; i++) {
             var ns = items.findIndex(f => f.id == newItems[i].id);
-            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 10 ? '0'+(i+1) : i+1);
+            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 9 ? '0'+(i+1) : i+1);
         }
         this.setState({ 
             isLevelChanged: true, 
