@@ -2098,7 +2098,12 @@ export default class ListTreeComponent extends Component {
         this.setState({ loading: true })
         const lan = 'en';
         const { versions } = this.state
-        var verList = versions;
+        var verList;
+        if(this.state.onlyDownloadedProgram) {
+            verList = [];
+        } else {
+            verList = versions;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
