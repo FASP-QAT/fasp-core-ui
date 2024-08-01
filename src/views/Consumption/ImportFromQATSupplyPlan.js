@@ -119,6 +119,7 @@ export default class ImportFromQATSupplyPlan extends Component {
         document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
         document.getElementById('stepThreeImport').style.display = 'none';
+        this.refs.stepOneChild.buildJexcel2();
         this.refs.stepOneChild.filterData();
     }
     /**
