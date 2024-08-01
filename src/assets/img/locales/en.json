@@ -3372,5 +3372,6 @@
     "static.spvr.resetQPL":"Reset QPL",
     "static.common.changetheme":"Change Theme",
     "static.common.lighttheme":"Light Theme",
-    "static.common.darktheme":"Dark Theme"
+    "static.common.darktheme":"Dark Theme",
+    "static.programPlanningUnit.forecastErrorTooltip":"Used in the Forecast Error (Monthly) report to signify that a specific month’s forecast error is above this desired threshold value"
 }
