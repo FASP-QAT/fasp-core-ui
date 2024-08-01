@@ -18,6 +18,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import csvicon from '../../assets/img/csv.png';
+import DropdownService from '../../api/DropdownService';
 // Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
 /**
@@ -45,6 +46,7 @@ export default class PlanningUnitListComponent extends Component {
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.dataChangeForRealm = this.dataChangeForRealm.bind(this);
+        this.dataChange=this.dataChange.bind(this)
     }
     /**
      * Clears the timeout when the component is unmounted.
@@ -158,7 +160,7 @@ export default class PlanningUnitListComponent extends Component {
                                     tracerCategories: listArray,
                                     tracerCategoryListAll: listArray
                                 })
-                                ForecastingUnitService.getForcastingUnitByRealmId(realmId)
+                                DropdownService.getForecastingUnitDropDownList()
                                     .then(response => {
                                         if (response.status == 200) {
                                             var listArray = response.data;
@@ -677,7 +679,7 @@ export default class PlanningUnitListComponent extends Component {
         let forecastingUnitList = forecastingUnits.length > 0
             && forecastingUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.forecastingUnitId}>
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
