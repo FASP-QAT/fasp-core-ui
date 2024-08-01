@@ -11088,6 +11088,7 @@ export default class BuildTree extends Component {
         nodeDataMap.month = updatedMonth;
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0] = nodeDataMap;
         this.setState({ currentItemConfig, currentScenario: nodeDataMap }, () => {
+            this.buildModelingJexcel();
         });
     }
     /**

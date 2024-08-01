@@ -4547,7 +4547,7 @@ export default class CreateTreeTemplate extends Component {
         if (scalingList.length == 0) {
             data = [];
             data[0] = ''
-            data[1] = this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo == -1 ? parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 : parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo)
+            data[1] = this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo == -1 ? parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 2 : parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo + 1)
             data[2] = this.state.maxMonth
             data[3] = ''
             data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
@@ -7688,6 +7688,7 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "monthNo") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo = event.target.value;
             this.calculateParentValueFromMOM(event.target.value);
+            this.buildModelingJexcel();
         }
         if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",", "");
