@@ -64,7 +64,8 @@ class SupplyPlanVersionAndReview extends Component {
             versionStatusId: this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined ? this.props.match.params.statusId : localStorage.getItem("sesVersionStatusSPVR") != "" && localStorage.getItem("sesVersionStatusSPVR") != null && localStorage.getItem("sesVersionStatusSPVR") != undefined ? localStorage.getItem("sesVersionStatusSPVR") : -1,
             versionTypeId: localStorage.getItem("sesVersionTypeSPVR") != "" && localStorage.getItem("sesVersionTypeSPVR") != null && localStorage.getItem("sesVersionTypeSPVR") != undefined ? localStorage.getItem("sesVersionTypeSPVR") : -1,
             lang: localStorage.getItem('lang'),
-            versionStatusIdResetQPL: "",
+            versionStatusIdResetQPL: [],
+            versionStatusIdResetQPLString: "",
             programIdsResetQPL: [],
             resetQPLModal: false,
             programIdsList: [],
@@ -110,13 +111,6 @@ class SupplyPlanVersionAndReview extends Component {
                 versionStatusId: event.target.value
             }, () => {
                 this.fetchData();
-            })
-        }
-        if (event.target.name == "versionStatusIdResetQPL") {
-            this.setState({
-                versionStatusIdResetQPL: event.target.value
-            }, () => {
-                this.getProgramListForResetQPL();
             })
         }
     }
@@ -785,7 +779,8 @@ class SupplyPlanVersionAndReview extends Component {
     toggleResetQPL() {
         this.setState({
             resetQPLModal: !this.state.resetQPLModal,
-            versionStatusIdResetQPL: "",
+            versionStatusIdResetQPL: [],
+            versionStatusIdResetQPLString: "",
             programIdsResetQPL: [],
             programIdsList: []
         })
@@ -796,9 +791,20 @@ class SupplyPlanVersionAndReview extends Component {
      * @param {*} e This is value of the event
      */
     setProgramIdsResetQPL(e) {
-        console.log("e Test@123", e);
         this.setState({
             programIdsResetQPL: e,
+        })
+    }
+    /**
+     * This function is used to set the version status Ids that are selected for reset
+     * @param {*} e This is value of the event
+     */
+    dataChangeVersionStatus(e) {
+        this.setState({
+            versionStatusIdResetQPL: e,
+            versionStatusIdResetQPLString: e.map(ele => ele.value).toString()
+        }, () => {
+            this.getProgramListForResetQPL()
         })
     }
     /**
@@ -808,7 +814,7 @@ class SupplyPlanVersionAndReview extends Component {
         this.setState({
             loadingResetQPL: true
         })
-        DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPL, FINAL_VERSION_TYPE)
+        DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPLString, FINAL_VERSION_TYPE)
             .then(response => {
                 var listArray = response.data;
                 var proList = [];
@@ -879,7 +885,6 @@ class SupplyPlanVersionAndReview extends Component {
             );
     }
     resetQPL() {
-        console.log("Reset QPL Test@123")
         this.setState({
             loadingResetQPL: true
         })
@@ -984,6 +989,10 @@ class SupplyPlanVersionAndReview extends Component {
                     </option>
                 )
             }, this);
+        var statusMultiselect = [];
+        statuses.length > 0 && statuses.map((item, i) => {
+            statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
+        }, this);
         const columns = [
             {
                 text: i18n.t('static.program.program'),
@@ -1029,10 +1038,20 @@ class SupplyPlanVersionAndReview extends Component {
                             this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />&nbsp;&nbsp;
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') && <a href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={this.toggleResetQPL}><i className="fa fa-refresh fa-2x"></i></a>}&nbsp;&nbsp;
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&  
+                                <Button
+                                    color="info"
+                                    size="md"
+                                    className="float-right mr-1"
+                                    type="button"
+                                    onClick={this.toggleResetQPL}
+                                >
+                                    {i18n.t("static.spvr.resetQPL")}
+                                </Button>}
+                                &nbsp;&nbsp;
                             </div>
                         }
                     </div>
@@ -1146,7 +1165,7 @@ class SupplyPlanVersionAndReview extends Component {
                             <FormGroup className="col-md-12">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                 <div className="controls">
-                                    <InputGroup>
+                                    {/* <InputGroup>
                                         <Input
                                             type="select"
                                             name="versionStatusIdResetQPL"
@@ -1158,7 +1177,15 @@ class SupplyPlanVersionAndReview extends Component {
                                             <option value="">{i18n.t("static.common.select")}</option>
                                             {statusList}
                                         </Input>
-                                    </InputGroup>
+                                    </InputGroup> */}
+                                    <MultiSelect
+                                        name="versionStatusIdResetQPL"
+                                        id="versionStatusIdResetQPL"
+                                        options={statusMultiselect && statusMultiselect.length > 0 ? statusMultiselect : []}
+                                        value={this.state.versionStatusIdResetQPL}
+                                        onChange={(e) => { this.dataChangeVersionStatus(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
                                 </div>
                             </FormGroup>
                             <FormGroup className="col-md-12">
