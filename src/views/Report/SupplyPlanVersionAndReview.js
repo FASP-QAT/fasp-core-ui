@@ -1040,8 +1040,8 @@ class SupplyPlanVersionAndReview extends Component {
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />&nbsp;&nbsp;
-                                {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&  */}
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&  
                                 <Button
                                     color="info"
                                     size="md"
@@ -1050,8 +1050,7 @@ class SupplyPlanVersionAndReview extends Component {
                                     onClick={this.toggleResetQPL}
                                 >
                                     {i18n.t("static.spvr.resetQPL")}
-                                </Button>
-                                {/* } */}
+                                </Button>}
                                 &nbsp;&nbsp;
                             </div>
                         }
