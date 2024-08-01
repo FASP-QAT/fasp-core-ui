@@ -9621,6 +9621,13 @@ export default class BuildTree extends Component {
                 }
             ],
             editable: true,
+            oneditionend:function (instance, cell, x, y, value) {
+                var elInstance = instance;
+                var rowData = elInstance.getRowData(y);
+                if (x == 1) {
+                    elInstance.setValueFromCoords(1, y, Math.round(rowData[1]), true);
+                }
+            },
             onload: this.loadedModelingCalculatorJexcel,
             onchange: this.changeModelingCalculatorJexcel,
             search: false,
