@@ -2793,11 +2793,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
                         this.setState({
-                            isChanged1: false
+                            isChanged1: false,
+                            messageColor: "green",
+                            message: i18n.t('static.extrapolation.bulkExtrapolationSuccess'),
+                            loading: false
+                        }, () => {
+                            this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : 3))
+                            hideFirstComponent();
+                            this.componentDidMount();
                         })
-                        // localStorage.setItem("sesDatasetId", this.props.items.datasetList[0].id);
-                        // window.location.reload();
-                        // this.props.history.push(`/Extrapolation/extrapolateData/` + 'green/' + i18n.t('static.extrapolation.bulkExtrapolationSuccess'))
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
