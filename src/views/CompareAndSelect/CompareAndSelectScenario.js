@@ -2501,7 +2501,7 @@ class CompareAndSelectScenario extends Component {
                                                             </Label>
                                                         </FormGroup>}
                                                     <FormGroup className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : ({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.consumption.forcast')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
                                                         <div className="controls ">
                                                             <InputGroup>
                                                                 <Input
@@ -2510,6 +2510,7 @@ class CompareAndSelectScenario extends Component {
                                                                     id="xAxisDisplayBy"
                                                                     bsSize="sm"
                                                                     value={this.state.xAxisDisplayBy}
+                                                                    disabled={this.state.showForecastPeriod}
                                                                     onChange={(e) => { this.setXAxisDisplayBy(e); }}
                                                                 >
                                                                     <option value="1">{i18n.t('static.ManageTree.Month')}</option>
@@ -2530,7 +2531,7 @@ class CompareAndSelectScenario extends Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3 pickerRangeBox">
+                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3 pickerRangeBox">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
                                                             <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
                                                         </Label>
@@ -2579,7 +2580,8 @@ class CompareAndSelectScenario extends Component {
                                                             </div>
                                                         )}
                                                     </FormGroup>
-                                                    {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                    }
+                                                    {/* {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -2593,7 +2595,7 @@ class CompareAndSelectScenario extends Component {
                                                                 <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
                                                             </Picker>
                                                         </div>
-                                                    </FormGroup>}
+                                                    </FormGroup>} */}
                                                     {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
