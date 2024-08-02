@@ -1233,7 +1233,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                 <tr>
                                   <th
                                     className="text-center Firstcolum1"
-                                    style={{ width: "27%" }}
+                                    style={{ width: "27%",left:"0" }}
                                   >
                                     {i18n.t("static.planningunit.planningunit")}
                                   </th>
@@ -1276,7 +1276,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                               <td></td>
                                             ) : (
                                               <td
-                                                className="text-center"
+                                                className="text-center darkModeclrblack"
                                                 style={this.cellstyleWithData(
                                                   item.programData.filter(
                                                     (c) =>
