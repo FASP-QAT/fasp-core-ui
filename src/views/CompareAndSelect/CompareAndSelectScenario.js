@@ -2677,7 +2677,7 @@ class CompareAndSelectScenario extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                             } */}
-                                                            <FormGroup className="col-md-3">
+                                                            <FormGroup className="col-md-5">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
                                                                 <div className="controls ">
                                                                     <InputGroup>
