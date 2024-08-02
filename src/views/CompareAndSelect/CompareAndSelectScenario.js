@@ -2500,7 +2500,7 @@ class CompareAndSelectScenario extends Component {
                                                                 {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
                                                             </Label>
                                                         </FormGroup>}
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-5">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.consumption.forcast')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
                                                         <div className="controls ">
                                                             <InputGroup>
