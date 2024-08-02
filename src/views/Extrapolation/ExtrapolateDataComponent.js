@@ -2414,18 +2414,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var forecastMaxDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
                         const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
                         const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
-                        if (id == 2 || id == 3) {//Optimise TES and ARIMA
-                            this.setState({ optimizeTESAndARIMAExtrapolation: true })
-                            if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
-                                count++;
-                                calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                            }
-                            if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
-                                count++;
-                                calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                            }
-                        } else if (id == 5) {//Extrapolate ARIMA & TES using default parameters
-                            this.setState({ optimizeTESAndARIMAExtrapolation: false })
+                        //2 and 3 - Optimise TES and ARIMA, 5 - Extrapolate ARIMA & TES using default parameters
+                        if (id == 2 || id == 3 || id == 5) {
+                            this.setState({ optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false })
                             if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
                                 count++;
                                 calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
@@ -2806,7 +2797,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         })
                         // localStorage.setItem("sesDatasetId", this.props.items.datasetList[0].id);
                         // window.location.reload();
-                        this.props.history.push(`/Extrapolation/extrapolateData/` + 'green/' + i18n.t('static.extrapolation.bulkExtrapolationSuccess'))
+                        // this.props.history.push(`/Extrapolation/extrapolateData/` + 'green/' + i18n.t('static.extrapolation.bulkExtrapolationSuccess'))
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
