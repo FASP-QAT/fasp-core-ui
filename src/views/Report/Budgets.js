@@ -944,6 +944,7 @@ class Budgets extends Component {
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
             var data = this.state.selBudget;
+            console.log('data[0]: ',data[0]);
             let outPutListArray = [];
             let count = 0;
             for (var j = 0; j < data.length; j++) {
