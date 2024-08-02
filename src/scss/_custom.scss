@@ -727,9 +727,9 @@ select>.Select-control .Select-value,
   color: #000; /* White text */
 }
 
-// .darkModeclrblack{
-//   color: #000;
-// }
+.darkModeclrblack{
+  color: #000;
+}
 
 .formulastext {
   color: #fff !important;
@@ -921,6 +921,12 @@ select>.Select-control .Select-value,
 #hideLegendDiv{
   color: #e4e5e6;
 }
+.Firstcolum1 {
+  width: 120px;
+  left: 0!important;
+  z-index: 3;
+}
+
 .Firstcolum {
   width: 120px;
   left: 0;
@@ -963,6 +969,21 @@ select>.Select-control .Select-value,
   min-width: 200px;
   max-width: 200px;
   /* left: 200px; */
+}
+.card-header {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: #323a49;
+  border-bottom: 1px solid #4d515a;
+  color: #e4e5e6;
+}
+.progress {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.65625rem;
+  background-color: #323a49;
+  border-radius: 0.25rem;
 }
 // .Select-menu-outer{
 //   background-color: #000!important;
