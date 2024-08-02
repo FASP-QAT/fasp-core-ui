@@ -1324,7 +1324,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[11] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
         data[12] = 0;
         data[13] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";
-        data[14] = `=ROUND(M${parseInt(0) + 1}*AO${parseInt(0) + 1},0)`;
+        data[14] = `=ROUND(M${parseInt(json.length) + 1}*AO${parseInt(json.length) + 1},0)`;
         data[15] = false;
         data[16] = "";
         data[17] = "";
