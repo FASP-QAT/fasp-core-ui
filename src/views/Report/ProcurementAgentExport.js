@@ -1500,8 +1500,7 @@ class ProcurementAgentExport extends Component {
         ? []
         : this.state.procurementAgentValues.map((ele) => ele.value.toString());
     let fundingSourceIds =
-      // this.state.fundingSourceValues.length == this.state.fundingSources.length
-      this.state.fundingSourceValues.length == this.state.fundingSourcesFiltered.length
+      this.state.fundingSourceValues.length == this.state.fundingSources.length
         ? []
         : this.state.fundingSourceValues.map((ele) => ele.value.toString());
     let isPlannedShipmentId = document.getElementById(
