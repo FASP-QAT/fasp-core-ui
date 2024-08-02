@@ -193,10 +193,11 @@ class CompareAndSelectScenario extends Component {
         var stopDate = this.state.singleValue2.to.year + '-' + this.state.singleValue2.to.month + '-' + new Date(this.state.singleValue2.to.year, this.state.singleValue2.to.month, 0).getDate();
         if (e.target.name == "showForecastPeriod") {
             this.setState({
+                xAxisDisplayBy: 1,
                 showForecastPeriod: checked,
                 showFits: checked ? false : this.state.showFits,
                 minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
-                singleValue2: checked ? this.state.singleValue2 : { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+                singleValue2: checked ? this.state.rangeValue : { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
             }, () => {
                 this.setMonth1List()
             })
@@ -2006,27 +2007,6 @@ class CompareAndSelectScenario extends Component {
             showGuidance: !this.state.showGuidance
         })
     }
-
-    /**
-       * Toggles the accordion state for a specific consumption unit ID.
-       * @param {String} consumptionUnitId The ID of the consumption unit to toggle.
-       */
-    toggleAccordion(consumptionUnitId) {
-        var consumptionUnitShowArr = this.state.consumptionUnitShowArr;
-        if (consumptionUnitShowArr.includes(consumptionUnitId)) {
-            consumptionUnitShowArr = consumptionUnitShowArr.filter(c => c != consumptionUnitId);
-        } else {
-            consumptionUnitShowArr.push(consumptionUnitId)
-        }
-        this.setState({
-            consumptionUnitShowArr: consumptionUnitShowArr
-        }, () => {
-            // this.setState({
-            //     isTableLoaded: this.getTableDiv()
-            // })
-        })
-    }
-
     /**
      * This function is used to set the x axis display by value selected by the user
      * @param {*} e This is the event value
