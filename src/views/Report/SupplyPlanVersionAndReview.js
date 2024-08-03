@@ -811,6 +811,7 @@ class SupplyPlanVersionAndReview extends Component {
      * This funtion is used to get the list of programs based on version status
      */
     getProgramListForResetQPL() {
+        if(this.state.versionStatusIdResetQPL.length>0){
         this.setState({
             loadingResetQPL: true
         })
@@ -840,7 +841,7 @@ class SupplyPlanVersionAndReview extends Component {
             }).catch(
                 error => {
                     this.setState({
-                        programIdsList: [], loadingResetQPL: false
+                        programIdsList: [],programIdsResetQPL:[], loadingResetQPL: false
                     })
                     if (error.message === "Network Error") {
                         this.setState({
@@ -883,6 +884,11 @@ class SupplyPlanVersionAndReview extends Component {
                     }
                 }
             );
+        }else{
+            this.setState({
+                programIdsList: [],programIdsResetQPL:[], loadingResetQPL: false
+            })
+        }
     }
     resetQPL() {
         this.setState({
