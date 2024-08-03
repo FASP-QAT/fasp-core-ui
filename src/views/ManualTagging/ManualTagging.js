@@ -1425,7 +1425,7 @@ export default class ManualTagging extends Component {
                 for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
                     qty1 = 0;
                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
-                        qty1 += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
+                        qty1 += Number(item[10]) * Number(this.state.instance.getValue(`V${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
                     })
                     qty += Math.round(qty1);
                 }
@@ -1776,7 +1776,7 @@ export default class ManualTagging extends Component {
                                                     var curUser = AuthenticationService.getLoggedInUserId();
                                                     var username = AuthenticationService.getLoggedInUsername();
                                                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
-                                                        shipmentQty += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                                                        shipmentQty += Number(item[10]) * Number(this.state.instance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                                                         shipmentARUQty += Number(item[10]);
                                                         var batchNo = item[7];
                                                         var expiryDate = item[8];
