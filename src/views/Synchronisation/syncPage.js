@@ -4239,7 +4239,7 @@ export default class syncPage extends Component {
     }
     var inputJson={
       'programVersionList':checkboxesChecked,
-      'cutOffDate':""
+      'cutOffDate':this.state.programRequestProgramJson.cutOffDate!=undefined && this.state.programRequestProgramJson.cutOffDate!=null && this.state.programRequestProgramJson.cutOffDate!=""?this.state.programRequestProgramJson.cutOffDate:""
     }
     ProgramService.getAllProgramData(inputJson)
       .then(response => {
