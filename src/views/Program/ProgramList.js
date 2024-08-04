@@ -553,7 +553,7 @@ export default class ProgramList extends Component {
                           {i18n.t("static.common.active")}
                         </option>
                         <option value="false">
-                          {i18n.t("static.common.disabled")}
+                          {i18n.t("static.dataentry.inactive")}
                         </option>
                       </Input>
                     </InputGroup>

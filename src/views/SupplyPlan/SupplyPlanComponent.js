@@ -174,7 +174,8 @@ export default class SupplyPlanComponent extends React.Component {
             shipmentQtyTotalForPopup: 0,
             batchQtyTotalForPopup: 0,
             multiplier: 1,
-            viewById: 1
+            viewById: 1,
+            planningUnitNotes:""
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -564,6 +565,9 @@ export default class SupplyPlanComponent extends React.Component {
             } else {
                 csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + ele.distributionLeadTime + "\"")
             }
+            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+                csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ele.info.planningUnitNotes + '"'))
+            }
             csvRow.push('')
             A = [header]
             A.push(openningArr)
@@ -697,6 +701,11 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
             }
+            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+                doc.text(i18n.t('static.program.notes') + ' : ' + ele.info.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
+                  align: 'left'
+                })
+              }
             doc.setTextColor("#000");
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...ele.data.consumptionTotalData]
@@ -2875,7 +2884,8 @@ export default class SupplyPlanComponent extends React.Component {
                     reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
                     minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
                     minStockMoSQty: minStockMoSQty,
-                    maxStockMoSQty: maxStockMoSQty
+                    maxStockMoSQty: maxStockMoSQty,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -4261,14 +4271,19 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="animated fadeIn" style={{ display: this.state.display }}>
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
-                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.reorderFrequency}</span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                     </ul>
                                 </FormGroup>
+                                {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                        </ul>
+                                    </FormGroup>}
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
@@ -4293,7 +4308,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
@@ -4709,7 +4724,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 coList: conList,
                                 shList: shiList,
                                 minStockMoSQty: minStockMoSQty,
-                                maxStockMoSQty: maxStockMoSQty
+                                maxStockMoSQty: maxStockMoSQty,
+                                planningUnitNotes:programPlanningUnit.notes
                             }
                             var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                             var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');

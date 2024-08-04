@@ -213,7 +213,8 @@ class EditSupplyPlanStatus extends Component {
                 regionList: [],
                 problemStatusListForEdit: [],
                 shipmentQtyTotalForPopup: 0,
-                batchQtyTotalForPopup: 0
+                batchQtyTotalForPopup: 0,
+                planningUnitNotes:""
             },
             statuses: [],
             regionList: [],
@@ -1573,7 +1574,8 @@ class EditSupplyPlanStatus extends Component {
                     maxStockMoSQty: maxStockMoSQty,
                     planBasedOn: programPlanningUnit.planBasedOn,
                     minQtyPpu: programPlanningUnit.minQty,
-                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -2354,8 +2356,7 @@ class EditSupplyPlanStatus extends Component {
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
-                    loading: false,
-                    loadSummaryTable:true
+                    loading: false
                 }, () => {
                     this.getPlanningUnit()
                     this.getProblemCriticality();
@@ -3042,7 +3043,7 @@ class EditSupplyPlanStatus extends Component {
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
                                 <div className="row">
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-2">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
                                             <Picker
@@ -3057,7 +3058,7 @@ class EditSupplyPlanStatus extends Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls">
                                             <InputGroup>
@@ -3080,14 +3081,19 @@ class EditSupplyPlanStatus extends Component {
                                 <div className="table-responsive RemoveStriped">
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
-                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.reorderFrequency}</span></li>
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
+                                    {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                        </ul>
+                                    </FormGroup>}
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
@@ -3112,7 +3118,7 @@ class EditSupplyPlanStatus extends Component {
                                     </FormGroup>
                                     <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
                                             <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
@@ -3569,7 +3575,7 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.problemList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
                     <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
@@ -3667,6 +3673,7 @@ class EditSupplyPlanStatus extends Component {
         if (cont == true) {
             this.setState({
                 problemList: [],
+                loadSummaryTable:false,
                 message: '',
                 loading: true,
                 problemReportChanged: 0
@@ -3702,7 +3709,7 @@ class EditSupplyPlanStatus extends Component {
                     });
             }
             else if (problemStatusIds == []) {
-                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
+                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [],loadSummaryTable:false, loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("problemListDiv"), '');
                         jexcel.destroy(document.getElementById("problemListDiv"), true);
@@ -4133,7 +4140,8 @@ class EditSupplyPlanStatus extends Component {
         this.el = problemEl;
         this.setState({
             problemEl: problemEl,
-            loading: false
+            loading: false,
+            loadSummaryTable:true
         })
     }
         /**
@@ -4966,6 +4974,8 @@ class EditSupplyPlanStatus extends Component {
                                 this.setState({
                                     loading:true
                                 })
+                                var validation = this.checkValidation();
+                                if(validation){
                                 ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
                                     .then(response => {
                                         let temp_version_status = 0;
@@ -5107,6 +5117,14 @@ class EditSupplyPlanStatus extends Component {
                                                     document.getElementById("submitButton").disabled = false;
                                                     alert("To approve a supply plan – Reviewed must all be checked.");
                                                 }
+                                            }else{
+                                                this.setState({
+                                                    submitMessage: 'static.supplyPlan.validationFailed',
+                                                    submitColor: "red",
+                                                    loading: false
+                                                }, () => {
+                                                    this.hideMessageComponent()
+                                                });
                                             }
                                         } else {
                                             confirmAlert({
@@ -5166,6 +5184,15 @@ class EditSupplyPlanStatus extends Component {
                                             }
                                         }
                                     );
+                                }else{
+                                    this.setState({
+                                        submitMessage: 'static.supplyPlan.validationFailed',
+                                        submitColor: "red",
+                                        loading: false
+                                    }, () => {
+                                        this.hideMessageComponent()
+                                    });
+                                }
                             }}
                             render={
                                 ({

@@ -98,7 +98,8 @@ export default class SupplyPlanComponent extends React.Component {
             ledgerForBatch: [],
             showBatchSaveButton: false,
             shipmentQtyTotalForPopup: 0,
-            batchQtyTotalForPopup: 0
+            batchQtyTotalForPopup: 0,
+            planningUnitNotes:""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -246,6 +247,9 @@ export default class SupplyPlanComponent extends React.Component {
         } else {
             csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
+        if(this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0){
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + this.state.planningUnitNotes + '"'))
+        }
         csvRow.push('')
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             ("\'").concat(item.monthName).concat(" ").concat(item.monthYear)
@@ -392,6 +396,11 @@ export default class SupplyPlanComponent extends React.Component {
                             align: 'left'
                         })
                     }
+                    if(this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0){
+                        doc.text(i18n.t('static.program.notes') + ' : ' + this.state.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
+                          align: 'left'
+                        })
+                      }
                 }
             }
         }
@@ -904,7 +913,8 @@ export default class SupplyPlanComponent extends React.Component {
                     programJson: programJsonForPlanningUnit,
                     planBasedOn: programPlanningUnit.planBasedOn,
                     minQtyPpu: roundARU(programPlanningUnit.minQty, this.props.items.multiplier),
-                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
