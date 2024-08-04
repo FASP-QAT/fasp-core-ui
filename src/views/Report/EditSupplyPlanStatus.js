@@ -14,7 +14,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
+import { contrast, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
@@ -235,7 +235,8 @@ class EditSupplyPlanStatus extends Component {
             submitColor: "",
             planningUnitDropdownList: [],
             temp_currentVersion_id: '',
-            loadSummaryTable:false
+            loadSummaryTable:false,
+            loadingForNotes:false
         }
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -258,6 +259,8 @@ class EditSupplyPlanStatus extends Component {
         this.loaded1 = this.loaded1.bind(this);
         this.roundAMC = this.roundAMC.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.toggleLargeNotes=this.toggleLargeNotes.bind(this);
+        this.actionCanceledNotes=this.actionCanceledNotes.bind(this);
     }
     /**
      * This is function is used to round the AMC value
@@ -4259,6 +4262,123 @@ class EditSupplyPlanStatus extends Component {
         })
     }
     /**
+     * This function is used to toggle the notes history model
+     */
+    toggleLargeNotes() {
+        this.setState({
+            notesPopup: !this.state.notesPopup,
+        },()=>{
+            if(this.state.notesPopup){
+                this.getNotes(this.state.programId)
+            }
+        });
+    }
+    getNotes(programId){
+        // this.toggleLargeNotes();
+        this.setState({
+            loadingForNotes:true
+        })
+        ProgramService.getNotesHistory(programId)
+        .then(response => {
+            var listArray = response.data;
+            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                jexcel.destroy(document.getElementById("notesTransTable"), true);
+            }
+            var json=[];
+            for (var sb = listArray.length-1; sb >= 0; sb--) {
+                var data = [];
+                data[0] = listArray[sb].versionId; 
+                data[1] = getLabelText(listArray[sb].versionStatus.label,this.state.lang);
+                data[2] = listArray[sb].notes; 
+                data[3] = listArray[sb].lastModifiedBy.username; 
+                data[4] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                json.push(data);
+            }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                { title: i18n.t('static.integration.versionStatus'), type: 'text', width: 80 },
+                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                {
+                    title: i18n.t("static.common.lastModifiedBy"),
+                    type: "text",
+                  },
+                  {
+                    title: i18n.t("static.common.lastModifiedDate"),
+                    type: "calendar",
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                  },
+            ],
+            editable: false,
+            onload: function (instance, cell) {
+                jExcelLoadedFunction(instance,1);
+            }.bind(this),
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: "top",
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
+            
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );        
+    }
+    /**
      * This is used to display the content
      * @returns The supply plan data in tabular format
      */
@@ -4380,7 +4500,8 @@ class EditSupplyPlanStatus extends Component {
                         <div className="Card-header-addicon">
                             <div className="card-header-actions">
                                 <a className="">
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{i18n.t('static.problemContext.viewTrans')}</small></span>
                                 </a>
                             </div>
                         </div>
@@ -5271,6 +5392,29 @@ class EditSupplyPlanStatus extends Component {
                                 )} />
                     </Card>
                 </Col>
+                <Modal isOpen={this.state.notesPopup}
+                    className={'modal-lg modalWidth ' + this.props.className}>
+                    <ModalHeader toggle={() => this.toggleLargeNotes()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div className="" style={{ display: this.state.loadingForNotes ? "none" : "block" }}>
+                            <div id="notesTransTable" className="AddListbatchtrHeight"></div>
+                        </div>
+                        <div style={{ display: this.state.loadingForNotes ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledNotes()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
             </div >
         );
     }
@@ -5368,6 +5512,18 @@ class EditSupplyPlanStatus extends Component {
                 this.componentDidMount();
             })
         }
+    }
+    /**
+     * This function is called when cancel button for notes history modal popup is clicked
+     */
+    actionCanceledNotes() {
+        this.setState({
+            message: i18n.t('static.actionCancelled'),
+            color: "#BA0C2F",
+        }, () => {
+            hideSecondComponent();
+            this.toggleLargeNotes();
+        })
     }
 }
 export default EditSupplyPlanStatus

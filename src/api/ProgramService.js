@@ -169,5 +169,8 @@ class ProgramService {
     getProgramListByProductCategoryIdList(productCategoryIds) {
         return axios.post(`${API_URL}/api/program/productCategoryList`, productCategoryIds, {});
     }
+    getNotesHistory(programId){
+        return axios.get(`${API_URL}/api/program/data/version/trans/programId/${programId}/versionId/0`, {});
+    }
 }
 export default new ProgramService()
