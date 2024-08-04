@@ -173,5 +173,8 @@ class ProgramService {
         return axios.put(`${API_URL}/api/programVersion/resetProblem`, json, {}
         );
     }
+    getNotesHistory(programId){
+        return axios.get(`${API_URL}/api/program/data/version/trans/programId/${programId}/versionId/0`, {});
+    }
 }
 export default new ProgramService()

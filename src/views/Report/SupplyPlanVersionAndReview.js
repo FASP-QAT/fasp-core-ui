@@ -1,4 +1,3 @@
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
@@ -31,8 +30,8 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
-import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 import { MultiSelect } from "react-multi-select-component";
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 const entityname = ""
 /**
  * Component for Supply Plan Version and Review Report.
@@ -69,7 +68,8 @@ class SupplyPlanVersionAndReview extends Component {
             programIdsResetQPL: [],
             resetQPLModal: false,
             programIdsList: [],
-            loadingResetQPL: false
+            loadingResetQPL: false,
+            loadingForNotes:false
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -83,6 +83,8 @@ class SupplyPlanVersionAndReview extends Component {
         this.toggleResetQPL = this.toggleResetQPL.bind(this);
         this.getProgramListForResetQPL = this.getProgramListForResetQPL.bind(this);
         this.resetQPL = this.resetQPL.bind(this);
+        this.toggleLarge=this.toggleLarge.bind(this);
+        this.actionCanceled=this.actionCanceled.bind(this);
     }
     /**
      * Handles the change event for the data.
@@ -241,7 +243,19 @@ class SupplyPlanVersionAndReview extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return false;
+                var items = [];
+                if (y != null) {
+                    var rowData = obj.getRowData(y);
+                    // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "") {
+                        items.push({
+                            title: i18n.t('static.problemContext.viewTrans'),
+                            onclick: function () {
+                                this.getNotes(rowData[11]);
+                            }.bind(this)
+                        });
+                    // }
+                }
+                return items;
             }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -249,6 +263,111 @@ class SupplyPlanVersionAndReview extends Component {
         this.setState({
             languageEl: languageEl, loading: false
         })
+    }
+    getNotes(programId){
+        this.toggleLarge();
+        this.setState({
+            loadingForNotes:true
+        })
+        ProgramService.getNotesHistory(programId)
+        .then(response => {
+            var listArray = response.data;
+            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                jexcel.destroy(document.getElementById("notesTransTable"), true);
+            }
+            var json=[];
+            for (var sb = listArray.length-1; sb >= 0; sb--) {
+                var data = [];
+                data[0] = listArray[sb].versionId; 
+                data[1] = getLabelText(listArray[sb].versionStatus.label,this.state.lang);
+                data[2] = listArray[sb].notes; 
+                data[3] = listArray[sb].lastModifiedBy.username; 
+                data[4] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                json.push(data);
+            }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                { title: i18n.t('static.integration.versionStatus'), type: 'text', width: 80 },
+                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                {
+                    title: i18n.t("static.common.lastModifiedBy"),
+                    type: "text",
+                  },
+                  {
+                    title: i18n.t("static.common.lastModifiedDate"),
+                    type: "calendar",
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                  },
+            ],
+            editable: false,
+            onload: function (instance, cell) {
+                jExcelLoadedFunction(instance,1);
+            }.bind(this),
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: "top",
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
+            
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );        
     }
     /**
      * Redirects to the edit supply plan status screen on row click.
@@ -1211,7 +1330,7 @@ class SupplyPlanVersionAndReview extends Component {
                             </FormGroup>
                         </div>
                         <div style={{ display: this.state.loadingResetQPL ? "block" : "none" }}>
-                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
                                     <div class="spinner-border blue ml-4" role="status">
@@ -1222,10 +1341,53 @@ class SupplyPlanVersionAndReview extends Component {
                     </ModalBody>
                     <ModalFooter>
                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.resetQPL()} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>
+                        </ModalFooter>
+                </Modal>
+                <Modal isOpen={this.state.notesPopup}
+                    className={'modal-lg modalWidth ' + this.props.className}>
+                    <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div className="" style={{ display: this.state.loadingForNotes ? "none" : "block" }}>
+                            <div id="notesTransTable" className="AddListbatchtrHeight"></div>
+                        </div>
+                        <div style={{ display: this.state.loadingForNotes ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
             </div>
         );
+    }
+    /**
+     * This function is used to toggle the notes history model
+     */
+    toggleLarge() {
+        this.setState({
+            notesPopup: !this.state.notesPopup,
+        });
+    }
+    /**
+     * This function is called when cancel button for notes modal popup is clicked
+     */
+    actionCanceled() {
+        this.setState({
+            message: i18n.t('static.actionCancelled'),
+            color: "#BA0C2F",
+        }, () => {
+            hideSecondComponent();
+            this.toggleLarge();
+        })
     }
 }
 export default SupplyPlanVersionAndReview

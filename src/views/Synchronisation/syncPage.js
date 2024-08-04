@@ -1630,7 +1630,8 @@ export default class syncPage extends Component {
                       this.setState({
                         programRequestResult: programRequest.result,
                         programRequestProgramJson: programJson,
-                        planningUnitDataList: planningUnitDataList
+                        planningUnitDataList: planningUnitDataList,
+                        notes:programJson.currentVersionNotes!=undefined?programJson.currentVersionNotes:""
                       })
                       var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                       var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
@@ -3724,7 +3725,9 @@ export default class syncPage extends Component {
                 <div id="detailsDiv">
                   <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                      initialValues={initialValues}
+                      initialValues={{
+                        notes: this.state.notes,
+                      }}
                       validationSchema={validationSchema}
                       onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.synchronize()
