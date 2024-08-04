@@ -706,7 +706,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                     {
                                                         title: i18n.t('static.common.status'),
                                                         type: 'dropdown',
-                                                        source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.common.disabled') }]
+                                                        source: [{ id: true, name: i18n.t('static.common.active') }, { id: false, name: i18n.t('static.dataentry.inactive') }]
                                                     }
                                                 ],
                                                 editable: false,

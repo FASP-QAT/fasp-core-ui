@@ -1577,7 +1577,7 @@ class EditUserComponent extends Component {
                             this.dataChange(e);
                           }}
                           onBlur={handleBlur}
-                          maxLength={25}
+                          maxLength={50}
                           required
                           value={this.state.user.username}
                         />{" "}
@@ -1752,7 +1752,7 @@ class EditUserComponent extends Component {
                             check
                             htmlFor="inline-radio2"
                           >
-                            {i18n.t("static.common.disabled")}
+                            {i18n.t("static.dataentry.inactive")}
                           </Label>
                         </FormGroup>
                       </FormGroup>

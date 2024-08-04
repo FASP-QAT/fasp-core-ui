@@ -23,6 +23,7 @@ import ProductService from '../../api/ProductService';
 import ReportService from '../../api/ReportService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import pdfIcon from '../../assets/img/pdf.png';
+import csvicon from "../../assets/img/csv.png";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -714,6 +715,210 @@ class AnnualShipmentCost extends Component {
         return doc;
     }
     /**
+   * Exports the data to a CSV file.
+   */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push(
+            '"' +
+            (
+              i18n.t("static.program.program") +
+              " : " +
+              document.getElementById("programId").selectedOptions[0].text
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.report.versionFinal*") +
+              " : " +
+              document.getElementById("versionId").selectedOptions[0].text
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.common.reportbase") +
+              " : " +
+              document.getElementById("view").selectedOptions[0].text
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.report.dateRange") +
+                " : " +
+                makeText(this.state.rangeValue.from) +
+                " ~ " +
+                makeText(this.state.rangeValue.to)
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.common.productFreight")
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.budget.fundingsource") +
+            " : " +
+            this.state.fundingSourceLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.procurementagent.procurementagent") +
+            " : " +
+            this.state.procurementAgentLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.planningunit.planningunit") +
+            " : " +
+            this.state.planningUnitLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.common.status") +
+            " : " +
+            this.state.statusLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        var B = [];
+        var year = [];
+        for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+            year.push(from);
+        }
+        var tempData = this.state.outPutList;
+        var data = tempData.sort((a, b) => {
+            if (a.PROCUREMENT_AGENT_ID === b.PROCUREMENT_AGENT_ID) {
+              return a.FUNDING_SOURCE_ID - b.FUNDING_SOURCE_ID;
+            } else {
+              return a.PROCUREMENT_AGENT_ID - b.PROCUREMENT_AGENT_ID;
+            }
+        });
+        var tempB = [];
+        tempB.push(i18n.t('static.procurementagent.procurementagent').replaceAll(" ", "%20"));
+        tempB.push(i18n.t('static.fundingsource.fundingsource').replaceAll(" ", "%20"));
+        tempB.push(i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20"));
+        for (var i = 0; i < year.length; i++) {
+            tempB.push(year[i].toString());
+        }
+        tempB.push("Total")
+        B.push(tempB);
+
+        var totalAmount = []
+        var GrandTotalAmount = []
+        for (var j = 0; j < data.length; j++) {
+            tempB = [];
+            var record = data[j]
+            var keys = Object.entries(record).map(([key, value]) => (key)
+            )
+            var values = Object.entries(record).map(([key, value]) => (value)
+            )
+            tempB.push(record.procurementAgent.replaceAll(",", " ").replaceAll(" ", "%20"));
+            tempB.push(record.fundingsource.replaceAll(",", " ").replaceAll(" ", "%20"));
+            tempB.push(record.planningUnit.replaceAll(",", " ").replaceAll(" ", "%20"));
+            
+            var total = 0
+            for (var x = 0; x < year.length; x++) {
+                for (var n = 0; n < keys.length; n++) {
+                    if (year[x] == keys[n]) {
+                        total = Number(total) + Number(values[n])
+                        totalAmount[x] = totalAmount[x] == null ? Number(values[n]) : Number(totalAmount[x]) + Number(values[n])
+                        GrandTotalAmount[x] = GrandTotalAmount[x] == null ? Number(values[n]) : Number(GrandTotalAmount[x]) + Number(values[n])
+                        tempB.push(formatter(values[n],0).toString().replaceAll(",", "").replaceAll(" ", "%20"));                        
+                    }
+                }
+            }
+            tempB.push(formatter(roundN2(total),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+            B.push(tempB)
+            
+            tempB = [];
+            totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
+            GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
+            if (j < data.length - 1) {
+                if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
+                    tempB.push("Total");
+                    tempB.push("");
+                    tempB.push("");
+                    var Gtotal = 0
+                    for (var l = 0; l < totalAmount.length; l++) {
+                        Gtotal = Number(Gtotal) + Number(totalAmount[l])
+                        tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+                        totalAmount[l] = 0;
+                    }
+                    B.push(tempB);
+                } else {
+                }
+            } if (j == data.length - 1) {
+                tempB.push("Total");
+                tempB.push("");
+                tempB.push("");
+                var Gtotal = 0
+                for (var l = 0; l < totalAmount.length; l++) {
+                    Gtotal = Number(Gtotal) + Number(totalAmount[l])
+                    tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+                }
+                B.push(tempB);
+            }
+        }
+        tempB = [];
+        tempB.push(i18n.t('static.common.grandTotal').replaceAll(",", "").replaceAll(" ", "%20"));
+        tempB.push("");
+        tempB.push("");
+        var Gtotal = 0
+        for (var l = 0; l < GrandTotalAmount.length; l++) {
+            Gtotal = Gtotal + GrandTotalAmount[l]
+            tempB.push(formatter(roundN2(GrandTotalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+        }
+        B.push(tempB);
+
+        for (var i = 0; i < B.length; i++) {
+            csvRow.push(B[i].join(","));
+            if(B[i][0] == "Total" || B[i][0] == i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20")) {
+                csvRow.push("");
+            }
+        }
+        var csvString = csvRow.join("%0A");
+        var a = document.createElement("a");
+        a.href = "data:attachment/csv," + csvString;
+        a.target = "_Blank";
+        a.download =
+        i18n.t("static.report.annualshipmentcost") +
+        makeText(this.state.rangeValue.from) +
+        " ~ " +
+        makeText(this.state.rangeValue.to) +
+        ".csv";
+        document.body.appendChild(a);
+        a.click();
+    }
+    /**
      * Exports the data to a PDF file.
      */
     exportPDF = () => {
@@ -1344,6 +1549,12 @@ class AnnualShipmentCost extends Component {
                             <a className="card-header-action">
                                 {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
                             </a>
+                            {this.state.outPutList.length > 0 && <img
+                                style={{ height: "25px", width: "25px", cursor: "pointer" }}
+                                src={csvicon}
+                                title={i18n.t("static.report.exportCsv")}
+                                onClick={() => this.exportCSV()}
+                            />}
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
