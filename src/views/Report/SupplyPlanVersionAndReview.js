@@ -954,6 +954,21 @@ class SupplyPlanVersionAndReview extends Component {
             );
     }
     /**
+     * Filters the options based on the provided filter string.
+     * @param {Array} options - The array of options to filter.
+     * @param {string} filter - The filter string used to match option labels.
+     * @returns {Promise<Array>} - A promise that resolves to the filtered options.
+     */
+    filterOptions = async (options, filter) => {
+        if (filter) {
+            return options.filter((i) =>
+                i.label.toLowerCase().includes(filter.toLowerCase())
+            );
+        } else {
+            return options;
+        }
+    };
+    /**
      * Renders the Supply Plan version and review report table.
      * @returns {JSX.Element} - Supply Plan version and review report table.
      */
@@ -1187,6 +1202,7 @@ class SupplyPlanVersionAndReview extends Component {
                                     <MultiSelect
                                         name="versionStatusIdResetQPL"
                                         id="versionStatusIdResetQPL"
+                                        filterOptions={this.filterOptions}
                                         options={statusMultiselect && statusMultiselect.length > 0 ? statusMultiselect : []}
                                         value={this.state.versionStatusIdResetQPL}
                                         onChange={(e) => { this.dataChangeVersionStatus(e) }}
@@ -1203,6 +1219,7 @@ class SupplyPlanVersionAndReview extends Component {
                                         name="programIdsResetQPL"
                                         id="programIdsResetQPL"
                                         options={this.state.programIdsList && this.state.programIdsList.length > 0 ? this.state.programIdsList : []}
+                                        filterOptions={this.filterOptions}
                                         value={this.state.programIdsResetQPL}
                                         onChange={(e) => { this.setProgramIdsResetQPL(e) }}
                                         labelledBy={i18n.t('static.common.select')}
