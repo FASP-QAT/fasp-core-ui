@@ -44,10 +44,10 @@
 //     }
 //     delinkShipment(event, row) {
 //         event.stopPropagation();
-//         console.log("shipment id row---"+row.shipmentId);
+//         // console.log("shipment id row---"+row.shipmentId);
 //         ManualTaggingService.delinkShipment(row.shipmentId)
 //             .then(response => {
-//                 console.log("link response===", response);
+//                 // console.log("link response===", response);
 //                 this.setState({
 //                     message : i18n.t('static.shipment.delinkingsuccess')
 //                 })
@@ -74,7 +74,7 @@
 //         var planningUnitId = document.getElementById("planningUnitId").value;
 //         ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
 //             .then(response => {
-//                 console.log("manual tagging response===", response);
+//                 // console.log("manual tagging response===", response);
 //                 this.setState({
 //                     outputList: response.data
 //                 })
@@ -138,7 +138,7 @@
 //     }
 
 //     addCommas(cell, row) {
-//         console.log("row---------->", row);
+//         // console.log("row---------->", row);
 //         cell += '';
 //         var x = cell.split('.');
 //         var x1 = x[0];
@@ -390,7 +390,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
 
 import i18n from '../../i18n';
@@ -399,8 +399,8 @@ import ProgramService from '../../api/ProgramService.js';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import PlanningUnitService from '../../api/PlanningUnitService.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -443,7 +443,7 @@ export default class ShipmentDelinking extends Component {
         });
     }
     dataChange(val) {
-        console.log("val---------------------------%%%%%%%%%%%%%", val)
+        // console.log("val---------------------------%%%%%%%%%%%%%", val)
         if (val === "no") {
             this.toggleLarge();
         }
@@ -460,7 +460,7 @@ export default class ShipmentDelinking extends Component {
             this.setState({ loading: true })
             ManualTaggingService.delinkShipment(this.state.shipmentId, notes, programId)
                 .then(response => {
-                    console.log("link response===", response);
+                    // console.log("link response===", response);
                     this.setState({
                         message: i18n.t('static.shipment.delinkingsuccess'),
                         color: 'green',
@@ -477,7 +477,8 @@ export default class ShipmentDelinking extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -523,7 +524,7 @@ export default class ShipmentDelinking extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -532,12 +533,12 @@ export default class ShipmentDelinking extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     buildJExcel() {
         let outputList = this.state.outputList;
-        // console.log("outputList---->", outputList);
+        // // console.log("outputList---->", outputList);
         let outputArray = [];
         let count = 0;
 
@@ -559,9 +560,11 @@ export default class ShipmentDelinking extends Component {
         //     data = [];
         //     outputArray[0] = data;
         // }
-        // console.log("outputArray---->", outputArray);
+        // // console.log("outputArray---->", outputArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("tableDiv"), true);
+
         var json = [];
         var data = outputArray;
 
@@ -574,63 +577,66 @@ export default class ShipmentDelinking extends Component {
                 {
                     title: i18n.t('static.commit.qatshipmentId'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.commit.shipmentTransId'),
                     type: 'hidden',
-                    readOnly: true
+                    // readOnly: true
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     title: i18n.t('static.supplyPlan.mtexpectedDeliveryDate'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.mtshipmentStatus'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.report.procurementagentcode'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
 
                 {
                     title: i18n.t('static.fundingsource.fundingsourceCode'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.dashboard.budget'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 },
                 {
                     title: i18n.t('static.supplyPlan.shipmentQty'),
                     type: 'text',
-                    readOnly: true
+                    // readOnly: true
                 }
 
             ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
+            editable: false,
 
             oneditionend: this.onedit,
             copyCompatibility: true,
@@ -652,7 +658,7 @@ export default class ShipmentDelinking extends Component {
             //                     this.setState({ loading: true })
             //                     ManualTaggingService.delinkShipment(`${this.el.getValueFromCoords(0, y)}`)
             //                         .then(response => {
-            //                             console.log("link response===", response);
+            //                             // console.log("link response===", response);
             //                             this.setState({
             //                                 message: i18n.t('static.shipment.delinkingsuccess'),
             //                                 color: 'green',
@@ -725,38 +731,41 @@ export default class ShipmentDelinking extends Component {
         jExcelLoadedFunction(instance);
     }
 
-    selected = function (instance, cell, x, y, value) {
-        if ((x == 0 && value != 0) || (y == 0)) {
-            console.log("HEADER SELECTION--------------------------");
-        } else {
-            this.setState({
-                shipmentId: `${this.el.getValueFromCoords(0, x)}`
-            })
-            this.toggleLarge();
-            // confirmAlert({
-            //     message: i18n.t('static.mt.confirmDelink'),
-            //     buttons: [
-            //         {
-            //             label: i18n.t('static.program.yes'),
-            //             onClick: () => {
-            //                 var userName = prompt('Please Enter your Name')
+    selected = function (instance, cell, x, y, value, e) {
+        if (e.buttons == 1) {
 
-            //             }
-            //         },
-            //         {
-            //             label: i18n.t('static.program.no')
-            //         }
-            //     ]
-            // });
-            // var outputListAfterSearch = [];
-            // let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
-            // outputListAfterSearch.push(row);
+            if ((x == 0 && value != 0) || (y == 0)) {
+                // console.log("HEADER SELECTION--------------------------");
+            } else {
+                this.setState({
+                    shipmentId: `${this.el.getValueFromCoords(0, x)}`
+                })
+                this.toggleLarge();
+                // confirmAlert({
+                //     message: i18n.t('static.mt.confirmDelink'),
+                //     buttons: [
+                //         {
+                //             label: i18n.t('static.program.yes'),
+                //             onClick: () => {
+                //                 var userName = prompt('Please Enter your Name')
 
-            // this.setState({
-            //     shipmentId: this.el.getValueFromCoords(0, x),
-            //     outputListAfterSearch
-            // })
-            // this.toggleLarge();
+                //             }
+                //         },
+                //         {
+                //             label: i18n.t('static.program.no')
+                //         }
+                //     ]
+                // });
+                // var outputListAfterSearch = [];
+                // let row = this.state.outputList.filter(c => (c.shipmentId == this.el.getValueFromCoords(0, x)))[0];
+                // outputListAfterSearch.push(row);
+
+                // this.setState({
+                //     shipmentId: this.el.getValueFromCoords(0, x),
+                //     outputListAfterSearch
+                // })
+                // this.toggleLarge();
+            }
         }
     }.bind(this);
 
@@ -766,7 +775,7 @@ export default class ShipmentDelinking extends Component {
         var planningUnitId = document.getElementById("planningUnitId").value;
         if (programId != -1 && planningUnitId != 0) {
             this.setState({ loading: true })
-            console.log("HASLINKED------->", this.state.haslink);
+            // console.log("HASLINKED------->", this.state.haslink);
             if (this.state.haslink) {
                 this.setState({ haslink: false })
             } else {
@@ -774,7 +783,7 @@ export default class ShipmentDelinking extends Component {
             }
             ManualTaggingService.getShipmentListForDelinking(programId, planningUnitId)
                 .then(response => {
-                    console.log("manual tagging response===", response);
+                    // console.log("manual tagging response===", response);
                     this.setState({
                         outputList: response.data,
                         // message: ''
@@ -785,7 +794,8 @@ export default class ShipmentDelinking extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -822,24 +832,28 @@ export default class ShipmentDelinking extends Component {
                     }
                 );
         } else if (programId == -1) {
-            console.log("2-programId------>", programId);
+            // console.log("2-programId------>", programId);
             this.setState({
                 outputList: [],
                 message: i18n.t('static.program.validselectprogramtext'),
                 color: '#BA0C2F'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
             });
         } else if (planningUnitId == 0) {
-            console.log("3-programId------>", programId);
+            // console.log("3-programId------>", programId);
             this.setState({
                 outputList: [],
                 message: i18n.t('static.procurementUnit.validPlanningUnitText'),
                 color: '#BA0C2F'
             }, () => {
                 this.el = jexcel(document.getElementById("tableDiv"), '');
-                this.el.destroy();
+                // this.el.destroy();
+                jexcel.destroy(document.getElementById("tableDiv"), true);
+
             });
         }
 
@@ -892,7 +906,8 @@ export default class ShipmentDelinking extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -963,7 +978,8 @@ export default class ShipmentDelinking extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1016,7 +1032,7 @@ export default class ShipmentDelinking extends Component {
     }
 
     addCommas(cell, row) {
-        console.log("row---------->", row);
+        // console.log("row---------->", row);
         cell += '';
         var x = cell.split('.');
         var x1 = x[0];
@@ -1038,6 +1054,11 @@ export default class ShipmentDelinking extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
@@ -1244,7 +1265,7 @@ export default class ShipmentDelinking extends Component {
                                                         id="notesTxt"
                                                         bsSize="sm"
                                                         autocomplete="off"
-                                                        // maxLength={600}
+                                                    // maxLength={600}
                                                     >
                                                     </Input>
                                                 </InputGroup>

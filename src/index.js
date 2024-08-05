@@ -19,9 +19,5 @@ const loading = () => <div className="animated fadeIn pt-3 text-center"><div cla
 
 
 ReactDOM.render(<React.Suspense fallback={loading()}><App /></React.Suspense>, document.getElementById('root'));
-console.log("inside index.js----------------------")
 getDatabase();
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
 registerServiceWorker();

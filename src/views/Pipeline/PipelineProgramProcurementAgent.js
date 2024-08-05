@@ -1,16 +1,16 @@
+import jexcel from 'jspreadsheet';
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import PipelineService from '../../api/PipelineService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import ProcurementAgentService from '../../api/ProcurementAgentService'
+import ProcurementAgentService from '../../api/ProcurementAgentService';
 import i18n from '../../i18n';
-import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
-import { textFilter } from 'react-bootstrap-table2-filter';
-import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+/**
+ * Component for pipeline program import procurement agent details
+ */
 export default class PipelineProgramProcurementAgent extends Component {
     constructor(props) {
         super(props);
@@ -23,26 +23,30 @@ export default class PipelineProgramProcurementAgent extends Component {
         this.changed = this.changed.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.saveProcurementAgent = this.saveProcurementAgent.bind(this);
-        //this.dropdownFilter = this.dropdownFilter.bind(this);
-        this.startLoading=this.startLoading.bind(this);
-        this.stopLoading=this.stopLoading.bind(this);
+        this.startLoading = this.startLoading.bind(this);
+        this.stopLoading = this.stopLoading.bind(this);
     }
-
-    startLoading(){
-        this.setState({loading:true});
+    /**
+     * Sets loading to true
+     */
+    startLoading() {
+        this.setState({ loading: true });
     }
-    stopLoading(){
-        this.setState({loading:false});
+    /**
+     * Sets loading to false
+     */
+    stopLoading() {
+        this.setState({ loading: false });
     }
-
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.procurementAgentList;
-        var json = this.el.getJson(null,false);
-
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[1]).toString();
-
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -52,47 +56,43 @@ export default class PipelineProgramProcurementAgent extends Component {
                 this.el.setComments(col, (list[y].pipelineProcurementAgent).concat(i18n.t('static.message.notExist')));
             }
         }
-
     }
-
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
-
-
-        //Planning Unit
         if (x == 1) {
-            var json = this.el.getJson(null,false);
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
             }
-            // var columnName = jexcel.getColumnNameFromId([x + 1, y]);
-            // instance.jexcel.setValue(columnName, '');
         }
-
-
     }
-
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
-
         var reg = /^[0-9\b]+$/;
         var regDec = /^(?:[1-9]\d*|0)?(?:\.\d+)?$/;
-
         var valid = true;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var col = ("B").concat(parseInt(y) + 1);
             var value = this.el.getValue(`B${parseInt(y) + 1}`, true);
-
             var currentProcurementAgent = this.el.getRowData(y)[1];
-
-            if (value == "" || value==undefined) {
+            if (value == "" || value == undefined) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -100,18 +100,17 @@ export default class PipelineProgramProcurementAgent extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
             }
         }
         return valid;
     }
-
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     saveProcurementAgent() {
         var list = this.state.procurementAgentList;
-        var json = this.el.getJson(null,false);
+        var json = this.el.getJson(null, false);
         var procurementAgentArray = []
-        console.log(json.length)
-        console.log(json)
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
             var procurementAgentId = map.get("1");
@@ -120,33 +119,22 @@ export default class PipelineProgramProcurementAgent extends Component {
             } else {
                 procurementAgentId = list[i].id;
             }
-
             var procurementAgentJson = {
-                // pipelineId: {
-                //     id: this.props.pipelineId
-                // },
-                // active: true,
-
                 procurementAgentId: procurementAgentId,
                 pipelineProcurementAgentId: map.get("2")
-
-
             }
             procurementAgentArray.push(procurementAgentJson);
         }
         return procurementAgentArray;
-
     }
-
-
+    /**
+     * Reterives procurement agent list on component mount
+     */
     componentDidMount() {
         var ProcurementAgentListQat = [];
-        // var activeDataSourceList=[];
-        // AuthenticationService.setupAxiosInterceptors();
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
                 if (response.status == 200) {
-                    // dataSourceListQat = response.data
                     this.setState({ activeDataSourceList: response.data });
                     for (var k = 0; k < (response.data).length; k++) {
                         var dataSourceJson = {
@@ -156,62 +144,52 @@ export default class PipelineProgramProcurementAgent extends Component {
                         ProcurementAgentListQat.push(dataSourceJson);
                     }
                     this.setState({ ProcurementAgentListQat: ProcurementAgentListQat });
-
-
-                    // AuthenticationService.setupAxiosInterceptors();
                     PipelineService.getQatTempProcurementAgentList(this.props.pipelineId)
                         .then(response => {
                             if (response.status == 200) {
                                 if (response.data.length > 0) {
-
                                     var procurementAgentList = response.data;
                                     var data = [];
                                     var productDataArr = []
-                                    //seting this for loaded function
                                     this.setState({ procurementAgentList: procurementAgentList });
-                                    //seting this for loaded function
                                     if (procurementAgentList.length != 0) {
                                         for (var j = 0; j < procurementAgentList.length; j++) {
                                             data = [];
-
                                             data[0] = procurementAgentList[j].pipelineProcurementAgent;
                                             data[1] = procurementAgentList[j].procurementAgentId;
                                             data[2] = procurementAgentList[j].pipelineProcurementAgentId;
                                             productDataArr.push(data);
-
                                         }
                                     } else {
-                                        console.log("procurementagent list length is 0.");
                                     }
-
                                     this.el = jexcel(document.getElementById("mapProcurementAgent"), '');
-                                    this.el.destroy();
+                                    jexcel.destroy(document.getElementById("mapProcurementAgent"), true);
                                     var json = [];
                                     var data = productDataArr;
-                                    // var data = []
                                     var options = {
                                         data: data,
-                                        columnDrag: true,
+                                        columnDrag: false,
                                         colWidths: [250, 250],
                                         columns: [
-
                                             {
                                                 title: i18n.t('static.pipeline.pplnprocurementagent'),
                                                 type: 'text',
                                                 readonly: true
                                             },
-
                                             {
                                                 title: i18n.t('static.procurementagent.procurementagent'),
                                                 type: 'autocomplete',
                                                 source: ProcurementAgentListQat,
-                                                //filter: this.dropdownFilter
                                             }, {
                                                 title: i18n.t('static.inventory.procurementAgent'),
                                                 type: 'hidden',
+                                                // title: 'A',
+                                                // type: 'text',
+                                                // visible: false,
                                                 readonly: true
                                             }
                                         ],
+                                        editable: true,
                                         pagination: localStorage.getItem("sesRecordCount"),
                                         filters: true,
                                         contextMenu: function (obj, x, y, e) {
@@ -219,26 +197,16 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         }.bind(this),
                                         search: true,
                                         columnSorting: true,
-                                        tableOverflow: true,
                                         wordWrap: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
-                                        // position: 'top',
                                         allowInsertColumn: false,
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: false,
                                         onchange: this.changed,
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
-                                        // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                                        text: {
-                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                            show: '',
-                                            entries: '',
-                                        },
                                         onload: this.loadedJexcelCommonFunction,
                                         license: JEXCEL_PRO_KEY,
-                                        // onload: this.loaded
-
                                     };
                                     var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);
                                     this.el = elVar;
@@ -246,7 +214,6 @@ export default class PipelineProgramProcurementAgent extends Component {
                                     this.setState({
                                         loading: false
                                     })
-
                                 }
                             } else {
                                 this.setState({ message: response.data.messageCode, loading: false })
@@ -255,12 +222,11 @@ export default class PipelineProgramProcurementAgent extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
@@ -291,19 +257,16 @@ export default class PipelineProgramProcurementAgent extends Component {
                                 }
                             }
                         );
-
-
                 }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -334,23 +297,29 @@ export default class PipelineProgramProcurementAgent extends Component {
                     }
                 }
             );
-
-
-
-
     }
-
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedJexcelCommonFunction = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
-
+    /**
+     * Renders the pipeline program import procurement agent details screen.
+     * @returns {JSX.Element} - Pipeline program import procurement agent details screen.
+     */
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
-
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div id="mapProcurementAgent">
                     </div>
                 </div>
@@ -358,9 +327,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
@@ -368,5 +335,4 @@ export default class PipelineProgramProcurementAgent extends Component {
             </>
         );
     }
-
 }

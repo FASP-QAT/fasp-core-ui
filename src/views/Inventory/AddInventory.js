@@ -1,30 +1,31 @@
 import CryptoJS from 'crypto-js';
-
-import { Formik } from 'formik';
-import React, { Component } from 'react';
-import {
-    Button, Card, CardBody, CardFooter, Col, Form, FormGroup,
-    Label, Modal, ModalBody, ModalFooter, ModalHeader, Input
-} from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText';
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DELIVERED_SHIPMENT_STATUS, API_URL, polling } from '../../Constants.js';
-import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
-import Select from 'react-select';
-import 'react-select/dist/react-select.min.css';
-import AuthenticationService from '../Common/AuthenticationService';
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import moment from "moment"
-import { Online } from 'react-detect-offline';
-import { Prompt } from 'react-router'
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Workbook } from 'exceljs';
 import * as fs from 'file-saver';
-
+import { Formik } from 'formik';
+import moment from "moment";
+import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import { MultiSelect } from "react-multi-select-component";
+import { Prompt } from 'react-router';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import {
+    Button, Card, CardBody, CardFooter,
+    Form, FormGroup,
+    Label, Modal, ModalBody, ModalFooter, ModalHeader
+} from 'reactstrap';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlanForDataEntry";
 const entityname = i18n.t('static.inventory.inventorydetils')
+/**
+ * This component is used to allow the users to do the data entry for the inventory or adjustment records
+ */
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -49,7 +50,14 @@ export default class AddInventory extends Component {
             regionList: [],
             dataSourceList: [],
             realmCountryPlanningUnitList: [],
-            programQPLDetails: []
+            programQPLDetails: [],
+            planningUnitListForJexcel: [],
+            planningUnitListForJexcelAll: [],
+            planningUnit: [],
+            puData: [],
+            inventoryListForSelectedPlanningUnits: [],
+            inventoryListForSelectedPlanningUnitsUnfiltered: [],
+            planningUnitList: []
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -61,21 +69,18 @@ export default class AddInventory extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
         this.exportCSV = this.exportCSV.bind(this);
     }
-
+    /**
+     * This function is used to export the inventory or adjustment data entry template so that user can copy paste the bulk data
+     */
     exportCSV() {
-
-        //Create workbook and worksheet
         let workbook = new Workbook();
         let worksheet = (this.state.inventoryDataType.value == 1 ? workbook.addWorksheet(i18n.t('static.supplyplan.inventoryDataEntry')) : workbook.addWorksheet(i18n.t('static.supplyplan.adjustmentDataEntryTemplate')));
-
-        //Add Header Row
-
         worksheet.columns = [
+            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
             { header: i18n.t('static.inventory.inventoryDate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.inventory.dataSource'), key: 'name', width: 40 },
@@ -89,33 +94,18 @@ export default class AddInventory extends Component {
             { header: i18n.t('static.common.note'), key: 'string', width: 25 },
             { header: i18n.t('static.inventory.active'), key: 'string', width: 25 },
         ];
-
         worksheet.getRow(1).eachCell({ includeEmpty: true }, function (cell, colNumber) {
-            // console.log('ROW--------->' + colNumber + ' = ' + cell.value);
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'FFFFFF00' },
                 bgColor: { argb: 'FF0000FF' },
-                // font: { bold: true }
             }
             cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
         });
-
-
-        // worksheet.dataValidations.add('A2:A100', {
-        //     type: 'date',
-        //     showErrorMessage: true,
-        //     formulae: [new Date('3021-01-01')],
-        //     allowBlank: false,
-        //     prompt: 'Format (YYYY-MM-DD)',
-        // });
-
-        for (let i = 0; i < 100; i++) {
-            worksheet.getCell('A' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
+        for (let i = 0; i < 1000; i++) {
+            worksheet.getCell('B' + (+i + 2)).note = i18n.t('static.dataEntry.dateValidation');
         }
-
-        //2 Dropdown
         let dataSourceVar = [];
         let datasourceList = this.state.dataSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
@@ -125,124 +115,66 @@ export default class AddInventory extends Component {
         for (let i = 0; i < datasourceList.length; i++) {
             dataSourceVar.push(datasourceList[i].name);
         }
-        worksheet.dataValidations.add('C2:C100', {
+        worksheet.dataValidations.add('D2:D1000', {
             type: 'list',
             allowBlank: false,
-            // formulae: ['"male,female,other"'],
-            // formulae: [`"${jsonDropdown.join(",")}"`],
-            // formulae: [`"${dataSourceVar}"`],
             formulae: [`"${dataSourceVar.join(",")}"`],
             showErrorMessage: true,
-            // errorStyle: 'error',
-            // error: 'Invalid value',
         });
-
-        //region
         let regionVar = [];
         let regionList = this.state.regionList;
         for (let i = 0; i < regionList.length; i++) {
             regionVar.push(regionList[i].name);
         }
-
-        worksheet.dataValidations.add('B2:B100', {
+        worksheet.dataValidations.add('C2:C1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${regionVar.join(",")}"`],
             showErrorMessage: true,
-            // errorStyle: 'error',
-            // error: 'Invalid value',
         });
-
-
-        //alternateReportingUnit
-        // let alternateReportingUnitVar = [];
-        // let alternateReportingUnitList = this.state.realmCountryPlanningUnitList.filter(c => c.active.toString() == "true").sort(function (a, b) {
-        //     a = a.name.toLowerCase();
-        //     b = b.name.toLowerCase();
-        //     return a < b ? -1 : a > b ? 1 : 0;
-        // });
-        // for (let i = 0; i < alternateReportingUnitList.length; i++) {
-        //     alternateReportingUnitVar.push(alternateReportingUnitList[i].name);
-        // }
-        // worksheet.dataValidations.add('D2:D100', {
-        //     type: 'list',
-        //     allowBlank: false,
-        //     formulae: [`"${alternateReportingUnitVar.join(",")}"`],
-        //     showErrorMessage: true,
-        //     // errorStyle: 'error',
-        //     // error: 'Invalid value',
-        // });
-
-
-        // let activeDropdown = [i18n.t('static.dataEntry.True'), i18n.t('static.dataEntry.False')];
         let activeDropdown = ["True", "False"];
-        worksheet.dataValidations.add('L2:L100', {
+        worksheet.dataValidations.add('M2:M1000', {
             type: 'list',
             allowBlank: false,
             formulae: [`"${activeDropdown.join(",")}"`],
             showErrorMessage: true,
-            // errorStyle: 'error',
-            // error: 'Invalid value',
         });
-
-
-        //Validations
         if (this.state.inventoryDataType.value == 1) {
-            worksheet.dataValidations.add('G2:G100', {
+            worksheet.dataValidations.add('H2:H1000', {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
                 formulae: [-1],
-                // formulae: [-100000000],
-                // errorStyle: 'error',
-                // errorTitle: 'Invalid Value',
-                // error: 'Invalid Value'
             });
         } else {
-            worksheet.dataValidations.add('F2:F100', {
+            worksheet.dataValidations.add('G2:G1000', {
                 type: 'whole',
                 operator: 'greaterThan',
                 showErrorMessage: true,
-                // formulae: [-1],
                 formulae: [-100000000],
-                // errorStyle: 'error',
-                // errorTitle: 'Invalid Value',
-                // error: 'Invalid Value'
             });
         }
-
-
-        //Gray color
-        for (let i = 0; i < 100; i++) {
-            worksheet.getCell('E' + (+i + 2)).fill = {
+        for (let i = 0; i < 1000; i++) {
+            worksheet.getCell('F' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-
             if (this.state.inventoryDataType.value == 1) {
-                worksheet.getCell('F' + (+i + 2)).fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'cccccc' },
-                    bgColor: { argb: '96C8FB' }
-                }
-            } else {
                 worksheet.getCell('G' + (+i + 2)).fill = {
                     type: 'pattern',
                     pattern: 'solid',
                     fgColor: { argb: 'cccccc' },
                     bgColor: { argb: '96C8FB' }
                 }
-            }
-
-
-            worksheet.getCell('H' + (+i + 2)).fill = {
-                type: 'pattern',
-                pattern: 'solid',
-                fgColor: { argb: 'cccccc' },
-                bgColor: { argb: '96C8FB' }
+            } else {
+                worksheet.getCell('H' + (+i + 2)).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'cccccc' },
+                    bgColor: { argb: '96C8FB' }
+                }
             }
             worksheet.getCell('I' + (+i + 2)).fill = {
                 type: 'pattern',
@@ -250,28 +182,19 @@ export default class AddInventory extends Component {
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-
             worksheet.getCell('J' + (+i + 2)).fill = {
                 type: 'pattern',
                 pattern: 'solid',
                 fgColor: { argb: 'cccccc' },
                 bgColor: { argb: '96C8FB' }
             }
-
+            worksheet.getCell('K' + (+i + 2)).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'cccccc' },
+                bgColor: { argb: '96C8FB' }
+            }
         }
-
-        //Protection
-
-
-        // worksheet.getColumn('G2').protection = {
-        //     locked: false,
-        //     hidden: true,
-        // };
-        // worksheet.getCell('G3').protection = {
-        //     locked: false,
-        //     hidden: true,
-        // };
-
         worksheet.protect();
         worksheet.getColumn('A').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
@@ -285,40 +208,33 @@ export default class AddInventory extends Component {
         worksheet.getColumn('D').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
+        worksheet.getColumn('E').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
         if (this.state.inventoryDataType.value == 1) {
-            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            worksheet.getColumn('H').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
                 cell.protection = { locked: false };
             });
         } else {
-            worksheet.getColumn('F').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            worksheet.getColumn('G').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
                 cell.protection = { locked: false };
             });
         }
-        worksheet.getColumn('K').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
-            cell.protection = { locked: false };
-        });
         worksheet.getColumn('L').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
             cell.protection = { locked: false };
         });
-
-        // Generate Excel File with given name
-
+        worksheet.getColumn('M').eachCell({ includeEmpty: true }, function (cell, rowNumber) {
+            cell.protection = { locked: false };
+        });
         workbook.xlsx.writeBuffer().then((data) => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            // fs.saveAs(blob, 'candidate.xlsx');
-            // fs.saveAs(blob, i18n.t('static.supplyplan.inventoryDataEntry') + '.xlsx');
             fs.saveAs(blob, (this.state.inventoryDataType.value == 1 ? i18n.t('static.supplyplan.inventoryDataEntry') : i18n.t('static.supplyplan.adjustmentDataEntryTemplate')) + '.xlsx');
-
         })
-
     }
-
-
-    show() {
-    }
-    handleRangeChange(value, text, listIndex) {
-        //
-    }
+    /**
+     * This function is used to update the inventory or adjustment date range filter value
+     * @param {*} value This is the value that user has selected
+     */
     handleRangeDissmis(value) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -326,7 +242,6 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
@@ -337,33 +252,43 @@ export default class AddInventory extends Component {
             this.formSubmit(this.state.planningUnit, value);
         }
     }
-
+    /**
+     * This function is used to hide the messages that are there in div1 after 30 seconds
+     */
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
-
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
-
+    /**
+     * This function is used to hide the messages that are there in div3 after 30 seconds
+     */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
-
+    /**
+     * This function is triggered when this component is about to unmount
+     */
     componentWillUnmount() {
         clearTimeout(this.timeout);
         window.onbeforeunload = null;
     }
-
+    /**
+     * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
+     */
     componentDidUpdate = () => {
         if (this.state.inventoryChangedFlag == 1 || this.state.inventoryBatchInfoChangedFlag == 1) {
             window.onbeforeunload = () => true
@@ -371,7 +296,10 @@ export default class AddInventory extends Component {
             window.onbeforeunload = undefined
         }
     }
-
+    /**
+     * This function is used to toggle the batch details model
+     * @param {*} method This method value is used to check if unsaved changes alert should be displayed or not
+     */
     toggleLarge(method) {
         var cont = false;
         if (method != "submit" && this.state.inventoryBatchInfoChangedFlag == 1) {
@@ -379,7 +307,6 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
@@ -396,8 +323,11 @@ export default class AddInventory extends Component {
             });
         }
     }
-
+    /**
+     * This function is used to fetch list all the offline programs that the user have downloaded
+     */
     componentDidMount() {
+        document.getElementById("adjustmentsTableDiv").closest('.card').classList.add("removeCardwrap");
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -428,11 +358,6 @@ export default class AddInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        // var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        // var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        // var programJson1 = JSON.parse(programData);
                         var programJson = {
                             label: myResult[i].programCode + "~v" + myResult[i].version,
                             value: myResult[i].id
@@ -451,7 +376,6 @@ export default class AddInventory extends Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
                 }
-                // var programIdd = this.props.match.params.programId || localStorage.getItem("sesProgramId");
                 var programIdd = '';
                 if (this.props.match.params.programId != '' && this.props.match.params.programId != undefined) {
                     programIdd = this.props.match.params.programId;
@@ -473,9 +397,11 @@ export default class AddInventory extends Component {
                 }
             }.bind(this);
         }.bind(this)
-
     }
-
+    /**
+     * This function is used to fetch list all the planning units based on the programs that the user has selected
+     * @param {*} value This is value of the program that is selected either by user or is autoselected
+     */
     getPlanningUnitList(value) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -483,14 +409,11 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
         }
         if (cont == true) {
-            document.getElementById("planningUnitId").value = 0;
-            document.getElementById("planningUnit").value = "";
             document.getElementById("adjustmentsTableDiv").style.display = "none";
             if (document.getElementById("addRowButtonId") != null) {
                 document.getElementById("addRowButtonId").style.display = "none";
@@ -499,15 +422,13 @@ export default class AddInventory extends Component {
                 programSelect: value,
                 programId: value != "" && value != undefined ? value.value : 0,
                 loading: true,
-                planningUnit: "",
-                planningUnitId: 0,
+                planningUnit: [],
                 inventoryChangedFlag: 0
             })
             var programId = value != "" && value != undefined ? value.value : 0;
             if (programId != 0) {
                 localStorage.setItem("sesProgramId", programId);
                 var db1;
-                var storeOS;
                 var regionList = [];
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -541,13 +462,10 @@ export default class AddInventory extends Component {
                                 label: programJson.regionList[i].label
                             }
                             regionList.push(regionJson)
-
                         }
-
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
                             this.setState({
                                 message: i18n.t('static.program.errortext'),
@@ -560,6 +478,7 @@ export default class AddInventory extends Component {
                             var programId = (value != "" && value != undefined ? value.value : 0).split("_")[0];
                             myResult = planningunitRequest.result.filter(c => c.program.id == programId);
                             var proList = []
+                            var planningUnitListForJexcel = []
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
                                     var productJson = {
@@ -567,12 +486,22 @@ export default class AddInventory extends Component {
                                         value: myResult[i].planningUnit.id
                                     }
                                     proList.push(productJson)
+                                    var productJson1 = {
+                                        name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
+                                        id: myResult[i].planningUnit.id
+                                    }
+                                    planningUnitListForJexcel.push(productJson1)
                                 }
                             }
                             this.setState({
                                 planningUnitList: proList.sort(function (a, b) {
                                     a = a.label.toLowerCase();
                                     b = b.label.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                planningUnitListForJexcelAll: planningUnitListForJexcel.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
                                 planningUnitListAll: myResult,
@@ -584,23 +513,43 @@ export default class AddInventory extends Component {
                                 }),
                                 loading: false
                             })
-
-                            // var planningUnitIdProp = this.props.match.params.planningUnitId || localStorage.getItem("sesPlanningUnitId");
                             var planningUnitIdProp = '';
                             if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
                                 planningUnitIdProp = this.props.match.params.planningUnitId;
-                            } else if (localStorage.getItem("sesPlanningUnitId") != '' && localStorage.getItem("sesPlanningUnitId") != undefined) {
-                                planningUnitIdProp = localStorage.getItem("sesPlanningUnitId");
-                            } else if (proList.length == 1) {
-                                planningUnitIdProp = proList[0].value;
+                                var proListFiltered = proList.filter(c => c.value == planningUnitIdProp);
+                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined && proListFiltered.length > 0) {
+                                    var planningUnit = [{ value: planningUnitIdProp, label: proListFiltered[0].label }];
+                                    this.setState({
+                                        planningUnit: planningUnit,
+                                    })
+                                    this.formSubmit(planningUnit, this.state.rangeValue);
+                                }
                             }
-                            if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
-                                var planningUnit = { value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label };
-                                this.setState({
-                                    planningUnit: planningUnit,
-                                    planningUnitId: planningUnitIdProp
-                                })
-                                this.formSubmit(planningUnit, this.state.rangeValue);
+                            else if (localStorage.getItem("sesPlanningUnitIdMulti") != '' && localStorage.getItem("sesPlanningUnitIdMulti") != undefined) {
+                                planningUnitIdProp = localStorage.getItem("sesPlanningUnitIdMulti");
+                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                    var planningUnitIdSession = JSON.parse(planningUnitIdProp);
+                                    var updatePlanningUnitList = [];
+                                    for (var pu = 0; pu < planningUnitIdSession.length; pu++) {
+                                        if (proList.filter(c => c.value == planningUnitIdSession[pu].value).length > 0) {
+                                            updatePlanningUnitList.push(planningUnitIdSession[pu]);
+                                        }
+                                    }
+                                    this.setState({
+                                        planningUnit: updatePlanningUnitList,
+                                    })
+                                    this.formSubmit(updatePlanningUnitList, this.state.rangeValue);
+                                }
+                            }
+                            else if (proList.length == 1) {
+                                planningUnitIdProp = proList[0].value;
+                                if (planningUnitIdProp != '' && planningUnitIdProp != undefined) {
+                                    var planningUnit = [{ value: planningUnitIdProp, label: proList.filter(c => c.value == planningUnitIdProp)[0].label }];
+                                    this.setState({
+                                        planningUnit: planningUnit,
+                                    })
+                                    this.formSubmit(planningUnit, this.state.rangeValue);
+                                }
                             }
                         }.bind(this);
                     }.bind(this)
@@ -608,12 +557,19 @@ export default class AddInventory extends Component {
             } else {
                 this.setState({
                     loading: false,
-                    planningUnitList: []
+                    planningUnitList: [],
+                    planningUnitListForJexcel: [],
+                    planningUnitListForJexcelAll: [],
+                    puData: [],
                 })
             }
         }
     }
-
+    /**
+     * This function is used fetch all the inventory or adjustment records based on the filters and build all the necessary data
+     * @param {*} value This is the value of planning unit
+     * @param {*} rangeValue This is the value of date range that is selected
+     */
     formSubmit(value, rangeValue) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -621,7 +577,6 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
@@ -631,11 +586,11 @@ export default class AddInventory extends Component {
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             this.setState({ loading: true, inventoryChangedFlag: 0 })
             var programId = document.getElementById('programId').value;
-            this.setState({ programId: programId, planningUnitId: value != "" && value != undefined ? value.value : 0, planningUnit: value });
-            var planningUnitId = value != "" && value != undefined ? value.value : 0;
+            this.setState({ programId: programId, planningUnit: value });
+            var puList = value;
             var programId = document.getElementById("programId").value;
-            if (planningUnitId != 0) {
-                localStorage.setItem("sesPlanningUnitId", planningUnitId);
+            if (puList.length > 0) {
+                localStorage.setItem("sesPlanningUnitIdMulti", JSON.stringify(value));
                 document.getElementById("adjustmentsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
@@ -668,57 +623,70 @@ export default class AddInventory extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (event) {
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-                        var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
-                        var programJson = {};
-                        if (planningUnitDataFilter.length > 0) {
-                            var planningUnitData = planningUnitDataFilter[0]
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
+                        var puData = [];
+                        var inventoryListForSelectedPlanningUnits = [];
+                        var inventoryListForSelectedPlanningUnitsUnfiltered = [];
+                        var planningUnitListForJexcel = this.state.planningUnitListForJexcelAll;
+                        var planningUnitListForJexcelUpdated = [];
+                        for (var pu = 0; pu < puList.length; pu++) {
+                            planningUnitListForJexcelUpdated.push(planningUnitListForJexcel.filter(c => c.id == puList[pu].value)[0]);
+                            var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == puList[pu].value);
+                            var programJson = {};
+                            if (planningUnitDataFilter.length > 0) {
+                                var planningUnitData = planningUnitDataFilter[0]
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = {
+                                    consumptionList: [],
+                                    inventoryList: [],
+                                    shipmentList: [],
+                                    batchInfoList: [],
+                                    supplyPlan: []
+                                }
                             }
-                        }
-                        var batchList = []
-                        var batchInfoList = programJson.batchInfoList;
-
-                        var batchList = [];
-                        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-
-                        for (var sl = 0; sl < shipmentList.length; sl++) {
-                            var bdl = shipmentList[sl].batchInfoList;
-                            for (var bd = 0; bd < bdl.length; bd++) {
-                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                if (index == -1) {
-                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                    if (batchDetailsToPush.length > 0) {
-                                        batchList.push(batchDetailsToPush[0]);
+                            var batchList = []
+                            var batchInfoList = programJson.batchInfoList;
+                            var batchList = [];
+                            var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+                            for (var sl = 0; sl < shipmentList.length; sl++) {
+                                var bdl = shipmentList[sl].batchInfoList;
+                                for (var bd = 0; bd < bdl.length; bd++) {
+                                    var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (index == -1) {
+                                        var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == puList[pu].value && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        if (batchDetailsToPush.length > 0) {
+                                            batchList.push(batchDetailsToPush[0]);
+                                        }
                                     }
                                 }
                             }
+                            var inventoryListUnFiltered = (programJson.inventoryList);
+                            inventoryListForSelectedPlanningUnitsUnfiltered = inventoryListForSelectedPlanningUnitsUnfiltered.concat(inventoryListUnFiltered);
+                            var inventoryList = (programJson.inventoryList).filter(c =>
+                                c.planningUnit.id == puList[pu].value &&
+                                c.region != null && c.region.id != 0);
+                            if (this.state.inventoryType == 1) {
+                                inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
+                            } else {
+                                inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
+                            }
+                            inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
+                            inventoryListForSelectedPlanningUnits = inventoryListForSelectedPlanningUnits.concat(inventoryList);
+                            puData.push({
+                                id: puList[pu].value,
+                                programJson: programJson,
+                                inventoryListUnFiltered: inventoryListUnFiltered,
+                                inventoryList: inventoryList,
+                                batchInfoList: batchList,
+                            })
                         }
-
-                        var inventoryListUnFiltered = (programJson.inventoryList);
-                        var inventoryList = (programJson.inventoryList).filter(c =>
-                            c.planningUnit.id == planningUnitId &&
-                            c.region != null && c.region.id != 0);
-                        if (this.state.inventoryType == 1) {
-                            inventoryList = inventoryList.filter(c => c.actualQty !== "" && c.actualQty != undefined && c.actualQty != null);
-                        } else {
-                            inventoryList = inventoryList.filter(c => c.adjustmentQty !== "" && c.adjustmentQty != undefined && c.adjustmentQty != null);
-                        }
-
-                        inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                         this.setState({
-                            batchInfoList: batchList,
-                            programJson: programJson,
-                            inventoryListUnFiltered: inventoryListUnFiltered,
-                            inventoryList: inventoryList,
+                            puData: puData,
+                            inventoryListForSelectedPlanningUnits: inventoryListForSelectedPlanningUnits,
+                            inventoryListForSelectedPlanningUnitsUnfiltered: inventoryListForSelectedPlanningUnitsUnfiltered,
+                            planningUnitListForJexcel: planningUnitListForJexcelUpdated,
                             showInventory: 1,
                             inventoryType: this.state.inventoryType,
                             inventoryMonth: "",
@@ -737,14 +705,20 @@ export default class AddInventory extends Component {
             }
         }
     }
-
+    /**
+     * This function is used to update the state of this component from any other component
+     * @param {*} parameterName This is the name of the key
+     * @param {*} value This is the value for the key
+     */
     updateState(parameterName, value) {
         this.setState({
             [parameterName]: value
         })
-
     }
-
+    /**
+     * This function is used to the value of data type
+     * @param {*} value This is the value of data type that user has selected
+     */
     updateDataType(value) {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -752,7 +726,6 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
@@ -772,7 +745,10 @@ export default class AddInventory extends Component {
             }
         }
     }
-
+    /**
+     * This is used to display the content
+     * @returns The inventory or adjustments data in tabular format
+     */
     render() {
         const checkOnline = localStorage.getItem('sessionType');
         const pickerLang = {
@@ -780,7 +756,6 @@ export default class AddInventory extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
@@ -800,11 +775,9 @@ export default class AddInventory extends Component {
                             <div className="card-header-actions">
                                 <div className="card-header-action">
                                     <a className="card-header-action">
-                                        {this.state.programId != 0 && this.state.planningUnitId != 0 &&
+                                        {this.state.programId != 0 && this.state.planningUnit.length > 0 &&
                                             <a href='javascript:;' onClick={this.exportCSV} ><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a>
                                         }
-                                        {/* <a href={this.state.inventoryDataType.value == 1 ? `${API_URL}/file/inventoryDataEntryTemplate` : `${API_URL}/file/adjustmentsDataEntryTemplate`}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small></span></a> */}
-                                        {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                     </a>
                                 </div>
                             </div>
@@ -821,20 +794,16 @@ export default class AddInventory extends Component {
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                     <div className="controls edit">
-
                                                         <Picker
                                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
-                                                            //theme="light"
-                                                            onChange={this.handleRangeChange}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                         </Picker>
                                                     </div>
-
                                                 </FormGroup>
                                                 <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -846,19 +815,23 @@ export default class AddInventory extends Component {
                                                             options={this.state.programList}
                                                             value={this.state.programSelect}
                                                             onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-3 ">
+                                                <FormGroup className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                     <div className="controls ">
-                                                        <Select
+                                                        <MultiSelect
                                                             name="planningUnit"
                                                             id="planningUnit"
-                                                            bsSize="sm"
-                                                            options={this.state.planningUnitList}
+                                                            options={this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
+                                                            labelledBy={i18n.t('static.common.select')}
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -875,10 +848,6 @@ export default class AddInventory extends Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                {/* {this.state.inventoryChangedFlag == 1 && <FormGroup check inline>
-                                                        <Input className="form-check-input removeMarginLeftCheckbox" type="checkbox" id="showErrors" name="showErrors" value="true" onClick={this.refs.inventoryChild.showOnlyErrors} />
-                                                        <Label className="form-check-label" check htmlFor="inline-checkbox1">{i18n.t("static.dataEntry.showOnlyErrors")}</Label>
-                                                    </FormGroup>} */}
                                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                 <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
@@ -888,24 +857,21 @@ export default class AddInventory extends Component {
                         {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
-                                {/* <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li> */}
-                                <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
+                                <li><span className=" mediumGreylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
                                 <li><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.common.readonlyData')} </span></li>
                             </ul>
                         </div>
-                        <div style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div >
                             <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} inventoryPage="inventoryDataEntry" useLocalData={1} />
-                            <div className="table-responsive inventoryDataEntryTable" id="adjustmentsTableDiv">
-                                <div id="adjustmentsTable" />
+                            <div className="inventoryDataEntryTable" id="adjustmentsTableDiv">
+                                <div id="adjustmentsTable" style={{ display: this.state.loading ? "none" : "block" }} />
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
@@ -922,15 +888,14 @@ export default class AddInventory extends Component {
                         </FormGroup>
                     </CardFooter>
                 </Card>
-
                 <Modal isOpen={this.state.inventoryBatchInfo}
-                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    className={'modal-lg modalWidth ' + this.props.className}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.dataEntry.batchDetails')}</strong>
                     </ModalHeader>
                     <ModalBody>
                         <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
-                        <div className="table-responsive">
+                        <div className="">
                             <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
                         <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
@@ -943,11 +908,12 @@ export default class AddInventory extends Component {
                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                 </Modal>
-
             </div >
         );
     }
-
+    /**
+     * This function is called when cancel button is clicked
+     */
     cancelClicked() {
         var cont = false;
         if (this.state.inventoryChangedFlag == 1) {
@@ -955,7 +921,6 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
@@ -971,7 +936,9 @@ export default class AddInventory extends Component {
             })
         }
     }
-
+    /**
+     * This function is called when cancel button for batch modal popup is clicked
+     */
     actionCanceled() {
         var cont = false;
         if (this.state.inventoryBatchInfoChangedFlag == 1) {
@@ -979,7 +946,6 @@ export default class AddInventory extends Component {
             if (cf == true) {
                 cont = true;
             } else {
-
             }
         } else {
             cont = true;
@@ -993,12 +959,13 @@ export default class AddInventory extends Component {
                 this.hideFirstComponent();
                 this.toggleLarge();
             })
-
         }
     }
-
+    /**
+     * This function is called when inventory or adjustment date picker is clicked
+     * @param {*} e 
+     */
     _handleClickRangeBox(e) {
         this.pickRange.current.show()
     }
 }
-

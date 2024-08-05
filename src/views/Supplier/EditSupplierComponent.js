@@ -1,17 +1,20 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText, FormFeedback } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL } from '../../Constants';
 import SupplierService from "../../api/SupplierService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 let initialValues = {
     supplier: ""
 }
 const entityname = i18n.t('static.supplier.supplier');
+/**
+ * This const is used to define the validation schema for supplier details
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         supplier: Yup.string()
@@ -19,34 +22,13 @@ const validationSchema = function (values) {
             .required(i18n.t('static.supplier.suppliertext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
+/**
+ * This component is used to display the supplier details in a form and allow user to edit the details
+ */
 class EditSupplierComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // supplier: this.props.location.state.supplier,
             supplier: {
                 realm: {
                     label: {
@@ -70,21 +52,20 @@ class EditSupplierComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
     }
-    changeMessage(message) {
-        this.setState({ message: message })
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
+    /**
+     * This function is used to capitalize the first letter of the supplier name
+     * @param {*} str This is the name of the supplier name
+     */
     Capitalize(str) {
         if (str != null && str != "") {
             let { supplier } = this.state;
@@ -93,6 +74,10 @@ class EditSupplierComponent extends Component {
             return "";
         }
     }
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { supplier } = this.state;
         if (event.target.name == "supplier") {
@@ -106,30 +91,10 @@ class EditSupplierComponent extends Component {
         },
             () => { });
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            supplier: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('supplierForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    /**
+     * This function is used to supplier details by supplier Id on page load
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             if (response.status == 200) {
                 this.setState({
@@ -137,7 +102,6 @@ class EditSupplierComponent extends Component {
                 });
             }
             else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
@@ -145,17 +109,15 @@ class EditSupplierComponent extends Component {
                         this.hideSecondComponent();
                     })
             }
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -187,6 +149,10 @@ class EditSupplierComponent extends Component {
             }
         );
     }
+    /**
+     * This is used to display the content
+     * @returns This returns supplier details form
+     */
     render() {
         return (
             <div className="animated fadeIn">
@@ -195,18 +161,14 @@ class EditSupplierComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{ supplier: this.state.supplier.label.label_en }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     SupplierService.updateSupplier(this.state.supplier)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -223,12 +185,11 @@ class EditSupplierComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -272,126 +233,119 @@ class EditSupplierComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='supplierForm' autocomplete="off">
-                                                <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Form onSubmit={handleSubmit} noValidate name='supplierForm' autocomplete="off">
+                                            <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="realmId"
+                                                        id="realmId"
+                                                        bsSize="sm"
+                                                        readOnly
+                                                        value={this.state.supplier.realm.label.label_en}
+                                                    >
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="supplier"
+                                                        id="supplier"
+                                                        bsSize="sm"
+                                                        valid={!errors.supplier}
+                                                        invalid={touched.supplier && !!errors.supplier || this.state.supplier.label.label_en == ''}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.supplier.label.label_en}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.supplier}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                    <FormGroup check inline>
                                                         <Input
-                                                            type="text"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.supplier.realm.label.label_en}
-                                                        >
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active1"
+                                                            name="active"
+                                                            value={true}
+                                                            checked={this.state.supplier.active === true}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.common.active')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="supplier"
-                                                            id="supplier"
-                                                            bsSize="sm"
-                                                            valid={!errors.supplier}
-                                                            invalid={touched.supplier && !!errors.supplier || this.state.supplier.label.label_en == ''}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.supplier.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.supplier}</FormFeedback>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="active2"
+                                                            name="active"
+                                                            value={false}
+                                                            checked={this.state.supplier.active === false}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.dataentry.inactive')}
+                                                        </Label>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active1"
-                                                                name="active"
-                                                                value={true}
-                                                                checked={this.state.supplier.active === true}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="active2"
-                                                                name="active"
-                                                                value={false}
-                                                                checked={this.state.supplier.active === false}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                                                            <div class="spinner-border blue ml-4" role="status">
-
-                                                            </div>
+                                                </FormGroup>
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                        <div class="spinner-border blue ml-4" role="status">
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-
-                                        )} />
-
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )} />
                         </Card>
                     </Col>
                 </Row>
-
-                {/* <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div> */}
             </div>
         );
     }
+    /**
+     * This function is called when cancel button is clicked and is redirected to list supplier screen
+     */
     cancelClicked() {
         this.props.history.push(`/supplier/listSupplier/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
+    /**
+     * This function is called when reset button is clicked to reset the supplier details
+     */
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
             this.setState({
                 supplier: response.data, loading: false
             });
-
         }).catch(
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -424,5 +378,4 @@ class EditSupplierComponent extends Component {
         );
     }
 }
-
 export default EditSupplierComponent;

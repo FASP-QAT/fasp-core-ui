@@ -1,47 +1,37 @@
-// const db1="";
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../Constants.js'
-
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../Constants.js';
+/**
+ * This function is used to check if there are any upgrade needed to indexed db
+ */
 export function getDatabase() {
-    console.log("inside get databases----------------------")
     var db1;
     var storeOS;
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onupgradeneeded = function (e) {
-        console.log("indexed db 1----------------------")
         db1 = e.target.result;
         if (!db1.objectStoreNames.contains('programData')) {
             storeOS = db1.createObjectStore('programData', { keyPath: 'id' });
         }
-        console.log("indexed db 2----------------------")
         if (!db1.objectStoreNames.contains('downloadedProgramData')) {
             storeOS = db1.createObjectStore('downloadedProgramData', { keyPath: 'id' });
         }
-        console.log("indexed db 3----------------------")
         if (!db1.objectStoreNames.contains('whatIfProgramData')) {
             storeOS = db1.createObjectStore('whatIfProgramData', { keyPath: 'id' });
         }
-        console.log("indexed db 4----------------------")
         if (!db1.objectStoreNames.contains('program')) {
             storeOS = db1.createObjectStore('program', { keyPath: 'programId', autoIncrement: true });
         }
-        console.log("indexed db 5----------------------")
         if (!db1.objectStoreNames.contains('realmCountry')) {
             storeOS = db1.createObjectStore('realmCountry', { keyPath: 'realmCountryId', autoIncrement: true });
         }
-        console.log("indexed db 6----------------------")
         if (!db1.objectStoreNames.contains('realm')) {
             storeOS = db1.createObjectStore('realm', { keyPath: 'realmId', autoIncrement: true });
         }
-        console.log("indexed db 7----------------------")
         if (!db1.objectStoreNames.contains('lastSyncDate')) {
             storeOS = db1.createObjectStore('lastSyncDate', { keyPath: 'id', autoIncrement: true });
         }
-        console.log("indexed db 8----------------------")
         if (!db1.objectStoreNames.contains('language')) {
             storeOS = db1.createObjectStore('language', { keyPath: 'languageId', autoIncrement: true });
         }
-        console.log("indexed db 9----------------------")
         if (!db1.objectStoreNames.contains('country')) {
             storeOS = db1.createObjectStore('country', { keyPath: 'countryId', autoIncrement: true });
         }
@@ -54,7 +44,6 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('unit')) {
             storeOS = db1.createObjectStore('unit', { keyPath: 'unitId', autoIncrement: true });
         }
-        console.log("indexed db 10----------------------")
         if (!db1.objectStoreNames.contains('organisation')) {
             storeOS = db1.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
         }
@@ -79,7 +68,6 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('fundingSource')) {
             storeOS = db1.createObjectStore('fundingSource', { keyPath: 'fundingSourceId', autoIncrement: true });
         }
-        console.log("indexed db 11----------------------")
         if (!db1.objectStoreNames.contains('subFundingSource')) {
             storeOS = db1.createObjectStore('subFundingSource', { keyPath: 'subFundingSourceId', autoIncrement: true });
         }
@@ -110,7 +98,6 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('logisticsUnit')) {
             storeOS = db1.createObjectStore('logisticsUnit', { keyPath: 'logisticsUnitId', autoIncrement: true });
         }
-        console.log("indexed db 13----------------------")
         if (!db1.objectStoreNames.contains('planningUnit')) {
             storeOS = db1.createObjectStore('planningUnit', { keyPath: 'planningUnitId', autoIncrement: true });
         }
@@ -135,7 +122,6 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('problem')) {
             storeOS = db1.createObjectStore('problem', { keyPath: 'realmProblemId', autoIncrement: true });
         }
-        console.log("indexed db 14----------------------")
         if (!db1.objectStoreNames.contains('problemStatus')) {
             storeOS = db1.createObjectStore('problemStatus', { keyPath: 'id', autoIncrement: true });
         }
@@ -148,21 +134,57 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('programQPLDetails')){
             storeOS = db1.createObjectStore('programQPLDetails', { keyPath: 'id', autoIncrement: true });
         }
-        console.log("indexed db completed----------------------")
-        
-    };
-}
-
-export function getEnLabel() {
-    var json = {
-        "static.procurementagent.realmtext": "Please select realm",
-        "static.healtharea.realmtext": "Please select realm",
-        "static.datasource.datasourceedit": "Update Data Source",
-        "static.program.programwithsameversion": "Program with same version already exists in the local machine you want to overwirte that program with the new data?",
-        "static.dashboard.subfundingsource": "Sub Funding Source",
-        "static.region.regionedit": "Update Region",
-        "static.common.select": "Please Select",
-        "static.procurementagent.procurementagentlist": "Procurement Agent List"
-    }
-    return json;
+        if(!db1.objectStoreNames.contains('usageType')){
+            storeOS = db1.createObjectStore('usageType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('nodeType')){
+            storeOS = db1.createObjectStore('nodeType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('forecastMethodType')){
+            storeOS = db1.createObjectStore('forecastMethodType', { keyPath: 'id', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('usagePeriod')){
+            storeOS = db1.createObjectStore('usagePeriod', { keyPath: 'usagePeriodId', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('modelingType')){
+            storeOS = db1.createObjectStore('modelingType', { keyPath: 'modelingTypeId', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('forecastMethod')){
+            storeOS = db1.createObjectStore('forecastMethod', { keyPath: 'forecastMethodId', autoIncrement: true });
+        }
+        if(!db1.objectStoreNames.contains('datasetData')){
+            storeOS = db1.createObjectStore('datasetData', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('downloadedDatasetData')){
+            storeOS = db1.createObjectStore('downloadedDatasetData', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('datasetDetails')){
+            storeOS = db1.createObjectStore('datasetDetails', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('usageTemplate')){
+            storeOS = db1.createObjectStore('usageTemplate', { keyPath: 'usageTemplateId'});
+        }
+        if(!db1.objectStoreNames.contains('treeTemplate')){
+            storeOS = db1.createObjectStore('treeTemplate', { keyPath: 'treeTemplateId'});
+        }
+        if(!db1.objectStoreNames.contains('versionType')){
+            storeOS = db1.createObjectStore('versionType', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('versionStatus')){
+            storeOS = db1.createObjectStore('versionStatus', { keyPath: 'id'});
+        }
+        if(!db1.objectStoreNames.contains('equivalencyUnit')){
+            storeOS = db1.createObjectStore('equivalencyUnit', { keyPath: 'equivalencyUnitMappingId', autoIncrement: true});
+        }
+        if(!db1.objectStoreNames.contains('extrapolationMethod')){
+            storeOS = db1.createObjectStore('extrapolationMethod', { keyPath: 'id', autoIncrement: true});
+        }
+        if(!db1.objectStoreNames.contains('datasetDataServer')){
+            storeOS = db1.createObjectStore('datasetDataServer', { keyPath: 'id'});
+        }
+        if (!db1.objectStoreNames.contains('fundingSourceType')) {
+            storeOS = db1.createObjectStore('fundingSourceType', { keyPath: 'fundingSourceTypeId', autoIncrement: true });
+        }
+        // console.log('Object stores:', db1.objectStoreNames);
+    };    
 }

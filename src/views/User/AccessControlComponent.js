@@ -1152,6 +1152,7 @@ import {
 } from 'reactstrap';
 import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
 import ProgramService from "../../api/ProgramService";
+import DatasetService from "../../api/DatasetService";
 import ProductService from "../../api/ProductService"
 import OrganisationService from "../../api/OrganisationService"
 import HealthAreaService from "../../api/HealthAreaService"
@@ -1163,12 +1164,12 @@ import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
 
 import CryptoJS from 'crypto-js';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { API_URL, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 // const entityname = i18n.t('static.dashboad.planningunitcapacity')
 
 class AccessControlComponent extends Component {
@@ -1214,7 +1215,7 @@ class AccessControlComponent extends Component {
 
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     filterProgram() {
         let realmId = this.state.user.realm.realmId;
@@ -1237,7 +1238,7 @@ class AccessControlComponent extends Component {
         } else {
             selHealthArea = this.state.healthAreas
         }
-        
+
         this.setState({
             selHealthArea
         });
@@ -1280,14 +1281,17 @@ class AccessControlComponent extends Component {
 
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
+                var name = selProgram[i].programCode + " (" + (selProgram[i].programTypeId == 1 ? "SP" : selProgram[i].programTypeId == 2 ? "FC" : "") + ")";
                 var paJson = {
-                    name: getLabelText(selProgram[i].label, this.state.lang),
+                    // name: getLabelText(selProgram[i].label, this.state.lang),
+                    name: name,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
                 }
                 programList[i] = paJson
             }
             var paJson = {
+                // name: "All",
                 name: "All",
                 id: -1,
                 active: true
@@ -1346,7 +1350,7 @@ class AccessControlComponent extends Component {
             healthAreaList.unshift(paJson);
         }
 
-        console.log("programList----", programList);
+        // console.log("programList----", programList);
         // console.log("countryList----",countryList);
         // console.log("organisationList----",organisationList);
         // console.log("healthAreaList---",healthAreaList);
@@ -1381,7 +1385,9 @@ class AccessControlComponent extends Component {
             papuDataArr[0] = data;
         }
         this.el = jexcel(document.getElementById("paputableDiv"), '');
-        this.el.destroy();
+        // this.el.destroy();
+        jexcel.destroy(document.getElementById("paputableDiv"), true);
+
         var json = [];
         var data = papuDataArr;
 
@@ -1418,7 +1424,7 @@ class AccessControlComponent extends Component {
 
                 },
                 {
-                    title: i18n.t('static.dataSource.program'),
+                    title: i18n.t('static.dashboard.programheader'),
                     type: 'autocomplete',
                     source: programList,
                     // filter: this.filterProgram
@@ -1426,11 +1432,12 @@ class AccessControlComponent extends Component {
                 },
 
             ],
+            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
+            // tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1442,12 +1449,12 @@ class AccessControlComponent extends Component {
             copyCompatibility: true,
             parseFormulas: true,
             onpaste: this.onPaste,
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
+            // text: {
+            //     // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+            //     showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+            //     show: '',
+            //     entries: '',
+            // },
             onload: this.loaded,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1621,14 +1628,14 @@ class AccessControlComponent extends Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance.jexcel).setValueFromCoords(0, data[i].y, this.state.user.username, true);
+                (instance).setValueFromCoords(0, data[i].y, this.state.user.username, true);
                 z = data[i].y;
             }
         }
     }
     submitForm() {
         var validation = this.checkValidation();
-        console.log("validation************", validation);
+        // console.log("validation************", validation);
         if (validation) {
 
             var tableJson = this.el.getJson(null, false);
@@ -1668,7 +1675,8 @@ class AccessControlComponent extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -1763,43 +1771,104 @@ class AccessControlComponent extends Component {
                                             ProgramService.getProgramList()
                                                 .then(response => {
                                                     if (response.status == "200") {
-                                                        var listArray = response.data;
-                                                        listArray.sort((a, b) => {
-                                                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                                                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                                                            return itemLabelA > itemLabelB ? 1 : -1;
-                                                        });
-                                                        this.setState({
-                                                            programs: listArray,
-                                                            selProgram: listArray
-                                                        });
-                                                        UserService.getUserByUserId(this.props.match.params.userId)
-                                                            .then(response => {
-                                                                if (response.status == 200) {
-                                                                    this.setState({
-                                                                        user: response.data,
-                                                                        rows: response.data.userAclList
-                                                                    }, (
-                                                                    ) => {
-                                                                        this.filterData();
-                                                                        this.filterOrganisation();
-                                                                        this.filterHealthArea();
-                                                                        this.filterProgram();
-                                                                        this.buildJexcel();
+                                                        //                                                         var listArray = [...response.data]
+                                                        //                                                         var arr = [];
+                                                        // for (var i = 0; i <= response.data.length; i++) {
+                                                        //     response.data[i].programTypeId = 1;
+                                                        // }
+                                                        // var listArray = response.data;
+                                                        // listArray.sort((a, b) => {
+                                                        //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                        //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                        //     return itemLabelA > itemLabelB ? 1 : -1;
+                                                        // });
+                                                        DatasetService.getDatasetList()
+                                                            .then(response1 => {
+                                                                if (response1.status == "200") {
+
+                                                                    var listArray = [...response.data, ...response1.data]
+                                                                    listArray.sort((a, b) => {
+                                                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                                                        return itemLabelA > itemLabelB ? 1 : -1;
                                                                     });
-                                                                } else {
                                                                     this.setState({
-                                                                        message: response.data.messageCode
-                                                                    },
-                                                                        () => {
-                                                                            this.hideSecondComponent();
-                                                                        })
+                                                                        programs: listArray,
+                                                                        selProgram: listArray
+                                                                    });
                                                                 }
+
+
+
+                                                                UserService.getUserByUserId(this.props.match.params.userId)
+                                                                    .then(response => {
+                                                                        if (response.status == 200) {
+                                                                            this.setState({
+                                                                                user: response.data,
+                                                                                rows: response.data.userAclList
+                                                                            }, (
+                                                                            ) => {
+                                                                                this.filterData();
+                                                                                this.filterOrganisation();
+                                                                                this.filterHealthArea();
+                                                                                this.filterProgram();
+                                                                                this.buildJexcel();
+                                                                            });
+                                                                        } else {
+                                                                            this.setState({
+                                                                                message: response.data.messageCode
+                                                                            },
+                                                                                () => {
+                                                                                    this.hideSecondComponent();
+                                                                                })
+                                                                        }
+                                                                    }).catch(
+                                                                        error => {
+                                                                            if (error.message === "Network Error") {
+                                                                                this.setState({
+                                                                                    // message: 'static.unkownError',
+                                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                                    loading: false
+                                                                                });
+                                                                            } else {
+                                                                                switch (error.response ? error.response.status : "") {
+
+                                                                                    case 401:
+                                                                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                        break;
+                                                                                    case 403:
+                                                                                        this.props.history.push(`/accessDenied`)
+                                                                                        break;
+                                                                                    case 500:
+                                                                                    case 404:
+                                                                                    case 406:
+                                                                                        this.setState({
+                                                                                            message: error.response.data.messageCode,
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                    case 412:
+                                                                                        this.setState({
+                                                                                            message: error.response.data.messageCode,
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                    default:
+                                                                                        this.setState({
+                                                                                            message: 'static.unkownError',
+                                                                                            loading: false
+                                                                                        });
+                                                                                        break;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    );
                                                             }).catch(
                                                                 error => {
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
-                                                                            message: 'static.unkownError',
+                                                                            // message: 'static.unkownError',
+                                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                             loading: false
                                                                         });
                                                                     } else {
@@ -1848,7 +1917,8 @@ class AccessControlComponent extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                // message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {
@@ -1894,7 +1964,8 @@ class AccessControlComponent extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    // message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
@@ -1943,7 +2014,8 @@ class AccessControlComponent extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        // message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
@@ -1992,7 +2064,8 @@ class AccessControlComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -2157,7 +2230,9 @@ class AccessControlComponent extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -2167,6 +2242,11 @@ class AccessControlComponent extends Component {
     }
 
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
 
             <div className="animated fadeIn">
@@ -2184,7 +2264,7 @@ class AccessControlComponent extends Component {
 
                             <Col xs="12" sm="12">
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="paputableDiv" className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
 
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -2204,7 +2284,7 @@ class AccessControlComponent extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
                         </CardFooter>

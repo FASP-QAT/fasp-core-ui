@@ -1,57 +1,51 @@
-import axios from 'axios'
-import { Online } from "react-detect-offline";
-import jwt_decode from 'jwt-decode'
-import { API_URL, INDEXED_DB_VERSION, INDEXED_DB_NAME, MONTHS_IN_PAST_FOR_SUPPLY_PLAN } from '../../Constants.js'
-import CryptoJS from 'crypto-js'
-import { SECRET_KEY } from '../../Constants.js'
-import bcrypt from 'bcryptjs';
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
+import jwt_decode from 'jwt-decode';
 import moment from 'moment';
-import i18n from '../../i18n';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, SECRET_KEY, SPV_REPORT_DATEPICKER_START_MONTH, API_URL } from '../../Constants.js';
+import i18n from '../../i18n';
 let myDt;
 class AuthenticationService {
-
+    /**
+     * Checks if a user with the specified email ID is logged in and returns their decrypted password.
+     * @param {string} emailId - The email ID of the user to check for login status.
+     * @returns {string} The decrypted password of the logged-in user, or an empty string if the user is not logged in.
+     */
     isUserLoggedIn(emailId) {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
-            // console.log("offline value---", value);
             if (localStorage.key(i).includes("user-")) {
                 let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                // console.log("offline user---", user);
                 let decryptedEmailId = user.emailId;
-                // console.log("offline decryptedEmailId---", decryptedEmailId);
                 if (decryptedEmailId.toUpperCase() == emailId.toUpperCase()) {
-                    // console.log("offline equals---");
                     localStorage.setItem("tempUser", user.userId);
-                    // console.log("offline user id---", localStorage.getItem("tempUser"));
                     decryptedPassword = user.password;
-                    // console.log("offline decryptedPassword---", decryptedPassword);
                 }
             }
-
         }
         return decryptedPassword;
     }
-
+    /**
+     * Checks if the synchronization expiration date for the current user is within 30 days.
+     * @returns {boolean} True if the synchronization expiration date is more than 30 days from the current date, otherwise false.
+     */
     syncExpiresOn() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         let syncExpiresOn = moment(decryptedUser.syncExpiresOn);
-        // console.log("syncExpiresOn---", syncExpiresOn);
         var curDate = moment(new Date());
         const diff = curDate.diff(syncExpiresOn, 'days');
-        // const diffDuration = moment.duration(diff);
-        // console.log("diff---", diff);
-        // console.log("diffDuration---",diffDuration)
-        // console.log("Days:", diffDuration.days());
-        // console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
         if (diff < 30) {
             return false;
         }
         return true;
     }
-
+    /**
+     * Retrieves the username of the currently logged-in user from local storage.
+     * @returns {string} The username of the currently logged-in user, or an empty string if the user is not logged in.
+     */
     getLoggedInUsername() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -60,7 +54,10 @@ class AuthenticationService {
         }
         return "";
     }
-
+    /**
+     * Retrieves the role(s) of the currently logged-in user from local storage.
+     * @returns {Array|string} An array containing the role(s) of the currently logged-in user, or an empty string if the user is not logged in.
+     */
     getLoggedInUserRole() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
@@ -68,42 +65,20 @@ class AuthenticationService {
             let roleList = "";
             for (let i = 0; i <= decryptedUser.roleList.length; i++) {
                 let role = decryptedUser.roleList[i];
-                // if (role != null && role != "") {
-                //     if (i > 0) {
-                //         roles += "," + role.label.label_en;
-                //     } else {
-                //         roles += role.label.label_en;
-                //     }
-                // }
             }
-            // console.log("decryptedUser.roles---" + decryptedUser.roleList);
             return decryptedUser.roleList;
         }
     }
-
-    getLoggedInUserRoleIdArr() {
-        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
-            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-            let roleList = [];
-            for (let i = 0; i < decryptedUser.roleList.length; i++) {
-                console.log("decryptedUser.roleList[i]", (decryptedUser.roleList[i]).roleId);
-                roleList.push((decryptedUser.roleList[i]).roleId);
-                // if (role != null && role != "") {
-                //     if (i > 0) {
-                //         roles += "," + role.label.label_en;
-                //     } else {
-                //         roles += role.label.label_en;
-                //     }
-                // }
-            }
-            // console.log("decryptedUser.roles---" + decryptedUser.roleList);
-            return roleList;
-        }
-    }
-
+    /**
+     * Determines the type of dashboard to be displayed based on the roles assigned to the currently logged-in user.
+     * @returns {number} An integer representing the type of dashboard to be displayed:
+     * 1 - Application-level dashboard for administrators.
+     * 2 - Realm-level dashboard for realm administrators.
+     * 3 - Program-level dashboard for program administrators.
+     * 4 - Default dashboard for regular users.
+     * If the user is not logged in, returns undefined.
+     */
     displayDashboardBasedOnRole() {
-        console.log("M sync role based dashboard 1");
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -112,10 +87,8 @@ class AuthenticationService {
                 let role = decryptedUser.roleList[i];
                 if (role != null && role != "") {
                     roleList.push(role.roleId);
-                    console.log("M sync role based dashboard 2");
                 }
             }
-            console.log("M sync role based dashboard 3");
             if (roleList.includes("ROLE_APPLICATION_ADMIN"))
                 return 1;
             if (roleList.includes("ROLE_REALM_ADMIN"))
@@ -125,28 +98,44 @@ class AuthenticationService {
             return 4;
         }
     }
-
+    /**
+     * Retrieves the user ID of the currently logged-in user from local storage.
+     * @returns {string} The user ID of the currently logged-in user, decrypted from local storage.
+     * If the user is not logged in or if the user ID is not found, returns an empty string.
+     */
     getLoggedInUserId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         return decryptedCurUser;
     }
-
-    getLanguageId() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        return decryptedUser.language.languageId;
-    }
-
+    /**
+     * Retrieves the realm ID of the currently logged-in user from local storage.
+     * @returns {string} The realm ID of the currently logged-in user, decrypted from local storage.
+     *                   If the user is not logged in or if the realm ID is not found, returns an empty string.
+     */
     getRealmId() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        // console.log("get realm id decryptedCurUser---", decryptedCurUser);
-        // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        // console.log("get realm id decryptedUser---", decryptedUser);
-        // console.log(decryptedUser);
-        return decryptedUser.realm.realmId;
+        try{
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            return decryptedUser.realm.realmId;
+        }catch{
+            return "";
+        }
     }
-
+    /**
+     * Retrieves the realm object of the currently logged-in user from local storage.
+     * @returns {Object} The realm object of the currently logged-in user, decrypted from local storage.
+     *                   If the user is not logged in or if the realm object is not found, returns null.
+     */
+    getLoggedInUserRealm() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        return decryptedUser.realm;
+    }
+    /**
+     * Checks the type of session based on the current URL and the stored session type in local storage.
+     * @param {string} url - The current URL.
+     * @returns {boolean} True if the session type matches the current URL conditions, otherwise false.
+     */
     checkTypeOfSession(url) {
         let sessionType = localStorage.getItem('sessionType');
         let typeOfSession = localStorage.getItem('typeOfSession');
@@ -156,23 +145,28 @@ class AuthenticationService {
         } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList","/report/problemList/:programId/:calculate/:color/:message","/report/problemList/:color/:message","/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate", "/ApplicationDashboard/:id", "/ApplicationDashboard", "/ApplicationDashboard/:color/:message", "/ApplicationDashboard/:id/:color/:message", "/planningUnitSetting/listPlanningUnitSetting", "/dataset/versionSettings", "/dataset/importDataset", "/dataset/exportDataset", "/dataentry/consumptionDataEntryAndAdjustment", "/dataentry/consumptionDataEntryAndAdjustment/:color/:message", "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId", "/extrapolation/extrapolateData","/extrapolation/extrapolateData/:planningUnitId", "/dataset/listTree", "/validation/modelingValidation", "/validation/productValidation", "/report/compareAndSelectScenario", "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId", "/forecastReport/forecastOutput", "/forecastReport/forecastOutput/:programId/:versionId", "/forecastReport/forecastSummary", "/forecastReport/forecastSummary/:programId/:versionId", "/report/compareVersion", "/dataSet/buildTree/tree/:treeId/:programId", "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId", "/dataSet/buildTree/", "/dataSet/buildTree/template/:templateId","/accessDenied"];
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
-            console.log("offline to online false");
             return false;
-
-
-
         }
     }
-
+    /**
+     * Checks if a different user is logged in by comparing the stored username with the new username.
+     * @param {string} newUsername - The new username to compare with the stored username.
+     * @returns {boolean} True if a different user is logged in, otherwise false.
+     */
     checkIfDifferentUserIsLoggedIn(newUsername) {
         let usernameStored = localStorage.getItem('username');
         if (usernameStored !== null && usernameStored !== "") {
-            var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
-            var originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
+            var originalText;
+            try{
+                var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
+                originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
+            }catch{
+                originalText = ""
+            }
             if (originalText !== newUsername) {
                 if (window.confirm("Are you sure you want to overrride already logged in user's details?")) {
                     return true;
@@ -185,7 +179,10 @@ class AuthenticationService {
             return true;
         }
     }
-
+    /**
+     * Checks if the user token has expired.
+     * @returns {boolean} True if the token has expired, otherwise false.
+     */
     checkIfTokenExpired() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
@@ -198,297 +195,98 @@ class AuthenticationService {
             return false;
         }
     }
-
-    checkSessionTimeOut() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        return decryptedUser.sessionExpiresOn;
-    }
+    /**
+     * Updates the user's language preference in local storage.
+     * @param {string} languageCode - The language code to set for the user.
+     */
     updateUserLanguage(languageCode) {
-        console.log("Going to change language code---", languageCode)
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("Going to change language decryptedCurUser---", decryptedCurUser)
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        console.log("Going to change language decryptedUser---", decryptedUser)
         decryptedUser.language.languageCode = languageCode;
-        console.log("Going to change language decryptedUser after change---", decryptedUser)
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
-    // refreshToken() {
-    //     let token = localStorage.getItem('token');
-    //     this.setupAxiosInterceptors();
-    //     return axios.get(`${API_URL}/refresh`, {}).then(response => {
-    //     }).catch(
-    //         error => {
-    //         })
-    // }
-
-
+    /**
+     * Sets up Axios interceptors to automatically add the Authorization header with the user's token for authenticated requests.
+     * It also handles token refreshing if the token is expired.
+     */
     setupAxiosInterceptors() {
-        // axios.defaults.headers.common['Authorization'] = '';
-        // delete axios.defaults.headers.common['Authorization'];
-        // console.log("############## Going to call axios interceptos################", localStorage.getItem('curUser'));
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            // console.log("Inside set up axios");
+            var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
+            var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());            
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedToken;
+            if(temp_time_token > 21000000){
+                axios.get(`${API_URL}/refresh`, {}).then(response => {
+                    var decoded = jwt_decode(response.data.token.toString().replaceAll("Bearer ",""));
+                    localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token.toString().replaceAll("Bearer ","")).toString(), `${SECRET_KEY}`));
+                    localStorage.setItem("tokenSetTime", new Date());
+                    decryptedToken = CryptoJS.AES.decrypt(response.data.token.toString().replaceAll("Bearer ",""), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                }).catch(error => {
+                    console.log("Error ",error);
+                })
+            }else{
+                decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            }
             let basicAuthHeader = 'Bearer ' + decryptedToken
             axios.defaults.headers.common['Authorization'] = basicAuthHeader;
-            // axios.interceptors.request.use(
-            //     (config) => {
-            //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
-            //         return config;
-            //     }
-            // )
-
-
-            // // Add a response interceptor
-            // axios.interceptors.response.use(function (response) {
-            //     return response;
-            // }, function (error) {
-            //     return Promise.reject(error);
-            // });
-        }
-
-    }
-
-    storeTokenInIndexedDb(token, decodedObj) {
-        let userObj = {
-            token: token,
-            typeOfSession: "Online",
-            userId: decodedObj.userId
-        }
-        let userId = {
-            userId: decodedObj.userId
-        }
-        if (!('indexedDB' in window)) {
-            alert(i18n.t('static.common.notSupportIndexDB'));
-        } else {
-            var db;
-            var customerObjectStore;
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-
-            openRequest.onupgradeneeded = function (e) {
-                var db = e.target.result;
-                if (!db.objectStoreNames.contains('programData')) {
-                    customerObjectStore = db.createObjectStore('programData', { keyPath: 'id', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('lastSyncDate')) {
-                    customerObjectStore = db.createObjectStore('lastSyncDate', { keyPath: 'id', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('language')) {
-                    customerObjectStore = db.createObjectStore('language', { keyPath: 'languageId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('country')) {
-                    customerObjectStore = db.createObjectStore('country', { keyPath: 'countryId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('currency')) {
-                    customerObjectStore = db.createObjectStore('currency', { keyPath: 'currencyId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('unit')) {
-                    customerObjectStore = db.createObjectStore('unit', { keyPath: 'unitId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('dimension')) {
-                    customerObjectStore = db.createObjectStore('dimension', { keyPath: 'dimensionId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('organisation')) {
-                    customerObjectStore = db.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('healthArea')) {
-                    customerObjectStore = db.createObjectStore('healthArea', { keyPath: 'healthAreaId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('region')) {
-                    customerObjectStore = db.createObjectStore('region', { keyPath: 'regionId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('fundingSource')) {
-                    customerObjectStore = db.createObjectStore('fundingSource', { keyPath: 'fundingSourceId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('subFundingSource')) {
-                    customerObjectStore = db.createObjectStore('subFundingSource', { keyPath: 'subFundingSourceId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('product')) {
-                    customerObjectStore = db.createObjectStore('product', { keyPath: 'productId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('productCategory')) {
-                    customerObjectStore = db.createObjectStore('productCategory', { keyPath: 'productCategoryId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('dataSource')) {
-                    customerObjectStore = db.createObjectStore('dataSource', { keyPath: 'dataSourceId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('dataSourceType')) {
-                    customerObjectStore = db.createObjectStore('dataSourceType', { keyPath: 'dataSourceTypeId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('shipmentStatus')) {
-                    customerObjectStore = db.createObjectStore('shipmentStatus', { keyPath: 'shipmentStatusId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('shipmentStatusAllowed')) {
-                    customerObjectStore = db.createObjectStore('shipmentStatusAllowed', { keyPath: 'shipmentStatusAllowedId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('supplier')) {
-                    customerObjectStore = db.createObjectStore('supplier', { keyPath: 'supplierId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('logisticsUnit')) {
-                    customerObjectStore = db.createObjectStore('logisticsUnit', { keyPath: 'logisticsUnitId', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('planningUnit')) {
-                    customerObjectStore = db.createObjectStore('planningUnit', { keyPath: 'planningUnitId', autoIncrement: true });
-                }
-            }.bind(this);
-
-            openRequest.onsuccess = function (e) {
-                db = e.target.result;
-                var transaction = db.transaction(['user'], 'readwrite');
-                var user = transaction.objectStore('user');
-                var result;
-                result = user.delete(decodedObj.userId);
-
-                result.onsuccess = function (event) {
-                    result = user.add(userObj);
-                    result.onerror = function (event) {
-                    };
-
-                    result.onsuccess = function (event) {
-                    };
-                };
-                result.onerror = function (event) {
-                };
-
-
-                var transaction1 = db.transaction(['curuser'], 'readwrite');
-                var curuser = transaction1.objectStore('curuser');
-                result = curuser.clear();
-                result.onsuccess = function (event) {
-                    result = curuser.add(userId);
-                    result.onerror = function (event) {
-                    };
-
-                    result.onsuccess = function (event) {
-                    };
-                };
-                result.onerror = function (event) {
-                };
-
-            }.bind(this);
-
         }
     }
-    checkLastActionTaken() {
-        if (localStorage.getItem('lastActionTaken') != null && localStorage.getItem('lastActionTaken') != "") {
-            var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            var lastActionTaken = moment(lastActionTakenStorage);
-            // console.log("lastActionTakenStorage---", lastActionTakenStorage);
-            var curDate = moment(new Date());
-            // console.log("curdate:", curDate);
-            const diff = curDate.diff(lastActionTaken);
-            const diffDuration = moment.duration(diff);
-            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-            // console.log("Days:", diffDuration.days());
-            // console.log("Hours:", diffDuration.hours());
-            // console.log("Minutes:", diffDuration.minutes());
-            // console.log("Seconds:", diffDuration.seconds());
-            if (diffDuration.minutes() < 30) {
-                // console.log("last action taken less than 30 minutes");
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
-    getLoggedInUserDetails() {
-        if (!('indexedDB' in window)) {
-            alert('This browser does not support IndexedDB');
-        } else {
-            var db;
-            var customerObjectStore;
-            var userObj = 0;
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-
-            openRequest.onupgradeneeded = function (e) {
-                db = e.target.result;
-                if (!db.objectStoreNames.contains('user')) {
-                    customerObjectStore = db.createObjectStore('user', { keyPath: 'userId', autoIncrement: true });
-                    customerObjectStore.createIndex("userId", "userId", { unique: true });
-                }
-                if (!db.objectStoreNames.contains('curuser')) {
-                    customerObjectStore = db.createObjectStore('curuser', { keyPath: 'userId' });
-                    customerObjectStore.createIndex("userId", "userId", { unique: true });
-                }
-            }.bind(this);
-
-            openRequest.onsuccess = function (e) {
-                db = e.target.result;
-                var result;
-                var transaction1 = db.transaction(['curuser'], 'readwrite');
-                var curuser = transaction1.objectStore('curuser');
-                result = curuser.getAll();
-                result.onsuccess = function (event) {
-                    var user = db.transaction(['user'], 'readwrite').objectStore('user');
-                    result = user.get(result.result[0].userId);
-                    result.onerror = function (event) {
-                    };
-
-                    result.onsuccess = function (event) {
-                        userObj = result.result;
-                        return userObj;
-                    };
-                };
-                result.onerror = function (event) {
-                };
-
-            }.bind(this);
-
-        }
-        return userObj;
-    }
-
+    /**
+     * Retrieves the business functions associated with the currently logged-in user.
+     * @returns {string[]} An array of business functions assigned to the user.
+     */
     getLoggedInUserRoleBusinessFunction() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             let businessFunctions = decryptedUser.businessFunctionList;
-            // console.log("decryptedUser.businessfunctions--->>>>" + decryptedUser.businessFunctionList);
             return businessFunctions;
         }
         return "";
     }
-
+    /**
+     * Retrieves the business functions associated with the currently logged-in user.
+     * @returns {string[]} An array of business functions assigned to the user.
+     */
     getLoggedInUserRoleBusinessFunctionArray() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        // console.log("decryptedCurUser---", decryptedCurUser);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        // console.log("decryptedUser---", decryptedUser);
-        let businessFunctionList = decryptedUser.businessFunctionList;
-        // console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunctionList);
-
-        var bfunction = [];
-        for (let i = 0; i < businessFunctionList.length; i++) {
-            bfunction.push(businessFunctionList[i]);
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let businessFunctionList = decryptedUser.businessFunctionList;
+                var bfunction = [];
+                for (let i = 0; i < businessFunctionList.length; i++) {
+                    bfunction.push(businessFunctionList[i]);
+                }
+                return bfunction;
+            } catch (err) {
+                localStorage.setItem('curUser', '')
+                return [];
+            }
+        } else {
+            return [];
         }
-        // console.log("bfuntion---", bfunction);
-        return bfunction;
     }
+    /**
+     * Checks if the current user is authenticated to access a specific route.
+     * @param {string} route - The route to be checked for authentication.
+     * @param {string} url - The URL of the route.
+     * @returns {boolean|string} Returns true if the user is authenticated, or a redirect URL if session is changed.
+     */
     authenticatedRoute(route, url) {
         if (url == "") {
-            console.log("route---" + route);
-
             localStorage.setItem("isOfflinePage", 0);
-            var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate"];
+            var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList","/report/problemList/:programId/:calculate/:color/:message","/report/problemList/:color/:message","/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate","/accessDenied"];
             if (urlarr.includes(route)) {
                 localStorage.setItem("isOfflinePage", 1);
             }
-            console.log("offline 1---------------")
             if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
-                console.log("cur user available");
                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                 if (localStorage.getItem("sessionType") === 'Online' && (localStorage.getItem('token-' + decryptedCurUser) == null || localStorage.getItem('token-' + decryptedCurUser) == "")) {
-                    console.log("token not available");
                     return true;
                 }
-                // console.log("going to check bf functions");
                 var bfunction = this.getLoggedInUserRoleBusinessFunctionArray();
-                // console.log("route bfunction--->", bfunction);
-                // console.log("includes---" + bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGARM"))
                 switch (route) {
                     case "/user/addUser":
                         if (bfunction.includes("ROLE_BF_ADD_USER")) {
@@ -624,6 +422,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/program/addManualIntegration":
+                        if (bfunction.includes("ROLE_BF_MANUAL_INTEGRATION")) {
+                            return true;
+                        }
+                        break;
                     case "/realm/addrealm":
                         if (bfunction.includes("ROLE_BF_CREATE_REALM")) {
                             return true;
@@ -685,6 +488,22 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/funderType/addFunderType":
+                        if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
+                    case "/funderType/listFunderType":
+                    case "/funderType/listFunderType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
+                    case "/funderType/editFunderType/:fundingSourceTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
                     case "/fundingSource/addFundingSource":
                         if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
                             return true;
@@ -694,7 +513,7 @@ class AuthenticationService {
                         if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
                             return true;
                         }
-                        break;
+                        break;                    
                     case "/fundingSource/listFundingSource":
                     case "/fundingSource/listFundingSource/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
@@ -714,6 +533,23 @@ class AuthenticationService {
                     case "/procurementAgent/listProcurementAgent":
                     case "/procurementAgent/listProcurementAgent/:message":
                     case "/procurementAgent/listProcurementAgent/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/addProcurementAgentType":
+                        if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/editProcurementAgentType/:procurementAgentTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/procurementAgentType/listProcurementAgentType":
+                    case "/procurementAgentType/listProcurementAgentType/:message":
+                    case "/procurementAgentType/listProcurementAgentType/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_PROCUREMENT_AGENT")) {
                             return true;
                         }
@@ -804,11 +640,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/program/addProgram":
-                        if (bfunction.includes("ROLE_BF_CREATE_A_PROGRAM")) {
-                            return true;
-                        }
-                        break;
                     case "/program/editProgram/:programId":
                         if (bfunction.includes("ROLE_BF_EDIT_PROGRAM")) {
                             return true;
@@ -857,7 +688,6 @@ class AuthenticationService {
                     case "/forecastingUnit/listForecastingUnit":
                     case "/forecastingUnit/listForecastingUnit/:message":
                     case "/forecastingUnit/listForecastingUnit/:color/:message":
-                        console.log("result---" + bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT"));
                         if (bfunction.includes("ROLE_BF_LIST_FORECASTING_UNIT")) {
                             return true;
                         }
@@ -927,15 +757,22 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId":
+                    case "/program/mapProcurementAgent/:programId":
+                        if (bfunction.includes("ROLE_BF_MAP_PROCUREMENT_AGENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/programProduct/addCountrySpecificPrice":
+                    case "/programProduct/addCountrySpecificPrice/:planningUnitId/:programId":
+                    case "/programProduct/addCountrySpecificPrice/1/:colour/:message":
                         if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
                             return true;
                         }
                         break;
                     case "/consumptionDetails":
+                    case "/consumptionDetails/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 2---------------")
                             return true;
                         }
                         break;
@@ -943,11 +780,11 @@ class AuthenticationService {
                     case "/inventory/addInventory/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_INVENTORY_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 3---------------")
                             return true;
                         }
                         break;
                     case "/shipment/manualTagging":
+                    case "/shipment/manualTagging/:tab":
                     case "/shipmentLinkingNotification":
                         if (bfunction.includes("ROLE_BF_MANUAL_TAGGING")) {
                             return true;
@@ -963,7 +800,6 @@ class AuthenticationService {
                     case "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_SHIPMENT_DATA")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 4---------------")
                             return true;
                         }
                         break;
@@ -982,7 +818,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    // case "/programProduct/addProgramProduct/:programId":
                     case "/programProduct/addProgramProduct":
                     case "/programProduct/addProgramProduct/:programId/:color/:message":
                         if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
@@ -1000,7 +835,6 @@ class AuthenticationService {
                     case "/supplyPlan/:programId/:planningUnitId/:batchNo/:expiryDate":
                         if (bfunction.includes("ROLE_BF_SUPPLY_PLAN")) {
                             localStorage.setItem("isOfflinePage", 1);
-                            console.log("offline 5---------------")
                             return true;
                         }
                         break;
@@ -1025,6 +859,11 @@ class AuthenticationService {
                         }
                         break;
                     case "/report/forecastOverTheTime":
+                        if (bfunction.includes("ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT")) {
+                            return true;
+                        }
+                        break;
+                    case "/report/consumptionForecastErrorSupplyPlan":
                         if (bfunction.includes("ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT")) {
                             return true;
                         }
@@ -1054,13 +893,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-
                     case "/report/problemList":
                         if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                             return true;
                         }
                         break;
-
                     case "/report/addProblem":
                         if (bfunction.includes("ROLE_BF_ADD_PROBLEM")) {
                             return true;
@@ -1071,7 +908,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-
                     case "/report/qatProblemPlusActionReport":
                         if (bfunction.includes("ROLE_BF_PROBLEM_AND_ACTION_REPORT")) {
                             return true;
@@ -1097,11 +933,6 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    // case "/report/aggregateShipmentByProduct":
-                    //     if (bfunction.includes("ROLE_BF_PROCUREMENT_AGENT_REPORT")) {
-                    //         return true;
-                    //     }
-                    //     break;
                     case "/report/shipmentGlobalView":
                         if (bfunction.includes("ROLE_BF_GLOBAL_DEMAND_REPORT")) {
                             return true;
@@ -1146,9 +977,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/program/deleteLocalProgram":
-                        // console.log("Going to check if condition")
                         if (bfunction.includes("ROLE_BF_DELETE_LOCAL_PROGRAM")) {
-                            // console.log("Going to check if condition")
                             return true;
                         }
                         break;
@@ -1180,6 +1009,7 @@ class AuthenticationService {
                     case "/report/supplyPlanVersionAndReview":
                     case "/report/editStatus/:programId/:versionId":
                     case "/report/supplyPlanVersionAndReview/:color/:message":
+                    case "/report/supplyPlanVersionAndReview/:statusId":
                         if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW")) {
                             return true;
                         }
@@ -1202,19 +1032,13 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    // case "/ProgramDashboard":
-                    // case "/RealmDashboard":
-                    //     if (bfunction.includes("ROLE_BF_PROGRAM_DASHBOARD")) {
-                    //         return true;
-                    //     }
-                    //     break;
                     case "/translations/labelTranslations":
                         if (bfunction.includes("ROLE_BF_LABEL_TRANSLATIONS")) {
                             return true;
                         }
                         break;
                     case "/translations/databaseTranslations":
-                        if (bfunction.includes("ROLE_BF_DATABASE_TRANSLATION")) {
+                        if (bfunction.includes("ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS") || bfunction.includes("ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS") || bfunction.includes("ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS")) {
                             return true;
                         }
                         break;
@@ -1228,9 +1052,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/changePassword":
-                        // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
-                        // }
                         break;
                     case "/logout/:message":
                     case "/logout":
@@ -1241,8 +1063,6 @@ class AuthenticationService {
                         if (bfunction.includes("ROLE_BF_EDIT_PROBLEM")) {
                             return true;
                         }
-                        break;
-                    case "/consumptionDetails/:programId/:versionId/:planningUnitId": return true
                         break;
                     case "/report/problemList/:programId/:calculate/:color/:message":
                     case "/report/problemList/:color/:message":
@@ -1261,35 +1081,201 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT")) {
+                            return true;
+                        }
+                        break;
                     case "/userManual/uploadUserManual":
                         if (bfunction.includes("ROLE_BF_UPLOAD_USER_MANUAL")) {
                             return true;
                         }
                         break;
+                    case "/usagePeriod/listUsagePeriod":
+                    case "/usagePeriod/listUsagePeriod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_PERIOD")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastMethod/listForecastMethod":
+                    case "/forecastMethod/listForecastMethod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_METHOD")) {
+                            return true;
+                        }
+                        break;
+                    case "/modelingType/listModelingType":
+                    case "/modelingType/listModelingType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_MODELING_TYPE")) {
+                            return true;
+                        }
+                        break;
+                    case "/planningUnitSetting/listPlanningUnitSetting":
+                    case "/planningUnitSetting/listPlanningUnitSetting/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_SETTING")) {
+                            return true;
+                        }
+                        break;
+                    case "/equivalancyUnit/listEquivalancyUnit":
+                    case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                            return true;
+                        }
+                        break;
+                    case "/extrapolation/extrapolateData":
+                    case "/extrapolation/extrapolateData/:planningUnitId":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
+                            return true;
+                        }
+                        break;
+                    case "/report/compareAndSelectScenario":
+                    case "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId":
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT") || bfunction.includes("ROLE_BF_VIEW_COMPARE_AND_SELECT")) {
+                            return true;
+                        }
+                        break;
+                    case "/validation/productValidation":
+                        if (bfunction.includes("ROLE_BF_PRODUCT_VALIDATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/validation/modelingValidation":
+                        if (bfunction.includes("ROLE_BF_MODELING_VALIDATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/report/compareVersion":
+                        if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/commitTree":
+                        if (bfunction.includes("ROLE_BF_COMMIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataentry/consumptionDataEntryAndAdjustment":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT") || bfunction.includes("ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/loadDeleteDataSet/:message":
+                    case "/dataset/loadDeleteDataSet":
+                        if (bfunction.includes("ROLE_BF_LOAD_DELETE_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/exportDataset":
+                        if (bfunction.includes("ROLE_BF_EXPORT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/importDataset":
+                        if (bfunction.includes("ROLE_BF_IMPORT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataSet/buildTree/tree/:treeId/:programId":
+                    case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
+                    case "/dataSet/buildTree/":
+                    case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
+                    case "/dataSet/buildTree/template/:templateId":
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/createTreeTemplate/:templateId":
+                        if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTreeTemplate/":
+                    case "/dataset/listTreeTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_TREE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/versionSettings":
+                        if (bfunction.includes("ROLE_BF_VERSION_SETTINGS")) {
+                            return true;
+                        }
+                        break;
+                    case "/usageTemplate/listUsageTemplate":
+                    case "/usageTemplate/listUsageTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/addDataSet":
+                        if (bfunction.includes("ROLE_BF_ADD_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/editDataSet/:dataSetId":
+                        if (bfunction.includes("ROLE_BF_EDIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listDataSet":
+                    case "/dataset/listDataSet/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastReport/forecastOutput":
+                    case "/forecastReport/forecastOutput/:programId/:versionId":
+                        if (bfunction.includes("ROLE_BF_LIST_MONTHLY_FORECAST")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastReport/forecastSummary":
+                    case "/forecastReport/forecastSummary/:programId/:versionId":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY") || bfunction.includes("ROLE_BF_VIEW_FORECAST_SUMMARY")) {
+                            return true;
+                        }
+                        break;
+                    case "/forecastReport/consumptionForecastError":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_FORECAST_ERROR")) {
+                            return true;
+                        }
+                        break;
                     default:
-                        console.log("default case");
                         return false;
                 }
-                // localStorage.removeItem("token-" + decryptedCurUser);
             } else {
-                console.log("else in route");
                 return true;
             }
-            console.log("route access denied------------------------");
-            // let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
-            // keysToRemove.forEach(k => localStorage.removeItem(k))
             return false;
         } else {
             localStorage.setItem("sessionChanged", 1)
             return "/login/static.message.sessionChange";
         }
-
     }
-    displayHeaderTitle(url) {
-        if (url.includes("/program/listProgram")) {
-            return "Programs";
-        }
-    }
+    /**
+     * Converts a hexadecimal color code to RGBA format.
+     * @param {string} hex - The hexadecimal color code (e.g., "#RRGGBB" or "#RGB").
+     * @returns {string} Returns the RGBA color code.
+     * @throws {Error} Throws an error if the input is not a valid hexadecimal color code.
+     */
     hexToRgbA(hex) {
         var c;
         if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
@@ -1302,51 +1288,23 @@ class AuthenticationService {
         }
         throw new Error('Bad Hex');
     }
-
+    /**
+     * Validates the current request to ensure user authentication and session validity.
+     * @returns {string} Returns a redirect URL or an empty string based on validation results.
+     */
     validateRequest() {
-        console.log("inside validate request")
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            // if (this.checkTypeOfSession()) {
             if (localStorage.getItem("sessionType") === 'Online') {
                 if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
-                    // if (this.checkLastActionTaken()) {
-                    //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                    //     var lastActionTaken = moment(lastActionTakenStorage);
-                    //     console.log("last action taken common component inside if---", lastActionTaken);
-                    //     localStorage.removeItem('lastActionTaken');
-                    //     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                     return "";
-                    // } else {
-                    //     var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                    //     var lastActionTaken = moment(lastActionTakenStorage);
-                    //     console.log("last action taken common component session expired---", lastActionTaken);
-                    //     localStorage.removeItem('lastActionTaken');
-                    //     return "/logout/static.message.sessionExpired";
-                    // }
                 } else {
-                    console.log("common component token error");
                     return "/logout/static.message.tokenError";
                 }
             } else {
                 return "";
             }
-            // else {
-            //     console.log("common component user is offline");
-            //     if (this.checkLastActionTaken()) {
-            //         localStorage.removeItem('lastActionTaken');
-            //         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
-            //     } else {
-            //         console.log("common component offline session expired");
-            //         return "/logout/static.message.sessionExpired";
-            //     }
-            // }
-            // } else {
-            //     localStorage.setItem("sessionChanged", 1)
-            //     return "/login/static.message.sessionChange";
-            // }
         } else {
-            console.log("offline to online ");
             if (localStorage.getItem("sessionChanged") == 1) {
                 return "/login/static.message.sessionChange";
             } else {
@@ -1354,16 +1312,22 @@ class AuthenticationService {
             }
         }
     }
+    /**
+     * Clears user-related details from local storage.
+     */
     clearUserDetails() {
-        console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti","sesAutoCalculate", "sesRangeValueManualJson","sesLatestDataset","sesCountryIdSPVR","sesProgramIdSPVR","sesVersionTypeSPVR","sesVersionStatusSPVR","sesReportRangeSPVR"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti","sesAutoCalculate", "sesRangeValueManualJson","sesLatestDataset","sesCountryIdSPVR","sesProgramIdSPVR","sesVersionTypeSPVR","sesVersionStatusSPVR","sesReportRangeSPVR"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
+    /**
+     * Retrieves the default language for the user from local storage.
+     * @returns {string} The default language code.
+     */
     getDefaultUserLanguage() {
         let lang = localStorage.getItem('lastLoggedInUsersLanguage');
         if (lang != null && lang != "") {
@@ -1372,34 +1336,72 @@ class AuthenticationService {
             return "en";
         }
     }
-
+    /**
+     * Sets the language change flag to false in local storage.
+     */
     setLanguageChangeFlag() {
         localStorage.setItem('lastLoggedInUsersLanguageChanged', false);
     }
-
+    /**
+     * Sets the record count and initializes various session storage items for the given count.
+     * @param {number} count - The record count to set.
+     */
     setRecordCount(count) {
         var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
+        var endDate = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - SPV_REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth());
         localStorage.setItem('sesRecordCount', count);
         localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }));
+        localStorage.setItem('sesRangeValueManualJson', JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+        localStorage.setItem('sesShipmentType', JSON.stringify([{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]));
         localStorage.setItem('sesProgramId', "");
+        localStorage.setItem('sesCountryId', "");
+        localStorage.setItem('sesDatasetId', "");
+        localStorage.setItem('sesLevelId', "");
+        localStorage.setItem('sesLiveDatasetId', "");
+        localStorage.setItem('sesTreeId', "");
+        localStorage.setItem('sesScenarioId', "");
+        localStorage.setItem('sesDatasetVersionId', "");
+        localStorage.setItem('sesDatasetCompareVersionId', "");
+        localStorage.setItem('sesDatasetPlanningUnitId', "");
+        localStorage.setItem('sesDataentryDateRange', "");
+        localStorage.setItem('sesDataentryStartDateRange', "");
+        localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
-        // localStorage.setItem('sesLocalVersionChange', false);
+        localStorage.setItem('sesPlanningUnitIdMulti', "");
         localStorage.setItem("sesLatestProgram", false);
+        localStorage.setItem("sesLatestDataset", false);
+        localStorage.setItem('sesReportRangeSPVR', JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }))
+        localStorage.setItem("sesCountryIdSPVR", -1);
+        localStorage.setItem("sesProgramIdSPVR", -1);
+        localStorage.setItem("sesVersionTypeSPVR", -1);
+        localStorage.setItem("sesVersionStatusSPVR", -1);
         localStorage.setItem("sesProblemStatus", JSON.stringify([{ label: "Open", value: 1 }, { label: "Addressed", value: 3 }]));
         localStorage.setItem('sesProblemType', "-1");
         localStorage.setItem('sesProblemCategory', "-1");
         localStorage.setItem('sesReviewed', "-1");
         localStorage.setItem('sesProgramIdReport', "");
         localStorage.setItem('sesVersionIdReport', "");
+        localStorage.setItem('sesForecastProgramIdReport', "");
+        localStorage.setItem('sesForecastVersionIdReport', "");
         localStorage.setItem('sesBudPro', "");
         localStorage.setItem('sesBudFs', "");
         localStorage.setItem('sesBudStatus', "");
-        var currentDate = moment(Date.now()).utcOffset('-0500')
+        localStorage.setItem('sesForecastProgramIds', "");
+        var currentDate = moment(Date.now()).utcOffset('-0500');
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+        localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
+        localStorage.setItem('sesAutoCalculate',true)
     }
-
+    /**
+     * Retrieves the icon or static label based on the specified value and the user's default language.
+     * @param {string} val - The value specifying whether to retrieve the icon or the label.
+     * @returns {string} - The icon class or static label based on the specified value and user's default language.
+     */
     getIconAndStaticLabel(val) {
         let lang = this.getDefaultUserLanguage();
         if (val == "icon") {
@@ -1430,10 +1432,6 @@ class AuthenticationService {
                     return "static.language.english";
             }
         }
-
     }
-
 }
-
-
 export default new AuthenticationService()
