@@ -2356,7 +2356,8 @@ class EditSupplyPlanStatus extends Component {
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
-                    loading: false
+                    loading: false,
+                    loadSummaryTable:true
                 }, () => {
                     this.getPlanningUnit()
                     this.getProblemCriticality();
@@ -3575,7 +3576,7 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.problemList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
                     <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
@@ -3673,7 +3674,7 @@ class EditSupplyPlanStatus extends Component {
         if (cont == true) {
             this.setState({
                 problemList: [],
-                loadSummaryTable: false,
+                // loadSummaryTable:false,
                 message: '',
                 loading: true,
                 problemReportChanged: 0
@@ -3709,7 +3710,7 @@ class EditSupplyPlanStatus extends Component {
                     });
             }
             else if (problemStatusIds == []) {
-                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loadSummaryTable: false, loading: false },
+                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("problemListDiv"), '');
                         jexcel.destroy(document.getElementById("problemListDiv"), true);
@@ -4141,7 +4142,7 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             problemEl: problemEl,
             loading: false,
-            loadSummaryTable: true
+            // loadSummaryTable:true
         })
     }
     /**
