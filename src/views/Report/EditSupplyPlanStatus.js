@@ -214,7 +214,7 @@ class EditSupplyPlanStatus extends Component {
                 problemStatusListForEdit: [],
                 shipmentQtyTotalForPopup: 0,
                 batchQtyTotalForPopup: 0,
-                planningUnitNotes:""
+                planningUnitNotes: ""
             },
             statuses: [],
             regionList: [],
@@ -235,7 +235,7 @@ class EditSupplyPlanStatus extends Component {
             submitColor: "",
             planningUnitDropdownList: [],
             temp_currentVersion_id: '',
-            loadSummaryTable:false
+            loadSummaryTable: false
         }
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -983,7 +983,7 @@ class EditSupplyPlanStatus extends Component {
      * @param {*} month This is the value of the month for which the inventory/adjustment value is clicked
      * @param {*} endDate  This value is the end date of the month for which the inventory/adjustment value is clicked
      * @param {*} actualFlag This is the value of the inventory type
-     */    
+     */
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
@@ -1795,7 +1795,7 @@ class EditSupplyPlanStatus extends Component {
                                             if (paColor4Array.indexOf(paColor4) === -1) {
                                                 paColor4Array.push(paColor4);
                                             }
-                                        }else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                        } else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2356,7 +2356,8 @@ class EditSupplyPlanStatus extends Component {
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
-                    loading: false
+                    loading: false,
+                    loadSummaryTable:true
                 }, () => {
                     this.getPlanningUnit()
                     this.getProblemCriticality();
@@ -3089,7 +3090,7 @@ class EditSupplyPlanStatus extends Component {
                                             {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
-                                    {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                    {this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
                                         </ul>
@@ -3575,7 +3576,7 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.problemList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
                     <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
@@ -3673,7 +3674,7 @@ class EditSupplyPlanStatus extends Component {
         if (cont == true) {
             this.setState({
                 problemList: [],
-                loadSummaryTable:false,
+                // loadSummaryTable:false,
                 message: '',
                 loading: true,
                 problemReportChanged: 0
@@ -3709,7 +3710,7 @@ class EditSupplyPlanStatus extends Component {
                     });
             }
             else if (problemStatusIds == []) {
-                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [],loadSummaryTable:false, loading: false },
+                this.setState({ message: i18n.t('static.report.selectProblemStatus'), problemList: [], loading: false },
                     () => {
                         this.el = jexcel(document.getElementById("problemListDiv"), '');
                         jexcel.destroy(document.getElementById("problemListDiv"), true);
@@ -4141,16 +4142,113 @@ class EditSupplyPlanStatus extends Component {
         this.setState({
             problemEl: problemEl,
             loading: false,
-            loadSummaryTable:true
+            // loadSummaryTable:true
         })
     }
-        /**
-     * This function is used to format the QPL table like add asterisk or info to the table headers
-     * @param {*} instance This is the DOM Element where sheet is created
-     * @param {*} cell This is the object of the DOM element
-     */
+    /**
+ * This function is used to format the QPL table like add asterisk or info to the table headers
+ * @param {*} instance This is the DOM Element where sheet is created
+ * @param {*} cell This is the object of the DOM element
+ */
     loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
+    }
+    updateFieldData = (value) => {
+        let { program } = this.state;
+        this.setState({ regionId: value });
+        var regionId = value;
+        var regionIdArray = [];
+        for (var i = 0; i < regionId.length; i++) {
+            regionIdArray[i] = regionId[i].value;
+        }
+        program.regionArray = regionIdArray;
+        this.setState({
+            program: program,
+        });
+    }
+
+    addMannualProblem() {
+        this.getProblemCriticality();
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+            loading: false
+        }, () => {
+        });
+    }
+    submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession) {
+        var json = {
+            "realmProblem": {
+                "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
+                "problemType": {
+                    "id": "2"
+                }
+            },
+            "program": {
+                "id": this.props.match.params.programId
+            },
+            "versionId": this.props.match.params.versionId,
+            "problemStatus": {
+                "id": "1"
+            },
+            "dt": moment(new Date()).format("YYYY-MM-DD"),
+            "region": {
+                "id": regionId
+            },
+            "planningUnit": {
+                "id": modelPlanningUnitId
+            },
+            "data5": '{"problemDescription":"' + problemDescription + '", "suggession":"' + suggession + '"}',
+            "notes": ""
+        }
+        ProgramService.createManualProblem(json)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        message: response.data.message,
+                        problemReportChanged: 0,
+                        remainingDataChanged: 0,
+                    })
+                    this.componentDidMount();
+                    this.toggle(0, '2');
+                } else {
+                    this.setState({
+                        message: response.data.message,
+                    })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 404:
+                                this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                break;
+                            case 500:
+                            case 401:
+                            case 403:
+                            case 406:
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        })
     }
     /**
      * This function is called when program is changed
@@ -4268,6 +4366,7 @@ class EditSupplyPlanStatus extends Component {
             entries: " ",
         });
         const { statuses } = this.state;
+        let { editable } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
@@ -4972,219 +5071,219 @@ class EditSupplyPlanStatus extends Component {
                             validationSchema={validationSchema}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 this.setState({
-                                    loading:true
+                                    loading: true
                                 })
                                 var validation = this.checkValidation();
-                                if(validation){
-                                ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
-                                    .then(response => {
-                                        let temp_version_status = 0;
-                                        temp_version_status = response.data.currentVersion.versionStatus.id;
-                                        if (temp_version_status == this.state.temp_currentVersion_id) {
-                                            var validation = this.checkValidation();
-                                            if (validation == true) {
-                                                document.getElementById("submitButton").disabled = true;
-                                                var elInstance = this.state.problemEl;
-                                                var json = elInstance.getJson();
-                                                var reviewedProblemList = [];
-                                                var isAllCheckForReviewed = true;
-                                                for (var i = 0; i < json.length; i++) {
-                                                    var map = new Map(Object.entries(json[i]));
-                                                    if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id!=map.get("11") || this.state.problemList[i].reviewed.toString()!=map.get("21").toString() || map.get("22").toString()!="")) {
-                                                        reviewedProblemList.push({
-                                                            problemReportId: map.get("0"),
-                                                            problemStatus: {
-                                                                id: map.get("11")
-                                                            },
-                                                            reviewed: map.get("21"),
-                                                            reviewedNotes: map.get("22"),
-                                                            notes: map.get("22")
-                                                        });
+                                if (validation) {
+                                    ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
+                                        .then(response => {
+                                            let temp_version_status = 0;
+                                            temp_version_status = response.data.currentVersion.versionStatus.id;
+                                            if (temp_version_status == this.state.temp_currentVersion_id) {
+                                                var validation = this.checkValidation();
+                                                if (validation == true) {
+                                                    document.getElementById("submitButton").disabled = true;
+                                                    var elInstance = this.state.problemEl;
+                                                    var json = elInstance.getJson();
+                                                    var reviewedProblemList = [];
+                                                    var isAllCheckForReviewed = true;
+                                                    for (var i = 0; i < json.length; i++) {
+                                                        var map = new Map(Object.entries(json[i]));
+                                                        if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != "")) {
+                                                            reviewedProblemList.push({
+                                                                problemReportId: map.get("0"),
+                                                                problemStatus: {
+                                                                    id: map.get("11")
+                                                                },
+                                                                reviewed: map.get("21"),
+                                                                reviewedNotes: map.get("22"),
+                                                                notes: map.get("22")
+                                                            });
+                                                        }
+                                                        if (map.get("21") == false && map.get("13") != 4) {
+                                                            isAllCheckForReviewed = false
+                                                        }
+                                                        if (map.get("0") == 0) {
+                                                            reviewedProblemList.push({
+                                                                problemReportId: 0,
+                                                                realmProblem: {
+                                                                    realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
+                                                                    problemType: {
+                                                                        id: "2"
+                                                                    }
+                                                                },
+                                                                program: {
+                                                                    id: this.props.match.params.programId
+                                                                },
+                                                                versionId: this.props.match.params.versionId,
+                                                                problemStatus: {
+                                                                    id: "1"
+                                                                },
+                                                                dt: moment(new Date()).format("YYYY-MM-DD"),
+                                                                region: {
+                                                                    id: map.get("1")
+                                                                },
+                                                                planningUnit: {
+                                                                    id: map.get("6")
+                                                                },
+                                                                reviewed: map.get("21"),
+                                                                reviewedNotes: map.get("22"),
+                                                                data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
+                                                                notes: map.get("22")
+                                                            })
+                                                        }
                                                     }
-                                                    if (map.get("21") == false && map.get("13") != 4) {
-                                                        isAllCheckForReviewed = false
-                                                    }
-                                                    if (map.get("0") == 0) {
-                                                        reviewedProblemList.push({
-                                                            problemReportId: 0,
-                                                            realmProblem: {
-                                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
-                                                                problemType: {
-                                                                    id: "2"
-                                                                }
-                                                            },
-                                                            program: {
-                                                                id: this.props.match.params.programId
-                                                            },
-                                                            versionId: this.props.match.params.versionId,
-                                                            problemStatus: {
-                                                                id: "1"
-                                                            },
-                                                            dt: moment(new Date()).format("YYYY-MM-DD"),
-                                                            region: {
-                                                                id: map.get("1")
-                                                            },
-                                                            planningUnit: {
-                                                                id: map.get("6")
-                                                            },
-                                                            reviewed: map.get("21"),
-                                                            reviewedNotes: map.get("22"),
-                                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
-                                                            notes: map.get("22")
-                                                        })
-                                                    }
-                                                }
-                                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
+                                                    if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
-                                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                                        .then(response => {
-                                                            if (this.state.program.currentVersion.versionStatus.id != 1) {
-                                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                                            } else {
-                                                                try{
-                                                                    document.getElementById("submitButton").disabled = false;
-                                                                }catch(err){}
-                                                                this.setState({
-                                                                    submitMessage: "static.message.supplyplanversionapprovedsuccess",
-                                                                    submitColor: "green",
-                                                                    problemReportChanged: 0,
-                                                                    remainingDataChanged: 0,
-                                                                    loadSummaryTable:false,
-                                                                    loading:false
-
-                                                                    // isModalOpen: !this.state.isModalOpen,
-                                                                }, () => {
-                                                                    this.hideMessageComponent()
-                                                                    this.componentDidMount();
-                                                                })
-                                                            }
-
-                                                        })
-                                                        .catch(
-                                                            error => {
-                                                                if (error.message === "Network Error") {
+                                                        ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                                            .then(response => {
+                                                                if (this.state.program.currentVersion.versionStatus.id != 1) {
+                                                                    this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                                                } else {
+                                                                    try {
+                                                                        document.getElementById("submitButton").disabled = false;
+                                                                    } catch (err) { }
                                                                     this.setState({
-                                                                        // message: 'static.unkownError',
-                                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                                        submitColor: "red",
+                                                                        submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                                        submitColor: "green",
+                                                                        problemReportChanged: 0,
+                                                                        remainingDataChanged: 0,
+                                                                        loadSummaryTable: false,
                                                                         loading: false
+
+                                                                        // isModalOpen: !this.state.isModalOpen,
                                                                     }, () => {
                                                                         this.hideMessageComponent()
-                                                                    });
-                                                                } else {
-                                                                    switch (error.response ? error.response.status : "") {
+                                                                        this.componentDidMount();
+                                                                    })
+                                                                }
 
-                                                                        case 401:
-                                                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                            break;
-                                                                        case 403:
-                                                                            this.props.history.push(`/accessDenied`)
-                                                                            break;
-                                                                        case 500:
-                                                                        case 404:
-                                                                        case 406:
-                                                                            this.setState({
-                                                                                submitMessage: error.response.data.messageCode,
-                                                                                submitColor: "red",
-                                                                                loading: false
-                                                                            }, () => {
-                                                                                this.hideMessageComponent()
-                                                                            });
-                                                                            break;
-                                                                        case 412:
-                                                                            this.setState({
-                                                                                submitMessage: error.response.data.messageCode,
-                                                                                submitColor: "red",
-                                                                                loading: false
-                                                                            }, () => {
-                                                                                this.hideMessageComponent()
-                                                                            });
-                                                                            break;
-                                                                        default:
-                                                                            this.setState({
-                                                                                submitMessage: 'static.unkownError',
-                                                                                submitColor: "red",
-                                                                                loading: false
-                                                                            }, () => {
-                                                                                this.hideMessageComponent()
-                                                                            });
-                                                                            break;
+                                                            })
+                                                            .catch(
+                                                                error => {
+                                                                    if (error.message === "Network Error") {
+                                                                        this.setState({
+                                                                            // message: 'static.unkownError',
+                                                                            submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                            submitColor: "red",
+                                                                            loading: false
+                                                                        }, () => {
+                                                                            this.hideMessageComponent()
+                                                                        });
+                                                                    } else {
+                                                                        switch (error.response ? error.response.status : "") {
+
+                                                                            case 401:
+                                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                break;
+                                                                            case 403:
+                                                                                this.props.history.push(`/accessDenied`)
+                                                                                break;
+                                                                            case 500:
+                                                                            case 404:
+                                                                            case 406:
+                                                                                this.setState({
+                                                                                    submitMessage: error.response.data.messageCode,
+                                                                                    submitColor: "red",
+                                                                                    loading: false
+                                                                                }, () => {
+                                                                                    this.hideMessageComponent()
+                                                                                });
+                                                                                break;
+                                                                            case 412:
+                                                                                this.setState({
+                                                                                    submitMessage: error.response.data.messageCode,
+                                                                                    submitColor: "red",
+                                                                                    loading: false
+                                                                                }, () => {
+                                                                                    this.hideMessageComponent()
+                                                                                });
+                                                                                break;
+                                                                            default:
+                                                                                this.setState({
+                                                                                    submitMessage: 'static.unkownError',
+                                                                                    submitColor: "red",
+                                                                                    loading: false
+                                                                                }, () => {
+                                                                                    this.hideMessageComponent()
+                                                                                });
+                                                                                break;
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
-                                                        );
-                                                } else {
-                                                    document.getElementById("submitButton").disabled = false;
-                                                    alert("To approve a supply plan – Reviewed must all be checked.");
-                                                }
-                                            }else{
-                                                this.setState({
-                                                    submitMessage: 'static.supplyPlan.validationFailed',
-                                                    submitColor: "red",
-                                                    loading: false
-                                                }, () => {
-                                                    this.hideMessageComponent()
-                                                });
-                                            }
-                                        } else {
-                                            confirmAlert({
-                                                message: i18n.t("static.supplyplan.inconsistent"),
-                                                buttons: [
-                                                    {
-                                                        label: i18n.t("static.common.refreshPage"),
-                                                        onClick: () => {
-                                                            window.location.reload(true);
-                                                        }
-                                                    },
-                                                    {
-                                                        label: i18n.t('static.common.close')
+                                                            );
+                                                    } else {
+                                                        document.getElementById("submitButton").disabled = false;
+                                                        alert("To approve a supply plan – Reviewed must all be checked.");
                                                     }
-                                                ]
-                                            });
-                                        }
-                                    })
-                                    .catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    // message: 'static.unkownError',
-                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                    loading: false
-                                                });
+                                                } else {
+                                                    this.setState({
+                                                        submitMessage: 'static.supplyPlan.validationFailed',
+                                                        submitColor: "red",
+                                                        loading: false
+                                                    }, () => {
+                                                        this.hideMessageComponent()
+                                                    });
+                                                }
                                             } else {
-                                                switch (error.response ? error.response.status : "") {
+                                                confirmAlert({
+                                                    message: i18n.t("static.supplyplan.inconsistent"),
+                                                    buttons: [
+                                                        {
+                                                            label: i18n.t("static.common.refreshPage"),
+                                                            onClick: () => {
+                                                                window.location.reload(true);
+                                                            }
+                                                        },
+                                                        {
+                                                            label: i18n.t('static.common.close')
+                                                        }
+                                                    ]
+                                                });
+                                            }
+                                        })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
 
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
                                                 }
                                             }
-                                        }
-                                    );
-                                }else{
+                                        );
+                                } else {
                                     this.setState({
                                         submitMessage: 'static.supplyPlan.validationFailed',
                                         submitColor: "red",
