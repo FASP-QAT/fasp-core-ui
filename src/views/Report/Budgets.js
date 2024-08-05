@@ -346,10 +346,13 @@ class Budgets extends Component {
     exportCSV = (columns) => {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
         this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
         this.state.fundingSourceTypeLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
@@ -359,7 +362,7 @@ class Budgets extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSourceType.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -430,7 +433,7 @@ class Budgets extends Component {
         var h1 = 50;
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, ele.fundingSourceType.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: height,
@@ -759,6 +762,9 @@ class Budgets extends Component {
                 text: i18n.t('static.budget.fundingsource'),
             },
             {
+                text: i18n.t('static.funderTypeHead.funderType'),
+            },
+            {
                 text: i18n.t('static.dashboard.currency'),
             },
             {
@@ -944,7 +950,6 @@ class Budgets extends Component {
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             jexcel.destroy(document.getElementById("budgetTable"), true);
             var data = this.state.selBudget;
-            console.log('data[0]: ',data[0]);
             let outPutListArray = [];
             let count = 0;
             for (var j = 0; j < data.length; j++) {
@@ -952,14 +957,15 @@ class Budgets extends Component {
                 data1[0] = getLabelText(data[j].budget.label, this.state.lang)
                 data1[1] = data[j].budget.code
                 data1[2] = data[j].fundingSource.code
-                data1[3] = getLabelText(data[j].currency.label, this.state.lang)
-                data1[4] = data[j].budgetAmt;
-                data1[5] = data[j].plannedBudgetAmt;
-                data1[6] = data[j].orderedBudgetAmt;
-                data1[7] = data[j].remainingBudgetAmtUsd;
-                data1[8] = data[j].startDate;
-                data1[9] = data[j].stopDate;
-                data1[10] = data[j].budget.id
+                data1[3] = data[j].fundingSourceType.code
+                data1[4] = getLabelText(data[j].currency.label, this.state.lang)
+                data1[5] = data[j].budgetAmt;
+                data1[6] = data[j].plannedBudgetAmt;
+                data1[7] = data[j].orderedBudgetAmt;
+                data1[8] = data[j].remainingBudgetAmtUsd;
+                data1[9] = data[j].startDate;
+                data1[10] = data[j].stopDate;
+                data1[11] = data[j].budget.id
                 outPutListArray[count] = data1;
                 count++;
             }
@@ -970,6 +976,7 @@ class Budgets extends Component {
                     { title: i18n.t('static.budget.budget'), type: 'text' },
                     { title: i18n.t('static.budget.budgetCode'), type: 'text' },
                     { title: i18n.t('static.budget.fundingsource'), type: 'text' },
+                    { title: i18n.t('static.funderTypeHead.funderType'), type: 'text' },
                     { title: i18n.t('static.dashboard.currency'), type: 'text' },
                     { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },
                     { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },
