@@ -1380,72 +1380,75 @@ export default class TreeTable extends Component {
      * @param {*} currentItemConfig The item configuration object that needs to be updated
      */
     updateNodeInfoInJson(currentItemConfig) {
-        var nodes = this.state.items;
-        if (currentItemConfig.context.level == 0 && currentItemConfig.context.newTree) {
-            currentItemConfig.context.newTree = false;
-        }
-        if (currentItemConfig.context.payload.nodeType.id == 4) {
-            var tracerCategoryId = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id;
-            if (tracerCategoryId == "" || tracerCategoryId == undefined || tracerCategoryId == null) {
-                var fu = this.state.forecastingUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id);
-                if (fu.length > 0) {
-                    (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = fu[0].tracerCategory.id;
-                }
+        return new Promise((resolve, reject) => {
+            var nodes = this.state.items;
+            if (currentItemConfig.context.level == 0 && currentItemConfig.context.newTree) {
+                currentItemConfig.context.newTree = false;
             }
-        }
-        if (this.state.deleteChildNodes) {
-            var childNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
-            childNodes.map(item => {
-                nodes = nodes.filter(c => !c.sortOrder.startsWith(item.sortOrder))
-            })
-        }
-        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
-        nodes[findNodeIndex] = currentItemConfig.context;
-        if (currentItemConfig.context.payload.nodeType.id == 4) {
-            var puNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
-            for (var puN = 0; puN < puNodes.length; puN++) {
-                var refillMonths = "";
-                var puPerVisit = "";
-                if (puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode != null) {
-                    var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
-                    var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
-                    var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
-                    if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                        var refillMonths = 1;
-                        puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
-                        puNode.refillMonths = refillMonths;
-                        puNode.puPerVisit = puPerVisit;
-                    } else {
-                        puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
-                        puNode.puPerVisit = puPerVisit;
+            if (currentItemConfig.context.payload.nodeType.id == 4) {
+                var tracerCategoryId = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id;
+                if (tracerCategoryId == "" || tracerCategoryId == undefined || tracerCategoryId == null) {
+                    var fu = this.state.forecastingUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id);
+                    if (fu.length > 0) {
+                        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = fu[0].tracerCategory.id;
                     }
-                    nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
                 }
             }
-        }
-        const { curTreeObj } = this.state;
-        var treeLevelList = curTreeObj.levelList;
-        if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
-            var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
-            if (levelListFiltered != -1) {
-                var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
-                var label = {}
-                if (unitId != "" && unitId != null) {
-                    label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
-                }
-                treeLevelList[levelListFiltered].unit = {
-                    id: unitId != "" && unitId != null ? parseInt(unitId) : null,
-                    label: label
+            if (this.state.deleteChildNodes) {
+                var childNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+                childNodes.map(item => {
+                    nodes = nodes.filter(c => !c.sortOrder.startsWith(item.sortOrder))
+                })
+            }
+            var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+            nodes[findNodeIndex] = currentItemConfig.context;
+            if (currentItemConfig.context.payload.nodeType.id == 4) {
+                var puNodes = nodes.filter(c => c.parent == currentItemConfig.context.id);
+                for (var puN = 0; puN < puNodes.length; puN++) {
+                    var refillMonths = "";
+                    var puPerVisit = "";
+                    if (puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode != null) {
+                        var pu = puNodes[puN].payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit;
+                        var findNodeIndexPu = nodes.findIndex(n => n.id == puNodes[puN].id);
+                        var puNode = nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode;
+                        if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                            var refillMonths = 1;
+                            puPerVisit = parseFloat(((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
+                            puNode.refillMonths = refillMonths;
+                            puNode.puPerVisit = puPerVisit;
+                        } else {
+                            puPerVisit = parseFloat(this.state.noFURequired / pu.multiplier).toFixed(8);
+                            puNode.puPerVisit = puPerVisit;
+                        }
+                        nodes[findNodeIndexPu].payload.nodeDataMap[this.state.selectedScenario][0].puNode = puNode;
+                    }
                 }
             }
-            curTreeObj.levelList = treeLevelList;
-        }
-        this.setState({
-            items: nodes,
-            isSubmitClicked: false,
-            curTreeObj
-        }, () => {
-            this.calculateMOMData(currentItemConfig.context.id, 0);
+            const { curTreeObj } = this.state;
+            var treeLevelList = curTreeObj.levelList;
+            if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
+                var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
+                if (levelListFiltered != -1) {
+                    var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
+                    var label = {}
+                    if (unitId != "" && unitId != null) {
+                        label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+                    }
+                    treeLevelList[levelListFiltered].unit = {
+                        id: unitId != "" && unitId != null ? parseInt(unitId) : null,
+                        label: label
+                    }
+                }
+                curTreeObj.levelList = treeLevelList;
+            }
+            this.setState({
+                items: nodes,
+                isSubmitClicked: false,
+                curTreeObj
+            }, () => {
+                this.calculateMOMData(currentItemConfig.context.id, 0);
+                resolve();
+            });
         });
     }
     /**
@@ -1623,6 +1626,96 @@ export default class TreeTable extends Component {
             }
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedTab2 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if(rowData[35] == 4) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if(rowData[35] == 5) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
     onChangeTab1Data = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(12, y, 1, true);
     }
@@ -1636,6 +1729,7 @@ export default class TreeTable extends Component {
         for (var i = 0; i < sortedArray.length; i++) {
             items.push(item1.filter(c => c.sortOrder == sortedArray[i])[0]);
         }
+        items = items.filter(c => c.payload.nodeType.id == 1 || c.payload.nodeType.id == 2 || c.payload.nodeType.id == 3)
         for (var i = 0; i < items.length; i++) {
             data = [];
             var row = "";
@@ -1869,27 +1963,67 @@ export default class TreeTable extends Component {
     buildTab2Jexcel() {
         var treeArray = [];
         var count = 0;
+        var item1 = this.state.items;
+        var sortOrderArray = [...new Set(item1.map(ele => (ele.sortOrder)))];
+        var sortedArray = sortOrderArray.sort();
+        var items = [];
+        for (var i = 0; i < sortedArray.length; i++) {
+            items.push(item1.filter(c => c.sortOrder == sortedArray[i])[0]);
+        }
+        items = items.filter(c => c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5)
+        for (var i = 0; i < items.length; i++) {
+            data = [];
+            var row = "";
+            var row1 = "";
+            var level = items[i].level;
+            var fuNode = items[i].payload.nodeType.id == 4;
+            var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
+            console.log("Hello",items[i])
+            data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
+            data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
+            data[3] = items[i].payload.label.label_en;
+            data[4] = moment(currentScenario.month).format("YYYY-MM-DD");
+            data[5] = 100; //Percentage of Parent
+            data[6] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]); //Parent Value
+            // data[7] = currentScenario.dataValue;//Node Value
+            data[7] = currentScenario.dataValue * (data[5] / 100);
+            data[8] = fuNode ? currentScenario.fuNode.forecastingUnit.id : ""; // Forecasting unit
+            data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
+            data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
+            data[11] = 0; // # PU / Interval / Patient (Reference)
+            data[12] = 0; // # PU / Interval / Patient
+            data[13] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
+            data[14] = fuNode ? currentScenario.fuNode.usageType.id : ""; // Type of Use
+            data[15] = fuNode ? currentScenario.fuNode.lagInMonths : ""; // Lag in months
+            data[16] = 0; // Every
+            data[17] = 0; // Unit
+            data[18] = 0; // Requires
+            data[19] = 0; // Forecasting Units Unit
+            data[20] = 0; // Every
+            data[21] = 0; // Usage Period
+            data[22] = 0; // Single Use
+            data[23] = 0; // For
+            data[24] = 0; // Period
+            data[25] = 0; // # of FU required for period
+            data[26] = 0; // # Of Months In Period
+            data[27] = 0; // # of FU / month / Patient
+            data[28] = 0; // # of FU / Unit/ Time
+            data[29] = 0; // # of FU required for period per Unit
+            data[30] = 0; // # of FU / month / Unit
+            data[31] = 0; // # of PU / month / Unit
+            data[32] = currentScenario.dataValue;
+            data[33] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
+            // data[35] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : addCommasNodeValue(currentScenario.dataValue);
+            data[34] = currentScenario.notes;
+            data[35] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
+            data[36] = items[i].id;
+            data[37] = "";
+
+            treeArray[count] = data;
+            count++;
+        }
+        
         if (0 == 0) {
-            for (var k = 0; k < 10; k++) {
-                data = [];
-                data[0] = 1
-                data[1] = 1
-                data[2] = 1
-                data[3] = 1
-                data[4] = 1
-                data[5] = 1
-                data[6] = 1
-                data[7] = ""
-                data[8] = ""
-                data[9] = ""
-                data[10] = ""
-                data[11] = ""
-                data[12] = ""
-                data[13] = ""
-                data[14] = ""
-                treeArray[count] = data;
-                count++;
-            }
             this.el = jexcel(document.getElementById("tableDiv"), '');
             jexcel.destroy(document.getElementById("tableDiv"), true);
             var data = treeArray;
@@ -1899,71 +2033,184 @@ export default class TreeTable extends Component {
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
-                        title: 'Tree Id',
+                        title: 'Node Id',
                         type: 'hidden'
                     },
                     {
-                        title: i18n.t('static.dashboard.programheader'),
+                        title: i18n.t('static.tree.parent'),
                         type: 'text',
                     },
                     {
-                        title: i18n.t('static.common.treeName'),
+                        title: i18n.t('static.ManageTree.NodeType'),
                         type: 'text',
                     },
                     {
-                        title: i18n.t('static.common.region'),
+                        title: i18n.t('static.tree.nodeTitle'),
                         type: 'text',
                     },
                     {
-                        title: i18n.t('static.forecastMethod.forecastMethod'),
+                        title: i18n.t('static.supplyPlan.startMonth'),
+                        options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                        type: 'calendar'
+                    },
+                    {
+                        title: i18n.t('static.tree.percentageOfParent'),
+                        mask: '#,##0.00%', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: i18n.t('static.tree.parentValue'),
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: i18n.t('static.tree.nodeValue'),
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Forecasting Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Planning Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Conversion Factor',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# PU / Interval / Patient (Reference)',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# PU / Interval / Patient',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Tracer Category',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Type Of Use',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Lag in months',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Every',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Planning Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Requires',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Forecasting Units Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Every',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Usage Period',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Single Use',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'For',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: 'Period',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# of FU required for period',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# Of Months In Period',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# of FU / month / Patient',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# of FU / Unit/ Time',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# of FU required for period per Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# of FU / month / Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: '# of PU / month / Unit',
+                        mask: '#,##0.00', decimal: '.',
+                        type: 'numeric',
+                    },
+                    {
+                        title: i18n.t('static.common.notes'),
                         type: 'text',
                     },
                     {
-                        title: i18n.t('static.common.scenarioName'),
-                        type: 'text',
-                    },
-                    {
-                        title: i18n.t('static.program.notes'),
-                        type: 'text',
-                    },
-                    {
-                        title: 'ProgramId',
+                        title: 'Node Type',
                         type: 'hidden',
                     },
                     {
-                        title: 'id',
+                        title: 'Node Id',
                         type: 'hidden',
                     },
                     {
-                        title: 'versionId',
+                        title: 'Is Changed',
                         type: 'hidden',
-                    },
-                    {
-                        title: i18n.t('static.common.lastModifiedBy'),
-                        type: 'text',
-                    },
-                    {
-                        title: i18n.t('static.common.lastModifiedDate'),
-                        type: 'calendar',
-                    },
-                    {
-                        type: 'checkbox',
-                        title: i18n.t('static.common.active'),
-                        width:60
-                        // source: [
-                        //     { id: true, name: i18n.t('static.common.active') },
-                        //     { id: false, name: i18n.t('static.common.disabled') }
-                        // ]
-                    },
-                    {
-                        type: 'hidden'
-                    },
-                    {
-                        type: 'hidden'
                     }
                 ],
-                editable: false,
-                // onload: this.loaded,
+                editable: true,
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
                 columnSorting: true,
@@ -1979,16 +2226,35 @@ export default class TreeTable extends Component {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
+                onload: this.loadedTab2,
+                onchange: this.onChangeTab1Data,
+                // onchangepage:
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    var rowData = obj.getRowData(y)
+                    if (y != null) {
+                        if (1 == 1) {
+                            items.push({
+                                title: "Go to Tree",
+                                onclick: function () {
+                                    localStorage.setItem("openNodeId", rowData[11]);
+                                    window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
+                                }.bind(this)
+                            });
+                        }
+                    }
+                    return items;
+                }.bind(this),
             };
-            var treeTabl2El = jexcel(document.getElementById("tableDiv2"), options);
-            this.el = treeTabl2El;
+            var treeTabl1El = jexcel(document.getElementById("tableDiv2"), options);
+            this.el = treeTabl1El;
             this.setState({
-                treeTabl2El: treeTabl2El,
+                treeTabl1El: treeTabl1El,
                 loading: false,
             })
         } else {
             this.setState({
-                treeTabl2El: "",
+                treeTabl1El: "",
                 loading: false
             })
             this.el = jexcel(document.getElementById("tableDiv2"), '');
