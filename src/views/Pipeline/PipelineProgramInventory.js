@@ -1,21 +1,21 @@
+import jexcel from 'jspreadsheet';
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import i18n from '../../i18n';
-import PipelineService from '../../api/PipelineService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
+import { jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { API_URL, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_INTEGER_REGEX_LONG, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY } from '../../Constants';
+import { JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import DataSourceService from '../../api/DataSourceService.js';
-import PlanningUnitService from '../../api/PlanningUnitService'
-import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline, checkValidtion, inValid, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js'
-import RealmCountryService from '../../api/RealmCountryService'
+import PipelineService from '../../api/PipelineService.js';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import RealmCountryService from '../../api/RealmCountryService';
+import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_DATE_FORMAT_WITHOUT_DATE, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_LONG, JEXCEL_INTEGER_REGEX_LONG, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants';
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_INTEGER_REGEX, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY } from '../../Constants.js';
+/**
+ * Component for pipeline program import inventory details
+ */
 export default class PipelineProgramInventory extends Component {
-
     constructor(props) {
-
         super(props);
         this.saveInventory = this.saveInventory.bind(this);
         this.loaded = this.loaded.bind(this);
@@ -29,22 +29,32 @@ export default class PipelineProgramInventory extends Component {
         this.stopLoading = this.stopLoading.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
-
+    /**
+     * Sets loading to true
+     */
     startLoading() {
         this.setState({ loading: true });
     }
+    /**
+     * Sets loading to false
+     */
     stopLoading() {
         this.setState({ loading: false });
     }
-
+    /**
+     * Function to filter realm country planning unit based on planning unit
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The jexcel cell object.
+     * @param {number} c - Column index.
+     * @param {number} r - Row index.
+     * @param {Array} source - The source array for autocomplete options (unused).
+     * @returns {Array} - Returns an array of active countries.
+     */
     dropdownFilter = function (instance, cell, c, r, source) {
         var realmCountryId = document.getElementById("realmCountryId").value;
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[c - 7];
-        console.log("==========>planningUnitValue", value);
-        console.log("========>", this.state.realmCountryPlanningUnitList);
         var puList = (this.state.realmCountryPlanningUnitList).filter(c => c.planningUnit.id == value && c.realmCountry.id == realmCountryId);
-
         for (var k = 0; k < puList.length; k++) {
             var realmCountryPlanningUnitJson = {
                 name: puList[k].label.label_en,
@@ -52,11 +62,12 @@ export default class PipelineProgramInventory extends Component {
             }
             mylist.push(realmCountryPlanningUnitJson);
         }
-
-        console.log("myList=====>", mylist);
         return mylist;
     }
-
+    /**
+     * Function to check validation of the jexcel table.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
@@ -72,7 +83,6 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValue(`C${parseInt(y) + 1}`, true);
             if (value == "" || value == undefined) {
@@ -84,7 +94,6 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValue(`D${parseInt(y) + 1}`, true);
             if (value == "" || value == undefined) {
@@ -96,62 +105,22 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
-            /* var col = ("H").concat(parseInt(y) + 1);
-             var value = this.el.getValueFromCoords(7, y);
-             if (value == "") {
-                 this.el.setStyle(col, "background-color", "transparent");
-                 this.el.setStyle(col, "background-color", "yellow");
-                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                 valid = false;
-             } else {
-                 this.el.setStyle(col, "background-color", "transparent");
-                 this.el.setComments(col, "");
-             }*/
-
-             var reg = JEXCEL_INTEGER_REGEX_LONG;
-             var col = ("G").concat(parseInt(y) + 1);
-             var col1 = ("H").concat(parseInt(y) + 1);
-             var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-             var value1=(this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-             // value = value.toString().replaceAll("\,", "");
-             if (value == "" && value1=="") {
-                 this.el.setStyle(col, "background-color", "transparent");
-                 this.el.setStyle(col, "background-color", "yellow");
-                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                 valid=false;
-             } else {
-                 if (isNaN(Number(value)) || !(reg.test(value))) {
-                     this.el.setStyle(col, "background-color", "transparent");
-                     this.el.setStyle(col, "background-color", "yellow");
-                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                     valid=false;
-                 } else {
-                     this.el.setStyle(col, "background-color", "transparent");
-                     this.el.setComments(col, "");
-                     this.el.setStyle(col1, "background-color", "transparent");
-                     this.el.setComments(col1, "");
-                 }
-             }
-
-
-            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
-            var col = ("H").concat(parseInt(y) + 1);
-            var col1 = ("G").concat(parseInt(y) + 1);
-            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            var value1 = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            // value = value.toString().replaceAll("\,", "");
-            if (value == "" && value1=="") {
+            var reg = JEXCEL_INTEGER_REGEX_LONG;
+            var col = ("G").concat(parseInt(y) + 1);
+            var col1 = ("H").concat(parseInt(y) + 1);
+            var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            var value1 = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            if (value == "" && value1 == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid=false;
+                valid = false;
             } else {
                 if (isNaN(Number(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid=false;
+                    valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -159,13 +128,40 @@ export default class PipelineProgramInventory extends Component {
                     this.el.setComments(col1, "");
                 }
             }
-
-
-
+            var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
+            var col = ("H").concat(parseInt(y) + 1);
+            var col1 = ("G").concat(parseInt(y) + 1);
+            var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            var value1 = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            if (value == "" && value1 == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(Number(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    this.el.setStyle(col1, "background-color", "transparent");
+                    this.el.setComments(col1, "");
+                }
+            }
         }
         return valid;
     }
-
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -198,7 +194,6 @@ export default class PipelineProgramInventory extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
                 var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
                 var filteredList = realmCountryPlanningUnitList.filter(c => c.realmCountryPlanningUnitId == value);
                 var multiplier = filteredList[0].multiplier;
@@ -222,14 +217,13 @@ export default class PipelineProgramInventory extends Component {
                 }
             }
         }
-
         if (x == 6) {
             var reg = JEXCEL_INTEGER_REGEX_LONG;
             var col = ("G").concat(parseInt(y) + 1);
-            var col1=("H").concat(parseInt(y) + 1);
+            var col1 = ("H").concat(parseInt(y) + 1);
             value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            var value1=(this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            if (value == "" && value1=="") {
+            var value1 = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            if (value == "" && value1 == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -246,15 +240,13 @@ export default class PipelineProgramInventory extends Component {
                 }
             }
         }
-
         if (x == 7) {
-
             var reg = JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY;
             var col = ("H").concat(parseInt(y) + 1);
-            var col1=("G").concat(parseInt(y) + 1);
+            var col1 = ("G").concat(parseInt(y) + 1);
             value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            var value1=(this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
-            if (value == "" && value1=="") {
+            var value1 = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "")).trim();
+            if (value == "" && value1 == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -270,15 +262,14 @@ export default class PipelineProgramInventory extends Component {
                     this.el.setComments(col1, "");
                 }
             }
-
         }
-
     }
-
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var list = this.state.inventoryList;
         var json = this.el.getJson(null, false);
-
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             var col = ("B").concat(parseInt(y) + 1);
@@ -291,7 +282,6 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].dataSourceId).concat(i18n.t('static.message.notExist')));
             }
-
             var col = ("C").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[2]).toString();
             if (value != "" && value > 0) {
@@ -302,19 +292,8 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].regionId).concat(i18n.t('static.message.notExist')));
             }
-
             var col = ("D").concat(parseInt(y) + 1);
-            // var value = map.get("3");
             var value = (this.el.getRowData(y)[3]).toString();
-            // if (value != "" && !isNaN(parseInt(value))) {
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setComments(col, "");
-            // } else {
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setStyle(col, "background-color", "yellow");
-            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            //     // this.el.setComments(col, (list[y].dataSourceId).concat(" Does not exist."));
-            // }
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -324,10 +303,10 @@ export default class PipelineProgramInventory extends Component {
                 this.el.setComments(col, (list[y].realmCountryPlanningUnitId).concat(i18n.t('static.message.notExist')));
             }
         }
-
     }
-
-
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     saveInventory() {
         var json = this.el.getJson(null, false);
         this.setState({ loading: true });
@@ -337,9 +316,7 @@ export default class PipelineProgramInventory extends Component {
         for (var i = 0; i < json.length; i++) {
             var map = new Map(Object.entries(json[i]));
             var dataSourceId = map.get("1");
-            // console.log("dataSourceId   iiiiiiiiiiiiiii->", dataSourceId)
             if (dataSourceId != "" && !isNaN(parseInt(dataSourceId))) {
-                // console.log("in iffffffffffffffffffff");
                 dataSourceId = map.get("1");
             } else {
                 dataSourceId = list[i].dataSourceId;
@@ -352,27 +329,21 @@ export default class PipelineProgramInventory extends Component {
                 inventory: (this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                 manualAdjustment: (this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                 notes: map.get("8"),
-                // active: map.get("6"),
                 realmCountryPlanningUnitId: map.get("3"),
                 multiplier: map.get("4")
             }
             inventoryArray.push(inventoryJson);
         }
         return inventoryArray;
-
     }
-
+    /**
+     * Reterives region, realm country planning unit, data source, planning unit, inventory list and builds jexcel table to display consumption data
+     */
     componentDidMount() {
-
-        // alert(document.getElementById("realmCountryId").value);
         var realmCounryId = document.getElementById("realmCountryId").value;
-        // AuthenticationService.setupAxiosInterceptors();
         RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCounryId).then(response => {
             var realmCountryPlanningUnitList = [];
-
             this.setState({ realmCountryPlanningUnitList: response.data });
-            console.log("realmCountryPlanningUnitId Inventory====>", response.data);
-
             for (var i = 0; i < response.data.length; i++) {
                 var rcpJson = {
                     id: ((response.data)[i]).realmCountryPlanningUnitId,
@@ -380,12 +351,7 @@ export default class PipelineProgramInventory extends Component {
                 }
                 realmCountryPlanningUnitList.push(rcpJson);
             }
-
-
-
-            // AuthenticationService.setupAxiosInterceptors();
             PipelineService.getQatTempProgramregion(this.props.pipelineId).then(response => {
-                // console.log("inventory region List +++++++++++++++ ----->", response.data);
                 var regionList = [];
                 for (var i = 0; i < response.data.length; i++) {
                     var regionJson = {
@@ -394,13 +360,9 @@ export default class PipelineProgramInventory extends Component {
                     }
                     regionList.push(regionJson);
                 }
-
-                // AuthenticationService.setupAxiosInterceptors();
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
                     var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE);
-                    console.log("inventory data source List ++++++++++++++++++----->", response.data);
-                    // INVENTORY_DATA_SOURCE_TYPE
                     for (var j = 0; j < dataSourceFilterList.length; j++) {
                         var dataSourceJson = {
                             id: ((dataSourceFilterList)[j]).dataSourceId,
@@ -408,7 +370,6 @@ export default class PipelineProgramInventory extends Component {
                         }
                         dataSourceList.push(dataSourceJson);
                     }
-                    // AuthenticationService.setupAxiosInterceptors();
                     PlanningUnitService.getActivePlanningUnitList()
                         .then(response => {
                             var planningUnitListQat = []
@@ -419,11 +380,7 @@ export default class PipelineProgramInventory extends Component {
                                 }
                                 planningUnitListQat.push(planningUnitJson);
                             }
-
-                            // AuthenticationService.setupAxiosInterceptors();
                             PipelineService.getPipelineProgramInventory(this.props.pipelineId).then(response => {
-                                console.log("inventory List iiiiiiiiiiii----->", response.data);
-
                                 var data = [];
                                 var inventoryDataArr = [];
                                 var inventoryList = response.data;
@@ -449,17 +406,15 @@ export default class PipelineProgramInventory extends Component {
                                     }
                                     inventoryDataArr.push(data);
                                 }
-
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), '');
-                                this.el.destroy();
+                                jexcel.destroy(document.getElementById("inventorytableDiv"), true);
                                 var json = [];
                                 var data = inventoryDataArr;
                                 var options = {
                                     data: data,
-                                    columnDrag: true,
+                                    columnDrag: false,
                                     colWidths: [190, 130, 100, 120, 100, 150, 100, 130, 100],
                                     columns: [
-
                                         {
                                             title: i18n.t('static.dashboard.product'),
                                             type: 'dropdown',
@@ -475,14 +430,11 @@ export default class PipelineProgramInventory extends Component {
                                             title: i18n.t('static.inventory.region'),
                                             type: 'dropdown',
                                             source: regionList
-
                                         },
                                         {
                                             title: i18n.t('static.planningunit.countrysku'),
                                             type: 'dropdown',
                                             source: realmCountryPlanningUnitList,
-                                            // filter: this.dropdownFilter
-
                                         },
                                         {
                                             title: i18n.t('static.unit.multiplier'),
@@ -495,7 +447,6 @@ export default class PipelineProgramInventory extends Component {
                                             title: i18n.t('static.inventory.inventoryDate'),
                                             type: 'calendar',
                                             format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
-
                                         },
                                         {
                                             title: i18n.t('static.inventory.inventory'),
@@ -504,9 +455,7 @@ export default class PipelineProgramInventory extends Component {
                                             disabledMaskOnEdition: true,
                                             textEditor: true,
                                             decimal: '.'
-
                                         },
-
                                         {
                                             title: i18n.t('static.inventory.manualAdjustment'),
                                             type: 'numeric',
@@ -527,26 +476,19 @@ export default class PipelineProgramInventory extends Component {
                                     }.bind(this),
                                     search: true,
                                     columnSorting: true,
-                                    tableOverflow: true,
                                     wordWrap: true,
                                     allowInsertColumn: false,
                                     allowManualInsertColumn: false,
                                     allowDeleteRow: false,
                                     onchange: this.changed,
-                                    // oneditionend: this.onedit,
                                     copyCompatibility: true,
                                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                                     position: 'top',
-                                    text: {
-                                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                                        show: '',
-                                        entries: '',
-                                    },
+                                    editable: true,
                                     onload: this.loadedJexcelCommonFunction,
                                     oneditionend: this.oneditionend,
                                     license: JEXCEL_PRO_KEY,
                                 };
-
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);
                                 this.loaded();
                                 this.setState({
@@ -556,12 +498,11 @@ export default class PipelineProgramInventory extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -592,18 +533,15 @@ export default class PipelineProgramInventory extends Component {
                                     }
                                 }
                             );
-
-
                         }).catch(
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
@@ -638,12 +576,11 @@ export default class PipelineProgramInventory extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -678,12 +615,11 @@ export default class PipelineProgramInventory extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -718,12 +654,11 @@ export default class PipelineProgramInventory extends Component {
             error => {
                 if (error.message === "Network Error") {
                     this.setState({
-                        message: 'static.unkownError',
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                         loading: false
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
-
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
@@ -755,32 +690,46 @@ export default class PipelineProgramInventory extends Component {
             }
         );
     }
-
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
-
         if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[4]));
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
         } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         }
-
     }
-
-    loadedJexcelCommonFunction = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedJexcelCommonFunction = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
-
+    /**
+     * Renders the pipeline program import inventory details screen.
+     * @returns {JSX.Element} - Pipeline program import inventory details screen.
+     */
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
-                <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
-
+                <div className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                     <div id="inventorytableDiv">
                     </div>
                 </div>
@@ -788,9 +737,7 @@ export default class PipelineProgramInventory extends Component {
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>

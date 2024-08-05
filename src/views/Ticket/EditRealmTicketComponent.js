@@ -1,24 +1,26 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import { SPACE_REGEX } from '../../Constants';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-
+import { API_URL, SPACE_REGEX } from '../../Constants';
+import JiraTikcetService from '../../api/JiraTikcetService';
+import RealmService from '../../api/RealmService';
+import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Edit Realm"
 const initialValues = {
     summary: summaryText_1,
     realmName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
-
+/**
+ * This const is used to define the validation schema for realm ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -30,38 +32,18 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validnotestext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
+/**
+ * This component is used to display the realm form and allow user to submit the update master request in jira
+ */
 export default class EditRealmTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             realm: {
                 summary: summaryText_1,
                 realmName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -72,8 +54,12 @@ export default class EditRealmTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
-
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { realm } = this.state
         if (event.target.name == "summary") {
@@ -81,16 +67,15 @@ export default class EditRealmTicketComponent extends Component {
         }
         if (event.target.name == "realmName") {
             var outText = "";
-            if(event.target.value !== "") {
+            if (event.target.value !== "") {
                 var realmT = this.state.realms.filter(c => c.realmId == event.target.value)[0];
                 outText = realmT.label.label_en + " | " + realmT.realmCode;
-            }            
+            }
             realm.realmName = outText;
             this.setState({
                 realmId: event.target.value
             })
         }
-
         if (event.target.name == "notes") {
             realm.notes = event.target.value;
         }
@@ -98,39 +83,17 @@ export default class EditRealmTicketComponent extends Component {
             realm
         }, () => { })
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            realmName: true,
-            notes: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    /**
+     * This function is used to get realm list on page load
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -147,7 +110,9 @@ export default class EditRealmTicketComponent extends Component {
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
@@ -165,34 +130,52 @@ export default class EditRealmTicketComponent extends Component {
                 }
             );
     }
-
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { realm } = this.state;
+        realm.priority = newState;
+        this.setState(
+            {
+                realm
+            }, () => {
+                // console.log('priority - state : '+this.state.realm.priority);
+            }
+        );
     }
 
+    /**
+     * This function is called when reset button is clicked to reset the realm details
+     */
     resetClicked() {
         let { realm } = this.state;
-        // realm.summary = '';
         realm.realmName = '';
         realm.notes = '';
+        realm.priority = 3;
         this.setState({
             realm: realm,
             realmId: ''
         },
             () => { });
     }
-
+    /**
+     * This is used to display the content
+     * @returns This returns realm details form
+     */
     render() {
-
         const { realms } = this.state;
-
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
@@ -201,7 +184,6 @@ export default class EditRealmTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -210,7 +192,7 @@ export default class EditRealmTicketComponent extends Component {
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                         initialValues={initialValues}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
@@ -218,7 +200,6 @@ export default class EditRealmTicketComponent extends Component {
                             this.state.realm.summary = summaryText_2;
                             this.state.realm.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.realm).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -242,12 +223,11 @@ export default class EditRealmTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -292,57 +272,57 @@ export default class EditRealmTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.realm.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realm.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="realmName">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="realmName" id="realmName"
-                                                bsSize="sm"
-                                                valid={!errors.realmName && this.state.realm.realmName != ''}
-                                                invalid={touched.realmName && !!errors.realmName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.realmId}
-                                                required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.realmName}</FormFeedback>
-                                        </FormGroup>
-
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.realm.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.realm.notes}
-                                                // maxLength={600}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                    </Form>
-                                )} />
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.realm.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="realmName">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="realmName" id="realmName"
+                                            bsSize="sm"
+                                            valid={!errors.realmName && this.state.realm.realmName != ''}
+                                            invalid={touched.realmName && !!errors.realmName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realmId}
+                                            required>
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.realmName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.realm.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.realm.notes}
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.realm.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className=" mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -355,5 +335,4 @@ export default class EditRealmTicketComponent extends Component {
             </div>
         );
     }
-
 }

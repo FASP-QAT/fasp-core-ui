@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des coûts de fret, des délais et des prix des unités de planification</title>
+    <style>
+        table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Gestion des coûts de fret, des délais et des prix des unités de planification</h3>
+    <p>Cette écran vous permet de gérer des détails spécifiques tels que les coûts de fret, les délais et les prix des unités de planification pour les agents d'approvisionnement et les unités de planification dans votre programme de planification des approvisionnements.</p>
+
+    <h5><strong>Ajout ou modification de lignes</h5></strong>
+    <p>Pour ajouter une ligne, suivez ces étapes :</p>
+    <ul>
+        <li><strong>Programme, Unité de planification et Agent d'approvisionnement :</strong> Remplissez ces champs.</li>
+        <li><strong>Création d'une combinaison Agent d'approvisionnement/Unité de planification :</strong> Sélectionnez des options à la fois dans les colonnes unité de planification et agent d'approvisionnement.</li>
+        <li><strong>Ligne spécifique à l'agent d'approvisionnement sans lien avec une unité de planification :</strong> Choisissez ‘Tous’ dans la colonne unité de planification.</li>
+        <li><strong>Coûts de fret, délais et prix unitaire :</strong> Au moins une des colonnes restantes doit avoir une valeur numérique.</li>
+    </ul>
+
+    <h5><strong>Contraintes et règles</h5></strong>
+    <ul>
+        <li>Une seule ligne est autorisée par combinaison programme/unité de planification/agent d'approvisionnement.</li>
+        <li>Si une ligne d'agent d'approvisionnement inclut ‘Tous’ les unités de planification, la colonne prix unitaire sera non modifiable.</li>
+    </ul>
+
+    <h5><strong>Utilisation dans le module de planification des approvisionnements</h5></strong>
+    <p>Ces détails auront un impact sur votre module de planification des approvisionnements comme suit :</p>
+    <ul>
+        <li><strong>Pourcentages de fret :</strong> Priorisés par les paramètres programme/agent d'approvisionnement/unité de planification puis les paramètres du programme.</li>
+        <li><strong>Délais :</strong> Priorisés par les paramètres programme/agent d'approvisionnement/unité de planification, puis les paramètres de l'agent d'approvisionnement au niveau du domaine et enfin les paramètres du programme.</li>
+        <li><strong>Prix unitaire :</strong> Priorisés par les paramètres programme/agent d'approvisionnement/unité de planification, puis les paramètres de l'agent d'approvisionnement au niveau du domaine et enfin les paramètres du programme.</li>
+    </ul>
+</body>
+</html>

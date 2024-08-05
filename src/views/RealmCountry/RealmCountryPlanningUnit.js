@@ -15,13 +15,13 @@ import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
-import { JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { API_URL, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 let initialValues = {
 
     planningUnit: {
@@ -106,18 +106,18 @@ class PlanningUnitCountry extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                var index = (instance.jexcel).getValue(`I${parseInt(data[i].y) + 1}`, true);
-                if (index == "" || index == null || index == undefined) {
-                    (instance.jexcel).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, 0, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, 1, true);
+                var index = (instance).getValue(`I${parseInt(data[i].y) + 1}`, true);
+                if (index === "" || index == null || index == undefined) {
+                    (instance).setValueFromCoords(7, data[i].y, this.props.match.params.realmCountryId, true);
+                    (instance).setValueFromCoords(8, data[i].y, 0, true);
+                    (instance).setValueFromCoords(9, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -218,7 +218,8 @@ class PlanningUnitCountry extends Component {
 
 
                                             this.el = jexcel(document.getElementById("paputableDiv"), '');
-                                            this.el.destroy();
+                                            // this.el.destroy();
+                                            jexcel.destroy(document.getElementById("paputableDiv"), true);
                                             var json = [];
                                             var data = papuDataArr;
                                             var options = {
@@ -267,20 +268,29 @@ class PlanningUnitCountry extends Component {
                                                     {
                                                         title: 'realmCountryId',
                                                         type: 'hidden'
+                                                        // title: 'A',
+                                                        // type: 'text',
+                                                        // visible: false
                                                     },
                                                     {
                                                         title: 'realmCountryPlanningUnitId',
                                                         type: 'hidden'
+                                                        // title: 'A',
+                                                        // type: 'text',
+                                                        // visible: false
                                                     },
                                                     {
                                                         title: 'isChange',
                                                         type: 'hidden'
+                                                        // title: 'A',
+                                                        // type: 'text',
+                                                        // visible: false
                                                     }
 
                                                 ],
                                                 onpaste: this.onPaste,
                                                 updateTable: function (el, cell, x, y, source, value, id) {
-                                                    var elInstance = el.jexcel;
+                                                    var elInstance = el;
                                                     var rowData = elInstance.getRowData(y);
                                                     var realmCountryPlanningUnitId = rowData[8];
                                                     if (realmCountryPlanningUnitId == 0) {
@@ -293,16 +303,16 @@ class PlanningUnitCountry extends Component {
 
                                                 },
                                                 onsearch: function (el) {
-                                                    el.jexcel.updateTable();
+                                                    // el.jexcel.updateTable();
                                                 },
                                                 onfilter: function (el) {
-                                                    el.jexcel.updateTable();
+                                                    // el.jexcel.updateTable();
                                                 },
                                                 pagination: localStorage.getItem("sesRecordCount"),
                                                 filters: true,
                                                 search: true,
                                                 columnSorting: true,
-                                                tableOverflow: true,
+                                                // tableOverflow: true,
                                                 wordWrap: true,
                                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                                                 position: 'top',
@@ -495,7 +505,8 @@ class PlanningUnitCountry extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
@@ -545,7 +556,8 @@ class PlanningUnitCountry extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            // message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
@@ -595,7 +607,8 @@ class PlanningUnitCountry extends Component {
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    // message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
@@ -646,7 +659,8 @@ class PlanningUnitCountry extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            // message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
@@ -707,11 +721,11 @@ class PlanningUnitCountry extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             var tableJson = this.el.getJson();
-            console.log("tableJson---", tableJson);
+            // console.log("tableJson---", tableJson);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("9 map---" + map1.get("9"))
+                // console.log("9 map---" + map1.get("9"))
                 if (parseInt(map1.get("9")) === 1) {
                     let json = {
                         planningUnit: {
@@ -735,12 +749,12 @@ class PlanningUnitCountry extends Component {
                     changedpapuList.push(json);
                 }
             }
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+            // console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             RealmCountryService.editPlanningUnitCountry(changedpapuList)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     if (response.status == "200") {
-                        console.log(response);
+                        // console.log(response);
                         this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
                         this.setState({
@@ -756,7 +770,8 @@ class PlanningUnitCountry extends Component {
                     error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                // message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 loading: false
                             });
                         } else {
@@ -793,7 +808,7 @@ class PlanningUnitCountry extends Component {
                     }
                 );
         } else {
-            console.log("Something went wrong");
+            // console.log("Something went wrong");
         }
     }
     checkDuplicatePlanningUnit = function () {
@@ -801,13 +816,13 @@ class PlanningUnitCountry extends Component {
         let count = 0;
 
         let tempArray = tableJson;
-        console.log('hasDuplicate------', tempArray);
+        // console.log('hasDuplicate------', tempArray);
 
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
-        console.log('hasDuplicate', hasDuplicate);
+        // console.log('hasDuplicate', hasDuplicate);
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.country.duplicatePlanningUnit'),
@@ -824,7 +839,8 @@ class PlanningUnitCountry extends Component {
     }
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
+        // var asterisk = document.getElementsByClassName("resizable")[0];
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -836,11 +852,11 @@ class PlanningUnitCountry extends Component {
     }
 
     blur = function (instance) {
-        console.log('on blur called');
+        // console.log('on blur called');
     }
 
     focus = function (instance) {
-        console.log('on focus called');
+        // console.log('on focus called');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -878,18 +894,18 @@ class PlanningUnitCountry extends Component {
 
         //Sku code
         if (x == 3) {
-            console.log("-----------------3--------------------");
+            // console.log("-----------------3--------------------");
             var col = ("D").concat(parseInt(y) + 1);
             // var value = this.el.getValueFromCoords(3, y);
             // var reg = /^[a-zA-Z0-9\b]+$/;
             if (value == "") {
-                console.log("-----------------blank--------------------");
+                // console.log("-----------------blank--------------------");
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
             else {
-                console.log("-----------------3--------------------");
+                // console.log("-----------------3--------------------");
                 // if (!(reg.test(value))) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
@@ -962,14 +978,14 @@ class PlanningUnitCountry extends Component {
     // -----end of changed function
 
     onedit = function (instance, cell, x, y, value) {
-        console.log("------------onedit called")
+        // console.log("------------onedit called")
         this.el.setValueFromCoords(9, y, 1, true);
     }.bind(this);
 
     checkValidation = function () {
         var valid = true;
         var json = this.el.getJson();
-        console.log("json.length-------", json.length);
+        // console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(9, y);
             if (parseInt(value) == 1) {
@@ -977,7 +993,7 @@ class PlanningUnitCountry extends Component {
                 //Planning Unit
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
-                console.log("value-----", value);
+                // console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -1039,7 +1055,7 @@ class PlanningUnitCountry extends Component {
                 // var value = this.el.getValueFromCoords(5, y);
                 // // var reg = /^[0-9\b]+$/;
                 // var reg = /^\s*(?=.*[1-9])\d{1,10}(?:\.\d{1,2})?\s*$/;
-                // // console.log("---------VAL----------", value);
+                // // // console.log("---------VAL----------", value);
                 // if (value == "" || isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                 //     this.el.setStyle(col, "background-color", "transparent");
                 //     this.el.setStyle(col, "background-color", "yellow");
@@ -1082,6 +1098,11 @@ class PlanningUnitCountry extends Component {
         return valid;
     }
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1092,8 +1113,9 @@ class PlanningUnitCountry extends Component {
                         <CardBody className="p-0">
 
                             <Col xs="12" sm="12">
-
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div className='consumptionDataEntryTable'>
+                                    <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    </div>
                                 </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -1113,9 +1135,9 @@ class PlanningUnitCountry extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
-</FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Card>
                 </div>

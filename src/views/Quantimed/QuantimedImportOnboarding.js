@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
-// import "../node_modules/react-step-progress-bar/styles.css";
-import "../../../node_modules/react-step-progress-bar/styles.css"
+import 'react-select/dist/react-select.min.css';
 import { ProgressBar, Step } from "react-step-progress-bar";
 import {
-    Row, Col,
-    Card, CardBody
+    Card, CardBody,
+    Col,
+    Row
 } from 'reactstrap';
-import Select from 'react-select';
-import 'react-select/dist/react-select.min.css';
+import "../../../node_modules/react-step-progress-bar/styles.css";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import ProgramService from "../../api/ProgramService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import QuantimedImportStepOne from './QuantimedImportStepOne';
-import QuantimedImportStepTwo from './QuantimedImportStepTwo';
-import QuantimedImportStepThree from './QuantimedImportStepThree';
 import QuantimedImportStepFour from './QuantimedImportStepFour';
+import QuantimedImportStepOne from './QuantimedImportStepOne';
+import QuantimedImportStepThree from './QuantimedImportStepThree';
+import QuantimedImportStepTwo from './QuantimedImportStepTwo';
 import QunatimedImportStepFive from './QunatimedImportStepFive';
+/**
+ * Component for quantimed import onboarding.
+ * Allows users to go through a multi-step form for quantimed import.
+ */
 export default class QuantimedImportOnboarding extends Component {
     constructor(props) {
         super(props);
@@ -45,34 +47,32 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0,
             qatPlanningList: []
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.finishedStepOne = this.finishedStepOne.bind(this);
         this.finishedStepTwo = this.finishedStepTwo.bind(this);
         this.finishedStepThree = this.finishedStepThree.bind(this);
         this.finishedStepFour = this.finishedStepFour.bind(this);
-
         this.previousToStepOne = this.previousToStepOne.bind(this);
         this.previousToStepTwo = this.previousToStepTwo.bind(this);
         this.previousToStepThree = this.previousToStepThree.bind(this);
         this.previousToStepFour = this.previousToStepFour.bind(this);
-
-        this.removeMessageText = this.removeMessageText.bind(this);
         this.triggerChildAlert = this.triggerChildAlert.bind(this);
         this.triggerStepThree = this.triggerStepThree.bind(this);
         this.triggerStepFour = this.triggerStepFour.bind(this);
         this.triggerStepFive = this.triggerStepFive.bind(this);
         this.redirectToDashboard = this.redirectToDashboard.bind(this);
-
     }
-
+    /**
+     * Redirects to the dashboard based on the user's role.
+     */
     redirectToDashboard() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.quantimed.quantimedImportSuccess'))
     }
-
+    /**
+     * Sets up the initial display state for the steps.
+     */
     componentDidMount() {
-
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
         document.getElementById('stepThree').style.display = 'none';
@@ -85,8 +85,10 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFour: 0,
             enableStepFive: 0
         })
-
     }
+    /**
+     * Handles the completion of step one and updates the display to show step two.
+     */
     finishedStepOne() {
         this.setState({ progressPer: 25 });
         document.getElementById('stepOne').style.display = 'none';
@@ -101,9 +103,10 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFour: 1,
             enableStepFive: 0
         })
-
     }
-
+    /**
+     * Handles the completion of step two and updates the display to show step three.
+     */
     finishedStepTwo() {
         this.setState({ progressPer: 50 });
         document.getElementById('stepOne').style.display = 'none';
@@ -118,9 +121,10 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFour: 1,
             enableStepFive: 0
         })
-
     }
-
+    /**
+     * Handles the completion of step three and updates the display to show step four.
+     */
     finishedStepThree() {
         this.setState({ progressPer: 75 });
         document.getElementById('stepOne').style.display = 'none';
@@ -135,9 +139,10 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFour: 1,
             enableStepFive: 0
         })
-
     }
-
+    /**
+     * Handles the completion of step four and updates the display to show step five.
+     */
     finishedStepFour() {
         this.setState({ progressPer: 100 });
         document.getElementById('stepOne').style.display = 'none';
@@ -152,13 +157,10 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFour: 1,
             enableStepFive: 1
         })
-
     }
-
-    removeMessageText() {
-        this.setState({ message: '' });
-    }
-
+    /**
+     * Handles moving back to step one from any subsequent step and updates the display accordingly.
+     */
     previousToStepOne() {
         this.setState({ progressPer: 0 });
         document.getElementById('stepOne').style.display = 'block';
@@ -174,7 +176,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
-
+    /**
+     * Handles moving back to step two from any subsequent step and updates the display accordingly.
+     */
     previousToStepTwo() {
         this.setState({ progressPer: 25 });
         document.getElementById('stepOne').style.display = 'none';
@@ -190,7 +194,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
-
+    /**
+     * Handles moving back to step three from any subsequent step and updates the display accordingly.
+     */
     previousToStepThree() {
         this.setState({ progressPer: 50 });
         document.getElementById('stepOne').style.display = 'none';
@@ -206,7 +212,9 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
-
+    /**
+     * Handles moving back to step four from any subsequent step and updates the display accordingly.
+     */
     previousToStepFour() {
         this.setState({ progressPer: 75 });
         document.getElementById('stepOne').style.display = 'none';
@@ -222,36 +230,41 @@ export default class QuantimedImportOnboarding extends Component {
             enableStepFive: 0
         })
     }
-
-    Capitalize(str) {
-        let { program } = this.state
-        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    /**
+     * Handles changes in data.
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
-
     }
-
+    /**
+     * Triggers an alert in a child component.
+     */
     triggerChildAlert() {
         this.refs.child.loadTableData();
     }
-
+    /**
+     * Triggers step three in the form.
+     */
     triggerStepThree() {
         this.refs.child_3.loadRegionList();
     }
-
+    /**
+     * Triggers step four in the form.
+     */
     triggerStepFour() {
-        // this.refs.child_4.setMinMaxDate();
     }
-
+    /**
+     * Triggers step five in the form.
+     */
     triggerStepFive() {
         this.refs.child_5.showFinalData();
     }
-
-
+    /**
+     * Renders the quantimed import screen.
+     * @returns {JSX.Element} - Quantimed import screen.
+     */
     render() {
-
         return (
-
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
@@ -262,11 +275,7 @@ export default class QuantimedImportOnboarding extends Component {
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card style={{ display: this.state.loading ? "none" : "block" }}>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>Setup Program</strong>{' '}
-                            </CardHeader> */}
                             <CardBody>
-
                                 <ProgressBar
                                     percent={this.state.progressPer}
                                     filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
@@ -274,73 +283,50 @@ export default class QuantimedImportOnboarding extends Component {
                                 >
                                     <Step transition="scale">
                                         {({ accomplished }) => (
-
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
                                                 width="30"
-                                                // src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
                                                 src="../../../../public/assets/img/numbers/number1.png"
                                             />
-
-
                                         )}
-
                                     </Step>
-
                                     <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
                                                 width="30"
                                                 src="../../../../public/assets/img/numbers/number2.png"
-                                            // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
                                             />
-                                            // <h2>2</h2>
                                         )}
-
                                     </Step>
-
                                     <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
                                                 width="30"
                                                 src="../../../../public/assets/img/numbers/number3.png"
-                                            // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
                                             />
-                                            // <h2>2</h2>
                                         )}
-
                                     </Step>
-
                                     <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
                                                 width="30"
                                                 src="../../../../public/assets/img/numbers/number4.png"
-                                            // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
                                             />
-                                            // <h2>2</h2>
                                         )}
-
                                     </Step>
-
                                     <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
                                                 width="30"
                                                 src="../../../../public/assets/img/numbers/number5.png"
-                                            // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
                                             />
-                                            // <h2>2</h2>
                                         )}
-
                                     </Step>
-
                                 </ProgressBar>
-
                                 <div className="d-sm-down-none  progressbar">
                                     <ul>
                                         <li className="quantimedProgressbartext1">{i18n.t('static.quantimed.quantimedImportScreenOne')}</li>
@@ -350,7 +336,6 @@ export default class QuantimedImportOnboarding extends Component {
                                         <li className="quantimedProgressbartext5">{i18n.t('static.quantimed.quantimedImportScreenFourth')}</li>
                                     </ul>
                                 </div>
-
                                 <br></br>
                                 <div id="stepOne">
                                     <QuantimedImportStepOne finishedStepOne={this.finishedStepOne} dataChange={this.dataChange} items={this.state} triggerChildAlert={this.triggerChildAlert}></QuantimedImportStepOne>
@@ -367,25 +352,17 @@ export default class QuantimedImportOnboarding extends Component {
                                 <div id="stepFive">
                                     <QunatimedImportStepFive ref="child_5" previousToStepFour={this.previousToStepFour} dataChange={this.dataChange} items={this.state} redirectToDashboard={this.redirectToDashboard}></QunatimedImportStepFive>
                                 </div>
-
                             </CardBody></Card>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </Col></Row></div>
-
-
-
-
-
         );
     }
 }

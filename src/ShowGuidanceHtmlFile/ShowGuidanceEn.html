@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;}
+		body{padding: 0;margin: 0;}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#e4e5e6;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="width:910px;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #eee;border-spacing:0;text-align:left;box-shadow: rgb(0 0 0 / 12%) 0px 4px 7px;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td align="center">
+							 <h2 style="color: #BA0C2F!important; text-align: center;font-size: 28px;text-transform: uppercase;margin-top: 27px;
+							 margin-bottom: 10px;">Intro to QAT Forecasting </h2>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<!-- <tr>
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<p style="margin:0 0 0px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id nulla et tellus porta mattis. 
+               Vestibulum lacus massa, scelerisque ac mi ut, faucibus condimentum purus. Proin
+                pulvinar ac purus eget dignissim. Ut consequat massa non feugiat efficitur. 
+                In ac nibh tempor, placerat sapien sodales, posuere tellus. <a href='/#/dataset/versionSettings' target="_blank" style="color: #205493;text-decoration: none;background-color: transparent;">Version Settings</a> et 
+                nec suscipit justo. Pellentesque aliquet pharetra enim a placerat. 
+                Nullam nec lacus eget ipsum dapibus pellentesque a a nisl. Sed velit nunc, 
+                suscipit at interdum a, finibus et elit. Maecenas vel sapien porta, elementum turpis sit amet, dictum diam. Donec bibendum ipsum ligula, ac tempor dolor euismod sed. Vivamus maximus egestas risus, euismod malesuada massa. </p>
+				</td>
+				</tr> -->
+				<tr>
+					<td style="padding:0;">
+						<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+							<tr>
+								<td style="width:260px;padding:0;vertical-align:top;color:#153643;">
+									<p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="/src/ShowGuidanceHtmlFile/img/showguidanceimg.jpg" alt="" width="280" style="height:auto;display:block;" /></p>
+									
+								</td>
+								<td style="width:20px;padding:0;font-size:0;line-height:0;">&nbsp;</td>
+								<td style="width:488px;padding:0;vertical-align:top;color:#153643;">
+									<p style="margin:0 0 0px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">A forecast is an estimate/prediction of the quantities of products to be consumed/utilized by clients or consumers over a future period of time. 
+										In QAT, the forecast process is generally conducted in a specific order (see image below). 
+										First, set up a program using <a href='/#/dataSet/listDataSet' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Update Program Info</a> or select a previous program using 
+										<a href='/#/dataset/loadDeleteDataSet' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Load or Delete Program</a>. After loading the program, add information on the 
+										forecast period, threshold (%), products, and other program settings in the 
+										<a href='/#/dataset/versionSettings' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Update Version Settings</a> and <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Updating Planning Unit</a> screens. In QAT, 
+										users can either create forecasts by designing forecasting trees 
+										(tree-based forecast) or by leveraging historical consumption 
+										(consumption-based forecast) to reach a final forecast. 
+										For each product, choose consumption or tree methodology, or both! </p>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td style="padding:0 0 10px 0;color:#153643;">
+                <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;"><b>Consumption</b>-based forecasts are most useful in mature, stable programs that have a full supply of products and reliable data.
+					 This method can be the most reliable predictor of future consumption 
+					 if future use is predicted to be very similar to the past. Ideally, 
+					 24+ months of monthly actual consumption data is available. 
+					 This data can be imported directly from the QAT Supply Planning module 
+					 using the <a href='/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Import From QAT Supply Plan </a>screen or manually entered. 
+					 Once data is added, it can be adjusted (e.g., reporting rate, stockout 
+					 rate, interpolation of missing data) in the <a href='/#/dataentry/consumptionDataEntryAndAdjustment' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Data Entry and Adjustment </a>
+					 screen to have a more accurate representation. In the <a href='/#/Extrapolation/extrapolateData' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Extrapolation</a> screen, 
+					 QAT computes future requirements by extrapolation using different forecasting 
+					 methodologies (semi-averages, exponential smoothing, Holt-Winter, etc.).   </p>
+
+                <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">
+					If the necessary data for a consumption-based forecast is not available or not 
+					helpful in predicting future consumption, conduct a <b>tree</b>-based forecast 
+					(<a href='/#/dataset/listTree' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Manage Tree</a>), which flexibly accommodates all other forecast methods, 
+					such as morbidity, services, and demographic methods. Take advantage of 
+					pre-built trees from <a href='/#/dataset/listTreeTemplate' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Tree Templates</a> or build a custom tree. 
+					Specify changes over time in a tree, either by directly specifying 
+					the rate of change or extrapolating from past data. Once a tree has 
+					been built, check the product usage using the <a href='/#/validation/productValidation' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Product Validation</a> screen 
+					and the change over time using the <a href='/#/validation/modelingValidation' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Modeling Validation</a> screen.  
+				</p>
+				<p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">Once the various forecasts have been created, navigate to the Forecast Analysis and Outputs 
+					section to view forecasts, and select the final forecast. The <a href='/#/report/compareAndSelectScenario' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Compare and Select 
+					Forecast</a> screen allows comparison of all tree and consumption forecasts and selection 
+					of the final forecast per planning unit. The <a href='/#/forecastReport/forecastOutput' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Monthly Forecast</a> and <a href='/#/forecastReport/forecastSummary' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Forecast Summary</a> will 
+					provide a further breakdown or aggregation of each selected forecast.
+					 The <a href='/#/report/compareVersion' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Version Comparison</a> screen allows comparison of selected forecasts across 
+					 different program versions.  </p>
+					 <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">
+						Throughout the forecasting process, save work often to the server by 
+						using the <a href='/#/dataset/commitTree' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Commit Program</a> screen. When finished with a forecast, commit 
+						forecasts as final and then import it into a Supply Plan using the 
+						<a href='/#/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan' target="_blank" style="color: #205493;text-decoration:underline;background-color: transparent;">QAT Forecast Import</a> screen!  
+					 </p>
+					 <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">Enjoy and use the tooltips and "Show Guidance" screens throughout QAT for more guidance and tips. </p>
+									</td>
+
+							
+								</tr>
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

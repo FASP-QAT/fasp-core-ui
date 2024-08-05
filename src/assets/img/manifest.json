@@ -1,6 +1,6 @@
 {
   "short_name": "QAT",
-  "name": "Quantification Analytics Tool",
+  "name": "UAT QAT",
   "scope" : ".",
   "icons": [
     {
@@ -27,7 +27,7 @@
   ],
   "start_url": "index.html",
   "background_color": "#EEE",
-"theme_color": "#4A148C",
-"display": "standalone",
-"orientation": "portrait-primary"
+  "theme_color": "#CFCDC9",
+  "display": "standalone",
+  "orientation": "portrait-primary"
 }

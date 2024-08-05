@@ -24,7 +24,7 @@ import { AdvancedForms, BasicForms, ValidationForms } from './Forms';
 import ReactGoogleMaps from './GoogleMaps';
 import { CoreUIIcons, Flags, FontAwesome, SimpleLineIcons } from './Icons';
 import { Alerts, Badges, Modals, Toastr } from './Notifications';
-import { Login, Page404, Page500, Register } from './Pages';
+import { Login, Page404, Page500, PageError, Register } from './Pages';
 import { Calendar, Spinners } from './Plugins';
 import { DataTable, Tables } from './Tables';
 import { Colors, Typography } from './Theme';
@@ -38,6 +38,7 @@ export {
   CoreUIIcons,
   Page404,
   Page500,
+  PageError,
   Register,
   Login,
   Modals,

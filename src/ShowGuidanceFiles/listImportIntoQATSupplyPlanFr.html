@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 {
+			/* width: 100%; */
+			border-collapse: collapse;
+		}
+
+		a {
+			color: #205493;
+			/* text-decoration: none; */
+			background-color: transparent;
+		}
+	</style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td>
+							<table role="presentation"
+								style="font-size:13px;width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Importation des
+											prévisions QAT</h3>
+										<p style="font-size: 13px;"><span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">But
+												:</span>Permettre aux utilisateurs d'importer des prévisions créées dans
+											QAT dans des programmes de plan d'approvisionnement. Les prévisions ne
+											peuvent être importées que si 1) elles sont validées en tant que version
+											finale et 2) une prévision est sélectionnée pour chaque unité de
+											planification.</p>
+
+										<p>
+											<span style="font-size: 13px; font-weight: bold;"><u>Utilisation de cet
+													écran:</u></span>
+
+										</p>
+										<p>
+										<p style="font-size: 13px;"></p>
+										<p><b>(Etape 1)</b>
+										<ul>
+											<li>Sélectionner le programme de prévision à importer (seules les prévisions
+												finales sont disponibles)</li>
+											<li>Sélectionner le programme du plan d'approvisionnement vers lequel
+												importer. </li>
+											<li>Sélectionner la période des données de prévision à importer, qui sont
+												limitées comme suit:<ul>
+													<li>Doit être compris dans la période de prévision</li>
+													<li>La consommation prévue que vous pouvez importer ne doit pas être
+														ancienne de plus de 6 mois par rapport au mois en cours. </li>
+													<li>Si la période de prévision entière remonte à plus de 6 mois dans
+														le passé, la prévision ne peut pas être importée et la version
+														n'apparaîtra pas dans la liste déroulante du programme. </li>
+												</ul>
+											</li>
+											<li>Dans le tableau qui s'affiche, sélectionner et faire correspondre les
+												unités de planification.<ul>
+													<li>Pour chaque unité de planification du module prévision, QAT
+														requiert une unité de planification correspondante du module
+														plan d'approvisionnement et un facteur de conversion. QAT marque
+														automatiquement les correspondances exactes entre les unités de
+														planification, mais les utilisateurs peuvent remplacer à la fois
+														les correspondances des unités de planification et le facteur de
+														conversion. </li>
+													<li>Toutes les unités de planification du module prévision n'ont pas
+														besoin d'être importées, cependant, toutes les unités de
+														planification du module prévision doivent avoir une sélection
+														dans la table de correspondance. Par exemple, dans le tableau
+														ci-dessous, même si 2 produits ne sont pas importés, vous devrez
+														toujours sélectionner "Ne pas importer".</li><br><img
+														class="img-fluid" src="../ShowGuidanceFiles/img/importintoqatsupplyplanscreenshot-1.jpg"
+														style="width: 971px;">
+												</ul>
+											</li>
+										</ul>
+										</p>
+										<p><b>(Etape 2) </b>Région(s) de prévision:
+										<ul>
+											<li>Prévision nationale au plan d'approvisionnement national<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Région(s) de prévision</th>
+																<th>% de Prévision</th>
+																<th>Région du plan d'approvisionnement</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										<ul>
+											<li>Prévision multirégionale vers plan d'approvisionnement multirégional<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Région(s) de prévision</th>
+																<th>% de Prévision</th>
+																<th>Région du plan d'approvisionnement</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>Nord</td>
+																<td>100</td>
+																<td>Nord</td>
+															</tr>
+															<tr>
+																<td>Est</td>
+																<td>100</td>
+																<td>Est</td>
+															</tr>
+															<tr>
+																<td>Sud</td>
+																<td>100</td>
+																<td>Sud</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										<ul>
+											<li>Prévision multirégionale au plan d'approvisionnement national -<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Région(s) de prévision</th>
+																<th>% de Prévision</th>
+																<th>Région du plan d'approvisionnement</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>Nord</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+															<tr>
+																<td>Est</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+															<tr>
+																<td>Sud</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										<ul>
+											<li>Prévision nationale vers plan d'approvisionnement multirégional : notez
+												que le processus d'importation doit être répété pour chaque région du
+												plan d'approvisionnement.<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Région(s) de prévision</th>
+																<th>% de Prévision</th>
+																<th>Région du plan d'approvisionnement</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>20</td>
+																<td>Nord</td>
+															</tr>
+														</tbody>
+													</table>
+												</div><br>
+												<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Région(s) de prévision</th>
+																<th>% de Prévision</th>
+																<th>Région du plan d'approvisionnement</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>45</td>
+																<td>Sud</td>
+															</tr>
+														</tbody>
+													</table>
+												</div><br>
+												<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Région(s) de prévision</th>
+																<th>% de Prévision</th>
+																<th>Région du plan d'approvisionnement</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>35</td>
+																<td>Est</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										</p>
+										<p><b>(Etape 3) </b><br>QAT listera chaque enregistrement de prévision à
+											importer (une ligne pour chaque combinaison d'unité de planification, de
+											région et de mois).
+										<ul>
+											<li>QAT calcule la consommation prévisionnelle à importer comme suit: </li>
+											<img class="formula-img-mr img-fluid mb-lg-0"
+												src="../ShowGuidanceFiles/img/ForecastedConsumptionimported.png"
+												style="border: 1px solid rgb(255, 255, 255); margin-left: -20px;">
+											<p>Pour l'exemple suivant:
+											<ul>
+												<li>Une prévision nationale qui sera divisée en deux régions de 50 %
+													chacune</li>
+												<li>L'unité de planification prévisionnelle est en pack de 3, et l'unité
+													de planification plan d'approvisionnement est en pack de 1 (facteur
+													de conversion = 3)</li>
+												<li>La prévision nationale pour le Mois N était de 100 (paquet de 3)
+												</li>
+												<li>Une prévision de 100 x 50 % x 3 = 150,00 arrondis (packs de 1) sera importée dans chaque région pour le mois N</li>
+											</ul>
+											</p>
+											<!-- New Additions Start -->
+											<li><b>Méthode d'arrondi: </b>Because QAT Supply Planning nécessite des nombres entiers sans décimales, QAT convertit la consommation prévue en nombres entiers en arrondissant et en additionnant les « résidus » au fil du temps. Chaque mois, QAT additionne le total des résidus du mois dernier et les prévisions de ce mois-ci, avant d'arrondir à l'inférieur, et tout résidu non arrondi à l'inférieur est ajouté à un total résiduel courant, appelé Total Cumulatif. De cette façon, les quantités ne sont pas perdues lors du processus d’arrondi.</li>
+											<p>
+											<ul style="font-size:13px;">
+												<li>Formules:</li>
+												<p>
+												<ul style="font-size:13px;">
+													<li><b>Total cumulé pour le mois N </b> = (Résiduel pour le Mois N - 1) + Prévision Convertie pour le Mois N</li>
+													<li><b>Résidu pour le mois N </b> = Combien a été perdu lors de l'arrondi = (Total cumulé pour le mois N) – (Prévision convertie arrondie pour le mois N)</li>
+													<li><b>Prévisions converties arrondies pour le mois N </b> = Total cumulé pour le mois N, arrondi à l'entier inférieur le plus proche</li>
+												</ul>
+												</p>
+												<li>Par exemple, une prévision nationale devrait consommer 0,25 pack de l'unité de planification des prévisions par mois, pendant 12 mois. L'unité de planification des prévisions et l'unité de planification du plan d'approvisionnement sont identiques (facteur de conversion = 1)</li>
+												<p>
+												<ul style="font-size:13px;">
+													<li>En janvier, la consommation convertie est de 0,25, et comme c'est le premier mois, le 0,25 est également le total cumulé de janvier. 0,25 est arrondi à un nombre entier égal à 0, et le nombre arrondi de 0 est importé dans le module de planification des approvisionnements. Le résidu de janvier résultant des arrondis est de 0,25 – 0 = 0,25.</li>
+													<li>En février, la consommation convertie est de 0,25, ajoutée au résiduel de janvier de 0,25, ce qui donne au total cumulé de février 0,25 + 0,25 = 0,5. Ensuite, 0,5 est arrondi à un nombre entier de 0, qui est importé dans le module de planification des approvisionnements. Le résiduel de février après arrondi est de 0,5 – 0 = 0,5.</li>
+													<li>En mars, la consommation convertie est de 0,25, ajoutée au résiduel de février de 0,5, ce qui donne au total cumulé de mars 0,25 + 0,5 = 0,75. Ensuite, 0,75 est arrondi à un nombre entier de 0, qui est importé dans le module de planification des approvisionnements. Le résidu de mars après arrondi est de 0,75 – 0 = 0,75.</li>
+													<li>En avril, la consommation convertie est de 0,25, ajoutée au résiduel de mars de 0,75, ce qui donne au total cumulé d'avril 0,25 + 0,75 = 1,00. Ensuite, 1,00 est arrondi à un nombre entier de 1,00, qui est importé dans le module de planification des approvisionnements. Le résidu d’avril résultant de l’arrondi est de 1,00 – 1,00 = 0.</li>
+													<li>À partir du mois de mai, le cycle se répète.</li>
+													<br><img class="img-fluid"
+														src="../ShowGuidanceFiles/img/importintoqatsupplyplanscreenshot-3.png"
+														style="width: 800px;">
+												</ul>
+												</p>
+											</ul>
+											</p>
+											<!-- New Addition End -->
+											<li>S'il existe une consommation prévisionnelle dans le plan
+												d'approvisionnement, la cellule « Consommation actuelle prévue » sera
+												surlignée en jaune. </li>
+											<li>S'il existe une consommation prévue dans le plan d'approvisionnement et que les données de consommation prévue que l'utilisateur tente d'importer datent de plus de 4 mois, la cellule « Consommation actuelle prévue » sera surlignée en gris et ne sera PAS importée.</li>
+											<li>la colonne Utiliser l'Importation ? permet de désélectionner les
+												prévisions que vous ne souhaitez pas importer dans le plan
+												d'approvisionnement. Si cette case est cochée, la consommation prévue
+												convertie remplacera la prévision du plan d'approvisionnement. Si elle
+												n'est pas cochée, la prévision actuelle du plan d'approvisionnement sera
+												conservée.</li><br><img class="img-fluid"
+												src="../ShowGuidanceFiles/img/importintoqatsupplyplanscreenshot-2.png" style="width: 971px;">
+										</ul>
+										</p>
+										</p>
+
+
+
+
+
+									</td>
+								</tr>
+
+
+							</table>
+						</td>
+					</tr>
+
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+
+</html>

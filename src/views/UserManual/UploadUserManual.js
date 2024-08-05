@@ -1,22 +1,26 @@
+import bsCustomFileInput from 'bs-custom-file-input';
 import React, { Component } from 'react';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import 'react-select/dist/react-select.min.css';
 import {
+    Button,
     Card, CardBody,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, Form
+    CardFooter,
+    Col, Form,
+    FormGroup,
+    Input,
+    Label
 } from 'reactstrap';
-import '../Forms/ValidationForms/ValidationForms.css';
-import 'react-select/dist/react-select.min.css';
-import 'react-select/dist/react-select.min.css';
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import bsCustomFileInput from 'bs-custom-file-input'
-import AuthenticationService from '../Common/AuthenticationService';
+import { API_URL } from '../../Constants';
 import UserManualService from '../../api/UserManualService';
-
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.dashboard.uploadUserManual')
+/**
+ * This component is used to upload the latest user manual
+ */
 export default class uploadUserManual extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -29,19 +33,21 @@ export default class uploadUserManual extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
     }
-
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
-
-
     componentDidMount() {
         bsCustomFileInput.init()
         this.setState({ loading: false })
     }
-
+    /**
+     * This component is used to check the extension of the file and save it on server
+     */
     formSubmit() {
         this.setState({ loading: true })
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -70,7 +76,7 @@ export default class uploadUserManual extends Component {
                     }).catch(error => {
                         if (error.message === "Network Error") {
                             this.setState({
-                                message: 'static.unkownError',
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                 color: '#BA0C2F',
                                 loading: false
                             }, () => {
@@ -78,7 +84,6 @@ export default class uploadUserManual extends Component {
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
-
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
@@ -117,7 +122,6 @@ export default class uploadUserManual extends Component {
                             }
                         }
                     })
-
                 } else {
                     this.setState({ loading: false })
                     alert(i18n.t('static.program.selectzipfile'))
@@ -125,14 +129,16 @@ export default class uploadUserManual extends Component {
             }
         }
     }
-
+    /**
+     * This is used to display the content
+     * @returns This component returns the upload user manual form
+     */
     render() {
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 id="div2" className={this.state.color}>{this.state.message}</h5>
                 <Card className="mt-2">
-
                     <Form noValidate name='simpleForm'>
                         <CardBody className="pb-lg-2 pt-lg-2" style={{ display: this.state.loading ? "none" : "block" }}>
                             <FormGroup>
@@ -149,38 +155,34 @@ export default class uploadUserManual extends Component {
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
                                     <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-
                                     <div class="spinner-border blue ml-4" role="status">
-
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                 <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 &nbsp;
-                                                </FormGroup>
+                            </FormGroup>
                         </CardFooter>
                     </Form>
                 </Card>
-
-
-
             </>
         )
-
     }
-
+    /**
+     * This function is called when cancel button is clicked to go back to application dashboard
+     */
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
+    /**
+     * This function is called when reset button is clicked to reset the form data
+     */
     resetClicked() {
     }
-
 }
