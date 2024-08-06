@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 {
+			/* width: 100%; */
+			border-collapse: collapse;
+		}
+
+		a {
+			color: #205493;
+			/* text-decoration: none; */
+			background-color: transparent;
+		}
+	</style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Add/Edit Node -
+											Modeling/Transfer
+										</h3>
+										<p>
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Purpose
+												:</span>If a node changes over time, a user
+											can utilize the Modeling/Transfer tab to model growth/loss within a single
+											node or a transfer
+											from one node to another. Note that this functionality is only available for
+											Number (#) Nodes
+											and Percentage (%) Nodes (including Forecasting Units and Planning Units).
+										</p>
+										</p>
+										<p>
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Using
+												this tab :</span><br>
+											Users can <b>manually</b> enter any desired changes over time
+											(growth/loss/transfer) in the top
+											table, or they can utilize the <br><b><i class="fa fa-calculator"
+													aria-hidden="true"></i> Modeling Calculator</b> for calculating the
+											monthly rate of
+											change (see 'Modeling Calculator' section below for more information). Each
+											entry must be added as separate rows per change in the top table
+											(i.e a node cannot grow and transfer in one data entry row - these must be
+											two separate rows).
+
+
+										</p>
+										</p>
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Rules
+												for Transfer Nodes:
+											</span>
+										<ul style="font-size: 13px;">
+											<li>Number nodes can only transfer to other number nodes and must belong to
+												the same level. </li>
+											<li>Percentage nodes can only transfer to other percentage nodes and must
+												belong to the same parent. </li>
+											<!-- <li>The order of operations for calculating a transfer occurs from the 
+													left to the right in the forecast tree. A transfer cannot be made from 
+													right to left, thus a user should be careful when designing their tree 
+													and determining where each node should be placed. </li> -->
+											<li>Transfers are always negative from the source node and positive to the
+												destination node. </li>
+											<li>Extrapolation is not allowed on a node that also has a transfer, whether
+												that be to/from another node. </li>
+										</ul>
+										</p>
+										<p>
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Modeling
+												Types :</span><br>
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Modeling Type</th>
+														<th># Node Calculation</th>
+														<th>% Node Calculation</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Linear (#)</td>
+														<td>+/- a static number each month</td>
+														<td>N/A</td>
+													</tr>
+													<tr>
+														<td>Linear (%)</td>
+														<td>+/- a static percentage each month, calculated based on the
+															starting month</td>
+														<td>N/A</td>
+													</tr>
+													<tr>
+														<td>Exponential (%)</td>
+														<td>+/- a percentage each month, calculated on the previous
+															month as a rolling percentage</td>
+														<td>N/A</td>
+													</tr>
+													<tr>
+														<td>Linear (% point)</td>
+														<td>N/A</td>
+														<td>+/- a static percentage each month (e.g. if the starting
+															month is 30% and the change is +1% each month, next month is
+															31%, the next is 32%, and so on)</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										</p>
+										<p>
+										<ul style="font-size: 13px;">
+											<li>Click on <b>"Show Monthly Data"</b> to show a table & graph with the
+												node
+												value across time
+												<ul>
+													<li>
+														This feature is helpful to see how modelling and transfer
+														inputs affect the monthly data in both a graphical and tabular
+														form.
+													</li>
+													<li>
+														In the tabular data, users may add a manual change for a
+														specific month or input a seasonality index percentage
+														(only available for # nodes), as needed.
+													</li>
+													<li>
+														If a user checks “Manual Change affects future month,” the
+														manual amount added to the end of the
+														month will carry over to the beginning of the next month. If
+														neither of these
+														fields are relevant, users can uncheck “Show (seasonality &)
+														manual change” to
+														hide these columns.
+													</li>
+												</ul>
+											</li>
+										</ul>
+										</p>
+										<!-- <p style="font-size: 13px;">
+												<b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should 
+												they need assistance in calculating the month-on-month change over time based on an ending 
+												target date &amp; percentage or total percentage change over time. The modelling 
+												calculator is only available for a # node and a % node.<br>Additionally, by clicking on 
+												"Show Monthly Data," users can see how their modelling and transfer inputs have 
+												affected the monthly data in both a graphical and tabular form. In the tabular data, 
+												users may add a manual change for a specific month or input a seasonality index 
+												percentage (only available for # nodes), as needed. If a user checks
+												 "Manual Change affects future month," the manual amount added to the end of 
+												 the month will carry over to the beginning of the next month. If neither of
+												  these fields are relevant, users can uncheck "Show (seasonality &amp;) manual change" to hide 
+												  these columns.
+											</p> -->
+
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">Examples
+												:</span>
+										<ul style="font-size: 13px;">
+											<li><b>Simple Growth</b> (linear #) - the example below shows a population
+												growth each month by 500/month from January 2022 to December 2024.<br>
+												<span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot1.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+											<li><b>Simple Loss</b> (linear #) - the example below shows attrition each
+												month by 100/month
+												from January 2022 to December 2024. QAT utilizes a negative number to
+												denote a decrease
+												or loss.<br>
+												<span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot2.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+											<li>
+												<p><b>Simple Growth</b> (linear %) - the example below shows a steady
+													population growth
+													each month by 2% from January 2022 to December 2024. QAT has
+													calculated this change to
+													be increasing the population by 108.64 each month.</p><br>
+												<span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0"
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot3.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+											<li><b>Simple Growth</b> (exponential %) - the example below shows a
+												population growth each
+												month by 1% from January 2022 to December 2024. Because the growth is
+												exponential, the
+												change differs each month.
+												<span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot4.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+														padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+												<ul>
+													<li>QAT calculates this change to be 54.32 in Jan-22 month, </li>
+													<li>QAT calculates this change to be 54.86 in Feb-22 month, and
+													</li>
+													<li>QAT calculates this change to be 55.41 in Mar-22 </li>
+												</ul>
+											</li>
+											<br>
+											<li>
+												<p><b>Multi-year Loss</b> - the example below shows a different rate of
+													attrition (loss)
+													each year. Year 1 (January 2022 to December 2022) decreases the
+													population by 1% or
+													54.32 each month, Year 2 (January 2023 to December 2023) decreases
+													the population
+													by 2% or 95.6 each month, etc. QAT utilizes a negative number to
+													denote a decrease
+													or loss.</p>
+												<span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot5.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+											<li>
+												<p><b>Transfer</b> - the example below shows a transfer of
+													250 patients each month for one year, January 2022 to December 2022,
+													from the current node
+													(Adults 1st Line) to another node (Adults 2nd Line). This transfer
+													will also appear on the
+													other node (Adults 2nd Line) greyed-out to signify an non-editable
+													change.</p>
+												<span><img
+														src="../ShowGuidanceFiles/img/ModelingTransferScreenshot6.jpg"
+														style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+													padding: 10px;border-radius: 5px;max-width:100%;height: auto;"></span>
+											</li>
+										</ul>
+										</p>
+
+										<p>
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold; font-size: 13px;">
+												<i class="fa fa-calculator" aria-hidden="true"></i> Modeling
+												Calculator:</span>
+										<p>Click on the modeling calculator icon if you need assistance to calculate the
+											monthly rate of change. The modeling calculator <b>Ending Value/Change</b>
+											is
+											available for all nodes except Aggregation Nodes, and the modeling
+											calculator <b>Annual Target</b> is only available for Number Nodes. Begin by
+											select
+											a <b>Modeling Type</b> (Linear #, Linear %, or Exponential %),
+											and then a <b>Target Type</b> (Ending Value/Change or Annual Target): </p>
+										<ul style="font-size: 13px;">
+											<li><b>Ending Value/Change:</b> Use this if you have target value
+												(non-cumulative) or total desired change over a specific period, rather
+												than a known monthly rate of change.
+												<ol>
+													<li>
+														The <b>Start Date</b> and <b>Target Date</b> will be filled in
+														based on the
+														original inputs for Start date and End date in the modeling
+														table, which are by default, based on the forecast period. The
+														user can change these if desired. These two dates will flow back
+														into the modeling table.
+													</li>
+													<li>
+														The <b>Start Value</b> is the node value at beginning of the
+														month for
+														the Start Date, as calculated by QAT. In other words, the Start
+														Value is the node value before any modeling changes occur. This
+														field is calculated and cannot be directly changed by the user.
+														If the Start Date is the month after the “Month” on the Node
+														Data tab, then the Start Value is equal to the "Node Value”
+														provided by the user on the Node Data tab.
+													</li>
+													<li>
+														<b>Period</b> is calculated as Target Date - Start Date (in
+														months).
+														This value is not displayed in the front-end of QAT, but is used
+														in the formulas below.
+													</li>
+													<li>
+														Based on the available data or assumptions, enter data in one of
+														the following fields: <b>Target Ending Value</b>, <b>Target
+															Change (%)</b> or
+														<b>Target Change (#)</b>
+													</li>
+													<li>
+														After an input is provided, the other fields will be
+														automatically populated, as well the final <b>'Calculated
+														Month-on-Month Change'</b>.
+													</li>
+													<li>
+														When user clicks 'Accept', <b>the Monthly Change (% or #)</b> will be
+														populated back in the main modeling table, based on the formulas
+														below. All negative changes will be displayed as “decrease” and
+														positive changes displayed as “increase”, with the number shown
+														in absolute value.
+														<br>If user enters <b>Target Ending Value</b>:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<!-- <thead>
+																	<tr>
+																		<th style="width: 130px;">Modeling Type</th>
+																		<th># Node Calculation</th>
+																		<th>% Node Calculation</th>
+																	</tr>
+																</thead> -->
+																<tbody>
+																	<tr>
+																		<td></td>
+																		<td><b>Linear (%) </b></td>
+																		<td><b>Linear (#) </b></td>
+																		<td><b>Exponential (%)</b></td>
+																	</tr>
+																	<tr>
+																		<td><b>Target Change (%)</b></td>
+																		<td colspan="3">(Target Ending Value - Start
+																			Value) / Start Value</td>
+																	</tr>
+																	<tr>
+																		<td><b>Target Change (#)</b></td>
+																		<td>-</td>
+																		<td>Target Ending Value - Start Value </td>
+																		<td>-</td>
+																	</tr>
+																	<tr>
+																		<td><b>Calculated Month-on-Month Change</b></td>
+																		<td colspan="3">(Target Ending Value - Start
+																			Value) / Period</td>
+																	</tr>
+																	<tr>
+																		<td><b>Monthly Change (%) </b></td>
+																		<td>(((Target Ending Value - Start Value)/
+																			Period) / Start Value) * 100</td>
+																		<td>-</td>
+																		<td>((Target Ending Value / Start Value) ^ (1 /
+																			Period) - 1) * 100 </td>
+																	</tr>
+																	<tr>
+																		<td><b>Monthly Change (#) </b></td>
+																		<td>-</td>
+																		<td>Change (#) / Period </td>
+																		<td>-</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+
+														If user enters <b>Target Change (%)</b>:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<tbody>
+																	<tr>
+																		<td></td>
+																		<td><b>Linear (%) </b></td>
+																		<td><b>Linear (#) </b></td>
+																		<td><b>Exponential (%)</b></td>
+																	</tr>
+																	<tr>
+																		<td><b>Target Ending Value </b></td>
+																		<td colspan="3">Start Value + (Start Value *
+																			Target Change (%)/100)/100</td>
+																	</tr>
+																	<tr>
+																		<td><b>Target Change (#)</b></td>
+																		<td>-</td>
+																		<td>Target Ending Value - Start Value </td>
+																		<td>-</td>
+																	</tr>
+																	<tr>
+																		<td><b>Calculated Month-on-Month Change</b></td>
+																		<td colspan="3">(Start value * Target Change
+																			(%)) / 100 / Period </td>
+																	</tr>
+																	<tr>
+																		<td><b>Monthly Change (%) </b></td>
+																		<td>(((Target Ending Value - Start Value) /
+																			Period) / Start Value) * 100 </td>
+																		<td>-</td>
+																		<td>((Target Ending Value / Start Value) ^ (1 /
+																			Period) - 1) * 100 </td>
+																	</tr>
+																	<tr>
+																		<td><b>Monthly Change (#) </b></td>
+																		<td>-</td>
+																		<td>Target Change (#) / Period </td>
+																		<td>-</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+														If user enters <b>Target Change (#)</b>:
+
+														<div class="pl-lg-4 pr-lg-4 table1">
+															<table style="border-collapse: collapse;">
+																<tbody>
+																	<tr>
+																		<td></td>
+																		<td><b>Linear (#) </b></td>
+																	</tr>
+																	<tr>
+																		<td><b>Target Ending Value </b></td>
+																		<td>Start Value + Target Change (#) </td>
+																	</tr>
+																	<tr>
+																		<td><b>Change (%) </b></td>
+																		<td>(Target Ending Value - Start Value) / (Start
+																			Value * 100) </td>
+																	</tr>
+																	<tr>
+																		<td><b>Calculated Month-on-Month Change</b></td>
+																		<td>Target Change (#)/ Period </td>
+																	</tr>
+																	<tr>
+																		<td><b>Monthly Change (%)</b></td>
+																		<td>Target Change (#) / Period</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+													</li>
+												</ol>
+											</li>
+											<li>
+												<b>Annual Target:</b> Use this if you have target values (cumulative
+												over a year). Instead of
+												simply dividing annual targets by 12, which creates a stairstep pattern
+												that is, the calculator
+												will help provide a smooth forecast.
+												<span><img src="../ShowGuidanceFiles/img/anualtargetimg.jpg" style="border: 1px solid rgb(255, 255, 255);margin: 10px 0px 20px 0px;
+													padding: 10px;border-radius: 5px;max-width:100%;height: auto;">
+												</span>
+												<ol>
+													<li>Select the first month of your target and the number of years
+														of targets available.
+														<ul>
+															<li>
+																QAT will autofill in the yearly rows in the table based
+																on the chosen first month of target,
+																assuming targets are for 12-month periods.
+															</li>
+														</ul>
+													</li>
+													<li>
+														In the table, enter figures for the year before the target (the
+														actual) and each target year.
+													</li>
+													<li>
+														After data entry, click “Calculate” (see below for calculation
+														approach and formulas).
+													</li>
+													<li>
+														Review the differences between the desired targets and the QAT
+														calculated numbers.
+														If differences are large, consider if the rate of change follows
+														a linear or
+														exponential pattern and change
+														the <b>Modeling Type</b> (Linear #, Linear %, or Exponential %)
+														and re-calculate if needed.
+													</li>
+													<li>
+														When user clicks “Accept,” QAT populates the calculated values
+														in two places:
+														<ul>
+															<li>Node Value tab - Starting Month and Starting Value </li>
+															<li>Modeling/Transfer tab - one row is created per 12-month
+																period
+																after the Starting Value. <b>Note that these are not the
+																	same periods as
+																	the Target Years</b> (see below).
+
+															</li>
+														</ul>
+													</li>
+										</ul>
+										</li>
+
+										</ul>
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Field </th>
+														<th>Explanation / Formula </th>
+
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Annual Change (%) </td>
+														<td>Change from previous year. Calculated for each
+															year after the first year.
+															= (Current Year Value - Previous Year Value) / (Previous
+															Year Value) </td>
+
+													</tr>
+													<tr>
+														<td>Monthly Change (%) / Monthly Change (#)* </td>
+														<td>Exponential Rate = (Year 2 Value/Year 1 Value)^ (1/12) -1
+
+															Linear Rate = Annual Change / 12 </td>
+
+													</tr>
+													<tr>
+														<td>Node Month** </td>
+														<td>= n-7, where n is the first month of the target. </td>
+
+													</tr>
+													<tr>
+														<td>Node Value** </td>
+														<td>Assumed to be the first value (the actual value) provided by
+															the user divided by 12, since this is assumed to be the
+															midpoint of the year.
+
+															= Year Value/12
+
+														</td>
+
+													</tr>
+													<tr>
+														<td>Calculated Total</td>
+														<td>Beginning with the Node Month and Node Value, and applying
+															the Monthly Change (% or #), QAT calculates each monthly
+															value, then provides sums the values across 12-month
+															periods.
+
+														</td>
+
+													</tr>
+
+													<tr>
+														<td>Difference (Target vs Calculated, #) </td>
+														<td>Calculated for each year after the first Actual year. This
+															difference will be large if the annual change varies
+															significantly between years.
+
+															= Calculated Total – Target
+														</td>
+
+													</tr>
+													<tr>
+														<td>Difference (Target vs Calculated, %) </td>
+														<td>Calculated for each year after the first Actual year. This
+															difference will be large if the annual change varies
+															significantly between years.
+
+															= (Calculated Total - Target) / Target.
+														</td>
+
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<p>
+										<p>@Annual Target Calculation Approach: QAT assumes that 1/12th of the
+											annual actual value was achieved in the midpoint of the actual year,
+											and 1/12th of the annual targets will be reached by the midpoint each
+											target year. QAT then effectively interpolates between those midpoints
+											by calculating a linear or exponential monthly rate of change. This monthly
+											rate of change is then applied to both years - the second half of the
+											first year and the first half of the second year. To achieve this, QAT
+											calculates the following fields:
+										</p>
+										<p>
+											* These values don't appear in the 'Modeling Calculator' section, but
+											populate in the top modeling/transfer node
+											table after user clicks "accept." <br>
+											** These values don't appear in the 'Modeling Calculator' section, but
+											populate
+											into the main node fields after use clicks "accept."
+										</p>
+										</p>
+
+
+										</p>
+
+
+										</li>
+										</ol>
+										</p>
+									</td>
+								</tr>
+
+
+							</table>
+						</td>
+					</tr>
+
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+
+</html>

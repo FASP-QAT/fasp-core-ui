@@ -1,51 +1,37 @@
-import React, { Component } from 'react';
-
-import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import ProgramService from "../../api/ProgramService";
 import { Formik } from 'formik';
-import * as Yup from 'yup'
+import React, { Component } from 'react';
 import {
-    Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label
 } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-
+import { API_URL } from '../../Constants';
+import DropdownService from '../../api/DropdownService';
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesFour = {
     organisationId: ''
 }
-
+/**
+ * Defines the validation schema for step four of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         organisationId: Yup.string()
             .required(i18n.t('static.program.validorganisationtext')),
     })
 }
-
-const validateFour = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorFour(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorFour = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
+/**
+ * Component for program Onboarding step six for taking the organisation details for program
+ */
 export default class StepFour extends Component {
     constructor(props) {
         super(props);
@@ -54,45 +40,25 @@ export default class StepFour extends Component {
         }
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
     }
-
-    touchAllFour(setTouched, errors) {
-        setTouched({
-            organisationId: true
-        }
-        )
-        this.validateFormFour(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorFour('organisationForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorFour(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    /**
+     * Generates a organisation code based on the selected organisation ID.
+     * @param {Event} event - The change event containing the selected organisation ID.
+     */
     generateOrganisationCode(event) {
-        let organisationCode = this.state.organisationList.filter(c => (c.organisationId == event.target.value))[0].organisationCode;
-        // alert(organisationCode);
+        let organisationCode = this.state.organisationList.filter(c => (c.id == event.target.value))[0].code;
         this.props.generateOrganisationCode(organisationCode);
     }
-
+    /**
+     * Reterives organisation list from server
+     */
     getOrganisationList() {
-        // AuthenticationService.setupAxiosInterceptors();
-        // ProgramService.getOrganisationList(this.props.items.program.realm.realmId)
-        ProgramService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
+        DropdownService.getOrganisationListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -107,12 +73,11 @@ export default class StepFour extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -143,34 +108,29 @@ export default class StepFour extends Component {
                     }
                 }
             );
-
-
     }
-
-    componentDidMount() {
-
-    }
+    /**
+     * Renders the program onboarding step four screen.
+     * @returns {JSX.Element} - Program onboarding step four screen.
+     */
     render() {
         const { organisationList } = this.state;
         let realmOrganisation = organisationList.length > 0
             && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationId}>
-                        {/* {item.organisationCode} */}
+                    <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     initialValues={initialValuesFour}
-                    validate={validateFour(validationSchemaFour)}
+                    validationSchema={validationSchemaFour}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.finishedStepFour && this.props.finishedStepFour();
-
                     }}
                     render={
                         ({
@@ -185,39 +145,34 @@ export default class StepFour extends Component {
                             setTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='organisationForm'>
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
-                                            invalid={touched.organisationId && !!errors.organisationId}
-                                            onBlur={handleBlur}
-                                            bsSize="sm"
-                                            type="select"
-                                            name="organisationId"
-                                            id="organisationId"
-                                            className="col-md-4"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateOrganisationCode(e) }}
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmOrganisation}
-
-                                        </Input>
-
-                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
-
-
+                            <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
+                                        invalid={touched.organisationId && !!errors.organisationId}
+                                        onBlur={handleBlur}
+                                        bsSize="sm"
+                                        type="select"
+                                        name="organisationId"
+                                        id="organisationId"
+                                        className="col-md-4"
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e); this.generateOrganisationCode(e) }}
+                                    >
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {realmOrganisation}
+                                    </Input>
+                                    <FormFeedback className="red">{errors.organisationId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="reset" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
             </>
-
         );
     }
 }

@@ -1,100 +1,64 @@
-import React, { Component } from 'react';
-import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import ProgramService from "../../api/ProgramService";
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import { Formik } from 'formik';
-import * as Yup from 'yup'
+import React, { Component } from 'react';
 import {
-    Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label
 } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-
+import { API_URL } from '../../Constants';
+import DropdownService from '../../api/DropdownService';
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesTwo = {
     realmCountryId: ''
 }
-
+/**
+ * Defines the validation schema for step two of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaTwo = function (values) {
     return Yup.object().shape({
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
     })
 }
-
-const validateTwo = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorTwo(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorTwo = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
+/**
+ * Component for program Onboarding step two for taking the realm country details for the program
+ */
 export default class Steptwo extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             realmCountryList: []
         }
         this.generateCountryCode = this.generateCountryCode.bind(this);
-
     }
-
-    touchAllTwo(setTouched, errors) {
-        setTouched({
-            realmCountryId: true
-        }
-        )
-        this.validateFormTwo(errors)
-    }
-    validateFormTwo(errors) {
-        this.findFirstErrorTwo('realmCountryForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorTwo(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    /**
+     * Generates a country code based on the selected realm country ID.
+     * @param {Event} event - The change event containing the selected realm country ID.
+     */ 
     generateCountryCode(event) {
-        let realmCountryCode = this.state.realmCountryList.filter(c => (c.realmCountryId == event.target.value))[0].country.countryCode;
-        // alert(realmCountryCode);
+        let realmCountryCode = this.state.realmCountryList.filter(c => (c.id == event.target.value))[0].code;
         this.props.generateCountryCode(realmCountryCode);
     }
-
+    /**
+     * Reterives Realm country list from server
+     */
     getRealmCountryList() {
-        // AuthenticationService.setupAxiosInterceptors();
-        console.log("in get realmCOuntry list----->", this.props.items.program.realm.realmId);
-        ProgramService.getRealmCountryList(this.props.items.program.realm.realmId)
+        DropdownService.getRealmCountryDropdownList(this.props.items.program.realm.realmId)
             .then(response => {
                 if (response.status == 200) {
-                    // var realmCountries = response.data.filter(c => c.active == true );
-                    var listArray = response.data.filter(c => c.active == true);
+                    var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.country.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -109,12 +73,11 @@ export default class Steptwo extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -146,30 +109,28 @@ export default class Steptwo extends Component {
                 }
             );
     }
-    componentDidMount() {
-
-    }
+    /**
+     * Renders the program onboarding step two screen.
+     * @returns {JSX.Element} - Program onboarding step two screen.
+     */
     render() {
         const { realmCountryList } = this.state;
         let realmCountries = realmCountryList.length > 0
             && realmCountryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
-                        {/* {item.country.countryCode} */}
+                    <option key={i} value={item.id}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     initialValues={initialValuesTwo}
-                    validate={validateTwo(validationSchemaTwo)}
+                    validationSchema={validationSchemaTwo}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.finishedStepTwo && this.props.finishedStepTwo();
-
                     }}
                     render={
                         ({
@@ -183,39 +144,31 @@ export default class Steptwo extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmCountryForm'>
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
-                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e); this.generateCountryCode(e) }}
-                                            bsSize="sm"
-                                            className="col-md-4"
-                                            onBlur={handleBlur}
-                                            type="select" name="realmCountryId" id="realmCountryId">
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmCountries}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
-                                    </FormGroup>
-
-                                    <FormGroup>
-
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
-                                    </FormGroup>
-
-                                </Form>
-                            )} />
-
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmCountryForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
+                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e); this.generateCountryCode(e) }}
+                                        bsSize="sm"
+                                        className="col-md-4"
+                                        onBlur={handleBlur}
+                                        type="select" name="realmCountryId" id="realmCountryId">
+                                        <option value="">{i18n.t('static.common.select')}</option>
+                                        {realmCountries}
+                                    </Input>
+                                    <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" disabled={!isValid}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
             </>
         );
     }
-
-
-
-
 }

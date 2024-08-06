@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar orientação</title>
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+		a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								
+								<tr>
+									<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Extrapolação</h3>
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo :</span>Permita que os usuários criem uma previsão identificando tendências e estações a partir de dados históricos de séries temporais inseridos pelo usuário no '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Entrada e Ajuste de Dados</a>' tela. Várias opções de extrapolação estatística estão disponíveis e serão descritas abaixo. As extrapolações dos dados de consumo são feitas com base na unidade de planejamento por unidade de planejamento. </p>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta tela:</span></p>
+<p style="font-size: 13px;">
+	<b style="font-size: 13px;">1.Iniciando a extrapolação:</b>
+	<ul style="font-size: 13px;">
+		<li>Antes de usar esta tela, certifique-se de ter concluído o '<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank" style="text-decoration: underline;">Entrada e Ajuste de Dados</a>' tela para cada unidade de planejamento e região que você deseja extrapolar</li>
+		<li>Use os filtros na parte superior desta tela para selecionar a unidade de planejamento, a região a ser extrapolada e o intervalo de datas a serem utilizados pelos dados históricos. 
+		</li>
+		<li>O usuário pode selecionar um ou vários dos métodos de extrapolação disponíveis no QAT, conforme apropriado para o padrão geral de consumo e dados disponíveis, como será discutido abaixo. Consulte as seções 2-4 abaixo para obter uma explicação dos métodos de extrapolação e como escolher os melhores métodos para sua previsão.
+		</li>
+		<li> Observe que as alterações nessa tela são opcionais – o QAT aplica automaticamente os parâmetros de extrapolação padrão a todas as unidades de planejamento após a conclusão da tela Ajustes. O usuário então faz a seleção final da previsão no '<a href="/#/report/compareAndSelectScenario" target="_blank" style="text-decoration: underline;">Compare e 
+				selecione a previsão</a>'  screen.
+		</li>
+	</ul>
+	<b style="font-size: 13px;">2.Métodos de extrapolação disponíveis no QAT</b>
+	<p class="pl-lg-3" style="font-size: 13px;">Os métodos de previsão no QAT são organizados do simples ao sofisticado.</p>
+	<ol type="a" style="font-size: 13px;">
+		<li><b>Média móvel:</b> A média móvel é uma média que se move ao longo do tempo, 
+			eliminando dados mais antigos à medida que incorpora dados mais recentes. Para QAT 
+			calcular a média móvel, insira o número de meses no passado que você gostaria de usar 
+			no cálculo da média. O usuário pode selecionar qualquer número inteiro positivo para 
+			este campo. Digitar 5, por exemplo, significaria que a projeção para o próximo mês 
+			da série seria a média dos cinco meses anteriores. Este método é mais útil para 
+			previsões de curto prazo e é sensível às tendências. Não é apropriado para dados 
+			sazonais
+		</li>
+		<li><b>Semi-médias:</b>A semimédia estima tendências com base em duas metades de uma série. 
+			O QAT divide os dados reais em duas partes iguais (metades), mas caso os dados de consumo 
+			real não sejam para os meses pares, o ponto médio é excluído e a média aritmética dos 
+			valores de cada parte (metade) é calculada como os valores y de dois pontos em uma linha. 
+			A inclinação da linha de tendência é determinada pela diferença entre estes valores de y ao 
+			longo do tempo, conforme definido pela diferença dos pontos médios das duas metades da série, 
+			ou valores de x, dos pontos. Este método é sensível às tendências e útil para previsões 
+			de curto e médio prazo, mas não é apropriado para dados sazonais.
+		</li>
+		<li><b>Regressão linear:</b> A regressão linear modela a relação entre duas variáveis 
+			ajustando uma equação linear aos dados observados. Intervalo de confiança :  entre 0% e 
+			100% (exclusivo), por exemplo, nível de confiança de 90% indica que 90% dos possíveis 
+			pontos futuros devem cair dentro deste raio da previsão representada pela linha de 
+			regressão. Este método não é apropriado para dados sazonais.
+		</li>
+		<li><b>Suavização Exponencial Tripla (Holt-Winters):</b>  Nas estatísticas, diferentes tipos 
+			de suavização são usados ​​para filtrar o ruído para que possamos ver os padrões em um 
+			conjunto de dados de séries temporais com mais clareza. A suavização exponencial usa 
+			dados mais antigos com pesos decrescentes exponencialmente ao longo do tempo. Os parâmetros 
+			de suavização na suavização exponencial são definidos entre 0 e 1, com valores próximos 
+			a 1 favorecendo valores recentes e valores próximos a 0 favorecendo valores mais antigos. 
+			Os usuários que utilizam a suavização exponencial tripla podem escolher entre quatro parâmetros:
+			<ul>
+				<li>alfa, aplica-se ao nível ou linha de base do conjunto de dados. Valores alfa mais altos dão mais peso aos dados mais recentes</li>
+				<li>beta, determina quão fortemente as tendências recentes devem ser valorizadas em comparação com as tendências mais antigas</li>
+				<li>gama, reflete o componente sazonal da previsão. Sazonal geralmente se refere a padrões repetidos dentro de um ano. Quanto maior o gama, mais peso será aplicado ao componente sazonal mais recente dos dados.</li>
+				<li>Sazonalidade: No QAT, uma estação pode ser descrita como a duração esperada (em meses) de qualquer padrão repetitivo no consumo</li>
+				<li>Intervalo de confiança:  entre 0% e 100% (exclusivo), por exemplo, nível de confiança de 
+					90% indica que 90% dos pontos futuros devem cair dentro deste raio de previsão.
+				</li>
+			</ul>
+			<li><b>ARIMA:</b> A modelagem ARIMA permite que dois modelos estatísticos projetados para 
+				séries temporais estacionárias sejam integrados e aplicados a séries temporais não 
+				estacionárias, ou seja, séries temporais que possuem tendências ou estações. 
+				É frequentemente aplicado a previsões de curto prazo. Auto-regressivo significa que 
+				cada ponto na regressão é influenciado por seus valores anteriores e média móvel implica 
+				que cada ponto é uma média, uma combinação linear de um ou mais pontos adjacentes. 
+				Tanto a auto-regressão quanto a média móvel são integradas juntas para ajustar um melhor 
+				modelo para a série por meio de diferenciação, ou literalmente usando a diferença entre 
+				pontos em uma série temporal para a análise em vez dos valores brutos. Os modelos ARIMA 
+				têm três parâmetros:
+				<ul >
+					<li>p ou AR (ordem de atraso): o número de observações de atraso no modelo</li>
+					<li>d ou I (grau de diferenciação): o número de vezes que as observações brutas são 
+						diferenciadas. Esse valor normalmente é 1 (se houver tendência) ou 0 
+						(sem tendência). Outros valores mais altos são possíveis, mas não esperados.
+					</li>
+					<li>q ou MA (ordem da média móvel): o tamanho da janela de média móvel ou o número 
+						de observações diferenciadas a serem calculadas.
+					</li>
+					<li>Os valores padrão de QAT para parâmetros ARIMA são p = 0, d = 1, q = 1.
+					</li>
+					<li>Intervalo de confiança: entre 0% e 100% (exclusivo), por ex. O nível de 
+						confiança de 90% indica que 90% dos pontos futuros devem cair dentro desse raio da previsão.
+					</li>
+					<br>
+				</ul>
+			</li>
+		</li>
+	</ol>
+	<b style="font-size: 13px;">3.Qual método de extrapolação devo usar?</b>
+	<p class="pl-lg-3" style="font-size: 13px;">Abaixo estão algumas considerações para selecionar um método de previsão. 
+		Os métodos de previsão no QAT são organizados do simples ao sofisticado. Em geral,
+		<ul style="font-size: 13px;">
+			<li>Modelos mais sofisticados são mais sensíveis a problemas nos dados </li>
+			<li>Se você tiver dados mais pobres (pontos de dados ausentes, taxas de relatórios 
+				variáveis, <i class="fa fa-angle-left" aria-hidden="true">12</i> meses de dados), 
+				métodos de previsão mais simples são recomendados
+			</li>
+		</ul>
+	</p>
+	<p class="pl-lg-3" style="font-size: 13px;">A escolha do método de extrapolação depende do padrão esperado nos dados.
+		 Alguns padrões típicos incluem:
+		 <ul style="font-size: 13px;">
+			<li>Estacionário, onde o intervalo de valores observados ao longo do tempo paira em 
+				torno de uma média. Os modelos aplicados a esses conjuntos de dados podem incluir
+				<ul>
+					<li>Média móvel</li>
+					<li>ARIMA</li>
+				</ul>
+			</li>
+			<li>Tendência sem componente sazonal, onde os valores observados têm tendência 
+				crescente ou decrescente. Os modelos aplicados a esses conjuntos de dados podem 
+				incluir
+				<ul>
+					<li>Semi-médias</li>
+					<li>Regressão Linear</li>
+				</ul>
+			</li>
+			<li>Tendência e Sazonal, em que os valores observados em um conjunto de dados têm 
+				componentes de tendência e sazonais. Os modelos aplicados a esses conjuntos de 
+				dados podem incluir
+				<ul>
+					<li>Modelo ARIMA sazonal</li>
+					<li>Suavização Exponencial Tripla (Holt-Winters) 
+				</ul>
+			</li>		
+				<li>Sazonal sem tendência,
+					onde os valores observados têm um componente sazonal, mas sem tendência. modelos
+					aplicados a tais conjuntos de dados podem incluir 
+						<ul>
+							<li>Suavização Exponencial Tripla (Holt-Winters)</li>
+						</ul>
+					</li>
+				</ul>
+					<p>Os modelos sugeridos aqui
+						não são exaustivas nem exclusivas. QAT permite ao usuário aplicar
+						uma variedade de métodos de extrapolação e, em seguida, compará-los usando os melhores
+						ajustar ou prever métricas de erro. 
+					</p>
+				
+			<p>A segunda etapa é considerar se os valores de previsão devem refletir de perto 
+				os padrões históricos em seus dados e, portanto, se você usará as métricas de 
+				erro para informar sua seleção. No entanto, ao optar por desconsiderar a métrica 
+				de erro, será importante documentar sua lógica para fazê-lo para informar 
+				discussões ou revisões de sua previsão e ajudar futuros analistas a apoiar 
+				suas decisões. 
+			</p>
+		</ul>
+	</p>
+	<b style="font-size: 13px;">4.Como interpreto os erros?</b>
+	<p class="pl-lg-3" style="font-size: 13px;">O QAT calcula automaticamente as métricas de erro de previsão usando 
+		vários métodos. Esses incluem:
+		<ul style="font-size: 13px;">
+			<li>MAPE (erro percentual médio absoluto):pode ser interpretado como a porcentagem média
+				diferença entre as previsões e os alvos pretendidos no conjunto de dados. Por exemplo, se
+				MAPE é de 15%, então suas previsões estão em média 15% distantes dos valores reais.</li>
+				<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MAPE.png"><br>
+
+				<li style="margin-top: 20px;">WAPE (erro percentual absoluto ponderado): WAPE é uma métrica apropriada para quando o
+					o conjunto de dados usado tem valores baixos ou intermitentes. Uma porcentagem WAPE de 5 significa que o
+					a previsão estava errada em 5% em todo o conjunto de dados para um determinado período de avaliação. Dependendo
+					No caso de uso, é recomendado escolher um modelo que forneça o menor valor WAPE.</li>
+					<br><img class="img-fluid" src="../ShowGuidanceFiles/img/WAPE.png"><br>
+
+					<li style="margin-top: 20px;">RMSE (erro quadrático médio): O RMSE pode ser interpretado como o erro médio que o
+						as previsões do modelo têm em comparação com o real, com peso extra adicionado a maiores
+						erros de previsão. Geralmente, quanto mais próximo o RMSE estiver de zero, mais preciso será o modelo.</li>
+						<br><img class="img-fluid" src="../ShowGuidanceFiles/img/RMSE.png"><br>
+
+						<li style="margin-top: 20px;">MSE (erro quadrático médio): MSE é a média agregada da diferença quadrática entre
+							os fatos reais e as previsões. Grandes erros são destacados devido a esta quadratura. MSE é útil
+							ao trabalhar em modelos onde grandes erros ocasionais devem ser minimizados. Geralmente, o
+							mais próximo de 0, mais preciso é o modelo.</li>
+							<br><img class="img-fluid" src="../ShowGuidanceFiles/img/MSE.png"><br>
+						<li style="margin-top: 20px;">R 2 (a correlação quadrática entre a variável dependente e os valores ajustados):
+							R 2 = 1 - [soma quadrada da regressão (SSR) / soma total dos quadrados (SST)], onde a soma
+							ao quadrado dos resíduos da regressão (SSR) é a soma de seus resíduos ao quadrado, e o
+							soma total dos quadrados (SST) é a soma da distância que os dados estão longe da média, todos
+							ao quadrado. O valor R 2 é sempre um número entre 0 e 1. R 2 é uma medida do ajuste de um
+							linha de regressão para uma série de observações históricas com valores mais próximos de 1 indicando uma
+							correspondência mais forte entre os valores reais e previstos (modelo de regressão). Isso é
+							não é uma medida de erro e não deve ser usada por si só para avaliar a adequação de uma previsão,
+							mas em combinação com outras métricas de erro e o conhecimento do programa pelo usuário.</li>
+								<br><img class="img-fluid" src="../ShowGuidanceFiles/img/r2.png"><br>
+								
+								<p style="margin-top: 20px;">Além de R 2, quanto menor a pontuação, mais próximo o resultado do método de previsão se ajusta ao histórico
+									dados. Em modelos onde se espera que os padrões históricos em um conjunto de dados sejam refletidos no futuro
+									valores, um valor de erro baixo poderia ser usado para ajudar a selecionar um método de extrapolação preferido, e QAT
+									destacará esses melhores ajustes em uma tabela. No entanto, se ocorrerem alterações substanciais que não se enquadrem no contexto histórico
+									Se os dados forem antecipados, a extrapolação mais adequada pode não ser a previsão mais apropriada a ser selecionada.
+									</p>
+			<p>Para fazer a melhor seleção entre os métodos de extrapolação para o seu propósito, 
+				o mais importante é primeiro entender qual método de extrapolação é mais 
+				apropriado para o padrão esperado nos dados. Os métodos de previsão no QAT são 
+				organizados do simples ao sofisticado. Em geral,
+				<ul>
+					<li>Modelos mais sofisticados são mais sensíveis a problemas nos dados </li>
+					<li>Se você tiver dados mais pobres (pontos de dados ausentes, taxas de 
+						relatórios variáveis, <i class="fa fa-angle-left" aria-hidden="true">12</i> meses de 
+						dados), métodos de previsão mais simples são recomendados<br>A segunda etapa é considerar 
+						se os valores de previsão devem refletir de perto os padrões históricos em seus dados e, 
+						portanto, se você usará as métricas de erro para informar sua seleção. No entanto, 
+						ao optar por desconsiderar a métrica de erro, será importante documentar sua lógica para 
+						fazê-lo para informar discussões ou revisões de sua previsão e ajudar futuros analistas 
+						a apoiar suas decisões.
+					</li>
+				</ul>
+			</p>
+		</ul>
+	</p>
+</p>
+<p style="font-size: 13px;">
+	<b>Observação :  Você tem 0 meses de dados de consumo real. Os valores mínimos necessários 
+		para os vários recursos estão abaixo: <br>
+		<span class="ml-lg-5">* TES, Holt-Invernos: Pelo menos 24 meses de dados de consumo real<br>
+		</span>
+		<span class="ml-lg-5">* ARIMA:  Pelo menos 14 meses de dados de consumo reais<br></span>
+		<span class="ml-lg-5">* Média Móvel, Semi-Médias e Regressão Linear: Pelo menos 3 meses de 
+			dados de consumo real</span></b>
+		</p>
+							
+				</td>
+				</tr>
+	
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

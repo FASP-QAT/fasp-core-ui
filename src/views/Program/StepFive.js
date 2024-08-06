@@ -1,54 +1,38 @@
-import React, { Component } from 'react';
-
-import i18n from '../../i18n';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import ProgramService from "../../api/ProgramService";
+import classNames from 'classnames';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import {
-    Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,
-} from 'reactstrap';
-import getLabelText from '../../CommonComponent/getLabelText';
+import React, { Component } from 'react';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import classNames from 'classnames';
-
+import {
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup, Label
+} from 'reactstrap';
+import * as Yup from 'yup';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants';
+import ProgramService from "../../api/ProgramService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValuesFour = {
     regionId: []
 }
-
+/**
+ * Defines the validation schema for step five of program onboarding.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchemaFour = function (values) {
     return Yup.object().shape({
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
     })
 }
-
-const validateFour = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationErrorFour(error)
-        }
-    }
-}
-
-const getErrorsFromValidationErrorFour = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
+/**
+ * Component for program Onboarding step five for taking the region details for program
+ */
 export default class StepFive extends Component {
     constructor(props) {
         super(props);
@@ -57,36 +41,10 @@ export default class StepFive extends Component {
             regionId: ''
         }
     }
-
-    touchAllFour(setTouched, errors) {
-        setTouched({
-            regionId: true
-        }
-        )
-        this.validateFormFour(errors)
-    }
-    validateFormFour(errors) {
-        this.findFirstErrorFour('regionForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstErrorFour(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-    componentDidMount() {
-
-    }
-
+    /**
+     * Reterives region list from server
+     */
     getRegionList() {
-
-        // AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(document.getElementById('realmCountryId').value)
             .then(response => {
                 if (response.status == 200) {
@@ -97,8 +55,8 @@ export default class StepFive extends Component {
                     }
                     var listArray = regList;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.label.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.label.toUpperCase();
+                        var itemLabelB = b.label.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -114,12 +72,11 @@ export default class StepFive extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -150,18 +107,20 @@ export default class StepFive extends Component {
                     }
                 }
             );
-
     }
+    /**
+     * Renders the program onboarding step five screen.
+     * @returns {JSX.Element} - Program onboarding step five screen.
+     */
     render() {
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
                     initialValues={initialValuesFour}
-                    validate={validateFour(validationSchemaFour)}
+                    validationSchema={validationSchemaFour}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.props.finishedStepFive && this.props.finishedStepFive();
-
                     }}
                     render={
                         ({
@@ -178,71 +137,37 @@ export default class StepFive extends Component {
                             setFieldTouched,
                             handleReset
                         }) => (
-                                <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='regionForm'>
-                                    <FormGroup className="Selectcontrol-bdrNone">
-                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
-                                        <Select
-                                            className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
-                                                { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
-                                                { 'is-invalid': (touched.regionId && !!errors.regionId) }
-                                            )}
-                                            onChange={(e) => {
-                                                handleChange(e);
-                                                setFieldValue("regionId", e);
-                                                this.props.updateFieldData(e);
-                                            }}
-                                            onBlur={() => setFieldTouched("regionId", true)}
-                                            // onChange={(e) => { this.props.updateFieldData(e) }}
-                                            // className="col-md-4"
-                                            bsSize="sm"
-                                            name="regionId"
-                                            id="regionId"
-                                            multi
-                                            options={this.state.regionList}
-                                            // value={this.state.regionId}
-                                            value={this.props.items.program.regionArray}
-                                        // onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
-                                        />
-
-                                        <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="reset" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
-                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button> */}
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        &nbsp;
-                                    </FormGroup>
-                                </Form>
-                            )} />
-
-
-                {/* 
-                <FormGroup className="col-md-4 pl-0">
-                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
-                    <Select
-                        onChange={(e) => { this.props.updateFieldData(e) }}
-                        // className="col-md-4"
-                        bsSize="sm"
-                        name="regionId"
-                        id="regionId"
-                        multi
-                        options={this.state.regionList}
-                        value={this.state.regionId}
-                        onChange={(e) => { handleChange(e); this.props.updateFieldData(e) }}
-                    />
-                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
-                </FormGroup>
-                <br></br>
-                <FormGroup>
-                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Back</Button>
-                    &nbsp;
-                    <Button color="info" size="md" className="float-left mr-1" type="button" name="regionSub" id="regionSub" onClick={this.props.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
-                    &nbsp;
-                    </FormGroup> */}
-
-
+                            <Form className="needs-validation" onReset={handleReset} onSubmit={handleSubmit} noValidate name='regionForm'>
+                                <FormGroup className="Selectcontrol-bdrNone">
+                                    <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-4', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.regionId && this.props.items.program.regionArray.length != 0 },
+                                            { 'is-invalid': (touched.regionId && !!errors.regionId) }
+                                        )}
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("regionId", e);
+                                            this.props.updateFieldData(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("regionId", true)}
+                                        bsSize="sm"
+                                        name="regionId"
+                                        id="regionId"
+                                        multi
+                                        options={this.state.regionList}
+                                        value={this.props.items.program.regionArray}
+                                    />
+                                    <FormFeedback className="red">{errors.regionId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="reset" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" disabled={!isValid} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                    &nbsp;
+                                </FormGroup>
+                            </Form>
+                        )} />
             </>
         );
     }

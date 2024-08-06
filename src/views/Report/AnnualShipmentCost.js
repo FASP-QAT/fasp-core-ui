@@ -1,41 +1,41 @@
-import React, { Component } from 'react';
-import pdfIcon from '../../assets/img/pdf.png';
-import { LOGO } from '../../CommonComponent/Logo.js'
+import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import Picker from 'react-month-picker'
-import i18n from '../../i18n'
-import MonthBox from '../../CommonComponent/MonthBox.js'
-import getLabelText from '../../CommonComponent/getLabelText';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import ProductService from '../../api/ProductService';
-import ProgramService from '../../api/ProgramService';
-import ShipmentStatusService from '../../api/ShipmentStatusService';
-import ProcurementAgentService from '../../api/ProcurementAgentService';
-import FundingSourceService from '../../api/FundingSourceService';
 import moment from "moment";
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { SECRET_KEY, DATE_FORMAT_CAP, INDEXED_DB_VERSION, INDEXED_DB_NAME, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js';
-import CryptoJS from 'crypto-js';
+import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import { MultiSelect } from 'react-multi-select-component';
 import {
     Card,
     CardBody,
-    // CardFooter,
-    CardHeader,
     Col,
-    Row,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
+    Form,
+    FormGroup, Input, InputGroup,
+    Label
 } from 'reactstrap';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { LOGO } from '../../CommonComponent/Logo.js';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import DropdownService from '../../api/DropdownService';
+import ProductService from '../../api/ProductService';
 import ReportService from '../../api/ReportService';
-
-import MultiSelect from 'react-multi-select-component';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import ShipmentStatusService from '../../api/ShipmentStatusService';
+import pdfIcon from '../../assets/img/pdf.png';
+import csvicon from "../../assets/img/csv.png";
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+/**
+ * Component for Annual Shipment Cost Report.
+ */
 class AnnualShipmentCost extends Component {
     constructor(props) {
         super(props);
@@ -66,10 +66,9 @@ class AnnualShipmentCost extends Component {
             fundingSourceValues: [],
             fundingSourceLabels: [],
             lang: localStorage.getItem('lang'),
-            // rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             outPutList: [],
             message: '',
             programId: '',
@@ -78,33 +77,24 @@ class AnnualShipmentCost extends Component {
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
-        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
-        this.getProductCategories = this.getProductCategories.bind(this)
         this.getPrograms = this.getPrograms.bind(this);
         this.getProcurementAgentList = this.getProcurementAgentList.bind(this);
         this.getFundingSourceList = this.getFundingSourceList.bind(this);
         this.getShipmentStatusList = this.getShipmentStatusList.bind(this);
         this.filterVersion = this.filterVersion.bind(this);
-        //this.pickRange = React.createRef()
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
-
     }
-    roundN = num => {
-        if (num != '') {
-            return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-        } else {
-            return ''
-        }
-    }
+    /**
+     * Fetches data based on selected filters.
+     */
     fetchData() {
         let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgents.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let shipmentStatusIds = this.state.statusValues.length == this.state.shipmentStatuses.length ? [] : this.state.statusValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-
         this.setState({
             outPutList: []
         }, () => {
@@ -112,28 +102,22 @@ class AnnualShipmentCost extends Component {
                 "programId": document.getElementById("programId").value,
                 "versionId": document.getElementById("versionId").value,
                 "procurementAgentIds": procurementAgentIds,
-                "planningUnitIds": planningUnitIds,//document.getElementById("planningUnitId").value,
+                "planningUnitIds": planningUnitIds,
                 "fundingSourceIds": fundingSourceIds,
                 "shipmentStatusIds": shipmentStatusIds,
                 "startDate": this.state.rangeValue.from.year + '-' + ("00" + this.state.rangeValue.from.month).substr(-2) + '-01',
                 "stopDate": this.state.rangeValue.to.year + '-' + ("00" + this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
                 "reportBasedOn": document.getElementById("view").value,
-
             }
-
             let versionId = document.getElementById("versionId").value;
             let programId = document.getElementById("programId").value;
-            //let planningUnitId = document.getElementById("planningUnitId").value;
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             let reportbaseValue = document.getElementById("view").value;
-            console.log('****', startDate, endDate)
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
                 if (versionId.includes('Local')) {
                     var db1;
-                    var storeOS;
                     getDatabase();
-                    var regionList = [];
                     this.setState({ loading: true })
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onerror = function (event) {
@@ -150,7 +134,6 @@ class AnnualShipmentCost extends Component {
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var program = `${programId}_v${version}_uId_${userId}`
                         var programDataOs = programDataTransaction.objectStore('programData');
-                        console.log("1----", program)
                         var programRequest = programDataOs.get(program);
                         programRequest.onerror = function (event) {
                             this.setState({
@@ -159,14 +142,6 @@ class AnnualShipmentCost extends Component {
                             })
                         }.bind(this);
                         programRequest.onsuccess = function (e) {
-                            // this.setState({ loading: true })
-                            console.log("2----", programRequest)
-                            // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-
-                            // var programJson = JSON.parse(programData);
-                            // console.log("3----", programJson);
-
                             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                             var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var papuOs = papuTransaction.objectStore('procurementAgent');
@@ -180,24 +155,20 @@ class AnnualShipmentCost extends Component {
                             papuRequest.onsuccess = function (event) {
                                 var papuResult = [];
                                 papuResult = papuRequest.result;
-
                                 var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
                                 var fsOs = fsTransaction.objectStore('fundingSource');
                                 var fsRequest = fsOs.getAll();
-
                                 fsRequest.onerror = function (event) {
                                     this.setState({
                                         supplyPlanError: i18n.t('static.program.errortext'),
                                         loading: false
                                     })
                                 }.bind(this);
-
                                 fsRequest.onsuccess = function (event) {
                                     var fsResult = [];
                                     fsResult = fsRequest.result;
                                     var outPutList = [];
                                     this.state.planningUnitValues.map(p => {
-                                        console.log("P+++++++++++", p);
                                         var planningUnitId = p.value;
                                         var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
                                         var programJson = {}
@@ -220,106 +191,75 @@ class AnnualShipmentCost extends Component {
                                         shipmentList = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
                                         var planningUnitLabel = p.label;
                                         var list = shipmentList.filter(c => c.planningUnit.id == planningUnitId)
-
                                         if (reportbaseValue == 1) {
                                             list = list.filter(c => (c.plannedDate >= startDate && c.plannedDate <= endDate));
                                         } else {
                                             list = list.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) : (c.receivedDate >= startDate && c.receivedDate <= endDate));
                                         }
-                                        console.log(list)
-                                        // var procurementAgentId = document.getElementById("procurementAgentId").value;
-                                        // var fundingSourceId = document.getElementById("fundingSourceId").value;
-                                        // var shipmentStatusId = document.getElementById("shipmentStatusId").value;
-
-                                        // if (procurementAgentId != -1) {
                                         var procurementAgentfilteredList = []
                                         this.state.procurementAgentValues.map(procurementAgent => {
                                             procurementAgentfilteredList = [...procurementAgentfilteredList, ...list.filter(c => c.procurementAgent.id == procurementAgent.value)];
                                         })
-                                        console.log('procurementAgentfilteredList', procurementAgentfilteredList)
-                                        // }
                                         var fundingSourcefilteredList = []
-                                        // if (fundingSourceId != -1) {
                                         this.state.fundingSourceValues.map(fundingsource => {
                                             fundingSourcefilteredList = [...fundingSourcefilteredList, ...procurementAgentfilteredList.filter(c => c.fundingSource.id == fundingsource.value)];
                                         })
-                                        console.log('fundingSourcefilteredList', fundingSourcefilteredList)
-                                        // if (shipmentStatusId != -1) {
                                         var list1 = []
                                         this.state.statusValues.map(status => {
                                             list1 = [...list1, ...fundingSourcefilteredList.filter(c => c.shipmentStatus.id == status.value)];
                                         })
-                                        console.log('list1', list1)
                                         var availableProcure = [...new Set(list1.map(ele => ele.procurementAgent.id))];
                                         var availableFunding = [...new Set(list1.map(ele => ele.fundingSource.id))];
-                                        console.log(availableProcure)
-                                        console.log(availableFunding)
                                         var list1 = list
                                         availableProcure.map(p => {
                                             availableFunding.map(f => {
-                                                console.log(p, '======', f)
                                                 list = list1.filter(c => c.procurementAgent.id == p && c.fundingSource.id == f)
-                                                console.log(list)
                                                 if (list.length > 0) {
-                                                    var fundingSource = this.state.fundingSources.filter(c => c.fundingSourceId == f)[0]
-                                                    var procurementAgent = this.state.procurementAgents.filter(c => c.procurementAgentId == p)[0]
-                                                    console.log(fundingSource)
-                                                    console.log(procurementAgent)
+                                                    var fundingSource = this.state.fundingSources.filter(c => c.id == f)[0]
+                                                    var procurementAgent = this.state.procurementAgents.filter(c => c.id == p)[0]
                                                     var json = {
                                                         'FUNDING_SOURCE_ID': fundingSource.fundingSourceId,
                                                         'PROCUREMENT_AGENT_ID': procurementAgent.procurementAgentId,
-                                                        'fundingsource': fundingSource.fundingSourceCode,
-                                                        'procurementAgent': procurementAgent.procurementAgentCode,
+                                                        'fundingsource': fundingSource.code,
+                                                        'procurementAgent': procurementAgent.code,
                                                         'PLANNING_UNIT_ID': planningUnitId,
                                                         'planningUnit': planningUnitLabel
-
                                                     };
                                                     var monthstartfrom = this.state.rangeValue.from.month
                                                     for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
                                                         var dtstr = from + "-" + String(monthstartfrom).padStart(2, '0') + "-01"
                                                         var m = from == to ? this.state.rangeValue.to.month : 12
                                                         var enddtStr = from + "-" + String(m).padStart(2, '0') + '-' + new Date(from, m, 0).getDate()
-                                                        console.log(dtstr, ' ', enddtStr)
                                                         var list2 = []
                                                         if (reportbaseValue == 1) {
                                                             list2 = list.filter(c => (c.plannedDate >= dtstr && c.plannedDate <= enddtStr));
                                                         } else {
                                                             list2 = list.filter(c => c.receivedDate == null || c.receivedDate == "" ? (c.expectedDeliveryDate >= dtstr && c.expectedDeliveryDate <= enddtStr) : (c.receivedDate >= dtstr && c.receivedDate <= enddtStr));
                                                         }
-                                                        console.log(list2)
                                                         var cost = 0;
                                                         for (var k = 0; k < list2.length; k++) {
                                                             cost += Number(list2[k].productCost * list2[k].currency.conversionRateToUsd) + Number(list2[k].freightCost * list2[k].currency.conversionRateToUsd);
                                                         }
-                                                        json[from] = this.roundN(cost)
-                                                        console.log(json)
+                                                        json[from] = roundN2(cost)
                                                         monthstartfrom = 1;
-
                                                     }
                                                     outPutList.push(json);
                                                 }
                                             })
                                         })
                                     })
-
                                     outPutList = outPutList.sort(function (a, b) {
                                         return parseInt(a.PROCUREMENT_AGENT_ID) - parseInt(b.PROCUREMENT_AGENT_ID);
                                     })
                                     this.setState({ outPutList: outPutList, message: '', loading: false });
-
-
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
                     }.bind(this)
                 } else {
                     this.setState({ loading: true })
-                    // alert("in else online version");
-                    console.log("json---", json);
-                    // AuthenticationService.setupAxiosInterceptors();
                     ReportService.getAnnualShipmentCost(json)
                         .then(response => {
-                            console.log("-----response", JSON.stringify(response.data));
                             var outPutList = [];
                             var responseData = response.data;
                             for (var i = 0; i < responseData.length; i++) {
@@ -335,13 +275,10 @@ class AnnualShipmentCost extends Component {
                                 for (var key in shipmentAmt) {
                                     var keyName = key.split("-")[1];
                                     var keyValue = shipmentAmt[key];
-                                    console.log("keyName--", keyName);
-                                    console.log("keyValue--", keyValue);
                                     json[keyName] = Number(keyValue).toFixed(2);
                                 }
                                 outPutList.push(json);
                             }
-                            console.log("json final---", json);
                             this.setState({
                                 outPutList: outPutList, message: '', loading: false
                             })
@@ -352,7 +289,10 @@ class AnnualShipmentCost extends Component {
                                     loading: false
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message, loading: false });
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -372,13 +312,10 @@ class AnnualShipmentCost extends Component {
                 }
             } else if (programId == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [], outPutList: [] });
-
             } else if (versionId == 0) {
                 this.setState({ message: i18n.t('static.program.validversion'), data: [], outPutList: [] });
-
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], outPutList: [] });
-
             } else if (this.state.procurementAgentValues.length == 0) {
                 this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [], outPutList: [] })
             } else if (this.state.fundingSourceValues.length == 0) {
@@ -386,19 +323,28 @@ class AnnualShipmentCost extends Component {
             }
             else {
                 this.setState({ message: i18n.t('static.report.validShipmentStatusText'), data: [], outPutList: [] });
-
             }
         })
     }
-
+    /**
+     * Retrieves the list of programs.
+     */
     getPrograms() {
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
-            ProgramService.getProgramList()
+        if (localStorage.getItem("sessionType") === 'Online') {
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
                 .then(response => {
-                    console.log(JSON.stringify(response.data))
+                    var proList = []
+                    for (var i = 0; i < response.data.length; i++) {
+                        var programJson = {
+                            programId: response.data[i].id,
+                            label: response.data[i].label,
+                            programCode: response.data[i].code
+                        }
+                        proList[i] = programJson
+                    }
                     this.setState({
-                        programs: response.data
+                        programs: proList, loading: false
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -406,7 +352,9 @@ class AnnualShipmentCost extends Component {
                             programs: []
                         }, () => { this.consolidatedProgramList() })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -423,19 +371,16 @@ class AnnualShipmentCost extends Component {
                         }
                     }
                 );
-
         } else {
-            console.log('offline')
             this.consolidatedProgramList()
         }
-
-
     }
+    /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
     consolidatedProgramList = () => {
-        const lan = 'en';
         const { programs } = this.state
         var proList = programs;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -444,9 +389,7 @@ class AnnualShipmentCost extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -455,17 +398,12 @@ class AnnualShipmentCost extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        console.log(programNameLabel)
-
                         var f = 0
                         for (var k = 0; k < this.state.programs.length; k++) {
                             if (this.state.programs[k].programId == programData.programId) {
                                 f = 1;
-                                console.log('already exist')
                             }
                         }
                         if (f == 0) {
@@ -473,75 +411,58 @@ class AnnualShipmentCost extends Component {
                         }
                     }
                 }
-                var lang = this.state.lang;
-
                 if (localStorage.getItem("sesProgramIdReport") != '' && localStorage.getItem("sesProgramIdReport") != undefined) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
+                        this.getProcurementAgentList()
                         this.filterVersion();
                     })
                 } else {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = a.programCode.toLowerCase();
+                            b = b.programCode.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     })
                 }
-
-
             }.bind(this);
-
         }.bind(this);
-
-
     }
-    formatter = value => {
-
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return x1 + x2;
-    }
-    show() {
-
-    }
-    handleRangeChange(value, text, listIndex) {
-        //
-    }
+    /**
+     * Handles the dismiss of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleRangeDissmis(value) {
         this.setState({ rangeValue: value }, () => {
             this.fetchData();
         })
-
     }
-
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
     }
-
+    /**
+     * Initializes the document by adding headers, footers, and content.
+     */
     initalisedoc = () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
             doc.setFontSize(6)
             for (var i = 1; i <= pageCount; i++) {
                 doc.setPage(i)
-
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
@@ -549,21 +470,15 @@ class AnnualShipmentCost extends Component {
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-
-
             }
         }
         const addHeaders = doc => {
             const pageCount = doc.internal.getNumberOfPages()
-
             doc.setFont('helvetica', 'bold')
-
             for (var i = 1; i <= pageCount; i++) {
                 doc.setFontSize(18)
                 doc.setPage(i)
-
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, '', 'FAST');
-
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.report.annualshipmentcost'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
@@ -571,52 +486,36 @@ class AnnualShipmentCost extends Component {
                 if (i == 1) {
                     doc.setFontSize(7)
                     var splittext = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
-
                     doc.text(doc.internal.pageSize.width / 8, 80, splittext)
                     var y = 80 + splittext.length * 10
-                    splittext = doc.splitTextToSize(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
-
+                    splittext = doc.splitTextToSize(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8);
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
                     y = y + splittext.length * 10
                     splittext = doc.splitTextToSize(i18n.t('static.common.reportbase') + ' : ' + document.getElementById("view").selectedOptions[0].text, doc.internal.pageSize.width / 8);
-
                     doc.text(doc.internal.pageSize.width / 8, y, splittext)
                     splittext = doc.splitTextToSize(i18n.t('static.common.runDate') + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + ' ' + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width / 8);
-
                     doc.text(doc.internal.pageSize.width * 3 / 4, 80, splittext)
                     doc.setFontSize(8)
                     doc.text(i18n.t('static.common.productFreight'), doc.internal.pageSize.width / 2, 90, {
                         align: 'center'
                     })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 2, 100, {
                         align: 'center'
                     })
-                    // doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                    //     align: 'left'
-                    // })
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 130, fundingSourceText)
-
                     var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceText.length * 10), procurementAgentText)
-
-                    // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), {
-                    //     align: 'left'
-                    // })
                     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 150 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10), planningText)
-
                     var statustext = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.statusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 160 + (fundingSourceText.length * 10) + (procurementAgentText.length * 10) + (planningText.length * 10), statustext)
-
-
                 }
             }
         }
         const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         var ystart = 200 + doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10
@@ -643,13 +542,7 @@ class AnnualShipmentCost extends Component {
         for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
             year.push(from);
         }
-        // ystart=ystart+10
-        // var year = ['2019', '2020']//[...new Set(this.state.matricsList.map(ele=>(ele.YEAR)))]//;
         var data = this.state.outPutList;
-        // var data = [{ 2019: 17534, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
-        // { 2019: 15234, 2020: 0, PROCUREMENT_AGENT_ID: 1, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "PEPFAR", procurementAgent: "PSM", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" },
-        // { 2019: 0, 2020: 17234, PROCUREMENT_AGENT_ID: 2, FUNDING_SOURCE_ID: 1, PLANNING_UNIT_ID: 1191, fundingsource: "USAID", procurementAgent: "GF", planningUnit: "Ceftriaxone 1 gm Powder Vial, 50" }]
-        //this.state.matricsList;//[['GHSC-PSM \n PEPFAR \nplanning unit 1', 200000, 300000], ['PPM \nGF \n planning unit 1', 15826, 2778993]]
         var index = doc.internal.pageSize.width / (year.length + 3);
         var initalvalue = index + 10
         for (var i = 0; i < year.length; i++) {
@@ -666,69 +559,48 @@ class AnnualShipmentCost extends Component {
         var yindex = ystart + 20
         var totalAmount = []
         var GrandTotalAmount = []
-        console.log('data', data)
         for (var j = 0; j < data.length; j++) {
             if (yindex > doc.internal.pageSize.height - 50) { doc.addPage(); yindex = 90 } else { yindex = yindex }
             var record = data[j]
-
             var keys = Object.entries(record).map(([key, value]) => (key)
             )
-
             var values = Object.entries(record).map(([key, value]) => (value)
             )
-
             var splittext = doc.splitTextToSize(record.procurementAgent, index);
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
-
                 doc.setFont('helvetica', 'bold')
-
                 if (yindex > doc.internal.pageSize.height - 110) {
                     doc.addPage();
                     yindex = 80;
-
                 }
                 doc.text(50, yindex, splittext[i]);
-
             }
             splittext = doc.splitTextToSize(record.fundingsource, index);
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
-
                 doc.setFont('helvetica', 'bold')
-
                 if (yindex > doc.internal.pageSize.height - 110) {
                     doc.addPage();
                     yindex = 80;
-
                 }
                 doc.text(60, yindex, splittext[i]);
-
             }
-            // splittext = doc.splitTextToSize(record.planningUnit + '\n', index);
             splittext = doc.splitTextToSize(record.planningUnit, index);
-
-            //doc.text(doc.internal.pageSize.width / 8, yindex, splittext)
-            //  yindex = yindex + 10;
             for (var i = 0; i < splittext.length; i++) {
                 yindex = yindex + 10;
-
                 doc.setFont('helvetica', 'normal')
-
                 if (yindex > doc.internal.pageSize.height - 110) {
                     doc.addPage();
                     yindex = 80;
-
                 }
                 doc.text(70, yindex, splittext[i]);
-
             }
             initalvalue = initalvalue + index
             var total = 0
             for (var x = 0; x < year.length; x++) {
                 for (var n = 0; n < keys.length; n++) {
                     if (year[x] == keys[n]) {
-                        console.log(values[n])
                         total = Number(total) + Number(values[n])
                         initalvalue = initalvalue + index
                         totalAmount[x] = totalAmount[x] == null ? Number(values[n]) : Number(totalAmount[x]) + Number(values[n])
@@ -736,55 +608,37 @@ class AnnualShipmentCost extends Component {
                         doc.setFont('helvetica', 'normal')
                         if (yindex - 40 > doc.internal.pageSize.height - 110) {
                             doc.addPage();
-                            // yindex = 80;
-                            doc.text(this.formatter(values[n]).toString(), initalvalue, 80, {
+                            doc.text(formatter(values[n],0).toString(), initalvalue, 80, {
                                 align: 'left'
                             })
-
                         } else {
-                            // doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 20, {
-                            //     align: 'left'
-                            // })
-                            doc.text(this.formatter(values[n]).toString(), initalvalue, yindex - 0, {
+                            doc.text(formatter(values[n],0).toString(), initalvalue, yindex - 0, {
                                 align: 'left'
                             })
                         }
-
                     }
                 }
             }
-            console.log(total)
             doc.setFont('helvetica', 'bold')
             if (yindex - 40 > doc.internal.pageSize.height - 110) {
                 doc.addPage();
                 yindex = 80;
-                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, 80, {
+                doc.text(formatter(roundN2(total),0).toString(), initalvalue + index, 80, {
                     align: 'left',
-
                 });
-
             } else {
-                // doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 20, {
-                //     align: 'left',
-
-                // });
-                doc.text(this.formatter(this.roundN(total)).toString(), initalvalue + index, yindex - 0, {
+                doc.text(formatter(roundN2(total),0).toString(), initalvalue + index, yindex - 0, {
                     align: 'left',
-
                 });
             }
-
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
             GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
             if (j < data.length - 1) {
-
                 if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
-                    console.log("in this if=======");
                     yindex = yindex + 40
                     if (yindex > doc.internal.pageSize.height - 100) {
                         doc.addPage();
                         yindex = 80;
-
                     }
                     initalvalue = 10
                     doc.setLineDash([2, 2], 0);
@@ -798,21 +652,18 @@ class AnnualShipmentCost extends Component {
                     for (var l = 0; l < totalAmount.length; l++) {
                         initalvalue += index;
                         Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                        doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
+                        doc.text(formatter(roundN2(totalAmount[l]),0).toString(), initalvalue, yindex, {
                             align: 'left'
                         })
                         totalAmount[l] = 0;
                     }
                 } else {
-
                 }
             } if (j == data.length - 1) {
-                console.log("in this second if=======");
                 yindex = yindex + 80
                 if (yindex > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     yindex = 80;
-
                 }
                 initalvalue = 10
                 doc.setLineDash([2, 2], 0);
@@ -826,7 +677,7 @@ class AnnualShipmentCost extends Component {
                 for (var l = 0; l < totalAmount.length; l++) {
                     initalvalue += index;
                     Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                    doc.text(this.formatter(this.roundN(totalAmount[l])).toString(), initalvalue, yindex, {
+                    doc.text(formatter(roundN2(totalAmount[l]),0).toString(), initalvalue, yindex, {
                         align: 'left'
                     })
                 }
@@ -835,10 +686,8 @@ class AnnualShipmentCost extends Component {
             if (yindex > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 yindex = 80;
-
             }
             initalvalue = 10
-
         }
         initalvalue = 10
         initalvalue += index;
@@ -852,82 +701,321 @@ class AnnualShipmentCost extends Component {
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             initalvalue += index;
             Gtotal = Gtotal + GrandTotalAmount[l]
-            doc.text(this.formatter(this.roundN(GrandTotalAmount[l])).toString(), initalvalue, yindex, {
+            doc.text(formatter(roundN2(GrandTotalAmount[l]),0).toString(), initalvalue, yindex, {
                 align: 'left'
             })
         }
-        doc.text(this.formatter(this.roundN(Gtotal)).toString(), initalvalue + index, yindex, {
+        doc.text(formatter(roundN2(Gtotal),0).toString(), initalvalue + index, yindex, {
             align: 'left'
         });
         doc.setFontSize(8);
-
-
         addHeaders(doc)
         addFooters(doc)
         doc.autoTable({ pagesplit: true })
         return doc;
     }
+    /**
+   * Exports the data to a CSV file.
+   */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push(
+            '"' +
+            (
+              i18n.t("static.program.program") +
+              " : " +
+              document.getElementById("programId").selectedOptions[0].text
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.report.versionFinal*") +
+              " : " +
+              document.getElementById("versionId").selectedOptions[0].text
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.common.reportbase") +
+              " : " +
+              document.getElementById("view").selectedOptions[0].text
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.report.dateRange") +
+                " : " +
+                makeText(this.state.rangeValue.from) +
+                " ~ " +
+                makeText(this.state.rangeValue.to)
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+                i18n.t("static.common.productFreight")
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.budget.fundingsource") +
+            " : " +
+            this.state.fundingSourceLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.procurementagent.procurementagent") +
+            " : " +
+            this.state.procurementAgentLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.planningunit.planningunit") +
+            " : " +
+            this.state.planningUnitLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        csvRow.push(
+            '"' +
+            (
+            i18n.t("static.common.status") +
+            " : " +
+            this.state.statusLabels.join('; ').toString()
+            ).replaceAll(" ", "%20") +
+            '"'
+        );
+        csvRow.push("");
+        var B = [];
+        var year = [];
+        for (var from = this.state.rangeValue.from.year, to = this.state.rangeValue.to.year; from <= to; from++) {
+            year.push(from);
+        }
+        var tempData = this.state.outPutList;
+        var data = tempData.sort((a, b) => {
+            if (a.PROCUREMENT_AGENT_ID === b.PROCUREMENT_AGENT_ID) {
+              return a.FUNDING_SOURCE_ID - b.FUNDING_SOURCE_ID;
+            } else {
+              return a.PROCUREMENT_AGENT_ID - b.PROCUREMENT_AGENT_ID;
+            }
+        });
+        var tempB = [];
+        tempB.push(i18n.t('static.procurementagent.procurementagent').replaceAll(" ", "%20"));
+        tempB.push(i18n.t('static.fundingsource.fundingsource').replaceAll(" ", "%20"));
+        tempB.push(i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20"));
+        for (var i = 0; i < year.length; i++) {
+            tempB.push(year[i].toString());
+        }
+        tempB.push("Total")
+        B.push(tempB);
+
+        var totalAmount = []
+        var GrandTotalAmount = []
+        for (var j = 0; j < data.length; j++) {
+            tempB = [];
+            var record = data[j]
+            var keys = Object.entries(record).map(([key, value]) => (key)
+            )
+            var values = Object.entries(record).map(([key, value]) => (value)
+            )
+            tempB.push(record.procurementAgent.replaceAll(",", " ").replaceAll(" ", "%20"));
+            tempB.push(record.fundingsource.replaceAll(",", " ").replaceAll(" ", "%20"));
+            tempB.push(record.planningUnit.replaceAll(",", " ").replaceAll(" ", "%20"));
+            
+            var total = 0
+            for (var x = 0; x < year.length; x++) {
+                for (var n = 0; n < keys.length; n++) {
+                    if (year[x] == keys[n]) {
+                        total = Number(total) + Number(values[n])
+                        totalAmount[x] = totalAmount[x] == null ? Number(values[n]) : Number(totalAmount[x]) + Number(values[n])
+                        GrandTotalAmount[x] = GrandTotalAmount[x] == null ? Number(values[n]) : Number(GrandTotalAmount[x]) + Number(values[n])
+                        tempB.push(formatter(values[n],0).toString().replaceAll(",", "").replaceAll(" ", "%20"));                        
+                    }
+                }
+            }
+            tempB.push(formatter(roundN2(total),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+            B.push(tempB)
+            
+            tempB = [];
+            totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
+            GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
+            if (j < data.length - 1) {
+                if (data[j].PROCUREMENT_AGENT_ID != data[j + 1].PROCUREMENT_AGENT_ID || data[j].FUNDING_SOURCE_ID != data[j + 1].FUNDING_SOURCE_ID) {
+                    tempB.push("Total");
+                    tempB.push("");
+                    tempB.push("");
+                    var Gtotal = 0
+                    for (var l = 0; l < totalAmount.length; l++) {
+                        Gtotal = Number(Gtotal) + Number(totalAmount[l])
+                        tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+                        totalAmount[l] = 0;
+                    }
+                    B.push(tempB);
+                } else {
+                }
+            } if (j == data.length - 1) {
+                tempB.push("Total");
+                tempB.push("");
+                tempB.push("");
+                var Gtotal = 0
+                for (var l = 0; l < totalAmount.length; l++) {
+                    Gtotal = Number(Gtotal) + Number(totalAmount[l])
+                    tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+                }
+                B.push(tempB);
+            }
+        }
+        tempB = [];
+        tempB.push(i18n.t('static.common.grandTotal').replaceAll(",", "").replaceAll(" ", "%20"));
+        tempB.push("");
+        tempB.push("");
+        var Gtotal = 0
+        for (var l = 0; l < GrandTotalAmount.length; l++) {
+            Gtotal = Gtotal + GrandTotalAmount[l]
+            tempB.push(formatter(roundN2(GrandTotalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+        }
+        B.push(tempB);
+
+        for (var i = 0; i < B.length; i++) {
+            csvRow.push(B[i].join(","));
+            if(B[i][0] == "Total" || B[i][0] == i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20")) {
+                csvRow.push("");
+            }
+        }
+        var csvString = csvRow.join("%0A");
+        var a = document.createElement("a");
+        a.href = "data:attachment/csv," + csvString;
+        a.target = "_Blank";
+        a.download =
+        i18n.t("static.report.annualshipmentcost") +
+        makeText(this.state.rangeValue.from) +
+        " ~ " +
+        makeText(this.state.rangeValue.to) +
+        ".csv";
+        document.body.appendChild(a);
+        a.click();
+    }
+    /**
+     * Exports the data to a PDF file.
+     */
     exportPDF = () => {
         var doc = this.initalisedoc()
         doc.save(i18n.t('static.report.annualshipmentcost').concat('.pdf'));
-
     }
+    /**
+     * Generates a PDF document and displays it on the page.
+     */
     previewPDF = () => {
         var doc = this.initalisedoc()
         var string = doc.output('datauristring');
         var embed = "<embed width='100%' height='100%' src='" + string + "'/>"
         document.getElementById("pdf").innerHTML = embed
     }
-
-
-
-    makeText = m => {
-        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
-        return '?'
-    }
-    roundN = num => {
-        return Number(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
-    }
-
-
-
+    /**
+     * Filters versions based on the selected program ID and updates the state accordingly.
+     * Sets the selected program ID in local storage.
+     * Fetches version list for the selected program and updates the state with the fetched versions.
+     * Handles error cases including network errors, session expiry, access denial, and other status codes.
+     */
     filterVersion = () => {
-        // let programId = document.getElementById("programId").value;
         let programId = this.state.programId;
         if (programId != 0) {
-
             localStorage.setItem("sesProgramIdReport", programId);
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
             if (program.length == 1) {
-                if (isSiteOnline()) {
+                if (localStorage.getItem("sessionType") === 'Online') {
                     this.setState({
                         versions: [],
-
                         planningUnits: [],
                         outPutList: [],
                         planningUnitValues: []
-
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                            .then(response => {
+                                this.setState({
+                                    versions: []
+                                }, () => {
+                                    this.setState({
+                                        versions: response.data
+                                    }, () => {
+                                        this.consolidatedVersionList(programId)
+                                    });
+                                });
+                            }).catch(
+                                error => {
+                                    this.setState({
+                                        programs: [], loading: false
+                                    })
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                            loading: false
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                                            case 401:
+                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`)
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                    loading: false
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: 'static.unkownError',
+                                                    loading: false
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
                     });
-
-
                 } else {
                     this.setState({
                         versions: []
                     }, () => { this.consolidatedVersionList(programId) })
                 }
             } else {
-
                 this.setState({
                     versions: []
                 })
-
             }
         } else {
             this.setState({
@@ -935,12 +1023,16 @@ class AnnualShipmentCost extends Component {
             })
         }
     }
-
+    /**
+     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+     * Filters out duplicate versions and reverses the list.
+     * Sets the version list in the state and triggers fetching of planning units.
+     * Handles cases where a version is selected from local storage or the default version is selected.
+     * @param {number} programId - The ID of the selected program
+     */
     consolidatedVersionList = (programId) => {
-        const lan = 'en';
         const { versions } = this.state
         var verList = versions;
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -949,9 +1041,7 @@ class AnnualShipmentCost extends Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-
             getRequest.onerror = function (event) {
-                // Handle errors!
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
@@ -960,28 +1050,18 @@ class AnnualShipmentCost extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
-
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
-
                     }
-
-
                 }
-
-                console.log(verList)
                 let versionList = verList.filter(function (x, i, a) {
                     return a.indexOf(x) === i;
                 });
                 versionList.reverse();
-
                 if (localStorage.getItem("sesVersionIdReport") != '' && localStorage.getItem("sesVersionIdReport") != undefined) {
-
                     let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionIdReport"));
                     if (versionVar != '' && versionVar != undefined) {
                         this.setState({
@@ -1006,16 +1086,12 @@ class AnnualShipmentCost extends Component {
                         this.getPlanningUnit();
                     })
                 }
-
             }.bind(this);
-
-
-
         }.bind(this)
-
-
     }
-
+    /**
+     * Retrieves the list of planning units for a selected program and version.
+     */
     getPlanningUnit = () => {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -1027,9 +1103,7 @@ class AnnualShipmentCost extends Component {
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
                 if (versionId.includes('Local')) {
-                    const lan = 'en';
                     var db1;
-                    var storeOS;
                     getDatabase();
                     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                     openRequest.onsuccess = function (e) {
@@ -1037,27 +1111,23 @@ class AnnualShipmentCost extends Component {
                         var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                         var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                         var planningunitRequest = planningunitOs.getAll();
-                        var planningList = []
                         planningunitRequest.onerror = function (event) {
-                            // Handle errors!
                         };
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
                             var programId = (document.getElementById("programId").value).split("_")[0];
                             var proList = []
-                            console.log(myResult)
                             for (var i = 0; i < myResult.length; i++) {
                                 if (myResult[i].program.id == programId && myResult[i].active == true) {
-
-                                    proList[i] = myResult[i]
+                                    proList[i] = myResult[i].planningUnit
                                 }
                             }
                             var lang = this.state.lang;
                             this.setState({
                                 planningUnits: proList.sort(function (a, b) {
-                                    a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-                                    b = getLabelText(b.planningUnit.label, lang).toLowerCase();
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }), message: ''
                             }, () => {
@@ -1065,19 +1135,17 @@ class AnnualShipmentCost extends Component {
                             })
                         }.bind(this);
                     }.bind(this)
-
-
                 }
                 else {
-                    // AuthenticationService.setupAxiosInterceptors();
-
-                    //let productCategoryId = document.getElementById("productCategoryId").value;
-                    ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        console.log('**' + JSON.stringify(response.data))
+                    var programJson = {
+                        tracerCategoryIds: [],
+                        programIds: [programId]
+                    }
+                    DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -1092,7 +1160,9 @@ class AnnualShipmentCost extends Component {
                                     planningUnits: [],
                                 })
                                 if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
                                         case 500:
@@ -1112,54 +1182,19 @@ class AnnualShipmentCost extends Component {
                 }
             }
         });
-
     }
-
-    getProductCategories() {
-        // AuthenticationService.setupAxiosInterceptors();
-        let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                console.log(JSON.stringify(response.data))
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    this.setState({
-                        productCategories: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-    }
-
+    /**
+     * Retrieves the list of funding sources.
+     */
     getFundingSourceList() {
         const { fundingSources } = this.state
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
-            FundingSourceService.getFundingSourceListAll()
+        if (localStorage.getItem("sessionType") === 'Online') {
+            DropdownService.getFundingSourceDropdownList()
                 .then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.fundingSourceCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.fundingSourceCode.toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = a.code.toUpperCase();
+                        var itemLabelB = b.code.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1171,7 +1206,9 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1199,43 +1236,44 @@ class AnnualShipmentCost extends Component {
                 var fSourceOs = fSourceTransaction.objectStore('fundingSource');
                 var fSourceRequest = fSourceOs.getAll();
                 fSourceRequest.onerror = function (event) {
-                    //handel error
                 }.bind(this);
                 fSourceRequest.onsuccess = function (event) {
-
-                    fSourceResult = fSourceRequest.result;
-                    console.log("funding source list offline--->", fSourceResult);
+                    for (var i = 0; i < fSourceRequest.result.length; i++) {
+                        var arr = {
+                            id: fSourceRequest.result[i].fundingSourceId,
+                            label: fSourceRequest.result[i].label,
+                            code: fSourceRequest.result[i].fundingSourceCode
+                        }
+                        fSourceResult[i] = arr
+                    }
                     this.setState({
                         fundingSources: fSourceResult.sort(function (a, b) {
-                            a = a.fundingSourceCode.toLowerCase();
-                            b = b.fundingSourceCode.toLowerCase();
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     });
-
                 }.bind(this)
-
             }.bind(this)
-
-
         }
-
     }
+    /**
+     * Retrieves the list of procurement agents.
+     */
     getProcurementAgentList() {
-        const { procurementAgents } = this.state
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
-
-            ProcurementAgentService.getProcurementAgentListAll()
+        let programId = document.getElementById("programId").value;
+        if (localStorage.getItem("sessionType") === 'Online') {
+            var programJson = [programId]
+            DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programJson)
                 .then(response => {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.procurementAgentCode.toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = b.procurementAgentCode.toUpperCase(); // ignore upper and lowercase                   
+                    var listArrays = response.data;
+                    listArrays.sort((a, b) => {
+                        var itemLabelA = a.code.toUpperCase();
+                        var itemLabelB = b.code.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
-                        procurementAgents: listArray
+                        procurementAgents: listArrays
                     })
                 }).catch(
                     error => {
@@ -1243,7 +1281,9 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1271,35 +1311,40 @@ class AnnualShipmentCost extends Component {
                 var papuOs = papuTransaction.objectStore('procurementAgent');
                 var papuRequest = papuOs.getAll();
                 papuRequest.onerror = function (event) {
-                    //handel error
                 }.bind(this);
                 papuRequest.onsuccess = function (event) {
-
                     papuResult = papuRequest.result;
-                    console.log("procurement agent list offline--->", papuResult);
+                    var listArrays = []
+                    for (var i = 0; i < papuResult.length; i++) {
+                        var arr = {
+                            id: papuResult[i].procurementAgentId,
+                            label: papuResult[i].label,
+                            code: papuResult[i].procurementAgentCode
+                        }
+                        listArrays.push(arr);
+                    }
                     this.setState({
-                        procurementAgents: papuResult.sort(function (a, b) {
-                            a = a.procurementAgentCode.toLowerCase();
-                            b = b.procurementAgentCode.toLowerCase();
+                        procurementAgents: listArrays.sort(function (a, b) {
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     });
                 }.bind(this)
-
             }.bind(this)
-
         }
     }
+    /**
+     * Retrieves the list of shipment statuses.
+     */
     getShipmentStatusList() {
-        const { shipmentStatuses } = this.state
-        if (isSiteOnline()) {
-            // AuthenticationService.setupAxiosInterceptors();
+        if (localStorage.getItem("sessionType") === 'Online') {
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -1311,7 +1356,9 @@ class AnnualShipmentCost extends Component {
                             countrys: []
                         })
                         if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            });
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 500:
@@ -1339,20 +1386,18 @@ class AnnualShipmentCost extends Component {
                 var sStatusOs = sStatusTransaction.objectStore('shipmentStatus');
                 var sStatusRequest = sStatusOs.getAll();
                 sStatusRequest.onerror = function (event) {
-                    //handel error
                 }.bind(this);
                 sStatusRequest.onsuccess = function (event) {
                     sStatusResult = sStatusRequest.result;
-                    console.log("shipment status list offline--->", sStatusResult);
                     this.setState({ shipmentStatuses: sStatusResult });
                 }.bind(this)
-
             }.bind(this)
-
-
         }
     }
-
+    /**
+     * Handles the change event for planning units.
+     * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
+     */
     handlePlanningUnitChange = (planningUnitIds) => {
         planningUnitIds = planningUnitIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1361,10 +1406,13 @@ class AnnualShipmentCost extends Component {
             planningUnitValues: planningUnitIds.map(ele => ele),
             planningUnitLabels: planningUnitIds.map(ele => ele.label)
         }, () => {
-
             this.fetchData()
         })
     }
+    /**
+     * Handles the change event for procurement agents.
+     * @param {array} procurementAgentIds - The selected procurement agent IDs.
+     */
     handleProcurementAgentChange = (procurementAgentIds) => {
         procurementAgentIds = procurementAgentIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1373,11 +1421,13 @@ class AnnualShipmentCost extends Component {
             procurementAgentValues: procurementAgentIds.map(ele => ele),
             procurementAgentLabels: procurementAgentIds.map(ele => ele.label)
         }, () => {
-
             this.fetchData()
         })
     }
-
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
+     */
     handleFundingSourceChange = (fundingSourceIds) => {
         fundingSourceIds = fundingSourceIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1386,11 +1436,13 @@ class AnnualShipmentCost extends Component {
             fundingSourceValues: fundingSourceIds.map(ele => ele),
             fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
         }, () => {
-
             this.fetchData()
         })
     }
-
+    /**
+     * Handles the change event for shipment status.
+     * @param {Array} fundingSourceIds - An array containing the selected shipment status IDs.
+     */
     handleStatusChange = (statusIds) => {
         statusIds = statusIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1399,43 +1451,36 @@ class AnnualShipmentCost extends Component {
             statusValues: statusIds.map(ele => ele),
             statusLabels: statusIds.map(ele => ele.label)
         }, () => {
-
             this.fetchData()
         })
     }
-
-
+    /**
+     * Calls the get programs, get funding source and get shipment status function on page load
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
-        this.getProcurementAgentList()
         this.getFundingSourceList()
         this.getShipmentStatusList()
-        // this.getProductCategories()
     }
-
+    /**
+     * Sets the selected program ID selected by the user.
+     * @param {object} event - The event object containing information about the program selection.
+     */
     setProgramId(event) {
         this.setState({
             programId: event.target.value,
             versionId: ''
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
+            this.getProcurementAgentList()
             this.filterVersion();
         })
-
     }
-
+    /**
+     * Sets the version ID and updates the tracer category list.
+     * @param {Object} event - The event object containing the version ID value.
+     */
     setVersionId(event) {
-        // this.setState({
-        //     versionId: event.target.value
-        // }, () => {
-        //     if (this.state.outPutList.length != 0) {
-        //         localStorage.setItem("sesVersionIdReport", this.state.versionId);
-        //         this.fetchData();
-        //     } else {
-        //         this.getPlanningUnit();
-        //     }
-        // })
         if (this.state.versionId != '' || this.state.versionId != undefined) {
             this.setState({
                 versionId: event.target.value
@@ -1450,26 +1495,26 @@ class AnnualShipmentCost extends Component {
                 this.getPlanningUnit();
             })
         }
-
     }
-
+    /**
+     * Renders the Annual Shipment Cost report table.
+     * @returns {JSX.Element} - Annual Shipment Cost report table.
+     */
     render() {
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
-
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {/* {getLabelText(item.label, this.state.lang)} */}
                         {(item.programCode)}
                     </option>
                 )
@@ -1477,84 +1522,39 @@ class AnnualShipmentCost extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
-
+                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }, this);
-
-        // const { planningUnits } = this.state
-        // let planningUnitList = planningUnits.length > 0
-        //     && planningUnits.map((item, i) => {
-        //         return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
-
-        //     }, this);
-
         const { procurementAgents } = this.state;
-        // console.log(JSON.stringify(countrys))
-        let procurementAgentList = procurementAgents.length > 0 && procurementAgents.map((item, i) => {
-            return (
-                <option key={i} value={item.procurementAgentId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-
-            )
-        }, this);
+        
         const { fundingSources } = this.state;
-        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
-            return (
-                <option key={i} value={item.fundingSourceId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-
-            )
-        }, this);
+        
         const { shipmentStatuses } = this.state;
-        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
-            return (
-                <option key={i} value={item.shipmentStatusId}>
-                    {getLabelText(item.label, this.state.lang)}
-                </option>
-
-            )
-        }, this);
-        // const { productCategories } = this.state;
-        // let productCategoryList = productCategories.length > 0
-        //     && productCategories.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-        //                 {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-        //             </option>
-        //         )
-        //     }, this);
-
+        
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
-
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
-
-
         return (
             <div className="animated fadeIn" >
-                {/* <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6> */}
                 <AuthenticationServiceComponent history={this.props.history} />
-                {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
-
                 <Card>
                     <div className="Card-header-reporticon">
-                        {/* <i className="icon-menu"></i><strong>{i18n.t('static.report.annualshipmentcost')}</strong> */}
                         <div className="card-header-actions">
-
                             <a className="card-header-action">
-
                                 {this.state.outPutList.length > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />}
                             </a>
+                            {this.state.outPutList.length > 0 && <img
+                                style={{ height: "25px", width: "25px", cursor: "pointer" }}
+                                src={csvicon}
+                                title={i18n.t("static.report.exportCsv")}
+                                onClick={() => this.exportCSV()}
+                            />}
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
@@ -1576,29 +1576,23 @@ class AnnualShipmentCost extends Component {
                                                         >
                                                             <option value="1">{i18n.t('static.supplyPlan.submittedDate')}</option>
                                                             <option value="2">{i18n.t('static.common.receivedate')}</option>
-
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
-
                                                     <Picker
                                                         ref="pickRange"
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         value={rangeValue}
                                                         lang={pickerLang}
-                                                        //theme="light"
-                                                        onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
                                                         <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                     </Picker>
                                                 </div>
-
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
@@ -1609,41 +1603,17 @@ class AnnualShipmentCost extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            // onChange={this.getProductCategories}
-                                                            // onChange={this.filterVersion}
                                                             onChange={(e) => { this.setProgramId(e); }}
                                                             value={this.state.programId}
-
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            {/* <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="productCategoryId"
-                                                        id="productCategoryId"
-                                                        bsSize="sm"
-                                                        onChange={this.getPlanningUnit}
-                                                    >
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {productCategoryList}
-                                                    </Input>
-
-                                                </InputGroup>
-                                            </div>
-
-                                        </FormGroup> */}
-
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1657,7 +1627,6 @@ class AnnualShipmentCost extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {versionList}
                                                         </Input>
-
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
@@ -1665,7 +1634,6 @@ class AnnualShipmentCost extends Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
-
                                                     <MultiSelect
                                                         name="planningUnitId"
                                                         id="planningUnitId"
@@ -1675,29 +1643,7 @@ class AnnualShipmentCost extends Component {
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         disabled={this.state.loading}
                                                     />     </div></FormGroup>
-                                            {/* <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="planningUnitId"
-                                                            id="planningUnitId"
-                                                            bsSize="sm"
-                                                            onChange={this.fetchData}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {planningUnitList}
-                                                        </Input>
-                                                        {/* <InputGroupAddon addonType="append">
-                                    <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon> 
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup> */}
-
-
-                                            <FormGroup className="col-md-3" >
+                                            {procurementAgents.length > 0 && <FormGroup className="col-md-3" >
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls">
@@ -1709,13 +1655,12 @@ class AnnualShipmentCost extends Component {
                                                         onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                         options={procurementAgents.length > 0
                                                             && procurementAgents.map((item, i) => {
-                                                                return ({ label: item.procurementAgentCode, value: item.procurementAgentId })
+                                                                return ({ label: item.code, value: item.id })
                                                             }, this)}
                                                         disabled={this.state.loading}
                                                     />
-
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup>}
                                             <FormGroup className="col-md-3" id="fundingSourceDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1729,16 +1674,13 @@ class AnnualShipmentCost extends Component {
                                                         options={fundingSources.length > 0
                                                             && fundingSources.map((item, i) => {
                                                                 return (
-                                                                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                                                                    { label: item.code, value: item.id }
                                                                 )
                                                             }, this)}
                                                         disabled={this.state.loading}
                                                     />
-
                                                 </div>
                                             </FormGroup>
-
-
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1757,41 +1699,29 @@ class AnnualShipmentCost extends Component {
                                                             }, this)}
                                                         disabled={this.state.loading}
                                                     /></div>
-
                                             </FormGroup>
-
-
                                         </div>
                                     </div>
                                 </Form>
                                 <Col md="12 pl-0">
-
                                     <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                                         <div className="col-md-12 p-0" id="div_id">
                                             {this.state.outPutList.length > 0 &&
-                                                // {true &&
                                                 <div className="col-md-12">
                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>{i18n.t('static.common.preview')}</button>
-
                                                     <p style={{ width: '100%', height: '700px', overflow: 'hidden' }} id='pdf'></p>   </div>}
-
                                         </div>
                                     </div>
                                     <div style={{ display: this.state.loading ? "block" : "none" }}>
                                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                             <div class="align-items-center">
                                                 <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                 <div class="spinner-border blue ml-4" role="status">
-
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </Col>
-
-
-
                             </div>
                         </div>
                     </CardBody>

@@ -1,92 +1,48 @@
-import React, { Component } from 'react';
-import i18n from '../../i18n';
-import HealthAreaService from "../../api/HealthAreaService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-
+import React, { Component } from 'react';
 import {
-    Row, Col,
-    Card, CardHeader, CardFooter,
-    Button, FormFeedback, CardBody,
-    FormText, Form, FormGroup, Label, Input,
-    InputGroupAddon, InputGroupText
+    Button,
+    Form,
+    FormFeedback,
+    FormGroup,
+    Input,
+    Label
 } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
-
-
+import { API_URL } from '../../Constants';
+import HealthAreaService from "../../api/HealthAreaService";
+import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+// Initial values for form fields
 const initialValues = {
     realmId: 1
 }
-
+/**
+ * Defines the validation schema for program realm Id details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
-
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-
-
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
+/**
+ * Component for pipeline program import realm details
+ */
 export default class PipelineProgramDataStepOne extends Component {
     constructor(props) {
         super(props);
         this.state = {
             realmList: [],
         }
-
     }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            realmId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('realmForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    /**
+     * Reterives realm list on component mount
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
@@ -103,12 +59,11 @@ export default class PipelineProgramDataStepOne extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -140,6 +95,10 @@ export default class PipelineProgramDataStepOne extends Component {
                 }
             );
     }
+    /**
+     * Renders the pipeline program import realm details screen.
+     * @returns {JSX.Element} - Pipeline program import realm details screen.
+     */
     render() {
         const { realmList } = this.state;
         let realms = realmList.length > 0
@@ -150,18 +109,14 @@ export default class PipelineProgramDataStepOne extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <Formik
-
                     initialValues={initialValues}
-                    validate={validate(validationSchema)}
+                    validationSchema={validationSchema}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        // console.log("in succcess--------------->");
                         this.props.finishedStepOne && this.props.finishedStepOne();
-
                     }}
                     render={
                         ({
@@ -175,36 +130,28 @@ export default class PipelineProgramDataStepOne extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
-
-                                    <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
-                                        <Input
-                                            valid={!errors.realmId}
-                                            invalid={touched.realmId && !!errors.realmId}
-                                            bsSize="sm"
-                                            className="col-md-6"
-                                            onBlur={handleBlur}
-                                            type="select" name="realmId" id="realmId"
-                                            value={this.props.realmId}
-                                        // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getDependentLists(e) }}
-                                        >
-                                            {/* <option value="">{i18n.t('static.common.select')}</option> */}
-                                            {realms}
-                                        </Input>
-                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                        {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        &nbsp;
-                                    </FormGroup>
-
-                                    <FormGroup>
-                                        {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
-                                    </FormGroup>
-
-                                </Form>
-                            )} />
-
+                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmForm'>
+                                <FormGroup>
+                                    <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+                                    <Input
+                                        valid={!errors.realmId}
+                                        invalid={touched.realmId && !!errors.realmId}
+                                        bsSize="sm"
+                                        className="col-md-6"
+                                        onBlur={handleBlur}
+                                        type="select" name="realmId" id="realmId"
+                                        value={this.props.realmId}
+                                    >
+                                        {realms}
+                                    </Input>
+                                    <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                    &nbsp;
+                                </FormGroup>
+                                <FormGroup>
+                                    <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>
+                                </FormGroup>
+                            </Form>
+                        )} />
             </>
         );
     }

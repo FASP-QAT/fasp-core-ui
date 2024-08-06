@@ -1,29 +1,31 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n';
-
-import Select from 'react-select';
+import React, { Component } from 'react';
 import 'react-select/dist/react-select.min.css';
-import IntegrationService from '../../api/IntegrationService.js';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from "../../api/RealmService";
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL } from '../../Constants.js';
+import IntegrationService from '../../api/IntegrationService.js';
+import RealmService from "../../api/RealmService";
+import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { SPACE_REGEX } from '../../Constants.js';
-
+import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+// Initial values for form fields
 const initialValues = {
     label: ""
 }
+// Localized entity name
 const entityname = i18n.t('static.integration.integration');
+/**
+ * Defines the validation schema for integration details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         integrationName: Yup.string()
-            // .matches(SPACE_REGEX, i18n.t('static.message.spacetext'))
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.integration.integrationValidName')),
         integrationViewId: Yup.string()
@@ -34,32 +36,10 @@ const validationSchema = function (values) {
             .required(i18n.t('static.integration.validFileName'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
-
+/**
+ * Component for add integrations
+ */
 export default class AddDimensionComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -79,24 +59,25 @@ export default class AddDimensionComponent extends Component {
             isHide: true,
             bodyParameter: ''
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.addParameter = this.addParameter.bind(this);
         this.clearParameter = this.clearParameter.bind(this);
     }
-
+    /**
+     * Sets the 'isHide' state to false, enabling the display of a parameter.
+     */
     addParameter() {
         this.setState({ isHide: false })
     }
-
+    /**
+     * Clears the fileName, isHide, and bodyParameter states, and resets the integration state.
+     */
     clearParameter() {
         this.state.fileName = ''
         this.state.isHide = true
         this.state.bodyParameter = ''
-
         let { integration } = this.state
         this.setState(
             {
@@ -104,14 +85,10 @@ export default class AddDimensionComponent extends Component {
             }
         )
     }
-
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 8000);
-    }
-
-
+    /**
+     * Handles data change in the form.
+     * @param {Event} event - The change event.
+     */
     dataChange(event) {
         if (event.target.name === "integrationName") {
             this.state.integrationName = event.target.value
@@ -138,73 +115,39 @@ export default class AddDimensionComponent extends Component {
                 this.state.fileName = fileName + '<%YMD%>';
             }
         }
-
         let { integration } = this.state
         this.setState(
             {
                 integration
             }
         )
-
     };
-
-    Capitalize(str) {
-        this.state.dimension.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            realmId: true,
-            integrationName: true,
-            integrationViewId: true,
-            folderLocation: true,
-            fileName: true,
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
-
+    /**
+     * Reterives realm, integration view list on component mount
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         this.setState({ loading: false })
         RealmService.getRealmListAll()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
                     realms: listArray, loading: false
                 })
-
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -235,30 +178,27 @@ export default class AddDimensionComponent extends Component {
                     }
                 }
             );
-
         IntegrationService.getIntegrationViewListAll()
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = (a.integrationViewDesc).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = (b.integrationViewDesc).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = (a.integrationViewDesc).toUpperCase();
+                    var itemLabelB = (b.integrationViewDesc).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
                     integrationViewList: listArray, loading: false
                 })
-
             })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -289,17 +229,12 @@ export default class AddDimensionComponent extends Component {
                     }
                 }
             );
-
-
     }
-
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
-    }
-
+    /**
+     * Renders the Add Integration form.
+     * @returns {JSX.Element} - Add Integration form.
+     */
     render() {
-
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -309,7 +244,6 @@ export default class AddDimensionComponent extends Component {
                     </option>
                 )
             }, this);
-
         const { integrationViewList } = this.state;
         let viewList = integrationViewList.length > 0
             && integrationViewList.map((item, i) => {
@@ -319,7 +253,6 @@ export default class AddDimensionComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -327,10 +260,6 @@ export default class AddDimensionComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
-
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={
@@ -341,13 +270,11 @@ export default class AddDimensionComponent extends Component {
                                         folderLocation: this.state.folderLocation,
                                         fileName: this.state.fileName,
                                     }}
-                                validate={validate(validationSchema)}
-
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    console.log("Submit------->", this.state);
                                     IntegrationService.addIntegration(this.state).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/integration/listIntegration/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -356,7 +283,7 @@ export default class AddDimensionComponent extends Component {
                                                 message: response.data.messageCode, loading: false
                                             },
                                                 () => {
-                                                    this.hideSecondComponent();
+                                                    hideSecondComponent();
                                                 })
                                         }
                                     }
@@ -365,12 +292,11 @@ export default class AddDimensionComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -406,7 +332,6 @@ export default class AddDimensionComponent extends Component {
                                     }, 2000)
                                 }
                                 }
-
                                 render={
                                     ({
                                         values,
@@ -420,174 +345,158 @@ export default class AddDimensionComponent extends Component {
                                         setTouched,
                                         handleReset
                                     }) => (
-                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                                <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
-
+                                        <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                            <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="realmId"
+                                                        id="realmId"
+                                                        bsSize="sm"
+                                                        valid={!errors.realmId && this.state.realm.id != ''}
+                                                        invalid={touched.realmId && !!errors.realmId}
+                                                        onChange={(e) => {
+                                                            handleChange(e); this.dataChange(e);
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.realm.id}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {realmList}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.integration.integration')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="integrationName"
+                                                        id="integrationName"
+                                                        bsSize="sm"
+                                                        valid={!errors.integrationName && this.state.integrationName != ''}
+                                                        invalid={touched.integrationName && !!errors.integrationName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.integrationName}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.integrationName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="realmId">{i18n.t('static.integration.integrationViewName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="integrationViewId"
+                                                        id="integrationViewId"
+                                                        bsSize="sm"
+                                                        valid={!errors.integrationViewId && this.state.integrationView.integrationViewId != ''}
+                                                        invalid={touched.integrationViewId && !!errors.integrationViewId}
+                                                        onChange={(e) => {
+                                                            handleChange(e); this.dataChange(e);
+                                                        }}
+                                                        onBlur={handleBlur}
+                                                        required
+                                                        value={this.state.integrationView.integrationViewId}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {viewList}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.integrationViewId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.integration.folderLocation')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="folderLocation"
+                                                        id="folderLocation"
+                                                        bsSize="sm"
+                                                        valid={!errors.folderLocation && this.state.folderLocation != ''}
+                                                        invalid={touched.folderLocation && !!errors.folderLocation}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.folderLocation}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.folderLocation}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="label">{i18n.t('static.integration.fileName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
+                                                        name="fileName"
+                                                        id="fileName"
+                                                        bsSize="sm"
+                                                        valid={!errors.fileName && this.state.fileName != ''}
+                                                        invalid={touched.fileName && !!errors.fileName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.fileName}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.fileName}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="pb-3">
+                                                    {this.state.isHide && <Button color="info" size="md" className="float-left mr-1" onClick={() => this.addParameter()}><i className="fa fa-plus"></i>{i18n.t('static.integration.addBodyParameter')}</Button>}
+                                                    &nbsp;
+                                                    <Button color="warning" size="md" className="float-left mr-1" onClick={() => this.clearParameter()}><i className="fa fa-refresh"></i>{i18n.t('static.integration.clearBodyParameter')}</Button>
+                                                </FormGroup>
+                                                {!this.state.isHide &&
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="bodyParameter">{i18n.t('static.integration.bodyParameter')}</Label>
                                                         <Input
                                                             type="select"
-                                                            name="realmId"
-                                                            id="realmId"
+                                                            name="bodyParameter"
+                                                            id="bodyParameter"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId && this.state.realm.id != ''}
-                                                            invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => {
                                                                 handleChange(e); this.dataChange(e);
                                                             }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realm.id}
+                                                            value={this.state.bodyParameter}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
+                                                            <option value="1">{i18n.t('static.programOnboarding.programCode')}</option>
+                                                            <option value="2">{i18n.t('static.pipelineProgram.programId')}</option>
+                                                            <option value="3">{i18n.t('static.program.versionId')}</option>
+                                                            <option value="4">{i18n.t('static.common.Date[YMDHMS]')}</option>
+                                                            <option value="5">{i18n.t('static.common.Date[YMD]')}</option>
                                                         </Input>
-                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.bodyParameter}</FormFeedback>
                                                     </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.integration.integration')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="integrationName"
-                                                            id="integrationName"
-                                                            bsSize="sm"
-                                                            valid={!errors.integrationName && this.state.integrationName != ''}
-                                                            invalid={touched.integrationName && !!errors.integrationName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.integrationName}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.integrationName}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.integration.integrationViewName')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="integrationViewId"
-                                                            id="integrationViewId"
-                                                            bsSize="sm"
-                                                            valid={!errors.integrationViewId && this.state.integrationView.integrationViewId != ''}
-                                                            invalid={touched.integrationViewId && !!errors.integrationViewId}
-                                                            onChange={(e) => {
-                                                                handleChange(e); this.dataChange(e);
-                                                            }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.integrationView.integrationViewId}
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {viewList}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.integrationViewId}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.integration.folderLocation')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="folderLocation"
-                                                            id="folderLocation"
-                                                            bsSize="sm"
-                                                            valid={!errors.folderLocation && this.state.folderLocation != ''}
-                                                            invalid={touched.folderLocation && !!errors.folderLocation}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.folderLocation}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.folderLocation}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.integration.fileName')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="text"
-                                                            name="fileName"
-                                                            id="fileName"
-                                                            bsSize="sm"
-                                                            valid={!errors.fileName && this.state.fileName != ''}
-                                                            invalid={touched.fileName && !!errors.fileName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.fileName}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.fileName}</FormFeedback>
-                                                    </FormGroup>
-
-                                                    <FormGroup className="pb-3">
-                                                        {this.state.isHide && <Button color="info" size="md" className="float-left mr-1" onClick={() => this.addParameter()}><i className="fa fa-plus"></i>{i18n.t('static.integration.addBodyParameter')}</Button>}
-                                                        &nbsp;
-                                                        <Button color="warning" size="md" className="float-left mr-1" onClick={() => this.clearParameter()}><i className="fa fa-refresh"></i>{i18n.t('static.integration.clearBodyParameter')}</Button>
-                                                    </FormGroup>
-
-                                                    {!this.state.isHide &&
-                                                        <FormGroup>
-                                                            <Label htmlFor="bodyParameter">{i18n.t('static.integration.bodyParameter')}</Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="bodyParameter"
-                                                                id="bodyParameter"
-                                                                bsSize="sm"
-                                                                // valid={!errors.realmId && this.state.realm.id != ''}
-                                                                // invalid={touched.realmId && !!errors.realmId}
-                                                                onChange={(e) => {
-                                                                    handleChange(e); this.dataChange(e);
-                                                                }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.bodyParameter}
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                <option value="1">{i18n.t('static.programOnboarding.programCode')}</option>
-                                                                <option value="2">{i18n.t('static.pipelineProgram.programId')}</option>
-                                                                <option value="3">{i18n.t('static.program.versionId')}</option>
-                                                                <option value="4">{i18n.t('static.common.Date[YMDHMS]')}</option>
-                                                                <option value="5">{i18n.t('static.common.Date[YMD]')}</option>
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.bodyParameter}</FormFeedback>
-                                                        </FormGroup>
-                                                    }
-                                                </CardBody>
-                                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                                        <div class="align-items-center">
-                                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
-                                                            <div class="spinner-border blue ml-4" role="status">
-
-                                                            </div>
+                                                }
+                                            </CardBody>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                        <div class="spinner-border blue ml-4" role="status">
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <CardFooter>
-                                                    <FormGroup>
-
-                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
-
-                                                        {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-
-                                                        &nbsp; */}
-                                                    </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )}
-
+                                            </div>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    &nbsp;
+                                                </FormGroup>
+                                            </CardFooter>
+                                        </Form>
+                                    )}
                             />
-
                         </Card>
                     </Col>
                 </Row>
-
             </div>
         );
     }
+    /**
+     * Redirects to the list integration screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/integration/listIntegration/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
+    /**
+     * Resets the integration details when reset button is clicked.
+     */
     resetClicked() {
         this.state.integrationName = ''
         this.state.integrationView.integrationViewId = ''
@@ -596,7 +505,6 @@ export default class AddDimensionComponent extends Component {
         this.state.fileName = ''
         this.state.isHide = true
         this.state.bodyParameter = ''
-
         let { integration } = this.state
         this.setState(
             {

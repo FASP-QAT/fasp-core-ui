@@ -1,21 +1,25 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import DataSourceTypeService from '../../api/DataSourceTypeService';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import { API_URL } from '../../Constants.js';
 import DataSourceService from '../../api/DataSourceService';
-import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
-import { ALPHABET_NUMBER_REGEX, SPACE_REGEX } from '../../Constants.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+// Localized entity name
 const entityname = i18n.t('static.datasource.datasource');
+// Initial values for form fields
 let initialValues = {
     label: '',
     dataSourceTypeId: '',
     dataSourceTypeList: []
 }
-
+/**
+ * Defines the validation schema for role details.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -25,34 +29,13 @@ const validationSchema = function (values) {
             .required(i18n.t('static.datasource.datasourcetypetext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+/**
+ * Component for editing data source details.
+ */
 export default class UpdateDataSourceComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
-
             dataSource: {
                 message: '',
                 active: '',
@@ -93,107 +76,58 @@ export default class UpdateDataSourceComponent extends Component {
             },
             loading: true
         }
-
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.changeMessage = this.changeMessage.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
-        this.changeLoading = this.changeLoading.bind(this);
-        // initialValues = {
-        //     label: this.props.location.state.dataSource.label.label_en,
-        //     dataSourceTypeId: this.props.location.state.dataSource.dataSourceType.dataSourceTypeId
-        // }
     }
-    changeMessage(message) {
-        this.setState({ message: message })
-    }
-    changeLoading(loading) {
-        this.setState({ loading: loading })
-    }
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 8000);
-    }
-
+    /**
+   * Handles data change in the form.
+   * @param {Event} event - The change event.
+   */
     dataChange(event) {
         let { dataSource } = this.state
-
         if (event.target.name === "label") {
             dataSource.label.label_en = event.target.value
         }
-
         if (event.target.name === "dataSourceTypeId") {
             this.state.dataSource.dataSourceType.id = event.target.value
         } else if (event.target.name === "active") {
             dataSource.active = event.target.id === "active2" ? false : true
         }
-
         this.setState(
             {
                 dataSource
             }
         )
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            'label': true,
-            'dataSourceTypeId': true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('dataSourceForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    /**
+     * Fetches data source details on component mount.
+     */
     componentDidMount() {
-
-        // AuthenticationService.setupAxiosInterceptors();
-
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             if (response.status == 200) {
-                console.log("getDataSourceById----->", response.data);
                 this.setState({
                     dataSource: response.data, loading: false
                 });
             }
             else {
-
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
-
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -224,21 +158,18 @@ export default class UpdateDataSourceComponent extends Component {
                     }
                 }
             );
-
     }
-
-
-    Capitalize(str) {
-        if (str != null && str != "") {
-            this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
+    /**
+     * Redirects to the list data source screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/dataSource/listDataSource/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
-
+    /**
+     * Renders the data source details form.
+     * @returns {JSX.Element} - Data source details form.
+     */
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -246,21 +177,17 @@ export default class UpdateDataSourceComponent extends Component {
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-                            {/* <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
-                            </CardHeader> */}
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.dataSource.label.label_en,
                                     dataSourceTypeId: this.state.dataSource.dataSourceType.id
                                 }}
-                                validate={validate(validationSchema)}
+                                validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    // AuthenticationService.setupAxiosInterceptors();
                                     DataSourceService.editDataSource(this.state.dataSource)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -270,7 +197,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         })
@@ -278,12 +205,11 @@ export default class UpdateDataSourceComponent extends Component {
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({
-                                                        message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                         loading: false
                                                     });
                                                 } else {
                                                     switch (error.response ? error.response.status : "") {
-
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
@@ -349,7 +275,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="programId"
                                                         bsSize="sm"
                                                         readOnly
-                                                        value={this.state.dataSource.program.code}
+                                                        value={this.state.dataSource.program != null ? this.state.dataSource.program.code : null}
                                                     >
                                                     </Input>
                                                 </FormGroup>
@@ -365,7 +291,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                     >
                                                     </Input>
                                                 </FormGroup>
-
                                                 <FormGroup>
                                                     <Label htmlFor="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -375,7 +300,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         bsSize="sm"
                                                         valid={!errors.label}
                                                         invalid={touched.label && !!errors.label || this.state.dataSource.label.label_en == ''}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
                                                         value={this.state.dataSource.label.label_en}
                                                         required
@@ -414,7 +339,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2">
-                                                            {i18n.t('static.common.disabled')}
+                                                            {i18n.t('static.dataentry.inactive')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>
@@ -423,9 +348,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
                                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                                         <div class="spinner-border blue ml-4" role="status">
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -434,18 +357,15 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
                                         </Form>
-
                                     )} />
-
                         </Card>
                     </Col>
                 </Row>
-
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
@@ -453,25 +373,24 @@ export default class UpdateDataSourceComponent extends Component {
             </div>
         );
     }
-
+    /**
+     * Resets the data source details when reset button is clicked.
+     */
     resetClicked() {
-        // AuthenticationService.setupAxiosInterceptors();
         DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
             this.setState({
                 dataSource: response.data
             });
-
         })
             .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -502,7 +421,5 @@ export default class UpdateDataSourceComponent extends Component {
                     }
                 }
             );
-
     }
-
 }

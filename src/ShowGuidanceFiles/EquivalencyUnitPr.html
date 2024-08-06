@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Usando esta tela </h3>
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta tela :</span>Mapeamento de unidades de equivalência para unidades de previsão.</p>
+										<p>
+											<p style="font-size: 13px;"><span><u style="font-weight: bold;">Usando esta tela:</u></span><br><b>Mapeamento de unidades de equivalência para unidades de previsão</b><br>Use a tela principal para gerenciar mapeamentos entre unidades de equivalência e unidades de previsão. Os mapeamentos em nível de domínio estão disponíveis para todos os usuários e são indicados por Todos. No entanto, os administradores do programa podem criar mapeamentos específicos do programa (adicionando uma linha e marcando-a para uma UE específica). Se houver algum conflito, os mapeamentos específicos do programa terão precedência e serão usados em vez dos mapeamentos em nível de território.</p>
+											<p style="font-size: 13px;">Por exemplo, um usuário está prevendo medicamentos para tratar QATitis, uma condição em que as pessoas não podem parar de usar QAT. O usuário pode prever por diferentes tratamentos (diferentes unidades de previsão), mas deseja ver como eles são agregados.<div class="pl-lg-4 pr-lg-4 table1"><table style="border-collapse: collapse; font-size:13px;"><thead><tr><th>Unidade de Equivalência</th><th>Unidade de previsão</th><th>Conversão para UE</th><th style="width: 150px;">Tratamento médio necessário para curar QATitis</th></tr></thead><tbody><tr><td>1 Tratamento para QATitis </td><td>1 comprimido de FASPicillin</td><td>14</td><td>1 comprimido por dia durante 2 semanas</td></tr><tr><td>1 Tratamento para QATitis </td><td>Tubo de 5mL de FASPasone (creme)</td><td>1</td><td>0,5mL/dia aplicado na testa durante 10 dias (1 tubo no total)</td></tr><tr><td>1 Tratamento para QATitis </td><td>Frasco de 2mL de FASPicaine (injeção)</td><td>0.5</td><td>Uma injeção de 1mL (duas pessoas podem compartilhar um frasco)</td></tr><tr><td>1 Tratamento para QATitis </td><td>1 barra de chocolate branco</td><td>2</td><td rowspan="3">2 barras de chocolate. O tipo de chocolate não importa, pois todo chocolate contém a forma natural de FASPicillin.  </td></tr><tr><td>1 Tratamento para QATitis  </td><td>1 barra de chocolate amargo</td><td>2</td></tr><tr><td>1 Tratamento para QATitis </td><td>1 barra de chocolate ao leite</td><td>2</td></tr></tbody></table></div></p>
+										</p>
+                                        <p style="font-size: 13px;"><b>Criando e gerenciando unidades de equivalência  </b><br>Se você não vir uma unidade de equivalência que gostaria de mapear ou se quiser editar uma unidade de equivalência existente, clique no botão Gerenciar Unidade de Equivalência no canto superior direito da tela.</p>
+										
+                                        <p style="font-size: 13px;"><b>Onde as unidades de equivalência são usadas?</b><ul style="font-size: 13px";><li>Nenhum módulo de previsão '<a href="/#/report/compareAndSelectScenario" target="_blank" style="text-decoration: underline;">Compare e selecione a previsão</a>' tela, o usuário pode exibir suas previsões em EUs. Usando o exemplo acima, um usuário que prevê 10.000 barras de chocolate amargo por mês, podem optar por exibir sua previsão na UE de “Tratamentos para QATite” e exibir sua previsão como 5.000 “Tratamentos para QATite” por mês. </li><li>Nenhum módulo de previsão '<a href="/#/forecastReport/forecastOutput" target="_blank" style="text-decoration: underline;">Previsão Mensal</a>' tela, o usuário pode exibir suas previsões selecionadas por unidades de planejamento individuais ou agregar entre unidades de planejamento se estiverem conectadas por EUs. Por exemplo, se um usuário previsse 10.000 barras de chocolate amargo e 10.000 barras de chocolate branco e 14.000 por mês, o QAT exibiria 7.000 Tratamentos para QATite.</li><li>In the Supply Planning Module '<a href="/#/report/consumptionForecastErrorSupplyPlan" target="_blank" style="text-decoration: underline;">Forecast Error (Monthly)</a> Report'  screen, users can also view the actual and forecasted consumption in Equivalency Units. </li></ul></p>
+                                        <p><div class="pl-lg-4 pr-lg-4 table1">
+                                            <table style="border-collapse: collapse;font-size: 13px;"><thead><tr><th>Previsão</th><th>Equivalente em "Tratamentos para QATitis"</th></tr></thead><tbody><tr><td>10.000 barras de chocolate amargo </td><td style="text-align: center;">5,000</td></tr><tr><td>10.000 barras de chocolate branco </td><td style="text-align: center;">5,000</td></tr><tr><td>14.000 comprimidos de FASPicillin </td><td style="text-align: center;">1,000</td></tr><tr><td style="text-align: right; border-left: 1px solid rgb(255, 255, 255); border-bottom: 1px solid rgb(255, 255, 255);"><b>Total</b></td><td style="text-align: center;"><b>7,000</b></td></tr></tbody></table>
+                                        </div></p>
+                                    </td>
+				                    </tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

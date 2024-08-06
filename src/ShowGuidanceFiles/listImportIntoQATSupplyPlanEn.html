@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 {
+			/* width: 100%; */
+			border-collapse: collapse;
+		}
+
+		a {
+			color: #205493;
+			/* text-decoration: none; */
+			background-color: transparent;
+		}
+	</style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td>
+							<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">QAT Forecast Import
+										</h3>
+										<p style="font-size: 13px;"><span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Purpose
+												:</span> Enable users to import QAT-created forecasts into supply plan
+											programs. Forecasts are only available for importing if 1) they are
+											committed as a final version and 2) there is a forecast selected for each
+											planning unit.</p>
+
+										<p>
+											<span style="font-size: 13px; font-weight: bold;"><u>Using this screen
+													:</u></span>
+
+										</p>
+										<p style="font-size: 13px;">
+										<p style="font-size:13px;"><b>(Step 1)</b>
+										<ul style="font-size:13px;">
+											<li>Select which forecast program to import from (only final forecasts are
+												available)</li>
+											<li>Select which supply plan program to import to. </li>
+											<li>Select the date range of forecast data to import, which are restricted
+												as follows:<ul>
+													<li>Must be within the forecast period</li>
+													<li>The oldest forecasted consumption you can import is 6 months
+														before the current month. </li>
+													<li>If the entire forecast period is more than 6 months in the past,
+														the forecast cannot be imported, and the version will not appear
+														in the program dropdown </li>
+												</ul>
+											</li>
+											<li>In the table that appears, select and map planning units.<ul
+													style="font-size:13px;">
+													<li>For every Forecasting Planning Unit, QAT requires a
+														corresponding Supply Plan Planning Unit and conversion factor.
+														QAT automatically maps exact planning unit matches, but users
+														can override both the planning unit mapping and conversion
+														factor. </li>
+													<li>Not all forecast planning units need to be imported, however,
+														all forecast planning units must have a selection in the mapping
+														table. For example, in the below table, even though 2 products
+														are not being imported, you would still need to select "Do not
+														import".</li><br><img class="img-fluid"
+														src="../ShowGuidanceFiles/img/importintoqatsupplyplanscreenshot-1.jpg"
+														style="width: 971px;">
+												</ul>
+											</li>
+										</ul>
+										</p>
+										<p style="font-size:13px;"><b>(Step 2) </b>Forecast Region(s):
+										<ul style="font-size:13px;">
+											<li>National forecast to national supply plan<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Forecast Region(s)</th>
+																<th>% of Forecast</th>
+																<th>Supply Plan Region</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										<ul style="font-size:13px;">
+											<li>Multi-region forecast to multi-region supply plan<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Forecast Region(s)</th>
+																<th>% of Forecast</th>
+																<th>Supply Plan Region</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>North</td>
+																<td>100</td>
+																<td>North</td>
+															</tr>
+															<tr>
+																<td>East</td>
+																<td>100</td>
+																<td>East</td>
+															</tr>
+															<tr>
+																<td>South</td>
+																<td>100</td>
+																<td>South</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										<ul style="font-size:13px;">
+											<li>Multi-region forecast to national supply plan -<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse:collapse ;">
+														<thead>
+															<tr>
+																<th>Forecast Region(s)</th>
+																<th>% of Forecast</th>
+																<th>Supply Plan Region</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>North</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+															<tr>
+																<td>East</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+															<tr>
+																<td>South</td>
+																<td>100</td>
+																<td>National</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										<ul style="font-size:13px;">
+											<li>National forecast to multi-region supply plan - note that the import
+												process needs to be repeated for each supply plan region.<div
+													class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Forecast Region(s)</th>
+																<th>% of Forecast</th>
+																<th>Supply Plan Region</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>20</td>
+																<td>North</td>
+															</tr>
+														</tbody>
+													</table>
+												</div><br>
+												<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Forecast Region(s)</th>
+																<th>% of Forecast</th>
+																<th>Supply Plan Region</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>45</td>
+																<td>South</td>
+															</tr>
+														</tbody>
+													</table>
+												</div><br>
+												<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
+													<table style="border-collapse: collapse;">
+														<thead>
+															<tr>
+																<th>Forecast Region(s)</th>
+																<th>% of Forecast</th>
+																<th>Supply Plan Region</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr>
+																<td>National</td>
+																<td>35</td>
+																<td>East</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</li>
+										</ul>
+										</p>
+										<p style="font-size:13px;"><b>(Step 3) </b><br>QAT will list each forecast
+											record to be imported (one row for each planning unit, region and month
+											combination).
+										<ul style="font-size:13px;">
+											<li>QAT calculates the Forecasted Consumption to be imported as follows:
+											</li><img class="formula-img-mr img-fluid mb-lg-0"
+												src="../ShowGuidanceFiles/img/ForecastedConsumptionimported.png"
+												style="border: 1px solid rgb(255, 255, 255); margin-left: -20px;">
+											<p>For the following example:
+											<ul style="font-size:13px;">
+												<li>A national forecast that will be split into two regions of 50% each
+												</li>
+												<li>The Forecast Planning Unit is in packs of 3, and the Supply Plan
+													Planning Unit is in packs of 1 (Conversion factor = 3)</li>
+												<li>The national forecast for Month N was 100 (packs of 3)</li>
+												<li>Forecast of 100 x 50% x 3 = 150.00 rounded (packs of 1) will be imported into each region for Month N</li>
+											</ul>
+											</p>
+											<!-- New Additions Start -->
+											<li><b>Rounding Method: </b>Because QAT Supply Planning requires whole numbers without decimals, QAT converts forecasted consumption into whole numbers by rounding down and summing the “residuals” over time. Each month, QAT adds last month's residuals total and this month's forecast, before rounding down, and any residual not rounded down is added to a running residual total, called the Cumulative Total. In this way, quantities are not lost through the rounding process.</li>
+											<p>
+											<ul style="font-size:13px;">
+												<li>Formulas:</li>
+												<p>
+												<ul style="font-size:13px;">
+													<li><b>Cumulative Total for Month N </b> = (Residual for Month N - 1) + Converted Forecast for Month N</li>
+													<li><b>Residual for Month N </b> = How much was lost in the rounding = (Cumulative Total for Month N) – (Rounded Converted Forecast for Month N)</li>
+													<li><b>Rounded Converted Forecast for Month N </b> = Cumulative Total for Month N, rounded down to the nearest whole number</li>
+												</ul>
+												</p>
+												<li>For example, a national forecast is projected to consume 0.25 packs of the Forecast Planning Unit per month, for 12 months. The Forecast Planning Unit and the Supply Plan Planning Unit are the same (Conversion factor = 1)</li>
+												<p>
+												<ul style="font-size:13px;">
+													<li>In January, the Converted Consumption is 0.25, and since it’s the first month, the 0.25 is also the January Cumulative Total. 0.25 is rounded down to a whole number is 0, and the rounded number of 0 is imported into the supply planning module. The January Residual from the rounding is 0.25 – 0 = 0.25.</li>
+													<li>In February, the Converted Consumption is 0.25, added to the January Residual of 0.25 makes the February Cumulative Total 0.25 + 0.25 = 0.5. Then, 0.5 is rounded down to a whole number of 0, which is imported into the supply planning module. The February Residual from the rounding is 0.5 – 0 = 0.5.</li>
+													<li>In March, the Converted Consumption is 0.25, added to the February Residual of 0.5 makes the March Cumulative Total 0.25 + 0.5 = 0.75. Then, 0.75 is rounded down to a whole number of 0, which is imported into the supply planning module. The March Residual from the rounding is 0.75 – 0 = 0.75.</li>
+													<li>In April, the Converted Consumption is 0.25, added to the March Residual of 0.75 makes the April Cumulative Total 0.25 + 0.75 = 1.00. Then, 1.00 is rounded down to a whole number of 1.00, which is imported into the supply planning module. The April Residual from the rounding is 1.00 – 1.00 = 0.</li>
+													<li>From May onwards, the cycle repeats itself.</li>
+													<br><img class="img-fluid"
+														src="../ShowGuidanceFiles/img/importintoqatsupplyplanscreenshot-3.png"
+														style="width: 800px;">
+												</ul>
+												</p>
+											</ul>
+											</p>
+											<!-- New Addition End -->
+											<li>If there is an existing forecasted consumption in the supply plan, the
+												"Current Forecasted Consumption" cell will be highlighted yellow. </li>
+											<li>If there is an existing forecasted consumption in the supply plan and the forecasted consumption data the user is trying to import is older than 4 months, the ‘Current Forecasted Consumption’ cell will be highlighted gray, and will NOT be imported.</li>
+											<li>Use the Import? column to de-select any forecasts that you do NOT want
+												to import into the supply plan. If checked, the Converted Forecasted
+												Consumption will override the Supply Plan forecast. If unchecked, the
+												current Supply Plan forecast will remain.</li><br><img class="img-fluid"
+												src="../ShowGuidanceFiles/img/importintoqatsupplyplanscreenshot-2.png" style="width: 971px;">
+										</ul>
+										</p>
+										</p>
+
+
+
+
+
+									</td>
+								</tr>
+
+
+							</table>
+						</td>
+					</tr>
+
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+
+</html>

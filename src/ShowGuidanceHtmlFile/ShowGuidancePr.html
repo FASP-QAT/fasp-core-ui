@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar orientação</title>
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;}
+		body{padding: 0;margin: 0;}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#e4e5e6;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="width:910px;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #eee;border-spacing:0;text-align:left;box-shadow: rgb(0 0 0 / 12%) 0px 4px 7px;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td align="center">
+							 <h2 style="color: #BA0C2F!important; text-align: center;font-size: 28px;text-transform: uppercase;margin-top: 27px;
+							 margin-bottom: 10px;">Introdução à previsão QAT </h2>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+							
+				<tr>
+					<td style="padding:0;">
+						<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+							<tr>
+								<td style="width:260px;padding:0;vertical-align:top;color:#153643;">
+									<p style="margin:0 0 25px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"><img src="/src/ShowGuidanceHtmlFile/img/showguidanceimg.jpg" alt="" width="280" style="height:auto;display:block;" /></p>
+									
+								</td>
+								<td style="width:20px;padding:0;font-size:0;line-height:0;">&nbsp;</td>
+								<td style="width:488px;padding:0;vertical-align:top;color:#153643;">
+									<p style="margin:0 0 0px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">Uma previsão é uma estimativa/previsão das quantidades de produtos a serem consumidos/utilizados por clientes ou consumidores em um período de tempo futuro. No QAT, o processo de previsão geralmente é realizado em uma ordem específica (veja a imagem abaixo). Primeiro, configure um programa usando <a href='/#/dataSet/listDataSet' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Atualizar informações do programa</a> ou selecione um programa anterior usando
+										<a href='/#/dataset/loadDeleteDataSet' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Carregar ou Excluir Programa</a>. Depois de carregar o programa, adicione informações sobre o período de previsão, limite (%), produtos e outras configurações do programa no
+										<a href='/#/dataset/versionSettings' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Atualizar configurações de versão</a> e <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Atualizando Unidade de Planejamento</a> telas. No QAT, os usuários podem criar previsões projetando árvores de previsão (previsão baseada em árvore) ou aproveitando o consumo histórico (previsão baseada em consumo) para chegar a uma previsão final. Para cada produto, escolha a metodologia de consumo ou árvore, ou ambas! </p>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td style="padding:0 0 10px 0;color:#153643;">
+                <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">As previsões baseadas no consumo são mais úteis em programas maduros e estáveis ​​que possuem um suprimento completo de produtos e dados confiáveis. Esse método pode ser o preditor mais confiável do consumo futuro se o uso futuro for muito semelhante ao passado. Idealmente, estão disponíveis mais de 24 meses de dados mensais de consumo real. Esses dados podem ser importados diretamente do módulo QAT Supply Planning usando o
+					<a href='/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Importar do Plano de Fornecimento QAT </a>tela ou inseridos manualmente. Uma vez que os dados são adicionados, eles podem ser ajustados (por exemplo, taxa de relatório, taxa de ruptura de estoque, interpolação de dados ausentes) no <a href='/#/dataentry/consumptionDataEntryAndAdjustment' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Entrada e Ajuste de Dados </a>
+					tela para ter uma representação mais precisa. No <a href='/#/Extrapolation/extrapolateData' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Extrapolação</a> tela, o QAT calcula os requisitos futuros por extrapolação usando diferentes metodologias de previsão (semi-médias, suavização exponencial, Holt-Winter, etc.).   </p>
+
+                <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">
+					Se os dados necessários para uma previsão baseada no consumo não estiverem disponíveis ou não forem úteis para prever o consumo futuro, realize uma previsão baseada em árvore
+					(<a href='/#/dataset/listTree' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Gerenciar árvore</a>),que acomoda de forma flexível todos os outros métodos de previsão, como morbidade, serviços e métodos demográficos. Aproveite as árvores pré-construídas de <a href='/#/dataset/listTreeTemplate' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Modelos de árvore</a>ou construir uma árvore personalizada. Especifique mudanças ao longo do tempo em uma árvore, especificando diretamente a taxa de mudança ou extrapolando dados anteriores. Uma vez que uma árvore foi construída, verifique o uso do produto usando o <a href='/#/validation/productValidation' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Validação do produto</a> 
+					tela e a mudança ao longo do tempo usando o <a href='/#/validation/modelingValidation' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Validação de modelagem</a> screen.  
+				</p>
+				<p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">Depois que as várias previsões forem criadas, navegue até a seção Análise de previsão e saídas para visualizar as previsões e selecione a previsão final. o <a href='/#/report/compareAndSelectScenario' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">
+					Compare e selecione a previsão</a> permite a comparação de todas as previsões em árvore e de consumo e a seleção da previsão final por unidade de planejamento. o <a href='/#/forecastReport/forecastOutput' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Previsão Mensal</a> e <a href='/#/forecastReport/forecastSummary' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Resumo da previsão</a> 
+					fornecerá um detalhamento ou agregação adicional de cada previsão selecionada. o <a href='/#/report/compareVersion' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Comparação de versões</a> tela permite a comparação de previsões selecionadas em diferentes versões do programa.  </p>
+					 <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">
+						Durante todo o processo de previsão, salve o trabalho com frequência no servidor usando o <a href='/#/dataset/commitTree' target="_blank" style="color: #205493;text-decoration: underline;background-color: transparent;">Programa de Compromisso</a> tela. Quando terminar com uma previsão, confirme as previsões como finais e importe-as para um Plano de fornecimento usando o
+						<a href='/#/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan' target="_blank" style="color: #205493;text-decoration:underline;background-color: transparent;">Importação de previsão QAT</a> screen!  
+					 </p>
+					 <p style="margin:0 0 12px 0;font-size: 14px;text-align: justify; padding-top: 12px;line-height: 22px;color: #212721;font-family:Arial,sans-serif;">Aproveite e use as dicas de ferramentas e as telas "Mostrar orientação" em todo o QAT para obter mais orientações e dicas. </p>
+									</td>
+
+							
+								</tr>
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

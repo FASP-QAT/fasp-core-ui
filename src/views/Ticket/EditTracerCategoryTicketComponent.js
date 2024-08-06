@@ -1,25 +1,26 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText, ModalFooter } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService';
-import imageHelp from '../../assets/img/help-icon.png';
-import InitialTicketPageComponent from './InitialTicketPageComponent';
 import { Formik } from 'formik';
-import i18n from '../../i18n';
+import React, { Component } from 'react';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, ModalFooter } from 'reactstrap';
 import * as Yup from 'yup';
-import JiraTikcetService from '../../api/JiraTikcetService';
-import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { BUDGET_NAME_REGEX, SPACE_REGEX } from '../../Constants';
+import { API_URL, SPACE_REGEX } from '../../Constants';
+import JiraTikcetService from '../../api/JiraTikcetService';
 import TracerCategoryService from '../../api/TracerCategoryService';
-
+import i18n from '../../i18n';
+import TicketPriorityComponent from './TicketPriorityComponent';
 let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.tracercategory.tracercategory"))
 let summaryText_2 = "Edit Tracer Category"
 const initialValues = {
     summary: summaryText_1,
     tracerCategoryName: "",
-    notes: ""
+    notes: "",
+    priority: 3
 }
-
+/**
+ * This const is used to define the validation schema for tracer category ticket component
+ * @param {*} values 
+ * @returns 
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         summary: Yup.string()
@@ -27,43 +28,22 @@ const validationSchema = function (values) {
             .required(i18n.t('static.common.summarytext')),
         tracerCategoryName: Yup.string()
             .required(i18n.t('static.common.pleaseSelect').concat(" ").concat((i18n.t('static.tracercategory.tracercategory')).concat((i18n.t('static.ticket.unavailableDropdownValidationText')).replace('?', i18n.t('static.tracercategory.tracercategory'))))),
-
         notes: Yup.string()
             .required(i18n.t('static.program.validnotestext'))
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
-
+/**
+ * This component is used to display the tracer category form and allow user to submit the update master request in jira
+ */
 export default class EditTracerCategoryTicketComponent extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             tracerCategory: {
                 summary: summaryText_1,
                 tracerCategoryName: "",
-                notes: ""
+                notes: "",
+                priority: 3
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -74,8 +54,12 @@ export default class EditTracerCategoryTicketComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.updatePriority = this.updatePriority.bind(this);
     }
-
+    /**
+     * This function is called when some data in the form is changed
+     * @param {*} event This is the on change event
+     */
     dataChange(event) {
         let { tracerCategory } = this.state
         if (event.target.name == "summary") {
@@ -83,16 +67,15 @@ export default class EditTracerCategoryTicketComponent extends Component {
         }
         if (event.target.name == "tracerCategoryName") {
             var outText = "";
-            if(event.target.value !== "") {
+            if (event.target.value !== "") {
                 var tracerCategoryT = this.state.tracerCategories.filter(c => c.tracerCategoryId == event.target.value)[0];
                 outText = tracerCategoryT.realm.label.label_en + " | " + tracerCategoryT.label.label_en;
-            }            
+            }
             tracerCategory.tracerCategoryName = outText;
             this.setState({
                 tracerCategoryId: event.target.value
             })
         }
-
         if (event.target.name == "notes") {
             tracerCategory.notes = event.target.value;
         }
@@ -100,39 +83,16 @@ export default class EditTracerCategoryTicketComponent extends Component {
             tracerCategory
         }, () => { })
     };
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            summary: true,
-            tracerCategoryName: true,
-            notes: true
-        })
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('simpleForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
-
+    /**
+     * This function is used to get the tracer category list on page load
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
-                console.log("response.data----", response.data);
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -142,12 +102,11 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -179,32 +138,51 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 }
             );
     }
-
+    /**
+     * This function is used to hide the messages that are there in div2 after 30 seconds
+     */
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
-    submitHandler = event => {
-        event.preventDefault();
-        event.target.className += " was-validated";
+    /**
+     * This function is used to update the ticket priority in state
+     * @param {*} newState - This the selected priority
+     */
+    updatePriority(newState){
+        // console.log('priority - : '+newState);
+        let { tracerCategory } = this.state;
+        tracerCategory.priority = newState;
+        this.setState(
+            {
+                tracerCategory
+            }, () => {
+                // console.log('priority - state : '+this.state.tracerCategory.priority);
+            }
+        );
     }
 
+    /**
+     * This function is called when reset button is clicked to reset the tracer category details
+     */
     resetClicked() {
         let { tracerCategory } = this.state;
-        // tracerCategory.summary = '';        
         tracerCategory.tracerCategoryName = '';
         tracerCategory.notes = '';
+        tracerCategory.priority = 3;
         this.setState({
             tracerCategory: tracerCategory,
             tracerCategoryId: ''
         },
             () => { });
     }
-
+    /**
+     * This is used to display the content
+     * @returns This returns tracer category details form
+     */
     render() {
-
         const { tracerCategories } = this.state;
         let tracerCategoryList = tracerCategories.length > 0
             && tracerCategories.map((item, i) => {
@@ -214,7 +192,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                     </option>
                 )
             }, this);
-
         return (
             <div className="col-md-12">
                 <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
@@ -223,7 +200,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
                         initialValues={initialValues}
-                        validate={validate(validationSchema)}
+                        validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             this.setState({
                                 loading: true
@@ -231,7 +208,6 @@ export default class EditTracerCategoryTicketComponent extends Component {
                             this.state.tracerCategory.summary = summaryText_2;
                             this.state.tracerCategory.userLanguageCode = this.state.lang;
                             JiraTikcetService.addEmailRequestIssue(this.state.tracerCategory).then(response => {
-                                console.log("Response :", response.status, ":", JSON.stringify(response.data));
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
                                     this.setState({
@@ -255,12 +231,11 @@ export default class EditTracerCategoryTicketComponent extends Component {
                                 error => {
                                     if (error.message === "Network Error") {
                                         this.setState({
-                                            message: 'static.unkownError',
+                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                             loading: false
                                         });
                                     } else {
                                         switch (error.response ? error.response.status : "") {
-
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
@@ -305,60 +280,57 @@ export default class EditTracerCategoryTicketComponent extends Component {
                                 setTouched,
                                 handleReset
                             }) => (
-                                    <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
-                                        < FormGroup >
-                                            <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text" name="summary" id="summary" readOnly={true}
-                                                bsSize="sm"
-                                                valid={!errors.summary && this.state.tracerCategory.summary != ''}
-                                                invalid={touched.summary && !!errors.summary}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.tracerCategory.summary}
-                                                required />
-                                            <FormFeedback className="red">{errors.summary}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="tracerCategoryName" id="tracerCategoryName"
-                                                bsSize="sm"
-                                                valid={!errors.tracerCategoryName && this.state.tracerCategory.tracerCategoryName != ''}
-                                                invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                value={this.state.tracerCategoryId}
-                                                required >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {tracerCategoryList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
-                                        </FormGroup>
-
-                                        <FormGroup>
-                                            <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="textarea" name="notes" id="notes"
-                                                bsSize="sm"
-                                                valid={!errors.notes && this.state.tracerCategory.notes != ''}
-                                                invalid={touched.notes && !!errors.notes}
-                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                onBlur={handleBlur}
-                                                maxLength={600}
-                                                value={this.state.tracerCategory.notes}
-                                            // required 
-                                            />
-                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
-                                        </FormGroup>
-                                        <ModalFooter className="pb-0 pr-0">
-                                            <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                                            <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                            <Button type="submit" size="md" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                        </ModalFooter>
-                                        {/* <br></br><br></br>
-                                    <div className={this.props.className}>
-                                        <p>{i18n.t('static.ticket.drodownvaluenotfound')}</p>
-                                    </div> */}
-                                    </Form>
-                                )} />
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm' autocomplete="off">
+                                    < FormGroup >
+                                        <Label for="summary">{i18n.t('static.common.summary')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="text" name="summary" id="summary" readOnly={true}
+                                            bsSize="sm"
+                                            valid={!errors.summary && this.state.tracerCategory.summary != ''}
+                                            invalid={touched.summary && !!errors.summary}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.tracerCategory.summary}
+                                            required />
+                                        <FormFeedback className="red">{errors.summary}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="select" name="tracerCategoryName" id="tracerCategoryName"
+                                            bsSize="sm"
+                                            valid={!errors.tracerCategoryName && this.state.tracerCategory.tracerCategoryName != ''}
+                                            invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            value={this.state.tracerCategoryId}
+                                            required >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {tracerCategoryList}
+                                        </Input>
+                                        <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="notes">{i18n.t('static.common.notes')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="textarea" name="notes" id="notes"
+                                            bsSize="sm"
+                                            valid={!errors.notes && this.state.tracerCategory.notes != ''}
+                                            invalid={touched.notes && !!errors.notes}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                            onBlur={handleBlur}
+                                            maxLength={600}
+                                            value={this.state.tracerCategory.notes}
+                                        />
+                                        <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <TicketPriorityComponent priority={this.state.tracerCategory.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
+                                    </FormGroup>
+                                    <ModalFooter className="pb-0 pr-0">
+                                        <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                                        <Button type="reset" size="md" color="warning" className="mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        <Button type="submit" size="md" color="success" className="mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    </ModalFooter>
+                                </Form>
+                            )} />
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -368,9 +340,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
                         </div>
                     </div>
                 </div>
-
             </div>
         );
     }
-
 }

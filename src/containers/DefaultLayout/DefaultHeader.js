@@ -2,47 +2,54 @@ import { AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Alert, Col, Nav, NavItem ,Row} from 'reactstrap';
+import { Nav, NavItem } from 'reactstrap';
+import logo from '../../assets/img/QAT-logo.png';
+import ShowGuidanceImg from '../../assets/img/ShowGuidance.png';
+import imageUsermanual from '../../assets/img/User-manual-icon.png';
 import QAT from '../../assets/img/brand/QAT-minimize.png';
 import imageNotificationCount from '../../assets/img/icons-truck.png';
-import logo from '../../assets/img/QAT-logo.png';
-import imageUsermanual from '../../assets/img/User-manual-icon.png';
-import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown';
-import eventBus from './eventBus.js'
-import CryptoJS from 'crypto-js'
-import ProgramService from "../../api/ProgramService"
-
 const propTypes = {
   children: PropTypes.node,
 };
-
 const defaultProps = {};
-
+/**
+ * Component representing the default header of the application.
+ * This header includes navigation links, logo, language switcher, user manual link, refresh button, and user actions dropdown.
+ */
 class DefaultHeader extends Component {
   constructor(props) {
     super(props);
-    this.changeLanguage = this.changeLanguage.bind(this)
+    this.changeLanguage = this.changeLanguage.bind(this);
+    this.refreshPage = this.refreshPage.bind(this);
   }
-
+  /**
+   * Refreshes the page by reloading the window.
+   */
+  refreshPage() {
+    setTimeout(() => {
+      window.location.reload(false);
+    }, 0);
+  }
+  /**
+   * Changes the language of the application and reloads the window.
+   * @param {string} lang - The language code to switch to.
+   */
   changeLanguage(lang) {
     localStorage.setItem('lang', lang);
     i18n.changeLanguage(lang)
     window.location.reload(false);
   }
-
-  componentDidMount() {
-    
-  }
-
+  /**
+   * Renders the DefaultHeader component.
+   * @returns {JSX.Element} The rendered JSX element.
+   */
   render() {
     // eslint-disable-next-line
     const { children, ...attributes } = this.props;
     const checkOnline = localStorage.getItem('sessionType');
-
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
@@ -51,106 +58,95 @@ class DefaultHeader extends Component {
             full={{ src: logo, width: 180, height: 50, alt: 'QAT Logo' }}
             minimized={{ src: QAT, width: 50, height: 50, alt: 'QAT Logo' }}
           />
-
         </NavLink>
         <AppSidebarToggler className="d-md-down-none" display="lg" />
-        {/* <Nav className="d-md-down-none" navbar>
-          <NavItem className="px-3">
-            <NavLink to="/dashboard" className="nav-link" >Application Dashboard</NavLink>
-          </NavItem>
-         
-        </Nav> */}
         <Nav className="" navbar>
-
-
-          {/*          <NavItem className="px-3">
-            <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
-    </NavItem>*/}
           <NavItem className="px-3">
-            {console.log("Inside header called---", this)}
-            <NavLink to="#" className="nav-link" ><b>{this.props.title}</b></NavLink>
+            <NavLink to="#" onClick={this.refreshPage} className={this.props.activeModule == 2 ? "nav-link titleColorModule1" : "nav-link titleColorModule2"} ><b>{this.props.activeModule == 2 ? i18n.t('static.module.supplyPlanningModule') : i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
-
-          {/* <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> */}
-          {/* <span><b>
-          {AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : "Unknown"}
-          </b></span> */}
-          {/* <br></br><span>
-              <small>{AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole() : "Unknown"}</small>
-            </span> */}
-          {/* </div> */}
-          {/* <UncontrolledDropdown nav direction="down" className="lang-btn">
-            <DropdownToggle nav className="nav-link-lng">
-
-              {localStorage.getItem('lang').toString() == 'undefined' ? 'en' : localStorage.getItem('lang').toString()}
-              &nbsp;<i className="fa fa-caret-down"></i>
-            </DropdownToggle >
-            <DropdownMenu right>
-              <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}> {i18n.t('static.language.english')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}> {i18n.t('static.language.french')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
-            </DropdownMenu>
-          </UncontrolledDropdown> */}
-          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') &&
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6' }}>{this.props.notificationCount}</span>}
-                <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px', marginTop: '-1px' }} />
+                {this.props.notificationCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px' }}>{this.props.notificationCount}</span>}
+                <img src={imageNotificationCount} onClick={this.props.shipmentLinkingAlerts} className="HomeIcon icon-anim-pulse text-primary" title={i18n.t('static.mt.shipmentLinkingNotification')} style={{ width: '30px', height: '30px', marginTop: '4px' }} />
               </NavLink>
             </NavItem>}
           <DefaultHeaderDropdown mssgs />
-
-          {/* <NavItem className="">
-            <NavLink to="#" className="nav-link">
-              <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.changesInLocalVersion')} />
-            </NavLink>
-          </NavItem> */}
-          {checkOnline === 'Online' &&
+          {checkOnline === 'Online' && this.props.activeModule == 2 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
                 {localStorage.getItem("sesLatestProgram") == "true" &&
-                  // <img src={iconsDownarrowRed} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F' }} ></i>
+                  <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
                 }
-                {/* {localStorage.getItem("sesLatestProgram") == "false" &&
-                  <img src={iconsDownarrowBlue} className="HelpIcon" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ width: '30px', height: '30px' }} />} */}
-                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon fa fa-download" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#20a8d8' }} ></i>}
+                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
               </NavLink>
             </NavItem>
           }
-          {/* <Online> */}
-          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') &&
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {console.log("localStorage.getItem(sesLocalVersionChange)----" + this.props.changeIcon)}
-
                 {this.props.changeIcon &&
-                  // <img src={iconsUparrowRed} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F' }}></i>
-
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F', lineHeight: '57px' }}></i>
                 }
                 {!this.props.changeIcon &&
-                  // <img src={iconsUparrowBlue} className="HelpIcon" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ width: '30px', height: '30px' }} />
-                  <i class="nav-icon fa fa-upload" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#20a8d8' }}></i>
-
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgram} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed', lineHeight: '57px' }}></i>
                 }
               </NavLink>
             </NavItem>
           }
-          {/* </Online> */}
-          <NavItem className="">
+          {checkOnline === 'Online' && this.props.activeModule == 1 &&
+            AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                {localStorage.getItem("sesLatestDataset") == "true" &&
+                  <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
+                }
+                {localStorage.getItem("sesLatestDataset") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
+              </NavLink>
+            </NavItem>
+          }
+          {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
+            <NavItem className="">
+              <NavLink to="#" className="nav-link">
+                {this.props.fuChangeIcon &&
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#BA0C2F', lineHeight: '57px' }}></i>
+                }
+                {!this.props.fuChangeIcon &&
+                  <i class="nav-icon cui-cloud-upload icons" onClick={this.props.commitProgramFC} title={i18n.t('static.header.changesInLocalVersion')} style={{ fontSize: '25px', paddingTop: '2px', paddingLeft: '5px', color: '#a7c6ed', lineHeight: '57px' }}></i>
+                }
+              </NavLink>
+            </NavItem>
+          }
+          {this.props.activeModule == 1 && <NavItem className="">
             <span className="nav-link">
-              <a href={`${API_URL}/file/qatUserGuide`}>
-                <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
+              <a href={localStorage.getItem('lang') == 'en' ?
+                "../../../../ShowGuidanceEn.html" :
+                localStorage.getItem('lang') == 'fr' ?
+                  "../../../../ShowGuidanceFr.html" :
+                  localStorage.getItem('lang') == 'sp' ?
+                    "../../../../ShowGuidanceSp.html" :
+                    "../../../../ShowGuidancePr.html"
+              } target="_blank">
+                <img src={ShowGuidanceImg} className="HelpIcon" title={i18n.t('static.common.showGuidance')} style={{ width: '25px', height: '25px' }} />
               </a>
             </span>
           </NavItem>
-
-
+          }
+          {checkOnline === 'Online' && <NavItem className="">
+            <span className="nav-link">
+              <a href={`https://api.quantificationanalytics.org/file/qatUserGuide`}>
+                <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
+              </a>
+            </span>
+          </NavItem>}
+          <NavItem className="" title={i18n.t('static.common.refreshPage')}>
+            <span className="nav-link">
+              <svg onClick={this.refreshPage} style={{ cursor: 'pointer', width: '28px', height: '28px', color: '#a7c6ed' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon icon-xxl" role="img"><path fill="var(--ci-primary-color, currentColor)" d="M265.614,206.387H456V16H424V149.887L397.863,123.75c-79.539-79.539-208.96-79.54-288.5,0s-79.539,208.96,0,288.5a204.232,204.232,0,0,0,288.5,0l-22.627-22.627c-67.063,67.063-176.182,67.063-243.244,0s-67.063-176.183,0-243.246,176.182-67.063,243.245,0l28.01,28.01H265.614Z" class="ci-primary"></path></svg>
+            </span>
+          </NavItem>
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
@@ -159,8 +155,7 @@ class DefaultHeader extends Component {
               </span>
             </NavLink>
           </NavItem>
-          {/* <DefaultHeaderDropdown /> */}
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} shipmentLinkingAlerts={this.props.shipmentLinkingAlerts} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} />
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} shipmentLinkingAlerts={this.props.shipmentLinkingAlerts} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} goOffline={this.props.goOffline} goOnline={this.props.goOnline} logout={this.props.logout} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
@@ -174,8 +169,6 @@ class DefaultHeader extends Component {
     );
   }
 }
-
 DefaultHeader.propTypes = propTypes;
 DefaultHeader.defaultProps = defaultProps;
-
 export default DefaultHeader;

@@ -1,17 +1,25 @@
 import React, { Component } from 'react';
-import { Card, CardBody, CardHeader, Col, Container, Jumbotron, Row } from 'reactstrap';
-import i18n from '../../i18n'
+import { Card, CardBody, Col, Container, Jumbotron, Row } from 'reactstrap';
+import i18n from '../../i18n';
+/**
+ * Component for showing access denied page.
+ */
 export default class AccessDeniedComponent extends Component {
     constructor(props) {
         super(props);
     }
+    /**
+     * Function to redirect to login page if user is not logged in on component mount
+     */
     componentDidMount() {
-        console.log("Component did mount access denied called");
         if (localStorage.getItem('curUser') == null || localStorage.getItem('curUser') == '') {
             this.props.history.push(`/login/static.accessDenied`)
         }
     }
-
+    /**
+     * Renders the access denied page.
+     * @returns {JSX.Element} - Access denied page.
+     */
     render() {
         return (
             <div className="animated fadeIn">

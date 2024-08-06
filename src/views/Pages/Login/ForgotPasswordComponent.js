@@ -1,22 +1,22 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, Container } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import i18n from '../../../i18n'
-import '../../Forms/ValidationForms/ValidationForms.css';
-// import image1 from '../../../../public/assets/img/QAT-logo.png';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Container, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+import i18n from '../../../i18n';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-login-logo.png';
-
-
-import UserService from '../../../api/UserService.js';
-import AuthenticationService from '../../Common/AuthenticationService.js';
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
-
+import { API_URL } from '../../../Constants';
+import UserService from '../../../api/UserService.js';
+// Initial values for form fields
 const initialValues = {
     emailId: ""
 }
-
+/**
+ * Defines the validation schema for forgot password.
+ * @param {Object} values - Form values.
+ * @returns {Yup.ObjectSchema} - Validation schema.
+ */
 const validationSchema = function (values) {
     return Yup.object().shape({
         emailId: Yup.string()
@@ -24,35 +24,13 @@ const validationSchema = function (values) {
             .required(i18n.t('static.user.validemail')),
     })
 }
-
-const validate = (getValidationSchema) => {
-    return (values) => {
-        const validationSchema = getValidationSchema(values)
-        try {
-            validationSchema.validateSync(values, { abortEarly: false })
-            return {}
-        } catch (error) {
-            return getErrorsFromValidationError(error)
-        }
-    }
-}
-
-const getErrorsFromValidationError = (validationError) => {
-    const FIRST_ERROR = 0
-    return validationError.inner.reduce((errors, error) => {
-        return {
-            ...errors,
-            [error.path]: error.errors[FIRST_ERROR],
-        }
-    }, {})
-}
+/**
+ * Component for forgot password.
+ */
 class ForgotPasswordComponent extends Component {
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         loading: false
-    //     }
-    // }
+    /**
+     * Displays a loading indicator while data is being loaded.
+     */
     loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
     constructor(props) {
         super(props);
@@ -62,43 +40,22 @@ class ForgotPasswordComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideMessage = this.hideMessage.bind(this);
     }
-
-
+    /**
+     * Redirects to the login screen when cancel button is clicked.
+     */
     cancelClicked() {
         this.props.history.push(`/login/` + i18n.t('static.actionCancelled'))
     }
-
-    touchAll(setTouched, errors) {
-        setTouched({
-            emailId: true
-        }
-        )
-        this.validateForm(errors)
-    }
-    validateForm(errors) {
-        this.findFirstError('forgotPasswordForm', (fieldName) => {
-            return Boolean(errors[fieldName])
-        })
-        this.setState({
-            loading: true
-        }, (
-        ) => {
-
-        })
-    }
-    findFirstError(formName, hasError) {
-        const form = document.forms[formName]
-        for (let i = 0; i < form.length; i++) {
-            if (hasError(form[i].name)) {
-                form[i].focus()
-                break
-            }
-        }
-    }
+    /**
+     * Hides message after 30 seconds.
+     */
     hideMessage() {
-        setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 8000);
+        setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 30000);
     }
-
+    /**
+     * Renders the Forgot password form.
+     * @returns {JSX.Element} - Forgot Password form.
+     */
     render() {
         return (
             <div className="app flex-row align-items-center">
@@ -113,13 +70,12 @@ class ForgotPasswordComponent extends Component {
                             <Col md="9" lg="7" xl="6" className="ForgotmarginTop">
                                 <h5 style={{ color: "#BA0C2F" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 " style={{ display: this.state.loading ? "none" : "block" }}>
-
                                     <CardHeader>
                                         <i className="fa fa-pencil-square-o frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={initialValues}
-                                        validate={validate(validationSchema)}
+                                        validationSchema={validationSchema}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (isSiteOnline()) {
                                                 UserService.forgotPassword(values.emailId)
@@ -134,10 +90,10 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
-
-                                                            console.log(error)
                                                             if (error.message === "Network Error") {
-                                                                this.setState({ message: error.message });
+                                                                this.setState({
+                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 404:
@@ -160,10 +116,7 @@ class ForgotPasswordComponent extends Component {
                                                             }
                                                         }
                                                     );
-
                                             } else {
-
-
                                                 this.setState({
                                                     message: "You must be online to update the password."
                                                 },
@@ -184,55 +137,48 @@ class ForgotPasswordComponent extends Component {
                                                 isValid,
                                                 setTouched
                                             }) => (
-                                                    <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
-                                                        <CardBody className="p-4">
-
-                                                            <FormGroup>
-                                                                <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
-                                                                <Input type="text"
-                                                                    name="emailId"
-                                                                    id="emailId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.emailId}
-                                                                    invalid={touched.emailId && !!errors.emailId}
-                                                                    onChange={handleChange}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                />
-                                                                <FormFeedback>{errors.emailId}</FormFeedback>
-                                                            </FormGroup>
-                                                        </CardBody>
-                                                        <CardFooter>
-                                                            <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                                &nbsp;
-                          </FormGroup>
-                                                        </CardFooter>
-                                                    </Form>
-                                                )} />
+                                                <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
+                                                    <CardBody className="p-4">
+                                                        <FormGroup>
+                                                            <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
+                                                            <Input type="text"
+                                                                name="emailId"
+                                                                id="emailId"
+                                                                bsSize="sm"
+                                                                valid={!errors.emailId}
+                                                                invalid={touched.emailId && !!errors.emailId}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback>{errors.emailId}</FormFeedback>
+                                                        </FormGroup>
+                                                    </CardBody>
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+                                                        </FormGroup>
+                                                    </CardFooter>
+                                                </Form>
+                                            )} />
                                 </Card>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
                                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                                             <div class="spinner-border blue ml-4" role="status">
-
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </Col>
                         </Row>
-
                     </Container>
                 </div>
             </div>
-
         );
     }
 }
-
 export default ForgotPasswordComponent;

@@ -1,27 +1,25 @@
+import jexcel from 'jspreadsheet';
+import moment from "moment";
 import React, { Component } from 'react';
-import jexcel from 'jexcel-pro';
-import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import { Button } from 'reactstrap';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import i18n from '../../i18n';
-import PipelineService from '../../api/PipelineService';
-import AuthenticationService from '../Common/AuthenticationService';
+import { jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT, JEXCEL_DECIMAL_NO_REGEX_LONG, JEXCEL_INTEGER_REGEX_LONG, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from '../../Constants.js';
 import DataSourceService from '../../api/DataSourceService';
+import FundingSourceService from '../../api/FundingSourceService';
+import PipelineService from '../../api/PipelineService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
-import ManufaturerService from '../../api/SupplierService';
-import getLabelText from '../../CommonComponent/getLabelText'
-import moment from "moment";
 import ShipmentStatusService from '../../api/ShipmentStatusService';
-import { Button } from 'reactstrap';
-import FundingSourceService from '../../api/FundingSourceService';
-import { Link } from 'react-router-dom';
-import { jExcelLoadedFunction, jExcelLoadedFunctionPipeline } from '../../CommonComponent/JExcelCommonFunctions.js'
-import { CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_LONG, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, JEXCEL_DATE_FORMAT, JEXCEL_PRO_KEY, JEXCEL_INTEGER_REGEX_LONG } from '../../Constants.js'
+import ManufaturerService from '../../api/SupplierService';
+import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_PAGINATION_OPTION, SHIPMENT_DATA_SOURCE_TYPE } from '../../Constants.js';
-
+/**
+ * Component for pipeline program import shipment details
+ */
 export default class PipelineProgramShipment extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -37,9 +35,7 @@ export default class PipelineProgramShipment extends Component {
             isValidData: false,
             changedData: false,
             loading: true
-
         }
-
         this.initialiseshipment = this.initialiseshipment.bind(this)
         this.loaded = this.loaded.bind(this);
         this.changed = this.changed.bind(this);
@@ -47,21 +43,16 @@ export default class PipelineProgramShipment extends Component {
         this.SubmitProgram = this.SubmitProgram.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
     }
-
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     */
     loaded() {
         var valid = true;
         var list = this.state.pipelineShipmentData;
-        console.log(list)
         var json = this.el.getJson(null, false);
-        console.log(json)
         for (var y = 0; y < json.length; y++) {
-
-
-            // var list = this.state.planningUnitList;
-
             var col = ("A").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[0]).toString();
-
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -82,10 +73,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, (list[y].dataSource).concat(i18n.t('static.message.notExist')));
             }
-
             var col = ("C").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[2]).toString();
-
             if (value != "" && value > 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -120,7 +109,6 @@ export default class PipelineProgramShipment extends Component {
             }
             var col = ("F").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[5]).toString();
-
             if (value != "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -130,10 +118,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
-
             var col = ("G").concat(parseInt(y) + 1);
             var value = (this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
-
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -145,7 +131,6 @@ export default class PipelineProgramShipment extends Component {
             }
             var col = ("H").concat(parseInt(y) + 1);
             var value = (this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
-
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -155,10 +140,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
-
             var col = ("I").concat(parseInt(y) + 1);
             var value = (this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
-
             if (value != "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -167,12 +150,9 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
-
             }
             var col = ("J").concat(parseInt(y) + 1);
             var value = (this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
-
             if (value != "" && value >= 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -182,140 +162,109 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
-
-
             var col = ("K").concat(parseInt(y) + 1);
             var value = (this.el.getRowData(y)[10]).toString();
-
             if ((value == "Invalid date" || value === "") && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                 valid = false;
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
-                // } else {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setComments(col, "");
-
-                // }
                 var col = ("L").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[11]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
-
                 var col = ("M").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[12]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
                 var col = ("N").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[13]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
                 var col = ("O").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[14]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
                 var col = ("P").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[15]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
                 var col = ("Q").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[16]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
                 var col = ("R").concat(parseInt(y) + 1);
                 var value = (this.el.getRowData(y)[17]).toString();
-
                 if ((value == "Invalid date" || value === "") && (shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
                     valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-
                 }
-
-
-
-
-
             }
             this.setState({
                 isValidData: valid
             })
-
         }
     }
-
+    /**
+     * Function to handle changes in jexcel cells.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Object} cell - The cell object that changed.
+     * @param {number} x - The x-coordinate of the changed cell.
+     * @param {number} y - The y-coordinate of the changed cell.
+     * @param {any} value - The new value of the changed cell.
+     */
     changed = function (instance, cell, x, y, value) {
         this.setState({ changedData: true })
         var regexDecimal = /^[0-9]+.[0-9]+$/
         var shipmentStatusId = 0;
         if (x == 0) {
-            var json = this.el.getJson(null, false);
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -327,7 +276,6 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 1) {
-            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -337,7 +285,6 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
         }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -346,14 +293,11 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
             }
         }
         if (x == 3) {
-            var json = this.el.getJson(null, false);
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -364,7 +308,6 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setComments(col, "");
             }
         }
-
         if (x == 4) {
             shipmentStatusId = value
             var reg = /^[0-9\b]+$/;
@@ -374,10 +317,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
             }
         }
         if (x == 5) {
@@ -388,10 +329,8 @@ export default class PipelineProgramShipment extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
             }
         }
         if (x == 6) {
@@ -469,7 +408,6 @@ export default class PipelineProgramShipment extends Component {
                 }
             }
         }
-
         if (x == 10) {
             var col = ("K").concat(parseInt(y) + 1);
             if ((value === "") && shipmentStatusId != "" && (shipmentStatusId == PLANNED_SHIPMENT_STATUS || shipmentStatusId == SUBMITTED_SHIPMENT_STATUS || shipmentStatusId == APPROVED_SHIPMENT_STATUS || shipmentStatusId == SHIPPED_SHIPMENT_STATUS || shipmentStatusId == ARRIVED_SHIPMENT_STATUS || shipmentStatusId == DELIVERED_SHIPMENT_STATUS)) {
@@ -607,14 +545,13 @@ export default class PipelineProgramShipment extends Component {
             }
         }
     }
-
-
+    /**
+     * Reterives planning unit, shipment status, data source, procurement agent, supplier, funding source and shipment lists on component mount
+     */
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
                 if (response.status == 200) {
-
                     this.setState({
                         planningUnitList: response.data.map(ele => ({
                             name: getLabelText(ele.label, this.state.lang),
@@ -624,18 +561,15 @@ export default class PipelineProgramShipment extends Component {
                     ShipmentStatusService.getShipmentStatusListActive()
                         .then(response => {
                             if (response.status == 200) {
-                                // console.log(response.data)
                                 this.setState({
                                     shipmentStatusList: response.data.map(ele => ({
                                         name: getLabelText(ele.label, this.state.lang),
                                         id: ele.shipmentStatusId
                                     }))
                                 });
-
                                 DataSourceService.getAllDataSourceList()
                                     .then(response => {
                                         if (response.status == 200) {
-                                            // console.log(response.data)
                                             var dataSourceFilterList = response.data.filter(c => c.dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE);
                                             this.setState({
                                                 dataSourceList: dataSourceFilterList.map(ele => ({
@@ -643,22 +577,18 @@ export default class PipelineProgramShipment extends Component {
                                                     id: ele.dataSourceId
                                                 }))
                                             });
-
                                             ProcurementAgentService.getProcurementAgentListAll()
                                                 .then(response => {
                                                     if (response.status == 200) {
-                                                        console.log(response.data)
                                                         this.setState({
                                                             procurementAgentList: response.data.map(ele => ({
                                                                 name: getLabelText(ele.label, this.state.lang),
                                                                 id: ele.procurementAgentId
                                                             }))
                                                         });
-
                                                         ManufaturerService.getSupplierListAll()
                                                             .then(response => {
                                                                 if (response.status == 200) {
-                                                                    console.log(response.data)
                                                                     this.setState({
                                                                         supplierList: response.data.map(ele => ({
                                                                             name: getLabelText(ele.label, this.state.lang),
@@ -677,11 +607,9 @@ export default class PipelineProgramShipment extends Component {
                                                                                 PipelineService.getShipmentDataById(this.props.match.params.pipelineId)
                                                                                     .then(response => {
                                                                                         if (response.status == 200) {
-                                                                                            console.log("pipeline shipment data my console--->", response.data);
                                                                                             this.setState({
                                                                                                 pipelineShipmentData: response.data
                                                                                             }, () => { this.initialiseshipment() })
-
                                                                                         } else {
                                                                                             this.setState({
                                                                                                 message: response.data.messageCode
@@ -691,12 +619,11 @@ export default class PipelineProgramShipment extends Component {
                                                                                         error => {
                                                                                             if (error.message === "Network Error") {
                                                                                                 this.setState({
-                                                                                                    message: 'static.unkownError',
+                                                                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                                                     loading: false
                                                                                                 });
                                                                                             } else {
                                                                                                 switch (error.response ? error.response.status : "") {
-
                                                                                                     case 401:
                                                                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                                                                         break;
@@ -727,8 +654,6 @@ export default class PipelineProgramShipment extends Component {
                                                                                             }
                                                                                         }
                                                                                     );
-
-
                                                                             } else {
                                                                                 this.setState({ message: response.data.messageCode })
                                                                             }
@@ -737,12 +662,11 @@ export default class PipelineProgramShipment extends Component {
                                                                             error => {
                                                                                 if (error.message === "Network Error") {
                                                                                     this.setState({
-                                                                                        message: 'static.unkownError',
+                                                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                                         loading: false
                                                                                     });
                                                                                 } else {
                                                                                     switch (error.response ? error.response.status : "") {
-
                                                                                         case 401:
                                                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                                                             break;
@@ -773,8 +697,6 @@ export default class PipelineProgramShipment extends Component {
                                                                                 }
                                                                             }
                                                                         );
-
-
                                                                 } else {
                                                                     this.setState({
                                                                         message: response.data.messageCode
@@ -784,12 +706,11 @@ export default class PipelineProgramShipment extends Component {
                                                                 error => {
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
-                                                                            message: 'static.unkownError',
+                                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                             loading: false
                                                                         });
                                                                     } else {
                                                                         switch (error.response ? error.response.status : "") {
-
                                                                             case 401:
                                                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                                                 break;
@@ -820,8 +741,6 @@ export default class PipelineProgramShipment extends Component {
                                                                     }
                                                                 }
                                                             );
-
-
                                                     } else {
                                                         this.setState({
                                                             message: response.data.messageCode
@@ -831,12 +750,11 @@ export default class PipelineProgramShipment extends Component {
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({
-                                                                message: 'static.unkownError',
+                                                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                                 loading: false
                                                             });
                                                         } else {
                                                             switch (error.response ? error.response.status : "") {
-
                                                                 case 401:
                                                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                                                     break;
@@ -867,9 +785,6 @@ export default class PipelineProgramShipment extends Component {
                                                         }
                                                     }
                                                 );
-
-
-
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -879,12 +794,11 @@ export default class PipelineProgramShipment extends Component {
                                         error => {
                                             if (error.message === "Network Error") {
                                                 this.setState({
-                                                    message: 'static.unkownError',
+                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                                     loading: false
                                                 });
                                             } else {
                                                 switch (error.response ? error.response.status : "") {
-
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                         break;
@@ -915,7 +829,6 @@ export default class PipelineProgramShipment extends Component {
                                             }
                                         }
                                     );
-
                             } else {
                                 this.setState({
                                     message: response.data.messageCode
@@ -925,12 +838,11 @@ export default class PipelineProgramShipment extends Component {
                             error => {
                                 if (error.message === "Network Error") {
                                     this.setState({
-                                        message: 'static.unkownError',
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                         loading: false
                                     });
                                 } else {
                                     switch (error.response ? error.response.status : "") {
-
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
@@ -961,8 +873,6 @@ export default class PipelineProgramShipment extends Component {
                                 }
                             }
                         );
-
-
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -972,12 +882,11 @@ export default class PipelineProgramShipment extends Component {
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -1008,14 +917,15 @@ export default class PipelineProgramShipment extends Component {
                     }
                 }
             );
-
     }
+    /**
+     * Function to build a jexcel table.
+     * Constructs and initializes a jexcel table using the provided data and options.
+     */
     initialiseshipment() {
         setTimeout('', 10000);
-        console.log('initialiseshipment' + JSON.stringify(this.state.pipelineShipmentData))
         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-        this.el.destroy();
-
+        jexcel.destroy(document.getElementById("shipmenttableDiv"), true);
         var data = this.state.pipelineShipmentData.map((item, index) => [
             item.planningUnit,
             item.dataSource,
@@ -1025,10 +935,7 @@ export default class PipelineProgramShipment extends Component {
             item.shipmentMode == '' ? this.state.shipModes[1] : item.shipmentMode,
             item.quantity,
             item.rate,
-            // item.freightCost == 0 ? item.quantity * this.props.items.program.seaFreightPerc : item.freightCost, 
             parseFloat(item.freightCost).toFixed(2),
-            // item.quantity * item.rate, 
-            // parseFloat(item.productCost).toFixed(2),
             `=ROUND(G${parseInt(index) + 1}*H${parseInt(index) + 1},2)`,
             moment(item.expectedDeliveryDate).format("YYYY-MM-DD"),
             moment(item.orderedDate).format("YYYY-MM-DD"),
@@ -1038,18 +945,15 @@ export default class PipelineProgramShipment extends Component {
             moment(item.shippedDate).format("YYYY-MM-DD"),
             moment(item.arrivedDate).format("YYYY-MM-DD"),
             moment(item.receivedDate).format("YYYY-MM-DD"), item.notes]);
-        // json[0] = data;
         var options = {
             data: data,
-            columnDrag: true,
+            columnDrag: false,
             colWidths: [150, 150, 150, 150, 150, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100, 100, 100, 100, 180],
             columns: [
-
                 {
                     title: i18n.t('static.dashboard.planningunit'),
                     type: 'autocomplete',
                     source: this.state.planningUnitList
-                    // readOnly: true
                 }, {
                     title: i18n.t('static.datasource.datasource'),
                     type: 'dropdown',
@@ -1080,8 +984,6 @@ export default class PipelineProgramShipment extends Component {
                     mask: '#,##.00',
                     disabledMaskOnEdition: true,
                     decimal: '.'
-                    // source: regionList
-                    // readOnly: true
                 }, {
                     title: i18n.t('static.shipment.rate'),
                     type: 'numeric',
@@ -1089,8 +991,6 @@ export default class PipelineProgramShipment extends Component {
                     textEditor: true,
                     disabledMaskOnEdition: true,
                     decimal: '.'
-                    // source: regionList
-                    // readOnly: true
                 }, {
                     title: i18n.t('static.shipment.freightcost'),
                     type: 'numeric',
@@ -1098,7 +998,6 @@ export default class PipelineProgramShipment extends Component {
                     mask: '#,##.00',
                     disabledMaskOnEdition: true,
                     decimal: '.'
-                    // source: dataSourceList
                 }, {
                     title: i18n.t('static.shipment.productcost'),
                     type: 'numeric',
@@ -1106,69 +1005,56 @@ export default class PipelineProgramShipment extends Component {
                     mask: '#,##.00',
                     disabledMaskOnEdition: true,
                     decimal: '.'
-                    // source: dataSourceList
                 }, {
                     title: i18n.t('static.shipment.edd'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT }
-
                 },
                 {
                     title: i18n.t('static.shipment.ordereddate'),
                     type: 'hidden',
-                    // options: { format: 'DD-MMM-YYYY' }
-
                 }, {
                     title: i18n.t('static.supplyPlan.plannedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT }
-
                 }, {
                     title: i18n.t('static.supplyPlan.submittedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT },
                     type: 'hidden',
-
                 }, {
                     title: i18n.t('static.supplyPlan.approvedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT },
                     type: 'hidden',
-
                 }, {
                     title: i18n.t('static.shipment.shipdate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT }
-
                 }, {
                     title: i18n.t('static.supplyPlan.arrivedDate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT },
                     type: 'hidden',
-
                 }, {
                     title: i18n.t('static.shipment.receiveddate'),
                     type: 'calendar',
                     options: { format: JEXCEL_DATE_FORMAT }
-
                 },
-
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text'
                 },
-
                 {
                     title: 'Index',
                     type: 'hidden'
                 }
-
             ],
+            editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
             columnSorting: true,
-            tableOverflow: true,
             wordWrap: true,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
@@ -1176,35 +1062,32 @@ export default class PipelineProgramShipment extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onchange: this.changed,
-            // oneditionend: this.onedit,
             copyCompatibility: true,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
-            text: {
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')} `,
-                show: '',
-                entries: '',
-            },
             onload: this.loadedCommonFunctionJExcel,
             oneditionend: this.oneditionend,
             license: JEXCEL_PRO_KEY,
-
         };
-
         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
         this.loaded();
         this.setState({
             loading: false
         })
     }
-
+    /**
+     * Callback function called when editing of a cell in the jexcel table ends.
+     * @param {object} instance - The jexcel instance.
+     * @param {object} cell - The cell object.
+     * @param {number} x - The x-coordinate of the cell.
+     * @param {number} y - The y-coordinate of the cell.
+     * @param {any} value - The new value of the cell.
+     */
     oneditionend = function (instance, cell, x, y, value) {
-        var elInstance = instance.jexcel;
+        var elInstance = instance;
         var rowData = elInstance.getRowData(y);
-
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
-            console.log("RESP---------", parseFloat(rowData[6]));
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
@@ -1213,21 +1096,23 @@ export default class PipelineProgramShipment extends Component {
         } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
-
     }
-
-    loadedCommonFunctionJExcel = function (instance, cell, x, y, value) {
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedCommonFunctionJExcel = function (instance, cell) {
         jExcelLoadedFunctionPipeline(instance, 0);
     }
-
-
+    /**
+     * Function to handle form submission and save the data on server.
+     */
     SubmitShipment() {
         this.loaded()
-
         var data = this.el.getJson(null, false).map((ele, y) => ({
             "shipmentId": null,
             "procurementUnit": null,
-
             "planningUnit": ele[0],
             "dataSource": ele[1],
             "procurementAgent": ele[2],
@@ -1251,28 +1136,24 @@ export default class PipelineProgramShipment extends Component {
             "accountFlag": false,
             "erpFlag": false,
             "versionId": 0,
-
             "active": true
         }))
-        console.log(JSON.stringify(data))
         PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
             .then(response => {
-                console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
                     changedData: false,
-                }, () => console.log("=====", this.state));
+                });
             }
             ).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -1303,10 +1184,11 @@ export default class PipelineProgramShipment extends Component {
                     }
                 }
             );
-
     }
+    /**
+     * Function to handle program form submission and save the data on server.
+     */
     SubmitProgram() {
-        // this.SubmitShipment()
         this.loaded()
         this.setState({ loading: true });
         var data = this.el.getJson(null, false).map((ele, y) => ({
@@ -1335,55 +1217,33 @@ export default class PipelineProgramShipment extends Component {
             "accountFlag": false,
             "erpFlag": false,
             "versionId": 0,
-
             "active": true
         }))
-        console.log(JSON.stringify(data))
         PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
             .then(response => {
-                console.log("==========>", response.data)
                 this.setState({
                     message: response.data.messageCode,
                     changedData: false,
-                    // loading: true
-                }, () => console.log("=====", this.state));
-
-                // PipelineService.getPlanningUnitListWithFinalInventry(this.props.match.params.pipelineId)
-                //     .then(response => {
-                // var planningUnitListFinalInventory = response.data;
-                // console.log("planningUnitListFinalInventory====", planningUnitListFinalInventory);
-                // var negtiveInventoryList = (planningUnitListFinalInventory).filter(c => c.inventory < 0);
-                // console.log("negtive inventory list=====", negtiveInventoryList);
-                // if (negtiveInventoryList.length > 0) {
-                //     console.log("my page------");
-                //     this.props.history.push({
-                //         pathname: `/pipeline/planningUnitListFinalInventory/${this.props.match.params.pipelineId}`
-                //     });
-                // } else {
+                });
                 PipelineService.submitProgram(this.props.match.params.pipelineId)
                     .then(response => {
-                        console.log(response.data.messageCode)
                         this.setState({
                             message: response.data.messageCode,
                             changedData: false, loading: false
                         })
                         this.props.history.push(
-                            // {
-                            // pathname: `/pipeline/pieplineProgramList`
                             '/pipeline/pieplineProgramList/' + 'green/' + i18n.t('static.message.pipelineProgramImportSuccess')
-                            // }
                         );
                     }
                     ).catch(
                         error => {
                             if (error.message === "Network Error") {
                                 this.setState({
-                                    message: 'static.unkownError',
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                                     loading: false
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
-
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
@@ -1414,62 +1274,15 @@ export default class PipelineProgramShipment extends Component {
                             }
                         }
                     );
-
-
-                console.log('You have submitted the program');
-                // }
-
-                // }).catch(
-                //     error => {
-                //         if (error.message === "Network Error") {
-                //             this.setState({
-                //                 message: 'static.unkownError',
-                //                 loading: false
-                //             });
-                //         } else {
-                //             switch (error.response ? error.response.status : "") {
-
-                //                 case 401:
-                //                     this.props.history.push(`/login/static.message.sessionExpired`)
-                //                     break;
-                //                 case 403:
-                //                     this.props.history.push(`/accessDenied`)
-                //                     break;
-                //                 case 500:
-                //                 case 404:
-                //                 case 406:
-                //                     this.setState({
-                //                         message: error.response.data.messageCode,
-                //                         loading: false
-                //                     });
-                //                     break;
-                //                 case 412:
-                //                     this.setState({
-                //                         message: error.response.data.messageCode,
-                //                         loading: false
-                //                     });
-                //                     break;
-                //                 default:
-                //                     this.setState({
-                //                         message: 'static.unkownError',
-                //                         loading: false
-                //                     });
-                //                     break;
-                //             }
-                //         }
-                //     }
-                // );
-
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({
-                            message: 'static.unkownError',
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
                             loading: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
-
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
@@ -1500,16 +1313,18 @@ export default class PipelineProgramShipment extends Component {
                     }
                 }
             );
-
-
-
     }
-
+    /**
+     * Renders the pipeline program import shipment details screen.
+     * @returns {JSX.Element} - Pipeline program import shipment details screen.
+     */
     render() {
-
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         return (
             <>
-
                 <AuthenticationServiceComponent history={this.props.history} />
                 <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                     <h5 class="red">{i18n.t(this.state.message)}</h5>
@@ -1518,18 +1333,16 @@ export default class PipelineProgramShipment extends Component {
                     <div className="ml-2" >
                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepFour} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button>
                         &nbsp;
-                                       {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>{i18n.t('static.pipeline.save')}<i className="fa fa-angle-double-right"></i></Button>}
+                        {this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitShipment}>{i18n.t('static.pipeline.save')}<i className="fa fa-angle-double-right"></i></Button>}
                         {this.state.isValidData && !this.state.changedData && <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.SubmitProgram}>{i18n.t('static.program.submitProgram')}</Button>}
                         &nbsp;
-                                        </div>
+                    </div>
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                         <div class="align-items-center">
                             <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-
                             <div class="spinner-border blue ml-4" role="status">
-
                             </div>
                         </div>
                     </div>
