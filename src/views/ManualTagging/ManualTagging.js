@@ -15,7 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionForErp, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { filterOptions, generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, BATCH_PREFIX, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, NONE_SELECTED_DATA_SOURCE_ID, PROGRAM_TYPE_SUPPLY_PLAN, PSM_PROCUREMENT_AGENT_ID, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, SHIPMENT_MODIFIED, STRING_TO_DATE_FORMAT, TBD_FUNDING_SOURCE, USD_CURRENCY_ID } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService.js';
@@ -4902,6 +4902,7 @@ export default class ManualTagging extends Component {
                                                         options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
                                                         overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -4957,6 +4958,7 @@ export default class ManualTagging extends Component {
                                                     options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>}
@@ -4974,6 +4976,7 @@ export default class ManualTagging extends Component {
                                                     labelledBy={i18n.t('static.common.select')}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>}

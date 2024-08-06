@@ -27,7 +27,7 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { filterOptions, generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { BATCH_PREFIX, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from '../../Constants.js';
@@ -1168,6 +1168,7 @@ export default class ShipmentDetails extends React.Component {
                                                             id="planningUnit"
                                                             options={this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnit}
+                                                            filterOptions={filterOptions}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
                                                             overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
@@ -1327,6 +1328,7 @@ export default class ShipmentDetails extends React.Component {
                                                     <MultiSelect
                                                         name="planningUnitIdsPlan"
                                                         id="planningUnitIdsPlan"
+                                                        filterOptions={filterOptions}
                                                         options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                         value={this.state.planningUnitIdsPlan}
                                                         onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}

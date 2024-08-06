@@ -22,6 +22,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlanForDataEntry";
+import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 const entityname = i18n.t('static.inventory.inventorydetils')
 /**
  * This component is used to allow the users to do the data entry for the inventory or adjustment records
@@ -832,6 +833,7 @@ export default class AddInventory extends Component {
                                                             labelledBy={i18n.t('static.common.select')}
                                                             overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
+                                                            filterOptions={filterOptions}
                                                         />
                                                     </div>
                                                 </FormGroup>

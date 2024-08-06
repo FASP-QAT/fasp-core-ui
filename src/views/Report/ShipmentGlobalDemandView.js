@@ -34,7 +34,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1975,6 +1975,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     disabled={this.state.loading}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1992,6 +1993,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     disabled={this.state.loading}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2054,6 +2056,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     disabled={this.state.loading}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2092,6 +2095,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     disabled={this.state.loading}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2109,6 +2113,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     disabled={this.state.loading}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>

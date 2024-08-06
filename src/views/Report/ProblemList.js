@@ -15,7 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { contrast, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, hideSecondComponent, filterOptions } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -1360,6 +1360,7 @@ export default class ProblemList extends React.Component {
                                             labelledBy={i18n.t('static.common.select')}
                                             overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                             selectSomeItems: i18n.t('static.common.select')}}
+                                            filterOptions={filterOptions}
                                         />
                                     </div>
                                 </FormGroup>

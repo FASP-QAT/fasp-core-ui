@@ -28,7 +28,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const options = {
     title: {
         display: true,
@@ -1203,6 +1203,7 @@ class StockStatusOverTime extends Component {
                                                 <MultiSelect
                                                     name="planningUnitId"
                                                     id="planningUnitId"
+                                                    filterOptions={filterOptions}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}

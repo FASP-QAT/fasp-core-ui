@@ -41,7 +41,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -2108,21 +2108,6 @@ class ForecastOutput extends Component {
         });
     }
     /**
-     * Filters the options based on the provided filter string.
-     * @param {Array} options - The array of options to filter.
-     * @param {string} filter - The filter string used to match option labels.
-     * @returns {Promise<Array>} - A promise that resolves to the filtered options.
-     */
-    filterOptions = async (options, filter) => {
-        if (filter) {
-            return options.filter((i) =>
-                i.label.toLowerCase().includes(filter.toLowerCase())
-            );
-        } else {
-            return options;
-        }
-    };
-    /**
      * Toggles the visibility of guidance.
      */
     toggleShowGuidance() {
@@ -2509,7 +2494,7 @@ class ForecastOutput extends Component {
                                                         onChange={(e) => this.setForecastingUnit(e)}
                                                         options={forecastingUnitList && forecastingUnitList.length > 0 ? forecastingUnitList : []}
                                                         value={this.state.forecastingUnitValues}
-                                                        filterOptions={this.filterOptions}
+                                                        filterOptions={filterOptions}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}
                                                     />
@@ -2524,7 +2509,7 @@ class ForecastOutput extends Component {
                                                         id="planningUnitId"
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         value={this.state.planningUnitValues}
-                                                        filterOptions={this.filterOptions}
+                                                        filterOptions={filterOptions}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}

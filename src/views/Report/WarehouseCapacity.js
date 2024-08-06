@@ -24,7 +24,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 /**
  * Component for Warehouse Capacity Report.
@@ -695,6 +695,7 @@ class warehouseCapacity extends Component {
                                                             bsSize="sm"
                                                             name="countrysId"
                                                             id="countrysId"
+                                                            filterOptions={filterOptions}
                                                             value={this.state.countryValues}
                                                             onChange={(e) => { this.handleChange(e) }}
                                                             options={countryList && countryList.length > 0 ? countryList : []}
@@ -716,6 +717,7 @@ class warehouseCapacity extends Component {
                                                         bsSize="sm"
                                                         name="programId"
                                                         id="programId"
+                                                        filterOptions={filterOptions}
                                                         value={this.state.programValues}
                                                         onChange={(e) => { this.handleChangeProgram(e) }}
                                                         options={programList && programList.length > 0 ? programList : []}

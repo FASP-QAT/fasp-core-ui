@@ -30,6 +30,7 @@ import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlanForDataEntry";
+import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 const entityname = i18n.t('static.dashboard.consumptiondetails');
 /**
  * This component is used to allow the users to do the data entry for the consumption records
@@ -853,6 +854,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             labelledBy={i18n.t('static.common.select')}
                                                             overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
+                                                            filterOptions={filterOptions}
                                                         />
                                                     </div>
                                                 </FormGroup>

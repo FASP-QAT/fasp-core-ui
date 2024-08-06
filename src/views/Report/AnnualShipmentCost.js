@@ -27,8 +27,8 @@ import csvicon from "../../assets/img/csv.png";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 import FundingSourceService from '../../api/FundingSourceService.js';
+import { filterOptions, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1813,6 +1813,7 @@ class AnnualShipmentCost extends Component {
                                                         disabled={this.state.loading}
                                                         overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
+                                                        filterOptions={filterOptions}
                                                     />     
                                                     </div>
                                                     </FormGroup>
@@ -1825,6 +1826,7 @@ class AnnualShipmentCost extends Component {
                                                         id="planningUnitId"
                                                         bsSize="procurementAgentId"
                                                         value={this.state.procurementAgentValues}
+                                                        filterOptions={filterOptions}
                                                         onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                         options={procurementAgents.length > 0
                                                             && procurementAgents.map((item, i) => {
@@ -1866,6 +1868,7 @@ class AnnualShipmentCost extends Component {
                                                         id="fundingSourceId"
                                                         bsSize="md"
                                                         value={this.state.fundingSourceValues}
+                                                        filterOptions={filterOptions}
                                                         onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                         options={
                                                             fundingSourceList && fundingSourceList.length > 0
@@ -1887,6 +1890,7 @@ class AnnualShipmentCost extends Component {
                                                         id="shipmentStatusId"
                                                         bsSize="md"
                                                         value={this.state.statusValues}
+                                                        filterOptions={filterOptions}
                                                         onChange={(e) => { this.handleStatusChange(e) }}
                                                         options={shipmentStatuses.length > 0
                                                             && shipmentStatuses.map((item, i) => {

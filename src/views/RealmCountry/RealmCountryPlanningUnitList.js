@@ -34,7 +34,7 @@ import UnitService from "../../api/UnitService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+import { filterOptions, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 // Localized entity name
 const entityname = i18n.t("static.dashboad.planningunitcountry");
 /**
@@ -739,21 +739,6 @@ export default class RealmCountryPlanningUnitList extends Component {
     });
   }
   /**
-   * Filters the options based on the provided filter string and sort the options.
-   * @param {Array} options - The array of options to filter.
-   * @param {string} filter - The filter string to apply.
-   * @returns {Array} - The filtered array of options.
-   */
-  filterOptions = async (options, filter) => {
-    if (filter) {
-      return options.filter((i) =>
-        i.label.toLowerCase().includes(filter.toLowerCase())
-      );
-    } else {
-      return options;
-    }
-  };
-  /**
    * Function to filter and fetch data based on selected programs from server.
    */
   filterData() {
@@ -1221,9 +1206,9 @@ export default class RealmCountryPlanningUnitList extends Component {
                       options={
                         programList && programList.length > 0 ? programList : []
                       }
-                      filterOptions={this.filterOptions}
                       overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                       selectSomeItems: i18n.t('static.common.select')}}
+                      filterOptions={filterOptions}
                     />
                     {!!this.props.error && this.props.touched && (
                       <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>

@@ -22,7 +22,7 @@ import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, formatter, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import { MultiSelect } from 'react-multi-select-component';
 import DropdownService from '../../api/DropdownService';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -1597,7 +1597,7 @@ class CountrySpecificPrices extends Component {
                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                         <div className="controls ">
                                             <MultiSelect
-                                                filterOptions={this.filterOptions}
+                                                filterOptions={filterOptions}
                                                 bsSize="sm"
                                                 name="programIds"
                                                 id="programIds"
@@ -1613,7 +1613,7 @@ class CountrySpecificPrices extends Component {
                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                         <div className="controls ">
                                             <MultiSelect
-                                                filterOptions={this.filterOptions}
+                                                filterOptions={filterOptions}
                                                 bsSize="sm"
                                                 name="planningUnitIds"
                                                 id="planningUnitIds"

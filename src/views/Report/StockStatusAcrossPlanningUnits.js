@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -1253,6 +1253,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         name="tracerCategoryId"
                                                         id="tracerCategoryId"
                                                         bsSize="sm"
+                                                        filterOptions={filterOptions}
                                                         value={this.state.tracerCategoryValues}
                                                         onChange={(e) => { this.handleTracerCategoryChange(e) }}
                                                         disabled={this.state.loading}

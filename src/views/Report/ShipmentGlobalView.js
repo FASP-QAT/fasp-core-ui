@@ -30,7 +30,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
 const backgroundColor = [
     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
@@ -1741,6 +1741,7 @@ class ShipmentGlobalView extends Component {
                                                 disabled={this.state.loading}
                                                 overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                 selectSomeItems: i18n.t('static.common.select')}}
+                                                filterOptions={filterOptions}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1760,6 +1761,7 @@ class ShipmentGlobalView extends Component {
                                                 disabled={this.state.loading}
                                                 overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                 selectSomeItems: i18n.t('static.common.select')}}
+                                                filterOptions={filterOptions}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1846,6 +1848,7 @@ class ShipmentGlobalView extends Component {
                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1862,6 +1865,7 @@ class ShipmentGlobalView extends Component {
                                                     options={procurementAgentTypeList && procurementAgentTypeList.length > 0 ? procurementAgentTypeList : []}
                                                     overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                     selectSomeItems: i18n.t('static.common.select')}}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
