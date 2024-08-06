@@ -21,7 +21,7 @@ import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import { SECRET_KEY } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -30,6 +30,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProblemListDashboard from '../Report/ProblemListDashboard';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js';
+import ProgramService from '../../api/ProgramService';
 const entityname = i18n.t('static.report.problem');
 /**
  * This component is used to display the Problem List for multiple planning units
@@ -437,7 +438,7 @@ export default class ProblemList extends React.Component {
                                 problemReportListForUpdate[indexToUpdate] = probObj;
                             }
                             programJson.problemReportList = problemReportListForUpdate;
-                            programJson.currentVersionNotes=this.state.currentVersionNotes;
+                            programJson.currentVersionNotes = this.state.currentVersionNotes;
                             var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
@@ -1120,9 +1121,68 @@ export default class ProblemList extends React.Component {
             notesPopup: !this.state.notesPopup,
         }, () => {
             if (this.state.notesPopup) {
-                setTimeout(function () {
-                    this.getNotes()
-                }.bind(this), 100);
+                if (localStorage.getItem('sessionType') === 'Online') {
+                    this.setState({
+                        loading:true
+                    })
+                    ProgramService.getNotesHistory(this.state.programId.split("_")[0])
+                        .then(response => {
+                            var listArray = response.data;
+                            this.setState({
+                                currentVersionNotesHistory:listArray,
+                                loading:false
+                            },()=>{
+                                setTimeout(function () {
+                                    this.getNotes()
+                                }.bind(this), 100);
+                            })
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    loadingForNotes: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    setTimeout(function () {
+                        this.getNotes()
+                    }.bind(this), 100);
+                }
             }
         });
     }
@@ -1428,24 +1488,24 @@ export default class ProblemList extends React.Component {
                                 <div className='col-md-6'>
                                     {this.state.showProblemDashboard == 1 && this.state.programId != 0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
                                 </div>
-                            <FormGroup className="col-md-6">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                <div className="controls ">
-                                    <InputGroup>
-                                        <Input type="textarea"
-                                            name="notes"
-                                            id="notes"
-                                            // valid={!errors.notes && this.state.notes != ''}
-                                            // invalid={touched.notes && !!errors.notes}
-                                            onChange={(e) => { this.notesChange(e); }}
-                                            // onBlur={handleBlur}
-                                            value={this.state.currentVersionNotes}
-                                        >
-                                        </Input>
-                                        {/* <FormFeedback className="red">{errors.notes}</FormFeedback> */}
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input type="textarea"
+                                                name="notes"
+                                                id="notes"
+                                                // valid={!errors.notes && this.state.notes != ''}
+                                                // invalid={touched.notes && !!errors.notes}
+                                                onChange={(e) => { this.notesChange(e); }}
+                                                // onBlur={handleBlur}
+                                                value={this.state.currentVersionNotes}
+                                            >
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.notes}</FormFeedback> */}
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
                             </div>
                             <div className='ProblemListTableBorder'>
                                 <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
