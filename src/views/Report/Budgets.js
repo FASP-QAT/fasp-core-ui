@@ -24,7 +24,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterCSV, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatterCSV, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import FundingSourceService from '../../api/FundingSourceService.js';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -623,7 +623,7 @@ class Budgets extends Component {
      */
     formatterValue = value => {
         if (value != null) {
-            return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            return Number(value).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
         }
     }
     /**
@@ -641,21 +641,6 @@ class Budgets extends Component {
             this.filterData()
         })
     }
-    /**
-     * Filters the options based on the provided filter string and sort the options.
-     * @param {Array} options - The array of options to filter.
-     * @param {string} filter - The filter string to apply.
-     * @returns {Array} - The filtered array of options.
-     */
-    filterOptions = async (options, filter) => {
-        if (filter) {
-            return options.filter((i) =>
-                i.label.toLowerCase().includes(filter.toLowerCase())
-            );
-        } else {
-            return options;
-        }
-    };
     /**
      * Renders the budget report table.
      * @returns {JSX.Element} - Budget report table.
@@ -853,7 +838,7 @@ class Budgets extends Component {
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls ">
                                         <MultiSelect
-                                            filterOptions={this.filterOptions}
+                                            filterOptions={filterOptions}
                                             bsSize="sm"
                                             name="programIds"
                                             id="programIds"
@@ -872,7 +857,7 @@ class Budgets extends Component {
                                             name="fundingSourceTypeId"
                                             id="fundingSourceTypeId"
                                             bsSize="md"
-                                            filterOptions={this.filterOptions}
+                                            filterOptions={filterOptions}
                                             value={this.state.fundingSourceTypeValues}
                                             onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
                                             options={fundingSourceTypes.length > 0
@@ -893,7 +878,7 @@ class Budgets extends Component {
                                             name="fundingSourceId"
                                             id="fundingSourceId"
                                             bsSize="md"
-                                            filterOptions={this.filterOptions}
+                                            filterOptions={filterOptions}
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
                                             options={
@@ -978,10 +963,10 @@ class Budgets extends Component {
                     { title: i18n.t('static.budget.fundingsource'), type: 'text' },
                     { title: i18n.t('static.funderTypeHead.funderType'), type: 'text' },
                     { title: i18n.t('static.dashboard.currency'), type: 'text' },
-                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##' },
-                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##', },
-                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##' },
-                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##' },
+                    { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##.00', decimal: '.' },
+                    { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
+                    { title: i18n.t('static.report.orderedBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
+                    { title: i18n.t('static.report.remainingBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
                     { title: i18n.t('static.common.startdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },
                     { title: i18n.t('static.common.stopdate'), options: { format: JEXCEL_DATE_FORMAT_SM }, type: 'calendar' },
                     { title: 'Budget Id', type: 'hidden' },

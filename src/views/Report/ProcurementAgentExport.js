@@ -46,7 +46,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { addDoubleQuoteToRowContent, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -1636,7 +1636,7 @@ class ProcurementAgentExport extends Component {
                       c.receivedDate == null || c.receivedDate == ""
                         ? c.expectedDeliveryDate
                         : c.receivedDate
-                    ).isBetween(startDate, endDate, null, "[)")
+                    ).isBetween(startDate, endDate, null, "[]")
                   );
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
@@ -2029,7 +2029,7 @@ class ProcurementAgentExport extends Component {
                       c.receivedDate == null || c.receivedDate == ""
                         ? c.expectedDeliveryDate
                         : c.receivedDate
-                    ).isBetween(startDate, endDate, null, "[)")
+                    ).isBetween(startDate, endDate, null, "[]")
                   );
                   let planningUnitFilter = [];
                   for (let i = 0; i < planningUnitIds.length; i++) {
@@ -2399,7 +2399,7 @@ class ProcurementAgentExport extends Component {
                     c.receivedDate == null || c.receivedDate == ""
                       ? c.expectedDeliveryDate
                       : c.receivedDate
-                  ).isBetween(startDate, endDate, null, "[)")
+                  ).isBetween(startDate, endDate, null, "[]")
                 );
                 let data = [];
                 let planningUnitFilter = [];
@@ -3306,6 +3306,7 @@ class ProcurementAgentExport extends Component {
                       id="planningUnitId"
                       bsSize="md"
                       value={this.state.planningUnitValues}
+                      filterOptions={filterOptions}
                       onChange={(e) => {
                         this.handlePlanningUnitChange(e);
                       }}
@@ -3387,6 +3388,7 @@ class ProcurementAgentExport extends Component {
                       name="procurementAgentId"
                       id="planningUnitId"
                       bsSize="procurementAgentId"
+                      filterOptions={filterOptions}
                       value={this.state.procurementAgentValues}
                       onChange={(e) => {
                         this.handleProcurementAgentChange(e);
@@ -3412,7 +3414,7 @@ class ProcurementAgentExport extends Component {
                       name="fundingSourceTypeId"
                       id="fundingSourceTypeId"
                       bsSize="md"
-                      // filterOptions={this.filterOptions}
+                      filterOptions={filterOptions}
                       value={this.state.fundingSourceTypeValues}
                       onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
                       options={fundingSourceTypes.length > 0
@@ -3438,6 +3440,7 @@ class ProcurementAgentExport extends Component {
                     <MultiSelect
                       name="fundingSourceId"
                       id="fundingSourceId"
+                      filterOptions={filterOptions}
                       bsSize="md"
                       value={this.state.fundingSourceValues}
                       onChange={(e) => {

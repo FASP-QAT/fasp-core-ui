@@ -321,9 +321,10 @@ export default class PlanningUnitListComponent extends Component {
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
-            data[5] = planningUnitList[j].lastModifiedBy.username;
-            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[7] = planningUnitList[j].active;
+            data[5] = planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms;
+            data[6] = planningUnitList[j].lastModifiedBy.username;
+            data[7] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = planningUnitList[j].active;
             planningUnitArray[count] = data;
             count++;
         }
@@ -357,6 +358,10 @@ export default class PlanningUnitListComponent extends Component {
                     type: 'text',
                 },
                 {
+                    title: i18n.t('static.program.noOfProgramsUsingPU'),
+                    type: 'text',
+                },
+                {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
                 },
@@ -370,7 +375,7 @@ export default class PlanningUnitListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -518,7 +523,25 @@ export default class PlanningUnitListComponent extends Component {
     toggleExport() {
         this.setState({
             exportModal: !this.state.exportModal,
+            productCategoryIdExport:document.getElementById("productCategoryId").value,
+            tracerCategoryIdExport:document.getElementById("tracerCategoryId").value,
+            forecastingUnitIdExport:document.getElementById("forecastingUnitId").value  
         })
+    }
+    dataChange(e){
+        if(e.target.name=="productCategoryIdExport"){
+            this.setState({
+                "productCategoryIdExport":e.target.value
+            })
+        }else if(e.target.name=="tracerCategoryIdExport"){
+            this.setState({
+                "tracerCategoryIdExport":e.target.value
+            })
+        }else if(e.target.name=="forecastingUnitIdExport"){
+            this.setState({
+                "forecastingUnitIdExport":e.target.value
+            })
+        }
     }
     /**
      * This function is used to get planning unit list and export that list into csv file
@@ -559,13 +582,14 @@ export default class PlanningUnitListComponent extends Component {
                     tableHeadTemp.push(i18n.t('static.planningUnit.associatedForecastingUnit').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.planningUnitOfMeasure').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.labelMultiplier').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingPU').replaceAll('#', '%23').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));
                     A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
                     planningUnitList = response.data;
                     for (var j = 0; j < planningUnitList.length; j++) {
-                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
+                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), (planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
                     }
                     for (var i = 0; i < A.length; i++) {
                         csvRow.push(A[i].join(","))
@@ -827,7 +851,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="productCategoryIdExport"
                                                 id="productCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.productCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {productCategoryList}
                                             </Input>
@@ -843,7 +868,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="tracerCategoryIdExport"
                                                 id="tracerCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.tracerCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {tracercategoryList}
@@ -860,7 +886,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="forecastingUnitIdExport"
                                                 id="forecastingUnitIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.forecastingUnitIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {forecastingUnitList}

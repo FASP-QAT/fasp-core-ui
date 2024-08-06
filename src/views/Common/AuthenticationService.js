@@ -762,7 +762,9 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId":
+                    case "/programProduct/addCountrySpecificPrice":
+                    case "/programProduct/addCountrySpecificPrice/:planningUnitId/:programId":
+                    case "/programProduct/addCountrySpecificPrice/1/:colour/:message":
                         if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
                             return true;
                         }

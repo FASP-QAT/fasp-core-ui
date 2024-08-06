@@ -6,6 +6,7 @@ import "jspdf-autotable";
 import moment from "moment";
 import React, { Component } from 'react';
 import { HorizontalBar, Pie } from 'react-chartjs-2';
+import Chart from 'chart.js';
 import Picker from 'react-month-picker';
 import { MultiSelect } from 'react-multi-select-component';
 import {
@@ -33,13 +34,20 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
 const options = {
+    plugins: {
+        datalabels: {
+          formatter: (value, context) => {
+            return ``;
+          },
+        },
+    },
     title: {
         display: true,
         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -117,6 +125,13 @@ const options = {
     }
 }
 const options1 = {
+    plugins: {
+        datalabels: {
+          formatter: (value, context) => {
+            return ``;
+          },
+        },
+    },
     title: {
         display: true,
         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -172,10 +187,14 @@ const options1 = {
         display: true,
         // text: document.getElementById("groupByFundingSourceType").value ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
         text: i18n.t('static.fundingSourceHead.fundingSource'),
-        fontColor: 'black'
+        fontColor: 'black',
+        padding: 30
     },
     legend: {
-        position: 'bottom'
+        position: 'bottom',
+        labels: {
+            padding: 25
+        }
     },
     tooltips: {
         callbacks: {
@@ -842,6 +861,58 @@ class ShipmentGlobalDemandView extends Component {
      * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
      */
     componentDidMount() {
+        Chart.plugins.register({
+            afterDraw: function(chart) {
+              if (chart.config.type === 'pie') {
+                const ctx = chart.chart.ctx;
+                const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                  const meta = chart.getDatasetMeta(datasetIndex);
+                  if (!meta.hidden) {
+                    meta.data.forEach((element, index) => {
+                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                        // Draw the connecting lines
+                        ctx.save();
+                        const model = element._model;
+                        const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                        const startAngle = model.startAngle;
+                        const endAngle = model.endAngle;
+                        const midAngle = startAngle + (endAngle - startAngle) / 2;
+        
+                        const x = Math.cos(midAngle);
+                        const y = Math.sin(midAngle);
+        
+                        // Calculate the end point for the line
+                        const lineX = model.x + x * model.outerRadius;
+                        const lineY = model.y + y * model.outerRadius;
+                        const labelX = model.x + x * (model.outerRadius + 10);
+                        const labelY = model.y + y * (model.outerRadius + 10);
+        
+                        const label = chart.data.labels[index];
+                        const value = dataset.data[index];
+                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+
+                        if(((value / total) * 100).toFixed(2) > 2) {
+                            ctx.beginPath();
+                            ctx.moveTo(model.x, model.y);
+                            ctx.lineTo(lineX, lineY);
+                            ctx.lineTo(labelX, labelY);
+                            ctx.strokeStyle = dataset.backgroundColor[index];
+                            ctx.stroke();                      
+                            ctx.textAlign = x >= 0 ? 'left' : 'right';
+                            ctx.font = 'bold 12px Arial';
+                            // ctx.textBaseline = 'middle';
+                            ctx.fillStyle = dataset.backgroundColor[index];
+                            ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+8 : x < 0.5 ? labelX-8 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
+                            ctx.restore();
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+            },
+          });
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
             // this.getFundingSourceType();
@@ -927,6 +998,8 @@ class ShipmentGlobalDemandView extends Component {
             countryLabels: countrysId.map(ele => ele.label),
             programValues: [],
             programLabels: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
             data: [],
             fundingSourceSplit: [],
             planningUnitSplit: [],
@@ -1900,6 +1973,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1915,6 +1989,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1975,6 +2050,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2011,6 +2087,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2026,6 +2103,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2122,9 +2200,10 @@ class ShipmentGlobalDemandView extends Component {
                                             this.state.fundingSourceSplit.length > 0 &&
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
-                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
                                                     /><br />
                                                 </div>
+                                                <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
                                                 <h5 className="red text-center">{this.state.groupByFundingSourceType? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
                                         }

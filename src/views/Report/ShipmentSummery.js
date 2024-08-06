@@ -59,7 +59,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 import FundingSourceService from "../../api/FundingSourceService.js";
 const ref = React.createRef();
 const options = {
@@ -2999,6 +2999,7 @@ class ShipmentSummery extends Component {
                             id="planningUnitId"
                             bsSize="md"
                             value={this.state.planningUnitValues}
+                            filterOptions={filterOptions}
                             onChange={(e) => {
                               this.handlePlanningUnitChange(e);
                             }}
@@ -3066,6 +3067,7 @@ class ShipmentSummery extends Component {
                             id="fundingSourceId"
                             bsSize="md"
                             value={this.state.fundingSourceValues}
+                            filterOptions={filterOptions}
                             onChange={(e) => {
                               this.handleFundingSourceChange(e);
                             }}
@@ -3090,6 +3092,7 @@ class ShipmentSummery extends Component {
                               id="budgetId"
                               bsSize="md"
                               value={this.state.budgetValues}
+                              filterOptions={filterOptions}
                               onChange={(e) => {
                                 this.handleBudgetChange(e);
                               }}

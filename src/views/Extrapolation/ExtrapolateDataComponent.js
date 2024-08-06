@@ -35,7 +35,7 @@ import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCom
 import { LOGO } from "../../CommonComponent/Logo";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from "../../CommonComponent/getLabelText";
-import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, TITLE_FONT } from "../../Constants";
+import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY, TITLE_FONT, PROGRAM_TYPE_DATASET } from "../../Constants";
 import { JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -47,6 +47,8 @@ import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
 import { calculateError } from "./ErrorCalculations";
+import DropdownService from '../../api/DropdownService.js';
+import DatasetService from '../../api/DatasetService.js';
 import { addDoubleQuoteToRowContent, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.extrapolation');
@@ -180,6 +182,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             forecastProgramList: [],
             planningUnitId: -1,
             planningUnitList: [],
+            versionId: -1,
+            versions: [],
             show: false,
             regionId: -1,
             regionList: [],
@@ -283,6 +287,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: false,
             notesChanged: false,
             noDataMessage: "",
+            noDataMessage1: "",
             showFits: false,
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
@@ -290,7 +295,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             seasonality: 1,
             extrapolationNotes: null,
             offlineTES: false,
-            offlineArima: false
+            offlineArima: false,
+            isDisabled: false,
+            onlyDownloadedProgram: false
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -307,104 +314,220 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
         this.changeNotes = this.changeNotes.bind(this);
         this.setButtonFlag = this.setButtonFlag.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
+        this.getPrograms = this.getPrograms.bind(this);
+        this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
     }
     /**
      * Handles change for seasonality check box.
      * @param {Event} event - The change event.
      */
     seasonalityCheckbox(event) {
+        var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
         this.setState({
-            seasonality: event.target.checked ? 1 : 0
+            seasonality: event.target.checked ? 1 : 0,
+            arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
+            arimaDisabled: (event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
         });
     }
     /**
-     * Reterives the forecast program list from indexed db on component mount
+     * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
+        this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
+        var db1;
+        getDatabase();
+        this.getPrograms();
+        this.getDateDifference();
+    }
+    /**
+     * Handles the change event of the diplaying only downloaded programs.
+     * @param {Object} event - The event object containing the checkbox state.
+     */
+    changeOnlyDownloadedProgram(event) {
+        var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                planningUnitList: this.state.versionId.toString().includes('Local') ? this.state.planningUnitList : [],
+                regionList: this.state.versionId.toString().includes('Local') ? this.state.regionList : [],
+                forecastProgramId: this.state.versionId.toString().includes('Local') ? this.state.forecastProgramId : "",
+                onlyDownloadedProgram: true,
+                loading: false
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedProgram: false,
+                loading: false
+            }, () => {
+                this.getPrograms();
+            })
+        }
+    }
+    /**
+     * Retrieves list of all programs
+     */
+    getPrograms() {
         this.setState({ loading: true })
+        if (localStorage.getItem('sessionType') === 'Online') {
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+                .then(response => {
+                    var proList = [];
+                    if (response.status == 200) {
+                        for (var i = 0; i < response.data.length; i++) {
+                            var programJson = {
+                                id: response.data[i].id,
+                                label: response.data[i].label,
+                                name: response.data[i].code
+                            }
+                            proList[i] = programJson
+                        }
+                        this.setState({
+                            forecastProgramList: proList,
+                            loading: false,
+                            allProgramList: proList
+                        }, () => {
+                            this.consolidatedProgramList();
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        }, () => {
+                            this.hideSecondComponent();
+                        })
+                    }
+                }).catch(
+                    error => {
+                        this.consolidatedProgramList();
+                    }
+                );
+        } else {
+            this.setState({ loading: false })
+            this.consolidatedProgramList()
+        }
+    }
+    /**
+     * Consolidates server and local version of all programs
+     */
+    consolidatedProgramList = () => {
+        this.setState({ loading: true })
+        const lan = 'en';
+        const { forecastProgramList } = this.state
+        var proList;
+        if(this.state.onlyDownloadedProgram) {
+            proList = [];
+        } else {
+            proList = forecastProgramList;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-            hideFirstComponent()
-        }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('datasetData');
-            var programRequest = programDataOs.getAll();
-            programRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                hideFirstComponent()
-            }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var forecastProgramList = [];
-                var myResult = programRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
-                        var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
-                        var regionList = datasetJson.regionList;
-                        planningUnitList.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        regionList.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        var forecastProgramJson = {
-                            name: datasetJson.programCode + "~v" + myResult[i].version,
-                            id: myResult[i].id,
-                            regionList: regionList,
-                            planningUnitList: planningUnitList,
-                            datasetData: datasetJson
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                
+                    myResult = getRequest.result;
+                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                    let downloadedProgramData = [];
+                    for (var i = 0; i < myResult.length; i++) {
+                        if (myResult[i].userId == userId) {
+                            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                            programData.code = programData.programCode;
+                            programData.id = programData.programId;
+                            var planningUnitList = programData.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
+                            var regionList = programData.regionList;
+                            planningUnitList.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            regionList.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            var forecastProgramJson = {
+                                name: programData.programCode,
+                                id: myResult[i].id.split("_")[0],
+                                regionList: regionList,
+                                planningUnitList: planningUnitList,
+                                datasetData: programData
+                            }
+                            var f = 0
+                            for (var k = 0; k < this.state.forecastProgramList.length; k++) {
+                                if (this.state.forecastProgramList[k].id == programData.programId) {
+                                    f = 1;
+                                }
+                            }
+                            if(this.state.onlyDownloadedProgram) {
+                                proList.push(forecastProgramJson)
+                            } else {
+                                if (f == 0) {
+                                    proList.push(forecastProgramJson)
+                                } else if(f == 1) {
+                                    proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
+                                }
+                            }
+                            downloadedProgramData.push(forecastProgramJson);
                         }
-                        forecastProgramList.push(forecastProgramJson)
                     }
-                }
-                var forecastProgramId = "";
-                var event = {
-                    target: {
-                        value: ""
+                    var lang = this.state.lang;
+                    if (proList.length == 1) {
+                        this.setState({
+                            forecastProgramList: proList.sort(function (a, b) {
+                                a = (a.name).toLowerCase();
+                                b = (b.name).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            loading: false,
+                            downloadedProgramData: downloadedProgramData,
+                            downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                                a = (a.name).toLowerCase();
+                                b = (b.name).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
+                        }, () => {
+                            this.filterVersion();
+                        })
+                    } else {
+                            this.setState({
+                                forecastProgramList: proList.sort(function (a, b) {
+                                    a = (a.name).toLowerCase();
+                                    b = (b.name).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                downloadedProgramData: downloadedProgramData,
+                                downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                                    a = (a.name).toLowerCase();
+                                    b = (b.name).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                loading: false
+                            }, () => {
+                                this.filterVersion();
+                            })
                     }
-                };
-                if (forecastProgramList.length == 1) {
-                    forecastProgramId = forecastProgramList[0].id;
-                    event.target.value = forecastProgramList[0].id;
-                } else if (localStorage.getItem("sesDatasetId") != "" && forecastProgramList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
-                    forecastProgramId = localStorage.getItem("sesDatasetId");
-                    event.target.value = localStorage.getItem("sesDatasetId");
-                }
-                forecastProgramList = forecastProgramList.sort(function (a, b) {
-                    a = a.name.toLowerCase();
-                    b = b.name.toLowerCase();
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
-                this.setState({
-                    forecastProgramList: forecastProgramList,
-                    loading: false
-                }, () => {
-                    if (forecastProgramId != "") {
-                        this.getPlanningUnitList(event);
-                    }
-                })
-            }.bind(this)
-        }.bind(this)
-        this.getDateDifference();
+                
+            }.bind(this);
+        }.bind(this);
     }
     /**
      * Resets the extrapolation data on reset button clicked
@@ -428,6 +551,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     handleRangeDissmis1(value) {
         this.setState({ rangeValue1: value }, () => {
             this.getDateDifference()
+            setTimeout(() => {
+                var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+                this.setState({
+                    movingAvgId: this.state.movingAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.movingAvgDisabled ? true : this.state.movingAvgId : false,
+                    semiAvgId: this.state.semiAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.semiAvgDisabled ? true : this.state.semiAvgId : false,
+                    linearRegressionId: this.state.linearRegressionData.length > 0 && this.state.monthsDiff >= 3 ? this.state.linearRegressionDisabled ? true : this.state.linearRegressionId : false,
+                    smoothingId: this.state.tesData.length > 0 && this.state.monthsDiff >= 24 ? this.state.tesDisabled ? true : this.state.smoothingId : false,
+                    arimaId: this.state.arimaData.length > 0 && this.state.seasonality ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
+                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
+                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                })
+            }, 0)
         })
     }
     /**
@@ -487,6 +625,11 @@ export default class ExtrapolateDataComponent extends React.Component {
         var stopDateFromRangeValue1 = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
         var actualStartDate = moment.min(actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDateFromRangeValue1).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
         var actualStopDate = moment.max(actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDateFromRangeValue1).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
+        var movingAvgDataFilter = [];
+        var semiAvgDataFilter = [];
+        var linearRegressionDataFilter = [];
+        var tesDataFilter = [];
+        var arimaDataFilter = [];
         var movingAvgDataFilter = [];
         var semiAvgDataFilter = [];
         var linearRegressionDataFilter = [];
@@ -901,7 +1044,288 @@ export default class ExtrapolateDataComponent extends React.Component {
         tr.children[2].title = 'Historic time series data may need to be adjusted for reporting rate and/or for stock out rate to better reflect actual demand. Update these on the "Data Entry and Adjustment" screen.';
     }
     /**
-     * Reterives planning unit and region list
+     * Sets selected Forecasting Program
+     * @param {*} event - Forecast Program change event
+     */
+    setForecastProgramId(event) {
+        this.setState({
+            forecastProgramId: event.target.value,
+            versionId: '',
+            planningUnitId: '',
+            regionId: '',
+            planningUnitList: [],
+            regionList: [],
+            showData: false,
+            dataEl: ""
+        }, () => {
+            this.filterVersion();
+        })
+    }
+    /**
+     * Sets selected version
+     * @param {*} event - Version change event
+     */
+    setVersionId(event) {
+        var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        versionId = parseInt(versionId);
+        if (versionId != '' || versionId != undefined) {
+            this.setState({
+                planningUnitList: [],
+                planningUnitId: "",
+                regionList: [],
+                regionId: "",
+                showData: false,
+                dataEl: "",
+                versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
+            }, () => {
+                this.getPlanningUnitList(event);
+            })
+        } else {
+            localStorage.setItem("sesVersionId", event.target.value);
+            this.setState({
+                planningUnitList: [],
+                planningUnitId: "",
+                regionList: [],
+                regionId: "",
+                showData: false,
+                dataEl: "",
+                versionId: event.target.value
+            }, () => {
+                this.getPlanningUnitList(event);
+            })
+        }
+    }
+    /**
+     * Retrieves list of all available version for selected forecast program
+     */
+    getVersionIds() {
+        let programId = this.state.forecastProgramId;
+        let forecastProgramId = this.state.forecastProgramId;
+        if (programId != 0) {
+            const program = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)
+            if (program.length == 1) {
+                if (localStorage.getItem("sessionType") === 'Online') {
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                        .then(response => {
+                            this.setState({
+                                versions: []
+                            }, () => {
+                                this.setState({
+                                    versions: response.data
+                                }, () => { this.consolidatedVersionList(programId) });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    this.setState({
+                        versions: [],
+                    }, () => {
+                        this.consolidatedVersionList(programId)
+                    })
+                }
+            } else {
+                this.setState({
+                    versions: [],
+                }, () => { })
+            }
+        } else {
+            this.setState({
+                versions: [],
+                planningUnitList: [],
+                regionList: []
+            }, () => { })
+        }
+    }
+    /**
+     * Retrieves version list of the selected program
+     */
+    filterVersion() {
+        this.setState({ loading: true })
+        let programId = this.state.forecastProgramId;
+        if (programId != 0) {
+            const program = this.state.forecastProgramList.filter(c => c.id == programId)
+            if (program.length == 1) {
+                if (localStorage.getItem('sessionType') === 'Online') {
+                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                        .then(response => {
+                            this.setState({
+                                versions: []
+                            }, () => {
+                                this.setState({
+                                    versions: response.data
+                                }, () => { this.consolidatedVersionList(programId) });
+                            });
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    programs: [], loading: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    this.setState({
+                        versions: [],
+                        loading: false
+                    }, () => {
+                        this.consolidatedVersionList(programId)
+                    })
+                }
+            } else {
+                this.setState({
+                    versions: [],
+                    loading: false
+                }, () => { })
+            }
+        } else {
+            this.setState({
+                versions: [],
+                loading:false
+            }, () => {
+                if(document.getElementById("tableDiv")){
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                }
+            })
+        }
+    }
+    /**
+     * Gets consolidated list of all versions for a forecast program
+     * @param {*} programId - Forecast Program Id
+     */
+    consolidatedVersionList = (programId) => {
+        const { versions } = this.state
+        var verList = versions;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var program = transaction.objectStore('datasetData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                        var programData = databytes.toString(CryptoJS.enc.Utf8)
+                        var version = JSON.parse(programData).currentVersion
+                        version.versionId = `${version.versionId} (Local)`
+                        verList.push(version)
+                    }
+                }
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                })
+                versionList.reverse();
+                if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
+                    this.setState({
+                        versions: versionList,
+                        versionId: this.props.match.params.versionId + " (Local)",
+                    }, () => {
+                        this.getPlanningUnitList(event);
+                    })
+                } else if (localStorage.getItem("sesVersionId") != '' && localStorage.getItem("sesVersionId") != undefined) {
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionId"));
+                    this.setState({
+                        versions: versionList,
+                        versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionId") : versionList[0].versionId),
+                    }, () => {
+                        this.getPlanningUnitList(event);
+                    })
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
+                    }, () => {
+                        this.getPlanningUnitList(event);
+                    })
+                }
+            }.bind(this);
+        }.bind(this)
+    }
+    /**
+     * Retrieves planning unit and region list
      * @param {Event} e This is change event
      */
     getPlanningUnitList(e) {
@@ -917,9 +1341,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
         if (cont == true) {
             this.setState({ loading: true })
-            localStorage.setItem("sesDatasetId", e.target.value);
-            var forecastProgramId = e.target.value;
-            if (forecastProgramId != "") {
+            localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
+            var forecastProgramId = document.getElementById("forecastProgramId").value;
+            var versionId = document.getElementById("versionId").value;
+            if (forecastProgramId != "" && versionId.includes("Local")) {
                 var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
                 var regionList = forecastProgramListFilter.regionList;
                 var startDate = forecastProgramListFilter.datasetData.currentVersion.forecastStartDate;
@@ -972,9 +1397,73 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                     this.getDateDifference()
                 })
+                this.showDataOnPlanningAndRegionChange();
+            } else if(forecastProgramId != "") {
+                DatasetService.getDatasetDataWithoutTree(forecastProgramId, versionId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var datasetJson = response.data
+                        var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
+                        var regionList = datasetJson.regionList;
+                        planningUnitList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        regionList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var planningUnitId = "";
+                        var event = {
+                            target: {
+                                value: ""
+                            }
+                        };
+                        if (planningUnitList.length == 1) {
+                            planningUnitId = planningUnitList[0].planningUnit.id;
+                            event.target.value = planningUnitList[0].planningUnit.id;
+                        } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
+                            planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
+                            event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
+                        } else if (this.props.match.params.planningUnitId > 0) {
+                            planningUnitId = this.props.match.params.planningUnitId;
+                            event.target.value = this.props.match.params.planningUnitId;
+                        }
+                        var regionId = "";
+                        var regionEvent = {
+                            target: {
+                                value: ""
+                            }
+                        };
+                        if (regionList.length == 1) {
+                            regionId = regionList[0].regionId;
+                            regionEvent.target.value = regionList[0].regionId;
+                        } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
+                            regionId = localStorage.getItem("sesDatasetRegionId");
+                            regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
+                        }
+                        this.setState({ 
+                            planningUnitList,
+                            regionList,
+                            loading: false 
+                        }, () => {
+                            if (planningUnitId != "") {
+                                this.setPlanningUnitId(event);
+                            }
+                            if (regionId != "") {
+                                this.setRegionId(regionEvent);
+                            }
+                            this.getDateDifference()
+                        })
+                    }
+                });
             } else {
-                this.el = jexcel(document.getElementById("tableDiv"), '');
-                jexcel.destroy(document.getElementById("tableDiv"), true);
+                if(document.getElementById("tableDiv")){
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    jexcel.destroy(document.getElementById("tableDiv"), true);
+                }
                 this.setState({
                     forecastProgramId: forecastProgramId,
                     planningUnitList: [],
@@ -1011,6 +1500,7 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Saves consumption extrapolation in indexed db
      */
     saveForecastConsumptionExtrapolation() {
+        var tempForecastProgramId = this.state.forecastProgramId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
         if (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) {
             var cont = false;
             var cf = window.confirm(i18n.t("static.extrapolation.confirmmsg"));
@@ -1034,7 +1524,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     db1 = e.target.result;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetTransaction = transaction.objectStore('datasetData');
-                    var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+                    var datasetRequest = datasetTransaction.get(tempForecastProgramId);
                     datasetRequest.onerror = function (event) {
                     }.bind(this);
                     datasetRequest.onsuccess = function (event) {
@@ -1070,7 +1560,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(tempForecastProgramId);
                             datasetDetailsRequest.onsuccess = function (e) {
                                 var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                 datasetDetailsRequestJson.changed = 1;
@@ -1114,7 +1604,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 extrapolationMethodRequest.onsuccess = function (event) {
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetTransaction = transaction.objectStore('datasetData');
-                    var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+                    var datasetRequest = datasetTransaction.get(tempForecastProgramId);
                     datasetRequest.onerror = function (event) {
                     }.bind(this);
                     datasetRequest.onsuccess = function (event) {
@@ -1133,7 +1623,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
                         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         var curUser = AuthenticationService.getLoggedInUserId();
-                        var json = this.state.dataEl.getJson(null, false);
+                        var json;
+                        try {
+                            json = this.state.dataEl.getJson(null, false);
+                        } catch (error) {
+                            json = []
+                        }
                         if (this.state.semiAvgId) {
                             var data = [];
                             for (var i = 0; i < json.length; i++) {
@@ -1294,7 +1789,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             db1 = e.target.result;
                             var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                             var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                            var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.forecastProgramId);
+                            var datasetDetailsRequest = datasetDetailsTransaction.get(tempForecastProgramId);
                             datasetDetailsRequest.onsuccess = function (e) {
                                 var datasetDetailsRequestJson = datasetDetailsRequest.result;
                                 datasetDetailsRequestJson.changed = 1;
@@ -1325,6 +1820,7 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     setPlanningUnitId(e) {
         var cont = false;
+        let versionId = document.getElementById("versionId").value;
         if (this.state.dataChanged) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
             if (cf == true) {
@@ -1383,13 +1879,38 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
      * Builds data on change of planning unit and region
      */
-    showDataOnPlanningAndRegionChange() {
+    async showDataOnPlanningAndRegionChange() {
+        let programId = this.state.forecastProgramId;
+        let versionId = this.state.versionId;
+        var datasetJson;
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
-            var datasetJson = this.state.datasetJson;
+            if (versionId.toString().includes('Local')) {
+                this.setState({ loading: true })
+                datasetJson = this.state.datasetJson;
+                this.setState({
+                    isDisabled: false,
+                    loading: false
+                })
+            } else {
+                this.setState({ loading: true })
+                this.setState({
+                    isDisabled: true
+                })
+                await DatasetService.getDatasetDataWithoutTree(programId, versionId)
+                .then(response => {
+                    if (response.status == 200) {
+                        datasetJson = response.data
+                        this.setState({ 
+                            datasetJson: datasetJson,
+                            loading: false 
+                        })
+                    }
+                });
+            }
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var extrapolationNotes = null;
-            if (consumptionExtrapolationList.length > 1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+            if (consumptionExtrapolationList.length > 0 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                 this.setState({ loading: true })
                 var startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                 var minStartDate = startDate1;
@@ -1546,6 +2067,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (this.state.arimaId && inputDataArima.length > 0) {
                     calculateError(inputDataArima, "arimaError", this);
                 }
+                let startDate = moment(rangeValue2.from.year + '-' + rangeValue2.from.month + '-01').format("YYYY-MM");
+                let endDate = moment(rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate()).format("YYYY-MM");
+                const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+                let tempMonthsDiff = Math.round(monthsDiff) + 1;
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     extrapolationNotes: (extrapolationNotes == "" || extrapolationNotes == undefined || extrapolationNotes == null) ? "" : extrapolationNotes,
@@ -1562,16 +2087,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                     beta: beta,
                     gamma: gamma,
                     showData: true,
-                    movingAvgId: movingAvgId,
-                    semiAvgId: semiAvgId,
-                    linearRegressionId: linearRegressionId,
-                    smoothingId: smoothingId,
-                    arimaId: arimaId,
+                    movingAvgId: inputDataMovingAvg.length > 0 && tempMonthsDiff >= 3 ? movingAvgId : false,
+                    semiAvgId: inputDataSemiAverage.length > 0 && tempMonthsDiff >= 3 ? semiAvgId : false,
+                    linearRegressionId: inputDataLinearRegression.length > 0 && tempMonthsDiff >= 3 ? linearRegressionId : false,
+                    smoothingId: inputDataTes.length > 0 && tempMonthsDiff >= 24 ? smoothingId : false,
+                    arimaId: inputDataArima.length > 0 && this.state.seasonality ? tempMonthsDiff >= 13 : tempMonthsDiff >= 2 ? arimaId : false,
                     movingAvgData: inputDataMovingAvg,
                     semiAvgData: inputDataSemiAverage,
                     linearRegressionData: inputDataLinearRegression,
                     tesData: inputDataTes,
                     arimaData: inputDataArima,
+                    movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                    semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                    linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
+                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
                     noDataMessage: "",
                     showDate: true,
                     minDate: minDate,
@@ -1594,6 +2124,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                     startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                     endDate1 = moment.max((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
+                    let startDate = moment(Number(moment(startDate1).startOf('month').format("YYYY")) + '-' + Number(moment(startDate1).startOf('month').format("M")) + '-01').format("YYYY-MM");
+                    let endDate = moment(Number(moment(endDate1).startOf('month').format("YYYY")) + '-' + Number(moment(endDate1).startOf('month').format("M")) + '-' + new Date(Number(moment(endDate1).startOf('month').format("YYYY")), Number(moment(endDate1).startOf('month').format("M")), 0).getDate()).format("YYYY-MM");
+                    const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
+                    let tempMonthsDiff = Math.round(monthsDiff) + 1;
                     actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                     this.setState({
                         rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
@@ -1601,7 +2135,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
                         showDate: true,
                         actualConsumptionList: actualConsumptionList,
-                        extrapolationNotes: ""
+                        extrapolationNotes: "",
+                        movingAvgId: false,
+                        semiAvgId: false,
+                        linearRegressionId: false,
+                        smoothingId: false,
+                        arimaId: false,
+                        movingAvgData: [],
+                        semiAvgData: [],
+                        linearRegressionData: [],
+                        tesData: [],
+                        arimaData: [],
+                        movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                        semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                        linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
+                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
+                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
                     }, () => {
                         this.getDateDifference()
                     })
@@ -1618,12 +2167,59 @@ export default class ExtrapolateDataComponent extends React.Component {
                         loading: false,
                         noDataMessage: i18n.t('static.extrapolate.noDataFound'),
                         actualConsumptionList: actualConsumptionList,
-                        extrapolationNotes: ""
+                        extrapolationNotes: "",
+                        movingAvgId: false,
+                        semiAvgId: false,
+                        linearRegressionId: false,
+                        smoothingId: false,
+                        arimaId: false,
+                        movingAvgData: [],
+                        semiAvgData: [],
+                        linearRegressionData: [],
+                        tesData: [],
+                        arimaData: [],
+                        movingAvgDisabled: true,
+                        semiAvgDisabled: true,
+                        linearRegressionDisabled: true,
+                        tesDisabled: true,
+                        arimaDisabled: true 
                     }, () => {
                         this.getDateDifference()
                     })
                 }
             }
+        } else {
+                this.setState({
+                    loading: true,
+                    isDisabled: true
+                })
+                await DatasetService.getDatasetDataWithoutTree(programId, versionId)
+                .then(response => {
+                    if (response.status == 200) {
+                        datasetJson = response.data
+                        var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
+                        var regionList = datasetJson.regionList;
+                        planningUnitList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        regionList.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({ 
+                            planningUnitList,
+                            regionList,
+                            loading: false 
+                        })
+                    }
+                }).catch((e) => {
+                    this.setState({
+                        loading: false
+                    })
+                });
         }
     }
     /**
@@ -2426,6 +3022,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </option>
             )
         }, this);
+        const { versions } = this.state;
+        let versionList = versions.length > 0
+            && versions.map((item, i) => {
+                return (
+                    <option key={i} value={item.versionId}>
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                    </option>
+                )
+            }, this);
         const { planningUnitList } = this.state;
         let planningUnits = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
@@ -2854,10 +3459,26 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 id="forecastProgramId"
                                                 bsSize="sm"
                                                 value={this.state.forecastProgramId}
-                                                onChange={(e) => { this.getPlanningUnitList(e) }}
+                                                onChange={(e) => { this.setForecastProgramId(e) }}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {forecastPrograms}
+                                            </Input>
+                                        </div>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-3">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
+                                        <div className="controls ">
+                                            <Input
+                                                type="select"
+                                                name="versionId"
+                                                id="versionId"
+                                                bsSize="sm"
+                                                onChange={(e) => { this.setVersionId(e); }}
+                                                value={this.state.versionId}
+                                            >
+                                                <option value="-1">{i18n.t('static.common.select')}</option>
+                                            {versionList}
                                             </Input>
                                         </div>
                                     </FormGroup>
@@ -2893,7 +3514,26 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
-                                    {this.state.showDate && <><FormGroup className="col-md-12">
+                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                                        <FormGroup className="col-md-3" style={{ marginTop: '30px' }}>
+                                            <div className="tab-ml-1 ml-lg-3">
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="onlyDownloadedProgram"
+                                                    name="onlyDownloadedProgram"
+                                                    checked={this.state.onlyDownloadedProgram}
+                                                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    {i18n.t('static.common.onlyDownloadedProgram')}
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
+                                    }
+                                    {this.state.forecastProgramId != 0 && this.state.showDate && <><FormGroup className="col-md-12">
                                         <h5>
                                             {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&
                                                 document.getElementById("planningUnitId").selectedOptions[0].text}</b>
@@ -2903,7 +3543,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </FormGroup>
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
-                                            <div className="controls edit">
+                                            <div className="controls edit" style={{backgroundColor: this.state.isDisabled ? "#e5edf5" : "#fff"}}>
                                                 <Picker
                                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                     ref={this.pickRange1}
@@ -2913,7 +3553,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     onDismiss={this.handleRangeDissmis1}
                                                     readOnly
                                                 >
-                                                    <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this._handleClickRangeBox1} />
+                                                    <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this.state.isDisabled ? "" : this._handleClickRangeBox1} />
                                                 </Picker>
                                             </div>
                                         </FormGroup>
@@ -2927,7 +3567,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 </div>
                             </div>
                         </Form>
-                        <Formik
+                        {this.state.forecastProgramId != 0 && <Formik
                             enableReinitialize={true}
                             initialValues={{
                                 noOfMonthsId: this.state.monthsForMovingAverage,
@@ -2967,9 +3607,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     setFieldTouched,
                                     setFieldError
                                 }) => (
-                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off" style={{display: !this.state.loading ? "block" : "none"}}>
                                         <FormGroup className="">
-                                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <><div className="col-md-12 pl-lg-0">
+                                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <>
+                                            <div className="col-md-12 pl-lg-0">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                             </div>
                                             <div className="row">
@@ -2986,6 +3627,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="movingAvgId"
                                                                 name="movingAvgId"
+                                                                disabled={this.state.isDisabled || this.state.movingAvgDisabled}
                                                                 checked={this.state.movingAvgId}
                                                                 value={this.state.movingAvgId}
                                                                 onClick={(e) => { this.setMovingAvgId(e); }}
@@ -3007,6 +3649,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     id="noOfMonthsId"
                                                                     name="noOfMonthsId"
                                                                     step={1}
+                                                                    readOnly={this.state.isDisabled}
                                                                     value={this.state.monthsForMovingAverage}
                                                                     valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
                                                                     invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
@@ -3027,6 +3670,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="semiAvgId"
                                                                 name="semiAvgId"
+                                                                disabled={this.state.isDisabled || this.state.semiAvgDisabled}
                                                                 checked={this.state.semiAvgId}
                                                                 onClick={(e) => { this.setSemiAvgId(e); }}
                                                             />
@@ -3048,6 +3692,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="linearRegressionId"
                                                                 name="linearRegressionId"
+                                                                disabled={this.state.isDisabled || this.state.linearRegressionDisabled}
                                                                 checked={this.state.linearRegressionId}
                                                                 onClick={(e) => { this.setLinearRegressionId(e); }}
                                                             />
@@ -3074,6 +3719,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     bsSize="sm"
                                                                     id="confidenceLevelIdLinearRegression"
                                                                     name="confidenceLevelIdLinearRegression"
+                                                                    disabled={this.state.isDisabled}
                                                                     value={this.state.confidenceLevelIdLinearRegression}
                                                                     valid={!errors.confidenceLevelIdLinearRegression && this.state.confidenceLevelIdLinearRegression != null ? this.state.confidenceLevelIdLinearRegression : '' != ''}
                                                                     invalid={touched.confidenceLevelIdLinearRegression && !!errors.confidenceLevelIdLinearRegression}
@@ -3101,6 +3747,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="smoothingId"
                                                                 name="smoothingId"
+                                                                disabled={this.state.isDisabled || this.state.tesDisabled}
                                                                 checked={this.state.smoothingId}
                                                                 onClick={(e) => { this.setSmoothingId(e); }}
                                                             />
@@ -3127,6 +3774,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     bsSize="sm"
                                                                     id="confidenceLevelId"
                                                                     name="confidenceLevelId"
+                                                                    disabled={this.state.isDisabled}
                                                                     value={this.state.confidenceLevelId}
                                                                     valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
                                                                     invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
@@ -3157,6 +3805,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     bsSize="sm"
                                                                     id="seasonalityId"
                                                                     name="seasonalityId"
+                                                                    readOnly={this.state.isDisabled}
                                                                     min={1}
                                                                     max={24}
                                                                     step={1}
@@ -3183,6 +3832,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     id="alphaId"
                                                                     bsSize="sm"
                                                                     name="alphaId"
+                                                                    readOnly={this.state.isDisabled}
                                                                     min={0}
                                                                     max={1}
                                                                     step={0.1}
@@ -3209,6 +3859,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     id="betaId"
                                                                     bsSize="sm"
                                                                     name="betaId"
+                                                                    readOnly={this.state.isDisabled}
                                                                     min={0}
                                                                     max={1}
                                                                     step={0.1}
@@ -3235,6 +3886,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     bsSize="sm"
                                                                     id="gammaId"
                                                                     name="gammaId"
+                                                                    readOnly={this.state.isDisabled}
                                                                     min={0}
                                                                     max={1}
                                                                     step={0.1}
@@ -3259,6 +3911,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     type="checkbox"
                                                                     id="arimaId"
                                                                     name="arimaId"
+                                                                    disabled={this.state.isDisabled || this.state.arimaDisabled}
                                                                     checked={this.state.arimaId}
                                                                     onClick={(e) => { this.setArimaId(e); }}
                                                                 />
@@ -3275,6 +3928,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     type="checkbox"
                                                                     id="seasonality"
                                                                     name="seasonality"
+                                                                    disabled={this.state.isDisabled}
                                                                     checked={this.state.seasonality}
                                                                     onClick={(e) => { this.seasonalityCheckbox(e); }}
                                                                 />
@@ -3300,6 +3954,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         bsSize="sm"
                                                                         id="confidenceLevelIdArima"
                                                                         name="confidenceLevelIdArima"
+                                                                        disabled={this.state.isDisabled}
                                                                         value={this.state.confidenceLevelIdArima}
                                                                         valid={!errors.confidenceLevelIdArima && this.state.confidenceLevelIdArima != null ? this.state.confidenceLevelIdArima : '' != ''}
                                                                         invalid={touched.confidenceLevelIdArima && !!errors.confidenceLevelIdArima}
@@ -3330,6 +3985,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         id="pId"
                                                                         bsSize="sm"
                                                                         name="pId"
+                                                                        readOnly={this.state.isDisabled}
                                                                         value={this.state.p}
                                                                         valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
                                                                         invalid={touched.pId && !!errors.pId}
@@ -3351,6 +4007,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         id="dId"
                                                                         bsSize="sm"
                                                                         name="dId"
+                                                                        readOnly={this.state.isDisabled}
                                                                         value={this.state.d}
                                                                         valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
                                                                         invalid={touched.dId && !!errors.dId}
@@ -3374,6 +4031,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         id="qId"
                                                                         bsSize="sm"
                                                                         name="qId"
+                                                                        readOnly={this.state.isDisabled}
                                                                         value={this.state.q}
                                                                         valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
                                                                         invalid={touched.qId && !!errors.qId}
@@ -3382,6 +4040,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     />
                                                                     <FormFeedback>{errors.qId}</FormFeedback>
                                                                 </div>
+                                                            </div>
+                                                            <div className="col-md-12 mt-2">
+                                                                <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3396,6 +4057,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             type="textarea"
                                                             name="extrapolationNotes"
                                                             id="extrapolationNotes"
+                                                            readOnly={this.state.isDisabled}
                                                             value={this.state.extrapolationNotes}
                                                             onChange={(e) => { this.changeNotes(e.target.value) }}
                                                         ></Input>
@@ -3409,7 +4071,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
                                                                         (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> : ""
                                                             }
-                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
+                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && !this.state.isDisabled && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                                         </FormGroup>
                                                     </div>
                                                 </div>
@@ -3588,7 +4250,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </div>
                                         </FormGroup>
                                     </Form>
-                                )} />
+                                )} />}
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">

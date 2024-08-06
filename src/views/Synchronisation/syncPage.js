@@ -3181,6 +3181,23 @@ export default class syncPage extends Component {
                 elInstance.setStyle(col, "background-color", "yellow");
               }
             }
+            if (jsonData[c][7].toString() == jsonData[c][14].toString()) {
+            } else if (jsonData[c][7].toString() == jsonData[c][34].toString()) {
+              this.setState({
+                isChanged: true
+              })
+              var col = ("O").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
+            } else if (jsonData[c][14].toString() == jsonData[c][34].toString()) {
+              this.setState({
+                isChanged: true
+              })
+              var col = ("H").concat(parseInt(c) + 1);
+              elInstance.setStyle(col, "background-color", "transparent");
+              elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
+            } else {
+            }
             if (jsonData[c][8].toString() == jsonData[c][15].toString()) {
             } else if (jsonData[c][8].toString() == jsonData[c][35].toString()) {
               this.setState({

@@ -34,7 +34,7 @@ import {
 import * as Yup from 'yup';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, filterOptions } from "../../CommonComponent/JavascriptCommonFunctions";
 import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -171,7 +171,8 @@ export default class SupplyPlanComponent extends React.Component {
             showPlanningUnitAndQty: 0,
             showPlanningUnitAndQtyList: [],
             shipmentQtyTotalForPopup: 0,
-            batchQtyTotalForPopup: 0
+            batchQtyTotalForPopup: 0,
+            planningUnitNotes:""
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -520,6 +521,9 @@ export default class SupplyPlanComponent extends React.Component {
             } else {
                 csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + ele.distributionLeadTime + "\"")
             }
+            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+                csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ele.info.planningUnitNotes + '"'))
+            }
             csvRow.push('')
             A = [header]
             A.push(openningArr)
@@ -647,6 +651,11 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
             }
+            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+                doc.text(i18n.t('static.program.notes') + ' : ' + ele.info.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
+                  align: 'left'
+                })
+              }
             doc.setTextColor("#000");
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...ele.data.consumptionTotalData]
@@ -1050,11 +1059,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#002f6c',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#002f6c',
+                    pointBackgroundColor: '#002f6c',
+                    pointBorderColor: '#002f6c',
+                    pointHoverBackgroundColor: '#002f6c',
+                    pointHoverBorderColor: '#002f6c',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -1062,11 +1071,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#49A4A1',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#49A4A1',
+                    pointBackgroundColor: '#49A4A1',
+                    pointBorderColor: '#49A4A1',
+                    pointHoverBackgroundColor: '#49A4A1',
+                    pointHoverBorderColor: '#49A4A1',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
                 },
                 {
@@ -1074,11 +1083,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#0067B9',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#0067B9',
+                    pointBackgroundColor: '#0067B9',
+                    pointBorderColor: '#0067B9',
+                    pointHoverBackgroundColor: '#0067B9',
+                    pointHoverBorderColor: '#0067B9',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
                 },
                 {
@@ -1086,11 +1095,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#6C6463',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#6C6463',
+                    pointBackgroundColor: '#6C6463',
+                    pointBorderColor: '#6C6463',
+                    pointHoverBackgroundColor: '#6C6463',
+                    pointHoverBorderColor: '#6C6463',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.onhold)),
                 },
                 {
@@ -1098,11 +1107,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#A7C6ED',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#A7C6ED',
+                    pointBackgroundColor: '#A7C6ED',
+                    pointBorderColor: '#A7C6ED',
+                    pointHoverBackgroundColor: '#A7C6ED',
+                    pointHoverBorderColor: '#A7C6ED',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                 },
                 {
@@ -1117,7 +1126,7 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'transparent',
                     },
                     lineTension: 0,
-                    pointStyle: 'line',
+                    pointStyle: 'circle',
                     pointRadius: 0,
                     showInLegend: true,
                     data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
@@ -2061,6 +2070,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <MultiSelect
                                                             name="planningUnitIdsPlan"
                                                             id="planningUnitIdsPlan"
+                                                            filterOptions={filterOptions}
                                                             options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnitIdsPlan}
                                                             onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}
@@ -2171,6 +2181,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <MultiSelect
                                             name="planningUnitIdsExport"
                                             id="planningUnitIdsExport"
+                                            filterOptions={filterOptions}
                                             options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                             value={this.state.planningUnitIdsExport}
                                             onChange={(e) => { this.setPlanningUnitIdsExport(e) }}
@@ -2804,7 +2815,8 @@ export default class SupplyPlanComponent extends React.Component {
                     reorderFrequency: programPlanningUnit.reorderFrequencyInMonths,
                     minMonthsOfStock: programPlanningUnit.minMonthsOfStock,
                     minStockMoSQty: minStockMoSQty,
-                    maxStockMoSQty: maxStockMoSQty
+                    maxStockMoSQty: maxStockMoSQty,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -4101,14 +4113,19 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="animated fadeIn" style={{ display: this.state.display }}>
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
-                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
+                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.reorderFrequency}</span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                     </ul>
                                 </FormGroup>
+                                {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                        </ul>
+                                    </FormGroup>}
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
@@ -4133,7 +4150,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
@@ -4548,7 +4565,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 coList: conList,
                                 shList: shiList,
                                 minStockMoSQty: minStockMoSQty,
-                                maxStockMoSQty: maxStockMoSQty
+                                maxStockMoSQty: maxStockMoSQty,
+                                planningUnitNotes:programPlanningUnit.notes
                             }
                             var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                             var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -5142,11 +5160,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             stack: 1,
                                             yAxisID: 'A',
                                             backgroundColor: '#002f6c',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            borderColor: '#002f6c',
+                                            pointBackgroundColor: '#002f6c',
+                                            pointBorderColor: '#002f6c',
+                                            pointHoverBackgroundColor: '#002f6c',
+                                            pointHoverBorderColor: '#002f6c',
                                             data: jsonArrForGraph.map((item, index) => (item.delivered)),
                                         },
                                         {
@@ -5154,11 +5172,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             stack: 1,
                                             yAxisID: 'A',
                                             backgroundColor: '#006789',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            borderColor: '#006789',
+                                            pointBackgroundColor: '#006789',
+                                            pointBorderColor: '#006789',
+                                            pointHoverBackgroundColor: '#006789',
+                                            pointHoverBorderColor: '#006789',
                                             data: jsonArrForGraph.map((item, index) => (item.shipped)),
                                         },
                                         {
@@ -5166,23 +5184,23 @@ export default class SupplyPlanComponent extends React.Component {
                                             stack: 1,
                                             yAxisID: 'A',
                                             backgroundColor: '#205493',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            borderColor: '#205493',
+                                            pointBackgroundColor: '#205493',
+                                            pointBorderColor: '#205493',
+                                            pointHoverBackgroundColor: '#205493',
+                                            pointHoverBorderColor: '#205493',
                                             data: jsonArrForGraph.map((item, index) => (item.ordered)),
                                         },
                                         {
                                             label: i18n.t('static.report.hold'),
                                             stack: 1,
                                             yAxisID: 'A',
-                                            backgroundColor: '#6C6463',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            backgroundColor: '#205493',
+                                            borderColor: '#205493',
+                                            pointBackgroundColor: '#205493',
+                                            pointBorderColor: '#205493',
+                                            pointHoverBackgroundColor: '#205493',
+                                            pointHoverBorderColor: '#205493',
                                             data: jsonArrForGraph.map((item, index) => (item.onhold)),
                                         },
                                         {
@@ -5190,11 +5208,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             stack: 1,
                                             yAxisID: 'A',
                                             backgroundColor: '#a7c6ed',
-                                            borderColor: 'rgba(179,181,198,1)',
-                                            pointBackgroundColor: 'rgba(179,181,198,1)',
-                                            pointBorderColor: '#fff',
-                                            pointHoverBackgroundColor: '#fff',
-                                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                                            borderColor: '#a7c6ed',
+                                            pointBackgroundColor: '#a7c6ed',
+                                            pointBorderColor: '#a7c6ed',
+                                            pointHoverBackgroundColor: '#a7c6ed',
+                                            pointHoverBorderColor: '#a7c6ed',
                                             data: jsonArrForGraph.map((item, index) => (item.planned)),
                                         },
                                         {
@@ -5209,7 +5227,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 fontColor: 'transparent',
                                             },
                                             lineTension: 0,
-                                            pointStyle: 'line',
+                                            pointStyle: 'circle',
                                             pointRadius: 0,
                                             showInLegend: true,
                                             data: jsonArrForGraph.map((item, index) => (item.stock))

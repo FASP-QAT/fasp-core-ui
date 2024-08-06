@@ -1,30 +1,21 @@
 import bsCustomFileInput from 'bs-custom-file-input';
 import 'chartjs-plugin-annotation';
 import CryptoJS from 'crypto-js';
-import { Formik } from 'formik';
 import JSZip from 'jszip';
 import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import 'react-select/dist/react-select.min.css';
 import { ProgressBar, Step } from "react-step-progress-bar";
-import Select from 'react-select';
 import {
     Row,
-    Button,
     Card, CardBody,
-    CardFooter,
-    Col, Form,
-    FormFeedback,
-    FormGroup,
-    Input,
-    Label
+    Col
 } from 'reactstrap';
 import "../../../node_modules/react-step-progress-bar/styles.css";
-import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import getLabelText from '../../CommonComponent/getLabelText.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { ENCRYPTION_EXPORT_PASSWORD, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -32,6 +23,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import StepOneImport from './StepOneImportDataset';
 import StepTwoImport from './StepTwoImportDataset';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import Minizip from 'minizip-asm.js';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -67,7 +59,7 @@ export default class ImportDataset extends Component {
      */
     redirectToDashboard(color, msg) {
         let id = AuthenticationService.displayDashboardBasedOnRole();
-        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/'+color+'/' + msg)
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/' + color + '/' + msg)
     }
     /**
      * Updates the state with the provided key-value pair.
@@ -85,8 +77,7 @@ export default class ImportDataset extends Component {
      * Handles the completion of step one and updates the display to show step two.
      */
     finishedStepOne() {
-        this.setState({ progressPer: 100, loading: true });
-        document.getElementById('stepOneImport').style.display = 'none';
+        this.setState({ progressPer: 100, loading: true, programId: this.state.programList });
         document.getElementById('stepTwoImport').style.display = 'block';
         this.refs.stepTwoChild.filterData();
     }
@@ -105,9 +96,9 @@ export default class ImportDataset extends Component {
         document.getElementById('stepTwoImport').style.display = 'none';
         this.refs.stepOneChild.filterData();
     }
-     /**
-     * Retrieves programs from the indexedDB.
-     */
+    /**
+    * Retrieves programs from the indexedDB.
+    */
     getPrograms() {
         var db1;
         getDatabase();
@@ -174,7 +165,6 @@ export default class ImportDataset extends Component {
         bsCustomFileInput.init()
         this.setState({ loading: false })
         hideSecondComponent();
-        document.getElementById('stepOneImport').style.display = 'block';
         document.getElementById('stepTwoImport').style.display = 'none';
     }
     /**
@@ -188,7 +178,6 @@ export default class ImportDataset extends Component {
                 this.setState({ loading: false })
                 alert(i18n.t('static.budget.programtext'));
             } else {
-                var file = document.querySelector('input[type=file]').files[0];
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -203,14 +192,14 @@ export default class ImportDataset extends Component {
                     getRequest.onsuccess = function (event) {
                         var myResult = [];
                         myResult = getRequest.result;
-                        var programDataJson = this.state.programListArray;
+                        var programDataJson = this.state.programList;
                         for (var i = 0; i < myResult.length; i++) {
                             for (var j = 0; j < programDataJson.length; j++) {
                                 for (var k = 0; k < selectedPrgArr.length; k++) {
-                                    if (programDataJson[j].filename == selectedPrgArr[k].value) {
+                                    if (programDataJson[j].value == selectedPrgArr[k].value) {
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        if (myResult[i].id == programDataJson[j].programId + "_v" + programDataJson[j].version + "_uId_" + userId) {
+                                        if (myResult[i].id == JSON.parse(programDataJson[j].fileData.split("@~-~@")[0]).programId + "_v" + JSON.parse(programDataJson[j].fileData.split("@~-~@")[0]).version + "_uId_" + userId) {
                                             count++;
                                         }
                                     }
@@ -218,11 +207,157 @@ export default class ImportDataset extends Component {
                             }
                         }
                         if (count == 0) {
-                            JSZip.loadAsync(file).then(function (zip) {
-                                Object.keys(zip.files).forEach(function (filename) {
-                                    zip.files[filename].async('string').then(function (fileData) {
-                                        for (var j = 0; j < selectedPrgArr.length; j++) {
-                                            if (selectedPrgArr[j].value == filename) {
+                            var temp_j = 0;
+                            for (var j = 0; j < selectedPrgArr.length; j++) {
+                                var fileData = this.state.programList.filter(c => c.value == selectedPrgArr[j].value)[0].fileData;
+                                db1 = e.target.result;
+                                var json = JSON.parse(fileData.split("@~-~@")[0]);
+                                var countryList = json.countryList;
+                                delete json.countryList;
+                                var forecastingUnitList = json.forecastingUnitList;
+                                delete json.forecastingUnitList;
+                                var planningUnitList = json.planningUnitList;
+                                delete json.planningUnitList;
+                                var procurementUnitList = json.procurementUnitList;
+                                delete json.procurementUnitList;
+                                var realmCountryList = json.realmCountryList;
+                                delete json.realmCountryList;
+                                var realmCountryPlanningUnitList = json.realmCountryPlanningUnitList;
+                                delete json.realmCountryPlanningUnitList;
+                                var procurementAgentPlanningUnitList = json.procurementAgentPlanningUnitList;
+                                delete json.procurementAgentPlanningUnitList;
+                                var procurementAgentProcurementUnitList = json.procurementAgentProcurementUnitList;
+                                delete json.procurementAgentProcurementUnitList;
+                                var programList = json.programList;
+                                delete json.programList;
+                                var programPlanningUnitList = json.programPlanningUnitList;
+                                delete json.programPlanningUnitList;
+                                var regionList = json.regionList;
+                                delete json.regionList;
+                                var budgetList = json.budgetList;
+                                delete json.budgetList;
+                                var usageTemplateList = json.usageTemplateList != undefined ? json.usageTemplateList : [];
+                                delete json.usageList;
+                                var equivalencyUnitList = json.equivalencyUnitList != undefined ? json.equivalencyUnitList : [];
+                                delete json.equivalencyUnitList;
+                                var countryTransaction = db1.transaction(['country'], 'readwrite');
+                                var countryObjectStore = countryTransaction.objectStore('country');
+                                for (var i = 0; i < countryList.length; i++) {
+                                    countryObjectStore.put(countryList[i]);
+                                }
+                                var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+                                var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
+                                for (var i = 0; i < forecastingUnitList.length; i++) {
+                                    forecastingUnitObjectStore.put(forecastingUnitList[i]);
+                                }
+                                var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                                var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
+                                for (var i = 0; i < planningUnitList.length; i++) {
+                                    planningUnitObjectStore.put(planningUnitList[i]);
+                                }
+                                var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                                var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
+                                for (var i = 0; i < procurementUnitList.length; i++) {
+                                    procurementUnitObjectStore.put(procurementUnitList[i]);
+                                }
+                                var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
+                                var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
+                                for (var i = 0; i < realmCountryList.length; i++) {
+                                    realmCountryObjectStore.put(realmCountryList[i]);
+                                }
+                                var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                                var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
+                                for (var i = 0; i < realmCountryPlanningUnitList.length; i++) {
+                                    realmCountryPlanningUnitObjectStore.put(realmCountryPlanningUnitList[i]);
+                                }
+                                var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                                var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                                for (var i = 0; i < procurementAgentPlanningUnitList.length; i++) {
+                                    procurementAgentPlanningUnitObjectStore.put(procurementAgentPlanningUnitList[i]);
+                                }
+                                var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
+                                var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
+                                for (var i = 0; i < procurementAgentProcurementUnitList.length; i++) {
+                                    procurementAgentProcurementUnitObjectStore.put(procurementAgentProcurementUnitList[i]);
+                                }
+                                var programTransaction = db1.transaction(['program'], 'readwrite');
+                                var programObjectStore = programTransaction.objectStore('program');
+                                for (var i = 0; i < programList.length; i++) {
+                                    programObjectStore.put(programList[i]);
+                                }
+                                var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                                var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                                for (var i = 0; i < programPlanningUnitList.length; i++) {
+                                    programPlanningUnitObjectStore.put(programPlanningUnitList[i]);
+                                }
+                                var regionTransaction = db1.transaction(['region'], 'readwrite');
+                                var regionObjectStore = regionTransaction.objectStore('region');
+                                for (var i = 0; i < regionList.length; i++) {
+                                    regionObjectStore.put(regionList[i]);
+                                }
+                                var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                                var budgetObjectStore = budgetTransaction.objectStore('budget');
+                                for (var i = 0; i < budgetList.length; i++) {
+                                    budgetObjectStore.put(budgetList[i]);
+                                }
+                                var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
+                                var usageTemplateObjectStore = usageTemplateTransaction.objectStore('usageTemplate');
+                                for (var i = 0; i < usageTemplateList.length; i++) {
+                                    usageTemplateObjectStore.put(usageTemplateList[i]);
+                                }
+                                var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
+                                var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
+                                for (var i = 0; i < equivalencyUnitList.length; i++) {
+                                    equivalencyUnitObjectStore.put(equivalencyUnitList[i]);
+                                }
+                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                json.userId = userId;
+                                json.id = json.programId + "_v" + json.version + "_uId_" + userId;
+                                var programDataBytes = json.programData;
+                                var programData = programDataBytes;
+                                var programJson = (programData);
+                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                var transactionn = db1.transaction(['datasetData'], 'readwrite');
+                                var programn = transactionn.objectStore('datasetData');
+                                var addProgramDataRequest = programn.put(json);
+                                // transactionn.oncomplete = function (event) {
+                                var item = {
+                                    id: json.programId + "_v" + json.version + "_uId_" + userId,
+                                    programId: json.programId,
+                                    version: json.version,
+                                    userId: userId,
+                                    programCode: programJson.programCode,
+                                    changed: json.changed,
+                                    readonly: json.readonly
+                                }
+                                var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
+                                var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+                                // programQPLDetailsTransaction.oncomplete = function (event) {
+                                temp_j++;
+                                if (temp_j == selectedPrgArr.length) {
+                                    this.setState({
+                                        message: i18n.t('static.program.dataimportsuccess'),
+                                        loading: false
+                                    })
+                                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                }
+                                // }.bind(this)
+                                // }.bind(this)
+                            }
+                        } else {
+                            confirmAlert({
+                                title: i18n.t('static.program.confirmsubmit'),
+                                message: i18n.t('static.program.programwithsameversion'),
+                                buttons: [
+                                    {
+                                        label: i18n.t('static.program.yes'),
+                                        onClick: () => {
+                                            var temp_j = 0;
+                                            for (var j = 0; j < selectedPrgArr.length; j++) {
+                                                var fileData = this.state.programList.filter(c => c.value == selectedPrgArr[j].value)[0].fileData;
                                                 db1 = e.target.result;
                                                 var json = JSON.parse(fileData.split("@~-~@")[0]);
                                                 var countryList = json.countryList;
@@ -249,9 +384,9 @@ export default class ImportDataset extends Component {
                                                 delete json.regionList;
                                                 var budgetList = json.budgetList;
                                                 delete json.budgetList;
-                                                var usageTemplateList = json.usageTemplateList != undefined ? json.usageTemplateList : [];
+                                                var usageTemplateList = json.usageTemplateList;
                                                 delete json.usageList;
-                                                var equivalencyUnitList = json.equivalencyUnitList != undefined ? json.equivalencyUnitList : [];
+                                                var equivalencyUnitList = json.equivalencyUnitList;
                                                 delete json.equivalencyUnitList;
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                 var countryObjectStore = countryTransaction.objectStore('country');
@@ -327,192 +462,40 @@ export default class ImportDataset extends Component {
                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                 json.userId = userId;
                                                 json.id = json.programId + "_v" + json.version + "_uId_" + userId;
-                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
-                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                var programJson = JSON.parse(programData);
+                                                var programDataBytes = json.programData;
+                                                var programData = programDataBytes;
+                                                var programJson = (programData);
                                                 json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                                 var programn = transactionn.objectStore('datasetData');
                                                 var addProgramDataRequest = programn.put(json);
-                                                transactionn.oncomplete = function (event) {
-                                                    var item = {
-                                                        id: json.programId + "_v" + json.version + "_uId_" + userId,
-                                                        programId: json.programId,
-                                                        version: json.version,
-                                                        userId: userId,
-                                                        programCode: programJson.programCode,
-                                                        changed: json.changed,
-                                                        readonly: json.readonly
-                                                    }
-                                                    var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                                                    var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(item);
-                                                    programQPLDetailsTransaction.oncomplete = function (event) {
-                                                        this.setState({
-                                                            message: i18n.t('static.program.dataimportsuccess'),
-                                                            loading: false
-                                                        })
-                                                        let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
-                                                    }.bind(this)
-                                                }.bind(this)
+                                                // transactionn.oncomplete = function (event) {
+                                                var item = {
+                                                    id: json.programId + "_v" + json.version + "_uId_" + userId,
+                                                    programId: json.programId,
+                                                    version: json.version,
+                                                    userId: userId,
+                                                    programCode: programJson.programCode,
+                                                    changed: json.changed,
+                                                    readonly: json.readonly
+                                                }
+                                                temp_j++;
+                                                var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                                var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
+                                                var programQPLDetailsRequest = programQPLDetailsOs.put(item);
+                                                // programQPLDetailsTransaction.oncomplete = function (event) {
+                                                if (temp_j == selectedPrgArr.length) {
+                                                    this.setState({
+                                                        message: i18n.t('static.program.dataimportsuccess'),
+                                                        loading: false
+                                                    })
+                                                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                    this.getPrograms();
+                                                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
+                                                }
+                                                // }.bind(this)
+                                                // }.bind(this)
                                             }
-                                        }
-                                    }.bind(this))
-                                }.bind(this))
-                            }.bind(this))
-                        } else {
-                            confirmAlert({
-                                title: i18n.t('static.program.confirmsubmit'),
-                                message: i18n.t('static.program.programwithsameversion'),
-                                buttons: [
-                                    {
-                                        label: i18n.t('static.program.yes'),
-                                        onClick: () => {
-                                            JSZip.loadAsync(file).then(function (zip) {
-                                                Object.keys(zip.files).forEach(function (filename) {
-                                                    zip.files[filename].async('string').then(function (fileData) {
-                                                        for (var j = 0; j < selectedPrgArr.length; j++) {
-                                                            if (selectedPrgArr[j].value == filename) {
-                                                                db1 = e.target.result;
-                                                                var json = JSON.parse(fileData.split("@~-~@")[0]);
-                                                                var countryList = json.countryList;
-                                                                delete json.countryList;
-                                                                var forecastingUnitList = json.forecastingUnitList;
-                                                                delete json.forecastingUnitList;
-                                                                var planningUnitList = json.planningUnitList;
-                                                                delete json.planningUnitList;
-                                                                var procurementUnitList = json.procurementUnitList;
-                                                                delete json.procurementUnitList;
-                                                                var realmCountryList = json.realmCountryList;
-                                                                delete json.realmCountryList;
-                                                                var realmCountryPlanningUnitList = json.realmCountryPlanningUnitList;
-                                                                delete json.realmCountryPlanningUnitList;
-                                                                var procurementAgentPlanningUnitList = json.procurementAgentPlanningUnitList;
-                                                                delete json.procurementAgentPlanningUnitList;
-                                                                var procurementAgentProcurementUnitList = json.procurementAgentProcurementUnitList;
-                                                                delete json.procurementAgentProcurementUnitList;
-                                                                var programList = json.programList;
-                                                                delete json.programList;
-                                                                var programPlanningUnitList = json.programPlanningUnitList;
-                                                                delete json.programPlanningUnitList;
-                                                                var regionList = json.regionList;
-                                                                delete json.regionList;
-                                                                var budgetList = json.budgetList;
-                                                                delete json.budgetList;
-                                                                var usageTemplateList = json.usageTemplateList;
-                                                                delete json.usageList;
-                                                                var equivalencyUnitList = json.equivalencyUnitList;
-                                                                delete json.equivalencyUnitList;
-                                                                var countryTransaction = db1.transaction(['country'], 'readwrite');
-                                                                var countryObjectStore = countryTransaction.objectStore('country');
-                                                                for (var i = 0; i < countryList.length; i++) {
-                                                                    countryObjectStore.put(countryList[i]);
-                                                                }
-                                                                var forecastingUnitTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
-                                                                var forecastingUnitObjectStore = forecastingUnitTransaction.objectStore('forecastingUnit');
-                                                                for (var i = 0; i < forecastingUnitList.length; i++) {
-                                                                    forecastingUnitObjectStore.put(forecastingUnitList[i]);
-                                                                }
-                                                                var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
-                                                                var planningUnitObjectStore = planningUnitTransaction.objectStore('planningUnit');
-                                                                for (var i = 0; i < planningUnitList.length; i++) {
-                                                                    planningUnitObjectStore.put(planningUnitList[i]);
-                                                                }
-                                                                var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
-                                                                var procurementUnitObjectStore = procurementUnitTransaction.objectStore('procurementUnit');
-                                                                for (var i = 0; i < procurementUnitList.length; i++) {
-                                                                    procurementUnitObjectStore.put(procurementUnitList[i]);
-                                                                }
-                                                                var realmCountryTransaction = db1.transaction(['realmCountry'], 'readwrite');
-                                                                var realmCountryObjectStore = realmCountryTransaction.objectStore('realmCountry');
-                                                                for (var i = 0; i < realmCountryList.length; i++) {
-                                                                    realmCountryObjectStore.put(realmCountryList[i]);
-                                                                }
-                                                                var realmCountryPlanningUnitTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                                                                var realmCountryPlanningUnitObjectStore = realmCountryPlanningUnitTransaction.objectStore('realmCountryPlanningUnit');
-                                                                for (var i = 0; i < realmCountryPlanningUnitList.length; i++) {
-                                                                    realmCountryPlanningUnitObjectStore.put(realmCountryPlanningUnitList[i]);
-                                                                }
-                                                                var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                                                                var procurementAgentPlanningUnitObjectStore = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
-                                                                for (var i = 0; i < procurementAgentPlanningUnitList.length; i++) {
-                                                                    procurementAgentPlanningUnitObjectStore.put(procurementAgentPlanningUnitList[i]);
-                                                                }
-                                                                var procurementAgentProcurementUnitTransaction = db1.transaction(['procurementAgentProcurementUnit'], 'readwrite');
-                                                                var procurementAgentProcurementUnitObjectStore = procurementAgentProcurementUnitTransaction.objectStore('procurementAgentProcurementUnit');
-                                                                for (var i = 0; i < procurementAgentProcurementUnitList.length; i++) {
-                                                                    procurementAgentProcurementUnitObjectStore.put(procurementAgentProcurementUnitList[i]);
-                                                                }
-                                                                var programTransaction = db1.transaction(['program'], 'readwrite');
-                                                                var programObjectStore = programTransaction.objectStore('program');
-                                                                for (var i = 0; i < programList.length; i++) {
-                                                                    programObjectStore.put(programList[i]);
-                                                                }
-                                                                var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                                                                var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
-                                                                for (var i = 0; i < programPlanningUnitList.length; i++) {
-                                                                    programPlanningUnitObjectStore.put(programPlanningUnitList[i]);
-                                                                }
-                                                                var regionTransaction = db1.transaction(['region'], 'readwrite');
-                                                                var regionObjectStore = regionTransaction.objectStore('region');
-                                                                for (var i = 0; i < regionList.length; i++) {
-                                                                    regionObjectStore.put(regionList[i]);
-                                                                }
-                                                                var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-                                                                var budgetObjectStore = budgetTransaction.objectStore('budget');
-                                                                for (var i = 0; i < budgetList.length; i++) {
-                                                                    budgetObjectStore.put(budgetList[i]);
-                                                                }
-                                                                var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
-                                                                var usageTemplateObjectStore = usageTemplateTransaction.objectStore('usageTemplate');
-                                                                for (var i = 0; i < usageTemplateList.length; i++) {
-                                                                    usageTemplateObjectStore.put(usageTemplateList[i]);
-                                                                }
-                                                                var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
-                                                                var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
-                                                                for (var i = 0; i < equivalencyUnitList.length; i++) {
-                                                                    equivalencyUnitObjectStore.put(equivalencyUnitList[i]);
-                                                                }
-                                                                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                                                                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                                                json.userId = userId;
-                                                                json.id = json.programId + "_v" + json.version + "_uId_" + userId;
-                                                                var programDataBytes = CryptoJS.AES.decrypt(json.programData, SECRET_KEY);
-                                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                var programJson = JSON.parse(programData);
-                                                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                                                                var transactionn = db1.transaction(['datasetData'], 'readwrite');
-                                                                var programn = transactionn.objectStore('datasetData');
-                                                                var addProgramDataRequest = programn.put(json);
-                                                                transactionn.oncomplete = function (event) {
-                                                                    var item = {
-                                                                        id: json.programId + "_v" + json.version + "_uId_" + userId,
-                                                                        programId: json.programId,
-                                                                        version: json.version,
-                                                                        userId: userId,
-                                                                        programCode: programJson.programCode,
-                                                                        changed: json.changed,
-                                                                        readonly: json.readonly
-                                                                    }
-                                                                    var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                                                                    var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
-                                                                    var programQPLDetailsRequest = programQPLDetailsOs.put(item);
-                                                                    programQPLDetailsTransaction.oncomplete = function (event) {
-                                                                        this.setState({
-                                                                            message: i18n.t('static.program.dataimportsuccess'),
-                                                                            loading: false
-                                                                        })
-                                                                        let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                                        this.getPrograms();
-                                                                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataimportsuccess'))
-                                                                    }.bind(this)
-                                                                }.bind(this)
-                                                            }
-                                                        }
-                                                    }.bind(this))
-                                                }.bind(this))
-                                            }.bind(this))
                                         }
                                     },
                                     {
@@ -553,57 +536,41 @@ export default class ImportDataset extends Component {
                 var fileName = file.name;
                 var fileExtenstion = fileName.split(".");
                 if (fileExtenstion[fileExtenstion.length - 1] == "zip") {
-                    const lan = 'en'
-                    JSZip.loadAsync(file).then(function (zip) {
-                        var i = 0;
-                        var fileName = []
-                        var programListArray = []
-                        var size = 0;
-                        Object.keys(zip.files).forEach(function (filename) {
-                            size++;
-                        })
-                        Object.keys(zip.files).forEach(function (filename) {
-                            zip.files[filename].async('string').then(function (fileData) {
-                                var programDataJson;
-                                try {
-                                    programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                    const lan = 'en';
+                    const password = ENCRYPTION_EXPORT_PASSWORD;
+                    const reader = new FileReader();
+                    var i = 0;
+                    var fileName = []
+                    var size = 0;
+                    reader.onload = (e) => {
+                        try {
+                            const zipData = new Uint8Array(e.target.result);
+                            const mz = new Minizip(zipData);
+                            const files = mz.list(); // Ensure to list files first
+                            files.forEach((fileInfo) => {
+                                size++;
+                                const fileDataList = mz.extract(fileInfo.filepath, { password });
+                                var fileData = new TextDecoder().decode(fileDataList)
+                                var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                                fileName[i] = {
+                                    value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.label), lan)) + "~v" + programDataJson.version, fileData: fileData
                                 }
-                                catch (err) {
-                                    this.setState({ message: i18n.t('static.program.zipfilereaderror'), loading: false },
-                                        () => {
-                                            hideSecondComponent();
-                                        })
-                                }
-                                var bytes = CryptoJS.AES.decrypt(programDataJson.programData, SECRET_KEY);
-                                var plaintext = bytes.toString(CryptoJS.enc.Utf8);
-                                if (plaintext == "") {
-                                    this.setState({
-                                        message: i18n.t('static.program.zipfilereaderror'),
-                                        loading: false
-                                    })
-                                } else {
-                                    var programDataJsonDecrypted = JSON.parse(plaintext);
-                                    programDataJson.filename = filename;
-                                    fileName[i] = {
-                                        value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJson.version
-                                    }
-                                    programListArray[i] = programDataJson;
-                                    i++;
-                                    if (i === size) {
-                                        this.updateStepOneData("loading", false);
-                                        this.setState({
-                                            message: "",
-                                            programList: fileName,
-                                            programListArray: programListArray,
-                                            loading: false
-                                        }, () => {
-                                            this.finishedStepOne();
-                                        })
-                                    }
-                                }
-                            }.bind(this))
-                        }.bind(this))
-                    }.bind(this))
+                                i++;
+                            });
+                            this.updateStepOneData("loading", false);
+                            this.setState({
+                                message: "",
+                                programList: fileName,
+                                loading: false
+                            }, () => {
+                                this.finishedStepOne();
+                            })
+                        } catch (error) {
+                            console.error('Extraction error:', error);
+                            alert('Failed to extract the zip file.');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
                 } else {
                     this.setState({ loading: false })
                     alert(i18n.t('static.program.selectzipfile'))
@@ -629,11 +596,11 @@ export default class ImportDataset extends Component {
                 <h5 style={{ color: "red" }} id="div2">
                     {i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                    <Col sm={6} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody>
                                 <Row>
-                                    <Col sm={6} md={6}>
+                                    <Col sm={12} md={12}>
                                         <ProgressBar
                                             percent={this.state.progressPer}
                                             filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
@@ -663,16 +630,25 @@ export default class ImportDataset extends Component {
                                 <div className="d-sm-down-none progressbar mr-4">
                                     <ul>
                                         <li className="progressbartext1Import">{i18n.t('static.chooseFile.chooseFile')}</li>
-                                        <li className="progressbartext4Import">{i18n.t('static.common.selectProgram')}</li>
+                                        <li className="progressbartext3Import">{i18n.t('static.common.selectProgram')}</li>
                                     </ul>
                                 </div>
                                 <br></br>
-                                <div>
+                                <div style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="stepOneImport">
                                         <StepOneImport ref='stepOneChild' importFile={this.importFile} cancelClicked={this.cancelClicked} resetClicked={this.resetClicked} finishedStepOne={this.finishedStepOne} updateStepOneData={this.updateStepOneData} redirectToDashboard={this.redirectToDashboard} loading={this.state.loading} items={this.state}></StepOneImport>
                                     </div>
                                     <div id="stepTwoImport">
                                         <StepTwoImport ref='stepTwoChild' formSubmit={this.formSubmit} updateFieldData={this.updateFieldData} cancelClicked={this.cancelClicked} resetClicked={this.resetClicked} updateStepOneData={this.updateStepOneData} previousToStepOne={this.previousToStepOne} redirectToDashboard={this.redirectToDashboard} loading={this.state.loading} items={this.state}></StepTwoImport>
+                                    </div>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                                            <div class="spinner-border blue ml-4" role="status">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </CardBody>
@@ -696,5 +672,7 @@ export default class ImportDataset extends Component {
         this.state.programId = '';
         this.updateStepOneData("message", "");
         this.setState({ programId: '', message: '' });
+        document.getElementById('stepTwoImport').style.display = 'none';
+        this.previousToStepOne();
     }
 }

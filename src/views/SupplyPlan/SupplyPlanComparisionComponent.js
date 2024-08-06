@@ -98,7 +98,8 @@ export default class SupplyPlanComponent extends React.Component {
             ledgerForBatch: [],
             showBatchSaveButton: false,
             shipmentQtyTotalForPopup: 0,
-            batchQtyTotalForPopup: 0
+            batchQtyTotalForPopup: 0,
+            planningUnitNotes:""
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -263,6 +264,9 @@ export default class SupplyPlanComponent extends React.Component {
         } else {
             csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
+        if(this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0){
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + this.state.planningUnitNotes + '"'))
+        }
         csvRow.push('')
         const header = [...[""], ... (this.state.monthsArray.map(item => (
             ("\'").concat(item.monthName).concat(" ").concat(item.monthYear)
@@ -403,6 +407,11 @@ export default class SupplyPlanComponent extends React.Component {
                             align: 'left'
                         })
                     }
+                    if(this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0){
+                        doc.text(i18n.t('static.program.notes') + ' : ' + this.state.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
+                          align: 'left'
+                        })
+                      }
                 }
             }
         }
@@ -915,7 +924,8 @@ export default class SupplyPlanComponent extends React.Component {
                     programJson: programJsonForPlanningUnit,
                     planBasedOn: programPlanningUnit.planBasedOn,
                     minQtyPpu: programPlanningUnit.minQty,
-                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -2081,11 +2091,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#002f6c',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#002f6c',
+                    pointBackgroundColor: '#002f6c',
+                    pointBorderColor: '#002f6c',
+                    pointHoverBackgroundColor: '#002f6c',
+                    pointHoverBorderColor: '#002f6c',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -2093,11 +2103,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#49A4A1',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#49A4A1',
+                    pointBackgroundColor: '#49A4A1',
+                    pointBorderColor: '#49A4A1',
+                    pointHoverBackgroundColor: '#49A4A1',
+                    pointHoverBorderColor: '#49A4A1',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
                 },
                 {
@@ -2105,11 +2115,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#0067B9',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#0067B9',
+                    pointBackgroundColor: '#0067B9',
+                    pointBorderColor: '#0067B9',
+                    pointHoverBackgroundColor: '#0067B9',
+                    pointHoverBorderColor: '#0067B9',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.ordered)),
                 },
                 {
@@ -2117,11 +2127,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#6C6463',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#6C6463',
+                    pointBackgroundColor: '#6C6463',
+                    pointBorderColor: '#6C6463',
+                    pointHoverBackgroundColor: '#6C6463',
+                    pointHoverBorderColor: '#6C6463',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.onhold)),
                 },
                 {
@@ -2129,11 +2139,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: '#A7C6ED',
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: '#A7C6ED',
+                    pointBackgroundColor: '#A7C6ED',
+                    pointBorderColor: '#A7C6ED',
+                    pointHoverBackgroundColor: '#A7C6ED',
+                    pointHoverBorderColor: '#A7C6ED',
                     data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
                 },
                 {
@@ -2148,7 +2158,7 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor: 'transparent',
                     },
                     lineTension: 0,
-                    pointStyle: 'line',
+                    pointStyle: 'circle',
                     pointRadius: 0,
                     showInLegend: true,
                     data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
