@@ -18,7 +18,7 @@ class ProcurementAgentService {
         );
     }
     getCountrySpecificPricesList(json) {
-        return axios.get(`${API_URL}/api/program/planningUnit/procurementAgent/${json}`, {}
+        return axios.post(`${API_URL}/api/program/planningUnit/procurementAgent/`,json, {}
         );
     }
     addprocurementAgentPlanningUnitMapping(json) {

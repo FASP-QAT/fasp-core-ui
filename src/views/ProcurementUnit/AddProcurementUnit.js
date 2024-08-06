@@ -427,7 +427,7 @@ export default class AddProcurementUnit extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -487,9 +487,14 @@ export default class AddProcurementUnit extends Component {
                                                         break;
                                                     case 500:
                                                     case 404:
-                                                    case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 406:
+                                                        this.setState({
+                                                            message: i18n.t('static.procurementAgentProcurementUnit.procurementUnitAlreadyExists'),
                                                             loading: false
                                                         });
                                                         break;

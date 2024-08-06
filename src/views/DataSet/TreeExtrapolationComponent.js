@@ -981,7 +981,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
                                 } catch (error) {
                                     this.setState({
-                                        noDataMessage: i18n.t('static.extrapolation.errorOccured'),
+                                        noDataMessage1: i18n.t('static.extrapolation.errorOccured'),
                                         arimaData: [],
                                         arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
                                     })

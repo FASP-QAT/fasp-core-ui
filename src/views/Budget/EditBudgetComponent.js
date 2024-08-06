@@ -708,7 +708,7 @@ class EditBudgetComponent extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-active2">
-                                                            {i18n.t('static.common.disabled')}
+                                                            {i18n.t('static.dataentry.inactive')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>

@@ -505,6 +505,7 @@ class ForecastMetrics extends Component {
       data[2] = consumptions[j].message != null ? "" : roundN2(consumptions[j].forecastError);
       data[3] = consumptions[j].monthCount;
       data[4] = roundN2(consumptions[j].forecastError);
+      data[5] = consumptions[j].forecastErrorThreshold;
       consumptionArray[count] = data;
       count++;
     }
@@ -536,6 +537,10 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.error'),
+          type: 'hidden',
+        },
+        {
+          title: i18n.t('static.report.forecastErrorThreshold'),
           type: 'hidden',
         },
       ],
@@ -581,7 +586,7 @@ class ForecastMetrics extends Component {
     for (var j = 0; j < json.length; j++) {
       var rowData = elInstance.getRowData(j);
       var forecastError = rowData[4];
-      if (forecastError > 50) {
+      if (forecastError > rowData[5]) {
         for (var i = 0; i < colArr.length; i++) {
           elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
           var cell = elInstance.getCell((colArr[i]).concat(parseInt(j) + 1))
@@ -599,7 +604,7 @@ class ForecastMetrics extends Component {
    */
   filterData() {
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-    let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
     let tracercategory = this.state.tracerCategoryValues.length == this.state.tracerCategories.length ? [] : this.state.tracerCategoryValues.map(ele => (ele.value).toString());
     let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let startDate = (this.state.singleValue2.year) + '-' + this.state.singleValue2.month + '-01';

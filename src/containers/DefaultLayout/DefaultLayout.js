@@ -196,8 +196,8 @@ const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.UpdateversionSettings.UpdateversionSettings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
-  { path: '/dataset/exportDataset', name: 'static.common.exportDataset', component: ExportDataset },
-  { path: '/dataset/importDataset', name: 'static.common.importDataset', component: ImportDataset },
+  { path: '/dataset/exportDataset', name: 'static.dashboard.exportprogram', component: ExportDataset },
+  { path: '/dataset/importDataset', name: 'static.dashboard.importprogram', component: ImportDataset },
   { path: '/dataset/loadDeleteDataSet/:message', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
@@ -300,7 +300,9 @@ const routes = [
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
-  { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/1/:colour/:message', name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/:planningUnitId/:programId', name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
   { path: '/program/mapProcurementAgent/:programId', exact: true, name: 'static.integration.programIntegration', component: MapProcurementAgent },
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -1627,6 +1629,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-cubes',
                             attributes: {
                               hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') && this.state.activeTab == 2) ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.countrySpecificPrices.countrySpecificPrices'),
+                            url: '/programProduct/addCountrySpecificPrice',
+                            icon: 'fa fa-cubes',
+                            attributes: {
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }

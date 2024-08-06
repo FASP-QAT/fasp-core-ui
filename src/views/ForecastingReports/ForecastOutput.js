@@ -78,6 +78,7 @@ class ForecastOutput extends Component {
             planningUnitValues: [],
             planningUnitLabels: [],
             forecastingUnits: [],
+            allForecastingUnits:[],
             forecastingUnitValues: [],
             forecastingUnitLabels: [],
             downloadedProgramData: [],
@@ -213,7 +214,7 @@ class ForecastOutput extends Component {
                                     filteredEquList.push(myResult[i]);
                                 }
                             }
-                            let fuList = this.state.forecastingUnits;
+                            let fuList = this.state.allForecastingUnits;
                             let newList = [];
                             for (var i = 0; i < filteredEquList.length; i++) {
                                 let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
@@ -258,7 +259,7 @@ class ForecastOutput extends Component {
                                     filteredEquList.push(listArray[i]);
                                 }
                             }
-                            let fuList = this.state.forecastingUnits;
+                            let fuList = this.state.allForecastingUnits;
                             let newList = [];
                             for (var i = 0; i < filteredEquList.length; i++) {
                                 let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
@@ -792,7 +793,7 @@ class ForecastOutput extends Component {
                                                 let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
                                                 if (scenarioId != null) {
                                                     for (let m = 0; m < treeList.length; m++) {
-                                                        let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId) : []);
+                                                        let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true") : []);
                                                         if (filteredScenario.length > 0) {
                                                             let flatlist = treeList[m].tree.flatList;
                                                             let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
@@ -900,7 +901,7 @@ class ForecastOutput extends Component {
                                                     let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
                                                     if (scenarioId != null) {
                                                         for (let m = 0; m < treeList.length; m++) {
-                                                            let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId) : []);
+                                                            let filteredScenario = (treeList[m].treeId == treeId ? treeList[m].scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true") : []);
                                                             if (filteredScenario.length > 0) {
                                                                 let flatlist = treeList[m].tree.flatList;
                                                                 let listContainNodeType4 = flatlist.filter(c => c.payload.nodeType.id == 5);
@@ -1248,9 +1249,9 @@ class ForecastOutput extends Component {
                     );
             }
         } else if (programId == -1) {
-            this.setState({ message: i18n.t('static.common.selectProgram'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], equivalencyUnitListFull:[], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+            this.setState({ message: i18n.t('static.common.selectProgram'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], allForecastingUnits:[], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], equivalencyUnitListFull:[], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
         } else if (versionId == -1) {
-            this.setState({ message: i18n.t('static.program.validversion'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], equivalencyUnitListFull:[], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+            this.setState({ message: i18n.t('static.program.validversion'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], allForecastingUnits:[], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], equivalencyUnitListFull:[], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
         } else if (viewById == 1 && planningUnitIds.length == 0) {
             this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptionData: [], graphConsumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
         } else if (viewById == 2 && forecastingUnitIds.length == 0) {
@@ -1436,6 +1437,7 @@ class ForecastOutput extends Component {
             planningUnitValues: [],
             planningUnitLabels: [],
             foreastingUnits: [],
+            allForecastingUnits:[],
             foreastingUnitValues: [],
             foreastingUnitLabels: []
         }, () => {
@@ -1514,6 +1516,7 @@ class ForecastOutput extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
+                                allForecastingUnits:forecastingUnitList,
                                 planningUnitValues: newPlanningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
                                 }, this),
@@ -1546,6 +1549,7 @@ class ForecastOutput extends Component {
                             this.setState({
                                 planningUnits: planningUnitList,
                                 forecastingUnits: forecastingUnitList,
+                                allForecastingUnits:forecastingUnitList,
                                 planningUnitValues: planningUnitList.map((item, i) => {
                                     return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
                                 }, this),
@@ -1588,6 +1592,7 @@ class ForecastOutput extends Component {
                                     });
                                     this.setState({
                                         forecastingUnits: listArray,
+                                        allForecastingUnits:listArray,
                                         message: ''
                                     }, () => {
                                         let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
@@ -1595,7 +1600,7 @@ class ForecastOutput extends Component {
                                             let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
                                             let newPlanningUnitList = [];
                                             let newForecastingUnitList = [];
-                                            let forecastingUnitList = this.state.forecastingUnits;
+                                            let forecastingUnitList = this.state.allForecastingUnits;
                                             let planningUnitList = this.state.planningUnits;
                                             for (var i = 0; i < forecastingUnitList.length; i++) {
                                                 let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitList[i].id);
@@ -1624,6 +1629,7 @@ class ForecastOutput extends Component {
                                             this.setState({
                                                 planningUnits: newPlanningUnitList,
                                                 forecastingUnits: newForecastingUnitList,
+                                                allForecastingUnits:listArray,
                                                 planningUnitValues: newPlanningUnitList.map((item, i) => {
                                                     return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
                                                 }, this),
