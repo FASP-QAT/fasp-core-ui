@@ -606,6 +606,11 @@ export default class BuildTree extends Component {
             usageTemplateListAll: [],
             usageTemplateId: '',
             usageText: '',
+            usageText1: '',
+            usageText2: '',
+            usageText3: '',
+            usageText4: '',
+            usage2Convert: '',
             noOfMonthsInUsagePeriod: '',
             tracerCategoryId: '',
             forecastingUnitList: [],
@@ -735,14 +740,15 @@ export default class BuildTree extends Component {
             currentNodeTypeId: "",
             deleteChildNodes: false,
             branchTemplateNotes: "",
-            calculateAllScenario:false,
+            calculateAllScenario: false,
             levelReorderJexcelLoader: false,
             levelReorderEl: "",
             showReorderJexcel: false,
             dropdownSources: {},
             childrenOfList: [],
             childrenOf: [],
-            isLevelChanged: false
+            isLevelChanged: false,
+            usage2ConvertCondition: true
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -2155,7 +2161,7 @@ export default class BuildTree extends Component {
                 })
             }
         }
-        if(data == "" && cf == false) {
+        if (data == "" && cf == false) {
             this.setState({
                 levelModal: true
             })
@@ -2171,7 +2177,7 @@ export default class BuildTree extends Component {
                 setTimeout(() => {
                     this.getChildrenOfList();
                     this.buildLevelReorderJexcel();
-                }, 0)  
+                }, 0)
             })
         }
     }
@@ -2238,7 +2244,7 @@ export default class BuildTree extends Component {
         for (var j = 0; j < levelNodes.length; j++) {
             var data = {};
             newParent = levelNodes[j].parent;
-            if(oldParent != newParent){
+            if (oldParent != newParent) {
                 var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
                 oldParent = newParent;
                 data.label = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
@@ -2296,16 +2302,16 @@ export default class BuildTree extends Component {
      */
     buildLevelReorderJexcel(isShiftNode) {
         var levelNodes = [];
-        if(this.state.childrenOf.length > 0){
+        if (this.state.childrenOf.length > 0) {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
             levelNodes.sort((a, b) => a.parent - b.parent);
-                var flatListUnsorted = levelNodes;
-                var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
-                var sortedArray = sortOrderArray.sort();
-                levelNodes = [];
-                for (var i = 0; i < sortedArray.length; i++) {
-                    levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
-                }
+            var flatListUnsorted = levelNodes;
+            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+            var sortedArray = sortOrderArray.sort();
+            levelNodes = [];
+            for (var i = 0; i < sortedArray.length; i++) {
+                levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
+            }
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
         }
@@ -2319,9 +2325,9 @@ export default class BuildTree extends Component {
         for (var j = 0; j < levelNodes.length; j++) {
             data = [];
             newParent = levelNodes[j].parent;
-            if(oldParent != newParent){
+            if (oldParent != newParent) {
                 dropdownSources[count] = [];
-                dropdownSources[count].push({id: 0, name: "Parent Node"});
+                dropdownSources[count].push({ id: 0, name: "Parent Node" });
                 var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
                 levelCount = 1;
                 oldParent = newParent;
@@ -2334,9 +2340,9 @@ export default class BuildTree extends Component {
                 j--;
             } else {
                 dropdownSources[count] = [];
-                dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
+                dropdownSources[count].push({ id: levelCount, name: levelCount.toString() });
                 data[0] = levelNodes[j].sortOrder;
-                data[1] = "Position "+levelCount.toString();
+                data[1] = "Position " + levelCount.toString();
                 data[2] = levelNodes[j].payload.label.label_en;
                 data[3] = levelNodes[j].id;
                 data[4] = newParent;
@@ -2462,8 +2468,8 @@ export default class BuildTree extends Component {
      */
     updateReorderTable(instance, cell, col, row) {
         var rowData = instance.getRowData(row);
-        var rowDataPrev = instance.getRowData(row-1);
-        var rowDataNext = instance.getRowData(row+1);
+        var rowDataPrev = instance.getRowData(row - 1);
+        var rowDataNext = instance.getRowData(row + 1);
         var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
         var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
         if (col === 5 && rowData[1] != 'Parent Node' && showUpArrow) {
@@ -2515,12 +2521,12 @@ export default class BuildTree extends Component {
         let pId = items.filter(f => f.id == currNode[0].id)[0].parent;
         var pObj = items.filter(f => f.id == pId)[0];
         let newItems = items.filter(f => f.parent == pId);
-        for(let i = 0; i < newItems.length; i++) {
+        for (let i = 0; i < newItems.length; i++) {
             var ns = items.findIndex(f => f.id == newItems[i].id);
-            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 9 ? '0'+(i+1) : i+1);
+            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 9 ? '0' + (i + 1) : i + 1);
         }
-        this.setState({ 
-            isLevelChanged: true, 
+        this.setState({
+            isLevelChanged: true,
             items
         }, () => {
             this.buildLevelReorderJexcel(true);
@@ -2561,8 +2567,8 @@ export default class BuildTree extends Component {
             items.forEach(item => {
                 if (item.oldSortOrder.includes(val.oldSortOrder)) {
                     var itemSplit = item.sortOrder.split(val.oldSortOrder);
-                    if(itemSplit.length > 1)
-                        item.sortOrder = val.newSortOrder+itemSplit[1];
+                    if (itemSplit.length > 1)
+                        item.sortOrder = val.newSortOrder + itemSplit[1];
                     else
                         item.sortOrder = val.newSortOrder;
                 }
@@ -4447,7 +4453,7 @@ export default class BuildTree extends Component {
             }, () => {
                 if (this.state.momEl != "") {
                     this.buildMomJexcel();
-                } else if(this.state.momElPer != "") {
+                } else if (this.state.momElPer != "") {
                     this.buildMomJexcelPercent();
                 }
             });
@@ -4774,7 +4780,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex,  "", true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, "", true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
@@ -5887,8 +5893,8 @@ export default class BuildTree extends Component {
             this.setState({
                 modelingTabChanged: true
             })
-        }       
-        
+        }
+
     }.bind(this);
     /**
      * This function is used to format the table like add asterisk or info to the table headers
@@ -7187,9 +7193,14 @@ export default class BuildTree extends Component {
                 noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             }
         }
+        var t1 = usagePeriodId != null && usagePeriodId != "" ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth : "";
+        var t2 = repeatUsagePeriodId != null && repeatUsagePeriodId != "" ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth : "";
         this.setState({
-            noFURequired: (noFURequired != "" && noFURequired != 0 ? noFURequired : 0)
+            noFURequired: (noFURequired != "" && noFURequired != 0 ? parseFloat(noFURequired).toFixed(8) : 0),
+            usage2Convert: (t1 / t2).toFixed(8),
+            usage2ConvertCondition: !(usagePeriodId == repeatUsagePeriodId)
         }, () => {
+            this.getUsageText();
         });
     }
     /**
@@ -7257,6 +7268,10 @@ export default class BuildTree extends Component {
     getUsageText() {
         try {
             var usageText = '';
+            var usageText1 = '';
+            var usageText2 = '';
+            var usageText3 = '';
+            var usageText4 = '';
             var noOfPersons = '';
             var noOfForecastingUnitsPerPerson = '';
             var usageFrequency = '';
@@ -7286,12 +7301,23 @@ export default class BuildTree extends Component {
                 if (this.state.currentScenario.fuNode.usageType.id == 1) {
                     if (this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true) {
                         var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
-                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s), " + " " + addCommas(usageFrequency) + " " + i18n.t('static.tree.timesPer') + " " + selectedText2.trim() + " " + i18n.t('static.tree.for') + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim();
+                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s), " + " " + addCommas(parseFloat(usageFrequency)) + " " + i18n.t('static.tree.timesPer').toLowerCase() + " " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.for').toLowerCase() + " " + (this.state.currentScenario.fuNode.repeatCount != null ? parseFloat(this.state.currentScenario.fuNode.repeatCount) : '') + " " + selectedText3.trim().toLowerCase();
+
+                        usageText3 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s)" + " " + i18n.t('static.tree.eachTime').toLowerCase();
+                        usageText4 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s) / " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim();
+                        var uc2 = this.state.usage2ConvertCondition ? ( " * " + parseFloat(this.state.usage2Convert) + " " + selectedText2.trim().toLowerCase() + " / " + selectedText3.trim().replace(/\(s\)/, '').toLowerCase()) : "";
+                        usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(this.state.noFURequired)) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                        usageText2 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s) * " + addCommas(parseFloat(usageFrequency)) + " " + i18n.t('static.tree.times').toLowerCase() + " / " + selectedText2.trim().replace(/\(s\)/, '').toLowerCase() + " * " + (this.state.currentScenario.fuNode.repeatCount != null ? parseFloat(this.state.currentScenario.fuNode.repeatCount) : '') + " " + selectedText3.trim().toLowerCase() + uc2;
+                        
                     } else {
-                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
+                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                        usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                        usageText2 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson))+ " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "(s) ";
                     }
                 } else {
-                    usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) " + i18n.t('static.usageTemplate.every') + " " + addCommas(usageFrequency) + " " + selectedText2.trim() + " indefinitely";
+                    usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s) " + i18n.t('static.usageTemplate.every').toLowerCase() + " " + addCommas(parseFloat(usageFrequency)) + " " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
+                    usageText1 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)) + " " + selectedText1.trim().toLowerCase() + "(s) / " + i18n.t('static.common.month').toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
+                    usageText2 = "= " + parseFloat(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s) " + " / " + parseFloat(this.state.currentScenario.fuNode.usageFrequency) + " " + selectedText2.trim().toLowerCase() + " * " + parseFloat((this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText2.trim().toLowerCase() + "/" + i18n.t('static.common.month').toLowerCase();
                 }
             } else {
                 if (this.state.currentScenario.puNode.planningUnit.id != null && this.state.currentScenario.puNode.planningUnit.id != "") {
@@ -7318,7 +7344,11 @@ export default class BuildTree extends Component {
         }
         finally {
             this.setState({
-                usageText
+                usageText,
+                usageText1,
+                usageText2,
+                usageText3,
+                usageText4
             }, () => {
             });
         }
@@ -8562,6 +8592,7 @@ export default class BuildTree extends Component {
             }
             fuNode.usageType = usageType;
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
+            this.getUsageText();
         }
         if (event.target.name === "planningUnitIdFU") {
             this.setState({ tempPlanningUnitId: event.target.value });
@@ -9292,6 +9323,13 @@ export default class BuildTree extends Component {
                 }
             ],
             editable: true,
+            oneditionend: function (instance, cell, x, y, value) {
+                var elInstance = instance;
+                var rowData = elInstance.getRowData(y);
+                if (x == 1) {
+                    elInstance.setValueFromCoords(1, y, Math.round(rowData[1]), true);
+                }
+            },
             onload: this.loadedModelingCalculatorJexcel,
             onchange: this.changeModelingCalculatorJexcel,
             search: false,
@@ -10679,7 +10717,7 @@ export default class BuildTree extends Component {
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
                                                                     <option key={i} value={item.id}>
-                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id+ " ("+i18n.t("static.tree.conversionFUToPU")+" = "+item.multiplier+")"}
+                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id + " (" + i18n.t("static.tree.conversionFUToPU") + " = " + item.multiplier + ")"}
                                                                     </option>
                                                                 )
                                                             }, this)}
@@ -10993,42 +11031,16 @@ export default class BuildTree extends Component {
                                                     <FormFeedback className="red">{errors.usagePeriodIdCon}</FormFeedback>
                                                 </FormGroup>
                                             </>
-                                            <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
-                                                {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
-                                                    <table className="table table-bordered">
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson)}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            {this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" &&
-                                                                <td style={{ width: '50%' }}>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
-                                                            {this.state.currentScenario.fuNode.usagePeriod != null && this.state.currentScenario.fuNode.usagePeriod.usagePeriodId == "" &&
-                                                                <td style={{ width: '50%' }}></td>
-                                                            }
-                                                        </tr>
-                                                    </table>}
-                                                {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
-                                                    <table className="table table-bordered">
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}{"/ Time"}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriodPerPatient') + " " + this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
-                                                        </tr>
-                                                    </table>}
-                                            </div>
                                         </div>
                                     </div>
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+                                    }
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText3}</b> {this.state.usageText4} </div>
+                                    }
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText1}</b> {this.state.usageText2} </div>
                                     }
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => {
@@ -13360,11 +13372,11 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}> 
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}>
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
                                                 </Col>
                                                 <Col>
                                                     <Input type="text"
@@ -13390,7 +13402,7 @@ export default class BuildTree extends Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.levelReorderNodeUnit')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
                                                         <i class="fa fa-info-circle icons pl-lg-2" id="PopoverNodeUnit" onClick={() => this.toggleTooltipNodeUnit()} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                     </Label>
                                                 </Col>
@@ -13419,7 +13431,7 @@ export default class BuildTree extends Component {
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
                                                 </Col>
                                                 <Col>
                                                     <MultiSelect
@@ -13435,12 +13447,12 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <p>{i18n.t('static.tree.levelChangeNote')}</p>
                                         <FormGroup>
-                                        {this.state.showReorderJexcel &&
-                                            <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                            {this.state.showReorderJexcel &&
+                                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                    <div id="levelReorderJexcel" style={{ display: "block" }}>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
+                                            }
                                         </FormGroup>
                                     </div>
                                 </ModalBody>

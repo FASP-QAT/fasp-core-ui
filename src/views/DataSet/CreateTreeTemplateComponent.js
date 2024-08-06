@@ -571,6 +571,11 @@ export default class CreateTreeTemplate extends Component {
             usageTemplateList: [],
             usageTemplateId: '',
             usageText: '',
+            usageText1: '',
+            usageText2: '',
+            usageText3: '',
+            usageText4: '',
+            usage2Convert: '',
             noOfMonthsInUsagePeriod: '',
             tracerCategoryId: '',
             forecastingUnitList: [],
@@ -759,7 +764,8 @@ export default class CreateTreeTemplate extends Component {
             dropdownSources: {},
             childrenOfList: [],
             childrenOf: [],
-            isLevelChanged: false
+            isLevelChanged: false,
+            usage2ConvertCondition: true
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -6413,8 +6419,14 @@ export default class CreateTreeTemplate extends Component {
                 noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
             }
         }
+        var t1 = usagePeriodId != null && usagePeriodId != "" ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth : "";
+        var t2 = repeatUsagePeriodId != null && repeatUsagePeriodId != "" ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth : "";
         this.setState({
-            noFURequired: (noFURequired != "" && noFURequired != 0 ? noFURequired : 0)
+            noFURequired: (noFURequired != "" && noFURequired != 0 ? parseFloat(noFURequired).toFixed(8) : 0),
+            usage2Convert: (t1/t2).toFixed(8),
+            usage2ConvertCondition: !(usagePeriodId == repeatUsagePeriodId)
+        }, () => {
+            this.getUsageText();
         });
     }
     /**
@@ -6480,6 +6492,10 @@ export default class CreateTreeTemplate extends Component {
      */
     getUsageText() {
         var usageText = '';
+        var usageText1 = '';
+        var usageText2 = '';
+        var usageText3 = '';
+        var usageText4 = '';
         var noOfPersons = '';
         var noOfForecastingUnitsPerPerson = '';
         var usageFrequency = '';
@@ -6536,12 +6552,22 @@ export default class CreateTreeTemplate extends Component {
                 if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true) {
                     var selectedText3 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod != null ? this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en : "";
                     var repeatCount = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount.toString().replaceAll(",", "") : '';
-                    usageText = "Every " + addCommas(noOfPersons) + " " + selectedText.trim() + "(s) requires " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s), " + addCommas(usageFrequency) + " times per " + selectedText2.trim() + " for " + addCommas(repeatCount) + " " + selectedText3.trim();
+                    usageText = "Every " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim() + "(s) requires " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s), " + addCommas(parseFloat(usageFrequency)) + " times per " + selectedText2.trim() + " for " + addCommas(parseFloat(repeatCount)) + " " + selectedText3.trim();
+                    
+                    usageText3 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s)" + " " + i18n.t('static.tree.eachTime').toLowerCase();
+                    usageText4 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s) / " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim();
+                    var uc2 = this.state.usage2ConvertCondition ? (" * " + parseFloat(this.state.usage2Convert) + " " + selectedText2.trim().toLowerCase() + " / " + selectedText3.trim().replace(/\(s\)/, '').toLowerCase()) : "";
+                    usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(this.state.noFURequired)) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                    usageText2 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s) * " + addCommas(parseFloat(usageFrequency)) + " " + i18n.t('static.tree.times').toLowerCase() + " / " + selectedText2.trim().replace(/\(s\)/, '').toLowerCase() + " * " + (repeatCount != null ? parseFloat(repeatCount) : '') + " " + selectedText3.trim().toLowerCase() + uc2;    
                 } else {
-                    usageText = "Every " + addCommas(noOfPersons) + " " + selectedText.trim() + "(s) requires " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
+                    usageText = "Every " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim() + "(s) requires " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s)";
+                    usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s)";
+                    usageText2 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "(s) ";
                 }
             } else {
-                usageText = "Every " + addCommas(noOfPersons) + " " + selectedText.trim() + "(s) requires " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) every " + addCommas(usageFrequency) + " " + selectedText2.trim() + " indefinitely";
+                usageText = "Every " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim() + "(s) requires " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s) every " + addCommas(parseFloat(usageFrequency)) + " " + selectedText2.trim() + " indefinitely";
+                usageText1 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat((noOfForecastingUnitsPerPerson / usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)) + " " + selectedText1.trim().toLowerCase() + "(s) / " + i18n.t('static.common.month').toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
+                usageText2 = "= " + parseFloat(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ parseFloat(usageFrequency) + " " + selectedText2.trim().toLowerCase() + " * " + parseFloat((this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText2.trim().toLowerCase() + "/" + i18n.t('static.common.month').toLowerCase();
             }
         } else {
             if (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
@@ -6570,7 +6596,11 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.setState({
-            usageText
+            usageText,
+            usageText1,
+            usageText2,
+            usageText3,
+            usageText4
         }, () => {
         });
     }
@@ -8176,6 +8206,7 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = event.target.value;
+            this.getUsageText();
         }
         if (event.target.name === "planningUnitIdFU") {
             this.setState({ tempPlanningUnitId: event.target.value });
@@ -8867,6 +8898,13 @@ export default class CreateTreeTemplate extends Component {
                 }
             ],
             editable: true,
+            oneditionend:function (instance, cell, x, y, value) {
+                var elInstance = instance;
+                var rowData = elInstance.getRowData(y);
+                if (x == 1) {
+                    elInstance.setValueFromCoords(1, y, Math.round(rowData[1]), true);
+                }
+            },
             onload: this.loadedModelingCalculatorJexcel,
             pagination: localStorage.getItem("sesRecordCount"),
             onchange: this.changeModelingCalculatorJexcel,
@@ -10608,6 +10646,12 @@ export default class CreateTreeTemplate extends Component {
                                     </div>
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                         <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+                                    }
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText3}</b> {this.state.usageText4} </div>
+                                    }
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText1}</b> {this.state.usageText2} </div>
                                     }
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.cancelNodeDataClicked()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

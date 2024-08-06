@@ -32,7 +32,7 @@ import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import { ACTUAL_CONSUMPTION_MODIFIED, ADJUSTMENT_MODIFIED, API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, FINAL_VERSION_TYPE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_MODIFIED, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, PENDING_APPROVAL_VERSION_STATUS, PROBLEM_STATUS_IN_COMPLIANCE, SECRET_KEY, SHIPMENT_MODIFIED } from '../../Constants.js';
+import { ACTUAL_CONSUMPTION_MODIFIED, ADJUSTMENT_MODIFIED, API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, FINAL_VERSION_TYPE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_MODIFIED, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, PENDING_APPROVAL_VERSION_STATUS, PROBLEM_STATUS_IN_COMPLIANCE, SECRET_KEY, SHIPMENT_MODIFIED, NO_REVIEW_NEEDED_VERSION_STATUS } from '../../Constants.js';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -4066,8 +4066,9 @@ export default class syncPage extends Component {
               problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
               problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
               programJson.problemReportList = problemReportList;
-              programJson.versionType = { id: document.getElementById("versionType").value };
-              programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS };
+              let versionType = document.getElementById("versionType").value;
+              programJson.versionType = { id: versionType };
+              programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS};
               programJson.notes = document.getElementById("notes").value;
               const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
