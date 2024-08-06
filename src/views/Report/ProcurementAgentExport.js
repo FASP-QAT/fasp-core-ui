@@ -3418,7 +3418,7 @@ class ProcurementAgentExport extends Component {
                       name="fundingSourceTypeId"
                       id="fundingSourceTypeId"
                       bsSize="md"
-                      // filterOptions={this.filterOptions}
+                      filterOptions={filterOptions}
                       value={this.state.fundingSourceTypeValues}
                       onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
                       options={fundingSourceTypes.length > 0

@@ -24,8 +24,8 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import FundingSourceService from '../../api/FundingSourceService.js';
 import { addDoubleQuoteToRowContent, dateFormatterCSV, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -362,7 +362,7 @@ class Budgets extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSourceType.code.replaceAll(',', ' ')).replaceAll(' ', '%20'),(getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Number(ele.budgetAmt).toFixed(2), Number(ele.plannedBudgetAmt).toFixed(2), Number(ele.orderedBudgetAmt).toFixed(2), Number((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))).toFixed(2), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSourceType.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -859,7 +859,7 @@ class Budgets extends Component {
                                             name="fundingSourceTypeId"
                                             id="fundingSourceTypeId"
                                             bsSize="md"
-                                            filterOptions={this.filterOptions}
+                                            filterOptions={filterOptions}
                                             value={this.state.fundingSourceTypeValues}
                                             onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
                                             options={fundingSourceTypes.length > 0

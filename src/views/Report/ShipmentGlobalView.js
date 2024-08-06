@@ -1898,6 +1898,7 @@ class ShipmentGlobalView extends Component {
                                                     onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
                                                     options={fundingSourceTypeList && fundingSourceTypeList.length > 0 ? fundingSourceTypeList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
