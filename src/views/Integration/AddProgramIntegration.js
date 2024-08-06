@@ -59,6 +59,7 @@ class ProgramIntegration extends Component {
     filterVersionStatus = function (instance, cell, c, r, source) {
         var rowData = (this.state.dataEL.getJson(null, false)[r]);
         return (rowData[2] == 1 ? this.state.versionStatusArr.filter(c => c.id == 1) : this.state.versionStatusArr);
+                
     }.bind(this);
     /**
      * Reterives program integartion by programId on component mount
@@ -795,6 +796,12 @@ class ProgramIntegration extends Component {
         if (x == 2 && rowData[2] == 1) {
             elInstance.setValueFromCoords(3, y, 1, true);
         }
+
+        // if (x == 2 && rowData[2] == 1) {
+        //     elInstance.setValueFromCoords(3, y, 4, true);//i.e versionStatus = 4 (No Review Needed)
+        // } else if (x == 2 && rowData[2] != 1) {
+        //     elInstance.setValueFromCoords(3, y, '', true);//i.e versionStatus = ''
+        // }
     }.bind(this);
     /**
      * Function to check validation of the jexcel table.
