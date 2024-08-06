@@ -541,13 +541,9 @@ export default class SyncProgram extends Component {
             var checkboxesChecked = [];
             for (var i = 0; i < programIds.length; i++) {
                 var program = this.state.programList.filter(c => c.programId == programIds[i])[0];
-                checkboxesChecked.push({ programId: program.programId, versionId: -1 })
+                checkboxesChecked.push({ programId: program.programId, versionId: -1,'cutOffDate':"" })
             }
-            var loadProgramInputJson={
-                'programVersionList':checkboxesChecked,
-                'cutOffDate':""
-              }
-            ProgramService.getAllProgramData(loadProgramInputJson)
+            ProgramService.getAllProgramData(checkboxesChecked)
                 .then(response => {
                     response.data = decompressJson(response.data);
                     var json = response.data;
