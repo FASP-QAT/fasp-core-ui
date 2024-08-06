@@ -2649,7 +2649,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 rcpuResult = rcpuRequest.result;
                                                 var aruList = [];
                                                 for (var i = 0; i < rcpuResult.length; i++) {
-                                                    if (rcpuResult[i].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[i].realmCountryPlanningUnitId != 0) {
+                                                    if (rcpuResult[i].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[i].realmCountryPlanningUnitId != 0 && proList.filter(c=>c.value==rcpuResult[i].planningUnit.id).length>0  && rcpuResult[i].active == true) {
                                                         aruList.push({
                                                             label: getLabelText(rcpuResult[i].label, this.state.lang),
                                                             value: rcpuResult[i].realmCountryPlanningUnitId,
