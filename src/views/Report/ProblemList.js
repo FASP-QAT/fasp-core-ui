@@ -1376,9 +1376,6 @@ export default class ProblemList extends React.Component {
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{i18n.t('static.problemContext.viewTrans')}</small></span>
-                                </a>&nbsp;
-                                <a className="card-header-action">
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
                                 </a>
                                 {this.state.data.length > 0 && <img style={{ verticalAlign: 'bottom', height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />} &nbsp;
@@ -1486,7 +1483,7 @@ export default class ProblemList extends React.Component {
                                     {this.state.showProblemDashboard == 1 && this.state.programId != 0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
                                 </div>
                                 <FormGroup className="col-md-6">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input type="textarea"
