@@ -276,7 +276,8 @@ export default class WhatIfReportComponent extends React.Component {
             shipmentQtyTotalForPopup: 0,
             batchQtyTotalForPopup: 0,
             activeTab: new Array(3).fill('1'),
-            takeDataFrom: "programData"
+            takeDataFrom: "programData",
+            planningUnitNotes: ""
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
@@ -391,7 +392,7 @@ export default class WhatIfReportComponent extends React.Component {
         var planningUnitId = (document.getElementById("planningUnitId").value);
         var rangeValue = value;
         let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString()=="true");
+        var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString() == "true");
         var startValue = "";
         startConsumptionRecord.map(c => {
             startValue = Number(startValue) + Number(c.consumptionQty);
@@ -854,13 +855,13 @@ export default class WhatIfReportComponent extends React.Component {
                 var planningUnitId = (document.getElementById("planningUnitId").value);
                 var rangeValue = this.state.rangeValue;
                 let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString()=="true");
+                var startConsumptionRecord = (this.state.programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && moment(c.consumptionDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM") && c.actualFlag.toString() == "false" && c.active.toString() == "true");
                 var startValue = "";
                 startConsumptionRecord.map(c => {
                     startValue = Number(startValue) + Number(c.consumptionQty);
                 })
                 this.setState({
-                    startValue:startValue
+                    startValue: startValue
                 })
                 document.getElementById("consumptionScenariosFields1").style.display = "none";
                 document.getElementById("consumptionScenariosFields2").style.display = "contents";
@@ -1416,7 +1417,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         consumptionList[index].lastModifiedDate = curDate;
                                         consumptionList[index].active = true;
                                         consumptionList[index].notes = "Source: Phase in/out scenario";
-                                        consumptionList[index].dataSource= {
+                                        consumptionList[index].dataSource = {
                                             id: INTERPOLATE_DATA_SOURCE_ID
                                         };
                                     } else if (indexWithoutMultiplier1 != -1) {
@@ -1430,7 +1431,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         };
                                         consumptionList[indexWithoutMultiplier1].multiplier = 1;
                                         consumptionList[indexWithoutMultiplier1].notes = "Source: Phase in/out scenario";
-                                        consumptionList[indexWithoutMultiplier1].dataSource= {
+                                        consumptionList[indexWithoutMultiplier1].dataSource = {
                                             id: INTERPOLATE_DATA_SOURCE_ID
                                         };
                                     } else {
@@ -2406,7 +2407,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 consumptionList[index].lastModifiedDate = curDate;
                                 consumptionList[index].active = true;
                                 consumptionList[index].notes = "Source: Phase in/out scenario";
-                                consumptionList[index].dataSource= {
+                                consumptionList[index].dataSource = {
                                     id: INTERPOLATE_DATA_SOURCE_ID
                                 };
                             } else if (indexWithoutMultiplier1 != -1) {
@@ -2420,7 +2421,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 };
                                 consumptionList[indexWithoutMultiplier1].multiplier = 1;
                                 consumptionList[indexWithoutMultiplier1].notes = "Source: Phase in/out scenario";
-                                consumptionList[indexWithoutMultiplier1].dataSource= {
+                                consumptionList[indexWithoutMultiplier1].dataSource = {
                                     id: INTERPOLATE_DATA_SOURCE_ID
                                 };
                             } else {
@@ -2607,6 +2608,9 @@ export default class WhatIfReportComponent extends React.Component {
         } else {
             csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.distributionLeadTime + "\"")
         }
+        if (this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0) {
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + this.state.planningUnitNotes + '"'))
+        }
         csvRow.push('')
         const senheaders = [];
         senheaders.push((i18n.t('static.whatIf.scenario')).replaceAll(' ', '%20'))
@@ -2752,6 +2756,11 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                     } else {
                         doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + this.formatter(this.state.distributionLeadTime), doc.internal.pageSize.width / 10, 150, {
+                            align: 'left'
+                        })
+                    }
+                    if (this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0) {
+                        doc.text(i18n.t('static.program.notes') + ' : ' + this.state.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
                             align: 'left'
                         })
                     }
@@ -3402,6 +3411,7 @@ export default class WhatIfReportComponent extends React.Component {
                     inList: invList,
                     coList: conList,
                     shList: shiList,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -6578,24 +6588,29 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="animated fadeIn" style={{ display: this.state.display }}>
                                 <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
-                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.reorderFrequency}</span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                     </ul>
                                 </FormGroup>
+                                {this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                    </ul>
+                                </FormGroup>}
                                 <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
                                         <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.supplyPlan.forecastedConsumption')}</i></span></li>
                                         <li><span className=" blacklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.actualConsumption')} </span></li>
                                     </ul>
                                 </FormGroup>
                                 <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.dashboard.shipments")} : </b></span></li>
                                         {
                                             this.state.paColors.map(item1 => (
                                                 <li><span className="legendcolor" style={{ backgroundColor: item1.color }}></span> <span className="legendcommitversionText">{item1.text}</span></li>
@@ -6611,7 +6626,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                         <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
                                         <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>

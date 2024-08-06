@@ -57,14 +57,15 @@
 						utile pour les prévisions à court terme et est sensible aux tendances. Elle n'est 
 						pas appropriée pour les données saisonnières
 					</li>
-					<li><b>Semi-moyennes:</b>Estimations semi-moyennes basent la tendance sur les deux 
-						moitiés d'une série. QAT divise les données réelles en deux parties égales (moitiés) 
-						et la moyenne arithmétique des valeurs de chaque partie (moitié) est calculée comme 
-						les valeurs y de deux points sur une ligne.  La pente de la ligne de tendance est 
-						déterminée par la différence entre ces valeurs y au fil du temps, définie par la 
-						différence entre les points médians des deux moitiés de la série ou valeurs x, de ces 
-						points.  Cette méthode est sensible aux tendances et utile pour les prévisions à 
-						court et moyen terme mais nest pas appropriée pour les données saisonnières. 
+					<li><b>Semi-moyennes:</b>Tendances d’estimations semi-moyennes basées sur deux moitiés d’une série. 
+						QAT divise les données réelles en deux parties égales (moitiés), mais si les données de 
+						consommation réelles ne concernent pas les mois pairs, le point médian est exclu et la 
+						moyenne arithmétique des valeurs de chaque partie (moitié) est calculée comme les valeurs 
+						y de deux. points sur une ligne. La pente de la ligne de tendance est déterminée par 
+						la différence entre ces valeurs y au fil du temps, définie par la différence des milieux 
+						des deux moitiés de la série, ou valeurs x, des points. Cette méthode est sensible 
+						aux tendances et utile pour les prévisions à court et moyen terme mais n'est pas appropriée 
+						pour les données saisonnières.
 					</li>
 					<li><b>Régression linéaire:</b> La régression linéaire modélise la relation entre deux 
 						variables en ajustant une équation linéaire aux données observées. Intervalle de 

@@ -9,6 +9,7 @@ import CryptoJS from 'crypto-js';
 import ProductCategoryServcie from '../../api/PoroductCategoryService.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import PlanningUnitService from '../../api/PlanningUnitService';
 /**
  * Component for mapping program and planning unit.
  */
@@ -39,19 +40,22 @@ export default class MapPlanningUnits extends Component {
         var data = [];
         data[0] = "-1";
         data[1] = "";
-        data[2] = 1;
-        data[3] = "";
+        data[2] = "";
+        data[3] = 1;
         data[4] = "";
         data[5] = "";
-        data[6] = MONTHS_IN_FUTURE_FOR_AMC;
-        data[7] = MONTHS_IN_PAST_FOR_AMC;
-        data[8] = "";
+        data[6] = "";
+        data[7] = MONTHS_IN_FUTURE_FOR_AMC;
+        data[8] = MONTHS_IN_PAST_FOR_AMC;
         data[9] = "";
         data[10] = "";
         data[11] = "";
-        data[12] = "";
+        data[12] = 50;
         data[13] = "";
         data[14] = "";
+        data[15] = "";
+        data[16] = "";
+        data[17] = "";
         this.el.insertRow(
             data, 0, 1
         );
@@ -102,8 +106,8 @@ export default class MapPlanningUnits extends Component {
                     }
                 }
             }
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(2, y);
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(3, y);
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -113,8 +117,8 @@ export default class MapPlanningUnits extends Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-            var col = ("D").concat(parseInt(y) + 1);
-            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -132,48 +136,10 @@ export default class MapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
-            var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            if (json[y][2] == 1 && value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
             var col = ("F").concat(parseInt(y) + 1);
             value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
-            if (json[y][2] == 2 && value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-            var col = ("J").concat(parseInt(y) + 1);
-            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_INTEGER_REGEX
-            if (json[y][2] == 2 && value === "") {
+            if (json[y][3] == 1 && value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -192,13 +158,32 @@ export default class MapPlanningUnits extends Component {
             var col = ("G").concat(parseInt(y) + 1);
             value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
-            if (value === "") {
+            if (json[y][3] == 2 && value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            var col = ("K").concat(parseInt(y) + 1);
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (json[y][3] == 2 && value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -229,25 +214,6 @@ export default class MapPlanningUnits extends Component {
             }
             var col = ("I").concat(parseInt(y) + 1);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            var reg = JEXCEL_DECIMAL_LEAD_TIME
-            if (value === "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-            var col = ("K").concat(parseInt(y) + 1);
-            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_INTEGER_REGEX
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -265,8 +231,65 @@ export default class MapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
+            var col = ("J").concat(parseInt(y) + 1);
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
             var col = ("L").concat(parseInt(y) + 1);
             value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            var col = ("M").concat(parseInt(y) + 1);
+            value = this.el.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_INTEGER_REGEX
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            var col = ("N").concat(parseInt(y) + 1);
+            value = this.el.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -334,8 +357,8 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -343,27 +366,10 @@ export default class MapPlanningUnits extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX
-                var col = ("E").concat(parseInt(y) + 1);
-                if (rowData[2] == 1 && value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
-                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
                 value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX
                 var col = ("F").concat(parseInt(y) + 1);
-                if (rowData[2] == 2 && value == "") {
+                if (rowData[3] == 1 && value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -377,11 +383,28 @@ export default class MapPlanningUnits extends Component {
                         this.el.setComments(col, "");
                     }
                 }
-                value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_INTEGER_REGEX
-                var col = ("J").concat(parseInt(y) + 1);
-                if (rowData[2] == 2 && value == "") {
-                    this.el.setValueFromCoords(9, y, 0, true);
+                var col = ("G").concat(parseInt(y) + 1);
+                if (rowData[3] == 2 && value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+                value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                var reg = JEXCEL_INTEGER_REGEX
+                var col = ("K").concat(parseInt(y) + 1);
+                if (rowData[3] == 2 && value == "") {
+                    this.el.setValueFromCoords(10, y, 0, true);
                 } else {
                     if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -393,20 +416,20 @@ export default class MapPlanningUnits extends Component {
                     }
                 }
             }
-            if (rowData[2] == 2) {
-                this.el.setValueFromCoords(4, y, "", true);
-                this.el.setValueFromCoords(5, y, rowData[13], true);
-                this.el.setValueFromCoords(9, y, rowData[14] != "" ? rowData[14] : 0, true);
-            } else {
+            if (rowData[3] == 2) {
                 this.el.setValueFromCoords(5, y, "", true);
-                this.el.setValueFromCoords(9, y, "", true);
-                this.el.setValueFromCoords(4, y, rowData[12], true);
+                this.el.setValueFromCoords(6, y, rowData[16], true);
+                this.el.setValueFromCoords(10, y, rowData[17] != "" ? rowData[17] : 0, true);
+            } else {
+                this.el.setValueFromCoords(6, y, "", true);
+                this.el.setValueFromCoords(10, y, "", true);
+                this.el.setValueFromCoords(5, y, rowData[15], true);
             }
         }
-        if (x == 3) {
+        if (x == 4) {
             var reg = JEXCEL_INTEGER_REGEX;
-            var col = ("D").concat(parseInt(y) + 1);
-            value = this.el.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -420,35 +443,13 @@ export default class MapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-            }
-        }
-        if (x == 4) {
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (rowData[2] == 1 && value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-            if (value !== "") {
-                this.el.setValueFromCoords(12, y, value, true);
             }
         }
         if (x == 5) {
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("F").concat(parseInt(y) + 1);
             value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (rowData[2] == 2 && value == "") {
+            if (rowData[3] == 1 && value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -463,41 +464,19 @@ export default class MapPlanningUnits extends Component {
                 }
             }
             if (value !== "") {
-                this.el.setValueFromCoords(13, y, value, true);
-            }
-        }
-        if (x == 9) {
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("J").concat(parseInt(y) + 1);
-            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (rowData[2] == 2 && value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-            if (value !== "") {
-                this.el.setValueFromCoords(14, y, value, true);
+                this.el.setValueFromCoords(15, y, value, true);
             }
         }
         if (x == 6) {
             var reg = JEXCEL_INTEGER_REGEX
             var col = ("G").concat(parseInt(y) + 1);
             value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
+            if (rowData[3] == 2 && value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -505,6 +484,31 @@ export default class MapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(16, y, value, true);
+            }
+        }
+        if (x == 10) {
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("K").concat(parseInt(y) + 1);
+            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (rowData[3] == 2 && value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if ((isNaN(parseInt(value)) || !(reg.test(value))) && value != "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (value !== "") {
+                this.el.setValueFromCoords(17, y, value, true);
             }
         }
         if (x == 7) {
@@ -527,28 +531,9 @@ export default class MapPlanningUnits extends Component {
             }
         }
         if (x == 8) {
-            var reg = JEXCEL_DECIMAL_LEAD_TIME
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("I").concat(parseInt(y) + 1);
             value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-        if (x == 10) {
-            var reg = JEXCEL_INTEGER_REGEX
-            var col = ("K").concat(parseInt(y) + 1);
-            value = this.el.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -564,10 +549,67 @@ export default class MapPlanningUnits extends Component {
                 }
             }
         }
+        if (x == 9) {
+            var reg = JEXCEL_DECIMAL_LEAD_TIME
+            var col = ("J").concat(parseInt(y) + 1);
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
         if (x == 11) {
-            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            var reg = JEXCEL_INTEGER_REGEX
             var col = ("L").concat(parseInt(y) + 1);
             value = this.el.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 12) {
+            var reg = JEXCEL_INTEGER_REGEX
+            var col = ("M").concat(parseInt(y) + 1);
+            value = this.el.getValue(`M${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 13) {
+            var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+            var col = ("N").concat(parseInt(y) + 1);
+            value = this.el.getValue(`N${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -672,19 +714,22 @@ export default class MapPlanningUnits extends Component {
                     data = [];
                     data[0] = "-1";
                     data[1] = "";
-                    data[2] = 1;
-                    data[3] = "";
+                    data[2] = "";
+                    data[3] = 1;
                     data[4] = "";
                     data[5] = "";
-                    data[6] = MONTHS_IN_FUTURE_FOR_AMC;
-                    data[7] = MONTHS_IN_PAST_FOR_AMC;
-                    data[8] = "";
+                    data[6] = "";
+                    data[7] = MONTHS_IN_FUTURE_FOR_AMC;
+                    data[8] = MONTHS_IN_PAST_FOR_AMC;
                     data[9] = "";
                     data[10] = "";
                     data[11] = "";
-                    data[12] = "";
+                    data[12] = 50;
                     data[13] = "";
                     data[14] = "";
+                    data[15] = "";
+                    data[16] = "";
+                    data[17] = "";
                     productDataArr[0] = data;                    
                     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                     jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
@@ -725,6 +770,12 @@ export default class MapPlanningUnits extends Component {
                                 },
                                 filter: this.dropdownFilter,
                                 width: '150',
+                            },
+                            {
+                                title: i18n.t('static.conversion.ConversionFactorFUPU'),
+                                type: 'text',
+                                readOnly:true,
+                                tooltip: i18n.t("static.tooltip.conversionFactorPU"),
                             },
                             {
                                 title: i18n.t('static.programPU.planBasedOn'),
@@ -800,6 +851,21 @@ export default class MapPlanningUnits extends Component {
                                 width: 120
                             },
                             {
+                                title: i18n.t('static.pu.forecastErrorThresholdPercentage'),
+                                type: 'numeric',
+                                textEditor: true,
+                                mask: '#,##',
+                                disabledMaskOnEdition: true,
+                                width: 140,
+                                required: true,
+                                number: true,
+                                regex: {
+                                    ex: JEXCEL_INTEGER_REGEX,
+                                    text: i18n.t('static.message.invalidnumber')
+                                },
+                                tooltip:i18n.t("static.programPlanningUnit.forecastErrorTooltip")
+                            },
+                            {
                                 title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
                                 type: 'numeric',
                                 textEditor: true,
@@ -808,6 +874,12 @@ export default class MapPlanningUnits extends Component {
                                 disabledMaskOnEdition: true,
                                 tooltip: i18n.t("static.programPU.catalogPriceTooltip"),
                                 width: 120
+                            },
+                            {
+                                title: 'Notes',
+                                type: 'text',
+                                width: 200,
+                                tooltip: i18n.t("static.pu.puNotesTooltip")
                             },
                             {
                                 title: 'Min Mos',
@@ -825,19 +897,19 @@ export default class MapPlanningUnits extends Component {
                         updateTable: function (el, cell, x, y, source, value, id) {
                             var elInstance = el;
                             var rowData = elInstance.getRowData(y);
-                            if (rowData[2] == 1) {
+                            if (rowData[3] == 1) {
+                                var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                                cell1.classList.add('readonly');
+                                var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                cell1.classList.add('readonly');
                                 var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                cell1.classList.add('readonly');
-                                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                cell1.classList.add('readonly');
-                                var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
                                 cell1.classList.remove('readonly');
                             } else {
+                                var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+                                cell1.classList.remove('readonly');
+                                var cell1 = elInstance.getCell(`K${parseInt(y) + 1}`)
+                                cell1.classList.remove('readonly');
                                 var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
-                                cell1.classList.remove('readonly');
-                                var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
-                                cell1.classList.remove('readonly');
-                                var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
                                 cell1.classList.add('readonly');
                             }
                         },
@@ -912,8 +984,8 @@ export default class MapPlanningUnits extends Component {
                                             var data = [];
                                             data[0] = "";
                                             data[1] = "";
-                                            data[2] = 1;
-                                            data[3] = "";
+                                            data[2] = "";
+                                            data[3] = 1;
                                             data[4] = "";
                                             data[5] = "";
                                             data[6] = "";
@@ -922,9 +994,12 @@ export default class MapPlanningUnits extends Component {
                                             data[9] = "";
                                             data[10] = "";
                                             data[11] = "";
-                                            data[12] = "";
+                                            data[12] = 50;
                                             data[13] = "";
                                             data[14] = "";
+                                            data[15] = "";
+                                            data[16] = "";
+                                            data[17] = "";
                                             obj.insertRow(data, parseInt(y), 1);
                                             obj.getCell(("B").concat(parseInt(y) + 1)).classList.add('typing-' + this.state.lang);
                                         }.bind(this)
@@ -937,8 +1012,8 @@ export default class MapPlanningUnits extends Component {
                                             var data = [];
                                             data[0] = "";
                                             data[1] = "";
-                                            data[2] = 1;
-                                            data[3] = "";
+                                            data[2] = "";
+                                            data[3] = 1;
                                             data[4] = "";
                                             data[5] = "";
                                             data[6] = "";
@@ -947,9 +1022,12 @@ export default class MapPlanningUnits extends Component {
                                             data[9] = "";
                                             data[10] = "";
                                             data[11] = "";
-                                            data[12] = "";
+                                            data[12] = 50;
                                             data[13] = "";
                                             data[14] = "";
+                                            data[15] = "";
+                                            data[16] = "";
+                                            data[17] = "";
                                             obj.insertRow(data, parseInt(y));
                                             obj.getCell(("B").concat(parseInt(y) + 2)).classList.add('typing-' + this.state.lang);
                                         }.bind(this)
@@ -1076,20 +1154,26 @@ export default class MapPlanningUnits extends Component {
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
-        if (x == 3 && !isNaN(rowData[3]) && rowData[3].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(3, y, parseFloat(rowData[3]), true);
-        } else if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
+        if (x == 4 && !isNaN(rowData[4]) && rowData[4].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(4, y, parseFloat(rowData[4]), true);
-        } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+        } else if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
-        } else if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(10, y, parseFloat(rowData[10]), true);
+        } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         } else if (x == 11 && !isNaN(rowData[11]) && rowData[11].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(11, y, parseFloat(rowData[11]), true);
+        } else if (x == 13 && !isNaN(rowData[13]) && rowData[13].toString().indexOf('.') != -1) {
+            elInstance.setValueFromCoords(13, y, parseFloat(rowData[13]), true);
+        }else if(x == 1){
+            PlanningUnitService.getPlanningUnitById(rowData[1]).then(response => {
+                if (response.status == 200) {
+                    elInstance.setValueFromCoords(2, y, (response.data.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                }
+            })
         }
     }
     /**
@@ -1102,22 +1186,22 @@ export default class MapPlanningUnits extends Component {
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[5].classList.add('InfoTr');
+        tr.children[3].classList.add('InfoTr');
+        tr.children[5].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[6].classList.add('InfoTr');
-        tr.children[7].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[7].classList.add('InfoTr');
         tr.children[8].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[10].classList.add('InfoTr');
-        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
-        var cell1 = instance.worksheets[0].getCell(`F1`)
+        tr.children[10].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[14].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[13].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[15].classList.add('InfoTr');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        var cell1 = instance.worksheets[0].getCell(`G1`)
         cell1.classList.add('readonly');
-        var cell1 = instance.worksheets[0].getCell(`J1`)
+        var cell1 = instance.worksheets[0].getCell(`K1`)
         cell1.classList.add('readonly');
-        var cell1 = instance.worksheets[0].getCell(`E1`)
-        cell1.classList.remove('readonly');
         jExcelLoadedFunctionWithoutPagination(instance);
     }
     /**
@@ -1136,18 +1220,20 @@ export default class MapPlanningUnits extends Component {
                 planningUnit: {
                     id: map.get("1"),
                 },
-                reorderFrequencyInMonths: this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                minMonthsOfStock: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                monthsInFutureForAmc: this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                monthsInPastForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                localProcurementLeadTime: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                shelfLife: this.el.getValue(`K${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                catalogPrice: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                reorderFrequencyInMonths: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                minMonthsOfStock: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInFutureForAmc: this.el.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                monthsInPastForAmc: this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                localProcurementLeadTime: this.el.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                shelfLife: this.el.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                catalogPrice: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                 active: true,
                 programPlanningUnitId: 0,
-                minQty: this.el.getValue(`N${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                distributionLeadTime: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                planBasedOn: map.get("2")
+                minQty: this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                distributionLeadTime: this.el.getValue(`R${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                planBasedOn: map.get("3"),
+                forecastErrorThreshold : this.el.getValue(`M${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                notes : map.get("14")
             }
             planningUnitArray.push(planningUnitJson);
         }

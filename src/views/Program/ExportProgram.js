@@ -16,10 +16,11 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { ENCRYPTION_EXPORT_PASSWORD, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import Minizip from 'minizip-asm.js';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -99,7 +100,7 @@ export default class ExportProgram extends Component {
      */
     formSubmit() {
         this.setState({ loading: true });
-        var zip = new JSZip();
+        const mz = new Minizip();
         var programId = this.state.programId;
         if (programId != "" && programId != undefined) {
             this.setState({
@@ -233,11 +234,34 @@ export default class ExportProgram extends Component {
                                                                                         myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
                                                                                         myResult[i].readonly = programQPLResultFiltered.readonly;
                                                                                         if (isUnEncrepted) {
+                                                                                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                                                                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                            var programJson1 = JSON.parse(programData);
+                                                                                            var planningUnitDataList = myResult[i].programData.planningUnitDataList;
+                                                                                            for (var h = 0; h < planningUnitDataList.length; h++) {
+                                                                                                var programDataForPlanningUnitBytes = CryptoJS.AES.decrypt(planningUnitDataList[h].planningUnitData, SECRET_KEY);
+                                                                                                var programDataForPlanningUnit = programDataForPlanningUnitBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJsonForPlanningUnit = JSON.parse(programDataForPlanningUnit);
+                                                                                                planningUnitDataList[h].planningUnitData = programJsonForPlanningUnit;
+                                                                                            }
+                                                                                            myResult[i].programData = { generalData: programJson1, planningUnitDataList: planningUnitDataList };
                                                                                             var txt = JSON.stringify(myResult[i]);
                                                                                             var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                            var programDataBytes1 = CryptoJS.AES.decrypt(dArray.programData.generalData, SECRET_KEY);
+                                                                                            var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                            var programJson11 = JSON.parse(programData1);
+                                                                                            var planningUnitDataList1 = dArray.programData.planningUnitDataList;
+                                                                                            for (var h = 0; h < planningUnitDataList1.length; h++) {
+                                                                                                var programDataForPlanningUnitBytes1 = CryptoJS.AES.decrypt(planningUnitDataList1[h].planningUnitData, SECRET_KEY);
+                                                                                                var programDataForPlanningUnit1 = programDataForPlanningUnitBytes1.toString(CryptoJS.enc.Utf8);
+                                                                                                var programJsonForPlanningUnit1 = JSON.parse(programDataForPlanningUnit1);
+                                                                                                planningUnitDataList1[h].planningUnitData = programJsonForPlanningUnit1;
+                                                                                            }
+                                                                                            dArray.programData = { generalData: programJson11, planningUnitDataList: planningUnitDataList1 };
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                            // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1, { password: ENCRYPTION_EXPORT_PASSWORD });
                                                                                         } else {
                                                                                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
@@ -273,19 +297,31 @@ export default class ExportProgram extends Component {
                                                                                             dArray.programData = { generalData: programJson111, planningUnitDataList: planningUnitDataList1 };
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                                                                                            // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt);
                                                                                         }
                                                                                     }
                                                                                 }
                                                                                 if (i == myResult.length - 1) {
-                                                                                    zip.generateAsync({
-                                                                                        type: "blob"
-                                                                                    }).then(function (content) {
-                                                                                        FileSaver.saveAs(content, "download.zip");
+                                                                                    // zip.generateAsync({
+                                                                                    //     type: "blob",
+                                                                                    //     compression: 'DEFLATE', // Specify the compression method
+                                                                                    //     compressionOptions: {
+                                                                                    //         level: 9, // Specify the compression level (0-9), where 9 is the best compression
+                                                                                    //     },
+                                                                                    // }).then(function (content) {
+                                                                                    //     FileSaver.saveAs(content, "download.zip");
+                                                                                        const zipBlob = new Blob([mz.zip()], { type: "application/zip" });
+                                                                                        const link = document.createElement('a');
+                                                                                        link.href = URL.createObjectURL(zipBlob);
+                                                                                        link.download = 'download.zip';
+                                                                                        document.body.appendChild(link);
+                                                                                        link.click();
+                                                                                        document.body.removeChild(link);
                                                                                         let id = AuthenticationService.displayDashboardBasedOnRole();
                                                                                         this.setState({ loading: false });
                                                                                         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
-                                                                                    }.bind(this));
+                                                                                    // }.bind(this));
                                                                                 }
                                                                             }
                                                                         }.bind(this)
