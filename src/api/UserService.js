@@ -68,9 +68,4 @@ class UserService {
         );
     }
 }
-<<<<<<< HEAD
-
 export default new UserService()
-=======
-export default new UserService()
->>>>>>> e61541e0026e49b9635076c789ea144e145a65d8
