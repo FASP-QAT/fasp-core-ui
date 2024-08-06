@@ -879,7 +879,8 @@ class Program extends Component {
                 count = count + 1;
                 var json = {
                     programId: versionCheckBox[i].dataset.programId,
-                    versionId: versionCheckBox[i].value
+                    versionId: versionCheckBox[i].value,
+                    'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
                 }
                 checkboxesChecked = checkboxesChecked.concat([json]);
             }
@@ -903,7 +904,8 @@ class Program extends Component {
                     if (count1 == 0) {
                         var json = {
                             programId: programCheckboxes[i].value,
-                            versionId: -1
+                            versionId: -1,
+                            'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
                         }
                         checkboxesChecked = checkboxesChecked.concat([json]);
                     }
@@ -933,11 +935,7 @@ class Program extends Component {
         }
         else {
             if (localStorage.getItem("sessionType") === 'Online') {
-                var inputJson = {
-                    'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
-                    'programVersionList': checkboxesChecked
-                }
-                ProgramService.getAllProgramData(inputJson)
+                ProgramService.getAllProgramData(checkboxesChecked)
                     .then(response => {
                         response.data = decompressJson(response.data);
                         var json = response.data;
