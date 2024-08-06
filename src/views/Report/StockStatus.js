@@ -3006,7 +3006,7 @@ class StockStatus extends Component {
                       <div className="col-md-12 p-0">
                         {this.state.stockStatusList.length > 0 && ppu != undefined &&
                       <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
-                        <ul className="legendcommitversion list-group">
+                        <ul className="legendcommitversion list-group" style={{"marginTop":"10px"}}>
                         <li><span className="redlegend "></span>
                               <span className="legendcommitversionText">
                                 <b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>
@@ -3042,7 +3042,7 @@ class StockStatus extends Component {
                           </>}
                         </ul>
                         {this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes!=null && this.state.planningUnitNotes.length>0 && 
-                            <span  className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.planningUnitNotes}</span>
+                            <span  style={{"marginTop":"10px"}} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.planningUnitNotes}</span>
                         }
                       </FormGroup>
                   }
