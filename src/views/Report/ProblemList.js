@@ -1229,7 +1229,7 @@ export default class ProblemList extends React.Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,

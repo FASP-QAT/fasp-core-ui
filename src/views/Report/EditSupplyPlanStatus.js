@@ -4431,7 +4431,7 @@ class EditSupplyPlanStatus extends Component {
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     allowDeleteRow: false,
-                    onselection: this.selected,
+                    // onselection: this.selected,
                     oneditionend: this.onedit,
                     copyCompatibility: true,
                     allowExport: false,
@@ -4614,7 +4614,7 @@ class EditSupplyPlanStatus extends Component {
                             <div className="card-header-actions">
                                 <a className="">
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{i18n.t('static.problemContext.viewTrans')}</small></span>
+                                    {!this.state.loading && <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{i18n.t('static.problemContext.viewTrans')}</small></span>}
                                 </a>
                             </div>
                         </div>
