@@ -4540,6 +4540,7 @@ export default class CreateTreeTemplate extends Component {
      * Builds Jexcel table for modeling data
      */
     buildModelingJexcel() {
+        console.log("====>", this.state.scalingMonth)
         var scalingList = this.state.scalingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
         var dataArray = [];
@@ -4632,7 +4633,9 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.setState({ scalingTotal });
-        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+            jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        }
         var data = dataArray;
         var options = {
             data: data,
@@ -7339,6 +7342,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             if (tab == 2) {
+                this.setState({ scalingMonth: parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 });
                 if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                     var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                     var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
@@ -7371,7 +7375,6 @@ export default class CreateTreeTemplate extends Component {
                             this.buildModelingJexcel();
                     })
                 }
-                this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
             }
         });
     }
@@ -7686,9 +7689,12 @@ export default class CreateTreeTemplate extends Component {
             this.getUsageText();
         }
         if (event.target.name === "monthNo") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo = event.target.value;
-            this.calculateParentValueFromMOM(event.target.value);
-            this.buildModelingJexcel();
+            this.setState({ scalingMonth: parseInt(event.target.value) + 1 }, () => {
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo = event.target.value;
+                this.calculateParentValueFromMOM(event.target.value);
+                this.buildModelingJexcel();
+            });
+
         }
         if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",", "");
