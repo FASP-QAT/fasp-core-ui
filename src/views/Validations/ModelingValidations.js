@@ -24,7 +24,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -1866,6 +1866,7 @@ class ModelingValidation extends Component {
                                                     <MultiSelect
                                                         name="nodeId"
                                                         id="nodeId"
+                                                        filterOptions={filterOptions}
                                                         options={this.state.nodeList && this.state.nodeList.length > 0 ? this.state.nodeList : []}
                                                         value={this.state.nodeVal}
                                                         onChange={(e) => { this.setNodeVal(e) }}

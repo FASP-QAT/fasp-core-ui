@@ -37,7 +37,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, formatter, makeText, round, roundN } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, round, roundN } from "../../CommonComponent/JavascriptCommonFunctions.js";
 const ref = React.createRef();
 const pickerLang = {
   months: [
@@ -1064,6 +1064,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                       <div className="controls edit">
                         <MultiSelect
                           bsSize="sm"
+                          filterOptions={filterOptions}
                           name="countrysId"
                           id="countrysId"
                           value={this.state.countryValues}
@@ -1094,6 +1095,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                         name="programIds"
                         id="programIds"
                         value={this.state.programValues}
+                        filterOptions={filterOptions}
                         onChange={(e) => {
                           this.handleChangeProgram(e);
                         }}
@@ -1121,6 +1123,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                           id="tracerCategoryId"
                           bsSize="sm"
                           value={this.state.tracerCategoryValues}
+                          filterOptions={filterOptions}
                           onChange={(e) => {
                             this.handleTracerCategoryChange(e);
                           }}
