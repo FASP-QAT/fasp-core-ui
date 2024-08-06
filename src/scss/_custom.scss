@@ -573,23 +573,23 @@ body{
   --rmsc-radius: 0.2rem !important;
   color: #e4e5e6 !important;
 }
-.rmsc .search
-{
-  width:100%;
-  position:relative;
-  border-bottom:1px solid var(--rmsc-border);
-  background-color: #323a49!important;
-  color:#e4e5e6;
-}
-.rmsc .search input{
-  height:var(--rmsc-h);
-  padding:0 var(--rmsc-p);
-  width:100%;
-  outline:0;
-  border:0;
-  background-color: #323a49!important;
-  color: #e4e5e6;
-}
+// .rmsc .search
+// {
+//   width:100%;
+//   position:relative;
+//   border-bottom:1px solid var(--rmsc-border);
+//   background-color: #323a49!important;
+//   color:#e4e5e6;
+// }
+// .rmsc .search input{
+//   height:var(--rmsc-h);
+//   padding:0 var(--rmsc-p);
+//   width:100%;
+//   outline:0;
+//   border:0;
+//   background-color: #323a49!important;
+//   color: #e4e5e6;
+// }
 
 .svgdropdown .rmsc .gray {
   color: #e4e5e6;
@@ -8247,10 +8247,10 @@ label.arrow_label:before {
   --rmsc-selected: #e2e6ea;
   --rmsc-border: #e4e7ea !important;
   --rmsc-gray: #697069 !important;
-  --rmsc-bg: #323a49;
+  --rmsc-bg: #fff;
   --rmsc-p: 10px;
   --rmsc-radius: 0.2rem !important;
-  color: #e4e7ea !important;
+  color: #697069 !important;
 }
 
 .Select.is-disabled>.Select-control {
