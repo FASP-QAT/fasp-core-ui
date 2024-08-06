@@ -1298,21 +1298,6 @@ class CountrySpecificPrices extends Component {
         return valid;
     }
     /**
-     * Filters the options based on the provided filter string and sort the options.
-     * @param {Array} options - The array of options to filter.
-     * @param {string} filter - The filter string to apply.
-     * @returns {Array} - The filtered array of options.
-     */
-    filterOptions = async (options, filter) => {
-        if (filter) {
-            return options.filter((i) =>
-                i.label.toLowerCase().includes(filter.toLowerCase())
-            );
-        } else {
-            return options;
-        }
-    };
-    /**
      * Handles the change event for program selection.
      * @param {array} programIds - The array of selected program IDs.
      */
