@@ -2365,13 +2365,13 @@ export default class BuildTree extends Component {
         if (this.state.childrenOf.length > 0) {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
             levelNodes.sort((a, b) => a.parent - b.parent);
-                var flatListUnsorted = levelNodes;
-                var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
-                var sortedArray = sortOrderArray.sort();
-                levelNodes = [];
-                for (var i = 0; i < sortedArray.length; i++) {
-                    levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
-                }
+            var flatListUnsorted = levelNodes;
+            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+            var sortedArray = sortOrderArray.sort();
+            levelNodes = [];
+            for (var i = 0; i < sortedArray.length; i++) {
+                levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
+            }
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
         }
@@ -2581,12 +2581,12 @@ export default class BuildTree extends Component {
         let pId = items.filter(f => f.id == currNode[0].id)[0].parent;
         var pObj = items.filter(f => f.id == pId)[0];
         let newItems = items.filter(f => f.parent == pId);
-        for(let i = 0; i < newItems.length; i++) {
+        for (let i = 0; i < newItems.length; i++) {
             var ns = items.findIndex(f => f.id == newItems[i].id);
-            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 9 ? '0'+(i+1) : i+1);
+            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 9 ? '0' + (i + 1) : i + 1);
         }
-        this.setState({ 
-            isLevelChanged: true, 
+        this.setState({
+            isLevelChanged: true,
             items
         }, () => {
             this.buildLevelReorderJexcel(true);
@@ -7496,7 +7496,7 @@ export default class BuildTree extends Component {
         var t2 = repeatUsagePeriodId != null && repeatUsagePeriodId != "" ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth : "";
         this.setState({
             noFURequired: (noFURequired != "" && noFURequired != 0 ? parseFloat(noFURequired).toFixed(8) : 0),
-            usage2Convert: (t1/t2).toFixed(8),
+            usage2Convert: (t1 / t2).toFixed(8),
             usage2ConvertCondition: !(usagePeriodId == repeatUsagePeriodId)
         }, () => {
             this.getUsageText();
@@ -7601,22 +7601,22 @@ export default class BuildTree extends Component {
                     if (this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true) {
                         var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
                         usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s), " + " " + addCommas(parseFloat(usageFrequency)) + " " + i18n.t('static.tree.timesPer').toLowerCase() + " " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.for').toLowerCase() + " " + (this.state.currentScenario.fuNode.repeatCount != null ? parseFloat(this.state.currentScenario.fuNode.repeatCount) : '') + " " + selectedText3.trim().toLowerCase();
-                        
+
                         usageText3 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s)" + " " + i18n.t('static.tree.eachTime').toLowerCase();
-                        usageText4 = "(= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s) / " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim() + ")";
-                        var uc2 = this.state.usage2ConvertCondition ? ( " * " + parseFloat(this.state.usage2Convert) + " " + selectedText2.trim().toLowerCase() + " / " + selectedText3.trim().toLowerCase()) : "";
+                        usageText4 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim() + "(s) / " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim();
+                        var uc2 = this.state.usage2ConvertCondition ? ( " * " + parseFloat(this.state.usage2Convert) + " " + selectedText2.trim().toLowerCase() + " / " + selectedText3.trim().replace(/\(s\)/, '').toLowerCase()) : "";
                         usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(this.state.noFURequired)) + " " + selectedText1.trim().toLowerCase() + "(s)";
-                        usageText2 = "(= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s) * " + addCommas(parseFloat(usageFrequency)) + " " + i18n.t('static.tree.times').toLowerCase() + " / " + selectedText2.trim().toLowerCase() + " * " + (this.state.currentScenario.fuNode.repeatCount != null ? parseFloat(this.state.currentScenario.fuNode.repeatCount) : '') + " " + selectedText3.trim().toLowerCase() + uc2 + ")";
+                        usageText2 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s) * " + addCommas(parseFloat(usageFrequency)) + " " + i18n.t('static.tree.times').toLowerCase() + " / " + selectedText2.trim().replace(/\(s\)/, '').toLowerCase() + " * " + (this.state.currentScenario.fuNode.repeatCount != null ? parseFloat(this.state.currentScenario.fuNode.repeatCount) : '') + " " + selectedText3.trim().toLowerCase() + uc2;
                         
                     } else {
                         usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s)";
                         usageText1 = i18n.t('static.tree.inTotal') + i18n.t('static.usageTemplate.every').toLowerCase() + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson / noOfPersons)) + " " + selectedText1.trim().toLowerCase() + "(s)";
-                        usageText2 = "(= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson))+ " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "(s) " + ")";
+                        usageText2 = "= " + addCommas(parseFloat(noOfForecastingUnitsPerPerson))+ " " + selectedText1.trim().toLowerCase() + "(s) " + " / "+ addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "(s) ";
                     }
                 } else {
                     usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(parseFloat(noOfPersons)) + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat(noOfForecastingUnitsPerPerson)) + " " + selectedText1.trim().toLowerCase() + "(s) " + i18n.t('static.usageTemplate.every').toLowerCase() + " " + addCommas(parseFloat(usageFrequency)) + " " + selectedText2.trim().toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
                     usageText1 = i18n.t('static.usageTemplate.every') + " " + selectedText.trim().toLowerCase() + "" + i18n.t('static.usageTemplate.requires').toLowerCase() + " " + addCommas(parseFloat((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)) + " " + selectedText1.trim().toLowerCase() + "(s) / " + i18n.t('static.common.month').toLowerCase() + " " + i18n.t('static.tree.indefinitely').toLowerCase();
-                    usageText2 = "(= " + parseFloat(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s) " + " / " + parseFloat(this.state.currentScenario.fuNode.usageFrequency) + " " + selectedText2.trim().toLowerCase() + " * " + parseFloat((this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText2.trim().toLowerCase() + "/" + i18n.t('static.common.month').toLowerCase() + ")";
+                    usageText2 = "= " + parseFloat(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson) + " " + selectedText1.trim().toLowerCase() + "(s) " + " / " + parseFloat(this.state.currentScenario.fuNode.usageFrequency) + " " + selectedText2.trim().toLowerCase() + " * " + parseFloat((this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth) + " " + selectedText2.trim().toLowerCase() + "/" + i18n.t('static.common.month').toLowerCase();
                 }
             } else {
                 if (this.state.currentScenario.puNode.planningUnit.id != null && this.state.currentScenario.puNode.planningUnit.id != "") {
@@ -9622,7 +9622,7 @@ export default class BuildTree extends Component {
                 }
             ],
             editable: true,
-            oneditionend:function (instance, cell, x, y, value) {
+            oneditionend: function (instance, cell, x, y, value) {
                 var elInstance = instance;
                 var rowData = elInstance.getRowData(y);
                 if (x == 1) {
@@ -11015,7 +11015,7 @@ export default class BuildTree extends Component {
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
                                                                     <option key={i} value={item.id}>
-                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id+ " ("+i18n.t("static.tree.conversionFUToPU")+" = "+item.multiplier+")"}
+                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id + " (" + i18n.t("static.tree.conversionFUToPU") + " = " + item.multiplier + ")"}
                                                                     </option>
                                                                 )
                                                             }, this)}
@@ -13682,11 +13682,11 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}> 
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}>
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
                                                 </Col>
                                                 <Col>
                                                     <Input type="text"
@@ -13712,7 +13712,7 @@ export default class BuildTree extends Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.levelReorderNodeUnit')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
                                                         <i class="fa fa-info-circle icons pl-lg-2" id="PopoverNodeUnit" onClick={() => this.toggleTooltipNodeUnit()} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                     </Label>
                                                 </Col>
@@ -13741,7 +13741,7 @@ export default class BuildTree extends Component {
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
                                                 </Col>
                                                 <Col>
                                                     <MultiSelect
@@ -13758,12 +13758,12 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <p>{i18n.t('static.tree.levelChangeNote')}</p>
                                         <FormGroup>
-                                        {this.state.showReorderJexcel &&
-                                            <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                            {this.state.showReorderJexcel &&
+                                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                    <div id="levelReorderJexcel" style={{ display: "block" }}>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
+                                            }
                                         </FormGroup>
                                     </div>
                                 </ModalBody>
