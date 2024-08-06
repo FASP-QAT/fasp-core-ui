@@ -302,7 +302,7 @@ class SupplyPlanVersionAndReview extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
+            // onselection: this.selected,
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
