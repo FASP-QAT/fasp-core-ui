@@ -2505,9 +2505,15 @@ export default class CreateTreeTemplate extends Component {
         copyModalTreeList = this.state.treeTemplateList;
         copyModalParentLevelList = this.state.treeTemplate.levelList;
         if(val == 1) {
-            copyModalParentLevel = this.state.copyModalNode.level-1;
-            copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevel);
-            copyModalParentNode = this.state.copyModalNode.parent;
+            if(this.state.copyModalNode.level != 0){
+                copyModalParentLevel = this.state.copyModalNode.level-1;
+                copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevel);
+                copyModalParentNode = this.state.copyModalNode.parent;
+            } else {
+                copyModalParentLevel = "";
+                copyModalParentNodeList = [];
+                copyModalParentNode = "";
+            }
         } else if(val == 2) {
             if(copyModalParentLevelList.length == 1) {
                 copyModalParentLevel = copyModalParentLevelList[0].levelNo;
@@ -2538,7 +2544,10 @@ export default class CreateTreeTemplate extends Component {
     copyModalParentLevelChange(e) {
         let allowedNodeTypeList = [];
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
-        let copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
+        let copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value);
+        if(this.state.copyModalData == 2){
+            copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
+        }
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
@@ -11665,9 +11674,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
-                        {itemConfig.parent != null &&
-                            <>
-                                {this.state.editable &&
+                        {this.state.editable &&
                                     <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -11686,7 +11693,9 @@ export default class CreateTreeTemplate extends Component {
                                         }}>
                                         <i class="fa fa-paste" aria-hidden="true"></i>
                                     </button>
-                                }
+                        }
+                        {itemConfig.parent != null &&
+                            <>
                                 {this.state.editable &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {

@@ -2642,9 +2642,15 @@ export default class BuildTree extends Component {
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
         if(val == 1) {
-            copyModalParentLevel = this.state.copyModalNode.level-1;
-            copyModalParentNodeList = this.state.curTreeObj.tree.flatList.filter(m => m.level == copyModalParentLevel);
-            copyModalParentNode = this.state.copyModalNode.parent;
+            if(this.state.copyModalNode.level != 0){
+                copyModalParentLevel = this.state.copyModalNode.level-1;
+                copyModalParentNodeList = this.state.curTreeObj.tree.flatList.filter(m => m.level == copyModalParentLevel);
+                copyModalParentNode = this.state.copyModalNode.parent;
+            } else {
+                copyModalParentLevel = "";
+                copyModalParentNodeList = [];
+                copyModalParentNode = "";
+            }
         } else if(val == 2) {
             if(copyModalParentLevelList.length == 1) {
                 copyModalParentLevel = copyModalParentLevelList[0].levelNo;
@@ -2685,12 +2691,12 @@ export default class BuildTree extends Component {
         copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
         if(this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
             copyModalParentLevel = this.state.copyModalNode.level-1;
-            copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
+            copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
             copyModalParentNode = this.state.copyModalNode.parent;
         } else if(this.state.copyModalData == 2 || copyModalTree != this.state.treeId) {
             if(copyModalParentLevelList.length == 1) {
                 copyModalParentLevel = copyModalParentLevelList[0].levelNo;
-                copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
+                copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
                 if(copyModalParentNodeList.length == 1) {
                     copyModalParentNode = copyModalParentNodeList[0].id;
                 } else {
@@ -2716,7 +2722,10 @@ export default class BuildTree extends Component {
     copyModalParentLevelChange(e) {
         let allowedNodeTypeList = [];
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
-        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
+        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value);
+        if(this.state.copyModalData == 2){
+            copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
+        }
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
@@ -7086,7 +7095,10 @@ export default class BuildTree extends Component {
                     if (nodeDataModelingList.length > 0) {
                         nodeDataModelingList.map((item1, c) => {
                             var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
-                            item1.transferNodeDataId = newTransferId[0].newId;
+                            try{
+                                item1.transferNodeDataId = newTransferId[0].newId;
+                            } catch {
+                            }
                         })
                     }
                 }
@@ -12226,9 +12238,7 @@ export default class BuildTree extends Component {
                 },
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
-                        {itemConfig.parent != null &&
-                            <>
-                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -12247,7 +12257,9 @@ export default class BuildTree extends Component {
                                         }}>
                                         <i class="fa fa-paste" aria-hidden="true"></i>
                                     </button>
-                                }
+                        }
+                        {itemConfig.parent != null &&
+                            <>
                                 {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
