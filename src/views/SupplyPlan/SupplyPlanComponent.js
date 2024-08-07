@@ -3171,7 +3171,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData)), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
+                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData),this.state.multiplier), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
@@ -4199,7 +4199,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-4">
+                                                <FormGroup className="col-md-4" style={{"marginTop": "-20px"}}>
                                                     <FormGroup check inline className='pl-lg-0'>
                                                         <Input
                                                             type="radio"
@@ -4216,7 +4216,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             title={i18n.t('static.report.planningUnit')}>
                                                             {i18n.t('static.report.planningUnit')}
                                                         </Label>
-                                                    </FormGroup>
+                                                    </FormGroup><br/>
                                                     <FormGroup check inline className='pl-lg-0'>
                                                         <Input
                                                             type="radio"
