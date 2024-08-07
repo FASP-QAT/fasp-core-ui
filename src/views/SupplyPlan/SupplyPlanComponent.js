@@ -4199,8 +4199,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-4" style={{"marginTop": "-17px"}}>
-                                                    <FormGroup check inline>
+                                                <FormGroup className="col-md-4">
+                                                    <FormGroup check inline className='pl-lg-0'>
                                                         <Input
                                                             type="radio"
                                                             id="viewById"
@@ -4217,7 +4217,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             {i18n.t('static.report.planningUnit')}
                                                         </Label>
                                                     </FormGroup>
-                                                    <FormGroup check inline>
+                                                    <FormGroup check inline className='pl-lg-0'>
                                                         <Input
                                                             type="radio"
                                                             id="viewById"
@@ -4234,7 +4234,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             {i18n.t('static.planningunit.countrysku')}
                                                         </Label>
                                                     </FormGroup>
-                                                    <FormGroup id="planningUnitDiv">
+                                                    <FormGroup id="planningUnitDiv" className='pt-lg-1'>
                                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label> */}
                                                         {/* <div className="controls "> */}
                                                         <Select
@@ -4247,7 +4247,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         />
                                                         {/* </div> */}
                                                     </FormGroup>
-                                                    <FormGroup id="aruDiv" style={{ display: 'none' }}>
+                                                    <FormGroup id="aruDiv" style={{ display: 'none' }} className='pt-lg-1'>
                                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.countrysku')}</Label> */}
                                                         {/* <div className="controls "> */}
                                                         <Select
