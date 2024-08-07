@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL, ASSIGNEE_ID_FOR_BUG_ISSUE, ASSIGNEE_ID_FOR_CHANGE_REQUEST, ASSIGNEE_ID_FOR_NON_BUG_ISSUE, JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA, JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_USER, JIRA_PROJECT_ISSUE_TYPE_BUG_REPORT, JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST, JIRA_PROJECT_KEY, JIRA_SUBJECT_PREFIX_DEMO, JIRA_SUBJECT_PREFIX_UAT } from "../Constants";
+import { API_URL, ASSIGNEE_ID_FOR_BUG_ISSUE, ASSIGNEE_ID_FOR_CHANGE_REQUEST, ASSIGNEE_ID_FOR_NON_BUG_ISSUE, JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA, JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_USER, JIRA_PROJECT_ISSUE_TYPE_BUG_REPORT, JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST, JIRA_PROJECT_KEY, JIRA_SUBJECT_PREFIX } from "../Constants";
 class JiraTicketService {
     addBugReportIssue(json) {
         var mainObject = new Object();
@@ -31,9 +31,9 @@ class JiraTicketService {
         }
 
         if ((`${API_URL}`).includes('uat-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_DEMO}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else {
             fields.summary = json.summary;
         }
@@ -78,9 +78,9 @@ class JiraTicketService {
         }
 
         if ((`${API_URL}`).includes('uat-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_DEMO}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else {
             fields.summary = json.summary;
         }
@@ -125,9 +125,9 @@ class JiraTicketService {
         }
 
         if ((`${API_URL}`).includes('uat-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_DEMO}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else {
             fields.summary = json.summary;
         }
@@ -181,9 +181,9 @@ class JiraTicketService {
         }
 
         if ((`${API_URL}`).includes('uat-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_UAT}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else if ((`${API_URL}`).includes('demo-api.')) {
-            fields.summary = `${JIRA_SUBJECT_PREFIX_DEMO}` + json.summary;
+            fields.summary = `${JIRA_SUBJECT_PREFIX}` + json.summary;
         } else {
             fields.summary = json.summary;
         }

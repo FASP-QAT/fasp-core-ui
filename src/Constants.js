@@ -1,20 +1,8 @@
-// export const API_URL='https://fasp.altius.cc/FASP'
-// export const API_URL='https://api-mod2.altius.cc'
-// export const API_URL = 'https://uatqatapi.altius.cc'
-// export const API_URL = 'http://server6.altius.cc:8080/FASP'
-export const API_URL = 'http://localhost:8084'
+export const API_URL = process.env.REACT_APP_API_URL
 
-// export const API_URL = 'https://uat-api.quantificationanalytics.org'
-// export const API_URL = 'https://api.quantificationanalytics.org'
-// export const API_URL = 'https://demo-api.quantificationanalytics.org'
+export const JIRA_SUBJECT_PREFIX = process.env.REACT_APP_JIRA_PREFIX
 
-
-// export const API_URL='http://192.168.43.70:8080/FASP'
-
-export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
-export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
-
-export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
+export const SECRET_KEY = process.env.REACT_APP_SECRET_KEY
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
 export const TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 18
 export const MONTHS_IN_PAST_FOR_AMC = 3
@@ -94,7 +82,7 @@ export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.n
 export const JEXCEL_MONTH_PICKER_FORMAT = "Mon-YYYY"
 export const FINAL_VERSION_TYPE = 2;
 export const OPEN_PROBLEM_STATUS_ID = 1
-export const JEXCEL_PRO_KEY = "Y2NkZmExMmFlNDE2OTg0ZWMwZWU5MzVkM2ZlOGI0YzY2NjkwZGFmNmY0ZTQ2M2I3MTI2M2I4ODljZTNmY2EyZDkyMTZkZWQ2YzZmYTRkN2I5YzY0OTRhNWViZjRiNGU1ODgwNjQzMDRiNzJhOWYzZmU5NWRkN2Q0Y2UxNTc3NmYsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqbzBOemMwTVRFNE5EQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2lZV3gwYVhWekxtTmpJaXdpYlc5a01pNWhiSFJwZFhNdVkyTWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2SWpJeElpd2ljMk52Y0dVaU9sc2lkamNpTENKMk9DSXNJblk1SWwxOQ=="
+export const JEXCEL_PRO_KEY = process.env.REACT_APP_JEXCEL_PRO_KEY
 export const SPECIAL_CHARECTER_WITHOUT_NUM = /^([^0-9\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM = /^([^\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE = /^(?!.*\s\s)\S(.*\S)?$/
@@ -140,4 +128,4 @@ export const PROGRAM_TYPE_DATASET = 2;
 export const COMPRESS_LIMIT_SIZE = 2;
 export const MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS=76;
 export const INTERPOLATE_DATA_SOURCE_ID=4;
-export const ENCRYPTION_EXPORT_PASSWORD="dgwsgdjwgyo3kjledhqwuigdwui";
+export const ENCRYPTION_EXPORT_PASSWORD=process.env.REACT_APP_ENCRYPTION_EXPORT_PASSWORD;

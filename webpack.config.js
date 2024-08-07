@@ -4,7 +4,8 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 // var enUs = require( 'json-loader!../public/locales/en.json' );
 // var en = require('./public/locales/en.json');
 // const en = require('./public/locales/en.json');
-
+const webpack = require('webpack');
+require('dotenv').config({ path: './.env' }); 
 module.exports = {
     // context: __dirname,
     entry: './src/index.js',
@@ -139,7 +140,10 @@ module.exports = {
             swDest: "faspsw.js",
             maximumFileSizeToCacheInBytes: 30 * 1024 * 1024
             // swSrc: './src/sw.js',
-        })
+        }),
+        new webpack.DefinePlugin({
+            "process.env": JSON.stringify(process.env),
+        }),
         // new WorkboxPlugin.GenerateSW({
         //     // Do not precache images
         //     // exclude: [/\.(?:png|jpg|jpeg|svg)$/],
