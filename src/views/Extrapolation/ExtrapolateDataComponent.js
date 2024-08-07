@@ -2389,6 +2389,12 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({ loading: true })
             var datasetJson = programData;
             var count = 0;
+            var totalExtrapolatedParams = listOfPlanningUnits.length * regionList.length * 10;
+            console.log("totalExtrapolatedParams", totalExtrapolatedParams)
+            // this.setState({
+            //     extrapolatedCount: extrapolatedCount + 1,
+            //     syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
+            // })
             for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                 for (var i = 0; i < regionList.length; i++) {
                     var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
@@ -2461,6 +2467,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             if (regionObj != "" && puObj != "") {
                 this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
             }
+            console.log("count====>", count)
             this.setState({
                 count: count
             })
