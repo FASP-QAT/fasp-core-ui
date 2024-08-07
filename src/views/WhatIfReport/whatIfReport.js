@@ -277,7 +277,8 @@ export default class WhatIfReportComponent extends React.Component {
             batchQtyTotalForPopup: 0,
             activeTab: new Array(3).fill('1'),
             takeDataFrom: "programData",
-            planningUnitNotes: ""
+            planningUnitNotes: "",
+            multiplier:1
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
