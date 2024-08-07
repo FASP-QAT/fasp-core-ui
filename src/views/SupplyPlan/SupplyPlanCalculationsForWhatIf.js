@@ -348,6 +348,17 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     } else {
                         openingBalanceWps = 0;
                     }
+                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                        var currentMonthSupplyPlan = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(createdDate).format("YYYY-MM-DD") && c.planningUnitId == planningUnitId);
+                        if(currentMonthSupplyPlan.length>0){
+                            openingBalance=currentMonthSupplyPlan[0].openingBalance;
+                            openingBalanceWps=currentMonthSupplyPlan[0].openingBalanceWps;
+                        }else{
+                            openingBalance=0;
+                            openingBalanceWps=0;
+                        }
+                    }    
                     var shipmentList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
                     var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
                     var shipmentTotalQty = 0;
@@ -981,6 +992,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         amc = null;
                     } else {
                         amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
+                    }
+                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
+                        amc=null;
                     }
                     var maxForMonths = 0;
                     var realm = generalProgramJson.realmCountry.realm;

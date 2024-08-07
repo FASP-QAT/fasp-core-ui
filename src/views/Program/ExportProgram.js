@@ -21,6 +21,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import Minizip from 'minizip-asm.js';
+import moment from 'moment';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -79,7 +80,8 @@ export default class ExportProgram extends Component {
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     if (json[i].userId == userId) {
-                        prgList.push({ value: json[i].id, label: programJson.programCode + "~v" + json[i].version })
+                        var cutOffDate=programJson.cutOffDate!=undefined && programJson.cutOffDate!=null && programJson.cutOffDate!=""?programJson.cutOffDate:"";
+                        prgList.push({ value: json[i].id, label: programJson.programCode + "~v" + json[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":"") })
                     }
                 }
             }.bind(this)

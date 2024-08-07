@@ -2349,7 +2349,8 @@ class EditSupplyPlanStatus extends Component {
                     openCount: 0,
                     addressedCount: 0,
                     programModified: 0,
-                    readonly: 0
+                    readonly: 0,
+                    cutOffDate:""
                 })
                 this.setState({
                     program,

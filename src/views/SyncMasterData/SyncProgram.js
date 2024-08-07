@@ -541,7 +541,7 @@ export default class SyncProgram extends Component {
             var checkboxesChecked = [];
             for (var i = 0; i < programIds.length; i++) {
                 var program = this.state.programList.filter(c => c.programId == programIds[i])[0];
-                checkboxesChecked.push({ programId: program.programId, versionId: -1,'cutOffDate':"" })
+                checkboxesChecked.push({ programId: program.programId, versionId: -1,'cutOffDate':program.cutOffDate!=undefined && program.cutOffDate!=null && program.cutOffDate!=""?program.cutOffDate:"" })
             }
             ProgramService.getAllProgramData(checkboxesChecked)
                 .then(response => {
@@ -680,7 +680,8 @@ export default class SyncProgram extends Component {
                                                         openCount: 0,
                                                         addressedCount: 0,
                                                         programModified: 0,
-                                                        readonly: 0
+                                                        readonly: 0,
+                                                        cutOffDate:json[r].cutOffDate
                                                     };
                                                     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                     programQPLDetailsOs.put(programQPLDetailsJson);

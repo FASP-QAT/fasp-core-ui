@@ -226,6 +226,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     } else {
                                         openingBalanceWps = 0;
                                     }
+                                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                                        var currentMonthSupplyPlan = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(createdDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id)
+                                        if(currentMonthSupplyPlan.length>0){
+                                            openingBalance=currentMonthSupplyPlan[0].openingBalance;
+                                            openingBalanceWps=currentMonthSupplyPlan[0].openingBalanceWps;
+                                        }else{
+                                            openingBalance=0;
+                                            openingBalanceWps=0;
+                                        }
+                                    }
                                     if (moment(startDate).format("YYYY-MM-DD") > moment(lastDate).format("YYYY-MM-DD") && openingBalance == 0 && openingBalanceWps == 0) {
                                         lastDataEntryDate = startDate;
                                     }
@@ -853,6 +864,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         amc = null;
                                     } else {
                                         amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
+                                    }
+                                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
+                                        amc=null;
                                     }
                                     var maxForMonths = 0;
                                     var realm = generalProgramJson.realmCountry.realm;
