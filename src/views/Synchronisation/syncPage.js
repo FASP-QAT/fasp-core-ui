@@ -3763,7 +3763,7 @@ export default class syncPage extends Component {
                                   </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-6">
-                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>
                                   <div className="controls ">
                                     <InputGroup>
                                       <Input type="textarea"

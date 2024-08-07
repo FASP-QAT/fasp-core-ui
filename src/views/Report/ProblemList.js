@@ -1021,7 +1021,7 @@ export default class ProblemList extends React.Component {
                             problemReportListUnFiltered: problemReportList,
                             showProblemDashboard: 1,
                             currentVersionNotesHistory: programJson.currentVersionTrans != undefined ? programJson.currentVersionTrans : [],
-                            currentVersionNotes: programJson.currentVersionNotes != undefined ? programJson.currentVersionNotes : ""
+                            currentVersionNotes: programJson.currentVersionNotes != undefined ? programJson.currentVersionNotes : programJson.currentVersion.notes
                         })
                         var problemReportFilterList = problemReportList;
                         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1128,7 +1128,24 @@ export default class ProblemList extends React.Component {
                     })
                     ProgramService.getNotesHistory(this.state.programId.split("_")[0])
                         .then(response => {
-                            var listArray = response.data;
+                            var data = response.data;
+                            const listArray = [];
+                            const grouped = data.reduce((acc, item) => {
+                                acc[item.versionId] = acc[item.versionId] || [];
+                                acc[item.versionId].push(item);
+                                return acc;
+                            }, {});
+                        
+                            Object.values(grouped).forEach(entries => {
+                                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                                if (pendingEntries.length) {
+                                    listArray.push(pendingEntries[0]);
+                                    if (pendingEntries.length > 1) {
+                                        listArray.push(pendingEntries[pendingEntries.length - 1]);
+                                    }
+                                }
+                                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+                            });
                             this.setState({
                                 currentVersionNotesHistory:listArray,
                                 loading:false
@@ -1196,10 +1213,11 @@ export default class ProblemList extends React.Component {
         for (var sb = listArray.length - 1; sb >= 0; sb--) {
             var data = [];
             data[0] = listArray[sb].versionId;
-            data[1] = getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-            data[2] = listArray[sb].notes;
-            data[3] = listArray[sb].lastModifiedBy.username;
-            data[4] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+            data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+            data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+            data[3] = listArray[sb].notes;
+            data[4] = listArray[sb].lastModifiedBy.username;
+            data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
             json.push(data);
         }
         var options = {
@@ -1207,7 +1225,8 @@ export default class ProblemList extends React.Component {
             columnDrag: false,
             columns: [
                 { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                { title: i18n.t('static.integration.versionStatus'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
                 { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
                 {
                     title: i18n.t("static.common.lastModifiedBy"),
@@ -1486,8 +1505,8 @@ export default class ProblemList extends React.Component {
                                 <div className='col-md-6'>
                                     {this.state.showProblemDashboard == 1 && this.state.programId != 0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
                                 </div>
-                                <FormGroup className="col-md-6">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
+                                {this.state.programId != 0 && !this.state.loading && <FormGroup className="col-md-6">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
                                     <div className="controls ">
                                         <InputGroup>
                                             <Input type="textarea"
@@ -1503,7 +1522,7 @@ export default class ProblemList extends React.Component {
                                             {/* <FormFeedback className="red">{errors.notes}</FormFeedback> */}
                                         </InputGroup>
                                     </div>
-                                </FormGroup>
+                                </FormGroup>}
                             </div>
                             <div className='ProblemListTableBorder'>
                                 <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>

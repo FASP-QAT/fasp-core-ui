@@ -3591,7 +3591,9 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    <div className='col-md-6'>
+                        {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    </div>
                     <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
@@ -4389,67 +4391,86 @@ class EditSupplyPlanStatus extends Component {
             loadingForNotes: true
         })
         ProgramService.getNotesHistory(programId)
-            .then(response => {
-                var listArray = response.data;
-                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                    jexcel.destroy(document.getElementById("notesTransTable"), true);
+        .then(response => {
+            var data = response.data;
+            const listArray = [];
+            const grouped = data.reduce((acc, item) => {
+                acc[item.versionId] = acc[item.versionId] || [];
+                acc[item.versionId].push(item);
+                return acc;
+            }, {});
+        
+            Object.values(grouped).forEach(entries => {
+                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                if (pendingEntries.length) {
+                    listArray.push(pendingEntries[0]);
+                    if (pendingEntries.length > 1) {
+                        listArray.push(pendingEntries[pendingEntries.length - 1]);
+                    }
                 }
-                var json = [];
-                for (var sb = listArray.length - 1; sb >= 0; sb--) {
-                    var data = [];
-                    data[0] = listArray[sb].versionId;
-                    data[1] = getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                    data[2] = listArray[sb].notes;
-                    data[3] = listArray[sb].lastModifiedBy.username;
-                    data[4] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
-                    json.push(data);
-                }
-                var options = {
-                    data: json,
-                    columnDrag: false,
-                    columns: [
-                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                        { title: i18n.t('static.integration.versionStatus'), type: 'text', width: 80 },
-                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                        {
-                            title: i18n.t("static.common.lastModifiedBy"),
-                            type: "text",
-                        },
-                        {
-                            title: i18n.t("static.common.lastModifiedDate"),
-                            type: "calendar",
-                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                        },
-                    ],
-                    editable: false,
-                    onload: function (instance, cell) {
-                        jExcelLoadedFunction(instance, 1);
-                    }.bind(this),
-                    pagination: localStorage.getItem("sesRecordCount"),
-                    search: true,
-                    columnSorting: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    // onselection: this.selected,
-                    oneditionend: this.onedit,
-                    copyCompatibility: true,
-                    allowExport: false,
-                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                    position: "top",
-                    filters: true,
-                    license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
-                        return false;
-                    }.bind(this),
-                };
-                var elVar = jexcel(document.getElementById("notesTransTable"), options);
-                this.el = elVar;
-                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
-
-            }).catch(
-                error => {
+                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+            });
+            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                jexcel.destroy(document.getElementById("notesTransTable"), true);
+            }
+            var json=[];
+            for (var sb = listArray.length-1; sb >= 0; sb--) {
+                var data = [];
+                data[0] = listArray[sb].versionId; 
+                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                data[3] = listArray[sb].notes;
+                data[4] = listArray[sb].lastModifiedBy.username;
+                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");                
+                json.push(data);
+            }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                {
+                    title: i18n.t("static.common.lastModifiedBy"),
+                    type: "text",
+                  },
+                  {
+                    title: i18n.t("static.common.lastModifiedDate"),
+                    type: "calendar",
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                  },
+            ],
+            editable: false,
+            onload: function (instance, cell) {
+                jExcelLoadedFunction(instance,1);
+            }.bind(this),
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: "top",
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
+            
+        }).catch(
+            error => {
                     this.setState({
                         loadingForNotes: false
                     })
@@ -4615,7 +4636,6 @@ class EditSupplyPlanStatus extends Component {
                             <div className="card-header-actions">
                                 <a className="">
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {!this.state.loading && <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{i18n.t('static.problemContext.viewTrans')}</small></span>}
                                 </a>
                             </div>
                         </div>
@@ -5447,7 +5467,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Col md="12 pl-0">
                                                     <div className="row">
                                                         <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
                                                             <Input
                                                                 type="textarea"
                                                                 maxLength={65535}
