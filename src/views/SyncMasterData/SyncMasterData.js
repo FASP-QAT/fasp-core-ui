@@ -809,7 +809,7 @@ export default class SyncMasterData extends Component {
                         if (result[i].id == realmId) {
                             var lastSyncDateRealm = lastSyncDateRequest.result[i];
                         }
-                        if (result[i].id == 0) {
+                        if (result[i].id === 0) {
                             var lastSyncDate = lastSyncDateRequest.result[i];
                         }
                     }
