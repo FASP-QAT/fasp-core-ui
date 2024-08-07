@@ -9330,6 +9330,13 @@ export default class BuildTree extends Component {
                     elInstance.setValueFromCoords(1, y, Math.round(rowData[1]), true);
                 }
             },
+            onpaste: function (instance, data) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].x == 1){
+                        (instance).setValueFromCoords(1, data[i].y, Math.round(data[i].value), true);
+                    }
+                }
+            },
             onload: this.loadedModelingCalculatorJexcel,
             onchange: this.changeModelingCalculatorJexcel,
             search: false,
