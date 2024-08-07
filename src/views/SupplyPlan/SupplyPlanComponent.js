@@ -4239,8 +4239,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                     </div>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-4" style={{"marginTop": "-20px"}}>
-                                                    <FormGroup check inline className='pl-lg-0'>
+                                                    <FormGroup check inline className='pl-lg-0' style={{"paddingLeft":"0px"}}>
                                                         <Input
+                                                            style={{"marginLeft":"0px"}}
                                                             type="radio"
                                                             id="viewById"
                                                             name="viewById"
@@ -4256,8 +4257,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                             {i18n.t('static.report.planningUnit')}
                                                         </Label>
                                                     </FormGroup><br/>
-                                                    <FormGroup check inline className='pl-lg-0'>
+                                                    <FormGroup check inline className='pl-lg-0' style={{"paddingLeft":"0px"}}>
                                                         <Input
+                                                            style={{"marginLeft":"0px"}}
                                                             type="radio"
                                                             id="viewById"
                                                             name="viewById"
