@@ -39,6 +39,7 @@ class Program extends Component {
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.getTree = this.getTree.bind(this);
+        var startDate = moment(Date.now()).subtract(18, 'months').startOf('month').format("YYYY-MM-DD");
         this.state = {
             loading: true,
             dropdownOpen: false,
@@ -54,8 +55,8 @@ class Program extends Component {
             loading: true,
             programList: [],
             minDate: { year: new Date().getFullYear() - 20, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() - 2, month: new Date().getMonth() + 1 },
-            startDate: { year: new Date().getFullYear() - 3, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 },
+            startDate: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 },
             isMonthSelected: false
         };
         this.pickRange = React.createRef();
@@ -880,7 +881,7 @@ class Program extends Component {
                 var json = {
                     programId: versionCheckBox[i].dataset.programId,
                     versionId: versionCheckBox[i].value,
-                    'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
+                    'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + (this.state.startDate.month<=9?"0"+this.state.startDate.month:this.state.startDate.month) + "-01" : "",
                 }
                 checkboxesChecked = checkboxesChecked.concat([json]);
             }
@@ -905,7 +906,7 @@ class Program extends Component {
                         var json = {
                             programId: programCheckboxes[i].value,
                             versionId: -1,
-                            'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + this.state.startDate.month + "-01" : "",
+                            'cutOffDate': this.state.isMonthSelected ? this.state.startDate.year + "-" + (this.state.startDate.month<=9?"0"+this.state.startDate.month:this.state.startDate.month) + "-01" : "",
                         }
                         checkboxesChecked = checkboxesChecked.concat([json]);
                     }
@@ -1074,7 +1075,8 @@ class Program extends Component {
                                                                     openCount: 0,
                                                                     addressedCount: 0,
                                                                     programModified: 0,
-                                                                    readonly: 0
+                                                                    readonly: 0,
+                                                                    cutOffDate:json[r].cutOffDate
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                                 programQPLDetailsOs.put(programQPLDetailsJson);
@@ -1168,7 +1170,8 @@ class Program extends Component {
                                                     openCount: 0,
                                                     addressedCount: 0,
                                                     programModified: 0,
-                                                    readonly: 0
+                                                    readonly: 0,
+                                                    cutOffDate:json[r].cutOffDate
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                 programQPLDetailsOs.put(programQPLDetailsJson);

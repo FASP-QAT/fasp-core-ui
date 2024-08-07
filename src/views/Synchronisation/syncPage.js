@@ -4404,7 +4404,8 @@ export default class syncPage extends Component {
                           openCount: 0,
                           addressedCount: 0,
                           programModified: 0,
-                          readonly: 0
+                          readonly: 0,
+                          cutOffDate:json[r].cutOffDate
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                         programQPLDetailsOs.put(programQPLDetailsJson);

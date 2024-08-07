@@ -183,7 +183,7 @@ export default class SyncMasterData extends Component {
                 }
             }
             var lastSyncDate = date;
-            lastSyncDate = moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
+            lastSyncDate = moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss")
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
                 programId: programList[pl].programId,
@@ -224,7 +224,7 @@ export default class SyncMasterData extends Component {
                                             }
                                             var problemReportList = generalJson.problemReportList;
                                             var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c => c.shipmentActive == true && c.orderActive == true);
-                                            var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
+                                            var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss") : date;
                                             var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(minDateForPPLModify).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
                                             var rebuild = false;
                                             if (shipArray.length > 0 || pplModified.length > 0) {
@@ -554,7 +554,7 @@ export default class SyncMasterData extends Component {
                                                 }
                                             }
                                             var changedPlanningUnits = [];
-                                            var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? generalJson.currentVersion.createdDate : date;
+                                            var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss") : date;
                                             programPlanningUnitList.map(c => {
                                                 var programPlanningUnitProcurementAgentPrices = c.programPlanningUnitProcurementAgentPrices.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD"));
                                                 if (programPlanningUnitProcurementAgentPrices.length > 0) {

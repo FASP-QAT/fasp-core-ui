@@ -3020,8 +3020,9 @@ export default class WhatIfReportComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
+                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version,
+                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
                             value: myResult[i].id,
                             programId: myResult[i].programId
                         }
@@ -3201,6 +3202,19 @@ export default class WhatIfReportComponent extends React.Component {
                                     rcpuRequest.onsuccess = function (event) {
                                         var rcpuResult = [];
                                         rcpuResult = rcpuRequest.result;
+                                        var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+                                        var startDate = this.state.startDate;
+                                        var monthDifference=this.state.monthCount;
+                                        if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                                            startDate = { year: new Date(cutOffDate).getFullYear(), month: new Date(cutOffDate).getMonth() + 1 };
+                                            localStorage.setItem("sesStartDate", JSON.stringify(startDate));
+                                            var date = moment(startDate.year + "-" + startDate.month + "-01").format("YYYY-MM-DD");
+                                            if (startDate.month <= 9) {
+                                                date = moment(startDate.year + "-0" + startDate.month + "-01").format("YYYY-MM-DD");
+                                            }
+                                            var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                                            monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
+                                        }
                                         this.setState({
                                             planningUnitList: proList.sort(function (a, b) {
                                                 a = a.label.toLowerCase();
@@ -3218,6 +3232,9 @@ export default class WhatIfReportComponent extends React.Component {
                                             planningUnitDataList: planningUnitDataList,
                                             dataSourceListAll: dataSourceListAll,
                                             realmCountryPlanningUnitListAll: rcpuResult,
+                                            minDate: { year: new Date(cutOffDate).getFullYear(), month: new Date(cutOffDate).getMonth() + 1 },
+                                            startDate: startDate,
+                                            monthCount:monthDifference,
                                             planningUnitListForConsumption: planningUnitListForConsumption,
                                             loading: false
                                         }, () => {
@@ -3281,6 +3298,23 @@ export default class WhatIfReportComponent extends React.Component {
     getMonthArray(currentDate) {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
+        var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+        if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+            document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
+            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
+                item.style.display="none";
+            });
+            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
+                item.style.display="none";
+            })
+        }else{
+            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
+                item.style.display="block";
+            });
+            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
+                item.style.display="block";
+            })
+        }
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
         localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), monthName: i18n.t("static.common." + (curDate.format('MMM')).toLowerCase()), monthYear: curDate.format('YY') })
@@ -6547,6 +6581,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                                             ref={this.pickRange1}
                                             value={this.state.startDate}
+                                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(this.state.startDate)}
                                             lang={pickerLang}
                                             onDismiss={this.handleRangeDissmis1}
                                         >
