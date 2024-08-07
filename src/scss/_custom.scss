@@ -239,7 +239,7 @@ body {
   min-height: 23px;
   text-align: center;
   white-space: pre;
-  // color: #000;
+  color: #e5edf5!important;
 }
 .form-control:disabled, .form-control[readonly] {
   // background-color: #212631;
@@ -343,7 +343,8 @@ h4, .h4 {
   background-color: #212631 !important;
 }
 .rmsc .dropdown-container{
-  background-color:#212631 ;
+  background-color:#212631;
+  color: #e4e5e6;
 }
 .jss > thead > tr > .InfoTr::after {
   color: #e4e5e6;
@@ -567,11 +568,10 @@ body{
   --rmsc-hover: #4d515a!important;
   --rmsc-selected: #323a49!important;
   --rmsc-border: #e4e7ea !important;
-  --rmsc-gray: #697069 !important;
+  --rmsc-gray: #697069;
   --rmsc-bg: #2a303d!important;
   --rmsc-p: 10px;
   --rmsc-radius: 0.2rem !important;
-  color: #e4e5e6 !important;
 }
 .rmsc .search
 {
@@ -579,7 +579,8 @@ body{
   position:relative;
   border-bottom:1px solid var(--rmsc-border);
   background-color: #323a49!important;
-  color:#e4e5e6;
+  color: #e4e5e6;
+
 }
 .rmsc .search input{
   height:var(--rmsc-h);
@@ -589,6 +590,7 @@ body{
   border:0;
   background-color: #323a49!important;
   color: #e4e5e6;
+
 }
 
 .svgdropdown .rmsc .gray {
@@ -1052,10 +1054,37 @@ select>.Select-control .Select-value,
   color: #cccccc;
   cursor: default;
 }
-.rmsc.dropdown-content{
-background-color: #2a303d!important;
-color: #fff!important;
+.TextCont h3 {
+  color: #e4e5e6 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  font-weight: 700;
 }
+.list-group-item-help {
+  margin-bottom: 14px !important;
+  border: none !important;
+  padding: 0.75rem 1.25rem !important;
+  cursor: pointer;
+  color: #e4e5e6 !important;
+  background-color: #f0f3f5;
+  font-size: 14px !important;
+  font-weight: 700;
+}
+a {
+  color: #e4e5e6;
+  text-decoration: none;
+  background-color: transparent;
+  // text-decoration: underline;
+}
+.hoverTd:hover {
+  background-color: #4d515a;
+  color: #000 !important;
+  cursor: pointer;
+}
+// .rmsc.dropdown-content{
+// background-color: #2a303d!important;
+// color: #fff!important;
+// }
 // .Select-menu-outer{
 //   background-color: #000!important;
 //   color: #e4e5e6; 
@@ -8250,7 +8279,7 @@ label.arrow_label:before {
   --rmsc-bg: #323a49;
   --rmsc-p: 10px;
   --rmsc-radius: 0.2rem !important;
-  color: #e4e7ea !important;
+  // color: #e4e7ea !important;
 }
 
 .Select.is-disabled>.Select-control {
