@@ -7293,6 +7293,10 @@ export default class BuildTree extends Component {
                     }
                     this.setState({
                         copyModal: false
+                    }, () => {
+                        if(this.state.copyModalTree != this.state.treeId){
+                            window.open("/#/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1", "_self")
+                        }
                     })
                 })
             })
@@ -13865,11 +13869,11 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label className="form-check-label">
-                                            Node name: {this.state.copyModalNode.payload.label.label_en} 
+                                            <b>Node name:</b> {this.state.copyModalNode.payload.label.label_en} 
                                         </Label>
                                     </FormGroup>
                                     <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
-                                        <p>{i18n.t('static.tree.destination')}:</p>
+                                        <p><b>{i18n.t('static.tree.destination')}:</b></p>
                                         <FormGroup>
                                             <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
                                             <Input
