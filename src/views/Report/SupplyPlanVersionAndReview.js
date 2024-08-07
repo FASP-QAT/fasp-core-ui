@@ -260,7 +260,25 @@ class SupplyPlanVersionAndReview extends Component {
         })
         ProgramService.getNotesHistory(programId)
         .then(response => {
-            var listArray = response.data;
+            var data = response.data;
+            const listArray = [];
+            const grouped = data.reduce((acc, item) => {
+                acc[item.versionId] = acc[item.versionId] || [];
+                acc[item.versionId].push(item);
+                return acc;
+            }, {});
+        
+            Object.values(grouped).forEach(entries => {
+                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                if (pendingEntries.length) {
+                    listArray.push(pendingEntries[0]);
+                    if (pendingEntries.length > 1) {
+                        listArray.push(pendingEntries[pendingEntries.length - 1]);
+                    }
+                }
+                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+            });            
+
             if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
                 jexcel.destroy(document.getElementById("notesTransTable"), true);
             }
@@ -268,10 +286,11 @@ class SupplyPlanVersionAndReview extends Component {
             for (var sb = listArray.length-1; sb >= 0; sb--) {
                 var data = [];
                 data[0] = listArray[sb].versionId; 
-                data[1] = getLabelText(listArray[sb].versionStatus.label,this.state.lang);
-                data[2] = listArray[sb].notes; 
-                data[3] = listArray[sb].lastModifiedBy.username; 
-                data[4] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                data[3] = listArray[sb].notes;
+                data[4] = listArray[sb].lastModifiedBy.username;
+                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
                 json.push(data);
             }
         var options = {
@@ -279,7 +298,8 @@ class SupplyPlanVersionAndReview extends Component {
             columnDrag: false,
             columns: [
                 { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                { title: i18n.t('static.integration.versionStatus'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
                 { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
                 {
                     title: i18n.t("static.common.lastModifiedBy"),
@@ -1041,7 +1061,8 @@ class SupplyPlanVersionAndReview extends Component {
                                 </div>
                             </Form>
                         </div>
-                        <div className="ReportSearchMarginTop consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <span>{i18n.t("static.spvr.rightClickNote")}</span>
+                        <div className="ReportSearchMarginTopSPVR consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable TableWidth100">
                             </div>
                         </div>
