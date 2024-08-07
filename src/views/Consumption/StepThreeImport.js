@@ -719,12 +719,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         let regionList = this.props.items.stepTwoData.filter(c => c.isRegionInForecastProgram == 1 && c.importRegion == 1);
         let regionIds = regionList.map(ele => ele.supplyPlanRegionId);
         let ActualConsumptionDataInput = {
-            programId: this.props.items.programId,
-            versionId: this.props.items.versionId,
+            programId: this.props.items.programId, //this will be multiple sp programId's
+            versionId: this.props.items.versionId, //this will be multiple sp versionId's
             planningUnitIds: supplyPlanPlanningUnitId,
             startDate: this.props.items.startDate,
             stopDate: this.props.items.stopDate,
-            regionIds: regionIds
+            regionIds: regionIds // now there will be separate region list for each sp program
         }
         ProgramService.getActualConsumptionData(ActualConsumptionDataInput)
             .then(response => {
