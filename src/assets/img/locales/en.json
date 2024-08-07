@@ -3380,5 +3380,6 @@
     "static.common.lighttheme":"Light Theme",
     "static.common.darktheme":"Dark Theme",
     "static.programPlanningUnit.forecastErrorTooltip":"Used in the Forecast Error (Monthly) report to signify that a specific month’s forecast error is above this desired threshold value",
-    "static.supplyPlan.start":"Start"
+    "static.supplyPlan.start":"Start",
+    "static.program.dateRange":"Download specific range of supply plan data"
 }
