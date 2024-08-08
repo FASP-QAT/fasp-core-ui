@@ -1501,10 +1501,10 @@ export default class ProblemList extends React.Component {
                                 <div className='col-md-6'>
                                     {this.state.showProblemDashboard == 1 && this.state.programId != 0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
                                 </div>
-                                {this.state.programId != 0 && !this.state.loading && <FormGroup className="col-md-6">
+                                {this.state.programId != 0 && !this.state.loading && <FormGroup className="col-md-6" style={{"marginTop":"-20px"}}>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
-                                    <div className="controls ">
-                                        <InputGroup>
+                                    <div className="controls " style={{"height":"97%"}}>
+                                        <InputGroup style={{"height":"97%"}}>
                                             <Input type="textarea"
                                                 name="notes"
                                                 id="notes"
