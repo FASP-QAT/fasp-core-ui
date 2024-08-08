@@ -310,7 +310,10 @@ export default class ExtrapolateDataComponent extends React.Component {
             jsonDataTes: [],
             jsonDataArima: [],
             message: "",
-            optimizeTESAndARIMAExtrapolation: false
+            optimizeTESAndARIMAExtrapolation: false,
+            totalExtrapolatedCount: 0,
+            syncedExtrapolations: 0,
+            syncedExtrapolationsPercentage: 0
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -2382,6 +2385,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     ExtrapolatedParameters(id) {
         var regionList = this.state.regionValues;
         var listOfPlanningUnits = this.state.planningUnitValues;
+        this.setState({ totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length) })
         var programData = this.state.datasetJson;
         var puObj = [];
         var regionObj = []
@@ -2389,12 +2393,6 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({ loading: true })
             var datasetJson = programData;
             var count = 0;
-            var totalExtrapolatedParams = listOfPlanningUnits.length * regionList.length * 10;
-            console.log("totalExtrapolatedParams", totalExtrapolatedParams)
-            // this.setState({
-            //     extrapolatedCount: extrapolatedCount + 1,
-            //     syncedPercentage: Math.floor(((syncedMasters + 1) / this.state.totalMasters) * 100)
-            // })
             for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                 for (var i = 0; i < regionList.length; i++) {
                     var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
@@ -2462,6 +2460,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                             }
                         }
                     }
+                    var syncedExtrapolations = this.state.syncedExtrapolations;
+                    this.setState({
+                        syncedExtrapolations: syncedExtrapolations + 1,
+                        syncedExtrapolationsPercentage: Math.floor(((syncedExtrapolations + 1) / this.state.totalExtrapolatedCount) * 100)
+                    });
                 }
             }
             if (regionObj != "" && puObj != "") {
@@ -4950,6 +4953,23 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 </Form>
                             )} />
                 </Modal>
+                <div id="extrapolationLoaderDiv" style={{ display: none }}>
+                    <h6 className="mt-success" style={{ color: this.props.match.params.color }} id="div1">{i18n.t(this.props.match.params.message)}</h6>
+                    {/* <h5 className="pl-md-5" style={{ color: "red" }} id="div2">{this.state.message != "" && i18n.t('static.masterDataSync.masterDataSyncFailed')}</h5> */}
+                    <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <Col xs="12" sm="12">
+                            <Card>
+                                <CardHeader>
+                                    <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}</strong>
+                                </CardHeader>
+                                <CardBody>
+                                    <div className="text-center">{this.state.syncedPercentage}% ({this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {i18next.t('static.extrapolation.extrapolation')})</div>
+                                    <Progress value={this.state.syncedMasters} max={this.state.totalMasters} />
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </div>
+                </div>
             </div>
         )
     }
