@@ -2435,7 +2435,7 @@ class CompareAndSelectScenario extends Component {
                                 <div class="pl-0">
                                     {this.state.datasetId != "" && this.state.regionId != "" &&
                                         <div onClick={this.expandCompressPUFuntion} style={{ display: this.state.loading ? "none" : "block", height: "45px" }}>
-                                            {this.state.expandCompressPUBtn ? <div><i className="fa fa-minus-square-o supplyPlanIcon" ></i> <span>{i18n.t("static.compareAndSelect.selectForecast")}<br /> ✅ {i18n.t("static.compareAndSelect.forecastSelected")} <i class="fa fa-exclamation-triangle"></i> {i18n.t("static.compareAndSelect.forecastNotSelected")}</span></div> : <div><i className="fa fa-plus-square-o supplyPlanIcon" ></i>  <span style={{ color: "#20a8d8" }}><b>{i18n.t("static.compareAndSelect.showPUPanel")}</b></span></div>}
+                                            {this.state.expandCompressPUBtn ? <div><i className="fa fa-minus-square-o supplyPlanIcon" ></i> <span className="WhiteText">{i18n.t("static.compareAndSelect.selectForecast")}<br /> ✅ {i18n.t("static.compareAndSelect.forecastSelected")} <i class="fa fa-exclamation-triangle"></i> {i18n.t("static.compareAndSelect.forecastNotSelected")}</span></div> : <div><i className="fa fa-plus-square-o supplyPlanIcon" ></i>  <span style={{ color: "#20a8d8" }}><b>{i18n.t("static.compareAndSelect.showPUPanel")}</b></span></div>}
                                         </div>
                                     }
                                     <div className="row">
