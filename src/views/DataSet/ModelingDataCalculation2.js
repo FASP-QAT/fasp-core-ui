@@ -165,6 +165,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var nodeDataList = [];
                                 var calculatedMMdPatients = [];
                                 var calculatedValueForLag = [];
+                                var parentAndCalculatedValueArray = [];
                                 for (var i = 0; curDate < stopDate; i++) {
                                     curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                                     var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
@@ -354,8 +355,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             if (parentValueFilter.length > 0) {
                                                 var parentValue = parentValueFilter[0].calculatedValue;
                                                 calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                                parentAndCalculatedValueArray.push({ "calculatedValue": calculatedValue, "month": moment(curDate).format("YYYY-MM-DD") })
                                             } else {
                                                 calculatedValue = 0;
+                                                parentAndCalculatedValueArray.push({ "calculatedValue": calculatedValue, "month": moment(curDate).format("YYYY-MM-DD") })
                                             }
                                         } else {
                                             calculatedValue = 0;
@@ -382,6 +385,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var usageFrequency;
                                             var repeatUsagePeriodId;
                                             var oneTimeUsage;
+                                            var noOfMonths = 1;
                                             usageTypeId = nodeDataMapForScenario.fuNode.usageType.id;
                                             if (usageTypeId == 1) {
                                                 oneTimeUsage = nodeDataMapForScenario.fuNode.oneTimeUsage;
@@ -416,7 +420,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                         convertToMonth = 0;
                                                     }
                                                 }
-                                                noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                                noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? noOfMonthsInUsagePeriod : noOfFUPatient;
+                                                if (oneTimeUsage != "true" && oneTimeUsage != true) {
+                                                    noOfMonths = nodeDataMapForScenario.fuNode.repeatCount / convertToMonth;
+                                                }
                                             } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                                 if (payload.nodeType.id == 4) {
                                                     noFURequired = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
@@ -434,14 +441,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
                                                 }
                                             } else {
-                                                if(i < noFURequired) {
-                                                    totalValue = i * calculatedValue;
-                                                } else {
-                                                    totalValue = noFURequired * calculatedValue;
-                                                }
+                                                var calculatedValueForLastNMonths = 0;
+                                                var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(noOfMonths, 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
+                                                f.map(item => {
+                                                    calculatedValueForLastNMonths += item.calculatedValue;
+                                                })
+                                                totalValue = noFURequired * calculatedValueForLastNMonths;
                                             }
                                         }
-                                        console.log("Hello1",convertToMonth,"-",noOfMonthsInUsagePeriod,"-",i,"-",totalValue,"-",noFURequired,"-",calculatedValue)
                                         calculatedValue = totalValue;
                                         calculatedValueForLag.push(calculatedValue);
                                         var lag = nodeDataMapForScenario.fuNode.lagInMonths;
@@ -623,7 +630,6 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     nodeId: flatList[fl].id,
                                     nodeDataMomList: nodeDataList
                                 })
-                                console.log("Hello",allNodeDataList)
                                 nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                                 nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                             }
