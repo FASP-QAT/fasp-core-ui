@@ -144,7 +144,7 @@ export default class ProblemList extends React.Component {
                     if (myResult[i].userId == userId) {
                         var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            name: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
                             id: myResult[i].id
                         }
                         proList[i] = programJson
