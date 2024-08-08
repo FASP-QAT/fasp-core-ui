@@ -1624,7 +1624,7 @@ class VersionSettingsComponent extends Component {
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
                             <div className="">
                                 {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
@@ -1639,7 +1639,7 @@ class VersionSettingsComponent extends Component {
                             <div className="mt-2">
                                 {(consumptionExtrapolationList.length > 0) ?
                                     <div className="table-wrap table-responsive fixTableHead">
-                                        <Table className="table-bordered text-center overflowhide main-table table-striped1" bordered size="sm" >
+                                        <Table className="table-bordered text-center overflowhide main-table" bordered size="sm" >
                                             <thead>
                                                 <tr>
                                                     <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
@@ -1653,7 +1653,7 @@ class VersionSettingsComponent extends Component {
                             <span>c. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="table-scroll">
                                 {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th style={{ width: '15%' }}><b>{i18n.t('static.forecastMethod.tree')}</b></th>
@@ -1669,7 +1669,7 @@ class VersionSettingsComponent extends Component {
                             <span>d. {i18n.t('static.commitTree.treeNodes')}:</span>
                             <div className="">
                                 {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>

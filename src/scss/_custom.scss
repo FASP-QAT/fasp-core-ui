@@ -701,6 +701,12 @@ select>.Select-control .Select-value,
   padding: 0px 0px 0px 8px;
   color: #e4e5e6;
 }
+.legendcommitversionTextStock {
+  text-align: left;
+  display: table;
+  padding: 0px 0px 0px 3px;
+  color: #e4e5e6;
+}
 .DeleteIcon {
   padding: 1px 2px;
   border: 2px solid #e4e5e6;
@@ -1080,6 +1086,9 @@ a {
   background-color: #4d515a;
   color: #000 !important;
   cursor: pointer;
+}
+.WhiteText{
+  color: #e4e5e6;
 }
 // .rmsc.dropdown-content{
 // background-color: #2a303d!important;
