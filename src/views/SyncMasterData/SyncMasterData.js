@@ -223,6 +223,9 @@ export default class SyncMasterData extends Component {
                                             if (actionList == undefined) {
                                                 actionList = []
                                             }
+                                            if(generalJson.currentVersionNotes == undefined){
+                                                generalJson.currentVersionNotes=response.data.versionNotes;
+                                            }
                                             var problemReportList = generalJson.problemReportList;
                                             var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c => c.shipmentActive == true && c.orderActive == true);
                                             var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss") : date;
