@@ -442,7 +442,7 @@ class Login extends Component {
                           }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
                               <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
-                              <h5 id="div2">{i18n.t(this.state.message)}</h5>
+                              <h5 id="div2" style={{color:"#000"}}>{i18n.t(this.state.message)}</h5>
                               <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
                               <InputGroup className="mb-3">
                                 <InputGroupAddon addonType="prepend">
