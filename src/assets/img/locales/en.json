@@ -3360,10 +3360,6 @@
     "static.compareAndSelect.forecastSelected": "Forecast selected",
     "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
     "static.compareAndSelect.showPUPanel": "Show Planning Unit panel",
-    "static.tree.times": "times",
-    "static.tree.inTotal": "In total, ",
-    "static.tree.eachTime": "each time",
-    "static.tree.indefinitely": "indefinitely",
     "static.funderTypeHead.funderType": "Funding Source Type",
     "static.funderType.funderTypeName": "Funding Source Type Name",
     "static.funderType.funderTypeCode": "Funding Source Type Display Name",
@@ -3379,8 +3375,8 @@
     "static.common.changetheme":"Change Theme",
     "static.common.lighttheme":"Light Theme",
     "static.common.darktheme":"Dark Theme",
-    "static.programPlanningUnit.forecastErrorTooltip":"Used in the Forecast Error (Monthly) report to signify that a specific month’s forecast error is above this desired threshold value",
     "static.supplyPlan.start":"Start",
     "static.program.dateRange":"Download specific range of supply plan data",
-    "static.spvr.rightClickNote":"Note : Right click to view notes history"
+    "static.spvr.rightClickNote":"Note : Right click to view notes history",
+    "static.tree.month": "month"
 }
