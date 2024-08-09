@@ -993,10 +993,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     } else {
                         amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
                     }
-                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
-                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
-                        amc=null;
-                    }
+                    // var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                    // if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
+                    //     amc=null;
+                    // }
                     var maxForMonths = 0;
                     var realm = generalProgramJson.realmCountry.realm;
                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;

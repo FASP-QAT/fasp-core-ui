@@ -418,14 +418,10 @@ export default class SupplyPlanComponent extends React.Component {
      */
     updateFieldDataARU(value) {
         if (value != null && value != "" && value != undefined && value.value != 0) {
-            console.log("Value Test@123", value);
             var aruList = this.state.aruList;
             var aruData = aruList.filter(c => c.value == value.value)[0];
-            console.log("Aru Data Test@123", aruData);
             var planningUnitDataList = this.state.planningUnitDataList;
-            console.log("planningUnitDataList Test@123", planningUnitDataList)
             var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == aruData.planningUnitId);
-            console.log("planningUnitDataFilter Test@123", planningUnitDataFilter)
             var programJson = {};
             if (planningUnitDataFilter.length > 0) {
                 var planningUnitData = planningUnitDataFilter[0]
@@ -2667,7 +2663,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var startDate = this.state.startDate;
                                                 var monthDifference=this.state.monthCount;
                                                 if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                                                    startDate = { year: new Date(cutOffDate).getFullYear(), month: new Date(cutOffDate).getMonth() + 1 };
+                                                    startDate = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
                                                     localStorage.setItem("sesStartDate", JSON.stringify(startDate));
                                                     var date = moment(startDate.year + "-" + startDate.month + "-01").format("YYYY-MM-DD");
                                                     if (startDate.month <= 9) {
@@ -2713,7 +2709,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     planningUnitDataList: planningUnitDataList,
                                                     dataSourceListAll: dataSourceListAll,
                                                     realmCountryPlanningUnitListAll: rcpuResult,
-                                                    minDate: { year: new Date(cutOffDate).getFullYear(), month: new Date(cutOffDate).getMonth() + 1 },
+                                                    minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
                                                     startDate: startDate,
                                                     monthCount:monthDifference,
                                                     planningUnitListForConsumption: planningUnitListForConsumption,
@@ -2785,6 +2781,7 @@ export default class SupplyPlanComponent extends React.Component {
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
         if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+            setTimeout(function () {
             document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
                 item.style.display="none";
@@ -2792,13 +2789,20 @@ export default class SupplyPlanComponent extends React.Component {
             [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
                 item.style.display="none";
             })
+            }, 500);
+            curDate=moment(cutOffDate).utcOffset('-0500');
+            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                currentDate=moment(cutOffDate).utcOffset('-0500');
+            }
         }else{
+            setTimeout(function () {
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
                 item.style.display="block";
             });
             [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
                 item.style.display="block";
             })
+        }, 500);
         }
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
         localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
@@ -2818,7 +2822,6 @@ export default class SupplyPlanComponent extends React.Component {
      * @param {*} monthCount This is value in terms of number for the month that user has clicked on or has selected
      */
     formSubmit(value, monthCount, doNotShowLoader) {
-        console.log("Value Test@123", value)
         if (value != "" && value != undefined ? value.value : 0 != 0) {
             this.setState({
                 planningUnitChange: true,
@@ -2967,8 +2970,6 @@ export default class SupplyPlanComponent extends React.Component {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
                             var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
-                                console.log("Multiplier Test@123", this.state.multiplier)
-                                console.log("roundARU(jsonList[0].openingBalance, this.state.multiplier) Test@123", roundARU(jsonList[0].openingBalance, this.state.multiplier))
                                 openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: roundARU(jsonList[0].openingBalance, this.state.multiplier) });
                                 consumptionTotalData.push({ consumptionQty: roundARU(jsonList[0].consumptionQty, this.state.multiplier), consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
                                 var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate))
@@ -4375,7 +4376,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}
+                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>

@@ -3207,7 +3207,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var startDate = this.state.startDate;
                                         var monthDifference=this.state.monthCount;
                                         if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                                            startDate = { year: new Date(cutOffDate).getFullYear(), month: new Date(cutOffDate).getMonth() + 1 };
+                                            startDate = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
                                             localStorage.setItem("sesStartDate", JSON.stringify(startDate));
                                             var date = moment(startDate.year + "-" + startDate.month + "-01").format("YYYY-MM-DD");
                                             if (startDate.month <= 9) {
@@ -3233,7 +3233,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             planningUnitDataList: planningUnitDataList,
                                             dataSourceListAll: dataSourceListAll,
                                             realmCountryPlanningUnitListAll: rcpuResult,
-                                            minDate: { year: new Date(cutOffDate).getFullYear(), month: new Date(cutOffDate).getMonth() + 1 },
+                                            minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
                                             startDate: startDate,
                                             monthCount:monthDifference,
                                             planningUnitListForConsumption: planningUnitListForConsumption,
@@ -3301,6 +3301,7 @@ export default class WhatIfReportComponent extends React.Component {
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
         if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+            setTimeout(function () {
             document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
                 item.style.display="none";
@@ -3308,6 +3309,11 @@ export default class WhatIfReportComponent extends React.Component {
             [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
                 item.style.display="none";
             })
+            }, 500);
+            curDate=moment(cutOffDate).utcOffset('-0500');
+            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                currentDate=moment(cutOffDate).utcOffset('-0500');
+            }
         }else{
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
                 item.style.display="block";
@@ -6689,7 +6695,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}
+                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>

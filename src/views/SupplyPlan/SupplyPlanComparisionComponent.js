@@ -777,6 +777,7 @@ export default class SupplyPlanComponent extends React.Component {
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
         if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+            setTimeout(function () {
             document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
                 item.style.display="none";
@@ -784,6 +785,11 @@ export default class SupplyPlanComponent extends React.Component {
             [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
                 item.style.display="none";
             })
+            }, 500);
+            curDate=moment(cutOffDate).utcOffset('-0500');
+            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                currentDate=moment(cutOffDate).utcOffset('-0500');
+            }
         }else{
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
                 item.style.display="block";
