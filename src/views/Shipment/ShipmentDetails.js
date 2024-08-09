@@ -730,8 +730,6 @@ export default class ShipmentDetails extends React.Component {
                                             planningUnitListForJexcel.push(productJson1)
                                         }
                                     }
-                                    console.log("this.state.programList Test@123",this.state.programList);
-                                    console.log("Program Id Test@123",programId);
                                     var cutOffDateFromProgram=this.state.programList.filter(c=>c.value==this.state.programId)[0].cutOffDate;
                                     var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                                     var rangeValue = this.state.rangeValue;

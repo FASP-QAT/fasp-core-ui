@@ -109,6 +109,18 @@ export default class StockStatusMatrix extends React.Component {
       () => {
         if (programId > 0 && versionId != 0) {
           localStorage.setItem("sesVersionIdReport", versionId);
+          var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+          var startYear = this.state.startYear;
+          var endYear=this.state.endYear;
+          if (moment(startYear).format("YYYY") < moment(cutOffDate).format("YYYY")) {
+              startYear=moment(cutOffDate).format("YYYY");
+              endYear=moment(cutOffDate).add(1,'years').format("YYYY")
+          }
+          this.setState({
+            startYear: startYear,
+            endYear:endYear
+          })
           if (versionId.includes("Local")) {
             var db1;
             getDatabase();
@@ -1096,6 +1108,7 @@ export default class StockStatusMatrix extends React.Component {
             var programData = databytes.toString(CryptoJS.enc.Utf8);
             var version = JSON.parse(programData).currentVersion;
             version.versionId = `${version.versionId} (Local)`;
+            version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
             verList.push(version);
           }
         }
@@ -2301,7 +2314,7 @@ export default class StockStatusMatrix extends React.Component {
             {item.versionStatus.id == 2 && item.versionType.id == 2
               ? item.versionId + "*"
               : item.versionId}{" "}
-            ({moment(item.createdDate).format(`MMM DD YYYY`)})
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
           </option>
         );
       }, this);
