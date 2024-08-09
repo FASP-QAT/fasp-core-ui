@@ -420,9 +420,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                         convertToMonth = 0;
                                                     }
                                                 }
-                                                noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? noOfMonthsInUsagePeriod : noOfFUPatient;
-                                                if (oneTimeUsage != "true" && oneTimeUsage != true) {
-                                                    noOfMonths = nodeDataMapForScenario.fuNode.repeatCount / convertToMonth;
+                                                if (nodeDataMapForScenario.fuNode.oneTimeDispensing==undefined || nodeDataMapForScenario.fuNode.oneTimeDispensing==null || nodeDataMapForScenario.fuNode.oneTimeDispensing.toString()=="" || nodeDataMapForScenario.fuNode.oneTimeDispensing.toString() == "true") {
+                                                    noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (nodeDataMapForScenario.fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                                } else {
+                                                    noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? noOfMonthsInUsagePeriod : noOfFUPatient;
+                                                    if (oneTimeUsage != "true" && oneTimeUsage != true) {
+                                                        noOfMonths = nodeDataMapForScenario.fuNode.repeatCount / convertToMonth;
+                                                    }
                                                 }
                                             } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
                                                 if (payload.nodeType.id == 4) {
@@ -441,12 +445,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     totalValue = Number(fuPerMonth).toFixed(4) * calculatedValue;
                                                 }
                                             } else {
-                                                var calculatedValueForLastNMonths = 0;
-                                                var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(noOfMonths, 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
-                                                f.map(item => {
-                                                    calculatedValueForLastNMonths += item.calculatedValue;
-                                                })
-                                                totalValue = noFURequired * calculatedValueForLastNMonths;
+                                                if (nodeDataMapForScenario.fuNode.oneTimeDispensing==undefined || nodeDataMapForScenario.fuNode.oneTimeDispensing==null || nodeDataMapForScenario.fuNode.oneTimeDispensing.toString()=="" || nodeDataMapForScenario.fuNode.oneTimeDispensing.toString() == "true") {
+                                                    totalValue = noFURequired * calculatedValue;
+                                                } else {
+                                                    var calculatedValueForLastNMonths = 0;
+                                                    var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(noOfMonths, 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
+                                                    f.map(item => {
+                                                        calculatedValueForLastNMonths += item.calculatedValue;
+                                                    })
+                                                    totalValue = noFURequired * calculatedValueForLastNMonths;
+                                                }
                                             }
                                         }
                                         calculatedValue = totalValue;
