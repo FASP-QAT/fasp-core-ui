@@ -594,7 +594,8 @@ export default class ShipmentDetails extends React.Component {
                         var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
                         var programJson = {
                             label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
-                            value: myResult[i].id
+                            value: myResult[i].id,
+                            cutOffDate: myResult[i].cutOffDate
                         }
                         proList.push(programJson)
                     }
@@ -729,6 +730,16 @@ export default class ShipmentDetails extends React.Component {
                                             planningUnitListForJexcel.push(productJson1)
                                         }
                                     }
+                                    console.log("this.state.programList Test@123",this.state.programList);
+                                    console.log("Program Id Test@123",programId);
+                                    var cutOffDateFromProgram=this.state.programList.filter(c=>c.value==this.state.programId)[0].cutOffDate;
+                                    var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+                                    var rangeValue = this.state.rangeValue;
+                                    if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                                        var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+                                        rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                                        localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+                                    }                                    
                                     this.setState({
                                         planningUnitList: proList.sort(function (a, b) {
                                             a = a.label.toLowerCase();
@@ -756,7 +767,9 @@ export default class ShipmentDetails extends React.Component {
                                             b = b.budgetCode.toLowerCase();
                                             return a < b ? -1 : a > b ? 1 : 0;
                                         }),
-                                        loading: false
+                                        loading: false,
+                                        minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                                        rangeValue: rangeValue,
                                     })
                                     var planningUnitIdProp = '';
                                     if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
@@ -1140,6 +1153,7 @@ export default class ShipmentDetails extends React.Component {
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
+                                                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />

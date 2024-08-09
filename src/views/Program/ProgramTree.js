@@ -55,8 +55,8 @@ class Program extends Component {
             loading: true,
             programList: [],
             minDate: { year: new Date().getFullYear() - 20, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 },
-            startDate: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 },
+            maxDate: { year: parseInt(moment(startDate).format("YYYY")), month: parseInt(moment(startDate).format("M")) },
+            startDate: { year: parseInt(moment(startDate).format("YYYY")), month: parseInt(moment(startDate).format("M")) },
             isMonthSelected: false
         };
         this.pickRange = React.createRef();
@@ -940,6 +940,7 @@ class Program extends Component {
                     .then(response => {
                         response.data = decompressJson(response.data);
                         var json = response.data;
+                        console.log("Json Test@123",json);
                         var updatedJson = [];
                         for (var r = 0; r < json.length; r++) {
                             var planningUnitList = json[r].planningUnitList;
