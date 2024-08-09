@@ -259,6 +259,7 @@ export default class EditProgram extends Component {
                 organisationCode: organisationCode,
                 realmCountryCode: realmCountryCode
             })
+            console.log('this.state.program.regionArray',this.state.program.regionArray);
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.programId)
                 .then(response => {
                     if (response.status == 200) {

@@ -20,6 +20,8 @@ import step4 from '../../assets/img/4-step.png';
 import step5 from '../../assets/img/5-step.png';
 import step6 from '../../assets/img/6-step.png';
 import i18n from '../../i18n';
+import Select from 'react-select';
+import classNames from 'classnames';
 // Initial values for form fields
 const initialValuesSix = {
     programName: '',
@@ -166,7 +168,9 @@ export default class StepSix extends Component {
                         handleSubmit,
                         isSubmitting,
                         isValid,
-                        setTouched
+                        setTouched,
+                        setFieldValue,
+                        setFieldTouched
                     }) => (
                         <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' autocomplete="off">
                             <Row>
@@ -229,6 +233,50 @@ export default class StepSix extends Component {
                                     <FormFeedback className="red">{errors.userId}</FormFeedback>
                                 </FormGroup>
                                 <div className="col-md-6"></div>
+
+                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
+                                    <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.regionId },
+                                            // { 'is-invalid': (touched.regionId && !!errors.regionId || this.state.program.regionArray.length == 0) }
+                                        )}
+                                        bsSize="sm"
+                                        onChange={(e) => {
+                                            // handleChange(e);
+                                            // setFieldValue("regionId", e);
+                                            // this.updateFieldData(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("regionId", true)}
+                                        multi
+                                        options={[]}
+                                        // value={this.state.program.regionArray}
+                                        value={1}
+                                    />
+                                    <FormFeedback>{errors.regionId}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
+                                    <Label htmlFor="select">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.regionId },
+                                            // { 'is-invalid': (touched.regionId && !!errors.regionId || this.state.program.regionArray.length == 0) }
+                                        )}
+                                        bsSize="sm"
+                                        onChange={(e) => {
+                                            // handleChange(e);
+                                            // setFieldValue("regionId", e);
+                                            // this.updateFieldData(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("regionId", true)}
+                                        multi
+                                        options={[]}
+                                        // value={this.state.program.regionArray}
+                                        value={1}
+                                    />
+                                    <FormFeedback>{errors.regionId}</FormFeedback>
+                                </FormGroup>
+
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
                                     <Input
