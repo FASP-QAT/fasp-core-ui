@@ -4074,7 +4074,7 @@ export default class BuildTree extends Component {
             var tempCalculatedValue = momListParentForMonth.length > 0 ? momListParentForMonth[0].calculatedValue : 0;
             var tempRepeatCountConvertToMonth = tempFuNode && tempFuNode.repeatUsagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId))[0].convertToMonth : 1;
             var tempNConvertToMonth = tempFuNode && tempFuNode.usagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth : 1;
-            if(this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false") {
+            if(this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false") {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
                 tempCalculatedValue = 0;
                 momListParent.filter(c => c.month > moment(momList[j].month).subtract(tempMonth, 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD")).map(x => tempCalculatedValue = x.calculatedValue + tempCalculatedValue);
@@ -4085,7 +4085,7 @@ export default class BuildTree extends Component {
             data[10] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(R${parseInt(j) + 1 - lagInMonths}<0,0,R${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(R${parseInt(j) + 1}<0,0,R${parseInt(j) + 1})`;
             data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[12] = this.state.currentScenario.manualChangesEffectFuture;
-            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : tempFuNode.oneTimeUsage.toString() == "true" ? this.state.noFURequired : (((tempFuNode.usageFrequency / tempNConvertToMonth) * tempFuNode.noOfForecastingUnitsPerPerson) / tempFuNode.noOfPersons)) : 1;
+            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false" ? (((tempFuNode.usageFrequency / tempNConvertToMonth) * tempFuNode.noOfForecastingUnitsPerPerson) / tempFuNode.noOfPersons): this.state.noFURequired)) : 1;
             data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
@@ -8481,6 +8481,7 @@ export default class BuildTree extends Component {
             if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode == undefined) {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode = {
                     oneTimeUsage: "false",
+                    oneTimeDispensing: "true",
                     lagInMonths: 0,
                     forecastingUnit: {
                         tracerCategory: {
@@ -8880,6 +8881,9 @@ export default class BuildTree extends Component {
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getUsageText();
+        }
+        if (event.target.name === "oneTimeDispensing") {
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeDispensing = (event.target.value).replaceAll(",", "");
         }
         if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",", "");
@@ -11315,7 +11319,22 @@ export default class BuildTree extends Component {
                                                                 }, this)}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.repeatUsagePeriodId}</FormFeedback>
-                                                    </FormGroup></>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
+                                                        <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="select"
+                                                            id="oneTimeDispensing"
+                                                            name="oneTimeDispensing"
+                                                            bsSize="sm"
+                                                            onChange={(e) => {
+                                                                this.dataChange(e)
+                                                            }}
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing!=undefined && this.state.currentScenario.fuNode.oneTimeDispensing!=null && this.state.currentScenario.fuNode.oneTimeDispensing.toString()!=""?this.state.currentScenario.fuNode.oneTimeDispensing.toString():"true") : ""}>
+                                                            <option value="true">{i18n.t('static.realm.yes')}</option>
+                                                            <option value="false">{i18n.t('static.program.no')}</option>
+                                                        </Input>
+                                                    </FormGroup>
+                                                    </>
                                             </>
                                             <>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2 ? 'block' : 'none' }}>
@@ -12554,6 +12573,7 @@ export default class BuildTree extends Component {
                                             nodeDataMomList: [],
                                             fuNode: {
                                                 oneTimeUsage: "false",
+                                                oneTimeDispensing: "true",
                                                 lagInMonths: 0,
                                                 noOfForecastingUnitsPerPerson: '',
                                                 usageFrequency: '',
