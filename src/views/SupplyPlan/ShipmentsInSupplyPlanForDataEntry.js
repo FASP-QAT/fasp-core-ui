@@ -134,7 +134,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
             }
             if (data[i].x == 22 && data[i].value != "") {
-                (instance).setValueFromCoords(22, data[i].y, data[i].value, true);
+                if((instance).getRowData(data[i].y)[21].toString()=="false"){
+                    (instance).setValueFromCoords(22, data[i].y, data[i].value, true);
+                }
             }
             if (data[i].x == 15 && data[i].value != "") {
                 (instance).setValueFromCoords(15, data[i].y, data[i].value, true);
