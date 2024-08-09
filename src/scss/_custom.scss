@@ -10935,3 +10935,13 @@ legend.scheduler-border {
   display: table;
   padding: 0px 0px 0px 3px;
 }
+.momJexcelPagination.jss_pagination_dropdown {
+  margin-left: 4px;
+  margin-right: 4px;
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+}
+.momJexcelPagination.jss_pagination>div {
+  padding-left: 56px!important;
+}
