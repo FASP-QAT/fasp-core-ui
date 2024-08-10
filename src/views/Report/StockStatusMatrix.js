@@ -119,7 +119,8 @@ export default class StockStatusMatrix extends React.Component {
           }
           this.setState({
             startYear: startYear,
-            endYear:endYear
+            endYear:endYear,
+            minDate:moment(cutOffDate).format("YYYY")
           })
           if (versionId.includes("Local")) {
             var db1;
@@ -2455,6 +2456,7 @@ export default class StockStatusMatrix extends React.Component {
                       id="date"
                       name="date"
                       onChange={this.onYearChange}
+                      disabledDate={(current) => current && current.year() < this.state.minDate}
                       value={[
                         moment(this.state.startYear.toString()),
                         moment(this.state.endYear.toString()),
