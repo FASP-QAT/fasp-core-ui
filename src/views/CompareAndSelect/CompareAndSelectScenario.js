@@ -65,10 +65,10 @@ const calculateSums = (data) => {
         }
     });
     // Calculate the total of all columns for each year
-    for (const year in yearSums) {
-        const total = yearSums[year].reduce((sum, val) => sum + val, 0);
-        yearSums[year].push(total);
-    }
+    // for (const year in yearSums) {
+    //     const total = yearSums[year].reduce((sum, val) => sum + val, 0);
+    //     yearSums[year].push(total);
+    // }
     return yearSums;
 };
 // Localized entity name
@@ -128,7 +128,8 @@ class CompareAndSelectScenario extends Component {
             yearArray: [],
             consolidatedData: [],
             collapsedExpandArr: [],
-            expandCompressBtn: true
+            expandCompressBtn: true,
+            calendarMonthList: ""
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -254,7 +255,13 @@ class CompareAndSelectScenario extends Component {
                 dataArr.push(data);
             }
         }
-        this.setState({ yearArray: dataArr })
+        const filteredDates = this.state.monthList.filter(date => {
+            const year = date.split("-")[0]; // Extract the year from the date string
+            return dataArr.includes(year);
+        });
+        this.setState({ yearArray: dataArr, calendarMonthList: filteredDates }, () => {
+            this.setMonth1List()
+        })
     }
 
     /**
@@ -381,7 +388,6 @@ class CompareAndSelectScenario extends Component {
             this.setState({
                 loading: true
             })
-            this.getData();
             jexcel.destroy(document.getElementById("tableDiv"), true);
             jexcel.destroy(document.getElementById("calendarTable"), true);
             var columns1 = [];
@@ -406,7 +412,7 @@ class CompareAndSelectScenario extends Component {
                     }
                 }
             }
-            calendarTableCol.push({ title: i18n.t('static.supplyPlan.total'), type: 'numeric', mask: '#,##.00' });
+            // calendarTableCol.push({ title: i18n.t('static.supplyPlan.total'), type: 'numeric', mask: '#,##.00' });
             var data = [];
             var data1 = [];
             var dataArr = [];
@@ -499,10 +505,8 @@ class CompareAndSelectScenario extends Component {
             var actualMultiplier = 1;
             for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
                 data = [];
-                data1 = [];
 
                 data[0] = monthArrayListWithoutFormat[m];
-                data1[0] = monthArrayListWithoutFormat[m];
                 var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                 data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
                 if (actualFilter.length > 0) {
@@ -520,6 +524,14 @@ class CompareAndSelectScenario extends Component {
                         consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
                         collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null })
                     }
+                }
+                dataArr.push(data)
+            }
+            var monthArrayListWithoutFormat = this.state.calendarMonthList;
+            for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
+                data1 = [];
+                data1[0] = monthArrayListWithoutFormat[m];
+                for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                     if (treeScenarioList[tsl].checked) {
                         if (treeScenarioList[tsl].type == "T") {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
@@ -530,7 +542,6 @@ class CompareAndSelectScenario extends Component {
                         }
                     }
                 }
-                dataArr.push(data)
                 dataArr1.push(data1)
             }
             var originalData = calculateSums(dataArr1);
@@ -1643,6 +1654,7 @@ class CompareAndSelectScenario extends Component {
                         forecastingUnitList: forecastingUnitList,
                         monthList: monthList,
                         monthList1: monthList1,
+                        calendarMonthList: monthList1,
                         startDate: startDate,
                         stopDate: stopDate,
                         forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
@@ -1962,7 +1974,7 @@ class CompareAndSelectScenario extends Component {
             }
         }
         this.setState({ singleValue2: val }, () => {
-            this.buildJexcel()
+            this.getData();
         })
     }
     /**
