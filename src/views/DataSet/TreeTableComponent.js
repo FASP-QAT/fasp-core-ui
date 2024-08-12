@@ -1083,12 +1083,19 @@ export default class TreeTable extends Component {
         var updatedPlanningUnitList = [];
         var fullPlanningUnitList = [];
         var forecastingUnitList = [];
+        var forecastingUnitListForDropdown = [];
+        var planningUnitListForDropdown = [];
         var tracerCategoryList = [];
+        var tracerCategoryListForDropdown = [];
         planningUnitList.map(item => {
             forecastingUnitList.push({
                 label: item.planningUnit.forecastingUnit.label, id: item.planningUnit.forecastingUnit.id,
                 unit: item.planningUnit.forecastingUnit.unit,
                 tracerCategory: item.planningUnit.forecastingUnit.tracerCategory
+            })
+            forecastingUnitListForDropdown.push({
+                id: item.planningUnit.forecastingUnit.id,
+                name: getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang)
             })
         })
         programData.planningUnitList.map(item => {
@@ -1101,14 +1108,24 @@ export default class TreeTable extends Component {
                 forecastingUnit: item.planningUnit.forecastingUnit,
                 multiplier: item.planningUnit.multiplier
             })
+            planningUnitListForDropdown.push({
+                id: item.planningUnit.id,
+                name: getLabelText(item.planningUnit.label, this.state.lang)
+            })
         })
         planningUnitList.map(item => {
             tracerCategoryList.push({
                 label: item.planningUnit.forecastingUnit.tracerCategory.label, tracerCategoryId: item.planningUnit.forecastingUnit.tracerCategory.id
             })
+            tracerCategoryListForDropdown.push({
+                id: item.planningUnit.forecastingUnit.tracerCategory.id,
+                name: getLabelText(item.planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
+            })
         })
         forecastingUnitList = [...new Map(forecastingUnitList.map(v => [v.id, v])).values()];
         tracerCategoryList = [...new Map(tracerCategoryList.map(v => [v.tracerCategoryId, v])).values()];
+        forecastingUnitListForDropdown = [...new Map(forecastingUnitListForDropdown.map(v => [v.id, v])).values()];
+        tracerCategoryListForDropdown = [...new Map(tracerCategoryListForDropdown.map(v => [v.id, v])).values()];
         var forecastingUnitListNew = JSON.parse(JSON.stringify(forecastingUnitList));
         let forecastingUnitMultiList = forecastingUnitListNew.length > 0
             && forecastingUnitListNew.map((item, i) => {
@@ -1118,6 +1135,9 @@ export default class TreeTable extends Component {
             forecastingUnitMultiList,
             tracerCategoryList,
             forecastingUnitList,
+            tracerCategoryListForDropdown,
+            forecastingUnitListForDropdown,
+            planningUnitListForDropdown,
             planningUnitList: updatedPlanningUnitList,
             updatedPlanningUnitList,
             fullPlanningUnitList: fullPlanningUnitList
@@ -1978,7 +1998,7 @@ export default class TreeTable extends Component {
             var level = items[i].level;
             var fuNode = items[i].payload.nodeType.id == 4;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
-            console.log("Hello",items[i])
+            console.log("Hello",items[i], this.state.forecastingUnitList)
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
             data[3] = items[i].payload.label.label_en;
@@ -1987,7 +2007,7 @@ export default class TreeTable extends Component {
             data[6] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]); //Parent Value
             // data[7] = currentScenario.dataValue;//Node Value
             data[7] = currentScenario.dataValue * (data[5] / 100);
-            data[8] = fuNode ? currentScenario.fuNode.forecastingUnit.id : ""; // Forecasting unit
+            data[8] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : ""; // Forecasting unit
             data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
             data[11] = 0; // # PU / Interval / Patient (Reference)
@@ -1995,13 +2015,13 @@ export default class TreeTable extends Component {
             data[13] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
             data[14] = fuNode ? currentScenario.fuNode.usageType.id : ""; // Type of Use
             data[15] = fuNode ? currentScenario.fuNode.lagInMonths : ""; // Lag in months
-            data[16] = 0; // Every
+            data[16] = fuNode ? currentScenario.fuNode.noOfPersons : ""; // Every
             data[17] = 0; // Unit
-            data[18] = 0; // Requires
-            data[19] = 0; // Forecasting Units Unit
+            data[18] = fuNode ? currentScenario.fuNode.noOfForecastingUnitsPerPerson : ""; // Requires
+            data[19] = ""; // Forecasting Units Unit
             data[20] = 0; // Every
             data[21] = 0; // Usage Period
-            data[22] = 0; // Single Use
+            data[22] = fuNode ? currentScenario.fuNode.oneTimeUsage : ""; // Single Use
             data[23] = 0; // For
             data[24] = 0; // Period
             data[25] = 0; // # of FU required for period
@@ -2070,13 +2090,13 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: 'Forecasting Unit',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.forecastingUnitListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Planning Unit',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.planningUnitListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Conversion Factor',
@@ -2095,13 +2115,13 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: 'Tracer Category',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.tracerCategoryListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Type Of Use',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.usageTypeListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Lag in months',
@@ -3327,9 +3347,15 @@ export default class TreeTable extends Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
+                var usageTypeListForDropdown = [];
+                myResult.map(m => usageTypeListForDropdown.push({
+                    id: m.id,
+                    name: getLabelText(m.label, this.state.lang)
+                }))
                 var proList = []
                 this.setState({
-                    usageTypeList: myResult
+                    usageTypeList: myResult,
+                    usageTypeListForDropdown
                 }, () => {
                 })
             }.bind(this);
