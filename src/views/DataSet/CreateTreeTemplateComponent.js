@@ -2625,6 +2625,7 @@ export default class CreateTreeTemplate extends Component {
         let copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value);
         if(this.state.copyModalData == 2){
             copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
+            copyModalParentNodeList = copyModalParentNodeList.filter(x => !x.sortOrder.startsWith(this.state.copyModalNode.sortOrder))
         }
         this.setState({
             copyModalParentLevel: e.target.value,
@@ -11647,6 +11648,17 @@ export default class CreateTreeTemplate extends Component {
                 )
             }, this);
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
+            var illegalNode = false;
+            var itemConfigParent = this.state.treeTemplate.flatList.filter(x => x.id == itemConfig.parent);
+            var allowedNodeTypeList = []; 
+            if(itemConfigParent.length > 0) {
+                allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(itemConfig.payload.nodeType.id))).map(x => x.id);
+                if(allowedNodeTypeList.includes(parseInt(itemConfigParent[0].payload.nodeType.id))){
+                    illegalNode = false;
+                } else {
+                    illegalNode = true;
+                }
+            }
             const opacity = isDragging ? 0.4 : 1
             let itemTitleColor = Colors.RoyalBlue;
             if (isOver) {
@@ -11661,7 +11673,7 @@ export default class CreateTreeTemplate extends Component {
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
                     </div>
                     :
-                    <div className={itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect == 0 ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
+                    <div className={(itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect == 0) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
                         <div className={itemConfig.payload.nodeType.id == 5
                             || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                             (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
