@@ -25,6 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterCSV, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -119,10 +120,14 @@ class Budgets extends Component {
             maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
             fundingSourceValues: [],
             fundingSourceLabels: [],
-            fundingSources: [],
+            fundingSources: [],//contains filtered funding sources
+            fundingSourcesOriginal: [],
             programId: '',
             programValues: [],
-            jexcelDataEl: ""
+            jexcelDataEl: "",
+            fundingSourceTypes: [],
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: [],
         }
         this.formatDate = this.formatDate.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -148,6 +153,123 @@ class Budgets extends Component {
         this.refs.pickRange.show()
     }
     /**
+     * Retrieves the list of funding sources types.
+     */
+    getFundingSourceType = () => {
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+        //Fetch all funding source type list
+        FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+            .then(response => {
+                if (response.status == 200) {
+                    var fundingSourceTypeValues = [];
+                    var fundingSourceTypes = response.data;
+                    fundingSourceTypes.sort(function (a, b) {
+                        a = a.fundingSourceTypeCode.toLowerCase();
+                        b = b.fundingSourceTypeCode.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
+
+                    fundingSourceTypes.map(ele => {
+                        fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
+                    })
+
+                    this.setState({
+                        fundingSourceTypes: fundingSourceTypes, loading: false,
+                        fundingSourceTypeValues: fundingSourceTypeValues,
+                        fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            // this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    this.setState({
+                        fundingSourceTypes: [], loading: false
+                    }, () => {
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+        fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+            fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+        }, () => {
+            var filteredFundingSourceArr = [];
+            var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+                for (var j = 0; j < fundingSources.length; j++) {
+                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+                        filteredFundingSourceArr.push(fundingSources[j]);
+                    }
+                }
+            }
+
+            if (filteredFundingSourceArr.length > 0) {
+                filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+                    a = a.code.toLowerCase();
+                    b = b.code.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+            }
+            this.setState({
+                fundingSources: filteredFundingSourceArr,
+                fundingSourceValues: [],
+                fundingSourceLabels: [],
+            }, () => {
+                this.filterData();
+            });
+
+        })
+    }
+
+    /**
      * Retrieves the list of funding sources.
      */
     getFundingSource = () => {
@@ -159,20 +281,22 @@ class Budgets extends Component {
                     fundingSources.map(ele => {
                         fundingSourceValues.push({ label: ele.code, value: ele.id })
                     })
+                    fundingSources.sort(function (a, b) {
+                        a = a.code.toLowerCase();
+                        b = b.code.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    })
                     this.setState({
-                        fundingSources: fundingSources.sort(function (a, b) {
-                            a = a.code.toLowerCase();
-                            b = b.code.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }), loading: false,
-                        fundingSourceValues: fundingSourceValues,
+                        fundingSourcesOriginal: fundingSources, loading: false,
+                        fundingSources: fundingSources,
+                        fundingSourceValues: fundingSourceValues,//by default all fs will be selected
                         fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
                     })
                 }).catch(
                     error => {
                         this.setState({
-                            fundingSources: [], loading: false
+                            fundingSourcesOriginal: [], loading: false
                         }, () => {
                         })
                         if (error.message === "Network Error") {
@@ -222,8 +346,13 @@ class Budgets extends Component {
     exportCSV = (columns) => {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
         this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
+        this.state.fundingSourceTypeLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
         this.state.fundingSourceLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
@@ -233,7 +362,7 @@ class Budgets extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Number(ele.budgetAmt).toFixed(2), Number(ele.plannedBudgetAmt).toFixed(2), Number(ele.orderedBudgetAmt).toFixed(2), Number((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))).toFixed(2), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
+        this.state.selBudget.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.budget.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), "\'" + ((ele.budget.code.replaceAll(',', ' ')).replaceAll(' ', '%20')) + "\'", (ele.fundingSource.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.fundingSourceType.code.replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.currency.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), Math.floor(ele.budgetAmt), Math.floor(ele.plannedBudgetAmt), Math.floor(ele.orderedBudgetAmt), Math.floor((ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt))), dateFormatterCSV(ele.startDate), dateFormatterCSV(ele.stopDate)])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -283,15 +412,17 @@ class Budgets extends Component {
                         align: 'left'
                     })
                     var programText = doc.splitTextToSize((i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 150, programText)
+                    doc.text(doc.internal.pageSize.width / 8, 105, programText)
+                    var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 120, fundingSourceTypeText)
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 150, fundingSourceText)
+                    doc.text(doc.internal.pageSize.width / 8, 135, fundingSourceText)
                 }
             }
         }
         const unit = "pt";
-        const size = "A4"; 
-        const orientation = "landscape"; 
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
@@ -302,7 +433,7 @@ class Budgets extends Component {
         var h1 = 50;
         doc.addImage(canvasImg, 'png', 50, 200, 750, 260, 'CANVAS');
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
+        const data = this.state.selBudget.map(ele => [getLabelText(ele.budget.label), ele.budget.code, ele.fundingSource.code, ele.fundingSourceType.code, getLabelText(ele.currency.label), this.formatterValue(ele.budgetAmt), this.formatterValue(ele.plannedBudgetAmt), this.formatterValue(ele.orderedBudgetAmt), this.formatterValue(ele.budgetAmt - (ele.plannedBudgetAmt + ele.orderedBudgetAmt)), this.formatDate(ele.startDate), this.formatDate(ele.stopDate)]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: height,
@@ -330,7 +461,7 @@ class Budgets extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
         let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString())
-        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+        let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSourcesOriginal.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         if (this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0) {
             this.setState({ loading: true })
             var inputjson = { "programIds": programId, "startDate": startDate, "stopDate": endDate, "fundingSourceIds": fundingSourceIds }
@@ -481,7 +612,8 @@ class Budgets extends Component {
      * Calls the get programs and get funding source function on page load
      */
     componentDidMount() {
-        this.getPrograms()
+        this.getPrograms();
+        this.getFundingSourceType();
         this.getFundingSource();
     }
     /**
@@ -522,8 +654,18 @@ class Budgets extends Component {
                 )
             }, this);
         var budgets = this.state.selBudget.map((item, index) => (item.budget))
+        const { fundingSourceTypes } = this.state;
         const { fundingSources } = this.state;
         const { rangeValue } = this.state
+
+        let fundingSourceListDD = fundingSources.length > 0 &&
+            fundingSources.map((item, i) => {
+                return {
+                    label: item.code,
+                    value: item.id,
+                };
+            }, this);
+
         let data1 = []
         let data2 = []
         let data3 = []
@@ -603,6 +745,9 @@ class Budgets extends Component {
             },
             {
                 text: i18n.t('static.budget.fundingsource'),
+            },
+            {
+                text: i18n.t('static.funderTypeHead.funderType'),
             },
             {
                 text: i18n.t('static.dashboard.currency'),
@@ -705,6 +850,27 @@ class Budgets extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-3" >
+                                    <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                                    <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                    <div className="controls">
+                                        <MultiSelect
+                                            name="fundingSourceTypeId"
+                                            id="fundingSourceTypeId"
+                                            bsSize="md"
+                                            filterOptions={filterOptions}
+                                            value={this.state.fundingSourceTypeValues}
+                                            onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                                            options={fundingSourceTypes.length > 0
+                                                && fundingSourceTypes.map((item, i) => {
+                                                    return (
+                                                        { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                                    )
+                                                }, this)}
+                                            disabled={this.state.loading}
+                                        />
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3" >
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls">
@@ -715,12 +881,11 @@ class Budgets extends Component {
                                             filterOptions={filterOptions}
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                            options={fundingSources.length > 0
-                                                && fundingSources.map((item, i) => {
-                                                    return (
-                                                        { label: item.code, value: item.id }
-                                                    )
-                                                }, this)}
+                                            options={
+                                                fundingSourceListDD && fundingSourceListDD.length > 0
+                                                    ? fundingSourceListDD
+                                                    : []
+                                            }
                                             disabled={this.state.loading}
                                         />
                                     </div>
@@ -777,14 +942,15 @@ class Budgets extends Component {
                 data1[0] = getLabelText(data[j].budget.label, this.state.lang)
                 data1[1] = data[j].budget.code
                 data1[2] = data[j].fundingSource.code
-                data1[3] = getLabelText(data[j].currency.label, this.state.lang)
-                data1[4] = data[j].budgetAmt;
-                data1[5] = data[j].plannedBudgetAmt;
-                data1[6] = data[j].orderedBudgetAmt;
-                data1[7] = data[j].remainingBudgetAmtUsd;
-                data1[8] = data[j].startDate;
-                data1[9] = data[j].stopDate;
-                data1[10] = data[j].budget.id
+                data1[3] = data[j].fundingSourceType.code
+                data1[4] = getLabelText(data[j].currency.label, this.state.lang)
+                data1[5] = data[j].budgetAmt;
+                data1[6] = data[j].plannedBudgetAmt;
+                data1[7] = data[j].orderedBudgetAmt;
+                data1[8] = data[j].remainingBudgetAmtUsd;
+                data1[9] = data[j].startDate;
+                data1[10] = data[j].stopDate;
+                data1[11] = data[j].budget.id
                 outPutListArray[count] = data1;
                 count++;
             }
@@ -795,6 +961,7 @@ class Budgets extends Component {
                     { title: i18n.t('static.budget.budget'), type: 'text' },
                     { title: i18n.t('static.budget.budgetCode'), type: 'text' },
                     { title: i18n.t('static.budget.fundingsource'), type: 'text' },
+                    { title: i18n.t('static.funderTypeHead.funderType'), type: 'text' },
                     { title: i18n.t('static.dashboard.currency'), type: 'text' },
                     { title: i18n.t('static.budget.budgetamount'), type: 'numeric', mask: '#,##.00', decimal: '.' },
                     { title: i18n.t('static.report.plannedBudgetAmt'), type: 'numeric', mask: '#,##.00', decimal: '.' },
