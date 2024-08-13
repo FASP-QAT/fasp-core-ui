@@ -126,5 +126,9 @@ class DropdownService {
       {}
     );
   }
+  getProgramListBasedOnVersionStatusAndVersionType(versionStatusId, versionTypeId) {
+    return axios.get(`${API_URL}/api/dropdown/program/versionStatus/${versionStatusId}/versionType/${versionTypeId}`, {});
+
+  }
 }
 export default new DropdownService();

@@ -20,7 +20,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, FINAL_VERSION_TYPE, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, SPV_REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
@@ -31,6 +31,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
+import { MultiSelect } from "react-multi-select-component";
 const entityname = ""
 /**
  * Component for Supply Plan Version and Review Report.
@@ -52,6 +53,7 @@ class SupplyPlanVersionAndReview extends Component {
             programs: [],
             countries: [],
             message: '',
+            color: '',
             programLst: [],
             rangeValue: localStorage.getItem("sesReportRangeSPVR") != "" && localStorage.getItem("sesReportRangeSPVR") != null && localStorage.getItem("sesReportRangeSPVR") != undefined ? JSON.parse(localStorage.getItem("sesReportRangeSPVR")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
@@ -61,7 +63,13 @@ class SupplyPlanVersionAndReview extends Component {
             versionStatusId: this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined ? this.props.match.params.statusId : localStorage.getItem("sesVersionStatusSPVR") != "" && localStorage.getItem("sesVersionStatusSPVR") != null && localStorage.getItem("sesVersionStatusSPVR") != undefined ? localStorage.getItem("sesVersionStatusSPVR") : -1,
             versionTypeId: localStorage.getItem("sesVersionTypeSPVR") != "" && localStorage.getItem("sesVersionTypeSPVR") != null && localStorage.getItem("sesVersionTypeSPVR") != undefined ? localStorage.getItem("sesVersionTypeSPVR") : -1,
             lang: localStorage.getItem('lang'),
-            loadingForNotes:false
+            loadingForNotes: false,
+            versionStatusIdResetQPL: [],
+            versionStatusIdResetQPLString: "",
+            programIdsResetQPL: [],
+            resetQPLModal: false,
+            programIdsList: [],
+            loadingResetQPL: false
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -72,8 +80,11 @@ class SupplyPlanVersionAndReview extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.toggleLarge=this.toggleLarge.bind(this);
-        this.actionCanceled=this.actionCanceled.bind(this);
+        this.toggleLarge = this.toggleLarge.bind(this);
+        this.actionCanceled = this.actionCanceled.bind(this);
+        this.toggleResetQPL = this.toggleResetQPL.bind(this);
+        this.getProgramListForResetQPL = this.getProgramListForResetQPL.bind(this);
+        this.resetQPL = this.resetQPL.bind(this);
     }
     /**
      * Handles the change event for the data.
@@ -236,12 +247,12 @@ class SupplyPlanVersionAndReview extends Component {
                 if (y != null) {
                     var rowData = obj.getRowData(y);
                     // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "") {
-                        items.push({
-                            title: i18n.t('static.problemContext.viewTrans'),
-                            onclick: function () {
-                                this.getNotes(rowData[11]);
-                            }.bind(this)
-                        });
+                    items.push({
+                        title: i18n.t('static.problemContext.viewTrans'),
+                        onclick: function () {
+                            this.getNotes(rowData[11]);
+                        }.bind(this)
+                    });
                     // }
                 }
                 return items;
@@ -253,133 +264,133 @@ class SupplyPlanVersionAndReview extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    getNotes(programId){
+    getNotes(programId) {
         this.toggleLarge();
         this.setState({
-            loadingForNotes:true
+            loadingForNotes: true
         })
         ProgramService.getNotesHistory(programId)
-        .then(response => {
-            var data = response.data;
-            const listArray = [];
-            const grouped = data.reduce((acc, item) => {
-                acc[item.versionId] = acc[item.versionId] || [];
-                acc[item.versionId].push(item);
-                return acc;
-            }, {});
-        
-            Object.values(grouped).forEach(entries => {
-                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
-                if (pendingEntries.length) {
-                    listArray.push(pendingEntries[0]);
-                    if (pendingEntries.length > 1) {
-                        listArray.push(pendingEntries[pendingEntries.length - 1]);
-                    }
-                }
-                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
-            });            
+            .then(response => {
+                var data = response.data;
+                const listArray = [];
+                const grouped = data.reduce((acc, item) => {
+                    acc[item.versionId] = acc[item.versionId] || [];
+                    acc[item.versionId].push(item);
+                    return acc;
+                }, {});
 
-            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                jexcel.destroy(document.getElementById("notesTransTable"), true);
-            }
-            var json=[];
-            for (var sb = listArray.length-1; sb >= 0; sb--) {
-                var data = [];
-                data[0] = listArray[sb].versionId; 
-                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                data[3] = listArray[sb].notes;
-                data[4] = listArray[sb].lastModifiedBy.username;
-                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
-                json.push(data);
-            }
-        var options = {
-            data: json,
-            columnDrag: false,
-            columns: [
-                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
-                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
-                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                {
-                    title: i18n.t("static.common.lastModifiedBy"),
-                    type: "text",
-                  },
-                  {
-                    title: i18n.t("static.common.lastModifiedDate"),
-                    type: "calendar",
-                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                  },
-            ],
-            editable: false,
-            onload: function (instance, cell) {
-                jExcelLoadedFunction(instance,1);
-            }.bind(this),
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            // onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: "top",
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return false;
-            }.bind(this),
-        };
-        var elVar = jexcel(document.getElementById("notesTransTable"), options);
-        this.el = elVar;
-        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
-            
-        }).catch(
-            error => {
-                this.setState({
-                    loadingForNotes:false
-                })
-                if (error.message === "Network Error") {
+                Object.values(grouped).forEach(entries => {
+                    const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                    if (pendingEntries.length) {
+                        listArray.push(pendingEntries[0]);
+                        if (pendingEntries.length > 1) {
+                            listArray.push(pendingEntries[pendingEntries.length - 1]);
+                        }
+                    }
+                    listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+                });
+
+                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                    jexcel.destroy(document.getElementById("notesTransTable"), true);
+                }
+                var json = [];
+                for (var sb = listArray.length - 1; sb >= 0; sb--) {
+                    var data = [];
+                    data[0] = listArray[sb].versionId;
+                    data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                    data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                    data[3] = listArray[sb].notes;
+                    data[4] = listArray[sb].lastModifiedBy.username;
+                    data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                    json.push(data);
+                }
+                var options = {
+                    data: json,
+                    columnDrag: false,
+                    columns: [
+                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                        { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                        { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                        {
+                            title: i18n.t("static.common.lastModifiedBy"),
+                            type: "text",
+                        },
+                        {
+                            title: i18n.t("static.common.lastModifiedDate"),
+                            type: "calendar",
+                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                        },
+                    ],
+                    editable: false,
+                    onload: function (instance, cell) {
+                        jExcelLoadedFunction(instance, 1);
+                    }.bind(this),
+                    pagination: localStorage.getItem("sesRecordCount"),
+                    search: true,
+                    columnSorting: true,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    // onselection: this.selected,
+                    oneditionend: this.onedit,
+                    copyCompatibility: true,
+                    allowExport: false,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: "top",
+                    filters: true,
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return false;
+                    }.bind(this),
+                };
+                var elVar = jexcel(document.getElementById("notesTransTable"), options);
+                this.el = elVar;
+                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+
+            }).catch(
+                error => {
                     this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                        loadingForNotes: false
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );        
+            );
     }
     /**
      * Redirects to the edit supply plan status screen on row click.
@@ -457,7 +468,8 @@ class SupplyPlanVersionAndReview extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
+                            loading: false,
+                            color: "red",
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -472,19 +484,22 @@ class SupplyPlanVersionAndReview extends Component {
                             case 406:
                                 this.setState({
                                     message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
+                                    loading: false,
+                                    color: "red",
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
+                                    loading: false,
+                                    color: "red",
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
+                                    loading: false,
+                                    color: "red",
                                 });
                                 break;
                         }
@@ -529,7 +544,8 @@ class SupplyPlanVersionAndReview extends Component {
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
+                                    loading: false,
+                                    color: "red",
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -544,19 +560,22 @@ class SupplyPlanVersionAndReview extends Component {
                                     case 406:
                                         this.setState({
                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
+                                            loading: false,
+                                            color: "red",
                                         });
                                         break;
                                     case 412:
                                         this.setState({
                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
+                                            loading: false,
+                                            color: "red",
                                         });
                                         break;
                                     default:
                                         this.setState({
                                             message: 'static.unkownError',
-                                            loading: false
+                                            loading: false,
+                                            color: "red",
                                         });
                                         break;
                                 }
@@ -587,7 +606,8 @@ class SupplyPlanVersionAndReview extends Component {
                 if (error.message === "Network Error") {
                     this.setState({
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
+                        loading: false,
+                        color: "red",
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
@@ -602,19 +622,22 @@ class SupplyPlanVersionAndReview extends Component {
                         case 406:
                             this.setState({
                                 message: error.response.data.messageCode,
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                             break;
                         case 412:
                             this.setState({
                                 message: error.response.data.messageCode,
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                             break;
                         default:
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                             break;
                     }
@@ -646,7 +669,8 @@ class SupplyPlanVersionAndReview extends Component {
                 if (error.message === "Network Error") {
                     this.setState({
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
+                        loading: false,
+                        color: "red",
                     });
                 } else {
                     switch (error.response ? error.response.status : "") {
@@ -661,19 +685,22 @@ class SupplyPlanVersionAndReview extends Component {
                         case 406:
                             this.setState({
                                 message: error.response.data.messageCode,
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                             break;
                         case 412:
                             this.setState({
                                 message: error.response.data.messageCode,
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                             break;
                         default:
                             this.setState({
                                 message: 'static.unkownError',
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                             break;
                     }
@@ -711,7 +738,8 @@ class SupplyPlanVersionAndReview extends Component {
                     });
                     this.setState({
                         matricsList: result,
-                        message: ''
+                        message: '',
+                        color: "",
                     }, () => { this.buildJexcel() })
                 }).catch(
                     error => {
@@ -725,7 +753,8 @@ class SupplyPlanVersionAndReview extends Component {
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
+                                loading: false,
+                                color: "red",
                             });
                         } else {
                             switch (error.response ? error.response.status : "") {
@@ -740,19 +769,22 @@ class SupplyPlanVersionAndReview extends Component {
                                 case 406:
                                     this.setState({
                                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
+                                        loading: false,
+                                        color: "red",
                                     });
                                     break;
                                 case 412:
                                     this.setState({
                                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
+                                        loading: false,
+                                        color: "red",
                                     });
                                     break;
                                 default:
                                     this.setState({
                                         message: 'static.unkownError',
-                                        loading: false
+                                        loading: false,
+                                        color: "red",
                                     });
                                     break;
                             }
@@ -761,14 +793,14 @@ class SupplyPlanVersionAndReview extends Component {
                 );
         }
         else if (countryId == 0) {
-            this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext') },
+            this.setState({ matricsList: [], message: i18n.t('static.program.validcountrytext'), color: "red", },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     jexcel.destroy(document.getElementById("tableDiv"), true);
                 })
         }
         else {
-            this.setState({ matricsList: [], message: i18n.t('static.common.selectProgram') },
+            this.setState({ matricsList: [], message: i18n.t('static.common.selectProgram'), color: "red", },
                 () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     jexcel.destroy(document.getElementById("tableDiv"), true);
@@ -884,6 +916,201 @@ class SupplyPlanVersionAndReview extends Component {
         doc.save("SupplyPlanVersionAndReview.pdf")
     }
     /**
+     * Function to toogle reset QPL
+     */
+    toggleResetQPL() {
+        this.setState({
+            resetQPLModal: !this.state.resetQPLModal,
+            versionStatusIdResetQPL: [],
+            versionStatusIdResetQPLString: "",
+            programIdsResetQPL: [],
+            programIdsList: []
+        })
+
+    }
+    /**
+     * This function is used to set the program Ids that are selected for reset
+     * @param {*} e This is value of the event
+     */
+    setProgramIdsResetQPL(e) {
+        this.setState({
+            programIdsResetQPL: e,
+        })
+    }
+    /**
+     * This function is used to set the version status Ids that are selected for reset
+     * @param {*} e This is value of the event
+     */
+    dataChangeVersionStatus(e) {
+        this.setState({
+            versionStatusIdResetQPL: e,
+            versionStatusIdResetQPLString: e.map(ele => ele.value).toString()
+        }, () => {
+            this.getProgramListForResetQPL()
+        })
+    }
+    /**
+     * This funtion is used to get the list of programs based on version status
+     */
+    getProgramListForResetQPL() {
+        if (this.state.versionStatusIdResetQPL.length > 0) {
+            this.setState({
+                loadingResetQPL: true
+            })
+            DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPLString, FINAL_VERSION_TYPE)
+                .then(response => {
+                    var listArray = response.data;
+                    var proList = [];
+                    for (var i = 0; i < listArray.length; i++) {
+                        var productJson = {
+                            label: listArray[i].code,
+                            value: listArray[i].id
+                        }
+                        proList.push(productJson);
+                    }
+                    this.setState({
+                        programIdsList: proList.sort(function (a, b) {
+                            a = a.label.toLowerCase();
+                            b = b.label.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loadingResetQPL: false,
+                        programIdsResetQPL: proList.sort(function (a, b) {
+                            a = a.label.toLowerCase();
+                            b = b.label.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
+                }).catch(
+                    error => {
+                        this.setState({
+                            programIdsList: [], programIdsResetQPL: [], loadingResetQPL: false
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loadingResetQPL: false,
+                                color: "red",
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loadingResetQPL: false,
+                                        color: "red",
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loadingResetQPL: false,
+                                        color: "red",
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loadingResetQPL: false,
+                                        color: "red",
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            this.setState({
+                programIdsList: [], programIdsResetQPL: [], loadingResetQPL: false
+            })
+        }
+    }
+    resetQPL() {
+        this.setState({
+            loadingResetQPL: true
+        })
+        let programIds = this.state.programIdsResetQPL.map((ele) =>
+            ele.value.toString()
+        );
+        ProgramService.resetQPL(programIds)
+            .then(response => {
+                this.setState({
+                    message: i18n.t("static.compareAndSelect.dataSaved"),
+                    color: "green",
+                    loadingResetQPL: false,
+                    resetQPLModal: !this.state.resetQPLModal
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                        loadingResetQPL: false,
+                        toggleResetQPL: !this.state.toggleResetQPL
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loadingResetQPL: false,
+                            color: "red",
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loadingResetQPL: false,
+                                    color: "red",
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                    loadingResetQPL: false,
+                                    color: "red",
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loadingResetQPL: false,
+                                    color: "red",
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    /**
+     * Filters the options based on the provided filter string.
+     * @param {Array} options - The array of options to filter.
+     * @param {string} filter - The filter string used to match option labels.
+     * @returns {Promise<Array>} - A promise that resolves to the filtered options.
+     */
+    filterOptions = async (options, filter) => {
+        if (filter) {
+            return options.filter((i) =>
+                i.label.toLowerCase().includes(filter.toLowerCase())
+            );
+        } else {
+            return options;
+        }
+    };
+    /**
      * Renders the Supply Plan version and review report table.
      * @returns {JSX.Element} - Supply Plan version and review report table.
      */
@@ -925,6 +1152,10 @@ class SupplyPlanVersionAndReview extends Component {
                     </option>
                 )
             }, this);
+        var statusMultiselect = [];
+        statuses.length > 0 && statuses.map((item, i) => {
+            statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
+        }, this);
         const columns = [
             {
                 text: i18n.t('static.program.program'),
@@ -963,16 +1194,27 @@ class SupplyPlanVersionAndReview extends Component {
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
                         {
                             this.state.matricsList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&
+                                    <Button
+                                        color="info"
+                                        size="md"
+                                        className="float-right mr-1"
+                                        type="button"
+                                        onClick={this.toggleResetQPL}
+                                    >
+                                        {i18n.t("static.spvr.resetQPL")}
+                                    </Button>}
+                                &nbsp;&nbsp;
                             </div>
                         }
                     </div>
@@ -1077,6 +1319,71 @@ class SupplyPlanVersionAndReview extends Component {
                         </div>
                     </CardBody>
                 </Card>
+                <Modal isOpen={this.state.resetQPLModal}
+                    className={'modal-md'}>
+                    <ModalHeader toggle={() => this.toggleResetQPL()} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
+                        <strong>{i18n.t('static.spvr.resetQPL')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div style={{ display: this.state.loadingResetQPL ? "none" : "block" }}>
+                            <FormGroup className="col-md-12">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                <div className="controls">
+                                    {/* <InputGroup>
+                                        <Input
+                                            type="select"
+                                            name="versionStatusIdResetQPL"
+                                            id="versionStatusIdResetQPL"
+                                            bsSize="sm"
+                                            value={this.state.versionStatusIdResetQPL}
+                                            onChange={(e) => { this.dataChange(e) }}
+                                        >
+                                            <option value="">{i18n.t("static.common.select")}</option>
+                                            {statusList}
+                                        </Input>
+                                    </InputGroup> */}
+                                    <MultiSelect
+                                        name="versionStatusIdResetQPL"
+                                        id="versionStatusIdResetQPL"
+                                        filterOptions={this.filterOptions}
+                                        options={statusMultiselect && statusMultiselect.length > 0 ? statusMultiselect : []}
+                                        value={this.state.versionStatusIdResetQPL}
+                                        onChange={(e) => { this.dataChangeVersionStatus(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                            <FormGroup className="col-md-12">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.programMaster')}
+                                    <span className="reportdown-box-icon  fa fa-sort-desc"></span>
+                                </Label>
+                                <div className="controls ">
+                                    <MultiSelect
+                                        name="programIdsResetQPL"
+                                        id="programIdsResetQPL"
+                                        options={this.state.programIdsList && this.state.programIdsList.length > 0 ? this.state.programIdsList : []}
+                                        filterOptions={this.filterOptions}
+                                        value={this.state.programIdsResetQPL}
+                                        onChange={(e) => { this.setProgramIdsResetQPL(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
+                                </div>
+                            </FormGroup>
+                        </div>
+                        <div style={{ display: this.state.loadingResetQPL ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.resetQPL()} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>
+                    </ModalFooter>
+                </Modal>
                 <Modal isOpen={this.state.notesPopup}
                     className={'modal-lg modalWidth ' + this.props.className}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
