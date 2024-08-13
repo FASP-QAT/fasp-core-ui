@@ -1479,7 +1479,7 @@ export default class syncPage extends Component {
               var lastSyncDate = lastSyncDateRequest.result[0];
               var result = lastSyncDateRequest.result;
               for (var i = 0; i < result.length; i++) {
-                if (result[i].id == 0) {
+                if (result[i].id === 0) {
                   var lastSyncDate = lastSyncDateRequest.result[i];
                 }
               }

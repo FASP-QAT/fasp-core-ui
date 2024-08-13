@@ -345,3 +345,28 @@ export async function filterOptions(options, filter){
     return options;
   }
 };
+/**
+ * This is function is used to round supply plan values when displayed in ARU
+ * @param {*} amc The value of supply plan parameter
+ * @returns This function returns the rounded values in terms of ARU
+ */
+export function roundARU(value, multiplier) {
+  if (multiplier != 1) {
+    if (value != null && value !== "") {
+      var aruValue = Number(value) / Number(multiplier);
+      if (Number(aruValue).toFixed(0) >= 100) {
+        return Number(aruValue).toFixed(0);
+      } else if (Number(aruValue).toFixed(1) >= 10) {
+        return Number(aruValue).toFixed(1);
+      } else if (Number(aruValue).toFixed(2) >= 1) {
+        return Number(aruValue).toFixed(2);
+      } else {
+        return Number(aruValue).toFixed(3);
+      }
+    } else {
+      return "";
+    }
+  } else {
+    return value;
+  }
+}
