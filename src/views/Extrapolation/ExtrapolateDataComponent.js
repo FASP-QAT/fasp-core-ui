@@ -2453,11 +2453,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         continue;
                     }
                     for (let i = 0; i < regionList.length; i++) {
-                        extrapolateCompleted = extrapolateCompleted + 1
-                        this.setState({
-                            syncedExtrapolations: extrapolateCompleted,
-                            syncedExtrapolationsPercentage: Math.floor(((extrapolateCompleted) / this.state.totalExtrapolatedCount) * 100)
-                        })
+                        setTimeout(() => {
+                            extrapolateCompleted++
+                            this.setState({
+                                syncedExtrapolations: extrapolateCompleted,
+                                syncedExtrapolationsPercentage: Math.floor(((extrapolateCompleted) / this.state.totalExtrapolatedCount) * 100)
+                            })
+                        }, pu * i * 1000);
+                        console.log("syncedExtrapolations", extrapolateCompleted)
                         var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
                         if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                             let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
