@@ -75,10 +75,14 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 let regionObj = selectedSpProgram.regionList.filter(c => c.regionId == supplyPlanRegionId)[0];
                 let spRegionLabel = getLabelText(regionObj.label, this.state.lang);
 
+                let forecastRegionId = parseInt(map1.get("3"));
+                let forecastRegionLabelTxt= this.state.forecastPgmRegionListDD.filter(c => c.id == forecastRegionId)[0].name;
+
                 let json = {
                     supplyPlanProgramId: supplyPlanProgramId,
                     percentOfSupplyPlan: map1.get("2"),
-                    forecastRegionId: parseInt(map1.get("3")),
+                    forecastRegionId: forecastRegionId,
+                    forecastRegionLabelTxt: forecastRegionLabelTxt,
                     supplyPlanRegionId: supplyPlanRegionId,
                     supplyPlanRegionLabelTxt: spRegionLabel
                 }
