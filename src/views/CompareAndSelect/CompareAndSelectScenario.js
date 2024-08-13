@@ -146,6 +146,7 @@ class CompareAndSelectScenario extends Component {
         this.changeTable1 = this.changeTable1.bind(this)
         this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
         this.loadedCalendar = this.loadedCalendar.bind(this);
+        this.disabledDate = this.disabledDate.bind(this);
     }
     /**
      * Handles the click event on the range picker box.
@@ -1944,6 +1945,19 @@ class CompareAndSelectScenario extends Component {
             // this.expandCompressFuntion();
         })
     }
+
+    disabledDate = (current) => {
+        // Set your min and max dates here
+        var minDate = new Date('2020-01-01'); // minimum date
+        var maxDate = new Date('2024-12-31'); // maximum date
+
+        console.log("===>", (current && (current < minDate || current > maxDate)))
+
+        return (
+            current && (current < minDate || current > maxDate)
+        );
+    }
+
     /**
      * This function is called when the date range is changed
      * @param {*} value This is the value of the daterange selected by the user
@@ -2567,6 +2581,7 @@ class CompareAndSelectScenario extends Component {
                                                                     picker="year"
                                                                     allowClear={false}
                                                                     id="date"
+                                                                    // disabledDate={this.disabledDate}
                                                                     name="date"
                                                                     onChange={this.handleYearRangeChange}
                                                                     value={[
