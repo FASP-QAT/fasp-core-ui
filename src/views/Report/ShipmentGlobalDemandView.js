@@ -34,7 +34,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1691,6 +1691,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1706,6 +1707,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1766,6 +1768,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1781,6 +1784,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1796,6 +1800,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>

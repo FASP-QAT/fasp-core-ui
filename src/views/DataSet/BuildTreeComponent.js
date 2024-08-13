@@ -60,6 +60,7 @@ import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 import PlanningUnitService from '../../api/PlanningUnitService';
 import { forEach } from 'mathjs';
+import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -13061,6 +13062,7 @@ export default class BuildTree extends Component {
                                     onChange={(e) => { this.handleRegionChange(e) }}
                                     options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
                                     labelledBy={i18n.t('static.common.regiontext')}
+                                    filterOptions={filterOptions}
                                 />
                             </div>
                         </FormGroup>
@@ -13448,6 +13450,7 @@ export default class BuildTree extends Component {
                                                         options={this.state.childrenOfList}
                                                         onChange={(e) => { this.childrenOfChanged(e) }}
                                                         value={this.state.childrenOf}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </Col>
                                             </Row>

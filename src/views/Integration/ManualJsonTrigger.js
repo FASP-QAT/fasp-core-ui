@@ -39,7 +39,7 @@ import RealmCountryService from "../../api/RealmCountryService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+import { filterOptions, hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 // Localized entity name
 const entityname = i18n.t("static.integration.manualProgramIntegration");
 /**
@@ -1293,7 +1293,7 @@ export default class ConsumptionDetails extends Component {
                             ? countryList
                             : []
                         }
-                        filterOptions={this.filterOptions}
+                        filterOptions={filterOptions}
                         disabled={this.state.loading}
                       />
                       {!!this.props.error && this.props.touched && (
@@ -1319,7 +1319,7 @@ export default class ConsumptionDetails extends Component {
                       options={
                         programList && programList.length > 0 ? programList : []
                       }
-                      filterOptions={this.filterOptions}
+                      filterOptions={filterOptions}
                       disabled={this.state.loading}
                     />
                     {!!this.props.error && this.props.touched && (

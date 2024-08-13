@@ -51,6 +51,7 @@ import CryptoJS from 'crypto-js'
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import DropdownService from '../../api/DropdownService';
 import { MultiSelect } from 'react-multi-select-component';
+import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree Template';
 const pickerLang = {
@@ -12772,6 +12773,7 @@ export default class CreateTreeTemplate extends Component {
                                                         options={this.state.childrenOfList}
                                                         onChange={(e) => { this.childrenOfChanged(e) }}
                                                         value={this.state.childrenOf}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </Col>
                                             </Row>

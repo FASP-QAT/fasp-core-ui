@@ -14,7 +14,7 @@ import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { PercentageFormatter, addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent, isSiteOnline, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { PercentageFormatter, addDoubleQuoteToRowContent, filterOptions, hideFirstComponent, hideSecondComponent, isSiteOnline, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import NumberFormat from 'react-number-format';
 import i18n from '../../i18n'
@@ -2616,6 +2616,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -2724,6 +2725,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             value={this.state.forecastingUnitIds}
                                                             onChange={(e) => { this.setForecastingUnit(e); }}
                                                             options={fuList && fuList.length > 0 ? fuList : []}
+                                                            filterOptions={filterOptions}
                                                         />}
                                                     </div>
                                                 </FormGroup>
@@ -2758,6 +2760,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             value={this.state.planningUnitIds}
                                                             onChange={(e) => { this.setPlanningUnit(e); }}
                                                             options={puList && puList.length > 0 ? puList : []}
+                                                            filterOptions={filterOptions}
                                                         />}
                                                     </div>
                                                 </FormGroup>

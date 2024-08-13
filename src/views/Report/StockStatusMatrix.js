@@ -39,7 +39,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { addDoubleQuoteToRowContent, formatter, roundAMC, roundN } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, roundAMC, roundN } from "../../CommonComponent/JavascriptCommonFunctions";
 const { RangePicker } = DatePicker;
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
@@ -2506,6 +2506,7 @@ export default class StockStatusMatrix extends React.Component {
                     <MultiSelect
                       name="tracerCategoryId"
                       id="tracerCategoryId"
+                      filterOptions={filterOptions}
                       bsSize="sm"
                       value={this.state.tracerCategoryValues}
                       onChange={(e) => {
@@ -2537,6 +2538,7 @@ export default class StockStatusMatrix extends React.Component {
                     <MultiSelect
                       name="planningUnitId"
                       id="planningUnitId"
+                      filterOptions={filterOptions}
                       bsSize="md"
                       value={this.state.planningUnitValues}
                       onChange={(e) => {

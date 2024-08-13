@@ -24,7 +24,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterCSV, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatterCSV, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -510,21 +510,6 @@ class Budgets extends Component {
         })
     }
     /**
-     * Filters the options based on the provided filter string and sort the options.
-     * @param {Array} options - The array of options to filter.
-     * @param {string} filter - The filter string to apply.
-     * @returns {Array} - The filtered array of options.
-     */
-    filterOptions = async (options, filter) => {
-        if (filter) {
-            return options.filter((i) =>
-                i.label.toLowerCase().includes(filter.toLowerCase())
-            );
-        } else {
-            return options;
-        }
-    };
-    /**
      * Renders the budget report table.
      * @returns {JSX.Element} - Budget report table.
      */
@@ -708,7 +693,7 @@ class Budgets extends Component {
                                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                     <div className="controls ">
                                         <MultiSelect
-                                            filterOptions={this.filterOptions}
+                                            filterOptions={filterOptions}
                                             bsSize="sm"
                                             name="programIds"
                                             id="programIds"
@@ -727,7 +712,7 @@ class Budgets extends Component {
                                             name="fundingSourceId"
                                             id="fundingSourceId"
                                             bsSize="md"
-                                            filterOptions={this.filterOptions}
+                                            filterOptions={filterOptions}
                                             value={this.state.fundingSourceValues}
                                             onChange={(e) => { this.handleFundingSourceChange(e) }}
                                             options={fundingSources.length > 0

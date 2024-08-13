@@ -34,7 +34,7 @@ import {
 import * as Yup from 'yup';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, filterOptions } from "../../CommonComponent/JavascriptCommonFunctions";
 import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -2070,6 +2070,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         <MultiSelect
                                                             name="planningUnitIdsPlan"
                                                             id="planningUnitIdsPlan"
+                                                            filterOptions={filterOptions}
                                                             options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnitIdsPlan}
                                                             onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}
@@ -2180,6 +2181,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <MultiSelect
                                             name="planningUnitIdsExport"
                                             id="planningUnitIdsExport"
+                                            filterOptions={filterOptions}
                                             options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                             value={this.state.planningUnitIdsExport}
                                             onChange={(e) => { this.setPlanningUnitIdsExport(e) }}

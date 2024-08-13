@@ -32,7 +32,7 @@ import * as Yup from 'yup';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, filterOptions } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -5357,6 +5357,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                             <div className="controls edit">
                                                                 <MultiSelect
                                                                     name="procurementAgentId"
+                                                                    filterOptions={filterOptions}
                                                                     id="procurementAgentId"
                                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                                                     value={this.state.procurementAgents}
@@ -5372,6 +5373,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 <MultiSelect
                                                                     name="fundingSourceId"
                                                                     id="fundingSourceId"
+                                                                    filterOptions={filterOptions}
                                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                                     value={this.state.fundingSources}
                                                                     onChange={(e) => { this.setFundingSources(e) }}
