@@ -493,6 +493,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
+        console.log('startDate: '+startDate);
+        console.log('stopDate: '+stopDate);
+
         var tableJson = this.el2.getJson(null, false);
         console.log('tableJson length: ', tableJson.length);
         if (tableJson.length > 0) {
@@ -1290,7 +1293,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                     data = [];
                     let planningUnitObj = this.state.planningUnitList.filter(c => c.id == puList[k].id)[0]; // filter PU list of Forecast Program
-                    if (k == 0) {
+                    if (k == 0) {//for sp programCode header row
                         data[0] = papuList[j].program.programCode;
                         data[1] = '0';
                         data[2] = '0';
@@ -1303,9 +1306,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         data[9] = '0';
                         data[10] = '0';
                         data[11] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.id : "";
-                        data[12] = 1;
+                        data[12] = 1;//is sp program code header
                         data[13] = papuList[j].program.programId;
                         data[14] = papuList[j].program.versionId;
+                        data[15] = papuList[j].program.programCode;
                         papuDataArr[count] = data;
                         count++;
                     }
@@ -1332,6 +1336,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         data[12] = row[12];
                         data[13] = row[13];
                         data[14] = row[14];
+                        data[15] = row[15];
 
                         papuDataArr[count] = data;
                         count++;
@@ -1365,9 +1370,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         }
 
                         data[11] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.id : "";
-                        data[12] = 0;
+                        data[12] = 0;//is sp program code header
                         data[13] = papuList[j].program.programId;
                         data[14] = papuList[j].program.versionId;
+                        data[15] = papuList[j].program.programCode;
                         papuDataArr[count] = data;
                         count++;
                     }
@@ -1464,7 +1470,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'ProgramCode',
+                    title: 'isProgramCodeHeader',
                     type: 'hidden',
                     readOnly: true
                 },
@@ -1475,6 +1481,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 },
                 {
                     title: 'Supply Plan Version Id',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: 'Supply Plan Program Code',
                     type: 'hidden',
                     readOnly: true
                 }
@@ -1758,6 +1769,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var tempId = sel.options[sel.selectedIndex].text;
             let forecastProgramVersionId = tempId.split('~')[1];
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == event.target.value && c.versionId == forecastProgramVersionId)[0]
+            console.log('selectedForecastProgram: ',selectedForecastProgram);
+            
             let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
             let forecastStopDate = new Date('01-' + selectedForecastProgram.forecastStartDate);
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
@@ -1800,6 +1813,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
             var isProgramHeader = this.el.getValueFromCoords(12, y);
+            var spProgramId = this.el.getValueFromCoords(13, y);
             // console.log('y: '+y+', checkValidation value: ',value);
             // console.log('isProgramHeader: ',isProgramHeader);
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
@@ -1815,7 +1829,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     for (var i = (json.length - 1); i >= 0; i--) {
                         var map = new Map(Object.entries(json[i]));
                         var planningUnitValue = map.get("7");
-                        if (planningUnitValue == value && y != i && i > y) {
+                        var spProgramId2 = map.get("13");
+                        if (planningUnitValue == value && y != i && i > y && spProgramId2 == spProgramId) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
@@ -1866,15 +1881,34 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
+            console.log('step 1 tableJson: ',tableJson);
+
+            // data[12] = 0;//is sp program code header
+            // data[13] = papuList[j].program.programId;
+            // data[14] = papuList[j].program.versionId;
+            // data[15] = papuList[j].program.programCode;
+
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
+
+                //skip program code headaer row
+                let isProgramCodeHeader = parseInt(map1.get("12"));
+                if(isProgramCodeHeader == 1) {
+                    continue;
+                }
                 let json = {
                     supplyPlanPlanningUnitId: parseInt(map1.get("1")),
                     forecastPlanningUnitId: parseInt(map1.get("7")),
                     multiplier: map1.get("9").toString().replace(/,/g, ""),
+                    supplyPlanProgramId:parseInt(map1.get("13")),
+                    supplyPlanVersionId: parseInt(map1.get("14")),
+                    supplyPlanProgramCode: map1.get("15")
                 }
                 changedpapuList.push(json);
             }
+            console.log('stepOneData length:', changedpapuList.length);
+            console.log('stepOneData :'+ JSON.stringify(changedpapuList));
+            // console.log('supplyPlanPlanningUnitIds: '+ changedpapuList.map(c => c.supplyPlanPlanningUnitId));
 
             //save supply plan program & version mapping data (table1) to state
             var tableJson2 = this.el2.getJson(null, false);

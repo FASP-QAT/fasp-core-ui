@@ -62,13 +62,36 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                let json = {
-                    supplyPlanRegionId: parseInt(map1.get("0")),
-                    isRegionInForecastProgram: parseInt(map1.get("2")),
-                    importRegion: parseInt(map1.get("3")),
+                let isProgramHeader = parseInt(map1.get("4"));
+                let isDoNotImport = parseInt(map1.get("3"));//forecast region column 
+                if (isProgramHeader == 1 || isDoNotImport == -1) {//to skip these rows
+                    continue;
                 }
+
+                let supplyPlanProgramId = parseInt(map1.get("0"));
+                let supplyPlanRegionId = parseInt(map1.get("5"));
+                //filter selectedSupplyPlanPrograms to fetch region label
+                let selectedSpProgram = this.state.selectedSupplyPlanPrograms.filter(c => c.programId == supplyPlanProgramId)[0];
+                let regionObj = selectedSpProgram.regionList.filter(c => c.regionId == supplyPlanRegionId)[0];
+                let spRegionLabel = getLabelText(regionObj.label, this.state.lang);
+
+                let json = {
+                    supplyPlanProgramId: supplyPlanProgramId,
+                    percentOfSupplyPlan: map1.get("2"),
+                    forecastRegionId: parseInt(map1.get("3")),
+                    supplyPlanRegionId: supplyPlanRegionId,
+                    supplyPlanRegionLabelTxt: spRegionLabel
+                }
+                
+                //old json
+                // let json = {
+                //     supplyPlanRegionId: parseInt(map1.get("0")),
+                //     isRegionInForecastProgram: parseInt(map1.get("2")),
+                //     importRegion: parseInt(map1.get("3")),
+                // }
                 changedpapuList.push(json);
             }
+            console.log('stepTwoData: '+JSON.stringify(changedpapuList));
             this.setState({
                 stepTwoData: changedpapuList,
                 selSource2: tableJson
@@ -258,6 +281,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 data[2] = '';
                 data[3] = '';
                 data[4] = 1;//is pgm code header
+                data[5] = 0;//supplyPlanRegionId
                 papuDataArr[count] = data; //to add program code heading
                 count++;
                 var regionList = papuList[j].regionList;
@@ -274,6 +298,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                         data[3] = '';
                     }
                     data[4] = 0;
+                    data[5] = regionList[k].regionId;
                     papuDataArr[count] = data;
                     count++;
 
@@ -330,6 +355,11 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 },
                 {
                     title: 'isProgramCodeHeader',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: 'supplyPlanRegionId',
                     type: 'hidden',
                     readOnly: true
                 },
