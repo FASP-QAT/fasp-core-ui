@@ -43,6 +43,7 @@ export default class ForecastingUnitListComponent extends Component {
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.dataChange=this.dataChange.bind(this);
     }
     /**
      * Builds the jexcel component to display forecasting unit list.
