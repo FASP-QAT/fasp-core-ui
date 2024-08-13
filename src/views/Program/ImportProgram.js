@@ -23,6 +23,7 @@ import StepOneImport from '../DataSet/StepOneImportDataset';
 import StepTwoImport from '../DataSet/StepTwoImportDataset';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import Minizip from 'minizip-asm.js';
+import moment from 'moment';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -314,6 +315,7 @@ export default class ImportProgram extends Component {
                                 if (programJson.actionList == undefined) {
                                     programJson.actionList = [];
                                 }
+                                var cutOffDate = programJson.cutOffDate;
                                 json.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                 var planningUnitDataList = json.programData.planningUnitDataList;
                                 for (var h = 0; h < planningUnitDataList.length; h++) {
@@ -348,7 +350,8 @@ export default class ImportProgram extends Component {
                                     openCount: openCount,
                                     addressedCount: addressedCount,
                                     programModified: programModified,
-                                    readonly: readonly
+                                    readonly: readonly,
+                                    cutOffDate:cutOffDate
                                 }
                                 var addProgramDataRequest = program2.put(json);
                                 // addProgramDataRequest.onerror = function (event) {
@@ -493,6 +496,7 @@ export default class ImportProgram extends Component {
                                                 if (programJson.actionList == undefined) {
                                                     programJson.actionList = [];
                                                 }
+                                                var cutOffDate = programJson.cutOffDate;
                                                 json.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 var planningUnitDataList = json.programData.planningUnitDataList;
                                                 for (var h = 0; h < planningUnitDataList.length; h++) {
@@ -530,7 +534,8 @@ export default class ImportProgram extends Component {
                                                     openCount: openCount,
                                                     addressedCount: addressedCount,
                                                     programModified: programModified,
-                                                    readonly: readonly
+                                                    readonly: readonly,
+                                                    cutOffDate:cutOffDate
                                                 }
                                                 temp_j++;
                                                 var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
@@ -607,8 +612,9 @@ export default class ImportProgram extends Component {
                                 const fileDataList = mz.extract(fileInfo.filepath, { password });
                                 var fileData = new TextDecoder().decode(fileDataList)
                                 var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                                var cutOffDate=programDataJson.programData.generalData.cutOffDate!=undefined && programDataJson.programData.generalData.cutOffDate!=null && programDataJson.programData.generalData.cutOffDate!=""?programDataJson.programData.generalData.cutOffDate:"";
                                 fileName[i] = {
-                                    value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.generalData.label), lan)) + "~v" + programDataJson.version, fileData: fileData
+                                    value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.generalData.label), lan)) + "~v" + programDataJson.version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""), fileData: fileData
                                 }
                                 i++;
                             });

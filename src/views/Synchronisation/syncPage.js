@@ -1555,10 +1555,10 @@ export default class syncPage extends Component {
         if (response1.status == 200) {
           var latestVersion = response1.data;
           var programRequestJson = [];
-          programRequestJson.push({ programId: (programId.split("_"))[0], versionId: -1 })
+          programRequestJson.push({ programId: (programId.split("_"))[0], versionId: -1,'cutOffDate':"" })
           if (latestVersion == programVersion) {
           } else {
-            programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion });
+            programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion,'cutOffDate':"" });
           }
           ProgramService.getAllProgramData(programRequestJson)
             .then(response => {
@@ -4251,7 +4251,7 @@ export default class syncPage extends Component {
     for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
       var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
       if (index == -1) {
-        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
+        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1,'cutOffDate':this.state.programRequestProgramJson.cutOffDate!=undefined && this.state.programRequestProgramJson.cutOffDate!=null && this.state.programRequestProgramJson.cutOffDate!=""?this.state.programRequestProgramJson.cutOffDate:"" })
       }
     }
     ProgramService.getAllProgramData(checkboxesChecked)
@@ -4408,7 +4408,8 @@ export default class syncPage extends Component {
                           openCount: 0,
                           addressedCount: 0,
                           programModified: 0,
-                          readonly: 0
+                          readonly: 0,
+                          cutOffDate:json[r].cutOffDate
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                         programQPLDetailsOs.put(programQPLDetailsJson);
