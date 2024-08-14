@@ -779,10 +779,12 @@ export default class TreeTable extends Component {
         this.buildTab1Jexcel = this.buildTab1Jexcel.bind(this);
         this.buildTab2Jexcel = this.buildTab2Jexcel.bind(this);
         this.updateTab1Data = this.updateTab1Data.bind(this);
+        this.updateTab2Data = this.updateTab2Data.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.updateState = this.updateState.bind(this);
         this.saveTreeData = this.saveTreeData.bind(this);
         this.onChangeTab1Data = this.onChangeTab1Data.bind(this);
+        this.onChangeTab2Data = this.onChangeTab2Data.bind(this);
     }
     /**
      * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
@@ -1680,6 +1682,40 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+                var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                if(rowData[14] == 2) {
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+                if(rowData[22] == 1) {
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
             } else if(rowData[35] == 5) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
@@ -1731,13 +1767,14 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
             }
         }
     }
     onChangeTab1Data = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(12, y, 1, true);
+    }
+    onChangeTab2Data = function (instance, cell, x, y, value) {
+        this.el.setValueFromCoords(37, y, 1, true);
     }
     buildTab1Jexcel() {
         var treeArray = [];
@@ -1980,6 +2017,98 @@ export default class TreeTable extends Component {
             }, 0)
         })
     }
+    filterPlanningUnit = function (instance, cell, c, r, source) {
+        var selectedForecastingUnitId = (this.state.treeTabl2El.getJson(null, false)[r-1])[8];
+        var mylist = this.state.planningUnitList.filter(c => c.forecastingUnit.id == selectedForecastingUnitId);
+        var mylist1 = mylist.map(c => {
+            return {id: c.id, name: getLabelText(c.label, this.state.lang)}
+        })
+        return mylist1.sort(function (a, b) {
+            a = a.name.toLowerCase();
+            b = b.name.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        });
+    }.bind(this)
+    updateTab2Data() {
+        this.setState({
+            // momJexcelLoader: true
+        }, () => {
+            setTimeout(() => {
+                var json = this.state.treeTabl2El.getJson(null, false);
+                var items = this.state.items;
+                for(var i = 0; i < json.length; i++){
+                    if(json[i][37] == 1){
+                        let curItem = {
+                            context: ''
+                        };
+                        curItem.context = items.filter(c => c.id == json[i][36])[0];
+                        console.log("Hello", curItem, json[i][36])
+                        // curItem.context.payload.label.label_en = json[i][3];
+                        // curItem.context.payload.nodeUnit.id = json[i][4];
+                        curItem.context.payload.label.label_en = json[i][3];
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
+
+                        if(json[i][35] == 5){
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = json[i][9];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = json[i][12];
+                        }
+                        // if(json[i][35] == 5){
+                        //     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
+                        //     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                        // }
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][32];
+                        this.getNotes();
+                        this.setState({
+                            currentItemConfig: curItem
+                        }, () => {
+                            this.updateNodeInfoInJson(curItem)
+                        })
+                    }
+                }
+                
+                // var save = false;
+                // if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
+                //     var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
+                //     if (cf == true) {
+                //         save = true;
+                //         this.setState({
+                //             deleteChildNodes: true
+                //         })
+                //     } else {
+                //     }
+                // } else {
+                //     save = true;
+                //     this.setState({
+                //         deleteChildNodes: false
+                //     })
+                // }
+                // if (save) {
+                //     this.formSubmitLoader();
+                //     if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
+                //         if (!this.state.isSubmitClicked) {
+                //             this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                //                 setTimeout(() => {
+                //                     if (this.state.addNodeFlag) {
+                //                         this.onAddButtonClick(this.state.currentItemConfig, false, null)
+                //                     } else {
+                //                         this.updateNodeInfoInJson(this.state.currentItemConfig)
+                //                     }
+                //                     this.setState({
+                //                         cursorItem: 0,
+                //                         highlightItem: 0,
+                //                         activeTab1: new Array(1).fill('1')
+                //                     })
+                //                 }, 0);
+                //             })
+                //             this.setState({ modelingTabChanged: false })
+                //         }
+                //     } else {
+                //         this.setState({ activeTab1: new Array(1).fill('2') })
+                //     }
+                // }
+            }, 0)
+        })
+    }
     buildTab2Jexcel() {
         var treeArray = [];
         var count = 0;
@@ -1998,7 +2127,7 @@ export default class TreeTable extends Component {
             var level = items[i].level;
             var fuNode = items[i].payload.nodeType.id == 4;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
-            console.log("Hello",items[i], this.state.forecastingUnitList)
+            console.log("Hello",items[i], fuNode ? currentScenario.fuNode.oneTimeUsage : "")
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
             data[3] = items[i].payload.label.label_en;
@@ -2011,19 +2140,19 @@ export default class TreeTable extends Component {
             data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
             data[11] = 0; // # PU / Interval / Patient (Reference)
-            data[12] = 0; // # PU / Interval / Patient
+            data[12] = fuNode ? "" : currentScenario.puNode.puPerVisit; // # PU / Interval / Patient
             data[13] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
             data[14] = fuNode ? currentScenario.fuNode.usageType.id : ""; // Type of Use
             data[15] = fuNode ? currentScenario.fuNode.lagInMonths : ""; // Lag in months
             data[16] = fuNode ? currentScenario.fuNode.noOfPersons : ""; // Every
-            data[17] = 0; // Unit
+            data[17] = fuNode ? "":""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
             data[18] = fuNode ? currentScenario.fuNode.noOfForecastingUnitsPerPerson : ""; // Requires
-            data[19] = ""; // Forecasting Units Unit
-            data[20] = 0; // Every
-            data[21] = 0; // Usage Period
-            data[22] = fuNode ? currentScenario.fuNode.oneTimeUsage : ""; // Single Use
-            data[23] = 0; // For
-            data[24] = 0; // Period
+            data[19] = fuNode ? currentScenario.fuNode.forecastingUnit.unit.id : ""; // Forecasting Units Unit unitList
+            data[20] = fuNode ? currentScenario.fuNode.usageFrequency : ""; // Every
+            data[21] = fuNode ? currentScenario.fuNode.usagePeriod.usagePeriodId : ""; // Usage Period usagePeriodList
+            data[22] = fuNode ? currentScenario.fuNode.oneTimeUsage.toString() == "false" ? 0 : 1 : ""; // Single Use
+            data[23] = fuNode ? currentScenario.fuNode.repeatUsagePeriod == null ? "" : currentScenario.fuNode.repeatCount : ""; // For
+            data[24] = fuNode ? currentScenario.fuNode.repeatUsagePeriod == null ? "" : currentScenario.fuNode.repeatUsagePeriod.usagePeriodId : ""; // Period usagePeriodList
             data[25] = 0; // # of FU required for period
             data[26] = 0; // # Of Months In Period
             data[27] = 0; // # of FU / month / Patient
@@ -2031,7 +2160,7 @@ export default class TreeTable extends Component {
             data[29] = 0; // # of FU required for period per Unit
             data[30] = 0; // # of FU / month / Unit
             data[31] = 0; // # of PU / month / Unit
-            data[32] = currentScenario.dataValue;
+            data[32] = currentScenario.notes;
             data[33] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
             // data[35] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : addCommasNodeValue(currentScenario.dataValue);
             data[34] = currentScenario.notes;
@@ -2097,6 +2226,7 @@ export default class TreeTable extends Component {
                         title: 'Planning Unit',
                         source: this.state.planningUnitListForDropdown,
                         type: 'dropdown',
+                        filter: this.filterPlanningUnit
                     },
                     {
                         title: 'Conversion Factor',
@@ -2105,12 +2235,12 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: '# PU / Interval / Patient (Reference)',
-                        mask: '#,##0.00', decimal: '.',
+                        decimal: '.',
                         type: 'numeric',
                     },
                     {
                         title: '# PU / Interval / Patient',
-                        mask: '#,##0.00', decimal: '.',
+                        decimal: '.',
                         type: 'numeric',
                     },
                     {
@@ -2135,13 +2265,8 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: 'Unit',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
-                    },
-                    {
-                        title: 'Planning Unit',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.nodeUnitListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Requires',
@@ -2150,8 +2275,8 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: 'Forecasting Units Unit',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.unitListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Every',
@@ -2160,13 +2285,13 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: 'Usage Period',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.usagePeriodListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'Single Use',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.booleanForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: 'For',
@@ -2175,8 +2300,8 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: 'Period',
-                        mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        source: this.state.usagePeriodListForDropdown,
+                        type: 'dropdown',
                     },
                     {
                         title: '# of FU required for period',
@@ -2226,6 +2351,14 @@ export default class TreeTable extends Component {
                         type: 'hidden',
                     },
                     {
+                        title: 'AA',
+                        type: 'hidden',
+                    },
+                    {
+                        title: 'AB',
+                        type: 'hidden',
+                    },
+                    {
                         title: 'Is Changed',
                         type: 'hidden',
                     }
@@ -2247,7 +2380,7 @@ export default class TreeTable extends Component {
                 filters: true,
                 license: JEXCEL_PRO_KEY,
                 onload: this.loadedTab2,
-                onchange: this.onChangeTab1Data,
+                onchange: this.onChangeTab2Data,
                 // onchangepage:
                 contextMenu: function (obj, x, y, e) {
                     var items = [];
@@ -2266,15 +2399,15 @@ export default class TreeTable extends Component {
                     return items;
                 }.bind(this),
             };
-            var treeTabl1El = jexcel(document.getElementById("tableDiv2"), options);
-            this.el = treeTabl1El;
+            var treeTabl2El = jexcel(document.getElementById("tableDiv2"), options);
+            this.el = treeTabl2El;
             this.setState({
-                treeTabl1El: treeTabl1El,
+                treeTabl2El: treeTabl2El,
                 loading: false,
             })
         } else {
             this.setState({
-                treeTabl1El: "",
+                treeTabl2El: "",
                 loading: false
             })
             this.el = jexcel(document.getElementById("tableDiv2"), '');
@@ -3129,12 +3262,16 @@ export default class TreeTable extends Component {
             };
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
+                var unitListForDropdown = [];
                 myResult = planningunitRequest.result;
                 var proList = []
                 this.setState({
                     unitList: myResult,
                     nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID && x.active == true)
                 }, () => {
+                    this.state.unitList.map((item, i) => {
+                        unitListForDropdown.push({id: item.unitId, name: getLabelText(item.label, this.state.lang)})
+                    })
                     var nodeUnitListPlural = [];
                     var nodeUnitListForDropdown = [];
                     for (let i = 0; i < this.state.nodeUnitList.length; i++) {
@@ -3143,7 +3280,7 @@ export default class TreeTable extends Component {
                         nodeUnit.label.label_en = nodeUnit.label.label_en + "(s)";
                         nodeUnitListPlural.push(nodeUnit);
                     }
-                    this.setState({ nodeUnitListPlural, nodeUnitListForDropdown })
+                    this.setState({ nodeUnitListPlural, nodeUnitListForDropdown, unitListForDropdown })
                 })
             }.bind(this);
         }.bind(this)
@@ -3318,11 +3455,19 @@ export default class TreeTable extends Component {
             };
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
+                var usagePeriodListForDropdown = [];
+                var booleanForDropdown = [];
                 myResult = planningunitRequest.result;
                 var proList = []
                 this.setState({
                     usagePeriodList: myResult
                 }, () => {
+                    this.state.usagePeriodList.map((item) => {
+                        usagePeriodListForDropdown.push({id: item.usagePeriodId,name: getLabelText(item.label, this.state.lang)})
+                    })
+                    booleanForDropdown.push({id: 0, name: i18n.t("static.realm.no")})
+                    booleanForDropdown.push({id: 1, name: i18n.t("static.realm.yes")})
+                    this.setState({ usagePeriodListForDropdown, booleanForDropdown })
                 })
             }.bind(this);
         }.bind(this)
@@ -3961,7 +4106,15 @@ export default class TreeTable extends Component {
                 <TabPane tabId="2">
                     <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
-                </TabPane >
+                    <div className="col-md-12 pr-lg-0">
+                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
+                            this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
+                        }}>
+                            <i className="fa fa-times"></i> {'Close'}</Button>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                    </div>
+                </TabPane>
             </>
         );
     }
