@@ -524,6 +524,7 @@ export default class CreateTreeTemplate extends Component {
             popoverOpenFirstMonthOfTarget: false,
             popoverOpenYearsOfTarget: false,
             popoverNodeUnit: false,
+            popoverOneTimeDispensing: false,
             hideFUPUNode: false,
             hidePUNode: false,
             viewMonthlyData: true,
@@ -793,6 +794,7 @@ export default class CreateTreeTemplate extends Component {
         this.toggleNodeType = this.toggleNodeType.bind(this);
         this.toggleNodeTitle = this.toggleNodeTitle.bind(this);
         this.toggleSenariotree = this.toggleSenariotree.bind(this);
+        this.toggleOneTimeDispensing = this.toggleOneTimeDispensing.bind(this);
         this.updateMomDataInDataSet = this.updateMomDataInDataSet.bind(this);
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -4465,6 +4467,14 @@ export default class CreateTreeTemplate extends Component {
     toggleTooltipNodeUnit() {
         this.setState({
             popoverNodeUnit: !this.state.popoverNodeUnit,
+        });
+    }
+    /**
+     * Toggle one time dispensing popup
+     */
+    toggleOneTimeDispensing() {
+        this.setState({
+            popoverOneTimeDispensing: !this.state.popoverOneTimeDispensing,
         });
     }
     /**
@@ -10327,6 +10337,52 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                         </div>
                                         <div className="row">
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOneTimeDispensing} target="Popover20" trigger="hover" toggle={this.toggleOneTimeDispensing}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.oneTimeDispensing')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <FormGroup check inline>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        id="oneTimeDispensingTrue"
+                                                        name="oneTimeDispensing"
+                                                        value={"true"}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString()!=""?this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString():"true") : "") == "true" ? true : false}
+                                                        onChange={(e) => {
+                                                            this.dataChange(e)
+                                                        }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio1">
+                                                        {i18n.t('static.realm.yes')}
+                                                    </Label>
+                                                </FormGroup>
+                                                <FormGroup check inline>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        id="oneTimeDispensingFalse"
+                                                        name="oneTimeDispensing"
+                                                        value={"false"}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString()!=""?this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString():"true") : "") == "true" ? false : true}
+                                                        onChange={(e) => {
+                                                            this.dataChange(e)
+                                                        }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2">
+                                                        {i18n.t('static.program.no')}
+                                                    </Label>
+                                                </FormGroup>
+                                            </FormGroup>
+                                        </div>
+                                        <div className="row">
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
                                             </FormGroup>
@@ -10532,20 +10588,6 @@ export default class CreateTreeTemplate extends Component {
                                                                 }, this)}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.repeatUsagePeriodId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                        <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="select"
-                                                            id="oneTimeDispensing"
-                                                            name="oneTimeDispensing"
-                                                            bsSize="sm"
-                                                            onChange={(e) => {
-                                                                this.dataChange(e)
-                                                            }}
-                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString()!=""?this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString():"true") : ""}>
-                                                            <option value="true">{i18n.t('static.realm.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
-                                                        </Input>
                                                     </FormGroup>
                                                     </>
                                             </>

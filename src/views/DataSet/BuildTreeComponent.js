@@ -494,6 +494,7 @@ export default class BuildTree extends Component {
             popoverOpenNodeType: false,
             popoverOpenNodeTitle: false,
             popoverNodeUnit: false,
+            popoverOneTimeDispensing: false,
             hideFUPUNode: false,
             hidePUNode: false,
             viewMonthlyData: true,
@@ -735,7 +736,7 @@ export default class BuildTree extends Component {
             currentNodeTypeId: "",
             deleteChildNodes: false,
             branchTemplateNotes: "",
-            calculateAllScenario:false,
+            calculateAllScenario: false,
             levelReorderJexcelLoader: false,
             levelReorderEl: "",
             showReorderJexcel: false,
@@ -776,6 +777,7 @@ export default class BuildTree extends Component {
         this.toggleNodeType = this.toggleNodeType.bind(this);
         this.toggleNodeTitle = this.toggleNodeTitle.bind(this);
         this.toggleSenariotree = this.toggleSenariotree.bind(this);
+        this.toggleOneTimeDispensing = this.toggleOneTimeDispensing.bind(this);
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
         this.onMoveItem = this.onMoveItem.bind(this);
@@ -2155,7 +2157,7 @@ export default class BuildTree extends Component {
                 })
             }
         }
-        if(data == "" && cf == false) {
+        if (data == "" && cf == false) {
             this.setState({
                 levelModal: true
             })
@@ -2171,7 +2173,7 @@ export default class BuildTree extends Component {
                 setTimeout(() => {
                     this.getChildrenOfList();
                     this.buildLevelReorderJexcel();
-                }, 0)  
+                }, 0)
             })
         }
     }
@@ -2238,7 +2240,7 @@ export default class BuildTree extends Component {
         for (var j = 0; j < levelNodes.length; j++) {
             var data = {};
             newParent = levelNodes[j].parent;
-            if(oldParent != newParent){
+            if (oldParent != newParent) {
                 var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
                 oldParent = newParent;
                 data.label = parentNode.length > 0 ? parentNode[0].payload.label.label_en : "";
@@ -2296,16 +2298,16 @@ export default class BuildTree extends Component {
      */
     buildLevelReorderJexcel(isShiftNode) {
         var levelNodes = [];
-        if(this.state.childrenOf.length > 0){
+        if (this.state.childrenOf.length > 0) {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
             levelNodes.sort((a, b) => a.parent - b.parent);
-                var flatListUnsorted = levelNodes;
-                var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
-                var sortedArray = sortOrderArray.sort();
-                levelNodes = [];
-                for (var i = 0; i < sortedArray.length; i++) {
-                    levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
-                }
+            var flatListUnsorted = levelNodes;
+            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+            var sortedArray = sortOrderArray.sort();
+            levelNodes = [];
+            for (var i = 0; i < sortedArray.length; i++) {
+                levelNodes.push(flatListUnsorted.filter(c => c.newSortOrder ? c.newSortOrder == sortedArray[i] : c.sortOrder == sortedArray[i])[0]);
+            }
             let tempList = this.state.childrenOf.map(co => co.value);
             levelNodes = levelNodes.filter(m => tempList.includes(m.parent));
         }
@@ -2319,9 +2321,9 @@ export default class BuildTree extends Component {
         for (var j = 0; j < levelNodes.length; j++) {
             data = [];
             newParent = levelNodes[j].parent;
-            if(oldParent != newParent){
+            if (oldParent != newParent) {
                 dropdownSources[count] = [];
-                dropdownSources[count].push({id: 0, name: "Parent Node"});
+                dropdownSources[count].push({ id: 0, name: "Parent Node" });
                 var parentNode = this.state.curTreeObj.tree.flatList.filter(m => m.id == levelNodes[j].parent);
                 levelCount = 1;
                 oldParent = newParent;
@@ -2334,9 +2336,9 @@ export default class BuildTree extends Component {
                 j--;
             } else {
                 dropdownSources[count] = [];
-                dropdownSources[count].push({id: levelCount, name: levelCount.toString()});
+                dropdownSources[count].push({ id: levelCount, name: levelCount.toString() });
                 data[0] = levelNodes[j].sortOrder;
-                data[1] = "Position "+levelCount.toString();
+                data[1] = "Position " + levelCount.toString();
                 data[2] = levelNodes[j].payload.label.label_en;
                 data[3] = levelNodes[j].id;
                 data[4] = newParent;
@@ -2462,8 +2464,8 @@ export default class BuildTree extends Component {
      */
     updateReorderTable(instance, cell, col, row) {
         var rowData = instance.getRowData(row);
-        var rowDataPrev = instance.getRowData(row-1);
-        var rowDataNext = instance.getRowData(row+1);
+        var rowDataPrev = instance.getRowData(row - 1);
+        var rowDataNext = instance.getRowData(row + 1);
         var showUpArrow = rowDataPrev[1] != 'Parent Node' && rowDataPrev[1] != undefined ? true : false;
         var showDownArrow = rowDataNext[1] != 'Parent Node' && rowDataNext[1] != undefined ? true : false;
         if (col === 5 && rowData[1] != 'Parent Node' && showUpArrow) {
@@ -2515,12 +2517,12 @@ export default class BuildTree extends Component {
         let pId = items.filter(f => f.id == currNode[0].id)[0].parent;
         var pObj = items.filter(f => f.id == pId)[0];
         let newItems = items.filter(f => f.parent == pId);
-        for(let i = 0; i < newItems.length; i++) {
+        for (let i = 0; i < newItems.length; i++) {
             var ns = items.findIndex(f => f.id == newItems[i].id);
-            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 10 ? '0'+(i+1) : i+1);
+            items[ns].newSortOrder = pObj.sortOrder + "." + (i < 10 ? '0' + (i + 1) : i + 1);
         }
-        this.setState({ 
-            isLevelChanged: true, 
+        this.setState({
+            isLevelChanged: true,
             items
         }, () => {
             this.buildLevelReorderJexcel(true);
@@ -2561,8 +2563,8 @@ export default class BuildTree extends Component {
             items.forEach(item => {
                 if (item.oldSortOrder.includes(val.oldSortOrder)) {
                     var itemSplit = item.sortOrder.split(val.oldSortOrder);
-                    if(itemSplit.length > 1)
-                        item.sortOrder = val.newSortOrder+itemSplit[1];
+                    if (itemSplit.length > 1)
+                        item.sortOrder = val.newSortOrder + itemSplit[1];
                     else
                         item.sortOrder = val.newSortOrder;
                 }
@@ -3260,6 +3262,14 @@ export default class BuildTree extends Component {
         })
     }
     /**
+     * Toggle one time dispensing popup
+     */
+    toggleOneTimeDispensing() {
+        this.setState({
+            popoverOneTimeDispensing: !this.state.popoverOneTimeDispensing,
+        });
+    }
+    /**
      * Updates a specific parameter in the component state.
      * @param {string} parameterName - The name of the parameter to be updated.
      * @param {*} value - The new value of the parameter.
@@ -3884,7 +3894,7 @@ export default class BuildTree extends Component {
             var tempCalculatedValue = momListParentForMonth.length > 0 ? momListParentForMonth[0].calculatedValue : 0;
             var tempRepeatCountConvertToMonth = tempFuNode && tempFuNode.repeatUsagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId))[0].convertToMonth : 1;
             var tempNConvertToMonth = tempFuNode && tempFuNode.usagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth : 1;
-            if(this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false") {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false") {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
                 tempCalculatedValue = 0;
                 momListParent.filter(c => c.month > moment(momList[j].month).subtract(tempMonth, 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD")).map(x => tempCalculatedValue = x.calculatedValue + tempCalculatedValue);
@@ -3895,7 +3905,7 @@ export default class BuildTree extends Component {
             data[10] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(R${parseInt(j) + 1 - lagInMonths}<0,0,R${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(R${parseInt(j) + 1}<0,0,R${parseInt(j) + 1})`;
             data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[12] = this.state.currentScenario.manualChangesEffectFuture;
-            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false" ? (((tempFuNode.usageFrequency / tempNConvertToMonth) * tempFuNode.noOfForecastingUnitsPerPerson) / tempFuNode.noOfPersons): this.state.noFURequired)) : 1;
+            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false" ? (((tempFuNode.usageFrequency / tempNConvertToMonth) * tempFuNode.noOfForecastingUnitsPerPerson) / tempFuNode.noOfPersons) : this.state.noFURequired)) : 1;
             data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
@@ -4457,7 +4467,7 @@ export default class BuildTree extends Component {
             }, () => {
                 if (this.state.momEl != "") {
                     this.buildMomJexcel();
-                } else if(this.state.momElPer != "") {
+                } else if (this.state.momElPer != "") {
                     this.buildMomJexcelPercent();
                 }
             });
@@ -4784,7 +4794,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, isNaN(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", ""))) ? "" : parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "")) < 0 ? parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4) * -1) : parseFloat(parseFloat((this.state.currentTargetChangeNumber).toString().replaceAll(",", "") / monthDifference).toFixed(4)), true);
-                elInstance.setValueFromCoords(9, this.state.currentRowIndex,  "", true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, "", true);
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
@@ -5897,8 +5907,8 @@ export default class BuildTree extends Component {
             this.setState({
                 modelingTabChanged: true
             })
-        }       
-        
+        }
+
     }.bind(this);
     /**
      * This function is used to format the table like add asterisk or info to the table headers
@@ -10693,7 +10703,7 @@ export default class BuildTree extends Component {
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
                                                                     <option key={i} value={item.id}>
-                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id+ " ("+i18n.t("static.tree.conversionFUToPU")+" = "+item.multiplier+")"}
+                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id + " (" + i18n.t("static.tree.conversionFUToPU") + " = " + item.multiplier + ")"}
                                                                     </option>
                                                                 )
                                                             }, this)}
@@ -10756,6 +10766,52 @@ export default class BuildTree extends Component {
                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.lagInMonths : ""}
                                                 ></Input>
                                                 <FormFeedback className="red">{errors.lagInMonths}</FormFeedback>
+                                            </FormGroup>
+                                        </div>
+                                        <div className="row">
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOneTimeDispensing} target="Popover20" trigger="hover" toggle={this.toggleOneTimeDispensing}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.oneTimeDispensing')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <FormGroup check inline>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        id="oneTimeDispensingTrue"
+                                                        name="oneTimeDispensing"
+                                                        value={"true"}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing != undefined && this.state.currentScenario.fuNode.oneTimeDispensing != null && this.state.currentScenario.fuNode.oneTimeDispensing.toString() != "" ? this.state.currentScenario.fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? true : false}
+                                                        onChange={(e) => {
+                                                            this.dataChange(e)
+                                                        }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio1">
+                                                        {i18n.t('static.realm.yes')}
+                                                    </Label>
+                                                </FormGroup>
+                                                <FormGroup check inline>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        id="oneTimeDispensingFalse"
+                                                        name="oneTimeDispensing"
+                                                        value={"false"}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing != undefined && this.state.currentScenario.fuNode.oneTimeDispensing != null && this.state.currentScenario.fuNode.oneTimeDispensing.toString() != "" ? this.state.currentScenario.fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? false : true}
+                                                        onChange={(e) => {
+                                                            this.dataChange(e)
+                                                        }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2">
+                                                        {i18n.t('static.program.no')}
+                                                    </Label>
+                                                </FormGroup>
                                             </FormGroup>
                                         </div>
                                         <div className="row">
@@ -10959,21 +11015,7 @@ export default class BuildTree extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.repeatUsagePeriodId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                        <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span></Label>
-                                                        <Input type="select"
-                                                            id="oneTimeDispensing"
-                                                            name="oneTimeDispensing"
-                                                            bsSize="sm"
-                                                            onChange={(e) => {
-                                                                this.dataChange(e)
-                                                            }}
-                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing!=undefined && this.state.currentScenario.fuNode.oneTimeDispensing!=null && this.state.currentScenario.fuNode.oneTimeDispensing.toString()!=""?this.state.currentScenario.fuNode.oneTimeDispensing.toString():"true") : ""}>
-                                                            <option value="true">{i18n.t('static.realm.yes')}</option>
-                                                            <option value="false">{i18n.t('static.program.no')}</option>
-                                                        </Input>
-                                                    </FormGroup>
-                                                    </>
+                                                </>
                                             </>
                                             <>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2 ? 'block' : 'none' }}>
@@ -13390,11 +13432,11 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div style={{ display: this.state.loading ? "none" : "block" }}> 
+                                    <div style={{ display: this.state.loading ? "none" : "block" }}>
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.tree.editLevelName')}<span class="red Reqasterisk">*</span></Label>
                                                 </Col>
                                                 <Col>
                                                     <Input type="text"
@@ -13420,7 +13462,7 @@ export default class BuildTree extends Component {
                                                             <PopoverBody>{i18n.t('static.tooltip.levelReorderNodeUnit')}</PopoverBody>
                                                         </Popover>
                                                     </div>
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.modelingValidation.levelUnit')}
                                                         <i class="fa fa-info-circle icons pl-lg-2" id="PopoverNodeUnit" onClick={() => this.toggleTooltipNodeUnit()} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                     </Label>
                                                 </Col>
@@ -13449,7 +13491,7 @@ export default class BuildTree extends Component {
                                         <FormGroup>
                                             <Row className="align-items-center">
                                                 <Col sm="3">
-                                                    <Label style={{marginBottom: "0"}} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
+                                                    <Label style={{ marginBottom: "0" }} htmlFor="currencyId">{i18n.t('static.tree.seeChildrenOf')}</Label>
                                                 </Col>
                                                 <Col>
                                                     <MultiSelect
@@ -13465,12 +13507,12 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <p>{i18n.t('static.tree.levelChangeNote')}</p>
                                         <FormGroup>
-                                        {this.state.showReorderJexcel &&
-                                            <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
-                                                <div id="levelReorderJexcel"  style={{ display: "block" }}>
+                                            {this.state.showReorderJexcel &&
+                                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                    <div id="levelReorderJexcel" style={{ display: "block" }}>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
+                                            }
                                         </FormGroup>
                                     </div>
                                 </ModalBody>
