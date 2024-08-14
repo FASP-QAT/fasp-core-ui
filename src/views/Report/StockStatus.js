@@ -67,14 +67,15 @@ class StockStatus extends Component {
       rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-      programId: '',
+      programId: [],
       planningUnitLabel: '',
       lang: localStorage.getItem('lang'),
       exportModal: false,
       planningUnitIdsExport: [],
       type: 0,
       viewById: 1,
-      planningUnitId: "",
+      planningUnitId: [],
+      realmCountryPlanningUnitId: [],
       planningUnitIds: [],
       forecastingUnitId: "",
       forecastingUnitIds: [],
@@ -93,14 +94,19 @@ class StockStatus extends Component {
       realmCountryPlanningUnits: [],
       realmCountryPlanningUnitValues: [],
       realmCountryPlanningUnitLabels: [],
+      planningUnitList: [],
+      realmCountryPlanningUnitList: [],
+
+
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.programChange = this.programChange.bind(this);
     this.toggleExport = this.toggleExport.bind(this);
-    this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
     this.yAxisChange = this.yAxisChange.bind(this);
+    this.setViewById = this.setViewById.bind(this);
+    this.fetchData = this.fetchData.bind(this);
   }
   /**
    * Handles the change event for the program selection.
@@ -109,22 +115,69 @@ class StockStatus extends Component {
    */
   programChange(event) {
     this.setState({
-      programId: event.target.value,
-      planningUnits: [],
-      planningUnitsMulti: [],
-      planningUnitLabel: "",
-      stockStatusList: [],
-      forecastingUnits: [],
-      allForecastingUnits: [],
-      forecastingUnitIds: [],
-      matricsList: [],
-      viewById: 1,
-      planningUnitId: "",
-      forecastingUnitId: "",
-      equivalencyUnitId: "",
-      dataList: [],
+      programId: event.map(ele => ele),
+      // planningUnits: [],
+      // planningUnitsMulti: [],
+      // planningUnitLabel: "",
+      // stockStatusList: [],
+      // forecastingUnits: [],
+      // allForecastingUnits: [],
+      // forecastingUnitIds: [],
+      // matricsList: [],
+      // viewById: 1,
+      // planningUnitId: "",
+      // forecastingUnitId: "",
+      // equivalencyUnitId: "",
+      // dataList: [],
     }, () => {
-      this.getPlanningUnitAndForcastingUnit();
+      ReportService.getDropdownListByProgramIds(this.state.programId.map(ele => ele.value)).then(response => {
+        this.setState({
+          equivalencyUnitList: response.data.equivalencyUnitList,
+          planningUnitList: response.data.planningUnitList,
+          realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList
+        })
+      }).catch(
+        error => {
+          this.setState({
+            stockStatusList: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
     })
   }
   /**
@@ -1111,120 +1164,63 @@ class StockStatus extends Component {
     }
   }
   /**
-   * Retrieves the list of planning units for a selected program and version.
-   */
-  getPlanningUnit = () => {
-    let programId = document.getElementById("programId").value;
-    this.setState({
-      planningUnits: [],
-      planningUnitsMulti: [],
-    }, () => {
-      ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-        var listArray = response.data;
-        var planningUnitsMulti = []
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-          var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-          return itemLabelA > itemLabelB ? 1 : -1;
-        }).map(item => {
-          planningUnitsMulti.push({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) })
-        });
-        this.setState({
-          planningUnits: listArray,
-          planningUnitsMulti: planningUnitsMulti,
-          message: ''
-        }, () => {
-          this.filterData();
-        })
-      }).catch(
-        error => {
-          this.setState({
-            planningUnits: [],
-            planningUnitsMulti: []
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-    });
-  }
-  /**
     * Sets the planning unit based on the provided event data.
     * @param {Object} e - Event data containing planning unit information.
     */
   setPlanningUnit(e) {
     if (this.state.yaxisEquUnit > 0) {
       var selectedText = e.map(item => item.label);
+      var tempPUList = e.filter(puItem => !this.state.planningUnitId.map(ele => ele).includes(puItem));
       this.setState({
-        planningUnitIds: e,
-        planningUnitLabels: selectedText,
+        planningUnitId: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList,
         show: false,
         dataList: [],
         consumptionAdjForStockOutId: false,
         loading: false
       }, () => {
-        document.getElementById("consumptionAdjusted").checked = false;
-        // this.fetchData();
+        // document.getElementById("consumptionAdjusted").checked = false;
+        this.fetchData();
       })
     } else {
-      if (e.target.value != -1) {
+      if (this.state.yaxisEquUnit == -1) {
         this.setState({
-          planningUnitId: e.target.value,
-          planningUnitIds: [{ "label": document.getElementById("planningUnitId").selectedOptions[0].text, "value": e.target.value }],
-          planningUnitLabels: [document.getElementById("planningUnitId").selectedOptions[0].text],
+          planningUnitId: e.map(ele => ele),
           show: false,
           dataList: [],
           consumptionAdjForStockOutId: false,
           loading: false
         }, () => {
-          document.getElementById("consumptionAdjusted").checked = false;
-          // this.fetchData();
+          // document.getElementById("consumptionAdjusted").checked = false;
+          this.fetchData();
         })
-      } else {
+      }
+    }
+  }
+  setRealmCountryPlanningUnit(e) {
+    if (this.state.yaxisEquUnit > 0) {
+      var selectedText = e.map(item => item.label);
+      var tempRCPUList = e.filter(rcpuItem => !this.state.planningUnitId.map(ele => ele).includes(rcpuItem));
+      this.setState({
+        realmCountryPlanningUnitId: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempRCPUList,
+        show: false,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false
+      }, () => {
+        // document.getElementById("consumptionAdjusted").checked = false;
+        this.fetchData();
+      })
+    } else {
+      if (this.state.yaxisEquUnit == -1) {
         this.setState({
-          planningUnitId: e.target.value,
-          planningUnitIds: [],
-          planningUnitLabels: [],
+          realmCountryPlanningUnitId: e.map(ele => ele),
           show: false,
           dataList: [],
           consumptionAdjForStockOutId: false,
           loading: false
         }, () => {
-          document.getElementById("consumptionAdjusted").checked = false;
-          // this.fetchData();
+          // document.getElementById("consumptionAdjusted").checked = false;
+          this.fetchData();
         })
       }
     }
@@ -1241,187 +1237,6 @@ class StockStatus extends Component {
     }, () => {
       // this.fetchData();
     })
-  }
-  /**
-  * Retrieves planning units and forecasting units based on the selected program and version, and updates the state accordingly.
-  */
-  getPlanningUnitAndForcastingUnit = () => {
-    let programId = [];
-    programId.push(document.getElementById("programId").value);
-    var lang = this.state.lang;
-    this.setState({
-      planningUnits: [],
-      forecastingUnits: [],
-      allForecastingUnits: [],
-      show: false,
-      loading: true
-    }, () => {
-
-      var proList = [];
-
-      // AuthenticationService.setupAxiosInterceptors();
-      RealmCountryService.getRealmCountryPlanningUnitByProgramId(programId).then(response => {
-        var listArray = response.data;
-        
-        var planingUnitList = listArray.map(c => c.planningUnit);
-        const ids = planingUnitList.map(o => o.id);
-        const planningUnitList1 = planingUnitList.filter(({ id }, index) => !ids.includes(id, index + 1));
-        planningUnitList1.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, lang).toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = getLabelText(b.label, lang).toUpperCase(); // ignore upper and lowercase                   
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-
-        listArray.sort((a, b) => {
-          var itemLabelA = getLabelText(a.label, lang).toUpperCase(); // ignore upper and lowercase
-          var itemLabelB = getLabelText(b.label, lang).toUpperCase(); // ignore upper and lowercase                   
-          return itemLabelA > itemLabelB ? 1 : -1;
-        });
-        let planningUnitList = planningUnitList1;
-        let realmCountryPlanningUnitList = listArray;
-
-        let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
-        
-        if (yaxisEquUnitId != -1) {//Yes
-
-          let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
-
-          let newRealmCountryPlanningUnitList = [];
-          let newPlanningUnitList = [];
-          for (var i = 0; i < planningUnitList.length; i++) {
-            let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].id);
-            if (temp.length > 0) {
-              newPlanningUnitList.push(planningUnitList[i]);
-            }
-          }
-
-          for (var i = 0; i < realmCountryPlanningUnitList.length; i++) {
-            let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].forecastingUnit.id);
-            if (temp.length > 0) {
-              newRealmCountryPlanningUnitList.push(realmCountryPlanningUnitList[i]);
-            }
-          }
-
-          var yaxisEquUnitt = document.getElementById("yaxisEquUnit");
-          var selectedText = yaxisEquUnitt.options[yaxisEquUnitt.selectedIndex].text;
-
-          newRealmCountryPlanningUnitList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-          });
-
-          newPlanningUnitList.sort(function (a, b) {
-            a = getLabelText(a.label, lang).toLowerCase();
-            b = getLabelText(b.label, lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-          })
-
-          this.setState({
-            realmCountryPlanningUnits: newRealmCountryPlanningUnitList,
-            planningUnits: newPlanningUnitList,
-            allPlanningUnits: planningUnitList,
-            realmCountryPlanningUnitValues: newRealmCountryPlanningUnitList.map((item, i) => {
-              return ({ label: item.label.label_en, value: item.realmCountryPlanningUnitId })
-
-            }, this),
-            realmCountryPlanningUnitLabels: newRealmCountryPlanningUnitList.map((item, i) => {
-              return (item.label.label_en)
-            }, this),
-            planningUnitValues: newPlanningUnitList.map((item, i) => {
-              return ({ label: getLabelText(item.label, lang), value: item.id })
-
-            }, this),
-            planningUnitLabels: newPlanningUnitList.map((item, i) => {
-              return (getLabelText(item.label, lang))
-            }, this),
-            equivalencyUnitLabel: selectedText,
-            filteredProgramEQList: filteredProgramEQList,
-            loading: false
-          }, () => {
-            this.getEquivalencyUnitData();
-            // this.fetchData();
-          })
-        } else {//NO
-          this.setState({
-            realmCountryPlanningUnits: realmCountryPlanningUnitList.sort(function (a, b) {
-              a = getLabelText(a.planningUnit.label, lang).toLowerCase();
-              b = getLabelText(b.planningUnit.label, lang).toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
-            planningUnits: planningUnitList.sort(function (a, b) {
-              a = getLabelText(a.label, lang).toLowerCase();
-              b = getLabelText(b.label, lang).toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
-            allPlanningUnits: planningUnitList,
-            realmCountryPlanningUnitValues: realmCountryPlanningUnitList.map((item, i) => {
-              return ({ label: item.label.label_en, value: item.realmCountryPlanningUnitId })
-            }, this),
-            realmCountryPlanningUnitLabels: realmCountryPlanningUnitList.map((item, i) => {
-              return (item.label.label_en)
-            }, this),
-            planningUnitValues: planningUnitList.map((item, i) => {
-              return ({ label: getLabelText(item.label, lang), value: item.id })
-            }, this),
-            planningUnitLabels: planningUnitList.map((item, i) => {
-              return (getLabelText(item.label, lang))
-            }, this),
-            equivalencyUnitLabel: '',
-            loading: false
-          }, () => {
-            this.getEquivalencyUnitData();
-            // this.fetchData();
-          })
-        }
-      }).catch(
-        error => {
-          this.setState({
-            planningUnits: [], loading: false
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              // message: 'static.unkownError',
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-
-
-    });
-
   }
   /**
    * Updates the selected view mode in the state and triggers actions to update the UI.
@@ -1450,169 +1265,6 @@ class StockStatus extends Component {
     })
   }
   /**
-   * Updates the selected forecasting unit in the state and triggers actions to update the UI.
-   * @param {Object} e - The event object containing the selected forecasting unit value.
-   */
-  setForecastingUnit(e) {
-    if (this.state.yaxisEquUnit > 0) {
-      // var forecastingUnitId = e.target.value;
-      var selectedText = e.map(item => item.label);
-      this.setState({
-        forecastingUnitIds: e,
-        forecastingUnitLabels: selectedText,
-        dataList: [],
-        consumptionAdjForStockOutId: false,
-        loading: false
-      }, () => {
-        document.getElementById("consumptionAdjusted").checked = false;
-        // this.fetchData();
-      })
-    } else {
-      if (e.target.value != -1) {
-        this.setState({
-          forecastingUnitId: e.target.value,
-          forecastingUnitIds: [{ "label": document.getElementById("forecastingUnitId").selectedOptions[0].text, "value": e.target.value }],
-          forecastingUnitLabels: [document.getElementById("forecastingUnitId").selectedOptions[0].text],
-          dataList: [],
-          consumptionAdjForStockOutId: false,
-          loading: false
-        }, () => {
-          document.getElementById("consumptionAdjusted").checked = false;
-          // this.fetchData();
-        })
-      } else {
-        this.setState({
-          forecastingUnitId: e.target.value,
-          forecastingUnitIds: [],
-          forecastingUnitLabels: [],
-          dataList: [],
-          consumptionAdjForStockOutId: false,
-          loading: false
-        }, () => {
-          document.getElementById("consumptionAdjusted").checked = false;
-          // this.fetchData();
-        })
-      }
-    }
-  }
-  /**
-   * Fetches equivalency unit data based on the selected program and version.
-   */
-  getEquivalencyUnitData() {
-    let programId = document.getElementById("programId").value;
-    this.setState({
-      loading: true
-    }, () => {
-      if (programId > 0) {
-        EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
-          if (response.status == 200) {
-            var listArray = response.data;
-
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-              var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-
-            var filteredEquList = []
-            for (var i = 0; i < listArray.length; i++) {
-              if (listArray[i].program != null) {
-                if (listArray[i].program.id == programId && listArray[i].active == true) {
-                  filteredEquList.push(listArray[i]);
-                }
-              } else {
-                filteredEquList.push(listArray[i]);
-              }
-            }
-
-            let fuList = this.state.allForecastingUnits;
-            let newList = [];
-            for (var i = 0; i < filteredEquList.length; i++) {
-              let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
-              if (temp.length > 0) {
-                newList.push(filteredEquList[i]);
-              }
-            }
-
-            filteredEquList = newList;
-
-            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
-            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
-            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
-
-            var lang = this.state.lang;
-            this.setState({
-              equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
-                a = getLabelText(a.label, lang).toLowerCase();
-                b = getLabelText(b.label, lang).toLowerCase();
-                return a < b ? -1 : a > b ? 1 : 0;
-              }),
-              programEquivalencyUnitList: filteredEquList,
-            }, () => {
-              // this.fetchData();
-            })
-          } else {
-            this.setState({
-              message: response.data.messageCode, loading: false
-            },
-              () => {
-                hideSecondComponent();
-              })
-          }
-
-        })
-          .catch(
-            error => {
-              if (error.message === "Network Error") {
-                this.setState({
-                  // message: 'static.unkownError',
-                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                  loading: false,
-                  color: "#BA0C2F",
-                });
-              } else {
-                switch (error.response ? error.response.status : "") {
-
-                  case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`)
-                    break;
-                  case 403:
-                    this.props.history.push(`/accessDenied`)
-                    break;
-                  case 500:
-                  case 404:
-                  case 406:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false,
-                      color: "#BA0C2F",
-                    });
-                    break;
-                  case 412:
-                    this.setState({
-                      message: error.response.data.messageCode,
-                      loading: false,
-                      color: "#BA0C2F",
-                    });
-                    break;
-                  default:
-                    this.setState({
-                      message: 'static.unkownError',
-                      loading: false,
-                      color: "#BA0C2F",
-                    });
-                    break;
-                }
-              }
-            }
-          );
-      }
-      this.setState({
-        loading: false
-      })
-    })
-  }
-  /**
   * Handles the change event for the Y-axis equivalency unit.
   * @param {object} e - The event object
   */
@@ -1620,26 +1272,84 @@ class StockStatus extends Component {
     var yaxisEquUnit = e.target.value;
     this.setState({
       yaxisEquUnit: yaxisEquUnit,
-      planningUnits: [],
-      planningUnitIds: [],
-      planningUnitValues: [],
-      planningUnitLabels: [],
-      foreastingUnits: [],
-      forecastingUnitIds: [],
-      foreastingUnitValues: [],
-      foreastingUnitLabels: [],
-      planningUnitId: "",
-      forecastingUnitId: "",
-      dataList: [],
-      loading: false
+      // planningUnits: [],
+      // planningUnitIds: [],
+      // planningUnitValues: [],
+      // planningUnitLabels: [],
+      // foreastingUnits: [],
+      // forecastingUnitIds: [],
+      // foreastingUnitValues: [],
+      // foreastingUnitLabels: [],
+      // planningUnitId: "",
+      // forecastingUnitId: "",
+      // dataList: [],
+      // loading: false
     }, () => {
       if (yaxisEquUnit > 0) {//Yes
-        this.getPlanningUnitAndForcastingUnit();
+        // this.getPlanningUnitAndForcastingUnit();
       } else {//NO
-        this.getPlanningUnitAndForcastingUnit();
+        // this.getPlanningUnitAndForcastingUnit();
         // this.fetchData();
       }
     })
+  }
+  fetchData() {
+    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    let inputjson = {
+      "aggregate": this.state.programId.length == 1 ? false : true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
+      "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
+      "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
+      "startDate":  startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
+      "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+      "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
+      "reportingUnitIds": this.state.viewById ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
+      "reportingUnitId": this.state.viewById ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value), // Will be used only if aggregate is false
+      "equivalencyUnitId": this.state.yaxisEquUnit
+    }
+    ReportService.getStockStatusData(inputjson).then((response) => {
+      console.log("Hello",response)
+    }).catch(
+      error => {
+        this.setState({
+          stockStatusList: [], loading: false
+        })
+        if (error.message === "Network Error") {
+          this.setState({
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+            loading: false
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                loading: false
+              });
+              break;
+            case 412:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                loading: false
+              });
+              break;
+            default:
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+              break;
+          }
+        }
+      }
+    );
   }
   /**
    * Calls the get programs function on page load
@@ -1676,48 +1386,26 @@ class StockStatus extends Component {
     let equivalencyUnitList1 = equivalencyUnitList.length > 0
       && equivalencyUnitList.map((item, i) => {
         return (
-          <option key={i} value={item.equivalencyUnitId}>
-            {item.label.label_en}
-          </option>
-        )
-      }, this);
-
-    const { planningUnits } = this.state;
-    let planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item, i) => {
-        return (
           <option key={i} value={item.id}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
-
-    const { realmCountryPlanningUnits } = this.state;
-    let realmCountryPlanningUnitList = realmCountryPlanningUnits.length > 0
-      && realmCountryPlanningUnits.map((item, i) => {
-        return (
-          <option key={i} value={item.realmCountryPlanningUnitId}>
-            {getLabelText(item.label, this.state.lang)}
+            {item.label.label_en}
           </option>
         )
       }, this);
 
     const { programs } = this.state;
     let programList = programs.length > 0
-      && programs.map((item, i) => {
-        return (
-          <option key={i} value={item.programId}>
-            {item.programCode}
-          </option>
-        )
+      && programs.map((item) => {
+         return { value: item.programId, label: item.programCode }
       }, this);
-
-    let puList = planningUnits.length > 0 && planningUnits.map((item, i) => {
+    
+    const { planningUnitList } = this.state;
+    let puList = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
     }, this);
 
-    let rcpuList = realmCountryPlanningUnits.length > 0 && realmCountryPlanningUnits.map((item, i) => {
-      return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.realmCountryPlanningUnitId, value: item.realmCountryPlanningUnitId })
+    const { realmCountryPlanningUnitList } = this.state;
+    let rcpuList = realmCountryPlanningUnitList.length > 0 && realmCountryPlanningUnitList.map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
     }, this);
 
     const options = {
@@ -2159,7 +1847,7 @@ class StockStatus extends Component {
             </div>
           </div>
           <CardBody className="pb-lg-2  CardBodyTop">
-            <div className="TableCust" >
+            <div>
               <div ref={ref}>
                 <Form >
                   <div className=" pl-0">
@@ -2180,21 +1868,17 @@ class StockStatus extends Component {
                       </FormGroup>
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                        <div className="controls ">
-                          <InputGroup>
-                            <Input
-                              type="select"
+                          <div className="controls">
+                            <MultiSelect
                               name="programId"
                               id="programId"
                               bsSize="sm"
-                              onChange={(e) => { this.programChange(e); }}
+                              options={programList.length > 0 ? programList : []}
                               value={this.state.programId}
-                            >
-                              <option value="0">{i18n.t('static.common.select')}</option>
-                              {programList}
-                            </Input>
-                          </InputGroup>
-                        </div>
+                              onChange={(e) => { this.programChange(e); }}
+                              labelledBy={i18n.t('static.common.select')}
+                            />
+                          </div>
                       </FormGroup>
                       <FormGroup className="col-md-3" id="equivelencyUnitDiv">
                         <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
@@ -2255,69 +1939,28 @@ class StockStatus extends Component {
                         </FormGroup>
                         <FormGroup id="forecastingUnitDiv" style={{ display: "none" }}>
                           <div className="controls">
-                            {this.state.yaxisEquUnit == -1 && <InputGroup>
-                              <Input
-                                type="select"
-                                name="forecastingUnitId"
-                                id="forecastingUnitId"
-                                value={this.state.forecastingUnitId}
-                                onChange={(e) => { this.setForecastingUnit(e); }}
-                                bsSize="sm"
-                                className="selectWrapText"
-                              >
-                                <option value="-1">{i18n.t('static.common.select')}</option>
-                                {realmCountryPlanningUnits.length > 0
-                                  && realmCountryPlanningUnits.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.realmCountryPlanningUnitId}>
-                                        {item.label.label_en + ' | ' + item.realmCountryPlanningUnitId}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
-                            </InputGroup>}
-                            {this.state.yaxisEquUnit != -1 && <MultiSelect
+                            <MultiSelect
                               bsSize="sm"
-                              name="forecastingUnitId"
-                              id="forecastingUnitId"
-                              value={this.state.forecastingUnitIds}
-                              onChange={(e) => { this.setForecastingUnit(e); }}
+                              name="realmCountryPlanningUnitId"
+                              id="realmCountryPlanningUnitId"
+                              value={this.state.realmCountryPlanningUnitId}
+                              onChange={(e) => { this.setRealmCountryPlanningUnit(e); }}
                               options={rcpuList && rcpuList.length > 0 ? rcpuList : []}
-                            />}
+                              hasSelectAll={this.state.yaxisEquUnit > 0 ? false : true}
+                            />
                           </div>
                         </FormGroup>
                         <FormGroup id="planningUnitDiv">
                           <div className="controls">
-                            {this.state.yaxisEquUnit == -1 && <InputGroup>
-                              <Input
-                                type="select"
-                                name="planningUnitId"
-                                id="planningUnitId"
-                                bsSize="sm"
-                                //  onChange={this.fetchData}
-                                value={this.state.planningUnitId}
-                                onChange={(e) => { this.setPlanningUnit(e); }}
-                                className="selectWrapText"
-                              >
-                                <option value="-1">{i18n.t('static.common.select')}</option>
-                                {planningUnits.length > 0
-                                  && planningUnits.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.id}>
-                                        {item.label.label_en + ' | ' + item.id}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
-                            </InputGroup>}
-                            {this.state.yaxisEquUnit != -1 && <MultiSelect
+                            <MultiSelect
                               bsSize="sm"
                               name="planningUnitId"
                               id="planningUnitId"
-                              value={this.state.planningUnitIds}
+                              value={this.state.planningUnitId}
                               onChange={(e) => { this.setPlanningUnit(e); }}
                               options={puList && puList.length > 0 ? puList : []}
-                            />}
+                              hasSelectAll={this.state.yaxisEquUnit > 0 ? false : true}
+                            />
                           </div>
                         </FormGroup>
                       </FormGroup>
