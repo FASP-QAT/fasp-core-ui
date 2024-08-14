@@ -488,6 +488,22 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/funderType/addFunderType":
+                        if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
+                    case "/funderType/listFunderType":
+                    case "/funderType/listFunderType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
+                    case "/funderType/editFunderType/:fundingSourceTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
                     case "/fundingSource/addFundingSource":
                         if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
                             return true;
@@ -497,7 +513,7 @@ class AuthenticationService {
                         if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
                             return true;
                         }
-                        break;
+                        break;                    
                     case "/fundingSource/listFundingSource":
                     case "/fundingSource/listFundingSource/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
@@ -746,7 +762,9 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    case "/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId":
+                    case "/programProduct/addCountrySpecificPrice":
+                    case "/programProduct/addCountrySpecificPrice/:planningUnitId/:programId":
+                    case "/programProduct/addCountrySpecificPrice/1/:colour/:message":
                         if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
                             return true;
                         }

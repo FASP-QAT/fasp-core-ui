@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -79,6 +79,16 @@ class StockStatusAcrossPlanningUnits extends Component {
         let versionId = document.getElementById("versionId").value;
         if (programId > 0 && versionId != 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
+            var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+            var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+            var singleValue2 = this.state.singleValue2;
+            if (moment(this.state.singleValue2.year + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                singleValue2 = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
+            }
+            this.setState({
+                minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                singleValue2: singleValue2,
+            })
             if (versionId.includes('Local')) {
                 var db1;
                 getDatabase();
@@ -548,6 +558,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
+                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
                         verList.push(version)
                     }
                 }
@@ -1103,7 +1114,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
                     </option>
                 )
             }, this);
@@ -1183,6 +1194,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         value={singleValue2}
                                                         lang={pickerLang.months}
                                                         theme="dark"
+                                                        key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(singleValue2)}
                                                         onDismiss={this.handleAMonthDissmis2}
                                                     >
                                                         <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
@@ -1250,6 +1262,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         name="tracerCategoryId"
                                                         id="tracerCategoryId"
                                                         bsSize="sm"
+                                                        filterOptions={filterOptions}
                                                         value={this.state.tracerCategoryValues}
                                                         onChange={(e) => { this.handleTracerCategoryChange(e) }}
                                                         disabled={this.state.loading}

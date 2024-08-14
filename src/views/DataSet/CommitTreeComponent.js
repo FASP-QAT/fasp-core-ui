@@ -2767,12 +2767,12 @@ export default class CommitTreeComponent extends React.Component {
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataModelingList = nodeDataModelingListUpdated;
-                                            var annualTargetCalculator=node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator;
-                                            if(annualTargetCalculator!=undefined){
-                                                var firstMonthOfTarget=node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator.firstMonthOfTarget
-                                                annualTargetCalculator.firstMonthOfTarget=moment(firstMonthOfTarget, 'YYYY-MM-DD').format("YYYY-MM")
-                                                if(annualTargetCalculator.yearsOfTarget=="" || annualTargetCalculator.actualOrTargetValueList.length==0){
-                                                    annualTargetCalculator={}
+                                            var annualTargetCalculator = node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator;
+                                            if (annualTargetCalculator != undefined) {
+                                                var firstMonthOfTarget = node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator.firstMonthOfTarget
+                                                annualTargetCalculator.firstMonthOfTarget = moment(firstMonthOfTarget, 'YYYY-MM-DD').format("YYYY-MM")
+                                                if (annualTargetCalculator.yearsOfTarget == "" || annualTargetCalculator.actualOrTargetValueList.length == 0) {
+                                                    annualTargetCalculator = {}
                                                 }
                                             }
                                             node.payload.nodeDataMap[scenarioList[ndm].id][0].annualTargetCalculator = annualTargetCalculator;

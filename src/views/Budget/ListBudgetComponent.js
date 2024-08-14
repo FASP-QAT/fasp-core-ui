@@ -213,7 +213,7 @@ class ListBudgetComponent extends Component {
       data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
       data[11] = budgetList[j].lastModifiedBy.username;
       data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null)
-      data[13] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
+      data[13] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive'));
       data[14] = budgetList[j].budgetAmt;
       data[15] = budgetList[j].usedUsdAmt;
       data[16] = budgetList[j].stopDate;
@@ -691,7 +691,7 @@ class ListBudgetComponent extends Component {
                       >
                         <option value="">{i18n.t('static.common.all')}</option>
                         <option value="true" selected>{i18n.t('static.common.active')}</option>
-                        <option value="false">{i18n.t('static.common.disabled')}</option>
+                        <option value="false">{i18n.t('static.dataentry.inactive')}</option>
                       </Input>
                     </InputGroup>
                   </div>

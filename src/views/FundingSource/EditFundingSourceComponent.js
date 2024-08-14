@@ -6,11 +6,13 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import FundingSourceService from "../../api/FundingSourceService";
 import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // Initial values for form fields
 let initialValues = {
     fundingSource: "",
     fundingSourceCode: "",
+    fundingSourceTypeId: ""
 }
 // Localized entity name
 const entityname = i18n.t('static.fundingsource.fundingsource');
@@ -21,6 +23,8 @@ const entityname = i18n.t('static.fundingsource.fundingsource');
  */
 const validationSchema = function (values) {
     return Yup.object().shape({
+        fundingSourceTypeId: Yup.string()
+        .required(i18n.t('static.funderType.funderTypeText')),
         fundingSource: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
@@ -36,6 +40,7 @@ class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            fundingSourceTypes: [],
             fundingSource: {
                 realm: {
                     label: {
@@ -52,6 +57,9 @@ class EditFundingSourceComponent extends Component {
                     label_fr: '',
                 },
                 fundingSourceCode: '',
+                fundingSourceType: {
+                    id: ''
+                }
             },
             message: '',
             lang: localStorage.getItem('lang'),
@@ -121,6 +129,70 @@ class EditFundingSourceComponent extends Component {
                 }
             }
         );
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+
+        //Fetch all funding source type list
+        //this.state.fundingSource.realm.id
+        FundingSourceService.getFundingSourceTypeListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSourceTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     /**
      * Hides the message in div2 after 30 seconds.
@@ -148,6 +220,9 @@ class EditFundingSourceComponent extends Component {
         if (event.target.name == "allowedInBudget") {
             fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
         }
+        if (event.target.name == "fundingSourceTypeId") {
+            fundingSource.fundingSourceType.id = event.target.value;
+        }
         this.setState({
             fundingSource
         },
@@ -168,6 +243,15 @@ class EditFundingSourceComponent extends Component {
      * @returns {JSX.Element} - Funding source form.
      */
     render() {
+        const { fundingSourceTypes } = this.state;
+        let fundingSourceTypeList = fundingSourceTypes.length > 0
+            && fundingSourceTypes.map((item, i) => {
+                return (
+                    <option key={i} value={item.fundingSourceTypeId}>
+                        {getLabelText(item.label, this.state.lang)} ({item.fundingSourceTypeCode})
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -179,7 +263,8 @@ class EditFundingSourceComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     fundingSource: this.state.fundingSource.label.label_en,
-                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode
+                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode,
+                                    fundingSourceTypeId: this.state.fundingSource.fundingSourceType.id
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -263,6 +348,25 @@ class EditFundingSourceComponent extends Component {
                                                         value={getLabelText(this.state.fundingSource.realm.label, this.state.lang)}
                                                     >
                                                     </Input>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        bsSize="sm"
+                                                        name="fundingSourceTypeId"
+                                                        id="fundingSourceTypeId"
+                                                        valid={!errors.fundingSourceTypeId && this.state.fundingSource.fundingSourceType.id != ''}
+                                                        invalid={touched.fundingSourceTypeId && !!errors.fundingSourceTypeId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.fundingSource.fundingSourceType.id}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {fundingSourceTypeList}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.fundingSourceTypeId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}<span className="red Reqasterisk">*</span> </Label>
@@ -361,7 +465,7 @@ class EditFundingSourceComponent extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-active2">
-                                                            {i18n.t('static.common.disabled')}
+                                                            {i18n.t('static.dataentry.inactive')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>

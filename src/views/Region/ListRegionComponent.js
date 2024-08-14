@@ -19,7 +19,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, formatter, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 // Localized entity name
 const entityname = i18n.t('static.region.region');
 /**
@@ -110,7 +110,7 @@ class RegionListComponent extends Component {
             getLabelText(ele.region.label, this.state.lang),
             formatter(ele.capacityCbm,0),
             ele.gln,
-            ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
+            ele.active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive')
         ]);
         let content = {
             margin: { top: 90, bottom: 70 },
@@ -143,7 +143,7 @@ class RegionListComponent extends Component {
         headers.push(i18n.t('static.region.gln'));
         headers.push(i18n.t('static.common.status'));
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.selRegion.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))])));
+        this.state.selRegion.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.realmCountry.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(ele.region.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.capacityCbm, ele.gln == null ? '' : ele.gln, (ele.active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive'))])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -223,7 +223,7 @@ class RegionListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -440,6 +440,7 @@ class RegionListComponent extends Component {
                                                         value={this.state.countryValues}
                                                         onChange={(e) => { this.handleChange(e) }}
                                                         options={countryList && countryList.length > 0 ? countryList : []}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>

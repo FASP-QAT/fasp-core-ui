@@ -31,7 +31,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -72,6 +72,7 @@ class StockStatus extends Component {
       exportModal: false,
       planningUnitIdsExport: [],
       type: 0,
+      planningUnitNotes:""
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -109,6 +110,18 @@ class StockStatus extends Component {
       this.setState({
         versionId: event.target.value
       }, () => {
+        var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+        var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+        var rangeValue = this.state.rangeValue;
+        if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+            var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+            rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+            // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+        }
+        this.setState({
+          minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+          rangeValue: rangeValue
+        })
         localStorage.setItem("sesVersionIdReport", this.state.versionId);
         this.filterData();
       })
@@ -176,6 +189,9 @@ class StockStatus extends Component {
           csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
         }
         csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ' : ' + ppu.reorderFrequencyInMonths + '"'))
+        if(ppu.notes!=null && ppu.notes!=undefined && ppu.notes.length>0){
+          csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ppu.notes + '"'))
+        }
         csvRow.push("")
         const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
@@ -316,9 +332,14 @@ class StockStatus extends Component {
             align: 'left'
           })
         }
+        if(ppu1.notes!=null && ppu1.notes!=undefined && ppu1.notes.length>0){
+          doc.text(i18n.t('static.program.notes') + ' : ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
+            align: 'left'
+          })
+        }
         var canv = document.getElementById("cool-canvas" + count)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg1, 'png', 50, 150, 750, 300, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, 160, 750, 300, "a" + count, 'CANVAS')
         count++
         var height = doc.internal.pageSize.height;
         let otherdata =
@@ -530,6 +551,13 @@ class StockStatus extends Component {
   filterData() {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
+    console.log("Planning Unit Id Test@123",planningUnitId);
+    if(planningUnitId!="" && planningUnitId!=0){
+      console.log("this.state.planningUnits Test@123",this.state.planningUnits);
+        this.setState({
+          planningUnitNotes:this.state.planningUnits.filter(c=>c.planningUnit.id==planningUnitId)[0].notes
+        })
+    }
     let versionId = document.getElementById("versionId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
     if (programId != 0 && versionId != 0 && planningUnitId != 0) {
@@ -2246,6 +2274,7 @@ class StockStatus extends Component {
             var programData = databytes.toString(CryptoJS.enc.Utf8)
             var version = JSON.parse(programData).currentVersion
             version.versionId = `${version.versionId} (Local)`
+            version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
             verList.push(version)
           }
         }
@@ -2302,6 +2331,18 @@ class StockStatus extends Component {
         this.setState({ message: i18n.t('static.program.validversion'), stockStatusList: [] });
       } else {
         localStorage.setItem("sesVersionIdReport", versionId);
+        var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+        var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+        var rangeValue = this.state.rangeValue;
+        if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+            var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+            rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+            // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+        }
+        this.setState({
+          minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+          rangeValue: rangeValue
+        })
         if (versionId.includes('Local')) {
           var db1;
           getDatabase();
@@ -2463,7 +2504,7 @@ class StockStatus extends Component {
       && versions.map((item, i) => {
         return (
           <option key={i} value={item.versionId}>
-            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+            {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
           </option>
         )
       }, this);
@@ -2919,6 +2960,7 @@ class StockStatus extends Component {
                             years={{ min: this.state.minDate, max: this.state.maxDate }}
                             value={rangeValue}
                             lang={pickerLang}
+                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                             onDismiss={this.handleRangeDissmis}
                           >
                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -2987,6 +3029,48 @@ class StockStatus extends Component {
                       this.state.stockStatusList.length > 0
                       &&
                       <div className="col-md-12 p-0">
+                        {this.state.stockStatusList.length > 0 && ppu != undefined &&
+                      <FormGroup className="col-md-12 pl-0" style={{ display: this.state.display }}>
+                        <ul className="legendcommitversion list-group" style={{"marginTop":"10px"}}>
+                        <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>
+                              </span>
+                            </li>
+                          {this.state.stockStatusList[0].planBasedOn == 1 ? <>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.report.shelfLife")}</b> : {ppu.shelfLife}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {formatter(this.state.stockStatusList[0].minMos, 0)}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {ppu.reorderFrequencyInMonths}
+                              </span>
+                            </li>
+                            <li><span className="redlegend "></span>
+                              <span className="legendcommitversionText">
+                                <b>{i18n.t("static.supplyPlan.maxStockMos")}</b>   : {this.state.stockStatusList[0].maxMos}
+                              </span>
+                            </li>
+                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
+                          </>}
+                        </ul>
+                        {this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes!=null && this.state.planningUnitNotes.length>0 && 
+                            <span  style={{"marginTop":"10px"}} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.planningUnitNotes}</span>
+                        }
+                      </FormGroup>
+                  }
                         <div className="col-md-12">
                           <div className="chart-wrapper chart-graph-report">
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
@@ -3006,44 +3090,15 @@ class StockStatus extends Component {
                         </div>
                       </div>}
                   </div>
-                  {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
-                    <>
-                      <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
-                        <ul className="legendcommitversion list-group">
-                          {this.state.stockStatusList[0].planBasedOn == 1 ? <>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                {i18n.t("static.supplyPlan.amcPastOrFuture")} : {ppu.monthsInPastForAmc}/{ppu.monthsInFutureForAmc}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                {i18n.t("static.report.shelfLife")} : {ppu.shelfLife}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                {i18n.t("static.supplyPlan.minStockMos")} : {formatter(this.state.stockStatusList[0].minMos, 0)}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                {i18n.t("static.supplyPlan.reorderInterval")} : {ppu.reorderFrequencyInMonths}
-                              </span>
-                            </li>
-                            <li><span className="redlegend "></span>
-                              <span className="legendcommitversionText">
-                                {i18n.t("static.supplyPlan.maxStockMos")} : {this.state.stockStatusList[0].maxMos}
-                              </span>
-                            </li>
-                          </> : <><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {formatter(this.state.stockStatusList[0].minStock, 0)}</span></li><li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {formatter(this.state.stockStatusList[0].distributionLeadTime, 0)}</span></li>
-                          </>}
-                        </ul>
-                      </FormGroup>
+                      {this.state.show && this.state.stockStatusList.length > 0 && ppu != undefined &&
                       <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                         <ul className="legendcommitversion list-group">
                           {
-                            <><li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
+                            <>
+                              <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                              <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
+                              <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
+                              <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
                               <li><span className="legendcolor" style={{ backgroundColor: "#f48521" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.lowstock')}</span></li>
                               <li><span className="legendcolor" style={{ backgroundColor: "#118b70" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.okaystock')}</span></li>
                               <li><span className="legendcolor" style={{ backgroundColor: "#edb944" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.overstock')}</span></li>
@@ -3051,7 +3106,6 @@ class StockStatus extends Component {
                           }
                         </ul>
                       </FormGroup>
-                    </>
                   }
                   {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
                     <thead>
@@ -3168,6 +3222,7 @@ class StockStatus extends Component {
                       <MultiSelect
                         name="planningUnitIdsExport"
                         id="planningUnitIdsExport"
+                        filterOptions={filterOptions}
                         options={this.state.planningUnitsMulti && this.state.planningUnitsMulti.length > 0 ? this.state.planningUnitsMulti : []}
                         value={this.state.planningUnitIdsExport}
                         onChange={(e) => { this.setPlanningUnitIdsExport(e) }}

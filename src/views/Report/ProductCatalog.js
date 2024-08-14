@@ -97,7 +97,7 @@ class ProductCatalog extends Component {
                 ele.reorderFrequencyInMonths,
                 ele.shelfLife,
                 ele.catalogPrice,
-                ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
+                ele.active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive')
             ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -179,7 +179,7 @@ class ProductCatalog extends Component {
             ele.reorderFrequencyInMonths,
             ele.shelfLife,
             ele.catalogPrice,
-            ele.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')
+            ele.active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive')
         ]);
         let content = {
             margin: { top: 90, bottom: 70 },
@@ -651,7 +651,7 @@ class ProductCatalog extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -1041,7 +1041,7 @@ class ProductCatalog extends Component {
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
                     return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+                        (row.active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive'))
                     );
                 }
             }

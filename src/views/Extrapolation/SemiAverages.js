@@ -39,14 +39,16 @@ function initializeSemiAverage(data, actualMonths) {
     let cnt = 0;
     for (let x = 1; x <= Math.floor(actualMonths / 2); x++) {
         x1 += data[x - 1].month;
+        console.log("X1 ",x)
         y1 += data[x - 1].actual;
         cnt++;
     }
     x1 = x1 / cnt;
     y1 = y1 / cnt;
     cnt = 0;
-    for (let x = Math.floor(actualMonths / 2) + 1; x <= actualMonths; x++) {
+    for (let x = actualMonths % 2 === 0 ? Math.floor(actualMonths / 2) + 1 : Math.floor(actualMonths / 2) + 2; x <= actualMonths; x++) {
         x2 += data[x - 1].month;
+        console.log("X2 ",x)
         y2 += data[x - 1].actual;
         cnt++;
     }

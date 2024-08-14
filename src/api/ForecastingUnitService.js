@@ -46,5 +46,9 @@ class ForecastingUnitService {
         return axios.post(`${API_URL}/api/forecastingUnit/tracerCategory/productCategory`, json, {}
         );
     }
+    getForcastingUnitByIdWithPrograms(forecastingUnitId) {
+        return axios.get(`${API_URL}/api/forecastingUnit/${forecastingUnitId}/withPrograms`, {}
+        );
+    }
 }
 export default new ForecastingUnitService();

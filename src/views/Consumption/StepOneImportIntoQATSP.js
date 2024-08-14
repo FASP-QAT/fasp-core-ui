@@ -635,6 +635,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 }
                             }
                         );
+                } else {
+                    this.props.updateStepOneData("loading", false);
                 }
             } else {
                 this.props.updateStepOneData("loading", false);
@@ -939,6 +941,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
      * Sets the version id in the component state on change and builds data accordingly.
      */
     setVersionId(event) {
+        if(event.target.value!=0 && event.target.value!=""){
         const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
         let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY") + "-01");
         let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY") + "-01");
@@ -1028,6 +1031,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
         }, () => {
             this.filterData(true);
         })
+    }else{
+        this.setState({
+            toggleDoNotImport:false,
+            versionId: event.target.value
+        }, () => {
+            this.filterData(true);
+        })
+    }
     }
     /**
      * Handles the selection of a forecast program ID and updates the state accordingly.
@@ -1066,7 +1077,23 @@ export default class StepOneImportMapPlanningUnits extends Component {
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(2, y);
             if (value != -1 && value != -2 && value != -3) {
-                valid = checkValidation(this.el);
+                var budgetRegx = /^\S+(?: \S+)*$/;
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
                 var col = ("D").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(3, y);
                 var reg = /^\d{1,6}(\.\d{1,6})?$/;
@@ -1158,6 +1185,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var rowData = this.el.getRowData(i);
                 if (rowData[2] == "") {
                     this.el.setValueFromCoords(2, parseInt(i), -1, true);
+                    this.el.setStyle("D"+parseInt(i), "background-color", "transparent");
+                    this.el.setComments("D"+parseInt(i), "");
                 }
             }
         } else {
@@ -1429,7 +1458,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
-                        {this.state.selSource != undefined && this.state.selSource.length != 0 && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
                             <Input
                                 className="form-check-input"
                                 type="checkbox"
@@ -1446,8 +1475,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>}
                     </div>
                 </div>
-                <div className="consumptionDataEntryTable" style={{ display: this.props.items.loading ? "none" : "block" }} >
-                    <div id="mapPlanningUnit" style={{ display: this.props.items.loading ? "none" : "block" }}>
+                <div className="consumptionDataEntryTable" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0 || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="") ? "none" : "block" }} >
+                    <div id="mapPlanningUnit" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0  || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="")  ? "none" : "block" }}>
                     </div>
                 </div>
                 <div style={{ display: this.props.items.loading ? "block" : "none" }}>

@@ -27,7 +27,7 @@ import {
 } from 'reactstrap';
 import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { filterOptions, generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { BATCH_PREFIX, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from '../../Constants.js';
@@ -591,9 +591,11 @@ export default class ShipmentDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
+                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version,
-                            value: myResult[i].id
+                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            value: myResult[i].id,
+                            cutOffDate: myResult[i].cutOffDate
                         }
                         proList.push(programJson)
                     }
@@ -728,6 +730,14 @@ export default class ShipmentDetails extends React.Component {
                                             planningUnitListForJexcel.push(productJson1)
                                         }
                                     }
+                                    var cutOffDateFromProgram=this.state.programList.filter(c=>c.value==this.state.programId)[0].cutOffDate;
+                                    var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+                                    var rangeValue = this.state.rangeValue;
+                                    if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                                        var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+                                        rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                                        localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+                                    }                                    
                                     this.setState({
                                         planningUnitList: proList.sort(function (a, b) {
                                             a = a.label.toLowerCase();
@@ -755,7 +765,9 @@ export default class ShipmentDetails extends React.Component {
                                             b = b.budgetCode.toLowerCase();
                                             return a < b ? -1 : a > b ? 1 : 0;
                                         }),
-                                        loading: false
+                                        loading: false,
+                                        minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                                        rangeValue: rangeValue,
                                     })
                                     var planningUnitIdProp = '';
                                     if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
@@ -1139,6 +1151,7 @@ export default class ShipmentDetails extends React.Component {
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
+                                                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -1167,6 +1180,7 @@ export default class ShipmentDetails extends React.Component {
                                                             id="planningUnit"
                                                             options={this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                             value={this.state.planningUnit}
+                                                            filterOptions={filterOptions}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
                                                         />
@@ -1323,6 +1337,7 @@ export default class ShipmentDetails extends React.Component {
                                                     <MultiSelect
                                                         name="planningUnitIdsPlan"
                                                         id="planningUnitIdsPlan"
+                                                        filterOptions={filterOptions}
                                                         options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                                                         value={this.state.planningUnitIdsPlan}
                                                         onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}

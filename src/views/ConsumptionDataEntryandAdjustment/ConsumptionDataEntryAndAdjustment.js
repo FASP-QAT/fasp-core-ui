@@ -1562,6 +1562,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     });
     this.setState({ onlyDownloadedProgram: !hasRole })
     hideSecondComponent();
+    if(localStorage.getItem('sessionType') === 'Online'){
     ForecastingUnitService.getForecastingUnitListAll().then(response => {
       if (response.status == 200) {
         this.setState({
@@ -1608,7 +1609,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
       }
     );
-
+    }
+    if(localStorage.getItem('sessionType') === 'Online'){
     PlanningUnitService.getAllPlanningUnitList().then(response => {
       if (response.status == 200) {
         this.setState({
@@ -1655,7 +1657,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             }
         }
     );
-
+      }
+    if(localStorage.getItem('sessionType') === 'Online'){
     TracerCategoryService.getTracerCategoryListAll()
       .then(response => {
         if (response.status == 200) {
@@ -1703,6 +1706,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
       }
     );
+    }
     // this.getDatasetList();
     this.getPrograms()
   }
@@ -2337,7 +2341,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    */
   consolidatedVersionList = (programId) => {
       const { versions } = this.state
-      var verList = versions;
+      var verList;
+      if(this.state.onlyDownloadedProgram) {
+        verList = [];
+      } else {
+        verList = versions;
+      }
       var db1;
       getDatabase();
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
