@@ -15,7 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { contrast, hideSecondComponent, filterOptions } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, filterOptions, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -1124,7 +1124,7 @@ export default class ProblemList extends React.Component {
             if (this.state.notesPopup) {
                 if (localStorage.getItem('sessionType') === 'Online') {
                     this.setState({
-                        loading:true
+                        loading: true
                     })
                     ProgramService.getNotesHistory(this.state.programId.split("_")[0])
                         .then(response => {
@@ -1135,7 +1135,7 @@ export default class ProblemList extends React.Component {
                                 acc[item.versionId].push(item);
                                 return acc;
                             }, {});
-                        
+
                             Object.values(grouped).forEach(entries => {
                                 const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
                                 if (pendingEntries.length) {
@@ -1147,9 +1147,9 @@ export default class ProblemList extends React.Component {
                                 listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
                             });
                             this.setState({
-                                currentVersionNotesHistory:listArray,
-                                loading:false
-                            },()=>{
+                                currentVersionNotesHistory: listArray,
+                                loading: false
+                            }, () => {
                                 setTimeout(function () {
                                     this.getNotes()
                                 }.bind(this), 100);
@@ -1214,7 +1214,7 @@ export default class ProblemList extends React.Component {
             var data = [];
             data[0] = listArray[sb].versionId;
             data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-            data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+            data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
             data[3] = listArray[sb].notes;
             data[4] = listArray[sb].lastModifiedBy.username;
             data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
@@ -1505,10 +1505,10 @@ export default class ProblemList extends React.Component {
                                 <div className='col-md-6'>
                                     {this.state.showProblemDashboard == 1 && this.state.programId != 0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
                                 </div>
-                                {this.state.programId != 0 && !this.state.loading && <FormGroup className="col-md-6" style={{"marginTop":"-20px"}}>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
-                                    <div className="controls " style={{"height":"97%"}}>
-                                        <InputGroup style={{"height":"97%"}}>
+                                {this.state.programId != 0 && !this.state.loading && <FormGroup className="col-md-6" style={{ "marginTop": "-20px" }}>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"(" + i18n.t('static.problemContext.viewTrans') + ")"}</small></span>
+                                    <div className="controls " style={{ "height": "97%" }}>
+                                        <InputGroup style={{ "height": "97%" }}>
                                             <Input type="textarea"
                                                 name="notes"
                                                 id="notes"

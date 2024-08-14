@@ -175,7 +175,7 @@ export default class SupplyPlanComponent extends React.Component {
             batchQtyTotalForPopup: 0,
             multiplier: 1,
             viewById: 1,
-            planningUnitNotes:""
+            planningUnitNotes: ""
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -542,9 +542,9 @@ export default class SupplyPlanComponent extends React.Component {
                 csvRow.push('')
                 csvRow.push('')
             }
-            if(this.state.viewById==1){
+            if (this.state.viewById == 1) {
                 csvRow.push("\"" + (i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
-            }else{
+            } else {
                 csvRow.push("\"" + (i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + (ele.label.replaceAll(',', '%20')).replaceAll(' ', '%20') + "\"")
             }
             csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + ele.info.monthsInPastForAMC + "\"")
@@ -561,7 +561,7 @@ export default class SupplyPlanComponent extends React.Component {
             } else {
                 csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + ele.distributionLeadTime + "\"")
             }
-            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+            if (ele.info.planningUnitNotes != null && ele.info.planningUnitNotes != undefined && ele.info.planningUnitNotes.length > 0) {
                 csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ele.info.planningUnitNotes + '"'))
             }
             csvRow.push('')
@@ -658,11 +658,11 @@ export default class SupplyPlanComponent extends React.Component {
             y = 80
             doc.setFontSize(8)
             doc.setTextColor("#002f6c");
-            if(this.state.viewById==1){
+            if (this.state.viewById == 1) {
                 doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(ele.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
                     align: 'left'
                 })
-            }else{
+            } else {
                 doc.text(i18n.t('static.planningunit.countrysku') + ' : ' + (ele.label), doc.internal.pageSize.width / 10, 90, {
                     align: 'left'
                 })
@@ -697,11 +697,11 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'left'
                 })
             }
-            if(ele.info.planningUnitNotes!=null && ele.info.planningUnitNotes!=undefined && ele.info.planningUnitNotes.length>0){
+            if (ele.info.planningUnitNotes != null && ele.info.planningUnitNotes != undefined && ele.info.planningUnitNotes.length > 0) {
                 doc.text(i18n.t('static.program.notes') + ' : ' + ele.info.planningUnitNotes, doc.internal.pageSize.width / 10, 160, {
-                  align: 'left'
+                    align: 'left'
                 })
-              }
+            }
             doc.setTextColor("#000");
             var openningArr = [...[i18n.t('static.supplyPlan.openingBalance')], ...ele.data.openingBalanceArray.map(item => item.balance)]
             var consumptionArr = [...[("-" + i18n.t('static.supplyPlan.consumption'))], ...ele.data.consumptionTotalData]
@@ -894,7 +894,7 @@ export default class SupplyPlanComponent extends React.Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: this.state.viewById==1?(this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.planningUnit.label : entityname):(this.state.aru != "" && this.state.aru != undefined && this.state.aru != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.aru.label : entityname)
+                text: this.state.viewById == 1 ? (this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.planningUnit.label : entityname) : (this.state.aru != "" && this.state.aru != undefined && this.state.aru != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.aru.label : entityname)
             },
             scales: {
                 yAxes: [{
@@ -980,7 +980,7 @@ export default class SupplyPlanComponent extends React.Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.viewById==1?(this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.planningUnit.label : entityname):(this.state.aru != "" && this.state.aru != undefined && this.state.aru != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.aru.label : entityname)
+                text: this.state.viewById == 1 ? (this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.planningUnit.label : entityname) : (this.state.aru != "" && this.state.aru != undefined && this.state.aru != null ? (this.state.programSelect).label + " (Local)" + " - " + this.state.aru.label : entityname)
             },
             scales: {
                 yAxes: [{
@@ -2222,15 +2222,15 @@ export default class SupplyPlanComponent extends React.Component {
                         <ModalBody>
                             <>
                                 <FormGroup className="col-md-12">
-                                    <Label htmlFor="appendedInputButton">{this.state.viewById==1?i18n.t('static.product.product'):i18n.t("static.planningunit.countrysku")}
+                                    <Label htmlFor="appendedInputButton">{this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t("static.planningunit.countrysku")}
                                         <span className="reportdown-box-icon  fa fa-sort-desc"></span>
                                     </Label>
                                     <div className="controls ">
                                         <MultiSelect
                                             name="planningUnitIdsExport"
                                             id="planningUnitIdsExport"
-                                            options={this.state.viewById==1?(this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []):(this.state.aruList && this.state.aruList.length > 0 ? this.state.aruList : [])}
                                             filterOptions={filterOptions}
+                                            options={this.state.viewById == 1 ? (this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []) : (this.state.aruList && this.state.aruList.length > 0 ? this.state.aruList : [])}
                                             value={this.state.planningUnitIdsExport}
                                             onChange={(e) => { this.setPlanningUnitIdsExport(e) }}
                                             labelledBy={i18n.t('static.common.select')}
@@ -2599,7 +2599,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 label: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                                                 value: myResult[i].planningUnit.id,
                                                 actualLabel: myResult[i].label,
-                                                multiplier:1
+                                                multiplier: 1
                                             }
                                             proList.push(productJson);
                                             planningList.push(myResult[i]);
@@ -2650,7 +2650,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 rcpuResult = rcpuRequest.result;
                                                 var aruList = [];
                                                 for (var i = 0; i < rcpuResult.length; i++) {
-                                                    if (rcpuResult[i].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[i].realmCountryPlanningUnitId != 0 && proList.filter(c=>c.value==rcpuResult[i].planningUnit.id).length>0  && rcpuResult[i].active == true) {
+                                                    if (rcpuResult[i].realmCountry.id == programJson.realmCountry.realmCountryId && rcpuResult[i].realmCountryPlanningUnitId != 0 && proList.filter(c => c.value == rcpuResult[i].planningUnit.id).length > 0 && rcpuResult[i].active == true) {
                                                         aruList.push({
                                                             label: getLabelText(rcpuResult[i].label, this.state.lang),
                                                             value: rcpuResult[i].realmCountryPlanningUnitId,
@@ -3209,7 +3209,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData),this.state.multiplier), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
+                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), this.state.multiplier), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
@@ -4239,10 +4239,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-4" style={{"marginTop": "-20px"}}>
-                                                    <FormGroup check inline className='pl-lg-0' style={{"paddingLeft":"0px"}}>
+                                                <FormGroup className="col-md-4" style={{ "marginTop": "-20px" }}>
+                                                    <FormGroup check inline className='pl-lg-0' style={{ "paddingLeft": "0px" }}>
                                                         <Input
-                                                            style={{"marginLeft":"0px"}}
+                                                            style={{ "marginLeft": "0px" }}
                                                             type="radio"
                                                             id="viewById"
                                                             name="viewById"
@@ -4257,10 +4257,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                             title={i18n.t('static.report.planningUnit')}>
                                                             {i18n.t('static.report.planningUnit')}
                                                         </Label>
-                                                    </FormGroup><br/>
-                                                    <FormGroup check inline className='pl-lg-0' style={{"paddingLeft":"0px"}}>
+                                                    </FormGroup><br />
+                                                    <FormGroup check inline className='pl-lg-0' style={{ "paddingLeft": "0px" }}>
                                                         <Input
-                                                            style={{"marginLeft":"0px"}}
+                                                            style={{ "marginLeft": "0px" }}
                                                             type="radio"
                                                             id="viewById"
                                                             name="viewById"
@@ -4314,7 +4314,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <div className="animated fadeIn" style={{ display: this.state.display }}>
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                    <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
                                         {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
@@ -4322,11 +4322,11 @@ export default class SupplyPlanComponent extends React.Component {
                                         {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                     </ul>
                                 </FormGroup>
-                                {this.state.planningUnitNotes!=null && this.state.planningUnitNotes!=undefined && this.state.planningUnitNotes.length>0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
-                                        <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
-                                        </ul>
-                                    </FormGroup>}
+                                {this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                    <ul className="legendcommitversion list-group">
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                    </ul>
+                                </FormGroup>}
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
@@ -4676,8 +4676,8 @@ export default class SupplyPlanComponent extends React.Component {
                         return a < b ? -1 : a > b ? 1 : 0;
                     });
                     sortedPlanningUnitData.map(planningUnit => {
-                        var planningUnitId = this.state.viewById==1?planningUnit.value:planningUnit.planningUnitId
-                        var multiplier=planningUnit.multiplier;
+                        var planningUnitId = this.state.viewById == 1 ? planningUnit.value : planningUnit.planningUnitId
+                        var multiplier = planningUnit.multiplier;
                         var programJson = {}
                         var planningUnitDataFilter = programResult.planningUnitDataList.filter(c => c.planningUnitId == planningUnitId);
                         if (planningUnitDataFilter.length > 0) {
@@ -4768,7 +4768,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 shList: shiList,
                                 minStockMoSQty: minStockMoSQty,
                                 maxStockMoSQty: maxStockMoSQty,
-                                planningUnitNotes:programPlanningUnit.notes
+                                planningUnitNotes: programPlanningUnit.notes
                             }
                             var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                             var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -5504,7 +5504,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     var chartOptions = {
                                         title: {
                                             display: true,
-                                            text: (this.state.programSelect).label + " (Local)" + " - " + this.state.viewById==1?getLabelText(programPlanningUnit.planningUnit.label, this.state.lang):planningUnit.label
+                                            text: (this.state.programSelect).label + " (Local)" + " - " + this.state.viewById == 1 ? getLabelText(programPlanningUnit.planningUnit.label, this.state.lang) : planningUnit.label
                                         },
                                         scales: {
                                             yAxes: (jsonArrForGraph.length > 0 && jsonArrForGraph[0].planBasedOn == 1 ? [{
@@ -5603,7 +5603,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         planBasedOn: programPlanningUnit.planBasedOn,
                                         minQtyPpu: roundARU(programPlanningUnit.minQty, multiplier),
                                         distributionLeadTime: programPlanningUnit.distributionLeadTime,
-                                        label:planningUnit.label
+                                        label: planningUnit.label
                                     }
                                     planningUnitData.push(planningUnitDataforExport)
                                     pcnt = pcnt + 1

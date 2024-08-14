@@ -30,8 +30,8 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
-import { MultiSelect } from "react-multi-select-component";
 import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
+import { MultiSelect } from "react-multi-select-component";
 const entityname = ""
 /**
  * Component for Supply Plan Version and Review Report.
@@ -63,13 +63,13 @@ class SupplyPlanVersionAndReview extends Component {
             versionStatusId: this.props.match.params.statusId != "" && this.props.match.params.statusId != undefined ? this.props.match.params.statusId : localStorage.getItem("sesVersionStatusSPVR") != "" && localStorage.getItem("sesVersionStatusSPVR") != null && localStorage.getItem("sesVersionStatusSPVR") != undefined ? localStorage.getItem("sesVersionStatusSPVR") : -1,
             versionTypeId: localStorage.getItem("sesVersionTypeSPVR") != "" && localStorage.getItem("sesVersionTypeSPVR") != null && localStorage.getItem("sesVersionTypeSPVR") != undefined ? localStorage.getItem("sesVersionTypeSPVR") : -1,
             lang: localStorage.getItem('lang'),
+            loadingForNotes: false,
             versionStatusIdResetQPL: [],
             versionStatusIdResetQPLString: "",
             programIdsResetQPL: [],
             resetQPLModal: false,
             programIdsList: [],
-            loadingResetQPL: false,
-            loadingForNotes:false
+            loadingResetQPL: false
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -247,12 +247,12 @@ class SupplyPlanVersionAndReview extends Component {
                 if (y != null) {
                     var rowData = obj.getRowData(y);
                     // if (rowData[2] != 2 && rowData[0] != "" && rowData[1] != "" && rowData[4] != "") {
-                        items.push({
-                            title: i18n.t('static.problemContext.viewTrans'),
-                            onclick: function () {
-                                this.getNotes(rowData[11]);
-                            }.bind(this)
-                        });
+                    items.push({
+                        title: i18n.t('static.problemContext.viewTrans'),
+                        onclick: function () {
+                            this.getNotes(rowData[11]);
+                        }.bind(this)
+                    });
                     // }
                 }
                 return items;
@@ -264,133 +264,133 @@ class SupplyPlanVersionAndReview extends Component {
             languageEl: languageEl, loading: false
         })
     }
-    getNotes(programId){
+    getNotes(programId) {
         this.toggleLarge();
         this.setState({
-            loadingForNotes:true
+            loadingForNotes: true
         })
         ProgramService.getNotesHistory(programId)
-        .then(response => {
-            var data = response.data;
-            const listArray = [];
-            const grouped = data.reduce((acc, item) => {
-                acc[item.versionId] = acc[item.versionId] || [];
-                acc[item.versionId].push(item);
-                return acc;
-            }, {});
-        
-            Object.values(grouped).forEach(entries => {
-                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
-                if (pendingEntries.length) {
-                    listArray.push(pendingEntries[0]);
-                    if (pendingEntries.length > 1) {
-                        listArray.push(pendingEntries[pendingEntries.length - 1]);
-                    }
-                }
-                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
-            });            
+            .then(response => {
+                var data = response.data;
+                const listArray = [];
+                const grouped = data.reduce((acc, item) => {
+                    acc[item.versionId] = acc[item.versionId] || [];
+                    acc[item.versionId].push(item);
+                    return acc;
+                }, {});
 
-            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                jexcel.destroy(document.getElementById("notesTransTable"), true);
-            }
-            var json=[];
-            for (var sb = listArray.length-1; sb >= 0; sb--) {
-                var data = [];
-                data[0] = listArray[sb].versionId; 
-                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                data[3] = listArray[sb].notes;
-                data[4] = listArray[sb].lastModifiedBy.username;
-                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
-                json.push(data);
-            }
-        var options = {
-            data: json,
-            columnDrag: false,
-            columns: [
-                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
-                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
-                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                {
-                    title: i18n.t("static.common.lastModifiedBy"),
-                    type: "text",
-                  },
-                  {
-                    title: i18n.t("static.common.lastModifiedDate"),
-                    type: "calendar",
-                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                  },
-            ],
-            editable: false,
-            onload: function (instance, cell) {
-                jExcelLoadedFunction(instance,1);
-            }.bind(this),
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            // onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: "top",
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return false;
-            }.bind(this),
-        };
-        var elVar = jexcel(document.getElementById("notesTransTable"), options);
-        this.el = elVar;
-        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
-            
-        }).catch(
-            error => {
-                this.setState({
-                    loadingForNotes:false
-                })
-                if (error.message === "Network Error") {
+                Object.values(grouped).forEach(entries => {
+                    const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                    if (pendingEntries.length) {
+                        listArray.push(pendingEntries[0]);
+                        if (pendingEntries.length > 1) {
+                            listArray.push(pendingEntries[pendingEntries.length - 1]);
+                        }
+                    }
+                    listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+                });
+
+                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                    jexcel.destroy(document.getElementById("notesTransTable"), true);
+                }
+                var json = [];
+                for (var sb = listArray.length - 1; sb >= 0; sb--) {
+                    var data = [];
+                    data[0] = listArray[sb].versionId;
+                    data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                    data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                    data[3] = listArray[sb].notes;
+                    data[4] = listArray[sb].lastModifiedBy.username;
+                    data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                    json.push(data);
+                }
+                var options = {
+                    data: json,
+                    columnDrag: false,
+                    columns: [
+                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                        { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                        { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                        {
+                            title: i18n.t("static.common.lastModifiedBy"),
+                            type: "text",
+                        },
+                        {
+                            title: i18n.t("static.common.lastModifiedDate"),
+                            type: "calendar",
+                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                        },
+                    ],
+                    editable: false,
+                    onload: function (instance, cell) {
+                        jExcelLoadedFunction(instance, 1);
+                    }.bind(this),
+                    pagination: localStorage.getItem("sesRecordCount"),
+                    search: true,
+                    columnSorting: true,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    // onselection: this.selected,
+                    oneditionend: this.onedit,
+                    copyCompatibility: true,
+                    allowExport: false,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: "top",
+                    filters: true,
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return false;
+                    }.bind(this),
+                };
+                var elVar = jexcel(document.getElementById("notesTransTable"), options);
+                this.el = elVar;
+                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+
+            }).catch(
+                error => {
                     this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
+                        loadingForNotes: false
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
                     }
                 }
-            }
-        );        
+            );
     }
     /**
      * Redirects to the edit supply plan status screen on row click.
@@ -953,82 +953,82 @@ class SupplyPlanVersionAndReview extends Component {
      * This funtion is used to get the list of programs based on version status
      */
     getProgramListForResetQPL() {
-        if(this.state.versionStatusIdResetQPL.length>0){
-        this.setState({
-            loadingResetQPL: true
-        })
-        DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPLString, FINAL_VERSION_TYPE)
-            .then(response => {
-                var listArray = response.data;
-                var proList = [];
-                for (var i = 0; i < listArray.length; i++) {
-                    var productJson = {
-                        label: listArray[i].code,
-                        value: listArray[i].id
+        if (this.state.versionStatusIdResetQPL.length > 0) {
+            this.setState({
+                loadingResetQPL: true
+            })
+            DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPLString, FINAL_VERSION_TYPE)
+                .then(response => {
+                    var listArray = response.data;
+                    var proList = [];
+                    for (var i = 0; i < listArray.length; i++) {
+                        var productJson = {
+                            label: listArray[i].code,
+                            value: listArray[i].id
+                        }
+                        proList.push(productJson);
                     }
-                    proList.push(productJson);
-                }
-                this.setState({
-                    programIdsList: proList.sort(function (a, b) {
-                        a = a.label.toLowerCase();
-                        b = b.label.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }), loadingResetQPL: false,
-                    programIdsResetQPL: proList.sort(function (a, b) {
-                        a = a.label.toLowerCase();
-                        b = b.label.toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    })
-                });
-            }).catch(
-                error => {
                     this.setState({
-                        programIdsList: [],programIdsResetQPL:[], loadingResetQPL: false
-                    })
-                    if (error.message === "Network Error") {
+                        programIdsList: proList.sort(function (a, b) {
+                            a = a.label.toLowerCase();
+                            b = b.label.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }), loadingResetQPL: false,
+                        programIdsResetQPL: proList.sort(function (a, b) {
+                            a = a.label.toLowerCase();
+                            b = b.label.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+                    });
+                }).catch(
+                    error => {
                         this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loadingResetQPL: false,
-                            color: "red",
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loadingResetQPL: false,
-                                    color: "red",
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loadingResetQPL: false,
-                                    color: "red",
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loadingResetQPL: false,
-                                    color: "red",
-                                });
-                                break;
+                            programIdsList: [], programIdsResetQPL: [], loadingResetQPL: false
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loadingResetQPL: false,
+                                color: "red",
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loadingResetQPL: false,
+                                        color: "red",
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loadingResetQPL: false,
+                                        color: "red",
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loadingResetQPL: false,
+                                        color: "red",
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-        }else{
+                );
+        } else {
             this.setState({
-                programIdsList: [],programIdsResetQPL:[], loadingResetQPL: false
+                programIdsList: [], programIdsResetQPL: [], loadingResetQPL: false
             })
         }
     }
@@ -1204,16 +1204,16 @@ class SupplyPlanVersionAndReview extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&  
-                                <Button
-                                    color="info"
-                                    size="md"
-                                    className="float-right mr-1"
-                                    type="button"
-                                    onClick={this.toggleResetQPL}
-                                >
-                                    {i18n.t("static.spvr.resetQPL")}
-                                </Button>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&
+                                    <Button
+                                        color="info"
+                                        size="md"
+                                        className="float-right mr-1"
+                                        type="button"
+                                        onClick={this.toggleResetQPL}
+                                    >
+                                        {i18n.t("static.spvr.resetQPL")}
+                                    </Button>}
                                 &nbsp;&nbsp;
                             </div>
                         }
