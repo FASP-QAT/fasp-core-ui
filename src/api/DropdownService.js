@@ -58,6 +58,9 @@ class DropdownService {
       {}
     );
   }
+  getProcurementAgentDropdownList() {
+    return axios.get(`${API_URL}/api/dropdown/procurementAgent`,{});
+  }
   getProgramPlanningUnitDropdownList(json) {
     return axios.post(
       `${API_URL}/api/dropdown/planningUnit/program/filter/multipleProgramAndTracerCategory`,
