@@ -22,7 +22,7 @@ import { API_URL, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, formatter, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import { MultiSelect } from 'react-multi-select-component';
 import DropdownService from '../../api/DropdownService';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -1298,21 +1298,6 @@ class CountrySpecificPrices extends Component {
         return valid;
     }
     /**
-     * Filters the options based on the provided filter string and sort the options.
-     * @param {Array} options - The array of options to filter.
-     * @param {string} filter - The filter string to apply.
-     * @returns {Array} - The filtered array of options.
-     */
-    filterOptions = async (options, filter) => {
-        if (filter) {
-            return options.filter((i) =>
-                i.label.toLowerCase().includes(filter.toLowerCase())
-            );
-        } else {
-            return options;
-        }
-    };
-    /**
      * Handles the change event for program selection.
      * @param {array} programIds - The array of selected program IDs.
      */
@@ -1597,7 +1582,7 @@ class CountrySpecificPrices extends Component {
                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                         <div className="controls ">
                                             <MultiSelect
-                                                filterOptions={this.filterOptions}
+                                                filterOptions={filterOptions}
                                                 bsSize="sm"
                                                 name="programIds"
                                                 id="programIds"
@@ -1613,7 +1598,7 @@ class CountrySpecificPrices extends Component {
                                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                         <div className="controls ">
                                             <MultiSelect
-                                                filterOptions={this.filterOptions}
+                                                filterOptions={filterOptions}
                                                 bsSize="sm"
                                                 name="planningUnitIds"
                                                 id="planningUnitIds"
