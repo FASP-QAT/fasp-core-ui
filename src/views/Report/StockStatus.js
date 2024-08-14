@@ -1302,8 +1302,8 @@ class StockStatus extends Component {
       "startDate":  startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
       "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
       "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
-      "reportingUnitIds": this.state.viewById ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
-      "reportingUnitId": this.state.viewById ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value), // Will be used only if aggregate is false
+      "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
+      "reportingUnitId": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitId.map(ele => ele.value).toString(), // Will be used only if aggregate is false
       "equivalencyUnitId": this.state.yaxisEquUnit
     }
     ReportService.getStockStatusData(inputjson).then((response) => {
