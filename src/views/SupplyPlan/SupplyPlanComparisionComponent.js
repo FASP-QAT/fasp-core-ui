@@ -786,9 +786,9 @@ export default class SupplyPlanComponent extends React.Component {
                 item.style.display="none";
             })
             }, 500);
-            curDate=moment(cutOffDate).utcOffset('-0500');
+            curDate=moment(cutOffDate);
             if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                currentDate=moment(cutOffDate).utcOffset('-0500');
+                currentDate=moment(cutOffDate);
             }
         }else{
             [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
