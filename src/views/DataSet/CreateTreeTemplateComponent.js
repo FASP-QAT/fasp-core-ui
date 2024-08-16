@@ -13440,7 +13440,7 @@ export default class CreateTreeTemplate extends Component {
                                             <Label
                                                 className="form-check-label"
                                                 check htmlFor="copyModeling" style={{ fontSize: '12px', "marginTop": '3px' }}>
-                                                Copy Modeling?
+                                                {i18n.t('static.tree.copyModeling')}
                                             </Label>
                                         </FormGroup>
                                         <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
