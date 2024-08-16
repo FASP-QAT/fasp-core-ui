@@ -804,7 +804,9 @@ export default class BuildTree extends Component {
             copyModalTreeList: [],
             copyModalParentLevelList: [],
             copyModalParentNodeList: [],
-            usage2ConvertCondition: true
+            usage2ConvertCondition: true,
+            copyModeling: true,
+            copyLoader: false
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -966,6 +968,7 @@ export default class BuildTree extends Component {
         this.copyMoveNode = this.copyMoveNode.bind(this);
         this.resetCopyMoveModal = this.resetCopyMoveModal.bind(this);
         this.toggleTooltipNodeUnit = this.toggleTooltipNodeUnit.bind(this);
+        this.setCopyModeling = this.setCopyModeling.bind(this);
     }
     /**
      * Function to check validation of the jexcel table.
@@ -2295,6 +2298,17 @@ export default class BuildTree extends Component {
         })
     }
     /**
+     * Sets the state to copy modeling data.
+     * @param {Event} e - The change event.
+     * @returns {void}
+     */
+    setCopyModeling(e) {
+        this.setState({
+            copyModeling: e.target.checked
+        }, () => {
+        })
+    }
+    /**
      * Function to get the list of all parents
      */
     getChildrenOfList() {
@@ -2967,7 +2981,6 @@ export default class BuildTree extends Component {
             }
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
-            var items = this.state.items;
             var programData = dataSetObj.programData;
             programData.treeList = treeData;
             if(!isCopy) {
@@ -2988,9 +3001,15 @@ export default class BuildTree extends Component {
                 this.setState({
                     calculateAllScenario: false
                 })
-                calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), curTreeObj.scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate).then(() => {
-                    resolve();
-                });
+                if(isCopy) {
+                    calculateModelingData(dataSetObj, this, '', -1, -1, type, [this.state.treeId, this.state.copyModalTree].toString(), false, false, this.state.autoCalculate).then(() => {
+                        resolve();
+                    });
+                } else {
+                    calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), curTreeObj.scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate).then(() => {
+                        resolve();
+                    });
+                }
             } else {
                 this.setState({
                     loading: false,
@@ -3500,12 +3519,15 @@ export default class BuildTree extends Component {
                 var nodeDataMomList = this.state.nodeDataMomList;
                 if (nodeDataMomList.length > 0) {
                     for (let i = 0; i < nodeDataMomList.length; i++) {
-                        var nodeId = nodeDataMomList[i].nodeId;
-                        var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
-                        var node = items.filter(n => n.id == nodeId)[0];
-                        (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
-                        var findNodeIndex = items.findIndex(n => n.id == nodeId);
-                        items[findNodeIndex] = node;
+                        try {
+                            var nodeId = nodeDataMomList[i].nodeId;
+                            var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                            var node = items.filter(n => n.id == nodeId)[0];
+                            (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
+                            var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                            items[findNodeIndex] = node;
+                        } catch (e) {
+                        }
                     }
                 }
                 this.setState({ items })
@@ -3924,8 +3946,6 @@ export default class BuildTree extends Component {
      */
     openScenarioModal(type) {
         var scenarioId = this.state.selectedScenario;
-        console.log("scenarioId", scenarioId)
-
         this.setState({
             scenarioActionType: type,
             showDiv1: false
@@ -7218,6 +7238,7 @@ export default class BuildTree extends Component {
         // Tree List: this.state.copyModalTreeList this.state.treeData
         // Node selected: this.state.copyModalNode
         // Current tree nodes: this.state.items  
+        this.setState({ copyLoader: true })
         var itemConfig = this.state.copyModalNode;
         var items1 = this.state.items;
         const { items } = this.state;
@@ -7295,36 +7316,40 @@ export default class BuildTree extends Component {
             var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
                 for (let i = 0; i < scenarioListNew.length; i++) {
-                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList;
-                    if (nodeDataModelingList.length > 0) {
-                        nodeDataModelingList.map((item1, c) => {
-                            var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
-                            try{
-                                item1.transferNodeDataId = newTransferId[0].newId;
-                            } catch {
-                            }
-                        })
-                    }
+                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                    (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList = nodeDataModelingList; 
                 }
             }
         })
+        let tempDatasetObj = this.state.dataSetObj;
+        tempDatasetObj.programData.treeList.filter(t => t.treeId == this.state.copyModalTree)[0].tree.flatList = updatedFlatList
+        tempDatasetObj.programData.treeList.filter(t => t.treeId == this.state.copyModalTree)[0].tree.autoCalculate = true
         this.setState({
+            dataSetObj: tempDatasetObj,
             // items,
             cursorItem: nodeId
         }, () => {
             this.calculateMOMData(0, 2, true).then(() => {
-                this.calculateMOMData(0, 2, false).then(() => {
-                    if(this.state.copyModalData == 2) {
-                        this.onRemoveButtonClick(itemConfig);
+                if(this.state.copyModalData == 2) {
+                    this.onRemoveButtonClick(itemConfig);
+                }
+                this.setState({
+                    copyLoader: false,
+                    copyModal: false,
+                }, () => {
+                    if(this.state.copyModalTree != this.state.treeId){
+                        // this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
+                        // window.location.reload(); 
+                        this.setState({
+                            treeId: this.state.copyModalTree,
+                            items: [],
+                            selectedScenario: '',
+                            selectedScenarioLabel: '',
+                            currentScenario: []
+                        }, () => {
+                            this.getTreeByTreeId(this.state.treeId);
+                        })
                     }
-                    this.setState({
-                        copyModal: false
-                    }, () => {
-                        if(this.state.copyModalTree != this.state.treeId){
-                            this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
-                            window.location.reload(); 
-                        }
-                    })
                 })
             })
         });
@@ -13928,137 +13953,163 @@ export default class BuildTree extends Component {
                                     <strong>{i18n.t('static.tree.moveCopy')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
-                                    <FormGroup>
-                                        <FormGroup check inline className="pl-0">
-                                            <Input
-                                                className="form-check-input ml-0"
-                                                type="radio"
-                                                id="copyMoveTrue"
-                                                name="copyMove"
-                                                value={1}
-                                                checked={this.state.copyModalData == 1 ? true : false}
-                                                onChange={(e) => {
-                                                    this.copyMoveChange(e)
-                                                }}
-                                            />
-                                            <Label
-                                                className="form-check-label login-text"
-                                                check htmlFor="copyMoveTrue">
-                                                {i18n.t('static.tree.copy')}
+                                    <div style={{ display: this.state.copyLoader ? "none" : "block" }}>
+                                        <FormGroup>
+                                            <FormGroup check inline className="pl-0">
+                                                <Input
+                                                    className="form-check-input ml-0"
+                                                    type="radio"
+                                                    id="copyMoveTrue"
+                                                    name="copyMove"
+                                                    value={1}
+                                                    checked={this.state.copyModalData == 1 ? true : false}
+                                                    onChange={(e) => {
+                                                        this.copyMoveChange(e)
+                                                    }}
+                                                />
+                                                <Label
+                                                    className="form-check-label login-text"
+                                                    check htmlFor="copyMoveTrue">
+                                                    {i18n.t('static.tree.copy')}
+                                                </Label>
+                                            </FormGroup>
+                                            <FormGroup check inline>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    id="copyMoveFalse"
+                                                    name="copyMove"
+                                                    value={2}
+                                                    checked={this.state.copyModalData == 2 ? true : false}
+                                                    onChange={(e) => {
+                                                        this.copyMoveChange(e)
+                                                    }}
+                                                />
+                                                <Label
+                                                    className="form-check-label login-text"
+                                                    check htmlFor="copyMoveFalse">
+                                                    {i18n.t('static.tree.move')}
+                                                </Label>
+                                            </FormGroup>
+                                            <div className="red">{errors.copyMove}</div>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label className="form-check-label">
+                                                <b>Node name:</b> {this.state.copyModalNode.payload.label.label_en} 
                                             </Label>
                                         </FormGroup>
-                                        <FormGroup check inline>
+                                        <FormGroup style={{ "marginLeft": '20px' }}>
                                             <Input
                                                 className="form-check-input"
-                                                type="radio"
-                                                id="copyMoveFalse"
-                                                name="copyMove"
-                                                value={2}
-                                                checked={this.state.copyModalData == 2 ? true : false}
-                                                onChange={(e) => {
-                                                    this.copyMoveChange(e)
-                                                }}
+                                                type="checkbox"
+                                                id="copyModeling"
+                                                name="copyModeling"
+                                                checked={this.state.copyModeling}
+                                                onClick={(e) => { this.setCopyModeling(e); }}
                                             />
                                             <Label
-                                                className="form-check-label login-text"
-                                                check htmlFor="copyMoveFalse">
-                                                {i18n.t('static.tree.move')}
+                                                className="form-check-label"
+                                                check htmlFor="copyModeling" style={{ fontSize: '12px', "marginTop": '3px' }}>
+                                                {i18n.t('static.tree.copyModeling')}
                                             </Label>
                                         </FormGroup>
-                                        <div className="red">{errors.copyMove}</div>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label className="form-check-label">
-                                            <b>Node name:</b> {this.state.copyModalNode.payload.label.label_en} 
-                                        </Label>
-                                    </FormGroup>
-                                    <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
-                                        <p><b>{i18n.t('static.tree.destination')}:</b></p>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
-                                            <Input
-                                                type="select"
-                                                id="treeDropdown"
-                                                name="treeDropdown"
-                                                bsSize="sm"
-                                                onChange={(e) => { this.copyModalTreeChange(e) }}
-                                                value={this.state.copyModalTree}
-                                                valid={!errors.treeDropdown && this.state.copyModalTree != ''}
-                                                invalid={touched.treeDropdown && !!errors.treeDropdown}
-                                                onBlur={handleBlur}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.treeData.length > 0
-                                                    && this.state.treeData.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.treeId}>
-                                                                {getLabelText(item.label, this.state.lang)}
-                                                            </option>
-                                                        )
-                                                    }, this)
-                                                }
-                                            </Input>
-                                            <div className="red">{errors.treeDropdown}</div>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentLevel')}</Label>
-                                            <Input
-                                                type="select"
-                                                id="parentLevelDropdown"
-                                                name="parentLevelDropdown"
-                                                bsSize="sm"
-                                                onChange={(e) => { this.copyModalParentLevelChange(e) }}
-                                                value={this.state.copyModalParentLevel}
-                                                valid={!errors.parentLevelDropdown && (this.state.copyModalParentLevel != '' || parseInt(this.state.copyModalParentLevel) == 0)}
-                                                invalid={(this.state.copyModalParentLevel == '' && parseInt(this.state.copyModalParentLevel) != 0) || !!errors.parentLevelDropdown}
-                                                onBlur={handleBlur}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.copyModalParentLevelList.length > 0
-                                                    && this.state.copyModalParentLevelList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.levelNo}>
-                                                                {item.label.label_en}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
-                                            <div className="red">{errors.parentLevelDropdown}</div>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentNode')}</Label>
-                                            <Input
-                                                type="select"
-                                                id="parentNodeDropdown"
-                                                name="parentNodeDropdown"
-                                                bsSize="sm"
-                                                onChange={(e) => { this.copyModalParentNodeChange(e) }}
-                                                value={this.state.copyModalParentNode}
-                                                valid={!errors.parentNodeDropdown && (this.state.copyModalParentNode != '' || parseInt(this.state.copyModalParentNode) == 0)}
-                                                invalid={(parseInt(this.state.copyModalParentNode) != 0 && this.state.copyModalParentNode == '') || !!errors.parentNodeDropdown}
-                                                onBlur={handleBlur}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {this.state.copyModalParentNodeList.length > 0
-                                                    && this.state.copyModalParentNodeList.map((item, i) => {
-                                                        return (
-                                                            <option key={i} value={item.id}>
-                                                                {item.payload.label.label_en}
-                                                            </option>
-                                                        )
-                                                    }, this)}
-                                            </Input>
-                                            <div className="red">{errors.parentNodeDropdown}</div>
-                                        </FormGroup>
-                                        <p>{i18n.t('static.tree.moveCopyNote')}</p>
+                                        <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
+                                            <p><b>{i18n.t('static.tree.destination')}:</b></p>
+                                            <FormGroup>
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
+                                                <Input
+                                                    type="select"
+                                                    id="treeDropdown"
+                                                    name="treeDropdown"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.copyModalTreeChange(e) }}
+                                                    value={this.state.copyModalTree}
+                                                    valid={!errors.treeDropdown && this.state.copyModalTree != ''}
+                                                    invalid={touched.treeDropdown && !!errors.treeDropdown}
+                                                    onBlur={handleBlur}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {this.state.treeData.length > 0
+                                                        && this.state.treeData.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.treeId}>
+                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                </option>
+                                                            )
+                                                        }, this)
+                                                    }
+                                                </Input>
+                                                <div className="red">{errors.treeDropdown}</div>
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parentLevel')}</Label>
+                                                <Input
+                                                    type="select"
+                                                    id="parentLevelDropdown"
+                                                    name="parentLevelDropdown"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.copyModalParentLevelChange(e) }}
+                                                    value={this.state.copyModalParentLevel}
+                                                    valid={!errors.parentLevelDropdown && (this.state.copyModalParentLevel != '' || parseInt(this.state.copyModalParentLevel) == 0)}
+                                                    invalid={(this.state.copyModalParentLevel == '' && parseInt(this.state.copyModalParentLevel) != 0) || !!errors.parentLevelDropdown}
+                                                    onBlur={handleBlur}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {this.state.copyModalParentLevelList.length > 0
+                                                        && this.state.copyModalParentLevelList.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.levelNo}>
+                                                                    {item.label.label_en}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+                                                </Input>
+                                                <div className="red">{errors.parentLevelDropdown}</div>
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parentNode')}</Label>
+                                                <Input
+                                                    type="select"
+                                                    id="parentNodeDropdown"
+                                                    name="parentNodeDropdown"
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.copyModalParentNodeChange(e) }}
+                                                    value={this.state.copyModalParentNode}
+                                                    valid={!errors.parentNodeDropdown && (this.state.copyModalParentNode != '' || parseInt(this.state.copyModalParentNode) == 0)}
+                                                    invalid={(parseInt(this.state.copyModalParentNode) != 0 && this.state.copyModalParentNode == '') || !!errors.parentNodeDropdown}
+                                                    onBlur={handleBlur}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {this.state.copyModalParentNodeList.length > 0
+                                                        && this.state.copyModalParentNodeList.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.id}>
+                                                                    {item.payload.label.label_en}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+                                                </Input>
+                                                <div className="red">{errors.parentNodeDropdown}</div>
+                                            </FormGroup>
+                                            <p>{i18n.t('static.tree.moveCopyNote')}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: this.state.copyLoader ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                                <div class="spinner-border blue ml-4" role="status">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
                                     <div className="mr-0">
                                         <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
-                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.resetCopyMoveModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({copyModal: false})}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.resetCopyMoveModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.setState({copyModal: false})}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </Form>
                         )} />
