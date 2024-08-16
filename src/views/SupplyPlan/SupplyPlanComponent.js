@@ -4239,8 +4239,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                         />
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-4" style={{ "marginTop": "-20px" }}>
-                                                    <FormGroup check inline className='pl-lg-0' style={{ "paddingLeft": "0px" }}>
+                                                {/* <FormGroup className="col-md-4" style={{ "marginTop": "-20px" }}> */}
+                                                    {/* <FormGroup check inline className='pl-lg-0' style={{ "paddingLeft": "0px" }}>
                                                         <Input
                                                             style={{ "marginLeft": "0px" }}
                                                             type="radio"
@@ -4275,10 +4275,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                             title={i18n.t('static.planningunit.countrysku')}>
                                                             {i18n.t('static.planningunit.countrysku')}
                                                         </Label>
-                                                    </FormGroup>
-                                                    <FormGroup id="planningUnitDiv" className='pt-lg-1'>
-                                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label> */}
-                                                        {/* <div className="controls "> */}
+                                                    </FormGroup> */}
+                                                    <FormGroup id="planningUnitDiv" className='pt-lg-1 col-md-4'>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                        <div className="controls ">
                                                         <Select
                                                             name="planningUnit"
                                                             id="planningUnit"
@@ -4288,22 +4288,22 @@ export default class SupplyPlanComponent extends React.Component {
                                                             onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
                                                             placeholder={i18n.t('static.common.select')}
                                                         />
-                                                        {/* </div> */}
+                                                        </div>
                                                     </FormGroup>
-                                                    <FormGroup id="aruDiv" style={{ display: 'none' }} className='pt-lg-1'>
+                                                    {/* <FormGroup id="aruDiv" style={{ display: 'none' }} className='pt-lg-1'> */}
                                                         {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.countrysku')}</Label> */}
                                                         {/* <div className="controls "> */}
-                                                        <Select
+                                                        {/* <Select
                                                             name="aru"
                                                             id="aru"
                                                             bsSize="sm"
                                                             options={this.state.aruList}
                                                             value={this.state.aru}
                                                             onChange={(e) => { this.updateFieldDataARU(e); }}
-                                                        />
+                                                        /> */}
                                                         {/* </div> */}
-                                                    </FormGroup>
-                                                </FormGroup>
+                                                    {/* </FormGroup> */}
+                                                {/* </FormGroup> */}
                                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                 <input type="hidden" id="programId" name="programId" value={this.state.programId} />
                                             </div>
