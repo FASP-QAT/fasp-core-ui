@@ -540,7 +540,7 @@ export default class EditProgram extends Component {
                 }
             })
 
-            DropdownService.getProcurementAgentDropdownList()
+            DropdownService.getFundingSourceDropdownList()
             .then(response => {
                 if (response.status == 200) {
                     var json = response.data;
