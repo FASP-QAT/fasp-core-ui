@@ -362,6 +362,7 @@ class ShipmentGlobalView extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
+            this.getFundingSource();
             this.fetchData()
         })
     }
@@ -641,12 +642,15 @@ class ShipmentGlobalView extends Component {
      */
     getFundingSource = () => {
         this.setState({ loading: true })
-        FundingSourceService.getFundingSourceListAll()
+        let programIds = this.state.programValues.map((ele) =>
+            Number(ele.value)
+        );
+                DropdownService.getFundingSourceForProgramsDropdownList(programIds)
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = a.fundingSourceCode.toUpperCase();
-                    var itemLabelB = b.fundingSourceCode.toUpperCase();
+                    var itemLabelA = a.code.toUpperCase();
+                    var itemLabelB = b.code.toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -713,7 +717,7 @@ class ShipmentGlobalView extends Component {
                 // });
                 this.setState({
                     productCategories: list, loading: false
-                }, () => { this.getFundingSource(); })
+                }, () => {  })
             }).catch(
                 error => {
                     this.setState({
@@ -763,16 +767,17 @@ class ShipmentGlobalView extends Component {
      */
     getFundingSourceType = () => {
         //Fetch realmId
-        let realmId = AuthenticationService.getRealmId();
-        //Fetch all funding source type list
-        FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+        let programIds = this.state.programValues.map((ele) =>
+            Number(ele.value)
+        );
+                DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
             .then(response => {
                 if (response.status == 200) {
                     var fundingSourceTypeValues = [];
                     var fundingSourceTypes = response.data;
                     fundingSourceTypes.sort(function (a, b) {
-                        a = a.fundingSourceTypeCode.toLowerCase();
-                        b = b.fundingSourceTypeCode.toLowerCase();
+                        a = a.code.toLowerCase();
+                        b = b.code.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     })                    
 
@@ -1324,7 +1329,7 @@ class ShipmentGlobalView extends Component {
         fundingSourceList = fundingSources.length > 0
             && fundingSources.map((item, i) => {
                 return (
-                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                    { label: item.code, value: item.id }
                 )
             }, this);
         const { fundingSourceTypes } = this.state;
@@ -1332,7 +1337,7 @@ class ShipmentGlobalView extends Component {
         fundingSourceTypeList = fundingSourceTypes.length > 0
         && fundingSourceTypes.map((item, i) => {
             return (
-                { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                { label: item.code, value: item.id }
             )
         }, this);
 

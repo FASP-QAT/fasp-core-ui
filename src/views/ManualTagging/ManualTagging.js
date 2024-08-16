@@ -4635,7 +4635,7 @@ export default class ManualTagging extends Component {
             )
         }, this);
         const { fundingSourceList } = this.state;
-        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
+        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId1))).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {item.fundingSourceCode}

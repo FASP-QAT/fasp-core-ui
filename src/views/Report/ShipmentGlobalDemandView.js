@@ -43,9 +43,9 @@ const pickerLang = {
 const options = {
     plugins: {
         datalabels: {
-          formatter: (value, context) => {
-            return ``;
-          },
+            formatter: (value, context) => {
+                return ``;
+            },
         },
     },
     title: {
@@ -127,9 +127,9 @@ const options = {
 const options1 = {
     plugins: {
         datalabels: {
-          formatter: (value, context) => {
-            return ``;
-          },
+            formatter: (value, context) => {
+                return ``;
+            },
         },
     },
     title: {
@@ -525,7 +525,7 @@ class ShipmentGlobalDemandView extends Component {
             let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let groupByProcurementAgentType = this.state.procurementAgentTypeId;
             let groupByFundingSourceType = this.state.groupByFundingSourceType;
-            
+
             if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: '', loading: true
@@ -862,67 +862,67 @@ class ShipmentGlobalDemandView extends Component {
      */
     componentDidMount() {
         Chart.plugins.register({
-            afterDraw: function(chart) {
-              if (chart.config.type === 'pie') {
-                const ctx = chart.chart.ctx;
-                const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
-                chart.data.datasets.forEach((dataset, datasetIndex) => {
-                  const meta = chart.getDatasetMeta(datasetIndex);
-                  if (!meta.hidden) {
-                    meta.data.forEach((element, index) => {
-                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
-                        // Draw the connecting lines
-                        ctx.save();
-                        const model = element._model;
-                        const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
-                        const startAngle = model.startAngle;
-                        const endAngle = model.endAngle;
-                        const midAngle = startAngle + (endAngle - startAngle) / 2;
-        
-                        const x = Math.cos(midAngle);
-                        const y = Math.sin(midAngle);
-        
-                        // Calculate the end point for the line
-                        const lineX = model.x + x * model.outerRadius;
-                        const lineY = model.y + y * model.outerRadius;
-                        const labelX = model.x + x * (model.outerRadius + 10);
-                        const labelY = model.y + y * (model.outerRadius + 10);
-        
-                        const label = chart.data.labels[index];
-                        const value = dataset.data[index];
-                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+            afterDraw: function (chart) {
+                if (chart.config.type === 'pie') {
+                    const ctx = chart.chart.ctx;
+                    const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        if (!meta.hidden) {
+                            meta.data.forEach((element, index) => {
+                                if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                                    // Draw the connecting lines
+                                    ctx.save();
+                                    const model = element._model;
+                                    const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                                    const startAngle = model.startAngle;
+                                    const endAngle = model.endAngle;
+                                    const midAngle = startAngle + (endAngle - startAngle) / 2;
 
-                        if(((value / total) * 100).toFixed(2) > 2) {
-                            ctx.beginPath();
-                            ctx.moveTo(model.x, model.y);
-                            ctx.lineTo(lineX, lineY);
-                            ctx.lineTo(labelX, labelY);
-                            ctx.strokeStyle = dataset.backgroundColor[index];
-                            ctx.stroke();                      
-                            ctx.textAlign = x >= 0 ? 'left' : 'right';
-                            ctx.font = 'bold 12px Arial';
-                            // ctx.textBaseline = 'middle';
-                            ctx.fillStyle = dataset.backgroundColor[index];
-                            ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+8 : x < 0.5 ? labelX-8 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
-                            ctx.restore();
+                                    const x = Math.cos(midAngle);
+                                    const y = Math.sin(midAngle);
+
+                                    // Calculate the end point for the line
+                                    const lineX = model.x + x * model.outerRadius;
+                                    const lineY = model.y + y * model.outerRadius;
+                                    const labelX = model.x + x * (model.outerRadius + 10);
+                                    const labelY = model.y + y * (model.outerRadius + 10);
+
+                                    const label = chart.data.labels[index];
+                                    const value = dataset.data[index];
+                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
+
+                                    if (((value / total) * 100).toFixed(2) > 2) {
+                                        ctx.beginPath();
+                                        ctx.moveTo(model.x, model.y);
+                                        ctx.lineTo(lineX, lineY);
+                                        ctx.lineTo(labelX, labelY);
+                                        ctx.strokeStyle = dataset.backgroundColor[index];
+                                        ctx.stroke();
+                                        ctx.textAlign = x >= 0 ? 'left' : 'right';
+                                        ctx.font = 'bold 12px Arial';
+                                        // ctx.textBaseline = 'middle';
+                                        ctx.fillStyle = dataset.backgroundColor[index];
+                                        ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
+                                        ctx.restore();
+                                    }
+                                }
+                            });
                         }
-                      }
                     });
-                  }
-                });
-              }
+                }
             },
-          });
+        });
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
             // this.getFundingSourceType();
-            this.getFundingSource();
+            // this.getFundingSource();
             this.getShipmentStatusList();
         } else {
             this.setState({ loading: false })
             this.getPrograms();
             // this.getFundingSourceType();
-            this.getFundingSource();
+            // this.getFundingSource();
             this.getShipmentStatusList();
         }
     }
@@ -1022,6 +1022,7 @@ class ShipmentGlobalDemandView extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
+            this.getFundingSource();
             this.fetchData();
             this.getPlanningUnit();
         })
@@ -1263,8 +1264,8 @@ class ShipmentGlobalDemandView extends Component {
 
             if (filteredFundingSourceArr.length > 0) {
                 filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
-                    a = a.fundingSourceCode.toLowerCase();
-                    b = b.fundingSourceCode.toLowerCase();
+                    a = a.code.toLowerCase();
+                    b = b.code.toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
                 });
             }
@@ -1284,10 +1285,15 @@ class ShipmentGlobalDemandView extends Component {
      */
     getFundingSource = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
-            FundingSourceService.getFundingSourceListAll()
+            let programIds = this.state.programValues.map((ele) =>
+                Number(ele.value)
+            );
+            DropdownService.getFundingSourceForProgramsDropdownList(programIds)
                 .then(response => {
                     this.setState({
-                        fundingSources: response.data, loading: false
+                        fundingSources: response.data, loading: false,
+                        fundingSourceValues: [],
+                        fundingSourceLabels: []
                     }, () => { this.consolidatedFundingSourceList() })
                 }).catch(
                     error => {
@@ -1339,45 +1345,45 @@ class ShipmentGlobalDemandView extends Component {
      * Consolidates the list of funding source obtained from Server and local programs.
      */
     consolidatedFundingSourceList = () => {
-        const { fundingSources } = this.state
-        var proList = fundingSources;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['fundingSource'], 'readwrite');
-            var fundingSource = transaction.objectStore('fundingSource');
-            var getRequest = fundingSource.getAll();
-            getRequest.onerror = function (event) {
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    var f = 0
-                    for (var k = 0; k < this.state.fundingSources.length; k++) {
-                        if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
-                            f = 1;
-                        }
-                    }
-                    var programData = myResult[i];
-                    if (f == 0) {
-                        proList.push(programData)
-                    }
-                }
-                proList.sort((a, b) => {
-                    var itemLabelA = a.fundingSourceCode.toUpperCase();
-                    var itemLabelB = b.fundingSourceCode.toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    fundingSources: proList
-                })
-            }.bind(this);
-        }.bind(this);
+        // const { fundingSources } = this.state
+        // var proList = fundingSources;
+        // var db1;
+        // getDatabase();
+        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        // openRequest.onsuccess = function (e) {
+        //     db1 = e.target.result;
+        //     var transaction = db1.transaction(['fundingSource'], 'readwrite');
+        //     var fundingSource = transaction.objectStore('fundingSource');
+        //     var getRequest = fundingSource.getAll();
+        //     getRequest.onerror = function (event) {
+        //     };
+        //     getRequest.onsuccess = function (event) {
+        //         var myResult = [];
+        //         myResult = getRequest.result;
+        //         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        //         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        //         for (var i = 0; i < myResult.length; i++) {
+        //             var f = 0
+        //             for (var k = 0; k < this.state.fundingSources.length; k++) {
+        //                 if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
+        //                     f = 1;
+        //                 }
+        //             }
+        //             var programData = myResult[i];
+        //             if (f == 0) {
+        //                 proList.push(programData)
+        //             }
+        //         }
+        //         proList.sort((a, b) => {
+        //             var itemLabelA = a.fundingSourceCode.toUpperCase();
+        //             var itemLabelB = b.fundingSourceCode.toUpperCase();
+        //             return itemLabelA > itemLabelB ? 1 : -1;
+        //         });
+        //         this.setState({
+        //             fundingSources: proList
+        //         })
+        //     }.bind(this);
+        // }.bind(this);
     }
     /**
      * Retrieves the list of programs.
@@ -1748,7 +1754,7 @@ class ShipmentGlobalDemandView extends Component {
     setProcurementAgentTypeId(e) {
         var procurementAgentTypeId = e.target.checked;
         var groupByFundingSourceType = this.state.groupByFundingSourceType;
-        if(procurementAgentTypeId == true){
+        if (procurementAgentTypeId == true) {
             groupByFundingSourceType = false;
         }
         this.setState({
@@ -1765,7 +1771,7 @@ class ShipmentGlobalDemandView extends Component {
     setGroupByFundingSourceType(e) {
         var groupByFundingSourceType = e.target.checked;
         var procurementAgentTypeId = this.state.procurementAgentTypeId;
-        if(groupByFundingSourceType == true){
+        if (groupByFundingSourceType == true) {
             procurementAgentTypeId = false;
         }
         this.setState({
@@ -1784,10 +1790,10 @@ class ShipmentGlobalDemandView extends Component {
         var groupByValue = e.target.value;
         var procurementAgentTypeId = this.state.procurementAgentTypeId;
         var groupByFundingSourceType = this.state.groupByFundingSourceType;
-        if(groupByValue == 1) {//Procurement Agent Type
+        if (groupByValue == 1) {//Procurement Agent Type
             procurementAgentTypeId = true;
             groupByFundingSourceType = false;
-        } else if(groupByValue == 2) {//Funding Source Type
+        } else if (groupByValue == 2) {//Funding Source Type
             groupByFundingSourceType = true;
             procurementAgentTypeId = false;
         } else {
@@ -1843,7 +1849,7 @@ class ShipmentGlobalDemandView extends Component {
         fundingSourceList = fundingSources.length > 0
             && fundingSources.map((item, i) => {
                 return (
-                    { label: item.fundingSourceCode, value: item.fundingSourceId }
+                    { label: item.code, value: item.id }
                 )
             }, this);
         const { shipmentStatuses } = this.state;
@@ -2214,7 +2220,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     /><br />
                                                 </div>
                                                 <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
-                                                <h5 className="red text-center">{this.state.groupByFundingSourceType? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                                <h5 className="red text-center">{this.state.groupByFundingSourceType ? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
                                         }
                                     </div>

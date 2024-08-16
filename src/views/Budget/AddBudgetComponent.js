@@ -12,7 +12,6 @@ import { API_URL, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_
 import BudgetService from "../../api/BudgetService";
 import CurrencyService from '../../api/CurrencyService.js';
 import DropdownService from '../../api/DropdownService';
-import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
@@ -153,11 +152,66 @@ class AddBudgetComponent extends Component {
                 id: programId[i].value
             }
         }
+        console.log("programIdArray Test@123",programIdArray);
         budget.programs = programIdArray;
         this.setState({
             budget,
         },
-            () => { });
+            () => {
+                let programIds = this.state.budget.programs.map((ele) =>
+            Number(ele.id)
+        );
+                DropdownService.getFundingSourceForProgramsDropdownList(programIds).then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSources: listArray
+                        , loading: false
+                    })
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+             });
     }
     /**
      * Show budget date range picker
@@ -306,58 +360,6 @@ class AddBudgetComponent extends Component {
                     }
                 }
             );
-        //Fetch all funding source list
-        FundingSourceService.getFundingSourceListAll()
-            .then(response => {
-                var listArray = response.data.filter(c => (c.allowedInBudget == true || c.allowedInBudget == "true"));
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    fundingSources: listArray
-                    , loading: false
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
         //Fetch currency list
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
@@ -418,6 +420,7 @@ class AddBudgetComponent extends Component {
      * @returns {JSX.Element} - Budget details form.
      */
     render() {
+        console.log("this.state.programId Test@123",this.state.programId)
         const { fundingSources } = this.state;
         const { currencyList } = this.state;
         const pickerLang = {
@@ -431,7 +434,7 @@ class AddBudgetComponent extends Component {
         }
         let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
             return (
-                <option key={i} value={item.fundingSourceId}>
+                <option key={i} value={item.id}>
                     {getLabelText(item.label, this.state.lang)}
                 </option>
             )
