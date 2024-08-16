@@ -30,7 +30,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 /**
  * Component for Forecast Metrics Report.
@@ -1066,6 +1066,7 @@ class ForecastMetrics extends Component {
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
                           disabled={this.state.loading}
+                          filterOptions={filterOptions}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -1084,6 +1085,7 @@ class ForecastMetrics extends Component {
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
                         disabled={this.state.loading}
+                        filterOptions={filterOptions}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -1101,6 +1103,7 @@ class ForecastMetrics extends Component {
                           value={this.state.tracerCategoryValues}
                           onChange={(e) => { this.handleTracerCategoryChange(e) }}
                           disabled={this.state.loading}
+                          filterOptions={filterOptions}
                           options=
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
@@ -1120,6 +1123,7 @@ class ForecastMetrics extends Component {
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           disabled={this.state.loading}
+                          filterOptions={filterOptions}
                         />
                       </div>
                     </FormGroup>

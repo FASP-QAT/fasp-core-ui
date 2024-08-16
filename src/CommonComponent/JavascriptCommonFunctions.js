@@ -330,3 +330,43 @@ export function PercentageFormatter(num) {
     return ''
   }
 }
+/**
+   * Filters the options based on the provided filter string and sort the options.
+   * @param {Array} options - The array of options to filter.
+   * @param {string} filter - The filter string to apply.
+   * @returns {Array} - The filtered array of options.
+   */
+export async function filterOptions(options, filter){
+  if (filter) {
+    return options.filter((i) =>
+      i.label.toLowerCase().includes(filter.toLowerCase())
+    );
+  } else {
+    return options;
+  }
+};
+/**
+ * This is function is used to round supply plan values when displayed in ARU
+ * @param {*} amc The value of supply plan parameter
+ * @returns This function returns the rounded values in terms of ARU
+ */
+export function roundARU(value, multiplier) {
+  if (multiplier != 1) {
+    if (value != null && value !== "") {
+      var aruValue = Number(value) / Number(multiplier);
+      if (Number(aruValue).toFixed(0) >= 100) {
+        return Number(aruValue).toFixed(0);
+      } else if (Number(aruValue).toFixed(1) >= 10) {
+        return Number(aruValue).toFixed(1);
+      } else if (Number(aruValue).toFixed(2) >= 1) {
+        return Number(aruValue).toFixed(2);
+      } else {
+        return Number(aruValue).toFixed(3);
+      }
+    } else {
+      return "";
+    }
+  } else {
+    return value;
+  }
+}

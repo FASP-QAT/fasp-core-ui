@@ -15,13 +15,13 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, filterOptions, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import { DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import { SECRET_KEY } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -30,6 +30,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import ProblemListDashboard from '../Report/ProblemListDashboard';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js';
+import ProgramService from '../../api/ProgramService';
 const entityname = i18n.t('static.report.problem');
 /**
  * This component is used to display the Problem List for multiple planning units
@@ -60,7 +61,8 @@ export default class ProblemList extends React.Component {
             problemDetail: {},
             problemTypeId: localStorage.getItem("sesProblemType") != "" ? localStorage.getItem("sesProblemType") : -1,
             productCategoryId: localStorage.getItem("sesProblemCategory") != "" ? localStorage.getItem("sesProblemCategory") : -1,
-            reviewedStatusId: localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1
+            reviewedStatusId: localStorage.getItem("sesReviewed") != "" ? localStorage.getItem("sesReviewed") : -1,
+            notesPopup: false
         }
         this.fetchData = this.fetchData.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -76,6 +78,9 @@ export default class ProblemList extends React.Component {
         this.filterProblemStatus = this.filterProblemStatus.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
+        this.toggleLargeNotes = this.toggleLargeNotes.bind(this);
+        this.actionCanceledNotes = this.actionCanceledNotes.bind(this);
+        this.getNotes = this.getNotes.bind(this);
     }
     /**
      * This function is used to update the state of this component from any other component
@@ -137,8 +142,9 @@ export default class ProblemList extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
+                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
                         var programJson = {
-                            name: myResult[i].programCode + "~v" + myResult[i].version,
+                            name: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -161,8 +167,8 @@ export default class ProblemList extends React.Component {
                         proListProblemStatus[i] = Json
                     }
                     proListProblemStatus.sort((a, b) => {
-                        var itemLabelA = a.name.toUpperCase(); 
-                        var itemLabelB = b.name.toUpperCase(); 
+                        var itemLabelA = a.name.toUpperCase();
+                        var itemLabelB = b.name.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
@@ -211,8 +217,8 @@ export default class ProblemList extends React.Component {
                             procList[i] = Json
                         }
                         procList.sort((a, b) => {
-                            var itemLabelA = a.name.toUpperCase(); 
-                            var itemLabelB = b.name.toUpperCase(); 
+                            var itemLabelA = a.name.toUpperCase();
+                            var itemLabelB = b.name.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -433,6 +439,7 @@ export default class ProblemList extends React.Component {
                                 problemReportListForUpdate[indexToUpdate] = probObj;
                             }
                             programJson.problemReportList = problemReportListForUpdate;
+                            programJson.currentVersionNotes = this.state.currentVersionNotes;
                             var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
@@ -744,7 +751,7 @@ export default class ProblemList extends React.Component {
         this.state.data.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
                 getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
-                (ele.problemType.id == 1 ? getLabelText(ele.problemCategory.label,this.state.lang) : (ele.realmProblem.criticality.id == 1 ? this.state.problemCategoryList.filter(c=>c.id==4)[0].name : (ele.realmProblem.criticality.id == 2 ? this.state.problemCategoryList.filter(c=>c.id==5)[0].name : this.state.problemCategoryList.filter(c=>c.id==6)[0].name))).replaceAll(' ', '%20'),
+                (ele.problemType.id == 1 ? getLabelText(ele.problemCategory.label, this.state.lang) : (ele.realmProblem.criticality.id == 1 ? this.state.problemCategoryList.filter(c => c.id == 4)[0].name : (ele.realmProblem.criticality.id == 2 ? this.state.problemCategoryList.filter(c => c.id == 5)[0].name : this.state.problemCategoryList.filter(c => c.id == 6)[0].name))).replaceAll(' ', '%20'),
                 getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
                 getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
@@ -814,8 +821,8 @@ export default class ProblemList extends React.Component {
             }
         }
         const unit = "pt";
-        const size = "A4"; 
-        const orientation = "landscape"; 
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
@@ -832,7 +839,7 @@ export default class ProblemList extends React.Component {
         headers.push(i18n.t('static.problemAction.criticality'));
         let data = this.state.data.map(ele => [
             getLabelText(ele.planningUnit.label, this.state.lang),
-            (ele.problemType.id == 1 ? getLabelText(ele.problemCategory.label,this.state.lang) : (ele.realmProblem.criticality.id == 1 ? this.state.problemCategoryList.filter(c=>c.id==4)[0].name : (ele.realmProblem.criticality.id == 2 ? this.state.problemCategoryList.filter(c=>c.id==5)[0].name : this.state.problemCategoryList.filter(c=>c.id==6)[0].name))),
+            (ele.problemType.id == 1 ? getLabelText(ele.problemCategory.label, this.state.lang) : (ele.realmProblem.criticality.id == 1 ? this.state.problemCategoryList.filter(c => c.id == 4)[0].name : (ele.realmProblem.criticality.id == 2 ? this.state.problemCategoryList.filter(c => c.id == 5)[0].name : this.state.problemCategoryList.filter(c => c.id == 6)[0].name))),
             getProblemDesc(ele, this.state.lang),
             getSuggestion(ele, this.state.lang),
             getLabelText(ele.problemStatus.label, this.state.lang),
@@ -1012,7 +1019,9 @@ export default class ProblemList extends React.Component {
                         var problemReportList = (programJson.problemReportList);
                         this.setState({
                             problemReportListUnFiltered: problemReportList,
-                            showProblemDashboard: 1
+                            showProblemDashboard: 1,
+                            currentVersionNotesHistory: programJson.currentVersionTrans != undefined ? programJson.currentVersionTrans : [],
+                            currentVersionNotes: programJson.currentVersionNotes != undefined ? programJson.currentVersionNotes : programJson.currentVersion.notes
                         })
                         var problemReportFilterList = problemReportList;
                         var myStartDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1106,6 +1115,157 @@ export default class ProblemList extends React.Component {
         }
     }
     /**
+     * This function is used to toggle the notes history model
+     */
+    toggleLargeNotes() {
+        this.setState({
+            notesPopup: !this.state.notesPopup,
+        }, () => {
+            if (this.state.notesPopup) {
+                if (localStorage.getItem('sessionType') === 'Online') {
+                    this.setState({
+                        loading: true
+                    })
+                    ProgramService.getNotesHistory(this.state.programId.split("_")[0])
+                        .then(response => {
+                            var data = response.data;
+                            const listArray = [];
+                            const grouped = data.reduce((acc, item) => {
+                                acc[item.versionId] = acc[item.versionId] || [];
+                                acc[item.versionId].push(item);
+                                return acc;
+                            }, {});
+
+                            Object.values(grouped).forEach(entries => {
+                                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                                if (pendingEntries.length) {
+                                    listArray.push(pendingEntries[0]);
+                                    if (pendingEntries.length > 1) {
+                                        listArray.push(pendingEntries[pendingEntries.length - 1]);
+                                    }
+                                }
+                                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+                            });
+                            this.setState({
+                                currentVersionNotesHistory: listArray,
+                                loading: false
+                            }, () => {
+                                setTimeout(function () {
+                                    this.getNotes()
+                                }.bind(this), 100);
+                            })
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    loadingForNotes: false
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    setTimeout(function () {
+                        this.getNotes()
+                    }.bind(this), 100);
+                }
+            }
+        });
+    }
+    getNotes() {
+        var listArray = this.state.currentVersionNotesHistory;
+        if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+            jexcel.destroy(document.getElementById("notesTransTable"), true);
+        }
+        var json = [];
+        for (var sb = listArray.length - 1; sb >= 0; sb--) {
+            var data = [];
+            data[0] = listArray[sb].versionId;
+            data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+            data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+            data[3] = listArray[sb].notes;
+            data[4] = listArray[sb].lastModifiedBy.username;
+            data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+            json.push(data);
+        }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                {
+                    title: i18n.t("static.common.lastModifiedBy"),
+                    type: "text",
+                },
+                {
+                    title: i18n.t("static.common.lastModifiedDate"),
+                    type: "calendar",
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                },
+            ],
+            editable: false,
+            onload: function (instance, cell) {
+                jExcelLoadedFunction(instance, 1);
+            }.bind(this),
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: "top",
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+    }
+    /**
      * This is used to display the content
      * @returns The problem list data in tabular format along with the different filters
      */
@@ -1140,7 +1300,7 @@ export default class ProblemList extends React.Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
-        
+
         const columnsTrans = [
             {
                 dataField: 'problemStatus.label',
@@ -1229,7 +1389,7 @@ export default class ProblemList extends React.Component {
                     this.setState({ message: message })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div2">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <ProblemListFormulas ref="formulaeChild" />
                     <div className="Card-header-addicon problemListMarginTop">
@@ -1275,6 +1435,7 @@ export default class ProblemList extends React.Component {
                                             onChange={(e) => { this.handleProblemStatusChange(e) }}
                                             options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             labelledBy={i18n.t('static.common.select')}
+                                            filterOptions={filterOptions}
                                         />
                                     </div>
                                 </FormGroup>
@@ -1338,7 +1499,29 @@ export default class ProblemList extends React.Component {
                             </ul>
                         </FormGroup>
                         <div className="" >
-                            {this.state.showProblemDashboard == 1 && this.state.programId!=0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
+                            <div className='row'>
+                                <div className='col-md-6'>
+                                    {this.state.showProblemDashboard == 1 && this.state.programId != 0 && <ProblemListDashboard problemListUnFilttered={this.state.problemReportListUnFiltered} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusList} />}
+                                </div>
+                                {this.state.programId != 0 && !this.state.loading && <FormGroup className="col-md-6" style={{ "marginTop": "-20px" }}>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"(" + i18n.t('static.problemContext.viewTrans') + ")"}</small></span>
+                                    <div className="controls " style={{ "height": "97%" }}>
+                                        <InputGroup style={{ "height": "97%" }}>
+                                            <Input type="textarea"
+                                                name="notes"
+                                                id="notes"
+                                                // valid={!errors.notes && this.state.notes != ''}
+                                                // invalid={touched.notes && !!errors.notes}
+                                                onChange={(e) => { this.notesChange(e); }}
+                                                // onBlur={handleBlur}
+                                                value={this.state.currentVersionNotes}
+                                            >
+                                            </Input>
+                                            {/* <FormFeedback className="red">{errors.notes}</FormFeedback> */}
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>}
+                            </div>
                             <div className='ProblemListTableBorder'>
                                 <div id="tableDiv" className='consumptionDataEntryTable' style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
@@ -1420,8 +1603,28 @@ export default class ProblemList extends React.Component {
                         </ModalFooter>
                     </div>
                 </Modal>
+                <Modal isOpen={this.state.notesPopup}
+                    className={'modal-lg modalWidth ' + this.props.className}>
+                    <ModalHeader toggle={() => this.toggleLargeNotes()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div className="">
+                            <div id="notesTransTable" className="AddListbatchtrHeight"></div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledNotes()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
             </div >
         );
+    }
+    notesChange(event) {
+        this.setState({
+            currentVersionNotes: event.target.value,
+            showUpdateButton: true
+        })
     }
     /**
      * This function is called when cancel button is clicked
@@ -1429,5 +1632,17 @@ export default class ProblemList extends React.Component {
      */
     cancelClicked(id) {
         this.props.history.push(`/ApplicationDashboard/` + id + '/red/' + i18n.t('static.message.cancelled', { entityname }));
+    }
+    /**
+     * This function is called when cancel button for notes modal popup is clicked
+     */
+    actionCanceledNotes() {
+        this.setState({
+            message: i18n.t('static.actionCancelled'),
+            color: "#BA0C2F",
+        }, () => {
+            hideSecondComponent();
+            this.toggleLargeNotes();
+        })
     }
 }
