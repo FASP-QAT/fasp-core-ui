@@ -118,7 +118,9 @@ class SupplyPlanVersionAndReview extends Component {
         }
         if (event.target.name == "versionTypeIdResetQPL") {
             this.setState({
-                versionTypeIdResetQPL: event.target.value
+                versionTypeIdResetQPL: event.target.value,
+                versionStatusIdResetQPL:[],
+                versionStatusIdResetQPLString:""
             },()=>{
                 this.getProgramListForResetQPL()
             })
