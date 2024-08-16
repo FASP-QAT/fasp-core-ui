@@ -49,6 +49,7 @@ const pickerLang = {
 
 const calculateSums = (data) => {
     const yearSums = {};
+    const yearWiseData = {};
 
     data.forEach((row) => {
         const date = new Date(row[0]);
@@ -58,6 +59,11 @@ const calculateSums = (data) => {
         if (!yearSums[year]) {
             yearSums[year] = new Array(row.length).fill(0);
         }
+        if (yearWiseData[year]) {
+            yearWiseData[year] += 1;
+        } else {
+            yearWiseData[year] = 1;
+        }
 
         // Start from the 2nd column (index 1) and sum each value
         for (let i = 1; i < row.length; i++) {
@@ -66,10 +72,10 @@ const calculateSums = (data) => {
         }
     });
     // Calculate the total of all columns for each year
-    // for (const year in yearSums) {
-    //     const total = yearSums[year].reduce((sum, val) => sum + val, 0);
-    //     yearSums[year].push(total);
-    // }
+    for (const year in yearWiseData) {
+        //     const total = yearSums[year].reduce((sum, val) => sum + val, 0);
+        yearSums[year].push(yearWiseData[year]);
+    }
     return yearSums;
 };
 // Localized entity name
@@ -452,6 +458,7 @@ class CompareAndSelectScenario extends Component {
                 }
             }
             // calendarTableCol.push({ title: i18n.t('static.supplyPlan.total'), type: 'numeric', mask: '#,##.00' });
+            calendarTableCol.push({ title: i18n.t("static.compareAndSelect.noOfMonths"), type: "numeric", width: 100 })
             var data = [];
             var data1 = [];
             var dataArr = [];
@@ -592,15 +599,16 @@ class CompareAndSelectScenario extends Component {
                 }
                 dataArr1.push(data1)
             }
-            var originalData = calculateSums(dataArr1);
-            // Convert the object to an array
-            const transformedData = Object.keys(originalData).map((year, index) => ({
-                [index]: [parseInt(year), ...originalData[year]]
-            }));
+            if (this.state.xAxisDisplayBy != 1) {
+                var originalData = calculateSums(dataArr1);
+                // Convert the object to an array
+                const transformedData = Object.keys(originalData).map((year, index) => ({
+                    [index]: [parseInt(year), ...originalData[year]]
+                }));
 
-            // Flatten the array of objects into a single object
-            calendarTableRowData = Object.assign({}, ...transformedData);
-
+                // Flatten the array of objects into a single object
+                calendarTableRowData = Object.assign({}, ...transformedData);
+            }
             var higherThenConsumptionThreshold = 0;
             var lowerThenConsumptionThreshold = 0;
             var higherThenConsumptionThresholdPU = 0;
@@ -1231,9 +1239,21 @@ class CompareAndSelectScenario extends Component {
         doc.addPage();
         doc.addImage(canvasImg, 'png', 50, 100, 750, 260, 'CANVAS');
         if (this.state.xAxisDisplayBy != 1) {
+            var C1 = []
+            var B1 = []
             let calendarColumns = this.state.calendarDataEl.options.columns.filter(c => c.type != "hidden")
             // Convert object to array while skipping the second cell data
-            const calendarData = Object.values(this.state.calendarDataEl.options.data).map(arr => [arr[0], arr[2], arr[3]]);
+            Object.values(this.state.calendarDataEl.options.data).map(ele => {
+                B1 = [];
+                this.state.calendarDataEl.options.columns.map((item, idx) => {
+                    if (item.type != 'hidden') {
+                        B1.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23'));
+                    }
+                })
+                C1.push(B1);
+            })
+
+            // Object.values(this.state.calendarDataEl.options.data).filter(c => c.type != "hidden");
 
             let calendarColumnsArr = [];
             for (var i = 0; i < calendarColumns.length; i++) {
@@ -1245,7 +1265,7 @@ class CompareAndSelectScenario extends Component {
                 margin: { top: 100, bottom: 50 },
                 startY: startYtable,
                 head: [calendarColumnsArr],
-                body: calendarData,
+                body: C1,
                 styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
             };
             doc.autoTable(calendarContent);
@@ -2061,6 +2081,7 @@ class CompareAndSelectScenario extends Component {
             // this.expandCompressFuntion();
         })
     }
+
     /**
      * This function is called when the date range is changed
      * @param {*} value This is the value of the daterange selected by the user
@@ -2723,6 +2744,7 @@ class CompareAndSelectScenario extends Component {
                                                                         <RangePicker
                                                                             picker="year"
                                                                             allowClear={false}
+                                                                            disabledDate={(current) => current && (current.year() < this.state.minDate.year || current.year() > this.state.maxDateForSingleValue.year)}
                                                                             id="date"
                                                                             name="date"
                                                                             onChange={this.handleYearRangeChange}
@@ -2738,6 +2760,7 @@ class CompareAndSelectScenario extends Component {
                                                                         <RangePicker
                                                                             picker="year"
                                                                             allowClear={false}
+                                                                            disabledDate={(current) => current && (current.year() < this.state.minDate.year || current.year() > this.state.maxDateForSingleValue.year)}
                                                                             id="date"
                                                                             name="date"
                                                                             onChange={this.handleYearRangeChange}
