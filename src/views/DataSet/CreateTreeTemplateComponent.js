@@ -7872,7 +7872,12 @@ export default class CreateTreeTemplate extends Component {
      * Resets the tree component.
      */
     resetTree() {
-        this.componentDidMount();
+        this.setState({
+            isChanged:false,
+            isTemplateChanged:false
+        },()=>{
+            this.componentDidMount();
+        })
     }
     /**
      * Handles changes in data input fields.
