@@ -7292,7 +7292,7 @@ export default class BuildTree extends Component {
             var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
                 for (let i = 0; i < scenarioListNew.length; i++) {
-                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList.filter(x => x.transferNodeDataId == "" && this.state.copyModeling);
+                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
                     (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList = nodeDataModelingList; 
                 }
             }
