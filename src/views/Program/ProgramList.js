@@ -255,16 +255,16 @@ export default class ProgramList extends Component {
                   }.bind(this)
                 });
               }
-              if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT')) {
-                items.push({
-                  title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementAgent'),
-                  onclick: function () {
-                    this.props.history.push({
-                      pathname: `/program/mapProcurementAgent/${this.el.getValueFromCoords(0, y)}`,
-                    })
-                  }.bind(this)
-                });
-              }
+              // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT')) {
+              //   items.push({
+              //     title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementAgent'),
+              //     onclick: function () {
+              //       this.props.history.push({
+              //         pathname: `/program/mapProcurementAgent/${this.el.getValueFromCoords(0, y)}`,
+              //       })
+              //     }.bind(this)
+              //   });
+              // }
             }
           }
           return items;
