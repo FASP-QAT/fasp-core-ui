@@ -422,6 +422,10 @@ class EditBudgetComponent extends Component {
      * @returns {JSX.Element} - Budget details form.
      */
     render() {
+        let selectedProgramIds = this.state.budget.programs.map((ele) =>
+            Number(ele.id)
+        );
+        
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -432,7 +436,13 @@ class EditBudgetComponent extends Component {
             return '?'
         }
         const { fundingSources } = this.state;
-        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
+        console.log("fundingSources Test@123",fundingSources);
+        console.log("Selected Program Ids Test@123",selectedProgramIds)
+        let fundingSourceList = fundingSources.length > 0 && fundingSources.filter(item => {
+            // Check if the funding source is available in at least one of the selected programs
+            return selectedProgramIds.some(programId => 
+              item.programList.some(program => program.id === programId)
+            );}).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {getLabelText(item.label, this.state.lang)}
