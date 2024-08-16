@@ -60,7 +60,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 ]
             }
             if (treeId != -1) {
-                treeList = treeList.filter(c => c.treeId == treeId);
+                treeList = treeList.filter(c => treeId.toString().split(",").includes(c.treeId.toString()));
             }
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
