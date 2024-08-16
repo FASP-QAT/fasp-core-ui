@@ -1727,6 +1727,8 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+                var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
                 var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
@@ -1774,7 +1776,43 @@ export default class TreeTable extends Component {
         this.el.setValueFromCoords(12, y, 1, true);
     }
     onChangeTab2Data = function (instance, cell, x, y, value) {
+        var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(37, y, 1, true);
+        let nodeId = this.el.getValueFromCoords(36, y)
+        if(x == 8) {
+            var childNodes = this.state.items.filter(ele => ele.parent == nodeId);
+            var jsonLength = parseInt(json.length);
+            for (var i = 0; i < childNodes.length; i++) {
+                for (var j = 0; j < jsonLength; j++) {
+                    var map = new Map(Object.entries(json[j]));
+                    var tempNodeId = map.get("0");
+                    if(tempNodeId == childNodes[i].id) {
+                        this.el.setValueFromCoords(8, j, value, true);
+                        this.el.setValueFromCoords(9, j, "", true);
+                        this.el.setValueFromCoords(10, j, "", true);
+                    }
+                }
+            }
+        }
+        if(x == 9) {
+            this.el.setValueFromCoords(10, this.state.planningUnitList.filter(x => x.id == value).length > 0 ? this.state.planningUnitList.filter(x => x.id == value)[0].multiplier : "", "", true);
+        }
+        if(x == 13) {
+            var childNodes = this.state.items.filter(ele => ele.parent == nodeId);
+            var jsonLength = parseInt(json.length);
+            this.el.setValueFromCoords(8, y, "", true);
+            for (var i = 0; i < childNodes.length; i++) {
+                for (var j = 0; j < jsonLength; j++) {
+                    var map = new Map(Object.entries(json[j]));
+                    var tempNodeId = map.get("0");
+                    if(tempNodeId == childNodes[i].id) {
+                        this.el.setValueFromCoords(8, j, "", true);
+                        this.el.setValueFromCoords(9, j, "", true);
+                        this.el.setValueFromCoords(10, j, "", true);
+                    }
+                }
+            }
+        }
     }
     buildTab1Jexcel() {
         var treeArray = [];
@@ -2018,7 +2056,7 @@ export default class TreeTable extends Component {
         })
     }
     filterPlanningUnit = function (instance, cell, c, r, source) {
-        var selectedForecastingUnitId = (this.state.treeTabl2El.getJson(null, false)[r-1])[8];
+        var selectedForecastingUnitId = (this.state.treeTabl2El.getJson(null, false)[r])[8];
         var mylist = this.state.planningUnitList.filter(c => c.forecastingUnit.id == selectedForecastingUnitId);
         var mylist1 = mylist.map(c => {
             return {id: c.id, name: getLabelText(c.label, this.state.lang)}
@@ -2048,14 +2086,17 @@ export default class TreeTable extends Component {
                         curItem.context.payload.label.label_en = json[i][3];
                         (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
 
+                        if(json[i][35] == 4){
+                            var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
+
+                            // (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                        }
                         if(json[i][35] == 5){
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = json[i][9];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = this.state.planningUnitList.filter(ele => ele.id == json[i][9])[0].multiplier;
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = json[i][12];
                         }
-                        // if(json[i][35] == 5){
-                        //     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
-                        //     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
-                        // }
                         (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][32];
                         this.getNotes();
                         this.setState({
@@ -2127,7 +2168,9 @@ export default class TreeTable extends Component {
             var level = items[i].level;
             var fuNode = items[i].payload.nodeType.id == 4;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
+            var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
             console.log("Hello",items[i], fuNode ? currentScenario.fuNode.oneTimeUsage : "")
+            data[0] = items[i].id;
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
             data[3] = items[i].payload.label.label_en;
@@ -2136,7 +2179,7 @@ export default class TreeTable extends Component {
             data[6] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]); //Parent Value
             // data[7] = currentScenario.dataValue;//Node Value
             data[7] = currentScenario.dataValue * (data[5] / 100);
-            data[8] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : ""; // Forecasting unit
+            data[8] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en; // Forecasting unit
             data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
             data[11] = 0; // # PU / Interval / Patient (Reference)
