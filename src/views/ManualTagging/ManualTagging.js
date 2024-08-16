@@ -1047,8 +1047,13 @@ export default class ManualTagging extends Component {
                     .then(response => {
                         if (response.status == 200) {
                             var listArray = response.data.map(ele => ele.realmCountry);
+                            var lang=this.state.lang;
                             this.setState({
-                                countryList: response.data
+                                countryList: response.data.sort(function (a, b) {
+                                    a = getLabelText(a.realmCountry.label,lang).toLowerCase();
+                                    b = getLabelText(b.realmCountry.label,lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                  })
                             }, () => {
                                 if (this.state.countryList.length == 1) {
                                     var event = {
