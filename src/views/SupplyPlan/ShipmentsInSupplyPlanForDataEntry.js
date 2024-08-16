@@ -1434,7 +1434,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
      * This function is used to filter the funding source list based on active flag
      */
     filterFundingSource = function (instance, cell, c, r, source) {
-        return this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        return this.state.fundingSourceList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
