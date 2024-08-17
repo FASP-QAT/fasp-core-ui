@@ -507,7 +507,7 @@
     "static.formula.suggestedText4": "” screen.",
     "static.formula.suggestedText7": "2. If Month N is stocked out (Ending Balance = 0), QAT will always suggest a shipment",
     "static.formula.suggestedText6": "1. If AMC = 0 or N/A for Month N, no suggested shipment",
-    "static.extrapolations.showFits": "Display forecasts in months with actual consumption.",
+    "static.extrapolations.showFits": "Display forecasts in months with actual consumption",
     "static.dashboard.applicationmaster": "Application masters",
     "static.program.validstatus": "Select Status",
     "static.message.fundingSource.listNotFound": "No funding source found",
