@@ -1779,6 +1779,9 @@ export default class TreeTable extends Component {
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(37, y, 1, true);
         let nodeId = this.el.getValueFromCoords(36, y)
+        if(x == 5) {
+            this.el.setValueFromCoords(6, y, this.el.getValueFromCoords(6, y)*(value/100), true);
+        }
         if(x == 8) {
             var childNodes = this.state.items.filter(ele => ele.parent == nodeId);
             var jsonLength = parseInt(json.length);
@@ -1795,7 +1798,7 @@ export default class TreeTable extends Component {
             }
         }
         if(x == 9) {
-            this.el.setValueFromCoords(10, this.state.planningUnitList.filter(x => x.id == value).length > 0 ? this.state.planningUnitList.filter(x => x.id == value)[0].multiplier : "", "", true);
+            this.el.setValueFromCoords(10, y, this.state.planningUnitList.filter(x => x.id == value).length > 0 ? this.state.planningUnitList.filter(x => x.id == value)[0].multiplier : "", true);
         }
         if(x == 13) {
             var childNodes = this.state.items.filter(ele => ele.parent == nodeId);
@@ -1811,6 +1814,44 @@ export default class TreeTable extends Component {
                         this.el.setValueFromCoords(10, j, "", true);
                     }
                 }
+            }
+        }
+        if(x == 14) {
+            if(value == 1) {
+                var cell1 = this.el.getCell(`W${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                this.el.setValueFromCoords(22, y, 0, true);
+            } else if(value == 2) {
+                var cell1 = this.el.getCell(`W${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                this.el.setValueFromCoords(22, y, "", true);
+                this.el.setValueFromCoords(23, y, "", true);
+                this.el.setValueFromCoords(24, y, "", true);
+            }
+        }
+        if(x == 22) {
+            if(value == 1) {
+                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                this.el.setValueFromCoords(22, y, 1, true);
+                this.el.setValueFromCoords(23, y, "", true);
+                this.el.setValueFromCoords(24, y, "", true);
+            } else if(value == 0) {
+                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                this.el.setValueFromCoords(22, y, 0, true);
             }
         }
     }
@@ -2080,16 +2121,29 @@ export default class TreeTable extends Component {
                             context: ''
                         };
                         curItem.context = items.filter(c => c.id == json[i][36])[0];
-                        console.log("Hello", curItem, json[i][36])
+                        console.log("Hello", curItem, json[i])
                         // curItem.context.payload.label.label_en = json[i][3];
                         // curItem.context.payload.nodeUnit.id = json[i][4];
                         curItem.context.payload.label.label_en = json[i][3];
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
                         (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
 
                         if(json[i][35] == 4){
                             var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
-
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = json[i][13];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id = json[i][14];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
+                            if(json[i][14] == 1 && json[i][22] == 0) {
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod = {};
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = json[i][24];
+                            }
                             // (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
                         }
                         if(json[i][35] == 5){
@@ -2169,7 +2223,6 @@ export default class TreeTable extends Component {
             var fuNode = items[i].payload.nodeType.id == 4;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
             var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
-            console.log("Hello",items[i], fuNode ? currentScenario.fuNode.oneTimeUsage : "")
             data[0] = items[i].id;
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
@@ -2252,12 +2305,12 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: i18n.t('static.tree.parentValue'),
-                        mask: '#,##0.00', decimal: '.',
+                        mask: '#,##0.0000', decimal: '.',
                         type: 'numeric',
                     },
                     {
                         title: i18n.t('static.tree.nodeValue'),
-                        mask: '#,##0.00', decimal: '.',
+                        mask: '#,##0.0000', decimal: '.',
                         type: 'numeric',
                     },
                     {
