@@ -517,7 +517,7 @@
     "static.common.integrationViewtext": "Seleccionar vista de integración",
     "static.shipment.receiveddate": "Fecha de recepción",
     "static.formula.suggestedText9": "Min MOS, el pedido sugerido traerá el mes N a",
-    "static.compareAndSelect.showOnlyForecastPeriod": "Mostrar solo el período de estimación",
+    "static.compareAndSelect.showOnlyForecastPeriod": "Mostrar sólo Período de pronóstico",
     "static.formula.suggestedText8": "Si los dos próximos 2 meses (N+1, N+2) son",
     "static.tree.conversionFUPU": "Conversión (FU:PU)",
     "static.productcategory.productcategory": "Categoría de producto",
