@@ -178,6 +178,7 @@ const ProductValidation = React.lazy(() => import('../../views/Validations/Produ
 const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAndSelect/CompareAndSelectScenario'))
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
+const TreeTable = React.lazy(() => import('../../views/DataSet/TreeTableComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
@@ -218,6 +219,8 @@ const routes = [
   { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/treeTable/', exact: true, name: 'static.common.managetree', component: TreeTable },
+  { path: '/dataSet/treeTable/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: TreeTable },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
