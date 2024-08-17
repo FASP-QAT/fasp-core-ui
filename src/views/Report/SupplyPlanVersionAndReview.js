@@ -70,7 +70,8 @@ class SupplyPlanVersionAndReview extends Component {
             resetQPLModal: false,
             programIdsList: [],
             loadingResetQPL: false,
-            versionTypeIdResetQPL: "",
+            versionTypeIdResetQPL: [],
+            versionTypeIdResetQPLString: "",
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -114,15 +115,6 @@ class SupplyPlanVersionAndReview extends Component {
                 versionStatusId: event.target.value
             }, () => {
                 this.fetchData();
-            })
-        }
-        if (event.target.name == "versionTypeIdResetQPL") {
-            this.setState({
-                versionTypeIdResetQPL: event.target.value,
-                versionStatusIdResetQPL:[],
-                versionStatusIdResetQPLString:""
-            },()=>{
-                this.getProgramListForResetQPL()
             })
         }
     }
@@ -935,7 +927,8 @@ class SupplyPlanVersionAndReview extends Component {
             versionStatusIdResetQPLString: "",
             programIdsResetQPL: [],
             programIdsList: [],
-            versionTypeIdResetQPL: "",
+            versionTypeIdResetQPL: [],
+            versionTypeIdResetQPLString: "",
         })
 
     }
@@ -961,14 +954,28 @@ class SupplyPlanVersionAndReview extends Component {
         })
     }
     /**
+     * This function is used to set the version type Ids that are selected for reset
+     * @param {*} e This is value of the event
+     */
+    dataChangeVersionType(e) {
+        this.setState({
+            versionTypeIdResetQPL: e,
+            versionTypeIdResetQPLString: e.map(ele => ele.value).toString(),
+            versionStatusIdResetQPL:[],
+            versionStatusIdResetQPLString:""
+        }, () => {
+            this.getProgramListForResetQPL()
+        })
+    }
+    /**
      * This funtion is used to get the list of programs based on version status
      */
     getProgramListForResetQPL() {
-        if (this.state.versionStatusIdResetQPL.length > 0 && this.state.versionTypeIdResetQPL!="") {
+        if (this.state.versionStatusIdResetQPL.length > 0 && this.state.versionTypeIdResetQPL.length > 0) {
             this.setState({
                 loadingResetQPL: true
             })
-            DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPLString, this.state.versionTypeIdResetQPL)
+            DropdownService.getProgramListBasedOnVersionStatusAndVersionType(this.state.versionStatusIdResetQPLString, this.state.versionTypeIdResetQPLString)
                 .then(response => {
                     var listArray = response.data;
                     var proList = [];
@@ -1165,11 +1172,15 @@ class SupplyPlanVersionAndReview extends Component {
             }, this);
         var statusMultiselect = [];
         statuses.length > 0 && statuses.map((item, i) => {
-            if(this.state.versionTypeIdResetQPL==DRAFT_VERSION_TYPE && item.id==PENDING_APPROVAL_VERSION_STATUS){
+            if(this.state.versionTypeIdResetQPLString.split(",").includes(DRAFT_VERSION_TYPE.toString()) && item.id==PENDING_APPROVAL_VERSION_STATUS){
                 statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
-            }else if(this.state.versionTypeIdResetQPL==FINAL_VERSION_TYPE){
+            }else if(this.state.versionTypeIdResetQPLString.split(",").includes(FINAL_VERSION_TYPE.toString())){
                 statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }
+        }, this);
+        var typeMultiselect = [];
+        versionTypeList.length > 0 && versionTypeList.map((item, i) => {
+            typeMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
         const columns = [
             {
@@ -1344,19 +1355,15 @@ class SupplyPlanVersionAndReview extends Component {
                             <FormGroup className="col-md-12">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                 <div className="controls">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="versionTypeIdResetQPL"
-                                            id="versionTypeIdResetQPL"
-                                            bsSize="sm"
-                                            value={this.state.versionTypeIdResetQPL}
-                                            onChange={(e) => { this.dataChange(e) }}
-                                        >
-                                            <option value="">{i18n.t("static.common.select")}</option>
-                                            {versionTypes}
-                                        </Input>
-                                    </InputGroup>
+                                <MultiSelect
+                                        name="versionTypeIdResetQPL"
+                                        id="versionTypeIdResetQPL"
+                                        filterOptions={this.filterOptions}
+                                        options={typeMultiselect && typeMultiselect.length > 0 ? typeMultiselect : []}
+                                        value={this.state.versionTypeIdResetQPL}
+                                        onChange={(e) => { this.dataChangeVersionType(e) }}
+                                        labelledBy={i18n.t('static.common.select')}
+                                    />
                                 </div>
                             </FormGroup>
                             <FormGroup className="col-md-12">
