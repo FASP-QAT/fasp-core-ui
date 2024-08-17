@@ -10937,3 +10937,8 @@ legend.scheduler-border {
   display: table;
   padding: 0px 0px 0px 3px;
 }
+
+.compareAndSelectCollapsecol .jss>tbody>tr>td {
+  white-space: pre !important;
+  text-align: center !important;
+}

@@ -1189,7 +1189,7 @@
     "static.manualTagging.search": "Search By RO/Order No.",
     "static.usageTemplate.lagInMonth": "Lag In Months",
     "static.tree.monthStartNoSeasonality": "Month Start (no seasonality)",
-    "static.tooltip.ForecastError": "Forecast Error calculated using Weighted Absolute Percentage Error (WAPE).",
+    "static.tooltip.ForecastError": "Forecast Error calculated using Weighted Absolute Percentage Error (WAPE). The error displayed is calculated always based on the total forecast",
     "static.planningUnitSetting.existingShipments": "Existing Shipments (",
     "static.message.addTreeTemplate": "Tree Template Added Successfully",
     "static.login.loginAgain": "Please login again to access QAT in online mode.",
@@ -3339,5 +3339,6 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.compareAndSelect.noOfMonths": "Number of months included in calculation"
 }
