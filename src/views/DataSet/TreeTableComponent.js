@@ -1778,9 +1778,15 @@ export default class TreeTable extends Component {
     onChangeTab2Data = function (instance, cell, x, y, value) {
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(37, y, 1, true);
-        let nodeId = this.el.getValueFromCoords(36, y)
+        let nodeId = this.el.getValueFromCoords(36, y);
+        var currentItem = this.state.items.filter(ele => ele.id == nodeId)[0];
+        var currentItemParent = this.state.items.filter(ele => ele.id == currentItem.parent).length > 0 ? this.state.items.filter(ele => ele.id == currentItem.parent)[0] : "";
+        if(x == 4) {
+            this.el.setValueFromCoords(6, y, currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD")).length > 0 ?  this.el.getValueFromCoords(35, y) == 4 ? currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD"))[0].calculatedValue : currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD"))[0].calculatedMmdValue : 0, true);
+            this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y)*(this.el.getValueFromCoords(5, y)/100), true);
+        }
         if(x == 5) {
-            this.el.setValueFromCoords(6, y, this.el.getValueFromCoords(6, y)*(value/100), true);
+            this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y)*(value/100), true);
         }
         if(x == 8) {
             var childNodes = this.state.items.filter(ele => ele.parent == nodeId);
@@ -2126,8 +2132,8 @@ export default class TreeTable extends Component {
                         // curItem.context.payload.nodeUnit.id = json[i][4];
                         curItem.context.payload.label.label_en = json[i][3];
                         (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
-
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
+                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
                         if(json[i][35] == 4){
                             var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
@@ -2220,6 +2226,7 @@ export default class TreeTable extends Component {
             var row = "";
             var row1 = "";
             var level = items[i].level;
+            console.log("hello json",items[i])
             var fuNode = items[i].payload.nodeType.id == 4;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
             var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
@@ -2228,10 +2235,10 @@ export default class TreeTable extends Component {
             data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
             data[3] = items[i].payload.label.label_en;
             data[4] = moment(currentScenario.month).format("YYYY-MM-DD");
-            data[5] = 100; //Percentage of Parent
-            data[6] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]); //Parent Value
+            data[5] = currentScenario.dataValue; //Percentage of Parent
+            data[6] = currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == data[4]).length > 0 ? fuNode ? currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == data[4])[0].calculatedValue : currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == data[4])[0].calculatedMmdValue : 0; //Parent Value
             // data[7] = currentScenario.dataValue;//Node Value
-            data[7] = currentScenario.dataValue * (data[5] / 100);
+            data[7] = currentScenario.calculatedDataValue;
             data[8] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en; // Forecasting unit
             data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
@@ -2402,37 +2409,37 @@ export default class TreeTable extends Component {
                     {
                         title: '# of FU required for period',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: '# Of Months In Period',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: '# of FU / month / Patient',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: '# of FU / Unit/ Time',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: '# of FU required for period per Unit',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: '# of FU / month / Unit',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: '# of PU / month / Unit',
                         mask: '#,##0.00', decimal: '.',
-                        type: 'numeric',
+                        type: 'hidden',
                     },
                     {
                         title: i18n.t('static.common.notes'),
