@@ -13923,22 +13923,22 @@ export default class BuildTree extends Component {
                                                 <b>Node name:</b> {this.state.copyModalNode.payload.label.label_en} 
                                             </Label>
                                         </FormGroup>
-                                        <FormGroup style={{ "marginLeft": '20px' }}>
-                                            <Input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                id="copyModeling"
-                                                name="copyModeling"
-                                                checked={this.state.copyModeling}
-                                                onClick={(e) => { this.setCopyModeling(e); }}
-                                            />
-                                            <Label
-                                                className="form-check-label"
-                                                check htmlFor="copyModeling" style={{ fontSize: '12px', "marginTop": '3px' }}>
-                                                {i18n.t('static.tree.copyModeling')}
-                                            </Label>
-                                        </FormGroup>
                                         <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
+                                            <FormGroup style={{ "marginLeft": '20px' }}>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="copyModeling"
+                                                    name="copyModeling"
+                                                    checked={this.state.copyModeling}
+                                                    onClick={(e) => { this.setCopyModeling(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="copyModeling" style={{ fontSize: '12px', "marginTop": '3px' }}>
+                                                    {i18n.t('static.tree.copyModeling')}
+                                                </Label>
+                                            </FormGroup>
                                             <p><b>{i18n.t('static.tree.destination')}:</b></p>
                                             <FormGroup>
                                                 <Label htmlFor="currencyId">{i18n.t('static.common.treeName')}</Label>
