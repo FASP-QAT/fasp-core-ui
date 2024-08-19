@@ -732,7 +732,8 @@ export default class TreeTable extends Component {
             branchTemplateNotes: "",
             calculateAllScenario:false,
             treeTabl1El: '',
-            treeTabl2El: ''
+            treeTabl2El: '',
+            isTabDataChanged: false
         }
         this.dataChange = this.dataChange.bind(this);
         this.scenarioChange = this.scenarioChange.bind(this);
@@ -785,6 +786,10 @@ export default class TreeTable extends Component {
         this.saveTreeData = this.saveTreeData.bind(this);
         this.onChangeTab1Data = this.onChangeTab1Data.bind(this);
         this.onChangeTab2Data = this.onChangeTab2Data.bind(this);
+        this.resetTab1Data = this.resetTab1Data.bind(this);
+        this.resetTab2Data = this.resetTab2Data.bind(this);
+        this.onChangePageTab1 = this.onChangePageTab1.bind(this);
+        this.onChangePageTab2 = this.onChangePageTab2.bind(this);
     }
     /**
      * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
@@ -1602,7 +1607,7 @@ export default class TreeTable extends Component {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
-        var jsonLength;
+        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
@@ -1611,6 +1616,55 @@ export default class TreeTable extends Component {
         }
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
         for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if(rowData[10] == 1) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if(rowData[10] == 2) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if(rowData[10] == 3) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
+    onChangePageTab1(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
             if(rowData[10] == 1) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
@@ -1657,7 +1711,7 @@ export default class TreeTable extends Component {
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
-        var jsonLength;
+        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
@@ -1772,10 +1826,134 @@ export default class TreeTable extends Component {
             }
         }
     }
+    onChangePageTab2(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var j = start; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if(rowData[35] == 4) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                if(rowData[14] == 2) {
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+                if(rowData[22] == 1) {
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if(rowData[35] == 5) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
     onChangeTab1Data = function (instance, cell, x, y, value) {
         this.el.setValueFromCoords(12, y, 1, true);
+        this.setState({
+            isTabDataChanged: true
+        })
     }
     onChangeTab2Data = function (instance, cell, x, y, value) {
+        this.setState({
+            isTabDataChanged: true
+        })
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(37, y, 1, true);
         let nodeId = this.el.getValueFromCoords(36, y);
@@ -1982,7 +2160,7 @@ export default class TreeTable extends Component {
                 license: JEXCEL_PRO_KEY,
                 onload: this.loadedTab1,
                 onchange: this.onChangeTab1Data,
-                // onchangepage:
+                onchangepage: this.onChangePageTab1,
                 contextMenu: function (obj, x, y, e) {
                     var items = [];
                     var rowData = obj.getRowData(y)
@@ -2102,6 +2280,47 @@ export default class TreeTable extends Component {
             }, 0)
         })
     }
+    resetTab1Data() {
+        if (this.state.isTabDataChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    isTabDataChanged: false
+                }, () => {
+                    if (this.state.treeTabl1El != "") {
+                        jexcel.destroy(document.getElementById('tableDiv'), true);
+                        if (this.state.treeTabl1El != "") {
+                            if (document.getElementById('tableDiv') != null) {
+                                jexcel.destroy(document.getElementById('tableDiv'), true);
+                            }
+                        }
+                        else if (this.state.treeTabl2El != "") {
+                            jexcel.destroy(document.getElementById('tableDiv2'), true);
+                        }
+                    }
+                    this.buildTab1Jexcel();
+                })
+            } else {
+            }
+        } else {
+            this.setState({
+                isTabDataChanged: false
+            }, () => {
+                if (this.state.treeTabl1El != "") {
+                    jexcel.destroy(document.getElementById('tableDiv'), true);
+                    if (this.state.treeTabl1El != "") {
+                        if (document.getElementById('tableDiv') != null) {
+                            jexcel.destroy(document.getElementById('tableDiv'), true);
+                        }
+                    }
+                    else if (this.state.treeTabl2El != "") {
+                        jexcel.destroy(document.getElementById('tableDiv2'), true);
+                    }
+                }
+                this.buildTab1Jexcel();
+            })
+        }
+    }
     filterPlanningUnit = function (instance, cell, c, r, source) {
         var selectedForecastingUnitId = (this.state.treeTabl2El.getJson(null, false)[r])[8];
         var mylist = this.state.planningUnitList.filter(c => c.forecastingUnit.id == selectedForecastingUnitId);
@@ -2209,6 +2428,47 @@ export default class TreeTable extends Component {
                 // }
             }, 0)
         })
+    }
+    resetTab2Data() {
+        if (this.state.isTabDataChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    isTabDataChanged: false
+                }, () => {
+                    if (this.state.treeTabl2El != "") {
+                        jexcel.destroy(document.getElementById('tableDiv2'), true);
+                        if (this.state.treeTabl2El != "") {
+                            if (document.getElementById('tableDiv2') != null) {
+                                jexcel.destroy(document.getElementById('tableDiv2'), true);
+                            }
+                        }
+                        else if (this.state.treeTabl2El != "") {
+                            jexcel.destroy(document.getElementById('tableDiv2'), true);
+                        }
+                    }
+                    this.buildTab2Jexcel();
+                })
+            } else {
+            }
+        } else {
+            this.setState({
+                isTabDataChanged: false
+            }, () => {
+                if (this.state.treeTabl2El != "") {
+                    jexcel.destroy(document.getElementById('tableDiv2'), true);
+                    if (this.state.treeTabl2El != "") {
+                        if (document.getElementById('tableDiv2') != null) {
+                            jexcel.destroy(document.getElementById('tableDiv2'), true);
+                        }
+                    }
+                    else if (this.state.treeTabl2El != "") {
+                        jexcel.destroy(document.getElementById('tableDiv2'), true);
+                    }
+                }
+                this.buildTab2Jexcel();
+            })
+        }
     }
     buildTab2Jexcel() {
         var treeArray = [];
@@ -2484,7 +2744,7 @@ export default class TreeTable extends Component {
                 license: JEXCEL_PRO_KEY,
                 onload: this.loadedTab2,
                 onchange: this.onChangeTab2Data,
-                // onchangepage:
+                onchangepage: this.onChangePageTab2,
                 contextMenu: function (obj, x, y, e) {
                     var items = [];
                     var rowData = obj.getRowData(y)
@@ -3640,7 +3900,7 @@ export default class TreeTable extends Component {
      * This function is trigged when this component is updated and is being used to display the warning for leaving unsaved changes
      */
     componentDidUpdate = () => {
-        if (this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true) {
+        if (this.state.isTabDataChanged == true) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -3672,40 +3932,89 @@ export default class TreeTable extends Component {
      * @param {number} tab - The new active tab index.
      */
     toggleModal(tabPane, tab) {
-        const newArray = this.state.activeTab1.slice()
-        newArray[tabPane] = tab
-        this.setState({
-            activeTab1: newArray,
-            showCalculatorFields: false
-        }, () => {
-            if (tab == 1) {
-                if (this.state.treeTabl1El != "") {
-                    jexcel.destroy(document.getElementById('tableDiv'), true);
-                    if (this.state.treeTabl1El != "") {
-                        if (document.getElementById('tableDiv') != null) {
-                            jexcel.destroy(document.getElementById('tableDiv'), true);
+        if (this.state.isTabDataChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    isTabDataChanged: false
+                }, () => {
+                    const newArray = this.state.activeTab1.slice()
+                    newArray[tabPane] = tab
+                    this.setState({
+                        activeTab1: newArray,
+                        showCalculatorFields: false
+                    }, () => {
+                        if (tab == 1) {
+                            if (this.state.treeTabl1El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv'), true);
+                                if (this.state.treeTabl1El != "") {
+                                    if (document.getElementById('tableDiv') != null) {
+                                        jexcel.destroy(document.getElementById('tableDiv'), true);
+                                    }
+                                }
+                                else if (this.state.treeTabl2El != "") {
+                                    jexcel.destroy(document.getElementById('tableDiv2'), true);
+                                }
+                            }
+                            this.buildTab1Jexcel();
+                        } else if (tab == 2) {
+                            if (this.state.treeTabl2El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv2'), true);
+                                if (this.state.treeTabl2El != "") {
+                                    if (document.getElementById('tableDiv2') != null) {
+                                        jexcel.destroy(document.getElementById('tableDiv2'), true);
+                                    }
+                                }
+                                else if (this.state.treeTabl1El != "") {
+                                    jexcel.destroy(document.getElementById('tableDiv1'), true);
+                                }
+                            }
+                            this.buildTab2Jexcel();
                         }
-                    }
-                    else if (this.state.treeTabl2El != "") {
-                        jexcel.destroy(document.getElementById('tableDiv2'), true);
-                    }
-                }
-                this.buildTab1Jexcel();
-            } else if (tab == 2) {
-                if (this.state.treeTabl2El != "") {
-                    jexcel.destroy(document.getElementById('tableDiv2'), true);
-                    if (this.state.treeTabl2El != "") {
-                        if (document.getElementById('tableDiv2') != null) {
-                            jexcel.destroy(document.getElementById('tableDiv2'), true);
-                        }
-                    }
-                    else if (this.state.treeTabl1El != "") {
-                        jexcel.destroy(document.getElementById('tableDiv1'), true);
-                    }
-                }
-                this.buildTab2Jexcel();
+                    });
+                })
+            } else {
             }
-        });
+        } else {
+            this.setState({
+                isTabDataChanged: false
+            }, () => {
+                const newArray = this.state.activeTab1.slice()
+                newArray[tabPane] = tab
+                this.setState({
+                    activeTab1: newArray,
+                    showCalculatorFields: false
+                }, () => {
+                    if (tab == 1) {
+                        if (this.state.treeTabl1El != "") {
+                            jexcel.destroy(document.getElementById('tableDiv'), true);
+                            if (this.state.treeTabl1El != "") {
+                                if (document.getElementById('tableDiv') != null) {
+                                    jexcel.destroy(document.getElementById('tableDiv'), true);
+                                }
+                            }
+                            else if (this.state.treeTabl2El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv2'), true);
+                            }
+                        }
+                        this.buildTab1Jexcel();
+                    } else if (tab == 2) {
+                        if (this.state.treeTabl2El != "") {
+                            jexcel.destroy(document.getElementById('tableDiv2'), true);
+                            if (this.state.treeTabl2El != "") {
+                                if (document.getElementById('tableDiv2') != null) {
+                                    jexcel.destroy(document.getElementById('tableDiv2'), true);
+                                }
+                            }
+                            else if (this.state.treeTabl1El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv1'), true);
+                            }
+                        }
+                        this.buildTab2Jexcel();
+                    }
+                });
+            })
+        }
     }
     /**
      * Resets the tree component.
@@ -4198,10 +4507,8 @@ export default class TreeTable extends Component {
                     <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
                     <div className="col-md-12 pr-lg-0">
-                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                            this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
-                        }}>
-                            <i className="fa fa-times"></i> {'Close'}</Button>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>
@@ -4210,10 +4517,8 @@ export default class TreeTable extends Component {
                     <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
                     <div className="col-md-12 pr-lg-0">
-                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
-                            this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
-                        }}>
-                            <i className="fa fa-times"></i> {'Close'}</Button>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>
