@@ -19,7 +19,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, formatter, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 // Localized entity name
 const entityname = i18n.t('static.region.region');
 /**
@@ -440,6 +440,7 @@ class RegionListComponent extends Component {
                                                         value={this.state.countryValues}
                                                         onChange={(e) => { this.handleChange(e) }}
                                                         options={countryList && countryList.length > 0 ? countryList : []}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>

@@ -1479,7 +1479,7 @@ export default class syncPage extends Component {
               var lastSyncDate = lastSyncDateRequest.result[0];
               var result = lastSyncDateRequest.result;
               for (var i = 0; i < result.length; i++) {
-                if (result[i].id == 0) {
+                if (result[i].id === 0) {
                   var lastSyncDate = lastSyncDateRequest.result[i];
                 }
               }
@@ -1555,10 +1555,10 @@ export default class syncPage extends Component {
         if (response1.status == 200) {
           var latestVersion = response1.data;
           var programRequestJson = [];
-          programRequestJson.push({ programId: (programId.split("_"))[0], versionId: -1 })
+          programRequestJson.push({ programId: (programId.split("_"))[0], versionId: -1,'cutOffDate':"" })
           if (latestVersion == programVersion) {
           } else {
-            programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion });
+            programRequestJson.push({ programId: (programId.split("_"))[0], versionId: programVersion,'cutOffDate':"" });
           }
           ProgramService.getAllProgramData(programRequestJson)
             .then(response => {
@@ -1626,7 +1626,8 @@ export default class syncPage extends Component {
                       this.setState({
                         programRequestResult: programRequest.result,
                         programRequestProgramJson: programJson,
-                        planningUnitDataList: planningUnitDataList
+                        planningUnitDataList: planningUnitDataList,
+                        notes:programJson.currentVersionNotes!=undefined?programJson.currentVersionNotes:""
                       })
                       var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
                       var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
@@ -3720,7 +3721,9 @@ export default class syncPage extends Component {
                 <div id="detailsDiv">
                   <div className="animated fadeIn" style={{ display: this.state.loading ? "none" : "block" }}>
                     <Formik
-                      initialValues={initialValues}
+                      initialValues={{
+                        notes: this.state.notes,
+                      }}
                       validationSchema={validationSchema}
                       onSubmit={(values, { setSubmitting, setErrors }) => {
                         this.synchronize()
@@ -3757,7 +3760,7 @@ export default class syncPage extends Component {
                                   </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-6">
-                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.programDiscription')}</Label>
                                   <div className="controls ">
                                     <InputGroup>
                                       <Input type="textarea"
@@ -4248,7 +4251,7 @@ export default class syncPage extends Component {
     for (var i = 0; i < programIdsSuccessfullyCommitted.length; i++) {
       var index = checkboxesChecked.findIndex(c => c.programId == programIdsSuccessfullyCommitted[i].notificationDetails.program.id);
       if (index == -1) {
-        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
+        checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1,'cutOffDate':this.state.programRequestProgramJson.cutOffDate!=undefined && this.state.programRequestProgramJson.cutOffDate!=null && this.state.programRequestProgramJson.cutOffDate!=""?this.state.programRequestProgramJson.cutOffDate:"" })
       }
     }
     ProgramService.getAllProgramData(checkboxesChecked)
@@ -4405,7 +4408,8 @@ export default class syncPage extends Component {
                           openCount: 0,
                           addressedCount: 0,
                           programModified: 0,
-                          readonly: 0
+                          readonly: 0,
+                          cutOffDate:json[r].cutOffDate
                         };
                         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                         programQPLDetailsOs.put(programQPLDetailsJson);

@@ -22,6 +22,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlanForDataEntry";
+import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 const entityname = i18n.t('static.inventory.inventorydetils')
 /**
  * This component is used to allow the users to do the data entry for the inventory or adjustment records
@@ -358,8 +359,9 @@ export default class AddInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
+                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version,
+                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -493,6 +495,13 @@ export default class AddInventory extends Component {
                                     planningUnitListForJexcel.push(productJson1)
                                 }
                             }
+                            var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+                            var rangeValue = this.state.rangeValue;
+                            if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+                                rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                                localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+                            }
                             this.setState({
                                 planningUnitList: proList.sort(function (a, b) {
                                     a = a.label.toLowerCase();
@@ -511,7 +520,9 @@ export default class AddInventory extends Component {
                                     b = b.name.toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
                                 }),
-                                loading: false
+                                loading: false,
+                                minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                                rangeValue: rangeValue,
                             })
                             var planningUnitIdProp = '';
                             if (this.props.match.params.planningUnitId != '' && this.props.match.params.planningUnitId != undefined) {
@@ -799,6 +810,7 @@ export default class AddInventory extends Component {
                                                             ref={this.pickRange}
                                                             value={rangeValue}
                                                             lang={pickerLang}
+                                                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                                                             onDismiss={this.handleRangeDissmis}
                                                         >
                                                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -829,6 +841,7 @@ export default class AddInventory extends Component {
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
+                                                            filterOptions={filterOptions}
                                                         />
                                                     </div>
                                                 </FormGroup>
