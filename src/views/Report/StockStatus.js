@@ -593,94 +593,94 @@ class StockStatus extends Component {
    * Fetches and filters data based on selected program, version, planning unit, and date range.
    */
   filterData() {
-    let programId = document.getElementById("programId").value;
-    let planningUnitIds = this.state.planningUnitIds.map(item => item.value.toString());
-    let forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value.toString());
-    let viewById = this.state.viewById;
-    let equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
-    let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-    if (programId != 0 && ((planningUnitIds.length > 0 && viewById == 1) || (forecastingUnitIds.length > 0 && viewById == 2))) {
+    // let programId = document.getElementById("programId").value;
+    // let planningUnitIds = this.state.planningUnitIds.map(item => item.value.toString());
+    // let forecastingUnitIds = this.state.forecastingUnitIds.map(item => item.value.toString());
+    // let viewById = this.state.viewById;
+    // let equivalencyUnitId = document.getElementById("yaxisEquUnit").value;
+    // let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    // if (programId != 0 && ((planningUnitIds.length > 0 && viewById == 1) || (forecastingUnitIds.length > 0 && viewById == 2))) {
 
-      this.setState({ loading: true })
-      var inputjson = {
-        "programId": programId,
-        "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
-        "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-        "planningUnitIds": planningUnitIds,
-        "allPlanningUnits": false
-      }
-      ReportService.getStockStatusData(inputjson)
-        .then(response => {
-          var inventoryList = [];
-          var consumptionList = [];
-          var shipmentList = [];
-          var responseData = response.data[0];
-          let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-          var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-          filteredResponseData.map(c => {
-            c.inventoryInfo.map(i => inventoryList.push(i))
-            c.consumptionInfo.map(ci => consumptionList.push(ci))
-            c.shipmentInfo.map(si => shipmentList.push(si))
-          }
-          );
-          this.setState({
-            firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
-            firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
-            stockStatusList: filteredResponseData,
-            message: '', loading: false,
-            planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
-            inList: inventoryList,
-            coList: consumptionList,
-            shList: shipmentList
-          })
-        }).catch(
-          error => {
-            this.setState({
-              stockStatusList: [], loading: false
-            })
-            if (error.message === "Network Error") {
-              this.setState({
-                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                loading: false
-              });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 401:
-                  this.props.history.push(`/login/static.message.sessionExpired`)
-                  break;
-                case 403:
-                  this.props.history.push(`/accessDenied`)
-                  break;
-                case 500:
-                case 404:
-                case 406:
-                  this.setState({
-                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                    loading: false
-                  });
-                  break;
-                case 412:
-                  this.setState({
-                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                    loading: false
-                  });
-                  break;
-                default:
-                  this.setState({
-                    message: 'static.unkownError',
-                    loading: false
-                  });
-                  break;
-              }
-            }
-          }
-        );
+    //   this.setState({ loading: true })
+    //   var inputjson = {
+    //     "programId": programId,
+    //     "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
+    //     "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+    //     "planningUnitIds": planningUnitIds,
+    //     "allPlanningUnits": false
+    //   }
+    //   ReportService.getStockStatusData(inputjson)
+    //     .then(response => {
+    //       var inventoryList = [];
+    //       var consumptionList = [];
+    //       var shipmentList = [];
+    //       var responseData = response.data[0];
+    //       let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+    //       var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+    //       filteredResponseData.map(c => {
+    //         c.inventoryInfo.map(i => inventoryList.push(i))
+    //         c.consumptionInfo.map(ci => consumptionList.push(ci))
+    //         c.shipmentInfo.map(si => shipmentList.push(si))
+    //       }
+    //       );
+    //       this.setState({
+    //         firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
+    //         firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
+    //         stockStatusList: filteredResponseData,
+    //         message: '', loading: false,
+    //         planningUnitLabel: document.getElementById("planningUnitId").selectedOptions[0].text,
+    //         inList: inventoryList,
+    //         coList: consumptionList,
+    //         shList: shipmentList
+    //       })
+    //     }).catch(
+    //       error => {
+    //         this.setState({
+    //           stockStatusList: [], loading: false
+    //         })
+    //         if (error.message === "Network Error") {
+    //           this.setState({
+    //             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+    //             loading: false
+    //           });
+    //         } else {
+    //           switch (error.response ? error.response.status : "") {
+    //             case 401:
+    //               this.props.history.push(`/login/static.message.sessionExpired`)
+    //               break;
+    //             case 403:
+    //               this.props.history.push(`/accessDenied`)
+    //               break;
+    //             case 500:
+    //             case 404:
+    //             case 406:
+    //               this.setState({
+    //                 message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+    //                 loading: false
+    //               });
+    //               break;
+    //             case 412:
+    //               this.setState({
+    //                 message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+    //                 loading: false
+    //               });
+    //               break;
+    //             default:
+    //               this.setState({
+    //                 message: 'static.unkownError',
+    //                 loading: false
+    //               });
+    //               break;
+    //           }
+    //         }
+    //       }
+    //     );
 
-    } else if (programId == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
-    } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [], planningUnitLabel: '' });
-    }
+    // } else if (programId == 0) {
+    //   this.setState({ message: i18n.t('static.common.selectProgram'), stockStatusList: [] });
+    // } else {
+    //   this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), stockStatusList: [], planningUnitLabel: '' });
+    // }
   }
   /**
    * Fetches the data for exporting it in CSV or PDF based on the planning units selected
@@ -1175,7 +1175,7 @@ class StockStatus extends Component {
     * @param {Object} e - Event data containing planning unit information.
     */
   setPlanningUnit(e) {
-    if (this.state.yaxisEquUnit > 0) {
+    if (this.state.yaxisEquUnit == -1) {
       var selectedText = e.map(item => item.label);
       var tempPUList = e.filter(puItem => !this.state.planningUnitId.map(ele => ele).includes(puItem));
       this.setState({
@@ -1189,7 +1189,7 @@ class StockStatus extends Component {
         this.fetchData();
       })
     } else {
-      if (this.state.yaxisEquUnit == -1) {
+      if (this.state.yaxisEquUnit > 0) {
         this.setState({
           planningUnitId: e.map(ele => ele),
           show: false,
@@ -1204,7 +1204,7 @@ class StockStatus extends Component {
     }
   }
   setRealmCountryPlanningUnit(e) {
-    if (this.state.yaxisEquUnit > 0) {
+    if (this.state.yaxisEquUnit == -1) {
       var selectedText = e.map(item => item.label);
       var tempRCPUList = e.filter(rcpuItem => !this.state.planningUnitId.map(ele => ele).includes(rcpuItem));
       this.setState({
@@ -1218,7 +1218,7 @@ class StockStatus extends Component {
         this.fetchData();
       })
     } else {
-      if (this.state.yaxisEquUnit == -1) {
+      if (this.state.yaxisEquUnit > 0) {
         this.setState({
           realmCountryPlanningUnitId: e.map(ele => ele),
           show: false,
@@ -1303,7 +1303,7 @@ class StockStatus extends Component {
   fetchData() {
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
     let inputjson = {
-      "aggregate": this.state.programId.length == 1 ? false : true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
+      "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
       "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
       "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
       "startDate":  startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
@@ -1311,10 +1311,32 @@ class StockStatus extends Component {
       "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
       "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
       "reportingUnitId": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitId.map(ele => ele.value).toString(), // Will be used only if aggregate is false
-      "equivalencyUnitId": this.state.yaxisEquUnit
+      "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
     }
     ReportService.getStockStatusData(inputjson).then((response) => {
       console.log("Hello",response)
+      var inventoryList = [];
+      var consumptionList = [];
+          var shipmentList = [];
+          var responseData = response.data[0];
+          let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+          var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+          filteredResponseData.map(c => {
+            c.inventoryInfo.map(i => inventoryList.push(i))
+            c.consumptionInfo.map(ci => consumptionList.push(ci))
+            c.shipmentInfo.map(si => shipmentList.push(si))
+          }
+          );
+          this.setState({
+            firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
+            firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
+            stockStatusList: filteredResponseData,
+            message: '', loading: false,
+            planningUnitLabel: "",//document.getElementById("planningUnitId").selectedOptions[0].text,
+            inList: inventoryList,
+            coList: consumptionList,
+            shList: shipmentList
+          })
     }).catch(
       error => {
         this.setState({
@@ -1370,7 +1392,7 @@ class StockStatus extends Component {
    * @param {object} value - The new range value selected by the user.
    */
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value }, () => { this.filterData() })
+    this.setState({ rangeValue: value }, () => { this.fetchData() })
   }
   /**
    * Handles the click event on the range picker box.
@@ -1954,7 +1976,7 @@ class StockStatus extends Component {
                               value={this.state.realmCountryPlanningUnitId}
                               onChange={(e) => { this.setRealmCountryPlanningUnit(e); }}
                               options={rcpuList && rcpuList.length > 0 ? rcpuList : []}
-                              hasSelectAll={this.state.yaxisEquUnit > 0 ? false : true}
+                              hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
                             />
                           </div>
                         </FormGroup>
@@ -1967,7 +1989,7 @@ class StockStatus extends Component {
                               value={this.state.planningUnitId}
                               onChange={(e) => { this.setPlanningUnit(e); }}
                               options={puList && puList.length > 0 ? puList : []}
-                              hasSelectAll={this.state.yaxisEquUnit > 0 ? false : true}
+                              hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
                             />
                           </div>
                         </FormGroup>
