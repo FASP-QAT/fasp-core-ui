@@ -558,39 +558,40 @@ export default class SyncMasterData extends Component {
                                                     planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                                 }
                                             }
-                                            var changedPlanningUnits = [];
-                                            var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss") : moment(date).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss");
-                                            programPlanningUnitList.map(c => {
-                                                var programPlanningUnitProcurementAgentPrices = c.programPlanningUnitProcurementAgentPrices.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD"));
-                                                if (programPlanningUnitProcurementAgentPrices.length > 0) {
-                                                    changedPlanningUnits.push(c.planningUnit.id)
-                                                }
-                                            });
-                                            var planningUnitListsFromProcurementAgentPlanningUnit = [...new Set(procurementAgentPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
-                                            var programPlanningUnitUpdated = [...new Set(programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
-                                            var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit).concat(programPlanningUnitUpdated)).map(ele => ele)]
+                                            // var changedPlanningUnits = [];
+                                            // var minDateForModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss") : moment(date).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss");
+                                            // programPlanningUnitList.map(c => {
+                                            //     var programPlanningUnitProcurementAgentPrices = c.programPlanningUnitProcurementAgentPrices.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD"));
+                                            //     if (programPlanningUnitProcurementAgentPrices.length > 0) {
+                                            //         changedPlanningUnits.push(c.planningUnit.id)
+                                            //     }
+                                            // });
+                                            // var planningUnitListsFromProcurementAgentPlanningUnit = [...new Set(procurementAgentPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
+                                            // var programPlanningUnitUpdated = [...new Set(programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD") >= moment(minDateForModify).format("YYYY-MM-DD")).map(ele => ele.planningUnit.id))];
+                                            // var overallList = [...new Set(changedPlanningUnits.concat(planningUnitListsFromProcurementAgentPlanningUnit).concat(programPlanningUnitUpdated)).map(ele => ele)]
                                             var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                             var curUser = AuthenticationService.getLoggedInUserId();
                                             var username = AuthenticationService.getLoggedInUsername();
-                                            for (var ol = 0; ol < overallList.length; ol++) {
-                                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == overallList[ol]);
+                                            for (var ol = 0; ol < planningUnitDataList.length; ol++) {
+                                                // var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitDataList[ol].planningUnitId);
                                                 var programJson = {}
-                                                if (planningUnitDataIndex != -1) {
-                                                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == overallList[ol]))[0];
+                                                // if (planningUnitDataIndex != -1) {
+                                                    var planningUnitData = planningUnitDataList[ol];
                                                     var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
                                                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                                                     programJson = JSON.parse(programData);
-                                                } else {
-                                                    programJson = {
-                                                        consumptionList: [],
-                                                        inventoryList: [],
-                                                        shipmentList: [],
-                                                        batchInfoList: [],
-                                                        supplyPlan: []
-                                                    }
-                                                }
+                                                // } else {
+                                                    // programJson = {
+                                                        // consumptionList: [],
+                                                        // inventoryList: [],
+                                                        // shipmentList: [],
+                                                        // batchInfoList: [],
+                                                        // supplyPlan: []
+                                                    // }
+                                                // }
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var getPlannedShipments = shipmentDataList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS);
+
                                                 for (var pss = 0; pss < getPlannedShipments.length; pss++) {
                                                     var pricePerUnit = 0;
                                                     var ppu = programPlanningUnitList.filter(c => c.program.id == generalJson.programId && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
@@ -609,8 +610,8 @@ export default class SyncMasterData extends Component {
                                                     shipmentDataList[shipmentIndex].rate = Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2)
                                                     var productCost = Math.round(Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2) * shipmentDataList[shipmentIndex].shipmentQty)
                                                     shipmentDataList[shipmentIndex].productCost = productCost;
-                                                    if(getPlannedShipments.autoGeneratedFreight!=undefined && getPlannedShipments.autoGeneratedFreight.toString()!="false"){
-                                                        var programPriceList = ppu.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalJson.programId && c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.active);
+                                                    if(getPlannedShipments[pss].autoGeneratedFreight!=undefined && getPlannedShipments[pss].autoGeneratedFreight.toString()!="false"){
+                                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalJson.programId && c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.active);
                                                         var programFilter = programMasterList.filter(c=>c.programId==generalJson.programId);
                                                         var freightPercentage = 0;
                                                         if (shipmentDataList[shipmentIndex].shipmentMode == "Air") {
@@ -653,18 +654,18 @@ export default class SyncMasterData extends Component {
                                                                 }
                                                             }
                                                         }
-                                                        // shipmentDataList[shipmentIndex].freightCost = Number(Number(productCost) * (Number(Number(freightPercentage) / 100))).toFixed(2);
+                                                        shipmentDataList[shipmentIndex].freightCost = Number(Number(productCost) * (Number(Number(freightPercentage) / 100))).toFixed(2);
                                                     }
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
                                                     shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
                                                 }
                                                 programJson.shipmentList = shipmentDataList;
-                                                if (planningUnitDataIndex != -1) {
-                                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                                                } else {
-                                                    planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
-                                                }
+                                                // if (planningUnitDataIndex != -1) {
+                                                    planningUnitDataList[ol].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                // } else {
+                                                    // planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                                // }
                                             }
                                             if (pplModified.length > 0) {
                                                 minDate = null;
@@ -751,6 +752,7 @@ export default class SyncMasterData extends Component {
                                             this.fetchData(1, programList[i].id);
                                         }
                                     }).catch(error => {
+                                        console.log("In catch Test@123",error)
                                         this.fetchData(1, 1);
                                         if (error.message === "Network Error") {
                                         } else {
