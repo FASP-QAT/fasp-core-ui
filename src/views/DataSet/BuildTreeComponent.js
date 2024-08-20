@@ -806,7 +806,10 @@ export default class BuildTree extends Component {
             copyModalParentNodeList: [],
             usage2ConvertCondition: true,
             copyModeling: true,
-            copyLoader: false
+            copyLoader: false,
+            invalidNodeError: false,
+            invalidNodeType: "",
+            invalidParentNodeType: ""
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -2780,14 +2783,32 @@ export default class BuildTree extends Component {
         let copyModalParentNode;
         let copyModalTreeList = [];
         let copyModalParentLevelList = [];
+        let tempCopyModalParentLevelList = [];
         let copyModalParentNodeList = [];
         let allowedNodeTypeList = []; 
+        let invalidNodeError = false;
+        let invalidNodeType = "";
+        let invalidParentNodeType = "";
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.map(x => x.level))];
+        if(tempCopyModalParentLevelList.length != copyModalParentLevelList.length) {
+            copyModalParentLevelList = [];
+            for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+                copyModalParentLevelList.push({
+                    label: {label_en: "Level " + i},
+                    levelNo: i
+                })
+            }
+        }
         if(this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
             copyModalParentLevel = this.state.copyModalNode.level-1;
-            copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
+            if(this.state.copyModalNode.payload.nodeType.id == 5) {
+                copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
+            } else {
+                copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
+            }
             copyModalParentNode = this.state.copyModalNode.parent;
         } else if(this.state.copyModalData == 2 || copyModalTree != this.state.treeId) {
             if(copyModalParentLevelList.length == 1) {
@@ -2795,6 +2816,16 @@ export default class BuildTree extends Component {
                 copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
                 if(copyModalParentNodeList.length == 1) {
                     copyModalParentNode = copyModalParentNodeList[0].id;
+                    let allowedNodeTypeList = [];
+                    allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+                    let tempParentNode = copyModalParentNodeList.filter(x => x.id == copyModalParentNode)[0].payload.nodeType.id;
+                    if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+                        invalidNodeError = false;
+                    } else {
+                        invalidNodeError = true;
+                        invalidNodeType = this.state.copyModalNode.payload.nodeType.id;
+                        invalidParentNodeType = tempParentNode;
+                    }
                 } else {
                     copyModalParentNode = "";
                 }
@@ -2810,30 +2841,72 @@ export default class BuildTree extends Component {
             copyModalParentLevelList: copyModalParentLevelList,
             copyModalParentLevel: copyModalParentLevel,
             copyModalParentNodeList: copyModalParentNodeList,
-            copyModalParentNode: copyModalParentNode
+            copyModalParentNode: copyModalParentNode,
+            invalidNodeError: invalidNodeError,
+            invalidNodeType: invalidNodeType,
+            invalidParentNodeType: invalidParentNodeType
         },() => {
             validationSchemaCopyMove();
         })
     }
     copyModalParentLevelChange(e) {
         let allowedNodeTypeList = [];
+        let invalidNodeError = false;
+        let invalidNodeType = "";
+        let invalidParentNodeType = "";
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
-        let copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value);
+        let copyModalParentNodeList;
+        if (this.state.copyModalNode.payload.nodeType.id == 5) {
+            copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
+        } else {
+            copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value);
+        }
         if(this.state.copyModalData == 2){
             if(this.state.copyModalTree == this.state.treeId) {
                 copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
                 copyModalParentNodeList = copyModalParentNodeList.filter(x => !x.sortOrder.startsWith(this.state.copyModalNode.sortOrder))
             }
         }
+        if(copyModalParentNodeList.length == 1) {
+            let allowedNodeTypeList = [];
+            allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+            let tempParentNode = copyModalParentNodeList.filter(x => x.id == copyModalParentNodeList[0].id)[0].payload.nodeType.id;
+            if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+                invalidNodeError = false;
+            } else {
+                invalidNodeError = true;
+                invalidNodeType = this.state.copyModalNode.payload.nodeType.id;
+                invalidParentNodeType = tempParentNode;
+            }
+        }
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
-            copyModalParentNode: copyModalParentNodeList.length == 1 ? copyModalParentNodeList[0].id : ""
+            copyModalParentNode: copyModalParentNodeList.length == 1 ? copyModalParentNodeList[0].id : "",
+            invalidNodeError: invalidNodeError,
+            invalidNodeType: invalidNodeType,
+            invalidParentNodeType: invalidParentNodeType
         })
     }
     copyModalParentNodeChange(e) {
+        let allowedNodeTypeList = [];
+        let invalidNodeError = false;
+        let invalidNodeType = "";
+        let invalidParentNodeType = "";
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+        let tempParentNode = this.state.copyModalParentNodeList.filter(x => x.id == e.target.value)[0].payload.nodeType.id;
+        if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+            invalidNodeError = false;
+        } else {
+            invalidNodeError = true;
+            invalidNodeType = this.state.copyModalNode.payload.nodeType.id;
+            invalidParentNodeType = tempParentNode;
+        }
         this.setState({
-            copyModalParentNode: e.target.value
+            copyModalParentNode: e.target.value,
+            invalidNodeError: invalidNodeError,
+            invalidNodeType: invalidNodeType,
+            invalidParentNodeType: invalidParentNodeType
         })
     }
     /**
@@ -7323,26 +7396,46 @@ export default class BuildTree extends Component {
         }, () => {
             this.calculateMOMData(0, 2, true).then(() => {
                 if(this.state.copyModalData == 2) {
-                    this.onRemoveButtonClick(itemConfig);
-                }
-                this.setState({
-                    copyLoader: false,
-                    copyModal: false,
-                }, () => {
-                    if(this.state.copyModalTree != this.state.treeId){
-                        // this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
-                        // window.location.reload(); 
+                    this.onRemoveButtonClick(itemConfig).then(() => {
                         this.setState({
-                            treeId: this.state.copyModalTree,
-                            items: [],
-                            selectedScenario: '',
-                            selectedScenarioLabel: '',
-                            currentScenario: []
+                            copyLoader: false,
+                            copyModal: false,
                         }, () => {
-                            this.getTreeByTreeId(this.state.treeId);
+                            if(this.state.copyModalTree != this.state.treeId){
+                                // this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
+                                // window.location.reload(); 
+                                this.setState({
+                                    treeId: this.state.copyModalTree,
+                                    items: [],
+                                    selectedScenario: '',
+                                    selectedScenarioLabel: '',
+                                    currentScenario: []
+                                }, () => {
+                                    this.getTreeByTreeId(this.state.treeId);
+                                })
+                            }
                         })
-                    }
-                })
+                    });
+                } else {
+                    this.setState({
+                        copyLoader: false,
+                        copyModal: false,
+                    }, () => {
+                        if(this.state.copyModalTree != this.state.treeId){
+                            // this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
+                            // window.location.reload(); 
+                            this.setState({
+                                treeId: this.state.copyModalTree,
+                                items: [],
+                                selectedScenario: '',
+                                selectedScenarioLabel: '',
+                                currentScenario: []
+                            }, () => {
+                                this.getTreeByTreeId(this.state.treeId);
+                            })
+                        }
+                    })
+                }
             })
         });
     }
@@ -9258,18 +9351,24 @@ export default class BuildTree extends Component {
      * @param {*} itemConfig The configuration object that needs to be deleted
      */
     onRemoveButtonClick(itemConfig) {
-        var { items } = this.state;
-        const ids = items.map(o => o.id)
-        const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
-        items = filtered;
-        this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
-            setTimeout(() => {
-                if (itemConfig.payload.nodeType.id == 2) {
-                    this.calculateMOMData(itemConfig.parent, 2, false);
-                } else {
-                    this.calculateMOMData(itemConfig.id, 2, false);
-                }
-            }, 0);
+        return new Promise((resolve, reject) => {
+            var { items } = this.state;
+            const ids = items.map(o => o.id)
+            const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
+            items = filtered;
+            this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
+                setTimeout(() => {
+                    if (itemConfig.payload.nodeType.id == 2) {
+                        this.calculateMOMData(itemConfig.parent, 2, false).then(() => {
+                            resolve();
+                        });
+                    } else {
+                        this.calculateMOMData(itemConfig.id, 2, false).then(() => {
+                            resolve();
+                        });
+                    }
+                }, 0);
+            });
         });
     }
     /**
@@ -14032,6 +14131,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "PU" : "FU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "PU" : "FU")}</p>
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>
