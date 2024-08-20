@@ -2393,22 +2393,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
      * Add PUs in local storage that were not extrapolated with ARIMA & TES while offline.
      */
-    addPUForArimaAndTesWhileOffline() {
-
-        const regionObj = this.state.regionList.filter(item1 =>
-            !this.state.regionValues.some(item2 => item2.value === item1.regionId)
-        );
-        const puObj = this.state.planningUnitList.filter(item1 =>
-            !this.state.planningUnitValues.some(item2 => item2.value === item1.planningUnit.id)
-        );
-        let rObject = regionObj != null && regionObj.map((item, i) => {
-            return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
-        }, this);
-
-        let pObject = puObj != null && puObj.map((item, i) => {
-            return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
-        }, this);
-
+    addPUForArimaAndTesWhileOffline(regionObj, puObj) {
         var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
         var db1;
         getDatabase();
@@ -2422,8 +2407,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this);
             planningUnitBulkExtrapolationRequest.onsuccess = function (event) {
                 var obj = {
-                    region: rObject,
-                    planningUnit: pObject,
+                    region: regionObj,
+                    planningUnit: puObj,
                     programId: tempForecastProgramId
                 }
                 planningUnitBulkExtrapolationTransaction.put(obj);
@@ -2439,6 +2424,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     ExtrapolatedParameters(id) {
         var regionList = this.state.regionValues;
         var listOfPlanningUnits = this.state.planningUnitValues;
+        var puObj = [];
+        var regionObj = []
         this.setState({ totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length), startBulkExtrapolation: true, dataChanged: true }, () => {
             var programData = this.state.datasetJson;
             console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
@@ -2485,8 +2472,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                             const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
                             const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
                             //2 and 3 - Optimise TES and ARIMA, 5 - Extrapolate ARIMA & TES using default parameters
-                            if (id == 2 || id == 3 || id == 5) {
+                            if (id == 3 || id == 5) {
                                 this.setState({ optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false })
+                                if (id == 2) {
+                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                        count++;
+                                        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                    }
+                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                        count++;
+                                        calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                    }
+                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                        count++;
+                                        calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                    }
+                                }
                                 if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
                                     count++;
                                     calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
@@ -2495,6 +2496,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     count++;
                                     calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
                                 }
+
                             } else {//Extrapolate all methods using default parameters
                                 this.setState({ optimizeTESAndARIMAExtrapolation: false })
                                 if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
@@ -2517,12 +2519,19 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     count++;
                                     calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
                                 }
+                                if (localStorage.getItem("sessionType") === "Offline" && (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 || ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)))) {
+                                    if (!regionObj.includes(regionList[i].value)) {
+                                        // Add the value to the array if it's not present
+                                        regionObj.push(regionList[i].value)
+                                    }
+                                    puObj.push(listOfPlanningUnits[pu].value)
+                                }
                             }
                         }
                     }
                 }
-                if (localStorage.getItem("sessionType") === "Offline") {
-                    this.addPUForArimaAndTesWhileOffline();
+                if (regionObj != "" && puObj != "") {
+                    this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
                 }
                 this.setState({
                     count: count
