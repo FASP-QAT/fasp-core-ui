@@ -1131,7 +1131,8 @@ export default class QatProblemActionNew extends Component {
                                                         userId: programRequestList[pp].userId,
                                                         programId: programList[pp].generalData.programId,
                                                         programModified: programQPLDetailsGetRequest.result.programModified,
-                                                        readonly: programQPLDetailsGetRequest.result.readonly
+                                                        readonly: programQPLDetailsGetRequest.result.readonly,
+                                                        cutOffDate:programQPLDetailsGetRequest.result.cutOffDate
                                                     }
                                                     programRequestList[pp].programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp].generalData), SECRET_KEY)).toString();
                                                 } catch (err) {

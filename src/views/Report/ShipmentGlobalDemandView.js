@@ -6,6 +6,7 @@ import "jspdf-autotable";
 import moment from "moment";
 import React, { Component } from 'react';
 import { HorizontalBar, Pie } from 'react-chartjs-2';
+import Chart from 'chart.js';
 import Picker from 'react-month-picker';
 import { MultiSelect } from 'react-multi-select-component';
 import {
@@ -33,13 +34,20 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
 const options = {
+    plugins: {
+        datalabels: {
+          formatter: (value, context) => {
+            return ``;
+          },
+        },
+    },
     title: {
         display: true,
         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -117,6 +125,13 @@ const options = {
     }
 }
 const options1 = {
+    plugins: {
+        datalabels: {
+          formatter: (value, context) => {
+            return ``;
+          },
+        },
+    },
     title: {
         display: true,
         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
@@ -167,14 +182,19 @@ const options1 = {
         }
     }
 }
-const optionsPie = {
+/*const optionsPie = {
     title: {
         display: true,
+        // text: document.getElementById("groupByFundingSourceType").value ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
         text: i18n.t('static.fundingSourceHead.fundingSource'),
-        fontColor: 'black'
+        fontColor: 'black',
+        padding: 30
     },
     legend: {
-        position: 'bottom'
+        position: 'bottom',
+        labels: {
+            padding: 25
+        }
     },
     tooltips: {
         callbacks: {
@@ -185,7 +205,7 @@ const optionsPie = {
             }
         }
     },
-}
+}*/
 /**
  * Component for Shipment Global Demand View Report.
  */
@@ -222,6 +242,7 @@ class ShipmentGlobalDemandView extends Component {
             programValues: [],
             shipmentStatuses: [],
             fundingSources: [],
+            fundingSourcesOriginal: [],
             programLabels: [],
             programs: [],
             countrys: [],
@@ -241,12 +262,18 @@ class ShipmentGlobalDemandView extends Component {
             loading: true,
             programLst: [],
             procurementAgentTypeId: false,
+            fundingSourceTypes: [],
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: [],
+            groupByFundingSourceType: false,
+            groupBy: 1
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.getPrograms = this.getPrograms.bind(this)
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.handleChange = this.handleChange.bind(this)
+        this.getFundingSourceType = this.getFundingSourceType.bind(this);
     }
     /**
      * Exports the data to a CSV file.
@@ -263,7 +290,10 @@ class ShipmentGlobalDemandView extends Component {
                 csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
             this.state.planningUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
+            // csvRow.push('')
+            // this.state.fundingSourceTypeLabels.map(ele =>
+            //     csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
             csvRow.push('')
             this.state.fundingSourceLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
@@ -274,6 +304,8 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
             csvRow.push('"' + (i18n.t('static.shipment.groupByProcurementAgentType') + ' : ' + (this.state.procurementAgentTypeId ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            // csvRow.push('')
+            // csvRow.push('"' + (i18n.t('static.shipment.groupByFundingSourceType') + ' : ' + (this.state.groupByFundingSourceType ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
         } else {
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
@@ -374,7 +406,7 @@ class ShipmentGlobalDemandView extends Component {
             len = len + countryLabelsText.length * 10
             var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 8, len, planningText)
-            len = len + 10 + planningText.length * 10
+            len = len + planningText.length * 10
         } else {
             doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                 align: 'left'
@@ -388,7 +420,19 @@ class ShipmentGlobalDemandView extends Component {
         doc.setTextColor("#002f6c");
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
+
+        // var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        // for (var i = 0; i < fundingSourceTypeText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
+        //     };
+        //     doc.text(doc.internal.pageSize.width / 8, y, fundingSourceTypeText[i]);
+        //     y = y + 10
+        // }
+
         var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
         for (var i = 0; i < fundingSourceText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -437,7 +481,7 @@ class ShipmentGlobalDemandView extends Component {
         doc.addImage(canvasImg, 'png', 10, startYtable, 500, 280, 'a', 'CANVAS');
         canvas = document.getElementById("cool-canvas2");
         canvasImg = canvas.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg, 'png', 500, startYtable, 340, 170, 'b', 'CANVAS');
+        doc.addImage(canvasImg, 'png', 500, startYtable, 340, 280, 'b', 'CANVAS');
         let length = this.state.table1Headers.length + 3;
         doc.addPage()
         startYtable = 80
@@ -476,9 +520,12 @@ class ShipmentGlobalDemandView extends Component {
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = AuthenticationService.getRealmId()
             let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-            let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
+            // let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
             let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+            let groupByProcurementAgentType = this.state.procurementAgentTypeId;
+            let groupByFundingSourceType = this.state.groupByFundingSourceType;
+            
             if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: '', loading: true
@@ -493,7 +540,8 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceIds: fundingSourceIds,
                     shipmentStatusIds: shipmentStatusIds,
                     useApprovedSupplyPlanOnly: useApprovedVersion,
-                    groupByProcurementAgentType: groupByProcurementAgentType
+                    groupByProcurementAgentType: groupByProcurementAgentType,
+                    groupByFundingSourceType: groupByFundingSourceType
                 }
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
@@ -813,13 +861,67 @@ class ShipmentGlobalDemandView extends Component {
      * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
      */
     componentDidMount() {
+        Chart.plugins.register({
+            afterDraw: function(chart) {
+              if (chart.config.type === 'pie') {
+                const ctx = chart.chart.ctx;
+                const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                chart.data.datasets.forEach((dataset, datasetIndex) => {
+                  const meta = chart.getDatasetMeta(datasetIndex);
+                  if (!meta.hidden) {
+                    meta.data.forEach((element, index) => {
+                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                        // Draw the connecting lines
+                        ctx.save();
+                        const model = element._model;
+                        const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                        const startAngle = model.startAngle;
+                        const endAngle = model.endAngle;
+                        const midAngle = startAngle + (endAngle - startAngle) / 2;
+        
+                        const x = Math.cos(midAngle);
+                        const y = Math.sin(midAngle);
+        
+                        // Calculate the end point for the line
+                        const lineX = model.x + x * model.outerRadius;
+                        const lineY = model.y + y * model.outerRadius;
+                        const labelX = model.x + x * (model.outerRadius + 10);
+                        const labelY = model.y + y * (model.outerRadius + 10);
+        
+                        const label = chart.data.labels[index];
+                        const value = dataset.data[index];
+                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+
+                        if(((value / total) * 100).toFixed(2) > 2) {
+                            ctx.beginPath();
+                            ctx.moveTo(model.x, model.y);
+                            ctx.lineTo(lineX, lineY);
+                            ctx.lineTo(labelX, labelY);
+                            ctx.strokeStyle = dataset.backgroundColor[index];
+                            ctx.stroke();                      
+                            ctx.textAlign = x >= 0 ? 'left' : 'right';
+                            ctx.font = 'bold 12px Arial';
+                            // ctx.textBaseline = 'middle';
+                            ctx.fillStyle = dataset.backgroundColor[index];
+                            ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX+8 : x < 0.5 ? labelX-8 : labelX, y < 0 ? y < -0.5 ? labelY-8 : labelY : y < 0.5 ? labelY : labelY+8);
+                            ctx.restore();
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+            },
+          });
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
+            // this.getFundingSourceType();
             this.getFundingSource();
             this.getShipmentStatusList();
         } else {
             this.setState({ loading: false })
             this.getPrograms();
+            // this.getFundingSourceType();
             this.getFundingSource();
             this.getShipmentStatusList();
         }
@@ -896,12 +998,14 @@ class ShipmentGlobalDemandView extends Component {
             countryLabels: countrysId.map(ele => ele.label),
             programValues: [],
             programLabels: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
             data: [],
             fundingSourceSplit: [],
             planningUnitSplit: [],
             procurementAgentSplit: [],
             table1Headers: [],
-            programLst:[]
+            programLst: []
         }, () => {
             this.getPrograms();
         })
@@ -1000,6 +1104,181 @@ class ShipmentGlobalDemandView extends Component {
             }.bind(this)
         }
     }
+
+    /**
+   * Retrieves the list of funding sources types.
+   */
+    getFundingSourceType = () => {
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+        this.setState({ loading: true });
+        if (localStorage.getItem("sessionType") === 'Online') {
+            //Fetch all funding source type list
+            FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+                .then(response => {
+                    if (response.status == 200) {
+                        var fundingSourceTypes = response.data;
+                        fundingSourceTypes.sort(function (a, b) {
+                            a = a.fundingSourceTypeCode.toLowerCase();
+                            b = b.fundingSourceTypeCode.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
+
+                        this.setState({
+                            fundingSourceTypes: fundingSourceTypes, loading: false,
+                            // fundingSourceTypeValues: fundingSourceTypeValues,
+                            // fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
+                        }, () => {
+                            this.consolidatedFundingSourceTypeList();
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.consolidatedFundingSourceTypeList();
+                            })
+                    }
+                }).catch(
+                    error => {
+                        this.setState({
+                            fundingSourceTypes: [], loading: false
+                        }, () => {
+                            this.consolidatedFundingSourceTypeList();
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            //Offline
+            this.consolidatedFundingSourceTypeList();
+            this.setState({ loading: false });
+        }
+    }
+
+    /**
+     * Consolidates the list of funding source type obtained from Server and local programs.
+     */
+    consolidatedFundingSourceTypeList = () => {
+        let realmId = AuthenticationService.getRealmId();
+        const { fundingSourceTypes } = this.state;
+        var fstList = fundingSourceTypes;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(["fundingSourceType"], "readwrite");
+            var fundingSourceType = transaction.objectStore("fundingSourceType");
+            var getRequest = fundingSourceType.getAll();
+            getRequest.onerror = function (event) {
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result.filter(c => c.realm.id == realmId);
+                var userBytes = CryptoJS.AES.decrypt(
+                    localStorage.getItem("curUser"),
+                    SECRET_KEY
+                );
+                for (var i = 0; i < myResult.length; i++) {
+                    var f = 0;
+                    for (var k = 0; k < this.state.fundingSourceTypes.length; k++) {
+                        if (
+                            this.state.fundingSourceTypes[k].fundingSourceTypeId ==
+                            myResult[i].fundingSourceTypeId
+                        ) {
+                            f = 1;
+                        }
+                    }
+                    var fstData = myResult[i];
+                    if (f == 0) {
+                        fstList.push(fstData);
+                    }
+                }
+                var lang = this.state.lang;
+                var fundingSourceTypesCombined = fstList.sort(function (a, b) {
+                    a = a.fundingSourceTypeCode.toLowerCase();
+                    b = b.fundingSourceTypeCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+                this.setState({
+                    fundingSourceTypes: fundingSourceTypesCombined,
+                });
+            }.bind(this);
+        }.bind(this);
+    };
+
+    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+        fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+            return parseInt(a.value) - parseInt(b.value);
+        })
+        this.setState({
+            fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+            fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+        }, () => {
+            var filteredFundingSourceArr = [];
+            var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+                for (var j = 0; j < fundingSources.length; j++) {
+                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+                        filteredFundingSourceArr.push(fundingSources[j]);
+                    }
+                }
+            }
+
+            if (filteredFundingSourceArr.length > 0) {
+                filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+                    a = a.fundingSourceCode.toLowerCase();
+                    b = b.fundingSourceCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
+            }
+            this.setState({
+                fundingSources: filteredFundingSourceArr,
+                fundingSourceValues: [],
+                fundingSourceLabels: [],
+            }, () => {
+                this.fetchData();
+            });
+        })
+    }
+
+
     /**
      * Retrieves the list of funding sources.
      */
@@ -1107,60 +1386,60 @@ class ShipmentGlobalDemandView extends Component {
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
-            if(newCountryList.length>0){
-            DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
-                .then(response => {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.code.toUpperCase();
-                        var itemLabelB = b.code.toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        programLst: listArray, loading: false
-                    })
-                }).catch(
-                    error => {
+            if (newCountryList.length > 0) {
+                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                    .then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.code.toUpperCase();
+                            var itemLabelB = b.code.toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
                         this.setState({
-                            programLst: [], loading: false
+                            programLst: listArray, loading: false
                         })
-                        if (error.message === "Network Error") {
+                    }).catch(
+                        error => {
                             this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
+                                programLst: [], loading: false
+                            })
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
+                    );
             }
         } else {
             this.consolidatedProgramList()
@@ -1468,12 +1747,62 @@ class ShipmentGlobalDemandView extends Component {
      */
     setProcurementAgentTypeId(e) {
         var procurementAgentTypeId = e.target.checked;
+        var groupByFundingSourceType = this.state.groupByFundingSourceType;
+        if(procurementAgentTypeId == true){
+            groupByFundingSourceType = false;
+        }
         this.setState({
             procurementAgentTypeId: procurementAgentTypeId,
+            groupByFundingSourceType: groupByFundingSourceType,
         }, () => {
             this.fetchData();
         })
     }
+    /**
+     * Sets the group by funding source type flag based on the checkbox state.
+     * @param {object} e - The event object containing checkbox information.
+     */
+    setGroupByFundingSourceType(e) {
+        var groupByFundingSourceType = e.target.checked;
+        var procurementAgentTypeId = this.state.procurementAgentTypeId;
+        if(groupByFundingSourceType == true){
+            procurementAgentTypeId = false;
+        }
+        this.setState({
+            groupByFundingSourceType: groupByFundingSourceType,
+            procurementAgentTypeId: procurementAgentTypeId
+        }, () => {
+            this.fetchData();
+        })
+    }
+
+    /**
+     * Sets the group by & related flags to state based on the selected dropdown value.
+     * @param {object} e - The event object containing checkbox information.
+     */
+    setGroupByValues(e) {
+        var groupByValue = e.target.value;
+        var procurementAgentTypeId = this.state.procurementAgentTypeId;
+        var groupByFundingSourceType = this.state.groupByFundingSourceType;
+        if(groupByValue == 1) {//Procurement Agent Type
+            procurementAgentTypeId = true;
+            groupByFundingSourceType = false;
+        } else if(groupByValue == 2) {//Funding Source Type
+            groupByFundingSourceType = true;
+            procurementAgentTypeId = false;
+        } else {
+            groupByFundingSourceType = false;
+            procurementAgentTypeId = false;
+        }
+        this.setState({
+            groupByFundingSourceType: groupByFundingSourceType,
+            procurementAgentTypeId: procurementAgentTypeId,
+            groupBy: groupByValue
+        }, () => {
+            this.fetchData();
+        })
+    }
+
     /**
      * Renders the Shipment Global Demand View report table.
      * @returns {JSX.Element} - Shipment Global Demand View report table.
@@ -1508,6 +1837,7 @@ class ShipmentGlobalDemandView extends Component {
                     { label: getLabelText(item.label, this.state.lang), value: item.id }
                 )
             }, this);
+        const { fundingSourceTypes } = this.state;
         const { fundingSources } = this.state;
         let fundingSourceList = [];
         fundingSourceList = fundingSources.length > 0
@@ -1571,6 +1901,31 @@ class ShipmentGlobalDemandView extends Component {
         }
         const { rangeValue } = this.state
         const checkOnline = localStorage.getItem('sessionType');
+
+        const optionsPie = {
+            title: {
+                display: true,
+                text: this.state.groupByFundingSourceType ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
+                fontColor: 'black',
+                padding: 30
+            },
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 25
+                }
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return data.labels[tooltipItems.index] +
+                            " : " + " $ " +
+                            (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
+                    }
+                }
+            },
+        }
+
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1618,6 +1973,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1633,6 +1989,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1693,9 +2050,31 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
+                                        {/* <FormGroup id="fundingSourceTypeDiv" className="col-md-3" style={{ zIndex: "1" }} >
+                                            <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect
+                                                    name="fundingSourceTypeId"
+                                                    id="fundingSourceTypeId"
+                                                    bsSize="md"
+                                                    // filterOptions={this.filterOptions}
+                                                    value={this.state.fundingSourceTypeValues}
+                                                    onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                                                    options={fundingSourceTypes.length > 0
+                                                        && fundingSourceTypes.map((item, i) => {
+                                                            return (
+                                                                { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                                            )
+                                                        }, this)}
+                                                    disabled={this.state.loading}
+                                                />
+                                            </div>
+                                        </FormGroup> */}
                                         <FormGroup className="col-md-3" id="fundingSourceDiv">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -1708,6 +2087,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1723,6 +2103,7 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                     disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1743,7 +2124,25 @@ class ShipmentGlobalDemandView extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupBy')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="groupBy"
+                                                        id="groupBy"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.setGroupByValues(e); }}
+                                                    >
+                                                        <option value="0">{i18n.t('static.supplyPlan.none')}</option>
+                                                        <option value="1">{i18n.t('static.dashboard.procurementagentType')}</option>
+                                                        <option value="2">{i18n.t('static.funderTypeHead.funderType')}</option>
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        {/* <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -1762,7 +2161,27 @@ class ShipmentGlobalDemandView extends Component {
                                                     <b>{i18n.t('static.shipment.groupByProcurementAgentType')}</b>
                                                 </Label>
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup> */}
+                                        {/* <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="groupByFundingSourceType"
+                                                        name="groupByFundingSourceType"
+                                                        checked={this.state.groupByFundingSourceType}
+                                                        value={this.state.groupByFundingSourceType}
+                                                        onChange={(e) => { this.setGroupByFundingSourceType(e); }}
+                                                    />
+                                                </InputGroup>
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{i18n.t('static.shipment.groupByFundingSourceType')}</b>
+                                                </Label>
+                                            </div>
+                                        </FormGroup> */}
                                     </div>
                                 </div>
                             </Form>
@@ -1781,10 +2200,11 @@ class ShipmentGlobalDemandView extends Component {
                                             this.state.fundingSourceSplit.length > 0 &&
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
-                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie}
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
                                                     /><br />
                                                 </div>
-                                                <h5 className="red text-center">{i18n.t('static.report.fundingSourceUsdAmount')}</h5>
+                                                <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
+                                                <h5 className="red text-center">{this.state.groupByFundingSourceType? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
                                         }
                                     </div>

@@ -287,6 +287,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: false,
             notesChanged: false,
             noDataMessage: "",
+            noDataMessage1: "",
             showFits: false,
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
@@ -322,8 +323,11 @@ export default class ExtrapolateDataComponent extends React.Component {
      * @param {Event} event - The change event.
      */
     seasonalityCheckbox(event) {
+        var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
         this.setState({
-            seasonality: event.target.checked ? 1 : 0
+            seasonality: event.target.checked ? 1 : 0,
+            arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
+            arimaDisabled: (event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
         });
     }
     /**
@@ -550,11 +554,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             setTimeout(() => {
                 var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
                 this.setState({
-                    movingAvgId: this.state.movingAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.movingAvgId : false,
-                    semiAvgId: this.state.semiAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.semiAvgId : false,
-                    linearRegressionId: this.state.linearRegressionData.length > 0 && this.state.monthsDiff >= 3 ? this.state.linearRegressionId : false,
-                    smoothingId: this.state.tesData.length > 0 && this.state.monthsDiff >= 24 ? this.state.smoothingId : false,
-                    arimaId: this.state.arimaData.length > 0 ? this.state.arimaId : false,
+                    movingAvgId: this.state.movingAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.movingAvgDisabled ? true : this.state.movingAvgId : false,
+                    semiAvgId: this.state.semiAvgData.length > 0 && this.state.monthsDiff >= 3 ? this.state.semiAvgDisabled ? true : this.state.semiAvgId : false,
+                    linearRegressionId: this.state.linearRegressionData.length > 0 && this.state.monthsDiff >= 3 ? this.state.linearRegressionDisabled ? true : this.state.linearRegressionId : false,
+                    smoothingId: this.state.tesData.length > 0 && this.state.monthsDiff >= 24 ? this.state.tesDisabled ? true : this.state.smoothingId : false,
+                    arimaId: this.state.arimaData.length > 0 && this.state.seasonality ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
@@ -1265,7 +1269,12 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     consolidatedVersionList = (programId) => {
         const { versions } = this.state
-        var verList = versions;
+        var verList;
+        if(this.state.onlyDownloadedProgram) {
+            verList = [];
+        } else {
+            verList = versions;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1906,7 +1915,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var extrapolationNotes = null;
-            if (consumptionExtrapolationList.length > 1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+            if (consumptionExtrapolationList.length > 0 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                 this.setState({ loading: true })
                 var startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                 var minStartDate = startDate1;
@@ -2087,7 +2096,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     semiAvgId: inputDataSemiAverage.length > 0 && tempMonthsDiff >= 3 ? semiAvgId : false,
                     linearRegressionId: inputDataLinearRegression.length > 0 && tempMonthsDiff >= 3 ? linearRegressionId : false,
                     smoothingId: inputDataTes.length > 0 && tempMonthsDiff >= 24 ? smoothingId : false,
-                    arimaId: inputDataArima.length > 0 ? arimaId : false,
+                    arimaId: inputDataArima.length > 0 && this.state.seasonality ? tempMonthsDiff >= 13 : tempMonthsDiff >= 2 ? arimaId : false,
                     movingAvgData: inputDataMovingAvg,
                     semiAvgData: inputDataSemiAverage,
                     linearRegressionData: inputDataLinearRegression,
@@ -4036,6 +4045,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     />
                                                                     <FormFeedback>{errors.qId}</FormFeedback>
                                                                 </div>
+                                                            </div>
+                                                            <div className="col-md-12 mt-2">
+                                                                <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
                                                             </div>
                                                         </div>
                                                     </div>

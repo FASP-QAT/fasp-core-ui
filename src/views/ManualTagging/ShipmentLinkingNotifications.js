@@ -18,7 +18,7 @@ import ManualTaggingService from '../../api/ManualTaggingService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { filterOptions, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = i18n.t('static.mt.shipmentLinkingNotification');
 /**
@@ -1341,6 +1341,7 @@ export default class ShipmentLinkingNotifications extends Component {
                                             value={this.state.hasSelectAll ? planningUnitMultiList : this.state.planningUnitValues}
                                             onChange={(e) => { this.filterData(e) }}
                                             options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
+                                            filterOptions={filterOptions}
                                         />
                                     </div>
                                 </FormGroup>

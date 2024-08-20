@@ -43,6 +43,7 @@ export default class ForecastingUnitListComponent extends Component {
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.dataChange=this.dataChange.bind(this);
     }
     /**
      * Builds the jexcel component to display forecasting unit list.
@@ -51,7 +52,7 @@ export default class ForecastingUnitListComponent extends Component {
         let forecastingUnitList = this.state.selSource;
         let forecastingUnitListArray = [];
         let count = 0;
-        for (var j = 0; j < forecastingUnitList.length; j++) {
+        for (var j = 0; j < forecastingUnitList.length; j++) {           
             data = [];
             data[0] = forecastingUnitList[j].forecastingUnitId
             data[1] = getLabelText(forecastingUnitList[j].realm.label, this.state.lang)
@@ -60,9 +61,10 @@ export default class ForecastingUnitListComponent extends Component {
             data[4] = getLabelText(forecastingUnitList[j].unit.label, this.state.lang)
             data[5] = getLabelText(forecastingUnitList[j].genericLabel, this.state.lang)
             data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId
-            data[7] = forecastingUnitList[j].lastModifiedBy.username;
-            data[8] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[9] = forecastingUnitList[j].active;
+            data[7] = forecastingUnitList[j].countOfSpPrograms + forecastingUnitList[j].countOfFcPrograms;
+            data[8] = forecastingUnitList[j].lastModifiedBy.username;
+            data[9] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[10] = forecastingUnitList[j].active;
             forecastingUnitListArray[count] = data;
             count++;
         }
@@ -104,6 +106,10 @@ export default class ForecastingUnitListComponent extends Component {
                     type: 'text',
                 },
                 {
+                    title: i18n.t('static.program.noOfProgramsUsingFU'),
+                    type: 'text',
+                },
+                {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
                 },
@@ -117,7 +123,7 @@ export default class ForecastingUnitListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -446,7 +452,21 @@ export default class ForecastingUnitListComponent extends Component {
     toggleExport() {
         this.setState({
             exportModal: !this.state.exportModal,
+            productCategoryIdExport:document.getElementById("productCategoryId").value,
+            tracerCategoryIdExport:document.getElementById("tracerCategoryId").value
+        },()=>{
         })
+    }
+    dataChange(e){
+        if(e.target.name=="productCategoryIdExport"){
+            this.setState({
+                "productCategoryIdExport":e.target.value
+            })
+        }else if(e.target.name=="tracerCategoryIdExport"){
+            this.setState({
+                "tracerCategoryIdExport":e.target.value
+            })
+        }
     }
     /**
      * This function is used to get forecasting unit list and export that list into csv file
@@ -486,6 +506,7 @@ export default class ForecastingUnitListComponent extends Component {
                         tableHeadTemp.push(i18n.t('static.unit.unit').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.product.productgenericname').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.forecastingunit.forecastingunit').replaceAll(' ', '%20'));
+                        tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingFU').replaceAll('#', '%23').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
                         tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));
@@ -493,9 +514,9 @@ export default class ForecastingUnitListComponent extends Component {
                         forecastingUnitList = response.data;
                         for (var j = 0; j < forecastingUnitList.length; j++) {
                             if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
-                                A.push([addDoubleQuoteToRowContent([forecastingUnitList[j].forecastingUnitId, getLabelText(forecastingUnitList[j].realm.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].productCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != null && getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != '' ? getLabelText(forecastingUnitList[j].genericLabel, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20') : "", (getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), forecastingUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(forecastingUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), forecastingUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
+                                A.push([addDoubleQuoteToRowContent([forecastingUnitList[j].forecastingUnitId, getLabelText(forecastingUnitList[j].realm.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].productCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != null && getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != '' ? getLabelText(forecastingUnitList[j].genericLabel, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20') : "", (getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'),(forecastingUnitList[j].countOfSpPrograms + forecastingUnitList[j].countOfFcPrograms), forecastingUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(forecastingUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), forecastingUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
                             } else {
-                                A.push([addDoubleQuoteToRowContent([forecastingUnitList[j].forecastingUnitId, getLabelText(forecastingUnitList[j].productCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != null && getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != '' ? getLabelText(forecastingUnitList[j].genericLabel, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20') : "", (getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), forecastingUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(forecastingUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), forecastingUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
+                                A.push([addDoubleQuoteToRowContent([forecastingUnitList[j].forecastingUnitId, getLabelText(forecastingUnitList[j].productCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != null && getLabelText(forecastingUnitList[j].genericLabel, this.state.lang) != '' ? getLabelText(forecastingUnitList[j].genericLabel, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20') : "", (getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (forecastingUnitList[j].countOfSpPrograms + forecastingUnitList[j].countOfFcPrograms), forecastingUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(forecastingUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), forecastingUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
                             }
                         }
                         for (var i = 0; i < A.length; i++) {
@@ -712,7 +733,8 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="productCategoryIdExport"
                                                 id="productCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.productCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {/* <option value="">{i18n.t('static.common.select')}</option> */}
                                                 {productCategoryList}
@@ -729,7 +751,8 @@ export default class ForecastingUnitListComponent extends Component {
                                                 name="tracerCategoryIdExport"
                                                 id="tracerCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.tracerCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {/* <option value="">{i18n.t('static.common.select')}</option> */}
                                                 <option value="">{i18n.t('static.common.all')}</option>

@@ -8,7 +8,6 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
-import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductService from '../../api/ProductService';
 import RealmService from '../../api/RealmService';
@@ -18,6 +17,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import csvicon from '../../assets/img/csv.png';
+import DropdownService from '../../api/DropdownService';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 // Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
 /**
@@ -27,7 +29,6 @@ export default class PlanningUnitListComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            forecastingUnits: [],
             planningUnitList: [],
             tracerCategories: [],
             productCategories: [],
@@ -38,13 +39,22 @@ export default class PlanningUnitListComponent extends Component {
             loading: true,
             lang: localStorage.getItem('lang'),
             exportModal: false,
-            loadingModal: false
+            loadingModal: false,
+            autocompleteData: [],
+            searchedValue: '',
+            autocompleteDataExport: [],
+            searchedValueExport: '',
+            autocompleteError: true,
+            forecastingUnitId:'',
+            forecastingUnitAutocompelete:null,
+            forecastingUnitExportAutocompelete:null,
         }
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.dataChangeForRealm = this.dataChangeForRealm.bind(this);
+        this.dataChange = this.dataChange.bind(this)
     }
     /**
      * Clears the timeout when the component is unmounted.
@@ -59,7 +69,7 @@ export default class PlanningUnitListComponent extends Component {
     filterData() {
         var tracerCategoryId = document.getElementById("tracerCategoryId").value;
         var productCategoryId = document.getElementById("productCategoryId").value;
-        let forecastingUnitId = document.getElementById("forecastingUnitId").value == "" ? null : document.getElementById("forecastingUnitId").value;
+        let forecastingUnitId = this.state.forecastingUnitId == "" ? null : this.state.forecastingUnitId;
         this.setState({
             loading: true
         })
@@ -156,69 +166,9 @@ export default class PlanningUnitListComponent extends Component {
                                 });
                                 this.setState({
                                     tracerCategories: listArray,
-                                    tracerCategoryListAll: listArray
+                                    tracerCategoryListAll: listArray,
+                                    loading: false
                                 })
-                                ForecastingUnitService.getForcastingUnitByRealmId(realmId)
-                                    .then(response => {
-                                        if (response.status == 200) {
-                                            var listArray = response.data;
-                                            listArray.sort((a, b) => {
-                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                                                return itemLabelA > itemLabelB ? 1 : -1;
-                                            });
-                                            this.setState({
-                                                forecastingUnits: listArray,
-                                                forecastingUnitListAll: listArray,
-                                                loading: false
-                                            })
-                                        } else {
-                                            this.setState({
-                                                message: response.data.messageCode, loading: false
-                                            },
-                                                () => {
-                                                    hideSecondComponent();
-                                                })
-                                        }
-                                    }).catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    );
                             } else {
                                 this.setState({
                                     message: response.data.messageCode, loading: false
@@ -308,6 +258,88 @@ export default class PlanningUnitListComponent extends Component {
         }
     }
     /**
+     * Retrieves autocomplete suggestions for forecasting units based on the given term.
+     * @param {string} term - The search term to retrieve autocomplete suggestions for.
+     */
+    getAutocompleteForecastingUnit = (term,type) => {
+        var language = this.state.lang;
+        var autocompletejson = {
+            "searchText": term,
+            "language": language
+        }
+        if(term.length > 2) {
+            DropdownService.getAutocompleteForecastingUnit(autocompletejson)
+                .then(response => {
+                    var forecastingUnitList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        var label = response.data[i].label.label_en + '|' + response.data[i].id;
+                        forecastingUnitList[i] = { value: response.data[i].id, label: label }
+                    }
+                    var listArray = forecastingUnitList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    if(type==1){
+                        this.setState({
+                            autocompleteData: listArray,
+                        });
+                    }else{
+                        this.setState({
+                            autocompleteDataExport: listArray,
+                        });
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            }, () => {
+                                hideSecondComponent()
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+    }
+    /**
      * Builds the jexcel component to display role list.
      */
     buildJExcel() {
@@ -321,9 +353,10 @@ export default class PlanningUnitListComponent extends Component {
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
-            data[5] = planningUnitList[j].lastModifiedBy.username;
-            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[7] = planningUnitList[j].active;
+            data[5] = planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms;
+            data[6] = planningUnitList[j].lastModifiedBy.username;
+            data[7] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = planningUnitList[j].active;
             planningUnitArray[count] = data;
             count++;
         }
@@ -357,6 +390,10 @@ export default class PlanningUnitListComponent extends Component {
                     type: 'text',
                 },
                 {
+                    title: i18n.t('static.program.noOfProgramsUsingPU'),
+                    type: 'text',
+                },
+                {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
                 },
@@ -370,7 +407,7 @@ export default class PlanningUnitListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -518,7 +555,22 @@ export default class PlanningUnitListComponent extends Component {
     toggleExport() {
         this.setState({
             exportModal: !this.state.exportModal,
+            productCategoryIdExport: document.getElementById("productCategoryId").value,
+            tracerCategoryIdExport: document.getElementById("tracerCategoryId").value,
+            forecastingUnitIdExport: this.state.forecastingUnitId,
+            forecastingUnitExportAutocompelete:this.state.forecastingUnitAutocompelete
         })
+    }
+    dataChange(e) {
+        if (e.target.name == "productCategoryIdExport") {
+            this.setState({
+                "productCategoryIdExport": e.target.value
+            })
+        } else if (e.target.name == "tracerCategoryIdExport") {
+            this.setState({
+                "tracerCategoryIdExport": e.target.value
+            })
+        }
     }
     /**
      * This function is used to get planning unit list and export that list into csv file
@@ -529,7 +581,7 @@ export default class PlanningUnitListComponent extends Component {
         })
         var tracerCategoryId = document.getElementById("tracerCategoryIdExport").value;
         var productCategoryId = document.getElementById("productCategoryIdExport").value;
-        let forecastingUnitId = document.getElementById("forecastingUnitIdExport").value == "" ? null : document.getElementById("forecastingUnitIdExport").value;
+        let forecastingUnitId = this.state.forecastingUnitIdExport=="" ? null : this.state.forecastingUnitIdExport;
         var json = {
             productCategorySortOrder: productCategoryId,
             tracerCategoryId: tracerCategoryId,
@@ -542,7 +594,7 @@ export default class PlanningUnitListComponent extends Component {
                 csvRow.push('')
                 csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryIdExport").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
                 csvRow.push('')
-                csvRow.push('"' + (i18n.t('static.forecastingunit.forecastingunit') + ' : ' + document.getElementById("forecastingUnitIdExport").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+                csvRow.push('"' + (i18n.t('static.forecastingunit.forecastingunit') + ' : ' + document.getElementById("forecastingUnitIdExport").value).replaceAll(' ', '%20') + '"')
                 csvRow.push('')
                 csvRow.push('')
                 csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -559,13 +611,14 @@ export default class PlanningUnitListComponent extends Component {
                     tableHeadTemp.push(i18n.t('static.planningUnit.associatedForecastingUnit').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.planningUnitOfMeasure').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.planningUnit.labelMultiplier').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingPU').replaceAll('#', '%23').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
                     tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));
                     A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
                     planningUnitList = response.data;
                     for (var j = 0; j < planningUnitList.length; j++) {
-                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
+                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), (planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
                     }
                     for (var i = 0; i < A.length; i++) {
                         csvRow.push(A[i].join(","))
@@ -649,15 +702,6 @@ export default class PlanningUnitListComponent extends Component {
                     </option>
                 )
             }, this);
-        const { forecastingUnits } = this.state;
-        let forecastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.forecastingUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
         const { tracerCategories } = this.state;
         let tracercategoryList = tracerCategories.length > 0
             && tracerCategories.map((item, i) => {
@@ -723,7 +767,7 @@ export default class PlanningUnitListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-5 pt-lg-2">
-                        <Col md="9 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div className="d-md-flex  Selectdiv2 row">
                                 <FormGroup className="col-md-3" id="realmDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
@@ -775,29 +819,36 @@ export default class PlanningUnitListComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                    <div className="controls">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="forecastingUnitId"
-                                                id="forecastingUnitId"
-                                                bsSize="sm"
-                                            // onChange={this.filterData}
-                                            >
-                                                <option value="">{i18n.t('static.common.all')}</option>
-                                                {forecastingUnitList}
-                                            </Input>
-                                        </InputGroup>
-                                    </div>
+                                <FormGroup className="col-md-5">
+                                    <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
+                                    <Autocomplete
+                                        id="forecastingUnitId"
+                                        name="forecastingUnitId"
+                                        options={this.state.autocompleteData}
+                                        getOptionLabel={(option) => option.label || ""}
+                                        onChange={(event, value) => {
+                                            if (value != null) {
+                                                this.setState({ searchedValue: value.label,forecastingUnitId:value.value,forecastingUnitAutocompelete:value }, () => { })
+                                            } else {
+                                                this.setState({
+                                                    searchedValue: '',
+                                                    autocompleteData: [],
+                                                    forecastingUnitId:""
+                                                });
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.typeAtleast3')} {...params} variant="outlined"
+                                            onChange={(e) => {
+                                                this.getAutocompleteForecastingUnit(e.target.value,1)
+                                            }} />}
+                                    />
                                 </FormGroup>
                                 <FormGroup>
                                     <button className="btn btn-info btn-md showdatabtn ml-2" style={{ "marginTop": '20px' }} onClick={this.filterData}>{i18n.t('static.jexcel.search')}</button>
                                 </FormGroup>
                             </div>
-                        </Col>
-                        <div className="consumptionDataEntryTable">
+                        </Col><br/><br/>
+                        <div>
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
@@ -827,7 +878,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="productCategoryIdExport"
                                                 id="productCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.productCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 {productCategoryList}
                                             </Input>
@@ -843,7 +895,8 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="tracerCategoryIdExport"
                                                 id="tracerCategoryIdExport"
                                                 bsSize="sm"
-                                            // onChange={this.filterData}
+                                                value={this.state.tracerCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
                                                 <option value="">{i18n.t('static.common.all')}</option>
                                                 {tracercategoryList}
@@ -852,21 +905,28 @@ export default class PlanningUnitListComponent extends Component {
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-12">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                    <div className="controls">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="forecastingUnitIdExport"
-                                                id="forecastingUnitIdExport"
-                                                bsSize="sm"
-                                            // onChange={this.filterData}
-                                            >
-                                                <option value="">{i18n.t('static.common.all')}</option>
-                                                {forecastingUnitList}
-                                            </Input>
-                                        </InputGroup>
-                                    </div>
+                                    <Label htmlFor="forecastingUnitIdExport">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
+                                    <Autocomplete
+                                        id="forecastingUnitIdExport"
+                                        name="forecastingUnitIdExport"
+                                        options={this.state.autocompleteDataExport}
+                                        defaultValue={this.state.forecastingUnitExportAutocompelete}
+                                        getOptionLabel={(option) => option.label || ""}
+                                        onChange={(event, value) => {
+                                            if (value != null) {
+                                                this.setState({ searchedValueExport: value.label,forecastingUnitIdExport:value.value }, () => { })
+                                            } else {
+                                                this.setState({
+                                                    searchedValueExport: '',
+                                                    autocompleteDataExport: []
+                                                });
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.typeAtleast3')} {...params} variant="outlined"
+                                            onChange={(e) => {
+                                                this.getAutocompleteForecastingUnit(e.target.value,2)
+                                            }} />}
+                                    />
                                 </FormGroup>
                             </div>
                             <div style={{ display: this.state.loadingModal ? "block" : "none" }}>

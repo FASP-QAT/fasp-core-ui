@@ -14,7 +14,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
+import { contrast, filterOptions, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
@@ -213,7 +213,8 @@ class EditSupplyPlanStatus extends Component {
                 regionList: [],
                 problemStatusListForEdit: [],
                 shipmentQtyTotalForPopup: 0,
-                batchQtyTotalForPopup: 0
+                batchQtyTotalForPopup: 0,
+                planningUnitNotes: ""
             },
             statuses: [],
             regionList: [],
@@ -234,7 +235,8 @@ class EditSupplyPlanStatus extends Component {
             submitColor: "",
             planningUnitDropdownList: [],
             temp_currentVersion_id: '',
-            loadSummaryTable:false
+            loadSummaryTable: false,
+            loadingForNotes: false
         }
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -257,6 +259,8 @@ class EditSupplyPlanStatus extends Component {
         this.loaded1 = this.loaded1.bind(this);
         this.roundAMC = this.roundAMC.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.toggleLargeNotes = this.toggleLargeNotes.bind(this);
+        this.actionCanceledNotes = this.actionCanceledNotes.bind(this);
     }
     /**
      * This is function is used to round the AMC value
@@ -982,7 +986,7 @@ class EditSupplyPlanStatus extends Component {
      * @param {*} month This is the value of the month for which the inventory/adjustment value is clicked
      * @param {*} endDate  This value is the end date of the month for which the inventory/adjustment value is clicked
      * @param {*} actualFlag This is the value of the inventory type
-     */    
+     */
     adjustmentsDetailsClicked(region, month, endDate, inventoryType) {
         this.setState({ loading: true, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD") })
         var elInstance = this.state.inventoryBatchInfoTableEl;
@@ -1573,7 +1577,8 @@ class EditSupplyPlanStatus extends Component {
                     maxStockMoSQty: maxStockMoSQty,
                     planBasedOn: programPlanningUnit.planBasedOn,
                     minQtyPpu: programPlanningUnit.minQty,
-                    distributionLeadTime: programPlanningUnit.distributionLeadTime
+                    distributionLeadTime: programPlanningUnit.distributionLeadTime,
+                    planningUnitNotes: programPlanningUnit.notes
                 })
                 var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
                 var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
@@ -1793,7 +1798,7 @@ class EditSupplyPlanStatus extends Component {
                                             if (paColor4Array.indexOf(paColor4) === -1) {
                                                 paColor4Array.push(paColor4);
                                             }
-                                        }else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                        } else if (shipmentDetails[i].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                             if (shipmentDetails[i].procurementAgent.id != "" && shipmentDetails[i].procurementAgent.id != TBD_PROCUREMENT_AGENT_ID) {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
@@ -2344,7 +2349,8 @@ class EditSupplyPlanStatus extends Component {
                     openCount: 0,
                     addressedCount: 0,
                     programModified: 0,
-                    readonly: 0
+                    readonly: 0,
+                    cutOffDate:""
                 })
                 this.setState({
                     program,
@@ -2355,7 +2361,7 @@ class EditSupplyPlanStatus extends Component {
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false,
                     loading: false,
-                    loadSummaryTable:true
+                    loadSummaryTable: true
                 }, () => {
                     this.getPlanningUnit()
                     this.getProblemCriticality();
@@ -3042,7 +3048,7 @@ class EditSupplyPlanStatus extends Component {
                         <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                             <Col md="12 pl-0" id="realmDiv">
                                 <div className="row">
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-2">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.startMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
                                             <Picker
@@ -3057,7 +3063,7 @@ class EditSupplyPlanStatus extends Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls">
                                             <InputGroup>
@@ -3080,14 +3086,19 @@ class EditSupplyPlanStatus extends Component {
                                 <div className="table-responsive RemoveStriped">
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")} : </b></span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.amcPastOrFuture")} : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.report.shelfLife")} : {this.state.shelfLife}</span></li>
-                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.minStockMos")} : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.minQuantity")} : {this.formatter(this.state.minQtyPpu)}</span></li>}
-                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.reorderInterval")} : {this.state.reorderFrequency}</span></li>
-                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.supplyPlan.maxStockMos")} : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText">{i18n.t("static.product.distributionLeadTime")} : {this.formatter(this.state.distributionLeadTime)}</span></li>}
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
+                                            <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.reorderFrequency}</span></li>
+                                            {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
                                         </ul>
                                     </FormGroup>
+                                    {this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
+                                        <ul className="legendcommitversion list-group">
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                        </ul>
+                                    </FormGroup>}
                                     <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
                                             <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.consumption")} : </b></span></li>
@@ -3112,7 +3123,7 @@ class EditSupplyPlanStatus extends Component {
                                     </FormGroup>
                                     <FormGroup className="col-md-12 mt-2 pl-0  mt-3" style={{ display: this.state.display }}>
                                         <ul className="legendcommitversion list-group">
-                                            <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
+                                            <li><span className="redlegend "></span> <span className="legendcommitversionTextStock"><b>{i18n.t("static.supplyPlan.stockBalance")}/{i18n.t("static.report.mos")} : </b></span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText"><b>{i18n.t('static.supplyPlan.actualBalance')}</b></span></li>
                                             <li><span className="legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.projectedBalance')}</span></li>
                                             <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.report.stockout')}</span></li>
@@ -3507,6 +3518,7 @@ class EditSupplyPlanStatus extends Component {
                                         value={this.state.problemStatusValues}
                                         onChange={(e) => { this.handleProblemStatusChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
+                                        filterOptions={filterOptions}
                                     />
                                 </div>
                             </FormGroup>
@@ -3551,6 +3563,7 @@ class EditSupplyPlanStatus extends Component {
                                         value={this.state.problemReviewedValues}
                                         onChange={(e) => { this.handleProblemReviewedChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
+                                        filterOptions={filterOptions}
                                     />
                                 </div>
                             </FormGroup>
@@ -3569,7 +3582,9 @@ class EditSupplyPlanStatus extends Component {
                             <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
-                    {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    <div className='col-md-6'>
+                        {this.state.loadSummaryTable && <ProblemListDashboardComponent problemListUnFilttered={this.state.program.problemReportList} problemCategoryList={this.state.problemCategoryList} problemStatusList={this.state.problemStatusListForEdit} />}
+                    </div>
                     <div className="consumptionDataEntryTable RemoveStriped EditStatusTable">
                         <div id="problemListDiv" className="TableWidth100" />
                     </div>
@@ -3667,6 +3682,7 @@ class EditSupplyPlanStatus extends Component {
         if (cont == true) {
             this.setState({
                 problemList: [],
+                // loadSummaryTable:false,
                 message: '',
                 loading: true,
                 problemReportChanged: 0
@@ -4133,16 +4149,114 @@ class EditSupplyPlanStatus extends Component {
         this.el = problemEl;
         this.setState({
             problemEl: problemEl,
-            loading: false
+            loading: false,
+            // loadSummaryTable:true
         })
     }
-        /**
-     * This function is used to format the QPL table like add asterisk or info to the table headers
-     * @param {*} instance This is the DOM Element where sheet is created
-     * @param {*} cell This is the object of the DOM element
-     */
+    /**
+ * This function is used to format the QPL table like add asterisk or info to the table headers
+ * @param {*} instance This is the DOM Element where sheet is created
+ * @param {*} cell This is the object of the DOM element
+ */
     loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
+    }
+    updateFieldData = (value) => {
+        let { program } = this.state;
+        this.setState({ regionId: value });
+        var regionId = value;
+        var regionIdArray = [];
+        for (var i = 0; i < regionId.length; i++) {
+            regionIdArray[i] = regionId[i].value;
+        }
+        program.regionArray = regionIdArray;
+        this.setState({
+            program: program,
+        });
+    }
+
+    addMannualProblem() {
+        this.getProblemCriticality();
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+            loading: false
+        }, () => {
+        });
+    }
+    submitManualProblem(criticalityId, regionId, modelPlanningUnitId, problemDescription, suggession) {
+        var json = {
+            "realmProblem": {
+                "realmProblemId": criticalityId == 1 ? "25" : criticalityId == 2 ? "26" : "27",
+                "problemType": {
+                    "id": "2"
+                }
+            },
+            "program": {
+                "id": this.props.match.params.programId
+            },
+            "versionId": this.props.match.params.versionId,
+            "problemStatus": {
+                "id": "1"
+            },
+            "dt": moment(new Date()).format("YYYY-MM-DD"),
+            "region": {
+                "id": regionId
+            },
+            "planningUnit": {
+                "id": modelPlanningUnitId
+            },
+            "data5": '{"problemDescription":"' + problemDescription + '", "suggession":"' + suggession + '"}',
+            "notes": ""
+        }
+        ProgramService.createManualProblem(json)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        message: response.data.message,
+                        problemReportChanged: 0,
+                        remainingDataChanged: 0,
+                    })
+                    this.componentDidMount();
+                    this.toggle(0, '2');
+                } else {
+                    this.setState({
+                        message: response.data.message,
+                    })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 404:
+                                this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                break;
+                            case 500:
+                            case 401:
+                            case 403:
+                            case 406:
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen
+        })
     }
     /**
      * This function is called when program is changed
@@ -4251,6 +4365,145 @@ class EditSupplyPlanStatus extends Component {
         })
     }
     /**
+     * This function is used to toggle the notes history model
+     */
+    toggleLargeNotes() {
+        this.setState({
+            notesPopup: !this.state.notesPopup,
+        }, () => {
+            if (this.state.notesPopup) {
+                this.getNotes(this.state.programId)
+            }
+        });
+    }
+    getNotes(programId) {
+        // this.toggleLargeNotes();
+        this.setState({
+            loadingForNotes: true
+        })
+        ProgramService.getNotesHistory(programId)
+            .then(response => {
+                var data = response.data;
+                const listArray = [];
+                const grouped = data.reduce((acc, item) => {
+                    acc[item.versionId] = acc[item.versionId] || [];
+                    acc[item.versionId].push(item);
+                    return acc;
+                }, {});
+
+                Object.values(grouped).forEach(entries => {
+                    const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                    if (pendingEntries.length) {
+                        listArray.push(pendingEntries[0]);
+                        if (pendingEntries.length > 1) {
+                            listArray.push(pendingEntries[pendingEntries.length - 1]);
+                        }
+                    }
+                    listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+                });
+                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                    jexcel.destroy(document.getElementById("notesTransTable"), true);
+                }
+                var json = [];
+                for (var sb = listArray.length - 1; sb >= 0; sb--) {
+                    var data = [];
+                    data[0] = listArray[sb].versionId;
+                    data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                    data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                    data[3] = listArray[sb].notes;
+                    data[4] = listArray[sb].lastModifiedBy.username;
+                    data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                    json.push(data);
+                }
+                var options = {
+                    data: json,
+                    columnDrag: false,
+                    columns: [
+                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                        { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                        { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                        {
+                            title: i18n.t("static.common.lastModifiedBy"),
+                            type: "text",
+                        },
+                        {
+                            title: i18n.t("static.common.lastModifiedDate"),
+                            type: "calendar",
+                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                        },
+                    ],
+                    editable: false,
+                    onload: function (instance, cell) {
+                        jExcelLoadedFunction(instance, 1);
+                    }.bind(this),
+                    pagination: localStorage.getItem("sesRecordCount"),
+                    search: true,
+                    columnSorting: true,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    // onselection: this.selected,
+                    oneditionend: this.onedit,
+                    copyCompatibility: true,
+                    allowExport: false,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: "top",
+                    filters: true,
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return false;
+                    }.bind(this),
+                };
+                var elVar = jexcel(document.getElementById("notesTransTable"), options);
+                this.el = elVar;
+                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+
+            }).catch(
+                error => {
+                    this.setState({
+                        loadingForNotes: false
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    /**
      * This is used to display the content
      * @returns The supply plan data in tabular format
      */
@@ -4260,6 +4513,7 @@ class EditSupplyPlanStatus extends Component {
             entries: " ",
         });
         const { statuses } = this.state;
+        let { editable } = this.state;
         let statusList = statuses.length > 0
             && statuses.map((item, i) => {
                 return (
@@ -4372,7 +4626,7 @@ class EditSupplyPlanStatus extends Component {
                         <div className="Card-header-addicon">
                             <div className="card-header-actions">
                                 <a className="">
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.report.problemReportStatusDetails')}</small></span>&nbsp;&nbsp;&nbsp;&nbsp;
                                 </a>
                             </div>
                         </div>
@@ -4964,208 +5218,227 @@ class EditSupplyPlanStatus extends Component {
                             validationSchema={validationSchema}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 this.setState({
-                                    loading:true
+                                    loading: true
                                 })
-                                ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
-                                    .then(response => {
-                                        let temp_version_status = 0;
-                                        temp_version_status = response.data.currentVersion.versionStatus.id;
-                                        if (temp_version_status == this.state.temp_currentVersion_id) {
-                                            var validation = this.checkValidation();
-                                            if (validation == true) {
-                                                document.getElementById("submitButton").disabled = true;
-                                                var elInstance = this.state.problemEl;
-                                                var json = elInstance.getJson();
-                                                var reviewedProblemList = [];
-                                                var isAllCheckForReviewed = true;
-                                                for (var i = 0; i < json.length; i++) {
-                                                    var map = new Map(Object.entries(json[i]));
-                                                    if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id!=map.get("11") || this.state.problemList[i].reviewed.toString()!=map.get("21").toString() || map.get("22").toString()!="")) {
-                                                        reviewedProblemList.push({
-                                                            problemReportId: map.get("0"),
-                                                            problemStatus: {
-                                                                id: map.get("11")
-                                                            },
-                                                            reviewed: map.get("21"),
-                                                            reviewedNotes: map.get("22"),
-                                                            notes: map.get("22")
-                                                        });
+                                var validation = this.checkValidation();
+                                if (validation) {
+                                    ProgramService.getProgramData({ "programId": this.props.match.params.programId, "versionId": this.props.match.params.versionId })
+                                        .then(response => {
+                                            let temp_version_status = 0;
+                                            temp_version_status = response.data.currentVersion.versionStatus.id;
+                                            if (temp_version_status == this.state.temp_currentVersion_id) {
+                                                var validation = this.checkValidation();
+                                                if (validation == true) {
+                                                    document.getElementById("submitButton").disabled = true;
+                                                    var elInstance = this.state.problemEl;
+                                                    var json = elInstance.getJson();
+                                                    var reviewedProblemList = [];
+                                                    var isAllCheckForReviewed = true;
+                                                    for (var i = 0; i < json.length; i++) {
+                                                        var map = new Map(Object.entries(json[i]));
+                                                        if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != "")) {
+                                                            reviewedProblemList.push({
+                                                                problemReportId: map.get("0"),
+                                                                problemStatus: {
+                                                                    id: map.get("11")
+                                                                },
+                                                                reviewed: map.get("21"),
+                                                                reviewedNotes: map.get("22"),
+                                                                notes: map.get("22")
+                                                            });
+                                                        }
+                                                        if (map.get("21") == false && map.get("13") != 4) {
+                                                            isAllCheckForReviewed = false
+                                                        }
+                                                        if (map.get("0") == 0) {
+                                                            reviewedProblemList.push({
+                                                                problemReportId: 0,
+                                                                realmProblem: {
+                                                                    realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
+                                                                    problemType: {
+                                                                        id: "2"
+                                                                    }
+                                                                },
+                                                                program: {
+                                                                    id: this.props.match.params.programId
+                                                                },
+                                                                versionId: this.props.match.params.versionId,
+                                                                problemStatus: {
+                                                                    id: "1"
+                                                                },
+                                                                dt: moment(new Date()).format("YYYY-MM-DD"),
+                                                                region: {
+                                                                    id: map.get("1")
+                                                                },
+                                                                planningUnit: {
+                                                                    id: map.get("6")
+                                                                },
+                                                                reviewed: map.get("21"),
+                                                                reviewedNotes: map.get("22"),
+                                                                data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
+                                                                notes: map.get("22")
+                                                            })
+                                                        }
                                                     }
-                                                    if (map.get("21") == false && map.get("13") != 4) {
-                                                        isAllCheckForReviewed = false
-                                                    }
-                                                    if (map.get("0") == 0) {
-                                                        reviewedProblemList.push({
-                                                            problemReportId: 0,
-                                                            realmProblem: {
-                                                                realmProblemId: map.get("20") == 1 ? "25" : map.get("20") == 2 ? "26" : "27",
-                                                                problemType: {
-                                                                    id: "2"
-                                                                }
-                                                            },
-                                                            program: {
-                                                                id: this.props.match.params.programId
-                                                            },
-                                                            versionId: this.props.match.params.versionId,
-                                                            problemStatus: {
-                                                                id: "1"
-                                                            },
-                                                            dt: moment(new Date()).format("YYYY-MM-DD"),
-                                                            region: {
-                                                                id: map.get("1")
-                                                            },
-                                                            planningUnit: {
-                                                                id: map.get("6")
-                                                            },
-                                                            reviewed: map.get("21"),
-                                                            reviewedNotes: map.get("22"),
-                                                            data5: '{"problemDescription":"' + map.get("9") + '", "suggession":"' + map.get("10") + '"}',
-                                                            notes: map.get("22")
-                                                        })
-                                                    }
-                                                }
-                                                if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
+                                                    if ((isAllCheckForReviewed == true && this.state.program.currentVersion.versionStatus.id == 2) || (this.state.program.currentVersion.versionStatus.id != 2)) {
 
-                                                    ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
-                                                        .then(response => {
-                                                            if (this.state.program.currentVersion.versionStatus.id != 1) {
-                                                                this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
-                                                            } else {
-                                                                try{
-                                                                    document.getElementById("submitButton").disabled = false;
-                                                                }catch(err){}
-                                                                this.setState({
-                                                                    submitMessage: "static.message.supplyplanversionapprovedsuccess",
-                                                                    submitColor: "green",
-                                                                    problemReportChanged: 0,
-                                                                    remainingDataChanged: 0,
-                                                                    loadSummaryTable:false,
-                                                                    loading:false
-
-                                                                    // isModalOpen: !this.state.isModalOpen,
-                                                                }, () => {
-                                                                    this.hideMessageComponent()
-                                                                    this.componentDidMount();
-                                                                })
-                                                            }
-
-                                                        })
-                                                        .catch(
-                                                            error => {
-                                                                if (error.message === "Network Error") {
+                                                        ProgramService.updateProgramStatus(this.state.program, reviewedProblemList)
+                                                            .then(response => {
+                                                                if (this.state.program.currentVersion.versionStatus.id != 1) {
+                                                                    this.props.history.push(`/report/supplyPlanVersionAndReview/` + 'green/' + i18n.t("static.message.supplyplanversionapprovedsuccess"))
+                                                                } else {
+                                                                    try {
+                                                                        document.getElementById("submitButton").disabled = false;
+                                                                    } catch (err) { }
                                                                     this.setState({
-                                                                        // message: 'static.unkownError',
-                                                                        submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                                        submitColor: "red",
+                                                                        submitMessage: "static.message.supplyplanversionapprovedsuccess",
+                                                                        submitColor: "green",
+                                                                        problemReportChanged: 0,
+                                                                        remainingDataChanged: 0,
+                                                                        loadSummaryTable: false,
                                                                         loading: false
+
+                                                                        // isModalOpen: !this.state.isModalOpen,
                                                                     }, () => {
                                                                         this.hideMessageComponent()
-                                                                    });
-                                                                } else {
-                                                                    switch (error.response ? error.response.status : "") {
+                                                                        this.componentDidMount();
+                                                                    })
+                                                                }
 
-                                                                        case 401:
-                                                                            this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                            break;
-                                                                        case 403:
-                                                                            this.props.history.push(`/accessDenied`)
-                                                                            break;
-                                                                        case 500:
-                                                                        case 404:
-                                                                        case 406:
-                                                                            this.setState({
-                                                                                submitMessage: error.response.data.messageCode,
-                                                                                submitColor: "red",
-                                                                                loading: false
-                                                                            }, () => {
-                                                                                this.hideMessageComponent()
-                                                                            });
-                                                                            break;
-                                                                        case 412:
-                                                                            this.setState({
-                                                                                submitMessage: error.response.data.messageCode,
-                                                                                submitColor: "red",
-                                                                                loading: false
-                                                                            }, () => {
-                                                                                this.hideMessageComponent()
-                                                                            });
-                                                                            break;
-                                                                        default:
-                                                                            this.setState({
-                                                                                submitMessage: 'static.unkownError',
-                                                                                submitColor: "red",
-                                                                                loading: false
-                                                                            }, () => {
-                                                                                this.hideMessageComponent()
-                                                                            });
-                                                                            break;
+                                                            })
+                                                            .catch(
+                                                                error => {
+                                                                    if (error.message === "Network Error") {
+                                                                        this.setState({
+                                                                            // message: 'static.unkownError',
+                                                                            submitMessage: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                                            submitColor: "red",
+                                                                            loading: false
+                                                                        }, () => {
+                                                                            this.hideMessageComponent()
+                                                                        });
+                                                                    } else {
+                                                                        switch (error.response ? error.response.status : "") {
+
+                                                                            case 401:
+                                                                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                break;
+                                                                            case 403:
+                                                                                this.props.history.push(`/accessDenied`)
+                                                                                break;
+                                                                            case 500:
+                                                                            case 404:
+                                                                            case 406:
+                                                                                this.setState({
+                                                                                    submitMessage: error.response.data.messageCode,
+                                                                                    submitColor: "red",
+                                                                                    loading: false
+                                                                                }, () => {
+                                                                                    this.hideMessageComponent()
+                                                                                });
+                                                                                break;
+                                                                            case 412:
+                                                                                this.setState({
+                                                                                    submitMessage: error.response.data.messageCode,
+                                                                                    submitColor: "red",
+                                                                                    loading: false
+                                                                                }, () => {
+                                                                                    this.hideMessageComponent()
+                                                                                });
+                                                                                break;
+                                                                            default:
+                                                                                this.setState({
+                                                                                    submitMessage: 'static.unkownError',
+                                                                                    submitColor: "red",
+                                                                                    loading: false
+                                                                                }, () => {
+                                                                                    this.hideMessageComponent()
+                                                                                });
+                                                                                break;
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
-                                                        );
-                                                } else {
-                                                    document.getElementById("submitButton").disabled = false;
-                                                    alert("To approve a supply plan – Reviewed must all be checked.");
-                                                }
-                                            }
-                                        } else {
-                                            confirmAlert({
-                                                message: i18n.t("static.supplyplan.inconsistent"),
-                                                buttons: [
-                                                    {
-                                                        label: i18n.t("static.common.refreshPage"),
-                                                        onClick: () => {
-                                                            window.location.reload(true);
-                                                        }
-                                                    },
-                                                    {
-                                                        label: i18n.t('static.common.close')
+                                                            );
+                                                    } else {
+                                                        document.getElementById("submitButton").disabled = false;
+                                                        alert("To approve a supply plan – Reviewed must all be checked.");
                                                     }
-                                                ]
-                                            });
-                                        }
-                                    })
-                                    .catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    // message: 'static.unkownError',
-                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                    loading: false
-                                                });
+                                                } else {
+                                                    this.setState({
+                                                        submitMessage: 'static.supplyPlan.validationFailed',
+                                                        submitColor: "red",
+                                                        loading: false
+                                                    }, () => {
+                                                        this.hideMessageComponent()
+                                                    });
+                                                }
                                             } else {
-                                                switch (error.response ? error.response.status : "") {
+                                                confirmAlert({
+                                                    message: i18n.t("static.supplyplan.inconsistent"),
+                                                    buttons: [
+                                                        {
+                                                            label: i18n.t("static.common.refreshPage"),
+                                                            onClick: () => {
+                                                                window.location.reload(true);
+                                                            }
+                                                        },
+                                                        {
+                                                            label: i18n.t('static.common.close')
+                                                        }
+                                                    ]
+                                                });
+                                            }
+                                        })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        // message: 'static.unkownError',
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
 
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
                                                 }
                                             }
-                                        }
-                                    );
+                                        );
+                                } else {
+                                    this.setState({
+                                        submitMessage: 'static.supplyPlan.validationFailed',
+                                        submitColor: "red",
+                                        loading: false
+                                    }, () => {
+                                        this.hideMessageComponent()
+                                    });
+                                }
                             }}
                             render={
                                 ({
@@ -5185,7 +5458,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Col md="12 pl-0">
                                                     <div className="row">
                                                         <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.notes')}</Label>
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"(" + i18n.t('static.problemContext.viewTrans') + ")"}</small></span>
                                                             <Input
                                                                 type="textarea"
                                                                 maxLength={65535}
@@ -5244,6 +5517,29 @@ class EditSupplyPlanStatus extends Component {
                                 )} />
                     </Card>
                 </Col>
+                <Modal isOpen={this.state.notesPopup}
+                    className={'modal-lg modalWidth ' + this.props.className}>
+                    <ModalHeader toggle={() => this.toggleLargeNotes()} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div className="" style={{ display: this.state.loadingForNotes ? "none" : "block" }}>
+                            <div id="notesTransTable" className="AddListbatchtrHeight"></div>
+                        </div>
+                        <div style={{ display: this.state.loadingForNotes ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceledNotes()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
             </div >
         );
     }
@@ -5341,6 +5637,18 @@ class EditSupplyPlanStatus extends Component {
                 this.componentDidMount();
             })
         }
+    }
+    /**
+     * This function is called when cancel button for notes history modal popup is clicked
+     */
+    actionCanceledNotes() {
+        this.setState({
+            message: i18n.t('static.actionCancelled'),
+            color: "#BA0C2F",
+        }, () => {
+            hideSecondComponent();
+            this.toggleLargeNotes();
+        })
     }
 }
 export default EditSupplyPlanStatus
