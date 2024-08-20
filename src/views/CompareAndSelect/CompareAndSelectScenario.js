@@ -145,7 +145,8 @@ class CompareAndSelectScenario extends Component {
             expandCompressPUBtn: true,
             showHidePU: true,
             actualMinDate: "",
-            calendarMonthList: ""
+            calendarMonthList: "",
+            toggleMultiselect: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.setViewById = this.setViewById.bind(this);
@@ -163,6 +164,13 @@ class CompareAndSelectScenario extends Component {
         this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
         this.getPlanningUnitsForTable = this.getPlanningUnitsForTable.bind(this);
         this.loadedCalendar = this.loadedCalendar.bind(this);
+    }
+    setToggleMultiselect(e) {
+        this.setState({
+            toggleMultiselect: e.target.checked
+        }, () => {
+            // this.updatePUs()
+        })
     }
     /**
      * Handles the click event on the range picker box.
@@ -2461,6 +2469,21 @@ class CompareAndSelectScenario extends Component {
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-4" style={{ "marginLeft": "20px", "marginTop": "28px" }}>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="toggleMultiselect"
+                                                    name="toggleMultiselect"
+                                                    checked={this.state.toggleMultiselect}
+                                                    onClick={(e) => { this.setToggleMultiselect(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    {i18n.t('static.import.doNoImportCheckbox')}
+                                                </Label>
                                             </FormGroup>
                                         </div>
                                     </div>

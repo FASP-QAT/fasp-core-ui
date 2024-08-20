@@ -3344,5 +3344,6 @@
     "static.compareAndSelect.selectForecast": "Click Planning Unit to display details",
     "static.compareAndSelect.forecastSelected": "Forecast selected",
     "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
-    "static.compareAndSelect.showPUPanel": "Show Planning Unit panel"
+    "static.compareAndSelect.showPUPanel": "Show Planning Unit panel",
+    "static.compareAndSelect.selectMultipleTree":"Select Multiple Tree"
 }
