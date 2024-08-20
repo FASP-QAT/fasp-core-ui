@@ -157,10 +157,10 @@ class PageError extends Component {
           <Row className="justify-content-left">
             <Col md="7" lg="7">
               <span className="clearfix">
-                <h1 className="float-left display-3 mr-4 err_text">{i18n.t('static.errorPage.error') + " "} <img style={{ width: "150px" }} className='img-fluid' src={ErrorMessageImg}></img></h1>
+                <h1 className="float-left display-3 mr-4 err_text lightModeclrblack">{i18n.t('static.errorPage.error') + " "} <img style={{ width: "150px"}} className='img-fluid ImgInvert' src={ErrorMessageImg}></img></h1>
               </span>
               <span>
-                <h3 className=''>{i18n.t('static.errorPage.errorMessage')}</h3>
+                <h3 className='lightModeclrblack'>{i18n.t('static.errorPage.errorMessage')}</h3>
                 <h4 className="pt-3">{i18n.t("static.errorPage.errorReason") + " "} {this.props.location.state.errorMessage}</h4>
               </span>
               <InputGroup className="input-prepend">
