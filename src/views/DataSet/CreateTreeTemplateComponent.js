@@ -824,7 +824,10 @@ export default class CreateTreeTemplate extends Component {
             copyModalParentNodeList: [],
             usage2ConvertCondition: true,
             copyModeling: true,
-            copyLoader: false
+            copyLoader: false,
+            invalidNodeError: false,
+            invalidNodeType: "",
+            invalidParentNodeType: ""
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -2639,21 +2642,60 @@ export default class CreateTreeTemplate extends Component {
     }
     copyModalParentLevelChange(e) {
         let allowedNodeTypeList = [];
+        let invalidNodeError = false;
+        let invalidNodeType = "";
+        let invalidParentNodeType = "";
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
-        let copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value);
+        let copyModalParentNodeList;
+        if (this.state.copyModalNode.payload.nodeType.id == 5) {
+            copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));;
+        } else {
+            copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value);
+        }
         if(this.state.copyModalData == 2){
             copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
             copyModalParentNodeList = copyModalParentNodeList.filter(x => !x.sortOrder.startsWith(this.state.copyModalNode.sortOrder))
         }
+        if(copyModalParentNodeList.length == 1) {
+            let allowedNodeTypeList = [];
+            allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+            let tempParentNode = copyModalParentNodeList.filter(x => x.id == copyModalParentNodeList[0].id)[0].payload.nodeType.id;
+            if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+                invalidNodeError = false;
+            } else {
+                invalidNodeError = true;
+                invalidNodeType = this.state.copyModalNode.payload.nodeType.id;
+                invalidParentNodeType = tempParentNode;
+            }
+        }
         this.setState({
             copyModalParentLevel: e.target.value,
             copyModalParentNodeList: copyModalParentNodeList,
-            copyModalParentNode: copyModalParentNodeList.length == 1 ? copyModalParentNodeList[0].id : ""
+            copyModalParentNode: copyModalParentNodeList.length == 1 ? copyModalParentNodeList[0].id : "",
+            invalidNodeError: invalidNodeError,
+            invalidNodeType: invalidNodeType,
+            invalidParentNodeType: invalidParentNodeType
         })
     }
     copyModalParentNodeChange(e) {
+        let allowedNodeTypeList = [];
+        let invalidNodeError = false;
+        let invalidNodeType = "";
+        let invalidParentNodeType = "";
+        allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+        let tempParentNode = this.state.copyModalParentNodeList.filter(x => x.id == e.target.value)[0].payload.nodeType.id;
+        if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+            invalidNodeError = false;
+        } else {
+            invalidNodeError = true;
+            invalidNodeType = this.state.copyModalNode.payload.nodeType.id;
+            invalidParentNodeType = tempParentNode;
+        }
         this.setState({
-            copyModalParentNode: e.target.value
+            copyModalParentNode: e.target.value,
+            invalidNodeError: invalidNodeError,
+            invalidNodeType: invalidNodeType,
+            invalidParentNodeType: invalidParentNodeType
         })
     }
     /**
@@ -6204,7 +6246,10 @@ export default class CreateTreeTemplate extends Component {
         childListArr.map(item => {
             var indexItems = items.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
-                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList //.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                if(!this.state.copyModeling) {
+                    nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null));
+                }
                 (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList = nodeDataModelingList;
             }
         })
@@ -13527,6 +13572,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "PU" : "FU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "PU" : "FU")}</p>
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>
