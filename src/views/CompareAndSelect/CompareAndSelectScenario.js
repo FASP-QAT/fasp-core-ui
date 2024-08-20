@@ -737,7 +737,7 @@ class CompareAndSelectScenario extends Component {
                 } catch (error) {
                 }
                 var calendarOptions = {
-                    data: calendarTableRowData,
+                    data: Object.values(calendarTableRowData),
                     columnDrag: false,
                     colHeaderClasses: ["Reqasterisk"],
                     columns: calendarTableCol,
