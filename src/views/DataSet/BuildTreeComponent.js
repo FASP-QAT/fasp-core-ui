@@ -7292,8 +7292,24 @@ export default class BuildTree extends Component {
             var indexItems = updatedFlatList.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
                 for (let i = 0; i < scenarioListNew.length; i++) {
-                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
-                    (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList = nodeDataModelingList; 
+                    let invalidTransfer = [];
+                    var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList //.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                    if(!this.state.copyModeling) {
+                        nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null));
+                    }
+                    if (nodeDataModelingList.length > 0) {
+                        nodeDataModelingList.map((item1, c) => {
+                            var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                            if(newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "" ) {
+                                invalidTransfer.push(item1.nodeDataModelingId);
+                            }
+                            try{
+                                item1.transferNodeDataId = newTransferId[0].newId;
+                            } catch {
+                            }
+                        })
+                    }
+                    (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList = nodeDataModelingList.filter(x => !invalidTransfer.includes(x.nodeDataModelingId)); 
                 }
             }
         })

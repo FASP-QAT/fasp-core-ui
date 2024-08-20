@@ -6177,7 +6177,10 @@ export default class CreateTreeTemplate extends Component {
         childListArr.map(item => {
             var indexItems = items.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
-                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList //.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                if(!this.state.copyModeling) {
+                    nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null));
+                }
                 (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList = nodeDataModelingList;
             }
         })
