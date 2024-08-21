@@ -2026,7 +2026,7 @@ export default class ManualTagging extends Component {
      */
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 && this.state.localProgramList.length>0 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
+        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 && this.state.localProgramList.length>0 ? this.state.localProgramList[0].programId : this.state.programId1!=undefined?this.state.programId1.toString().split("_")[0]:"") : document.getElementById("programId").value);
         var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         var linkedRoNoAndRoPrimeLineNo = [];

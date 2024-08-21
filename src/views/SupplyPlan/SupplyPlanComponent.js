@@ -4273,7 +4273,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                             {i18n.t('static.planningunit.countrysku')}
                                                         </Label>
                                                     </FormGroup> */}
-                                                    <FormGroup id="planningUnitDiv" className='pt-lg-1 col-md-4'>
+                                                    {/* <FormGroup id="planningUnitDiv" className='pt-lg-1 col-md-4'> */}
+                                                    <FormGroup id="planningUnitDiv" className='col-md-4'>
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
                                                         <div className="controls ">
                                                         <Select
