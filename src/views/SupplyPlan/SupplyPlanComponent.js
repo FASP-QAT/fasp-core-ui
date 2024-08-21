@@ -2788,9 +2788,9 @@ export default class SupplyPlanComponent extends React.Component {
                 item.style.display="none";
             })
             }, 500);
-            curDate=moment(cutOffDate).utcOffset('-0500');
+            curDate=moment(cutOffDate);
             if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                currentDate=moment(cutOffDate).utcOffset('-0500');
+                currentDate=moment(cutOffDate);
             }
         }else{
             setTimeout(function () {
@@ -4372,7 +4372,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
+                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=undefined && this.state.generalProgramJson.cutOffDate!=null && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>
