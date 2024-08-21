@@ -46,6 +46,7 @@ export default class ImportFromQATSupplyPlan extends Component {
             selSource1: [],
             selSource2: [],
             stepTwoData: [],
+            spProgramVersionChanged: false,
         }
         this.finishedStepOne = this.finishedStepOne.bind(this);
         this.finishedStepTwo = this.finishedStepTwo.bind(this);

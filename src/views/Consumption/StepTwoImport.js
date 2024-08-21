@@ -56,7 +56,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
      */
     formSubmit = function () {
         var validation = this.checkValidation();
-        console.log('onSubmit. validation: ',validation);
         if (validation == true) {
             var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
@@ -95,7 +94,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 // }
                 changedpapuList.push(json);
             }
-            console.log('stepTwoData: '+JSON.stringify(changedpapuList));
+            // console.log('stepTwoData: '+JSON.stringify(changedpapuList));
             this.setState({
                 stepTwoData: changedpapuList,
                 selSource2: tableJson
@@ -143,22 +142,18 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             var col = ("C").concat(parseInt(y) + 1);
             // var value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString();
             var value = this.el.getValueFromCoords(2, y);
-            console.log('cv value: ',value);
             var reg = JEXCEL_DECIMAL_NO_REGEX;
             if (value == "") {
-                console.log('inside if: ');
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else if(isNaN(parseInt(value)) || !(reg.test(value))) {
-                console.log('inside else if: ');
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                 valid = false;
             } else {
-                console.log('inside else. valid: ');
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
@@ -229,16 +224,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         let datasetList = this.props.items.datasetList
         let forecastProgramVersionId = this.props.items.forecastProgramVersionId
 
-        console.log('programIdArr.length: ',programIdArr.length);
         let selectedPrograms = [];
         for(var i=0; i < programIdArr.length; i++) {
             let selectedProgramObj = programs.filter(c => c.programId == programIdArr[i])[0];
             selectedPrograms.push(selectedProgramObj);
         }
-        console.log('selectedSupplyPlanPrograms.length: ',selectedPrograms.length);
         
         let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
-        console.log('selectedForecastProgramObj step 2: ',selectedForecastProgramObj);
         let forecastProgramRegionList = selectedForecastProgramObj.regionList;
         //create regionList for dropdown
         let forecastPgmRegionListDD = [];
@@ -273,7 +265,6 @@ export default class StepTwoImportMapPlanningUnits extends Component {
     buildJexcel() {
         // var papuList = this.state.selSource;
         var papuList = this.state.selectedSupplyPlanPrograms;
-        console.log('papuList s2: ',papuList);
         var data = [];
         var papuDataArr = [];
         var count = 0;
@@ -318,12 +309,23 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.el = jexcel(document.getElementById("mapImport"), '');
         jexcel.destroy(document.getElementById("mapImport"), true);
         var papuList11 = this.state.selSource2;
+        // console.log('step2Data selSource2 len: ',papuList11.length);
+        // console.log('s2 spProgramVersionChanged: ',this.props.items.spProgramVersionChanged);
         var data;
-        if (papuList11 != "") {
-            data = papuList11
-        } else {
-            data = papuDataArr
+        if (this.props.items.spProgramVersionChanged == true) {
+            //generate fresh table
+            data = papuDataArr;
+            
+        } else if(papuList11.length > 0 && this.props.items.spProgramVersionChanged == false) {
+            //render selSource2 from state
+            data = papuList11;
         }
+
+        // if (papuList11 != "") {
+        //     data = papuList11
+        // } else {
+        //     data = papuDataArr
+        // }
         var options = {
             data: data,
             columnDrag: false,
