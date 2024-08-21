@@ -582,7 +582,7 @@ class ListBudgetComponent extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
+    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.filter(c=>this.state.programId==0 || this.state.programId==-1?1==1:[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId))).map((item, i) => {
       return (
         <option key={i} value={item.fundingSourceId}>
           {getLabelText(item.label, this.state.lang)}

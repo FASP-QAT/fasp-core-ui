@@ -1037,8 +1037,13 @@ export default class ManualTagging extends Component {
                     .then(response => {
                         if (response.status == 200) {
                             var listArray = response.data.map(ele => ele.realmCountry);
+                            var lang=this.state.lang;
                             this.setState({
-                                countryList: response.data
+                                countryList: response.data.sort(function (a, b) {
+                                    a = getLabelText(a.realmCountry.label,lang).toLowerCase();
+                                    b = getLabelText(b.realmCountry.label,lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                  })
                             }, () => {
                                 if (this.state.countryList.length == 1) {
                                     var event = {
@@ -2021,7 +2026,7 @@ export default class ManualTagging extends Component {
      */
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
+        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 && this.state.localProgramList.length>0 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
         var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         var linkedRoNoAndRoPrimeLineNo = [];
@@ -4499,7 +4504,7 @@ export default class ManualTagging extends Component {
             )
         }, this);
         const { fundingSourceList } = this.state;
-        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
+        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId1))).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {item.fundingSourceCode}

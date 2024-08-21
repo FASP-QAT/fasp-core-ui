@@ -110,7 +110,8 @@ export default class StockStatusMatrix extends React.Component {
         if (programId > 0 && versionId != 0) {
           localStorage.setItem("sesVersionIdReport", versionId);
           var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
-          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-1, 'years').format("YYYY-MM-DD");
+          var cutOffDateForMin = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
           var startYear = this.state.startYear;
           var endYear=this.state.endYear;
           if (moment(startYear).format("YYYY") < moment(cutOffDate).format("YYYY")) {
@@ -120,7 +121,7 @@ export default class StockStatusMatrix extends React.Component {
           this.setState({
             startYear: startYear,
             endYear:endYear,
-            minDate:moment(cutOffDate).format("YYYY")
+            minDate:moment(cutOffDateForMin).format("YYYY")
           })
           if (versionId.includes("Local")) {
             var db1;
