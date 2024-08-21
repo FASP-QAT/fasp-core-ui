@@ -392,27 +392,47 @@ class CompareVersion extends Component {
                             var total = 0;
                             var label = { label_en: "", label_fr: "", label_pr: "", label_sp: "" };
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
-                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
-                                    var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
-                                    if (selectedTree != undefined) {
-                                        var flatList = selectedTree.tree.flatList;
-                                        var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId][0].puNode != null && c.payload.nodeDataMap[planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId][0].puNode.planningUnit.id == planningUnitList[pu].planningUnit.id);
-                                        var nodeDataMomList = [];
-                                        for (var fl = 0; fl < flatListFilter.length; fl++) {
-                                            nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario.length > 0) {
+                                    var treeAndScenario = planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario;
+                                    var count = 0;
+                                    var selectedScenarioId_en = "";
+                                    var selectedScenarioId_fr = "";
+                                    var selectedScenarioId_sp = "";
+                                    var selectedScenarioId_pr = "";
+                                    for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                                        var selectedTree = treeList.filter(c => treeAndScenario[tas].treeId == c.treeId)[0];
+                                        if (selectedTree != undefined) {
+                                            count+=1;
+                                            var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == treeAndScenario[tas].scenarioId && c.active.toString() == "true")[0];
+                                            if (selectedScenarioId_en != "") {
+                                                selectedScenarioId_en += ", ";
+                                                selectedScenarioId_fr += ", ";
+                                                selectedScenarioId_sp += ", ";
+                                                selectedScenarioId_pr += ", ";
+                                            }
+                                            selectedScenarioId_en += selectedTree.label.label_en + " - " + scenarioLabel.label.label_en;
+                                            selectedScenarioId_fr += selectedTree.label.label_fr + " - " + scenarioLabel.label.label_fr;
+                                            selectedScenarioId_sp += selectedTree.label.label_sp + " - " + scenarioLabel.label.label_sp;
+                                            selectedScenarioId_pr += selectedTree.label.label_pr + " - " + scenarioLabel.label.label_pr;
+                                            var flatList = selectedTree.tree.flatList;
+                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].puNode.planningUnit.id == planningUnitList[pu].planningUnit.id);
+                                            var nodeDataMomList = [];
+                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                            }
+                                            nodeDataMomList.map(ele => {
+                                                total += Number(ele.calculatedMmdValue);
+                                            });
                                         }
-                                        nodeDataMomList.map(ele => {
-                                            total += Number(ele.calculatedMmdValue);
-                                        });
-                                    } else {
+                                    }
+                                    if (count == 0) {
                                         total = null;
                                     }
-                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId && c.active.toString() == "true")[0];
                                     label = {
-                                        label_en: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
-                                        label_sp: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
-                                        label_pr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
-                                        label_fr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_en: selectedScenarioId_en,
+                                        label_sp: selectedScenarioId_sp,
+                                        label_pr: selectedScenarioId_pr,
+                                        label_fr: selectedScenarioId_fr,
                                     };
                                 } else if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != "") {
                                     var ceFilter = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId);
@@ -562,27 +582,47 @@ class CompareVersion extends Component {
                             var total = 0;
                             var label = { label_en: "", label_fr: "", label_pr: "", label_sp: "" };
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
-                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId != "") {
-                                    var selectedTree = treeList.filter(c => planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeId == c.treeId)[0];
-                                    if (selectedTree != undefined) {
-                                        var flatList = selectedTree.tree.flatList;
-                                        var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId][0].puNode != null && c.payload.nodeDataMap[planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId][0].puNode.planningUnit.id == planningUnitList[pu].planningUnit.id);
-                                        var nodeDataMomList = [];
-                                        for (var fl = 0; fl < flatListFilter.length; fl++) {
-                                            nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario.length > 0) {
+                                    var treeAndScenario = planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario;
+                                    var count = 0;
+                                    var selectedScenarioId_en = "";
+                                    var selectedScenarioId_fr = "";
+                                    var selectedScenarioId_sp = "";
+                                    var selectedScenarioId_pr = "";
+                                    for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                                        var selectedTree = treeList.filter(c => treeAndScenario[tas].treeId == c.treeId)[0];
+                                        if (selectedTree != undefined) {
+                                            count+=1;
+                                            var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == treeAndScenario[tas].scenarioId && c.active.toString() == "true")[0];
+                                            if (selectedScenarioId_en != "") {
+                                                selectedScenarioId_en += ", ";
+                                                selectedScenarioId_fr += ", ";
+                                                selectedScenarioId_sp += ", ";
+                                                selectedScenarioId_pr += ", ";
+                                            }
+                                            selectedScenarioId_en += selectedTree.label.label_en + " - " + scenarioLabel.label.label_en;
+                                            selectedScenarioId_fr += selectedTree.label.label_fr + " - " + scenarioLabel.label.label_fr;
+                                            selectedScenarioId_sp += selectedTree.label.label_sp + " - " + scenarioLabel.label.label_sp;
+                                            selectedScenarioId_pr += selectedTree.label.label_pr + " - " + scenarioLabel.label.label_pr;
+                                            var flatList = selectedTree.tree.flatList;
+                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].puNode.planningUnit.id == planningUnitList[pu].planningUnit.id);
+                                            var nodeDataMomList = [];
+                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                            }
+                                            nodeDataMomList.map(ele => {
+                                                total += Number(ele.calculatedMmdValue);
+                                            });
                                         }
-                                        nodeDataMomList.map(ele => {
-                                            total += Number(ele.calculatedMmdValue);
-                                        });
-                                    } else {
+                                    }
+                                    if (count == 0) {
                                         total = null;
                                     }
-                                    var scenarioLabel = selectedTree.scenarioList.filter(c => c.id == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].scenarioId && c.active.toString() == "true")[0];
                                     label = {
-                                        label_en: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
-                                        label_sp: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
-                                        label_pr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
-                                        label_fr: getLabelText(selectedTree.label, this.state.lang) + " - " + getLabelText(scenarioLabel.label, this.state.lang),
+                                        label_en: selectedScenarioId_en,
+                                        label_sp: selectedScenarioId_sp,
+                                        label_pr: selectedScenarioId_pr,
+                                        label_fr: selectedScenarioId_fr,
                                     };
                                 } else if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != null && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId != "") {
                                     var ceFilter = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == planningUnitList[pu].selectedForecastMap[regionList[r].regionId].consumptionExtrapolationId);

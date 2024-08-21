@@ -4513,6 +4513,17 @@ h6 {
   transform: translate(0, -50%);
   content: '-';
 }
+.ReportSearchMarginTop {
+  margin-top: -51px;
+}
+
+.ReportSearchMarginTopSPVR {
+  margin-top: -42px;
+}
+
+.shipmentconsumptionSearchMarginTop {
+  margin-top: -51px;
+}
 
 .accordion-toggle.collapsed .expand-button:after {
   content: '+';
@@ -13938,6 +13949,12 @@ label.arrow_label:before {
   align-items: center;
 }
 
+.legendcommitversionTextStock {
+  text-align: left;
+  display: table;
+  padding: 0px 0px 0px 3px;
+}
+
 .compareAndSelectCollapsecol .jss>tbody>tr>td {
   white-space: pre !important;
   text-align: center !important;
@@ -13981,4 +13998,7 @@ label.arrow_label:before {
 }
 .momJexcelPagination.jss_pagination>div {
   padding-left: 56px!important;
+}
+.compareAndSelectPU {
+  background-color: #e5e5e5 !important;
 }

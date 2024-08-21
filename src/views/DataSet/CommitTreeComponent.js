@@ -1527,26 +1527,44 @@ export default class CommitTreeComponent extends React.Component {
                                     data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
                                     data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
                                     var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
+                                    var selectedScenarioId="";
                                     var ce = regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId) : [];
-                                    var selectedTreeScenario = [];
-                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null) {
-                                        selectedTreeScenario = treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId && c.treeId == regionalSelectedForecastData.treeId);
-                                    }
-                                    var total = 0;
-                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null && selectedTreeScenario.length > 0) {
-                                        var tsListFilter = datasetData.treeList.filter(c => c.treeId == regionalSelectedForecastData.treeId);
-                                        if (tsListFilter.length > 0) {
-                                            var flatList = tsListFilter[0].tree.flatList;
-                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].puNode != null && c.payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
-                                            var nodeDataMomList = [];
-                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
-                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[regionalSelectedForecastData.scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.treeAndScenario.length>0) {
+                                        var treeAndScenario=regionalSelectedForecastData.treeAndScenario;
+                                        for(var tas=0;tas<treeAndScenario.length;tas++){
+                                            var treeFilter = treeScenarioList.filter(c => c.scenarioId == treeAndScenario[tas].scenarioId && c.treeId == treeAndScenario[tas].treeId);
+                                            if(treeFilter.length>0){
+                                                if(selectedScenarioId!=""){
+                                                    selectedScenarioId+=",\r";
+                                                }
+                                                selectedScenarioId+=treeFilter[0].treeLabel+" ~ "+treeFilter[0].scenarioLabel;
                                             }
-                                            nodeDataMomList.map(ele => {
-                                                total += Number(ele.calculatedMmdValue);
-                                            });
-                                        } else {
-                                            total = null;
+                                        }
+                                    }else if(regionalSelectedForecastData!=undefined){
+                                        selectedScenarioId=regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0 ? getLabelText(ce[0].extrapolationMethod.label, this.state.lang) : "";
+                                    }
+
+                                    var total = 0;
+                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.treeAndScenario.length>0) {
+                                        var treeAndScenario=regionalSelectedForecastData.treeAndScenario;
+                                        var count=0;
+                                        for(var tas=0;tas<treeAndScenario.length;tas++){
+                                            var tsListFilter = datasetData.treeList.filter(c => c.treeId == treeAndScenario[tas].treeId);
+                                            if (tsListFilter.length > 0) {
+                                                count+=1;
+                                                var flatList = tsListFilter[0].tree.flatList;
+                                                var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
+                                                var nodeDataMomList = [];
+                                                for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                    nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[treeAndScenario[tas].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                                }
+                                                nodeDataMomList.map(ele => {
+                                                    total += Number(ele.calculatedMmdValue);
+                                                });
+                                            }
+                                        }
+                                        if(count==0){
+                                            total=null;
                                         }
                                     } else if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0) {
                                         var ceFilter = datasetData.consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId);
@@ -1560,30 +1578,50 @@ export default class CommitTreeComponent extends React.Component {
                                     } else {
                                         total = null;
                                     }
-                                    data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? selectedTreeScenario.length > 0 ? selectedTreeScenario[0].treeLabel + " ~ " + selectedTreeScenario[0].scenarioLabel : "" : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0 ? getLabelText(ce[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                                    data[2] = regionalSelectedForecastData != undefined ? selectedScenarioId : ""
                                     data[3] = regionalSelectedForecastData != undefined && total != null ? total.toFixed(2) : "";
                                     data[4] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                                     var regionalSelectedForecastData1 = selectedForecastData1[regionSet[k]];
+                                    console.log("regionalSelectedForecastData1 Test@123",regionalSelectedForecastData1)
+                                    var selectedScenarioId1="";
                                     var ce1 = regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId) : [];
-                                    var selectedTreeScenario1 = [];
-                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null) {
-                                        selectedTreeScenario1 = treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId && c.treeId == regionalSelectedForecastData1.treeId);
-                                    }
-                                    var total1 = 0;
-                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null && selectedTreeScenario1.length > 0) {
-                                        var tsListFilter1 = datasetData1.treeList.filter(c => c.treeId == regionalSelectedForecastData1.treeId);
-                                        if (tsListFilter1.length > 0) {
-                                            var flatList1 = tsListFilter1[0].tree.flatList;
-                                            var flatListFilter1 = flatList1.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[regionalSelectedForecastData1.scenarioId][0].puNode != null && c.payload.nodeDataMap[regionalSelectedForecastData1.scenarioId][0].puNode.planningUnit.id == pu1[0].planningUnit.id);
-                                            var nodeDataMomList1 = [];
-                                            for (var fl1 = 0; fl1 < flatListFilter1.length; fl1++) {
-                                                nodeDataMomList1 = nodeDataMomList1.concat(flatListFilter1[fl1].payload.nodeDataMap[regionalSelectedForecastData1.scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData1.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData1.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
+                                        var treeAndScenario1=regionalSelectedForecastData1.treeAndScenario;
+                                        for(var tas1=0;tas1<treeAndScenario1.length;tas1++){
+                                            var treeFilter1 = treeScenarioList1.filter(c => c.scenarioId == treeAndScenario1[tas1].scenarioId && c.treeId == treeAndScenario1[tas1].treeId);
+                                            if(treeFilter1.length>0){
+                                                if(selectedScenarioId1!=""){
+                                                    selectedScenarioId1+=",\r";
+                                                }
+                                                selectedScenarioId1+=treeFilter1[0].treeLabel+" ~ "+treeFilter1[0].scenarioLabel;
                                             }
-                                            nodeDataMomList1.map(ele1 => {
-                                                total1 += Number(ele1.calculatedMmdValue);
-                                            });
-                                        } else {
-                                            total1 = null;
+                                        }
+                                    }else if(regionalSelectedForecastData1!=undefined){
+                                        selectedScenarioId1=regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0 ? getLabelText(ce1[0].extrapolationMethod.label, this.state.lang) : "";
+                                    }
+
+                                    var total1 = 0;
+                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
+                                        var treeAndScenario1=regionalSelectedForecastData1.treeAndScenario;
+                                        var count1=0;
+                                        for(var tas1=0;tas1<treeAndScenario1.length;tas1++){
+                                            var tsListFilter1 = datasetData1.treeList.filter(c => c.treeId == treeAndScenario1[tas1].treeId);
+                                            if (tsListFilter1.length > 0) {
+                                                count1+=1;
+                                                var flatList1 = tsListFilter1[0].tree.flatList;
+                                                var flatListFilter1 = flatList1.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
+                                                console.log("flatListFilter1 Test@123",flatListFilter1)
+                                                var nodeDataMomList1 = [];
+                                                for (var fl1 = 0; fl1 < flatListFilter1.length; fl1++) {
+                                                    nodeDataMomList1 = nodeDataMomList1.concat(flatListFilter1[fl1].payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData1.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData1.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                                }
+                                                nodeDataMomList1.map(ele1 => {
+                                                    total1 += Number(ele1.calculatedMmdValue);
+                                                });
+                                            }
+                                        }
+                                        if(count1==0){
+                                            total1=null;
                                         }
                                     } else if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0) {
                                         var ceFilter1 = datasetData1.consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId);
@@ -1595,30 +1633,48 @@ export default class CommitTreeComponent extends React.Component {
                                             total1 = null;
                                         }
                                     }
-                                    data[5] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? selectedTreeScenario1.length > 0 ? selectedTreeScenario1[0].treeLabel + " ~ " + selectedTreeScenario1[0].scenarioLabel : "" : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0 ? getLabelText(ce1[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                                    data[5] = regionalSelectedForecastData1 != undefined ? selectedScenarioId1 : ""
                                     data[6] = regionalSelectedForecastData1 != undefined && total1 != null ? total1.toFixed(2) : "";
                                     data[7] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
                                     var regionalSelectedForecastData2 = selectedForecastData2[regionSet[k]];
+                                    var selectedScenarioId2="";
                                     var ce2 = regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.consumptionExtrapolationId != null ? consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId) : [];
-                                    var selectedTreeScenario2 = [];
-                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null) {
-                                        selectedTreeScenario2 = treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId && c.treeId == regionalSelectedForecastData2.treeId);
-                                    }
-                                    var total2 = 0;
-                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null && selectedTreeScenario2.length > 0) {
-                                        var tsListFilter2 = datasetData2.treeList.filter(c => c.treeId == regionalSelectedForecastData2.treeId);
-                                        if (tsListFilter2.length > 0) {
-                                            var flatList2 = tsListFilter2[0].tree.flatList;
-                                            var flatListFilter2 = flatList2.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[regionalSelectedForecastData2.scenarioId][0].puNode != null && c.payload.nodeDataMap[regionalSelectedForecastData2.scenarioId][0].puNode.planningUnit.id == pu2[0].planningUnit.id);
-                                            var nodeDataMomList2 = [];
-                                            for (var fl2 = 0; fl2 < flatListFilter2.length; fl2++) {
-                                                nodeDataMomList2 = nodeDataMomList2.concat(flatListFilter2[fl2].payload.nodeDataMap[regionalSelectedForecastData2.scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData2.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData2.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.treeAndScenario.length>0) {
+                                        var treeAndScenario2=regionalSelectedForecastData2.treeAndScenario;
+                                        for(var tas2=0;tas2<treeAndScenario2.length;tas2++){
+                                            var treeFilter2 = treeScenarioList2.filter(c => c.scenarioId == treeAndScenario2[tas2].scenarioId && c.treeId == treeAndScenario2[tas2].treeId);
+                                            if(treeFilter2.length>0){
+                                                if(selectedScenarioId2!=""){
+                                                    selectedScenarioId2+=",\r";
+                                                }
+                                                selectedScenarioId2+=treeFilter2[0].treeLabel+" ~ "+treeFilter2[0].scenarioLabel;
                                             }
-                                            nodeDataMomList2.map(ele2 => {
-                                                total2 += Number(ele2.calculatedMmdValue);
-                                            });
-                                        } else {
-                                            total2 = null;
+                                        }
+                                    }else if(regionalSelectedForecastData2!=undefined){
+                                        selectedScenarioId2=regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0 ? getLabelText(ce2[0].extrapolationMethod.label, this.state.lang) : "";
+                                    }
+
+                                    var total2 = 0;
+                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.treeAndScenario.length>0) {
+                                        var treeAndScenario2=regionalSelectedForecastData2.treeAndScenario;
+                                        var count2=0;
+                                        for(var tas2=0;tas2<treeAndScenario2.length;tas2++){
+                                            var tsListFilter2 = datasetData2.treeList.filter(c => c.treeId == treeAndScenario2[tas2].treeId);
+                                            if (tsListFilter2.length > 0) {
+                                                count2+=1;
+                                                var flatList2 = tsListFilter2[0].tree.flatList;
+                                                var flatListFilter2 = flatList2.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
+                                                var nodeDataMomList2 = [];
+                                                for (var fl2 = 0; fl2 < flatListFilter2.length; fl2++) {
+                                                    nodeDataMomList2 = nodeDataMomList2.concat(flatListFilter2[fl2].payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData2.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData2.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                                }
+                                                nodeDataMomList2.map(ele2 => {
+                                                    total2 += Number(ele2.calculatedMmdValue);
+                                                });
+                                            }
+                                        }
+                                        if(count2==0){
+                                            total2=null;
                                         }
                                     } else if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0) {
                                         var ceFilter2 = datasetData2.consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId);
@@ -1632,7 +1688,7 @@ export default class CommitTreeComponent extends React.Component {
                                     } else {
                                         total2 = null;
                                     }
-                                    data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? selectedTreeScenario2.length > 0 ? selectedTreeScenario2[0].treeLabel + " ~ " + selectedTreeScenario2[0].scenarioLabel : "" : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0 ? getLabelText(ce2[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                                    data[8] = regionalSelectedForecastData2 != undefined ? selectedScenarioId2 : ""
                                     data[9] = regionalSelectedForecastData2 != undefined && total2 != null ? total2.toFixed(2) : "";
                                     data[10] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
                                     data[11] = 4;
@@ -2808,6 +2864,7 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.planningUnitList = planningUnitToUpdate;
                                 programJson.treeList = treeList;
+                                console.log("Program Json Test@123",programJson)
                                 const compressedData = isCompress(programJson);
                                 DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
                                     if (response.status == 200) {
