@@ -3346,5 +3346,6 @@
     "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
     "static.compareAndSelect.showPUPanel": "Show Planning Unit panel",
     "static.compareAndSelect.selectMultipleTree":"Select Multiple Tree",
-    "static.compareAndSelect.orMore":"or more"
+    "static.compareAndSelect.orMore":"or more",
+    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts"
 }

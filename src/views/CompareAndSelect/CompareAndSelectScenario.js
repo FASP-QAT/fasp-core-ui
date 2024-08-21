@@ -407,14 +407,14 @@ class CompareAndSelectScenario extends Component {
             }
             var selectedTreeScenarioId = [];
             if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined) {
-                if (selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 0) {
+                if (selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario!=undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 0) {
                     var treeAndScenario = selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario;
                     for (var tas = 0; tas < treeAndScenario.length; tas++) {
                         if (treeScenarioList.filter(c => c.scenario.id == treeAndScenario[tas].scenarioId && c.tree.treeId == treeAndScenario[tas].treeId).length > 0) {
                             selectedTreeScenarioId.push((treeScenarioList.filter(c => c.scenario.id == treeAndScenario[tas].scenarioId && c.tree.treeId == treeAndScenario[tas].treeId)[0].id).toString());
                         }
                     }
-                } else {
+                } else if((selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId)!=undefined){
                     selectedTreeScenarioId.push((selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId).toString());
                 }
             }
@@ -437,7 +437,6 @@ class CompareAndSelectScenario extends Component {
                 return a < b ? -1 : a > b ? 1 : 0;
             }.bind(this));
             var sortedTreeScenraioList = nonReadonlyList.concat(readonlyList);
-            console.log("this.state.toggleMultiselect Test@123", this.state.toggleMultiselect)
             if (this.state.toggleMultiselect) {
                 sortedTreeScenraioList = sortedTreeScenraioList.filter(c => c.type == "T");
             }
@@ -919,9 +918,8 @@ class CompareAndSelectScenario extends Component {
             })
             if (e > 0) {
                 var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e);
-                console.log("Name Test@123", name)
                 var toggleMultiselect = this.state.toggleMultiselect;
-                if (name.length > 0 && this.state.regionId != "" && name[0].selectedForecastMap != undefined && name[0].selectedForecastMap[this.state.regionId] != undefined && name[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 1) {
+                if (name.length > 0 && this.state.regionId != "" && name[0].selectedForecastMap != undefined && name[0].selectedForecastMap[this.state.regionId] != undefined && name[0].selectedForecastMap[this.state.regionId].treeAndScenario!=undefined && name[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 1) {
                     toggleMultiselect = true
                 } else {
                     toggleMultiselect = false
@@ -1716,7 +1714,7 @@ class CompareAndSelectScenario extends Component {
                 var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
                 selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
                 planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
-            } else if (map != undefined && map.treeAndScenario.length > 0) {
+            } else if (map != undefined && map.treeAndScenario!=undefined && map.treeAndScenario.length > 0) {
                 var treeAndScenario = map.treeAndScenario;
                 for (var tas = 0; tas < treeAndScenario.length; tas++) {
                     var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && treeAndScenario[tas].treeId == c.treeId)[0];
@@ -1922,7 +1920,7 @@ class CompareAndSelectScenario extends Component {
             var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
             var name = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
             var toggleMultiselect = this.state.toggleMultiselect;
-            if (name.length > 0 && event.target.value != "" && name[0].selectedForecastMap != undefined && name[0].selectedForecastMap[event.target.value] != undefined && name[0].selectedForecastMap[event.target.value].treeAndScenario.length > 1) {
+            if (name.length > 0 && event.target.value != "" && name[0].selectedForecastMap != undefined && name[0].selectedForecastMap[event.target.value] != undefined && name[0].selectedForecastMap[event.target.value].treeAndScenario!=undefined && name[0].selectedForecastMap[event.target.value].treeAndScenario.length > 1) {
                 toggleMultiselect = true
             }
             var regionId = event.target.value;

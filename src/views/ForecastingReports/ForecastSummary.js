@@ -20,7 +20,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -73,6 +73,7 @@ class ForecastSummary extends Component {
             monthArrayList: [],
             planningUnitId: "",
             hideCalculation: false,
+            failedValidationCount: [],
             scenarioList: [{ id: 1, name: "A. Consumption High", checked: true, color: "#4f81bd" },
             { id: 2, name: "B. Consumption Med", checked: true, color: "#f79646" },
             { id: 3, name: "C. Consumption Low", checked: true, color: "#000000" },
@@ -939,6 +940,7 @@ class ForecastSummary extends Component {
                                 versionId: filteredGetRequestList[i].version,
                                 id: filteredGetRequestList[i].id,
                                 loading: false,
+                                programJson: programJson1,
                                 forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
                                 forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
                                 healthAreaList: programJson1.healthAreaList,
@@ -996,9 +998,9 @@ class ForecastSummary extends Component {
                                                 notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes);
                                             }
                                         }
-                                        if (((selectedForecastMapObjIn.treeAndScenario.length > 0) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
+                                        if (((selectedForecastMapObjIn.treeAndScenario!=undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
                                             let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
-                                            if (selectedForecastMapObjIn.treeAndScenario.length > 0) {//scenarioId
+                                            if (selectedForecastMapObjIn.treeAndScenario!=undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) {//scenarioId
                                                 var treeAndScenario = selectedForecastMapObjIn.treeAndScenario;
                                                 var selectedScenarioId = "";
                                                 for (let tas = 0; tas < treeAndScenario.length; tas++) {
@@ -1014,7 +1016,7 @@ class ForecastSummary extends Component {
                                                         let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
                                                         let myTempData = [];
                                                         for (let k = 0; k < listContainNodeType5.length; k++) {
-                                                            let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[treeAndScenario[tas]]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
+                                                            let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[treeAndScenario[tas].scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
                                                             if (arrayOfNodeDataMap.length > 0) {
                                                                 nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
                                                                 let consumptionList = nodeDataMomList.map(m => {
@@ -1160,8 +1162,8 @@ class ForecastSummary extends Component {
                                     var treeList = this.state.regDatasetJson.treeList.filter(c => c.active == true);;
                                     var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
                                     var tsList = [];
-                                    let startDate = this.state.regDatasetJson.forecastStartDate;
-                                    let endDate = this.state.regDatasetJson.forecastStopDate;
+                                    let startDate = this.state.regDatasetJson.programJson.currentVersion.forecastStartDate;
+                                    let endDate = this.state.regDatasetJson.programJson.currentVersion.forecastStopDate;
                                     for (var tl = 0; tl < treeList.length; tl++) {
                                         var scenarioList = treeList[tl].scenarioList.filter(c => c.active.toString() == "true");
                                         for (var sl = 0; sl < scenarioList.length; sl++) {
@@ -1211,27 +1213,47 @@ class ForecastSummary extends Component {
                                             let selectedForecastQty = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
-                                                var selectedForecast = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                var selectedForecast = "";
+                                                if (filterForecastSelected != undefined) {
+                                                    if (filterForecastSelected.treeAndScenario!=undefined && filterForecastSelected.treeAndScenario.length > 0) {
+                                                        var treeAndScenario = filterForecastSelected.treeAndScenario;
+                                                        for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                                                            if (selectedForecast != "") {
+                                                                selectedForecast += ";"
+                                                            }
+                                                            selectedForecast += "T" + treeAndScenario[tas].treeId + "~" + treeAndScenario[tas].scenarioId;
+                                                        }
+                                                    } else {
+                                                        if (filterForecastSelected.consumptionExtrapolationId > 0) {
+                                                            selectedForecast = "C" + filterForecastSelected.consumptionExtrapolationId;
+                                                        }
+                                                    }
+                                                }
                                                 data[(k + 1) * 3] = selectedForecast;
                                                 var totalForecast = 0;
                                                 if (selectedForecast != "") {
-                                                    var tsListFilter = tsList.filter(c => c.id == selectedForecast)[0]
-                                                    if (tsListFilter != undefined) {
-                                                        totalForecast = 0;
-                                                        if (tsListFilter.type == "C") {
-                                                            totalForecast = tsListFilter.totalForecast;
-                                                        } else {
-                                                            var flatList = tsListFilter.flatList;
-                                                            var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == puListFiltered[j].planningUnit.id);
-                                                            var nodeDataMomList = [];
-                                                            for (var fl = 0; fl < flatListFilter.length; fl++) {
-                                                                nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                                                    var count = 0;
+                                                    var selectedForecastSplit = selectedForecast.split(";");
+                                                    for (var sfs = 0; sfs < selectedForecastSplit.length; sfs++) {
+                                                        var tsListFilter = tsList.filter(c => c.id == selectedForecastSplit[sfs])[0]
+                                                        if (tsListFilter != undefined) {
+                                                            count += 1;
+                                                            if (tsListFilter.type == "C") {
+                                                                totalForecast += tsListFilter.totalForecast;
+                                                            } else {
+                                                                var flatList = tsListFilter.flatList;
+                                                                var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == puListFiltered[j].planningUnit.id);
+                                                                var nodeDataMomList = [];
+                                                                for (var fl = 0; fl < flatListFilter.length; fl++) {
+                                                                    nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.programJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.programJson.currentVersion.forecastStopDate).format("YYYY-MM")));
+                                                                }
+                                                                nodeDataMomList.map(ele => {
+                                                                    totalForecast += Number(ele.calculatedMmdValue);
+                                                                });
                                                             }
-                                                            nodeDataMomList.map(ele => {
-                                                                totalForecast += Number(ele.calculatedMmdValue);
-                                                            });
                                                         }
-                                                    } else {
+                                                    }
+                                                    if (count == 0) {
                                                         totalForecast = null;
                                                     }
                                                 } else {
@@ -1255,7 +1277,7 @@ class ForecastSummary extends Component {
                                     columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });//B1
                                     columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
                                     for (var k = 0; k < regRegionList.length; k++) {
-                                        columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });//D3
+                                        columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList, multiple: true });//D3
                                         columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });//F5
                                     }
@@ -1562,7 +1584,6 @@ class ForecastSummary extends Component {
                                     jExcelLoadedFunctionOnlyHideRow(instance);
                                     var elInstance = instance.worksheets[0];
                                     var rowElement = elInstance.records;
-                                    console.log("hello1")
 
                                     for (var r = 0; r < rowElement.length; r++) {
                                         if (rowElement[r][0].v == 1) {
@@ -1660,23 +1681,45 @@ class ForecastSummary extends Component {
             isChanged1: true,
         });
         var index = possiblex.findIndex(c => c == x);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
         if (index != -1) {
             if (value != "") {
-                var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
                 var totalForecast = 0;
-                if (tsListFilter.type == "C") {
-                    totalForecast = tsListFilter.totalForecast;
-                } else {
-                    var flatList = tsListFilter.flatList;
-                    var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
-                    var nodeDataMomList = [];
-                    for (var fl = 0; fl < flatListFilter.length; fl++) {
-                        nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM")));
+                var valueSplit = value.toString().split(";")
+                var consumptionCount = 0;
+                for (var vs = 0; vs < valueSplit.length; vs++) {
+                    var tsListFilter = this.state.tsList.filter(c => c.id == valueSplit[vs])[0]
+                    if (tsListFilter.type == "C") {
+                        consumptionCount += 1;
+                        totalForecast += Number(tsListFilter.totalForecast);
+                    } else {
+                        var flatList = tsListFilter.flatList;
+                        var flatListFilter = flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
+                        var nodeDataMomList = [];
+                        for (var fl = 0; fl < flatListFilter.length; fl++) {
+                            nodeDataMomList = nodeDataMomList.concat(flatListFilter[fl].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(this.state.regDatasetJson.programJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(this.state.regDatasetJson.programJson.currentVersion.forecastStopDate).format("YYYY-MM")));
+                        }
+                        nodeDataMomList.map(ele => {
+                            totalForecast += Number(ele.calculatedMmdValue);
+                        });
                     }
-                    nodeDataMomList.map(ele => {
-                        totalForecast += Number(ele.calculatedMmdValue);
-                    });
                 }
+                var failedValidationCount = this.state.failedValidationCount;
+                if (valueSplit.length > 1 && consumptionCount > 0) {
+                    var col = (colArr[Number(x)]).concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.forecastSummary.eitherTreeOrConsumptionValidation'));
+                    failedValidationCount.push(x);
+                } else {
+                    failedValidationCount = failedValidationCount.filter(c => c != x);
+                    var col = (colArr[Number(x)]).concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+                this.setState({
+                    failedValidationCount: failedValidationCount
+                })
                 elInstance.setValueFromCoords((Number(x) + 1), y, (totalForecast).toFixed(2), true);
                 let loopVar = 4;
                 let total = 0;
@@ -2280,108 +2323,141 @@ class ForecastSummary extends Component {
     }
 
     saveSelectedForecast() {
-        var id = this.state.regDatasetJson.id;
-        var json = this.state.dataEl.getJson(null, false).filter(c => c[this.state.regRegionList.length * 3 + 3] == 2);
-        var dataList = [];
-        for (var j = 0; j < json.length; j++) {
-            for (var k = 0; k < this.state.regRegionList.length; k++) {
-                if (json[j][(k + 1) * 3] != "") {
-                    var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
-                    if (tsList.length > 0) {
-                        dataList.push({
-                            planningUnit: json[j][1],
-                            scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
-                            treeId: tsList[0].type == "T" ? tsList[0].treeId : null,
-                            consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
-                            totalForecast: json[j][((k + 1) * 3) + 1],
-                            notes: json[j][((k + 1) * 3) + 2],
-                            region: this.state.regRegionList[k]
-                        })
-                    }
-                } else {
-                    if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
-                        dataList.push({
-                            planningUnit: json[j][1],
-                            scenarioId: null,
-                            treeId: null,
-                            consumptionExtrapolationId: null,
-                            totalForecast: '',
-                            notes: '',
-                            region: this.state.regRegionList[k]
-                        })
-                    }
-                }
-            }
-
-        }
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-
-            var programRequest = programTransaction.get(id);
-            programRequest.onerror = function (event) {
-            }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var dataset = programRequest.result;
-                var programDataJson = programRequest.result.programData;
-                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
-                var datasetForEncryption = datasetJson;
-                var planningUnitList = datasetJson.planningUnitList;
-                var planningUnitList1 = planningUnitList;
-                for (var dl = 0; dl < dataList.length; dl++) {
-                    var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id && c.active.toString() == "true");
-                    var pu = planningUnitList1[index];
-                    if (dataList[dl].treeId == null && dataList[dl].consumptionExtrapolationId == null) {
-                        pu.selectedForecastMap[dataList[dl].region.regionId] = {};
-                        planningUnitList1[index] = pu;
+        if (this.state.failedValidationCount.length == 0) {
+            var id = this.state.regDatasetJson.id;
+            var json = this.state.dataEl.getJson(null, false).filter(c => c[this.state.regRegionList.length * 3 + 3] == 2);
+            var dataList = [];
+            for (var j = 0; j < json.length; j++) {
+                for (var k = 0; k < this.state.regRegionList.length; k++) {
+                    if (json[j][(k + 1) * 3] != "") {
+                        var selectedForecastSplit = (json[j][(k + 1) * 3]).toString().split(";");
+                        var treeAndScenario = [];
+                        if (selectedForecastSplit.length == 1) {
+                            var tsList = this.state.tsList.filter(c => c.id == selectedForecastSplit[0]);
+                            if (tsList.length > 0) {
+                                if (tsList[0].type == "T") {
+                                    treeAndScenario.push({
+                                        "treeId": tsList[0].treeId,
+                                        "scenarioId": tsList[0].id1
+                                    })
+                                }
+                                dataList.push({
+                                    planningUnit: json[j][1],
+                                    treeAndScenario: treeAndScenario,
+                                    consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
+                                    totalForecast: json[j][((k + 1) * 3) + 1],
+                                    notes: json[j][((k + 1) * 3) + 2],
+                                    region: this.state.regRegionList[k]
+                                })
+                            }
+                        } else {
+                            for (var sfs = 0; sfs < selectedForecastSplit.length; sfs++) {
+                                var tsList = this.state.tsList.filter(c => c.id == selectedForecastSplit[sfs]);
+                                if (tsList.length > 0) {
+                                    treeAndScenario.push({
+                                        "treeId": tsList[0].treeId,
+                                        "scenarioId": tsList[0].id1
+                                    })
+                                }
+                            }
+                            dataList.push({
+                                planningUnit: json[j][1],
+                                treeAndScenario: treeAndScenario,
+                                consumptionExtrapolationId: null,
+                                totalForecast: json[j][((k + 1) * 3) + 1],
+                                notes: json[j][((k + 1) * 3) + 2],
+                                region: this.state.regRegionList[k]
+                            })
+                        }
                     } else {
-                        pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: dataList[dl].treeId };
-                        planningUnitList1[index] = pu;
-                    }
-
-                }
-                datasetForEncryption.planningUnitList = planningUnitList1;
-                var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
-                dataset.programData = encryptedDatasetJson;
-                var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
-                var datasetOs = datasetTransaction.objectStore('datasetData');
-                var putRequest = datasetOs.put(dataset);
-                putRequest.onerror = function (event) {
-                }.bind(this);
-                putRequest.onsuccess = function (event) {
-                    db1 = e.target.result;
-                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                    var datasetDetailsRequest = datasetDetailsTransaction.get(id);
-                    datasetDetailsRequest.onsuccess = function (e) {
-                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                        datasetDetailsRequestJson.changed = 1;
-                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                        datasetDetailsRequest1.onsuccess = function (event) {
-
+                        if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
+                            dataList.push({
+                                planningUnit: json[j][1],
+                                treeAndScenario:[],
+                                consumptionExtrapolationId: null,
+                                totalForecast: '',
+                                notes: '',
+                                region: this.state.regRegionList[k]
+                            })
                         }
                     }
-                    this.setState({
-                        isChanged1: false,
-                        message1: i18n.t('static.compareAndSelect.dataSaved'),
-                        color: 'green'
-                    },
-                        () => {
-                            this.hideSecondComponent();
-                        })
+                }
+
+            }
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+
+                var programRequest = programTransaction.get(id);
+                programRequest.onerror = function (event) {
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var dataset = programRequest.result;
+                    var programDataJson = programRequest.result.programData;
+                    var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
+                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                    var datasetJson = JSON.parse(datasetData);
+                    var datasetForEncryption = datasetJson;
+                    var planningUnitList = datasetJson.planningUnitList;
+                    var planningUnitList1 = planningUnitList;
+                    for (var dl = 0; dl < dataList.length; dl++) {
+                        var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id && c.active.toString() == "true");
+                        var pu = planningUnitList1[index];
+                        if (dataList[dl].treeAndScenario.length==0 && dataList[dl].consumptionExtrapolationId == null) {
+                            pu.selectedForecastMap[dataList[dl].region.regionId] = {};
+                            planningUnitList1[index] = pu;
+                        } else {
+                            pu.selectedForecastMap[dataList[dl].region.regionId] = { "treeAndScenario": dataList[dl].treeAndScenario, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes };
+                            planningUnitList1[index] = pu;
+                        }
+                    }
+                    datasetForEncryption.planningUnitList = planningUnitList1;
+                    var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
+                    dataset.programData = encryptedDatasetJson;
+                    var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+                    var datasetOs = datasetTransaction.objectStore('datasetData');
+                    var putRequest = datasetOs.put(dataset);
+                    putRequest.onerror = function (event) {
+                    }.bind(this);
+                    putRequest.onsuccess = function (event) {
+                        db1 = e.target.result;
+                        var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                        var datasetDetailsRequest = datasetDetailsTransaction.get(id);
+                        datasetDetailsRequest.onsuccess = function (e) {
+                            var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                            datasetDetailsRequestJson.changed = 1;
+                            var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                            datasetDetailsRequest1.onsuccess = function (event) {
+
+                            }
+                        }
+                        this.setState({
+                            isChanged1: false,
+                            message1: i18n.t('static.compareAndSelect.dataSaved'),
+                            color: 'green'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
-        }.bind(this)
+        } else {
+            this.setState({
+                message: i18n.t("static.supplyPlan.validationFailed")
+            }, () => {
+                hideFirstComponent();
+            })
+        }
     }
 
     radioChange(event) {
@@ -2454,7 +2530,7 @@ class ForecastSummary extends Component {
                 />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <h5 className="red" id="div1">{i18n.t(this.state.message)}</h5>
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
