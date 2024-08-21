@@ -331,8 +331,11 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                             fsRequest.onsuccess = function (event) {
                                 var fsResult = [];
                                 fsResult = fsRequest.result;
+                                console.log("fsResult Test@123",fsResult)
                                 for (var k = 0; k < fsResult.length; k++) {
-                                    if (fsResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId) {
+                                    console.log("fsResult Test@123",fsResult[k]);
+                                    console.log("fsResult Test@123",fsResult[k].programList);
+                                    if (fsResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && [...new Set(fsResult[k].programList.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId))) {
                                         var fsJson = {
                                             name: fsResult[k].fundingSourceCode,
                                             id: fsResult[k].fundingSourceId,
@@ -1428,7 +1431,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
      * This function is used to filter the funding source list based on active flag
      */
     filterFundingSource = function (instance, cell, c, r, source) {
-        return this.state.fundingSourceList.filter(c => c.active.toString() == "true").sort(function (a, b) {
+        return this.state.fundingSourceList.filter(c => c.name != "" && c.active.toString() == "true").sort(function (a, b) {
             a = a.name.toLowerCase();
             b = b.name.toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;

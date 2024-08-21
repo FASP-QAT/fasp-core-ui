@@ -20,6 +20,10 @@ import step4 from '../../assets/img/4-step.png';
 import step5 from '../../assets/img/5-step.png';
 import step6 from '../../assets/img/6-step.png';
 import i18n from '../../i18n';
+import Select from 'react-select';
+import classNames from 'classnames';
+import DropdownService from '../../api/DropdownService';
+import getLabelText from '../../CommonComponent/getLabelText';
 // Initial values for form fields
 const initialValuesSix = {
     programName: '',
@@ -36,7 +40,9 @@ const initialValuesSix = {
     shippedToArrivedByRoadLeadTime: '',
     arrivedToDeliveredLeadTime: '',
     programCode: '',
-    programCode1: ''
+    programCode1: '',
+    procurementAgents: [],
+    fundingSources:[]
 }
 /**
  * Defines the validation schema for step six of program onboarding.
@@ -99,6 +105,10 @@ const validationSchemaSix = function (values) {
                         return true;
                     }
                 }),
+        procurementAgents: Yup.string()
+            .required(i18n.t('static.procurementAgent.selectProcurementAgent')),        
+        fundingSources: Yup.string()
+            .required(i18n.t('static.budget.fundingtext')),            
     })
 }
 /**
@@ -108,7 +118,11 @@ export default class StepSix extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            programManagerList: []
+            programManagerList: [],
+            procurementAgentList: [],
+            fundingSourceList: [],
+            procurementAgents:'',
+            fundingSources:''
         }
     }
     /**
@@ -126,6 +140,53 @@ export default class StepSix extends Component {
                     });
                     this.setState({
                         programManagerList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+            DropdownService.getProcurementAgentDropdownList()
+            .then(response => {
+                if (response.status == 200) {
+                    var json = response.data;
+                    var paList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        paList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    var listArray = paList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        procurementAgentList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+
+            DropdownService.getFundingSourceDropdownList()
+            .then(response => {
+                if (response.status == 200) {
+                    var json = response.data;
+                    var fsList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        fsList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    var listArray = fsList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSourceList: listArray
                     })
                 } else {
                     this.setState({
@@ -166,7 +227,9 @@ export default class StepSix extends Component {
                         handleSubmit,
                         isSubmitting,
                         isValid,
-                        setTouched
+                        setTouched,
+                        setFieldValue,
+                        setFieldTouched
                     }) => (
                         <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='programDataForm' autocomplete="off">
                             <Row>
@@ -229,6 +292,48 @@ export default class StepSix extends Component {
                                     <FormFeedback className="red">{errors.userId}</FormFeedback>
                                 </FormGroup>
                                 <div className="col-md-6"></div>
+
+                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
+                                    <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-12', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.procurementAgents && this.props.items.program.procurementAgents.length != 0 },
+                                            { 'is-invalid': (touched.procurementAgents && !!errors.procurementAgents) }
+                                        )}
+                                        bsSize="sm"
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("procurementAgents", e);
+                                            this.props.updateFieldDataProcurementAgent(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("procurementAgents", true)}
+                                        multi
+                                        options={this.state.procurementAgentList}
+                                        value={this.props.items.program.procurementAgents}
+                                    />
+                                    <FormFeedback>{errors.procurementAgents}</FormFeedback>
+                                </FormGroup>
+                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
+                                    <Label htmlFor="select">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+                                    <Select
+                                        className={classNames('form-control', 'col-md-12', 'd-block', 'w-100', 'bg-light',
+                                            { 'is-valid': !errors.fundingSources && this.props.items.program.fundingSources.length != 0 },
+                                            { 'is-invalid': (touched.fundingSources && !!errors.fundingSources) }
+                                        )}
+                                        bsSize="sm"
+                                        onChange={(e) => {
+                                            handleChange(e);
+                                            setFieldValue("fundingSources", e);
+                                            this.props.updateFieldDataFundingSource(e);
+                                        }}
+                                        onBlur={() => setFieldTouched("fundingSources", true)}
+                                        multi
+                                        options={this.state.fundingSourceList}
+                                        value={this.props.items.program.fundingSources}
+                                    />
+                                    <FormFeedback>{errors.fundingSources}</FormFeedback>
+                                </FormGroup>
+
                                 <FormGroup className="col-md-4">
                                     <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%)<span class="red ">*</span></Label>
                                     <Input

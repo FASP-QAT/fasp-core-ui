@@ -264,6 +264,8 @@ class ProcurementAgentExport extends Component {
               programId: localStorage.getItem("sesProgramIdReport"),
             },
             () => {
+              this.getFundingSource();
+              this.getFundingSourceType();
               this.getProcurementAgent();
               this.filterVersion();
             }
@@ -1683,14 +1685,14 @@ class ProcurementAgentExport extends Component {
                     // var fundingSource = this.state.fundingSources.filter(
                     var fundingSource = this.state.fundingSourcesFiltered.filter(
                       (c) =>
-                        c.fundingSourceId ==
+                        c.id ==
                         planningUnitFilter[j].fundingSource.id
                     );
                     if (fundingSource.length > 0) {
                       var simpleFSObject = {
-                        id: fundingSource[0].fundingSourceId,
+                        id: fundingSource[0].id,
                         label: fundingSource[0].label,
-                        code: fundingSource[0].fundingSourceCode,
+                        code: fundingSource[0].code,
                       };
                     }
                     let json = {
@@ -2064,14 +2066,14 @@ class ProcurementAgentExport extends Component {
                     // var fundingSource = this.state.fundingSources.filter(//old
                     var fundingSource = this.state.fundingSourcesFiltered.filter(//change here
                       (c) =>
-                        c.fundingSourceId ==
+                        c.id ==
                         planningUnitFilter[j].fundingSource.id
                     );
                     if (fundingSource.length > 0) {
                       var simpleFSObject = {
-                        id: fundingSource[0].fundingSourceId,
+                        id: fundingSource[0].id,
                         label: fundingSource[0].label,
-                        code: fundingSource[0].fundingSourceCode,                        
+                        code: fundingSource[0].code,                        
                       };
                     }
                     let json = {
@@ -2696,8 +2698,8 @@ class ProcurementAgentExport extends Component {
    * Calls the get programs and funding source function on page load
    */
   componentDidMount() {
-    this.getFundingSourceType();
-    this.getFundingSource();
+    // this.getFundingSourceType();
+    // this.getFundingSource();
     this.getPrograms();
     document.getElementById("procurementAgentDiv").style.display = "none";
     let viewby = document.getElementById("viewById").value;
@@ -2716,6 +2718,8 @@ class ProcurementAgentExport extends Component {
         versionId: "",
       },
       () => {
+        this.getFundingSource();
+        this.getFundingSourceType();
         localStorage.setItem("sesVersionIdReport", "");
         this.getProcurementAgent();
         this.filterVersion();
@@ -2772,13 +2776,14 @@ class ProcurementAgentExport extends Component {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
       //Fetch all funding source type list
-      FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+      let programIds = [Number(document.getElementById("programId").value)];
+                DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
         .then(response => {
           if (response.status == 200) {
             var fundingSourceTypes = response.data;
             fundingSourceTypes.sort(function (a, b) {
-              a = a.fundingSourceTypeCode.toLowerCase();
-              b = b.fundingSourceTypeCode.toLowerCase();
+              a = a.code.toLowerCase();
+              b = b.code.toLowerCase();
               return a < b ? -1 : a > b ? 1 : 0;
             })
 
@@ -2866,36 +2871,54 @@ class ProcurementAgentExport extends Component {
       getRequest.onerror = function (event) {
       };
       getRequest.onsuccess = function (event) {
+        var transaction1 = db1.transaction(["fundingSource"], "readwrite");
+      var fundingSource = transaction1.objectStore("fundingSource");
+      var getRequest1 = fundingSource.getAll();
+      getRequest1.onerror = function (event) {
+      };
+      getRequest1.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result.filter(c => c.realm.id == realmId);
+        var fundingSourceList=getRequest1.result.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(document.getElementById("programId").value)));
+        const fundingSourceTypeIds = [...new Set(fundingSourceList.map(fs => fs.fundingSourceType.id))];
         var userBytes = CryptoJS.AES.decrypt(
           localStorage.getItem("curUser"),
           SECRET_KEY
         );
         for (var i = 0; i < myResult.length; i++) {
+          if(fundingSourceTypeIds.includes(myResult[i].fundingSourceTypeId)){
           var f = 0;
           for (var k = 0; k < this.state.fundingSourceTypes.length; k++) {
             if (
-              this.state.fundingSourceTypes[k].fundingSourceTypeId ==
+              this.state.fundingSourceTypes[k].id ==
               myResult[i].fundingSourceTypeId
             ) {
               f = 1;
             }
           }
-          var fstData = myResult[i];
+          // var fstData = myResult[i];
           if (f == 0) {
-            fstList.push(fstData);
+            var json={
+              id:myResult[i].fundingSourceTypeId,
+              code:myResult[i].fundingSourceTypeCode,
+              label:myResult[i].label
+            }
+            fstList.push(json);
           }
+        }
         }
         var lang = this.state.lang;
         var fundingSourceTypesCombined = fstList.sort(function (a, b) {
-          a = a.fundingSourceTypeCode.toLowerCase();
-          b = b.fundingSourceTypeCode.toLowerCase();
+          a = a.code.toLowerCase();
+          b = b.code.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
         this.setState({
           fundingSourceTypes: fundingSourceTypesCombined,
+          fundingSourceTypeValues: [],
+          fundingSourceTypeLabels: []
         });
+      }.bind(this);
       }.bind(this);
     }.bind(this);
   };
@@ -2921,8 +2944,8 @@ class ProcurementAgentExport extends Component {
 
       if (filteredFundingSourceArr.length > 0) {
         filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
-          a = a.fundingSourceCode.toLowerCase();
-          b = b.fundingSourceCode.toLowerCase();
+          a = a.code.toLowerCase();
+          b = b.code.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
       }
@@ -2942,7 +2965,8 @@ class ProcurementAgentExport extends Component {
   getFundingSource = () => {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
-      FundingSourceService.getFundingSourceListAll()
+      let programIds = [Number(document.getElementById("programId").value)];
+                DropdownService.getFundingSourceForProgramsDropdownList(programIds)
         .then((response) => {
           this.setState(
             {
@@ -3037,28 +3061,39 @@ class ProcurementAgentExport extends Component {
           SECRET_KEY
         );
         for (var i = 0; i < myResult.length; i++) {
+          if([...new Set(myResult[i].programList.map(ele => ele.id))].includes(parseInt(document.getElementById("programId").value))){
           var f = 0;
           for (var k = 0; k < this.state.fundingSources.length; k++) {
             if (
-              this.state.fundingSources[k].fundingSourceId ==
+              this.state.fundingSources[k].id ==
               myResult[i].fundingSourceId
             ) {
               f = 1;
             }
           }
-          var programData = myResult[i];
+          // var programData = myResult[i];
           if (f == 0) {
-            proList.push(programData);
+            var json={
+              id:myResult[i].fundingSourceId,
+              code:myResult[i].fundingSourceCode,
+              label:myResult[i].label,
+              fundingSourceType:myResult[i].fundingSourceType
+            }
+            proList.push(json);
           }
+        }
         }
         var lang = this.state.lang;
         var fundingSourcesCombined = proList.sort(function (a, b) {
-          a = a.fundingSourceCode.toLowerCase();
-          b = b.fundingSourceCode.toLowerCase();
+          a = a.code.toLowerCase();
+          b = b.code.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
         this.setState({
           fundingSources: fundingSourcesCombined,
+          fundingSourcesFiltered: [],
+          fundingSourceValues: [],
+          fundingSourceLabels: [],
           // fundingSourcesFiltered: fundingSourcesCombined
         });
       }.bind(this);
@@ -3109,8 +3144,8 @@ class ProcurementAgentExport extends Component {
     let fundingSourceList = fundingSourcesFiltered.length > 0 &&
       fundingSourcesFiltered.map((item, i) => {
         return {
-          label: item.fundingSourceCode,
-          value: item.fundingSourceId,
+          label: item.code,
+          value: item.id,
         };
       }, this)
 
@@ -3447,7 +3482,7 @@ class ProcurementAgentExport extends Component {
                       options={fundingSourceTypes.length > 0
                         && fundingSourceTypes.map((item, i) => {
                           return (
-                            { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                            { label: item.code, value: item.id }
                           )
                         }, this)}
                       disabled={this.state.loading}

@@ -836,7 +836,11 @@ class ShipmentSummery extends Component {
    */
   getFundingSourceList() {
     if (localStorage.getItem("sessionType") === 'Online') {
-      DropdownService.getFundingSourceDropdownList()
+      this.setState({
+        loading:true
+      })
+      var programIds = [Number(this.state.programId)];
+      DropdownService.getFundingSourceForProgramsDropdownList(programIds)
         .then((response) => {
           var listArray = response.data;
           listArray.sort((a, b) => {
@@ -847,6 +851,10 @@ class ShipmentSummery extends Component {
           this.setState(
             {
               fundingSources: listArray,
+              loading:false,
+              fundingSourceValues: [],
+              fundingSourceLabels: [],
+              filteredBudgetList: [],
             },
             () => {
               this.getBudgetList();
@@ -900,7 +908,7 @@ class ShipmentSummery extends Component {
         fSourceRequest.onerror = function (event) {
         }.bind(this);
         fSourceRequest.onsuccess = function (event) {
-          fSourceResult = fSourceRequest.result;
+          fSourceResult = fSourceRequest.result.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId)));
           var fundingSource = [];
           for (var i = 0; i < fSourceResult.length; i++) {
             var arr = {
@@ -918,6 +926,9 @@ class ShipmentSummery extends Component {
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
+              fundingSourceValues: [],
+              fundingSourceLabels: [],
+              filteredBudgetList: [],
             },
             () => {
               this.getBudgetList();
@@ -931,7 +942,7 @@ class ShipmentSummery extends Component {
    * Retrieves the list of budgets.
    */
   getBudgetList() {
-    var programId = localStorage.getItem("sesProgramIdReport");
+    var programId = this.state.programId;
     if (this.state.programId != "" && this.state.programId != 0 && programId != "") {
       if (localStorage.getItem("sessionType") === 'Online') {
         DropdownService.getBudgetDropdownBasedOnProgram(programId)
@@ -1176,7 +1187,7 @@ class ShipmentSummery extends Component {
           });
       }
       else {
-        var programId = localStorage.getItem("sesProgramIdReport");
+        var programId = this.state.programId;
         var db3;
         var fSourceResult = [];
         getDatabase();
@@ -1623,6 +1634,7 @@ class ShipmentSummery extends Component {
               programId: localStorage.getItem("sesProgramIdReport"),
             },
             () => {
+              this.getFundingSourceList();
               this.filterVersion();
             }
           );
@@ -2064,7 +2076,6 @@ class ShipmentSummery extends Component {
    */
   componentDidMount() {
     this.getPrograms();
-    this.getFundingSourceList();
     this.getFundingSourceType();
   }
   /**     
@@ -2079,6 +2090,7 @@ class ShipmentSummery extends Component {
       },
       () => {
         localStorage.setItem("sesVersionIdReport", "");
+        this.getFundingSourceList();
         this.filterVersion();
         this.getBudgetList();
       }
