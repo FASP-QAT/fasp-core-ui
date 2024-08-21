@@ -115,7 +115,7 @@ class CompareAndSelectScenario extends Component {
             monthArrayList: [],
             planningUnitId: "",
             scenarioList: [],
-            selectedTreeScenarioId: 0,
+            selectedTreeScenarioId: [],
             actualConsumptionList: [],
             showAllData: false,
             consumptionDataForTree: [],
@@ -166,11 +166,26 @@ class CompareAndSelectScenario extends Component {
         this.loadedCalendar = this.loadedCalendar.bind(this);
     }
     setToggleMultiselect(e) {
-        this.setState({
-            toggleMultiselect: e.target.checked
-        }, () => {
-            // this.updatePUs()
-        })
+        var cont = false;
+        if (this.state.dataChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+
+        } else {
+            cont = true;
+        }
+
+        if (cont == true) {
+            this.setState({
+                toggleMultiselect: e.target.checked,
+                loading:true
+            }, () => {
+                this.showData()
+            })
+        }
     }
     /**
      * Handles the click event on the range picker box.
@@ -390,7 +405,26 @@ class CompareAndSelectScenario extends Component {
             }
             if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined) {
             }
-            var selectedTreeScenarioId = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != null && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0;
+            var selectedTreeScenarioId = [];
+            if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined) {
+                if (selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 0) {
+                    var treeAndScenario = selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario;
+                    for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                        if (treeScenarioList.filter(c => c.scenario.id == treeAndScenario[tas].scenarioId && c.tree.treeId == treeAndScenario[tas].treeId).length > 0) {
+                            selectedTreeScenarioId.push((treeScenarioList.filter(c => c.scenario.id == treeAndScenario[tas].scenarioId && c.tree.treeId == treeAndScenario[tas].treeId)[0].id).toString());
+                        }
+                    }
+                } else {
+                    selectedTreeScenarioId.push((selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId).toString());
+                }
+            }
+            if (this.state.toggleMultiselect) {
+                selectedTreeScenarioId = selectedTreeScenarioId.filter(c => c.toString().split("~")[1] != undefined);
+            } else {
+                if (selectedTreeScenarioId.length > 1) {
+                    selectedTreeScenarioId = []
+                }
+            }
             var forecastNotes = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes : "" : "";
             var readonlyList = treeScenarioList.filter(c => c.readonly).sort(function (a, b) {
                 a = (a.type == "T" ? getLabelText(a.tree.label, this.state.lang) + " - " + getLabelText(a.scenario.label, this.state.lang) : getLabelText(a.scenario.extrapolationMethod.label, this.state.lang)).toLowerCase();
@@ -403,6 +437,10 @@ class CompareAndSelectScenario extends Component {
                 return a < b ? -1 : a > b ? 1 : 0;
             }.bind(this));
             var sortedTreeScenraioList = nonReadonlyList.concat(readonlyList);
+            console.log("this.state.toggleMultiselect Test@123", this.state.toggleMultiselect)
+            if (this.state.toggleMultiselect) {
+                sortedTreeScenraioList = sortedTreeScenraioList.filter(c => c.type == "T");
+            }
             this.setState({
                 treeScenarioList: sortedTreeScenraioList,
                 actualConsumptionList: datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId),
@@ -715,7 +753,7 @@ class CompareAndSelectScenario extends Component {
                 let count = 0;
                 for (var j = 0; j < treeScenarioList1.length; j++) {
                     data = [];
-                    data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
+                    data[0] = this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString()) ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                     data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
@@ -728,7 +766,7 @@ class CompareAndSelectScenario extends Component {
                     count++;
                 }
                 let columns = [];
-                columns.push({ title: i18n.t('static.common.select'), type: 'radio', width: 50 });
+                columns.push({ title: i18n.t('static.common.select'), type: this.state.toggleMultiselect ? 'checkbox' : 'radio', width: 50 });
                 columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 50 });
                 columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 50 });
                 columns.push({ title: i18n.t('static.consumption.forcast'), type: 'html', readOnly: true, width: 150 });
@@ -771,7 +809,6 @@ class CompareAndSelectScenario extends Component {
                 };
                 var calendarDataEl = jexcel(document.getElementById("calendarTable"), calendarOptions);
                 this.el = calendarDataEl;
-
                 var data = dataArray;
                 var options = {
                     data: data,
@@ -860,7 +897,6 @@ class CompareAndSelectScenario extends Component {
             // var pu = localStorage.getItem("sesDatasetPlanningUnitId")
             // var trElement1 = document.querySelector('.planingUnitId-' + pu);
             // trElement1.classList.add('compareAndSelectPU');
-            console.log('Element not found');
         }
 
         var cont = false;
@@ -883,11 +919,19 @@ class CompareAndSelectScenario extends Component {
             })
             if (e > 0) {
                 var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e);
+                console.log("Name Test@123", name)
+                var toggleMultiselect = this.state.toggleMultiselect;
+                if (name.length > 0 && this.state.regionId != "" && name[0].selectedForecastMap != undefined && name[0].selectedForecastMap[this.state.regionId] != undefined && name[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 1) {
+                    toggleMultiselect = true
+                } else {
+                    toggleMultiselect = false
+                }
                 var planningUnitId = e;
                 var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
                 var viewById = this.state.viewById;
                 this.setState({
                     planningUnitId: planningUnitId,
+                    toggleMultiselect: toggleMultiselect,
                     planningUnitLabel: name.length > 0 ? name[0].planningUnit.label : "",
                     forecastingUnitId: name.length > 0 ? name[0].planningUnit.forecastingUnit.id : "",
                     equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
@@ -976,7 +1020,7 @@ class CompareAndSelectScenario extends Component {
         this.state.finalData.map(ele =>
             A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
-            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            this.state.selectedTreeScenarioId.includes(ele.id.toString()) ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
             !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
             ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
             ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
@@ -1217,7 +1261,7 @@ class CompareAndSelectScenario extends Component {
         this.state.finalData.map(ele =>
             dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
-            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            this.state.selectedTreeScenarioId.includes(ele.id.toString()) ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
             formatter(ele.totalForecast, 0),
             ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
             ele.noOfMonths.toString(),
@@ -1500,7 +1544,7 @@ class CompareAndSelectScenario extends Component {
                     cell.classList.add('readonlyForecast');
                     cell.classList.add('readonly');
                 }
-            } else if (this.state.selectedTreeScenarioId == rowData[8]) {
+            } else if (this.state.selectedTreeScenarioId.includes(rowData[8].toString())) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                     cell.classList.add('selectedForecast');
@@ -1533,9 +1577,9 @@ class CompareAndSelectScenario extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changeTable1 = function (instance, cell, x, y, value) {
-        this.setState({
-            loading: true
-        })
+        // this.setState({
+        //     loading: true
+        // })
         var elInstance = instance;
         // elInstance.setColumnGroup(0, this.state.yearArray.length)
 
@@ -1544,18 +1588,26 @@ class CompareAndSelectScenario extends Component {
             var index = this.state.treeScenarioList.findIndex(c => c.id == elInstance.getRowData(y)[8]);
             treeScenarioList[index].checked = !treeScenarioList[index].checked;
             this.setState({
-                treeScenarioList: treeScenarioList
+                treeScenarioList: treeScenarioList,
+                loading:true
             }, () => {
                 this.buildJexcel()
             })
         }
         if (x == 0) {
+            if (value.toString() == "true") {
+                var selectedTreeScenarioId = this.state.selectedTreeScenarioId;
+                selectedTreeScenarioId.push(elInstance.getRowData(y)[8].toString());
+            } else {
+                var selectedTreeScenarioId = this.state.selectedTreeScenarioId;
+                selectedTreeScenarioId = selectedTreeScenarioId.filter(c => c != elInstance.getRowData(y)[8].toString());
+            }
             this.setState({
                 dataChangedFlag: 1,
                 changed: true,
-                selectedTreeScenarioId: elInstance.getRowData(y)[8]
+                selectedTreeScenarioId: selectedTreeScenarioId
             }, () => {
-                this.buildJexcel();
+                // this.buildJexcel();
             })
         }
     }
@@ -1664,10 +1716,13 @@ class CompareAndSelectScenario extends Component {
                 var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
                 selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
                 planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
-            } else if (map != undefined && map.scenarioId > 0 && map.treeId > 0) {
-                var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
-                var s = t != undefined ? t.scenarioList.filter(s => s.id == map.scenarioId)[0] : undefined;
-                selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
+            } else if (map != undefined && map.treeAndScenario.length > 0) {
+                var treeAndScenario = map.treeAndScenario;
+                for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                    var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && treeAndScenario[tas].treeId == c.treeId)[0];
+                    var s = t != undefined ? t.scenarioList.filter(s => s.id == treeAndScenario[tas].scenarioId)[0] : undefined;
+                    selectedForecastString = selectedForecastString.concat(t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : "");
+                }
                 planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
             } else {
                 selectedForecastString = ""
@@ -1865,9 +1920,15 @@ class CompareAndSelectScenario extends Component {
             });
             localStorage.setItem("sesDatasetRegionId", event.target.value);
             var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
+            var name = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
+            var toggleMultiselect = this.state.toggleMultiselect;
+            if (name.length > 0 && event.target.value != "" && name[0].selectedForecastMap != undefined && name[0].selectedForecastMap[event.target.value] != undefined && name[0].selectedForecastMap[event.target.value].treeAndScenario.length > 1) {
+                toggleMultiselect = true
+            }
             var regionId = event.target.value;
             this.setState({
                 regionId: event.target.value,
+                toggleMultiselect: toggleMultiselect,
                 regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : "",
                 changed: false
             }, () => {
@@ -1886,7 +1947,7 @@ class CompareAndSelectScenario extends Component {
             loading: true
         })
         this.setState({
-            selectedTreeScenarioId: id,
+            // selectedTreeScenarioId: id,
             loading: false
         }, () => {
             this.buildJexcel();
@@ -1928,17 +1989,39 @@ class CompareAndSelectScenario extends Component {
      */
     submitScenario() {
         this.setState({ dataChangedFlag: 0, loading: true })
-        var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
-        var treeId = this.state.selectedTreeScenarioId.toString().split("~")[0];
-        if (scenarioId == undefined) {
-            scenarioId = null;
-            treeId = null;
-        }
+        var selectedTreeScenarioId = this.state.selectedTreeScenarioId;
+        var treeAndScenario = [];
         var consumptionExtrapolationId = "";
-        if (!this.state.selectedTreeScenarioId.toString().includes("~")) {
-            consumptionExtrapolationId = this.state.selectedTreeScenarioId
+        if (selectedTreeScenarioId.length > 1) {
+            for (var tas = 0; tas < selectedTreeScenarioId.length; tas++) {
+                treeAndScenario.push({
+                    "treeId": selectedTreeScenarioId[tas].toString().split("~")[0],
+                    "scenarioId": selectedTreeScenarioId[tas].toString().split("~")[1]
+                })
+            }
+        } else if (selectedTreeScenarioId.length == 1) {
+            var scenarioId = this.state.selectedTreeScenarioId[0].toString().split("~")[1];
+            if (scenarioId == undefined) {
+                treeAndScenario = []
+            } else {
+                treeAndScenario.push({
+                    "treeId": this.state.selectedTreeScenarioId[0].toString().split("~")[0],
+                    "scenarioId": this.state.selectedTreeScenarioId[0].toString().split("~")[1]
+                })
+            }
+            var consumptionExtrapolationId = "";
+            if (!this.state.selectedTreeScenarioId[0].toString().includes("~")) {
+                consumptionExtrapolationId = this.state.selectedTreeScenarioId[0]
+            }
         }
-        var totalIndex = this.state.treeScenarioList.findIndex(c => c.id == this.state.selectedTreeScenarioId);
+        let total = 0;
+        this.state.treeScenarioList.forEach((c, index) => {
+            if (this.state.selectedTreeScenarioId.includes(c.id.toString())) {
+                total += Number(this.state.totalArray[index]);
+            } else {
+                total += 0;
+            }
+        });
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1962,7 +2045,7 @@ class CompareAndSelectScenario extends Component {
                 var planningUnitList1 = planningUnitList;
                 var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.active.toString() == "true");
                 var pu = planningUnitList1[index];
-                pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "treeId": treeId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[totalIndex], notes: this.state.forecastNotes };
+                pu.selectedForecastMap[this.state.regionId] = { treeAndScenario: treeAndScenario, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": total, notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
                 var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
@@ -2306,7 +2389,7 @@ class CompareAndSelectScenario extends Component {
                             fontColor: 'transparent',
                         },
                         lineTension: 0.1,
-                        borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
+                        borderWidth: (this.state.selectedTreeScenarioId.includes(item.id.toString())) ? 5 : 3,
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
@@ -2482,7 +2565,7 @@ class CompareAndSelectScenario extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    {i18n.t('static.import.doNoImportCheckbox')}
+                                                    {i18n.t('static.compareAndSelect.selectMultipleTree')}
                                                 </Label>
                                             </FormGroup>
                                         </div>
@@ -2524,7 +2607,7 @@ class CompareAndSelectScenario extends Component {
                                         <div className={this.state.showHidePU ? "col-md-9" : "col-md-12"} style={{ display: this.state.loading ? "none" : "block" }}>
                                             {this.state.showAllData &&
                                                 <>
-                                                    <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
+                                                    <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => this.state.selectedTreeScenarioId.includes(c.id.toString())).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + (this.state.toggleMultiselect ? " " + i18n.t("static.compareAndSelect.orMore") : "") + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
                                                     <ul className="legendcommitversion">
                                                         <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
