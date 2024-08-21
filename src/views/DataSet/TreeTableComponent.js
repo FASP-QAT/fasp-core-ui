@@ -790,6 +790,8 @@ export default class TreeTable extends Component {
         this.resetTab2Data = this.resetTab2Data.bind(this);
         this.onChangePageTab1 = this.onChangePageTab1.bind(this);
         this.onChangePageTab2 = this.onChangePageTab2.bind(this);
+        this.checkValidationTab1 = this.checkValidationTab1.bind(this);
+        this.checkValidationTab2 = this.checkValidationTab2.bind(this);
     }
     /**
      * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
@@ -1471,7 +1473,8 @@ export default class TreeTable extends Component {
             this.setState({
                 items: nodes,
                 isSubmitClicked: false,
-                curTreeObj
+                curTreeObj,
+                isTabDataChanged: false
             }, () => {
                 this.calculateMOMData(currentItemConfig.context.id, 0);
                 resolve();
@@ -1945,15 +1948,22 @@ export default class TreeTable extends Component {
         }
     }
     onChangeTab1Data = function (instance, cell, x, y, value) {
+        this.checkValidationTab1();
+        this.el = this.state.treeTabl1El;
         this.el.setValueFromCoords(12, y, 1, true);
+        if(x == 6) {
+            this.el.setValueFromCoords(8, y, this.el.getValueFromCoords(6, y)*(this.el.getValueFromCoords(7, y)/100), true);
+        }
         this.setState({
             isTabDataChanged: true
         })
     }
     onChangeTab2Data = function (instance, cell, x, y, value) {
+        this.checkValidationTab2();
         this.setState({
             isTabDataChanged: true
         })
+        this.el = this.state.treeTabl2El;
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(37, y, 1, true);
         let nodeId = this.el.getValueFromCoords(36, y);
@@ -2039,6 +2049,99 @@ export default class TreeTable extends Component {
             }
         }
     }
+    /**
+     * Function to check validation of the jexcel table before performing updation.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
+    checkValidationTab1() {
+        var valid = true;
+        var elInstance = this.state.treeTabl1El;
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var nodeType = this.el.getValueFromCoords(10, y);
+            if(this.el.getValueFromCoords(3, y) == "") {
+                var col = ('D').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                var col = ('D').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+            if(nodeType == 2) {
+                if(this.el.getValueFromCoords(4, y) === "") {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(5, y) === "") {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(8, y) === "") {
+                    var col = ('I').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('I').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else if(nodeType == 3) {
+                if(this.el.getValueFromCoords(4, y) === "") {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(5, y) === "") {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(6, y) === "") {
+                    var col = ('G').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('G').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
     buildTab1Jexcel() {
         var treeArray = [];
         var count = 0;
@@ -2063,8 +2166,8 @@ export default class TreeTable extends Component {
             data[3] = items[i].payload.label.label_en;
             data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId;
             data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
-            data[6] = currentScenario.dataValue;
-            data[7] = this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
+            data[6] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : currentScenario.dataValue == "" ? 0 : currentScenario.dataValue;
+            data[7] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2)  ? "" : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]) == "" ? 0 : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
             data[8] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : addCommasNodeValue(currentScenario.dataValue);
             data[9] = currentScenario.notes;
             data[10] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
@@ -2117,12 +2220,12 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: i18n.t('static.tree.parentValue'),
-                        mask: '#,##0.00', decimal: '.',
+                        mask: '#,##0.0000', decimal: '.',
                         type: 'numeric',
                     },
                     {
                         title: i18n.t('static.tree.nodeValue'),
-                        mask: '#,##0.00', decimal: '.',
+                        mask: '#,##0.0000', decimal: '.',
                         type: 'numeric',
                     },
                     {
@@ -2198,85 +2301,46 @@ export default class TreeTable extends Component {
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
-                var json = this.state.treeTabl1El.getJson(null, false);
-                var items = this.state.items;
-                for(var i = 0; i < json.length; i++){
-                    if(json[i][12] == 1){
-                    let curItem = {
-                        context: ''
-                    };
-                    curItem.context = items.filter(c => c.id == json[i][11])[0];
-                    curItem.context.payload.label.label_en = json[i][3];
-                    curItem.context.payload.nodeUnit.id = json[i][4];
-                    // var nodeUnit = document.getElementById("nodeUnitId");
-                    // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
-                    // var label = {
-                    //     label_en: selectedText,
-                    //     label_fr: '',
-                    //     label_sp: '',
-                    //     label_pr: ''
-                    // }
-                    // curItem.context.payload.nodeUnit.label = label;
-                    if(json[i][10] == 3){
-                        var value = json[i][6];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
-                        this.state.currentScenario.dataValue = value;
-                        this.calculateParentValueFromMOM((curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
-                    }
-                    if(json[i][10] == 2){
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
-                    }
-                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][9];
-                    this.getNotes();
-                    this.setState({
-                        currentItemConfig: curItem
-                    }, () => {
-                        this.updateNodeInfoInJson(curItem)
-                    })
+                if(this.checkValidationTab1()){
+                    var json = this.state.treeTabl1El.getJson(null, false);
+                    var items = this.state.items;
+                    for(var i = 0; i < json.length; i++){
+                        if(json[i][12] == 1){
+                            let curItem = {
+                                context: ''
+                            };
+                            curItem.context = items.filter(c => c.id == json[i][11])[0];
+                            curItem.context.payload.label.label_en = json[i][3];
+                            curItem.context.payload.nodeUnit.id = json[i][4];
+                            // var nodeUnit = document.getElementById("nodeUnitId");
+                            // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
+                            // var label = {
+                            //     label_en: selectedText,
+                            //     label_fr: '',
+                            //     label_sp: '',
+                            //     label_pr: ''
+                            // }
+                            // curItem.context.payload.nodeUnit.label = label;
+                            if(json[i][10] == 3){
+                                var value = json[i][6];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
+                                this.state.currentScenario.dataValue = value;
+                                this.calculateParentValueFromMOM((curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
+                            }
+                            if(json[i][10] == 2){
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                            }
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][9];
+                            this.getNotes();
+                            this.setState({
+                                currentItemConfig: curItem
+                            }, () => {
+                                this.updateNodeInfoInJson(curItem)
+                            })
+                        }
                     }
                 }
-                
-                // var save = false;
-                // if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
-                //     var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
-                //     if (cf == true) {
-                //         save = true;
-                //         this.setState({
-                //             deleteChildNodes: true
-                //         })
-                //     } else {
-                //     }
-                // } else {
-                //     save = true;
-                //     this.setState({
-                //         deleteChildNodes: false
-                //     })
-                // }
-                // if (save) {
-                //     this.formSubmitLoader();
-                //     if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
-                //         if (!this.state.isSubmitClicked) {
-                //             this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                //                 setTimeout(() => {
-                //                     if (this.state.addNodeFlag) {
-                //                         this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                //                     } else {
-                //                         this.updateNodeInfoInJson(this.state.currentItemConfig)
-                //                     }
-                //                     this.setState({
-                //                         cursorItem: 0,
-                //                         highlightItem: 0,
-                //                         activeTab1: new Array(1).fill('1')
-                //                     })
-                //                 }, 0);
-                //             })
-                //             this.setState({ modelingTabChanged: false })
-                //         }
-                //     } else {
-                //         this.setState({ activeTab1: new Array(1).fill('2') })
-                //     }
-                // }
             }, 0)
         })
     }
@@ -2338,94 +2402,55 @@ export default class TreeTable extends Component {
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
-                var json = this.state.treeTabl2El.getJson(null, false);
-                var items = this.state.items;
-                for(var i = 0; i < json.length; i++){
-                    if(json[i][37] == 1){
-                        let curItem = {
-                            context: ''
-                        };
-                        curItem.context = items.filter(c => c.id == json[i][36])[0];
-                        console.log("Hello", curItem, json[i])
-                        // curItem.context.payload.label.label_en = json[i][3];
-                        // curItem.context.payload.nodeUnit.id = json[i][4];
-                        curItem.context.payload.label.label_en = json[i][3];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
-                        if(json[i][35] == 4){
-                            var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = json[i][13];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id = json[i][14];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
-                            if(json[i][14] == 1 && json[i][22] == 0) {
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod = {};
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = json[i][24];
+                if(this.checkValidationTab2()){
+                    var json = this.state.treeTabl2El.getJson(null, false);
+                    var items = this.state.items;
+                    for(var i = 0; i < json.length; i++){
+                        if(json[i][37] == 1){
+                            let curItem = {
+                                context: ''
+                            };
+                            curItem.context = items.filter(c => c.id == json[i][36])[0];
+                            // curItem.context.payload.label.label_en = json[i][3];
+                            // curItem.context.payload.nodeUnit.id = json[i][4];
+                            curItem.context.payload.label.label_en = json[i][3];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
+                            if(json[i][35] == 4){
+                                var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit = this.state.forecastingUnitList.filter(c => c.id == json[i][8])[0];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = json[i][13];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id = json[i][14];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
+                                if(json[i][14] == 1 && json[i][22] == 0) {
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod = {};
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = json[i][24];
+                                }
+                                // (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
                             }
-                            // (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                            if(json[i][35] == 5){
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = json[i][9];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = this.state.planningUnitList.filter(ele => ele.id == json[i][9])[0].multiplier;
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = json[i][12];
+                            }
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][32];
+                            this.getNotes();
+                            this.setState({
+                                currentItemConfig: curItem
+                            }, () => {
+                                this.updateNodeInfoInJson(curItem)
+                            })
                         }
-                        if(json[i][35] == 5){
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = json[i][9];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = this.state.planningUnitList.filter(ele => ele.id == json[i][9])[0].multiplier;
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = json[i][12];
-                        }
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][32];
-                        this.getNotes();
-                        this.setState({
-                            currentItemConfig: curItem
-                        }, () => {
-                            this.updateNodeInfoInJson(curItem)
-                        })
                     }
                 }
-                
-                // var save = false;
-                // if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
-                //     var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
-                //     if (cf == true) {
-                //         save = true;
-                //         this.setState({
-                //             deleteChildNodes: true
-                //         })
-                //     } else {
-                //     }
-                // } else {
-                //     save = true;
-                //     this.setState({
-                //         deleteChildNodes: false
-                //     })
-                // }
-                // if (save) {
-                //     this.formSubmitLoader();
-                //     if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
-                //         if (!this.state.isSubmitClicked) {
-                //             this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                //                 setTimeout(() => {
-                //                     if (this.state.addNodeFlag) {
-                //                         this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                //                     } else {
-                //                         this.updateNodeInfoInJson(this.state.currentItemConfig)
-                //                     }
-                //                     this.setState({
-                //                         cursorItem: 0,
-                //                         highlightItem: 0,
-                //                         activeTab1: new Array(1).fill('1')
-                //                     })
-                //                 }, 0);
-                //             })
-                //             this.setState({ modelingTabChanged: false })
-                //         }
-                //     } else {
-                //         this.setState({ activeTab1: new Array(1).fill('2') })
-                //     }
-                // }
             }, 0)
         })
     }
@@ -2470,6 +2495,188 @@ export default class TreeTable extends Component {
             })
         }
     }
+    /**
+     * Function to check validation of the jexcel table before performing updation.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
+    checkValidationTab2() {
+        var valid = true;
+        var elInstance = this.state.treeTabl2El;
+        var json = this.el.getJson(null, false);
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
+        var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
+        for (var y = 0; y < json.length; y++) {
+            var nodeType = this.el.getValueFromCoords(35, y);
+            if(this.el.getValueFromCoords(3, y) === "") {
+                var col = ('D').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                var col = ('D').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+            if(this.el.getValueFromCoords(4, y) === "") {
+                var col = ('E').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                var col = ('E').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+            if(this.el.getValueFromCoords(5, y) === "") {
+                var col = ('F').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                var col = ('F').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+            if(nodeType == 4) {
+                if(this.el.getValueFromCoords(8, y) === "") {
+                    var col = ('I').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('I').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(13, y) === "") {
+                    var col = ('N').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('N').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(14, y) === "") {
+                    var col = ('O').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('O').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(16, y) === "") {
+                    var col = ('Q').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('Q').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(18, y) === "") {
+                    var col = ('S').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('S').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(20, y) === "") {
+                    var col = ('U').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('U').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(21, y) === "") {
+                    var col = ('V').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('V').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(22, y) == 0 && this.el.getValueFromCoords(14, y) == 1) {
+                    if(this.el.getValueFromCoords(23, y) == "") {
+                        var col = ('X').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('X').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    if(this.el.getValueFromCoords(24, y) === "") {
+                        var col = ('Y').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('Y').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                } else {
+                    var col = ('X').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+
+                    var col = ('Y').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else if(nodeType == 5) {
+                if(this.el.getValueFromCoords(9, y) === "") {
+                    var col = ('J').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('J').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+                if(this.el.getValueFromCoords(12, y) === "") {
+                    var col = ('M').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    var col = ('M').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
     buildTab2Jexcel() {
         var treeArray = [];
         var count = 0;
@@ -2486,7 +2693,6 @@ export default class TreeTable extends Component {
             var row = "";
             var row1 = "";
             var level = items[i].level;
-            console.log("hello json",items[i])
             var fuNode = items[i].payload.nodeType.id == 4;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
             var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
@@ -2502,13 +2708,13 @@ export default class TreeTable extends Component {
             data[8] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en; // Forecasting unit
             data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
-            data[11] = 0; // # PU / Interval / Patient (Reference)
+            data[11] = !fuNode ? this.qatCalculatedPUPerVisitForJexcel(items[i]) : ""; // # PU / Interval / Patient (Reference)
             data[12] = fuNode ? "" : currentScenario.puNode.puPerVisit; // # PU / Interval / Patient
             data[13] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
             data[14] = fuNode ? currentScenario.fuNode.usageType.id : ""; // Type of Use
             data[15] = fuNode ? currentScenario.fuNode.lagInMonths : ""; // Lag in months
             data[16] = fuNode ? currentScenario.fuNode.noOfPersons : ""; // Every
-            data[17] = fuNode ? "":""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
+            data[17] = fuNode ? items[i].payload.nodeUnit.id : ""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
             data[18] = fuNode ? currentScenario.fuNode.noOfForecastingUnitsPerPerson : ""; // Requires
             data[19] = fuNode ? currentScenario.fuNode.forecastingUnit.unit.id : ""; // Forecasting Units Unit unitList
             data[20] = fuNode ? currentScenario.fuNode.usageFrequency : ""; // Every
@@ -2544,184 +2750,184 @@ export default class TreeTable extends Component {
                 columnDrag: false,
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
-                    {
+                    { // A
                         title: 'Node Id',
                         type: 'hidden'
                     },
-                    {
+                    { // b
                         title: i18n.t('static.tree.parent'),
                         type: 'text',
                     },
-                    {
+                    { //c
                         title: i18n.t('static.ManageTree.NodeType'),
                         type: 'text',
                     },
-                    {
+                    { //d
                         title: i18n.t('static.tree.nodeTitle'),
                         type: 'text',
                     },
-                    {
+                    {//e
                         title: i18n.t('static.supplyPlan.startMonth'),
                         options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
                         type: 'calendar'
                     },
-                    {
+                    {//f
                         title: i18n.t('static.tree.percentageOfParent'),
                         mask: '#,##0.00%', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//g
                         title: i18n.t('static.tree.parentValue'),
                         mask: '#,##0.0000', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//h
                         title: i18n.t('static.tree.nodeValue'),
                         mask: '#,##0.0000', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//i
                         title: 'Forecasting Unit',
                         source: this.state.forecastingUnitListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//j
                         title: 'Planning Unit',
                         source: this.state.planningUnitListForDropdown,
                         type: 'dropdown',
                         filter: this.filterPlanningUnit
                     },
-                    {
+                    {//k
                         title: 'Conversion Factor',
                         mask: '#,##0.00', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//l
                         title: '# PU / Interval / Patient (Reference)',
                         decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//m
                         title: '# PU / Interval / Patient',
                         decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//n
                         title: 'Tracer Category',
                         source: this.state.tracerCategoryListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//o
                         title: 'Type Of Use',
                         source: this.state.usageTypeListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//p
                         title: 'Lag in months',
                         mask: '#,##0.00', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//q
                         title: 'Every',
                         mask: '#,##0.00', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//r
                         title: 'Unit',
                         source: this.state.nodeUnitListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//s
                         title: 'Requires',
                         mask: '#,##0.00', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//t
                         title: 'Forecasting Units Unit',
                         source: this.state.unitListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//u
                         title: 'Every',
                         mask: '#,##0.00', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//v
                         title: 'Usage Period',
                         source: this.state.usagePeriodListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//w
                         title: 'Single Use',
                         source: this.state.booleanForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//x
                         title: 'For',
                         mask: '#,##0.00', decimal: '.',
                         type: 'numeric',
                     },
-                    {
+                    {//y
                         title: 'Period',
                         source: this.state.usagePeriodListForDropdown,
                         type: 'dropdown',
                     },
-                    {
+                    {//z
                         title: '# of FU required for period',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//aa
                         title: '# Of Months In Period',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//ab
                         title: '# of FU / month / Patient',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//ac
                         title: '# of FU / Unit/ Time',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//ad
                         title: '# of FU required for period per Unit',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//ae
                         title: '# of FU / month / Unit',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//af
                         title: '# of PU / month / Unit',
                         mask: '#,##0.00', decimal: '.',
                         type: 'hidden',
                     },
-                    {
+                    {//ag
                         title: i18n.t('static.common.notes'),
                         type: 'text',
                     },
-                    {
+                    {//ah
                         title: 'Node Type',
                         type: 'hidden',
                     },
-                    {
+                    {//ai
                         title: 'Node Id',
                         type: 'hidden',
                     },
-                    {
+                    {//aj
                         title: 'AA',
                         type: 'hidden',
                     },
-                    {
+                    {//ak
                         title: 'AB',
                         type: 'hidden',
                     },
-                    {
+                    {//al
                         title: 'Is Changed',
                         type: 'hidden',
                     }
@@ -2753,7 +2959,7 @@ export default class TreeTable extends Component {
                             items.push({
                                 title: "Go to Tree",
                                 onclick: function () {
-                                    localStorage.setItem("openNodeId", rowData[11]);
+                                    localStorage.setItem("openNodeId", rowData[36]);
                                     window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
                                 }.bind(this)
                             });
@@ -2786,27 +2992,29 @@ export default class TreeTable extends Component {
     calculateParentValueFromMOM(month) {
         var parentValue = 0;
         var currentItemConfig = this.state.currentItemConfig;
-        if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
-            var items = this.state.items;
-            var parentItem = items.filter(x => x.id == currentItemConfig.context.parent);
-            if (parentItem.length > 0) {
-                var nodeDataMomList = parentItem[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
-                if (nodeDataMomList.length) {
-                    var momDataForNode = nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(month).format("YYYY-MM-DD"));
-                    if (momDataForNode.length > 0) {
-                        if (currentItemConfig.context.payload.nodeType.id == 5) {
-                            parentValue = momDataForNode[0].calculatedMmdValue;
-                        } else {
-                            parentValue = momDataForNode[0].calculatedValue;
+        if(currentItemConfig.context.payload.nodeDataMap.length > 0) { 
+            if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
+                var items = this.state.items;
+                var parentItem = items.filter(x => x.id == currentItemConfig.context.parent);
+                if (parentItem.length > 0) {
+                    var nodeDataMomList = parentItem[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
+                    if (nodeDataMomList.length) {
+                        var momDataForNode = nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(month).format("YYYY-MM-DD"));
+                        if (momDataForNode.length > 0) {
+                            if (currentItemConfig.context.payload.nodeType.id == 5) {
+                                parentValue = momDataForNode[0].calculatedMmdValue;
+                            } else {
+                                parentValue = momDataForNode[0].calculatedValue;
+                            }
                         }
                     }
                 }
+                var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue;
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString()
             }
-            var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue;
-            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString()
+            this.setState({ parentValue, currentItemConfig, currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0] }, () => {
+            });
         }
-        this.setState({ parentValue, currentItemConfig, currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0] }, () => {
-        });
     }
     calculateParentValueFromMOMForJexcel(month, currentItemConfig) {
         var parentValue = 0;
@@ -2861,6 +3069,35 @@ export default class TreeTable extends Component {
             }
         }
         this.setState({ qatCalculatedPUPerVisit });
+    }
+    /**
+     * Calculates the planning unit usage per visit (PU per visit) based on the current item's configuration and usage type.
+     * Updates the PU per visit value in the current item's node data map.
+     * @param {number} type - The type of calculation to perform. 1 for refill months calculation, 2 for standard calculation.
+     */
+    qatCalculatedPUPerVisitForJexcel(item) {
+        var currentItemConfig = {
+            context: '',
+            parentItem: ''
+        };
+        var currentScenarioParent = this.state.items.filter(ele => ele.id == item.parent).length > 0 ? this.state.items.filter(ele => ele.id == item.parent)[0] : "";
+        currentItemConfig.context = item;
+        currentItemConfig.parentItem = currentScenarioParent;
+        let {noFURequired, noOfMonthsInUsagePeriod} = this.getNoFURequiredForJexcel(currentItemConfig);
+        var qatCalculatedPUPerVisit = "";
+        var planningUnitList = this.state.planningUnitList;
+        if (planningUnitList.length > 0 && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
+            if (planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id).length > 0) {
+                var pu = planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
+                if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                    var refillMonths = 1;
+                    qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
+                } else {
+                    qatCalculatedPUPerVisit = parseFloat(1 / pu.multiplier).toFixed(8);
+                }       
+            }
+        }
+        return qatCalculatedPUPerVisit;
     }
     /**
      * Reterives forecast program list
@@ -3397,6 +3634,77 @@ export default class TreeTable extends Component {
             noFURequired: (noFURequired != "" && noFURequired != 0 ? noFURequired : 0)
         }, () => {
         });
+    }
+    /**
+     * Function to calculate no of forecasting units required
+     */
+    getNoFURequiredForJexcel(currentItemConfig) {
+        var usagePeriodId;
+        var usageTypeId;
+        var usageFrequency;
+        var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
+        var scenarioId = this.state.selectedScenario;
+        var repeatUsagePeriodId;
+        var oneTimeUsage;
+        if (nodeTypeId == 5) {
+            usageTypeId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+            usagePeriodId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod != null ? (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId : "";
+            usageFrequency = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+            if (usageTypeId == 1) {
+                oneTimeUsage = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+            }
+        } else {
+            usageTypeId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+            if (usageTypeId == 1) {
+                oneTimeUsage = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+            }
+            if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
+                usagePeriodId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+            }
+            usageFrequency = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+        }
+        var noOfMonthsInUsagePeriod = 0;
+        if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+            var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+            if (usageTypeId == 2) {
+                var div = (convertToMonth * usageFrequency);
+                if (div != 0) {
+                    noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                }
+            } else {
+                var noOfFUPatient;
+                if (currentItemConfig.context.payload.nodeType.id == 4) {
+                    noOfFUPatient = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                } else {
+                    noOfFUPatient = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                }
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+            }
+            if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                if (currentItemConfig.context.payload.nodeType.id == 4) {
+                    repeatUsagePeriodId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                } else {
+                    repeatUsagePeriodId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                }
+                if (repeatUsagePeriodId != "") {
+                    convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                } else {
+                    convertToMonth = 0;
+                }
+            }
+            if (currentItemConfig.context.payload.nodeType.id == 4) {
+                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            } else {
+                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            }
+        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+            if (currentItemConfig.context.payload.nodeType.id == 4) {
+                noFURequired = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+            } else {
+                noFURequired = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+            }
+        }
+        return {noFURequired, noOfMonthsInUsagePeriod};
     }
     /**
      * Function to calculate no of months in usage period
@@ -4503,25 +4811,25 @@ export default class TreeTable extends Component {
     tabPane1() {
         return (
             <>
-                <TabPane tabId="1">
+                <TabPane tabId="1" style={{paddingBottom: "50px"}}>
                     <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
-                    <div className="col-md-12 pr-lg-0">
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
-                    </div>
+                    </div>}
                 </TabPane>
-                <TabPane tabId="2">
+                <TabPane tabId="2" style={{paddingBottom: "50px"}}>
                     <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
-                    <div className="col-md-12 pr-lg-0">
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
-                    </div>
+                    </div>}
                 </TabPane>
             </>
         );
@@ -4986,17 +5294,6 @@ export default class TreeTable extends Component {
                                                             </Input>
                                                         </InputGroup>
                                                     </FormGroup>
-                                                    <Picker
-                                                        ref={this.pickAMonth3}
-                                                        id="monthPicker"
-                                                        name="monthPicker"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={this.state.singleValue2}
-                                                        key={JSON.stringify(this.state.singleValue2)}
-                                                        lang={pickerLang.months}
-                                                    >
-                                                        <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
-                                                    </Picker>
                                                 </Row>
                                             </div>
                                         </CardBody>
@@ -5009,7 +5306,7 @@ export default class TreeTable extends Component {
                                                             active={this.state.activeTab1[0] === '1'}
                                                             onClick={() => { this.toggleModal(0, '1'); }}
                                                         >
-                                                            Node Data
+                                                            Aggregation/Number/Percentage Node
                                                         </NavLink>
                                                     </NavItem>
                                                     <NavItem>
@@ -5017,7 +5314,7 @@ export default class TreeTable extends Component {
                                                             active={this.state.activeTab1[0] === '2'}
                                                             onClick={() => { this.toggleModal(0, '2'); }}
                                                         >
-                                                            Modeling/Transfer
+                                                            FU/PU Node
                                                         </NavLink>
                                                     </NavItem>
                                                 </Nav>
