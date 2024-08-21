@@ -51,8 +51,7 @@ const calculateSums = (data) => {
     const yearWiseData = {};
 
     data.forEach((row) => {
-        const date = new Date(row[0]);
-        const year = date.getFullYear();
+        const year = moment(row[0]).format("YYYY");
 
         // Ensure the year is present in the sums object
         if (!yearSums[year]) {
@@ -554,6 +553,7 @@ class CompareAndSelectScenario extends Component {
             if (this.state.xAxisDisplayBy != 1) {
                 var originalData = calculateSums(dataArr1);
                 // Convert the object to an array
+                console.log("originalData", dataArr1)
                 const transformedData = Object.keys(originalData).map((year, index) => ({
                     [index]: [parseInt(year), ...originalData[year]]
                 }));
