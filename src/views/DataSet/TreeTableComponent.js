@@ -1473,7 +1473,8 @@ export default class TreeTable extends Component {
             this.setState({
                 items: nodes,
                 isSubmitClicked: false,
-                curTreeObj
+                curTreeObj,
+                isTabDataChanged: false
             }, () => {
                 this.calculateMOMData(currentItemConfig.context.id, 0);
                 resolve();
@@ -2707,13 +2708,13 @@ export default class TreeTable extends Component {
             data[8] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en; // Forecasting unit
             data[9] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
-            data[11] = 0; // # PU / Interval / Patient (Reference)
+            data[11] = !fuNode ? this.qatCalculatedPUPerVisitForJexcel(items[i]) : ""; // # PU / Interval / Patient (Reference)
             data[12] = fuNode ? "" : currentScenario.puNode.puPerVisit; // # PU / Interval / Patient
             data[13] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
             data[14] = fuNode ? currentScenario.fuNode.usageType.id : ""; // Type of Use
             data[15] = fuNode ? currentScenario.fuNode.lagInMonths : ""; // Lag in months
             data[16] = fuNode ? currentScenario.fuNode.noOfPersons : ""; // Every
-            data[17] = fuNode ? "":""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
+            data[17] = fuNode ? items[i].payload.nodeUnit.id : ""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
             data[18] = fuNode ? currentScenario.fuNode.noOfForecastingUnitsPerPerson : ""; // Requires
             data[19] = fuNode ? currentScenario.fuNode.forecastingUnit.unit.id : ""; // Forecasting Units Unit unitList
             data[20] = fuNode ? currentScenario.fuNode.usageFrequency : ""; // Every
@@ -3068,6 +3069,35 @@ export default class TreeTable extends Component {
             }
         }
         this.setState({ qatCalculatedPUPerVisit });
+    }
+    /**
+     * Calculates the planning unit usage per visit (PU per visit) based on the current item's configuration and usage type.
+     * Updates the PU per visit value in the current item's node data map.
+     * @param {number} type - The type of calculation to perform. 1 for refill months calculation, 2 for standard calculation.
+     */
+    qatCalculatedPUPerVisitForJexcel(item) {
+        var currentItemConfig = {
+            context: '',
+            parentItem: ''
+        };
+        var currentScenarioParent = this.state.items.filter(ele => ele.id == item.parent).length > 0 ? this.state.items.filter(ele => ele.id == item.parent)[0] : "";
+        currentItemConfig.context = item;
+        currentItemConfig.parentItem = currentScenarioParent;
+        let {noFURequired, noOfMonthsInUsagePeriod} = this.getNoFURequiredForJexcel(currentItemConfig);
+        var qatCalculatedPUPerVisit = "";
+        var planningUnitList = this.state.planningUnitList;
+        if (planningUnitList.length > 0 && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
+            if (planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id).length > 0) {
+                var pu = planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
+                if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                    var refillMonths = 1;
+                    qatCalculatedPUPerVisit = parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(8);
+                } else {
+                    qatCalculatedPUPerVisit = parseFloat(1 / pu.multiplier).toFixed(8);
+                }       
+            }
+        }
+        return qatCalculatedPUPerVisit;
     }
     /**
      * Reterives forecast program list
@@ -3604,6 +3634,77 @@ export default class TreeTable extends Component {
             noFURequired: (noFURequired != "" && noFURequired != 0 ? noFURequired : 0)
         }, () => {
         });
+    }
+    /**
+     * Function to calculate no of forecasting units required
+     */
+    getNoFURequiredForJexcel(currentItemConfig) {
+        var usagePeriodId;
+        var usageTypeId;
+        var usageFrequency;
+        var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
+        var scenarioId = this.state.selectedScenario;
+        var repeatUsagePeriodId;
+        var oneTimeUsage;
+        if (nodeTypeId == 5) {
+            usageTypeId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+            usagePeriodId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod != null ? (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId : "";
+            usageFrequency = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+            if (usageTypeId == 1) {
+                oneTimeUsage = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+            }
+        } else {
+            usageTypeId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+            if (usageTypeId == 1) {
+                oneTimeUsage = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+            }
+            if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
+                usagePeriodId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+            }
+            usageFrequency = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+        }
+        var noOfMonthsInUsagePeriod = 0;
+        if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+            var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+            if (usageTypeId == 2) {
+                var div = (convertToMonth * usageFrequency);
+                if (div != 0) {
+                    noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                }
+            } else {
+                var noOfFUPatient;
+                if (currentItemConfig.context.payload.nodeType.id == 4) {
+                    noOfFUPatient = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                } else {
+                    noOfFUPatient = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                }
+                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+            }
+            if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                if (currentItemConfig.context.payload.nodeType.id == 4) {
+                    repeatUsagePeriodId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                } else {
+                    repeatUsagePeriodId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                }
+                if (repeatUsagePeriodId != "") {
+                    convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                } else {
+                    convertToMonth = 0;
+                }
+            }
+            if (currentItemConfig.context.payload.nodeType.id == 4) {
+                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            } else {
+                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            }
+        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+            if (currentItemConfig.context.payload.nodeType.id == 4) {
+                noFURequired = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+            } else {
+                noFURequired = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+            }
+        }
+        return {noFURequired, noOfMonthsInUsagePeriod};
     }
     /**
      * Function to calculate no of months in usage period
@@ -4710,25 +4811,25 @@ export default class TreeTable extends Component {
     tabPane1() {
         return (
             <>
-                <TabPane tabId="1">
+                <TabPane tabId="1" style={{paddingBottom: "50px"}}>
                     <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
-                    <div className="col-md-12 pr-lg-0">
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
-                    </div>
+                    </div>}
                 </TabPane>
-                <TabPane tabId="2">
+                <TabPane tabId="2" style={{paddingBottom: "50px"}}>
                     <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                     </div>
-                    <div className="col-md-12 pr-lg-0">
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                             {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
-                    </div>
+                    </div>}
                 </TabPane>
             </>
         );
