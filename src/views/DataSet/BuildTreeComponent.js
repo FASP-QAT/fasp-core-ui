@@ -2733,6 +2733,7 @@ export default class BuildTree extends Component {
         let copyModalParentNode;
         let copyModalTreeList = [];
         let copyModalParentLevelList = [];
+        let tempCopyModalParentLevelList = [];
         let copyModalParentNodeList = [];
         let allowedNodeTypeList = []; 
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
@@ -2741,6 +2742,18 @@ export default class BuildTree extends Component {
         }
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.map(x => x.level))];
+        if(tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
+            copyModalParentLevelList = [];
+            for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+                copyModalParentLevelList.push({
+                    label: {label_en: "Level " + i},
+                    levelNo: i
+                })
+            }
+        } else if(tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
+            copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
+        }
         if(val == 1) {
             if(this.state.copyModalNode.level != 0){
                 copyModalParentLevel = this.state.copyModalNode.level-1;
@@ -2794,7 +2807,7 @@ export default class BuildTree extends Component {
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.map(x => x.level))];
-        if(tempCopyModalParentLevelList.length != copyModalParentLevelList.length) {
+        if(tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             copyModalParentLevelList = [];
             for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
                 copyModalParentLevelList.push({
@@ -2802,6 +2815,8 @@ export default class BuildTree extends Component {
                     levelNo: i
                 })
             }
+        } else if(tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
+            copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
         if(this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
             copyModalParentLevel = this.state.copyModalNode.level-1;
@@ -7404,12 +7419,12 @@ export default class BuildTree extends Component {
                     let invalidTransfer = [];
                     var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList //.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
                     if(!this.state.copyModeling) {
-                        nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null));
+                        nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null && x.transferNodeDataId != "null"));
                     }
                     if (nodeDataModelingList.length > 0) {
                         nodeDataModelingList.map((item1, c) => {
                             var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
-                            if(newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "" ) {
+                            if(newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "null" && item1.transferNodeDataId != "") {
                                 invalidTransfer.push(item1.nodeDataModelingId);
                             }
                             try{
@@ -14218,7 +14233,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
-                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "PU" : "FU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "PU" : "FU")}</p>
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : "PU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : "PU")}</p>
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>

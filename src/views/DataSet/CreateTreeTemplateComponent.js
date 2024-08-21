@@ -6246,11 +6246,25 @@ export default class CreateTreeTemplate extends Component {
         childListArr.map(item => {
             var indexItems = items.findIndex(i => i.id == item.newId);
             if (indexItems != -1) {
-                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList //.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
+                let invalidTransfer = [];
+                var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList;
                 if(!this.state.copyModeling) {
-                    nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null));
+                    nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null && x.transferNodeDataId != "null"));
                 }
-                (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList = nodeDataModelingList;
+                if (nodeDataModelingList.length > 0) {
+                    nodeDataModelingList.map((item1, c) => {
+                        var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
+                        if(newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "null" && item1.transferNodeDataId != "") {
+                            invalidTransfer.push(item1.nodeDataModelingId);
+                        }
+                        try {
+                            item1.transferNodeDataId = newTransferId[0].newId;
+                        } catch {
+
+                        }
+                    })
+                }
+                (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList = nodeDataModelingList.filter(x => !invalidTransfer.includes(x.nodeDataModelingId)); 
             }
         })
         this.setState({
