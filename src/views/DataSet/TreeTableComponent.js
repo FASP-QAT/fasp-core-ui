@@ -1948,6 +1948,7 @@ export default class TreeTable extends Component {
     }
     onChangeTab1Data = function (instance, cell, x, y, value) {
         this.checkValidationTab1();
+        this.el = this.state.treeTabl1El;
         this.el.setValueFromCoords(12, y, 1, true);
         if(x == 6) {
             this.el.setValueFromCoords(8, y, this.el.getValueFromCoords(6, y)*(this.el.getValueFromCoords(7, y)/100), true);
@@ -1961,6 +1962,7 @@ export default class TreeTable extends Component {
         this.setState({
             isTabDataChanged: true
         })
+        this.el = this.state.treeTabl2El;
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(37, y, 1, true);
         let nodeId = this.el.getValueFromCoords(36, y);
@@ -2298,85 +2300,46 @@ export default class TreeTable extends Component {
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
-                var json = this.state.treeTabl1El.getJson(null, false);
-                var items = this.state.items;
-                for(var i = 0; i < json.length; i++){
-                    if(json[i][12] == 1){
-                        let curItem = {
-                            context: ''
-                        };
-                        curItem.context = items.filter(c => c.id == json[i][11])[0];
-                        curItem.context.payload.label.label_en = json[i][3];
-                        curItem.context.payload.nodeUnit.id = json[i][4];
-                        // var nodeUnit = document.getElementById("nodeUnitId");
-                        // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
-                        // var label = {
-                        //     label_en: selectedText,
-                        //     label_fr: '',
-                        //     label_sp: '',
-                        //     label_pr: ''
-                        // }
-                        // curItem.context.payload.nodeUnit.label = label;
-                        if(json[i][10] == 3){
-                            var value = json[i][6];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
-                            this.state.currentScenario.dataValue = value;
-                            this.calculateParentValueFromMOM((curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
+                if(this.checkValidationTab1()){
+                    var json = this.state.treeTabl1El.getJson(null, false);
+                    var items = this.state.items;
+                    for(var i = 0; i < json.length; i++){
+                        if(json[i][12] == 1){
+                            let curItem = {
+                                context: ''
+                            };
+                            curItem.context = items.filter(c => c.id == json[i][11])[0];
+                            curItem.context.payload.label.label_en = json[i][3];
+                            curItem.context.payload.nodeUnit.id = json[i][4];
+                            // var nodeUnit = document.getElementById("nodeUnitId");
+                            // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
+                            // var label = {
+                            //     label_en: selectedText,
+                            //     label_fr: '',
+                            //     label_sp: '',
+                            //     label_pr: ''
+                            // }
+                            // curItem.context.payload.nodeUnit.label = label;
+                            if(json[i][10] == 3){
+                                var value = json[i][6];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
+                                this.state.currentScenario.dataValue = value;
+                                this.calculateParentValueFromMOM((curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
+                            }
+                            if(json[i][10] == 2){
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                            }
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][9];
+                            this.getNotes();
+                            this.setState({
+                                currentItemConfig: curItem
+                            }, () => {
+                                this.updateNodeInfoInJson(curItem)
+                            })
                         }
-                        if(json[i][10] == 2){
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][8];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
-                        }
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][9];
-                        this.getNotes();
-                        this.setState({
-                            currentItemConfig: curItem
-                        }, () => {
-                            this.updateNodeInfoInJson(curItem)
-                        })
                     }
                 }
-                
-                // var save = false;
-                // if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
-                //     var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
-                //     if (cf == true) {
-                //         save = true;
-                //         this.setState({
-                //             deleteChildNodes: true
-                //         })
-                //     } else {
-                //     }
-                // } else {
-                //     save = true;
-                //     this.setState({
-                //         deleteChildNodes: false
-                //     })
-                // }
-                // if (save) {
-                //     this.formSubmitLoader();
-                //     if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
-                //         if (!this.state.isSubmitClicked) {
-                //             this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                //                 setTimeout(() => {
-                //                     if (this.state.addNodeFlag) {
-                //                         this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                //                     } else {
-                //                         this.updateNodeInfoInJson(this.state.currentItemConfig)
-                //                     }
-                //                     this.setState({
-                //                         cursorItem: 0,
-                //                         highlightItem: 0,
-                //                         activeTab1: new Array(1).fill('1')
-                //                     })
-                //                 }, 0);
-                //             })
-                //             this.setState({ modelingTabChanged: false })
-                //         }
-                //     } else {
-                //         this.setState({ activeTab1: new Array(1).fill('2') })
-                //     }
-                // }
             }, 0)
         })
     }
@@ -2438,94 +2401,55 @@ export default class TreeTable extends Component {
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
-                // this.checkValidationTab2();
-                var json = this.state.treeTabl2El.getJson(null, false);
-                var items = this.state.items;
-                for(var i = 0; i < json.length; i++){
-                    if(json[i][37] == 1){
-                        let curItem = {
-                            context: ''
-                        };
-                        curItem.context = items.filter(c => c.id == json[i][36])[0];
-                        // curItem.context.payload.label.label_en = json[i][3];
-                        // curItem.context.payload.nodeUnit.id = json[i][4];
-                        curItem.context.payload.label.label_en = json[i][3];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
-                        if(json[i][35] == 4){
-                            var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = json[i][13];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id = json[i][14];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
-                            if(json[i][14] == 1 && json[i][22] == 0) {
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod = {};
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = json[i][24];
+                if(this.checkValidationTab2()){
+                    var json = this.state.treeTabl2El.getJson(null, false);
+                    var items = this.state.items;
+                    for(var i = 0; i < json.length; i++){
+                        if(json[i][37] == 1){
+                            let curItem = {
+                                context: ''
+                            };
+                            curItem.context = items.filter(c => c.id == json[i][36])[0];
+                            // curItem.context.payload.label.label_en = json[i][3];
+                            // curItem.context.payload.nodeUnit.id = json[i][4];
+                            curItem.context.payload.label.label_en = json[i][3];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
+                            if(json[i][35] == 4){
+                                var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = json[i][8];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit = this.state.forecastingUnitList.filter(c => c.id == json[i][8])[0];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = json[i][13];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id = json[i][14];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
+                                if(json[i][14] == 1 && json[i][22] == 0) {
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod = {};
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = json[i][24];
+                                }
+                                // (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
                             }
-                            // (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][8];
+                            if(json[i][35] == 5){
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = json[i][9];
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = this.state.planningUnitList.filter(ele => ele.id == json[i][9])[0].multiplier;
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = json[i][12];
+                            }
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][32];
+                            this.getNotes();
+                            this.setState({
+                                currentItemConfig: curItem
+                            }, () => {
+                                this.updateNodeInfoInJson(curItem)
+                            })
                         }
-                        if(json[i][35] == 5){
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = json[i][9];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = this.state.planningUnitList.filter(ele => ele.id == json[i][9])[0].multiplier;
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = json[i][12];
-                        }
-                        (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][32];
-                        this.getNotes();
-                        this.setState({
-                            currentItemConfig: curItem
-                        }, () => {
-                            this.updateNodeInfoInJson(curItem)
-                        })
                     }
                 }
-                
-                // var save = false;
-                // if ((this.state.currentNodeTypeId == 3 && this.state.currentItemConfig.context.payload.nodeType.id == 4) || (this.state.currentNodeTypeId == 4 && this.state.currentItemConfig.context.payload.nodeType.id == 3)) {
-                //     var cf = window.confirm(i18n.t("static.tree.nodeTypeChanged"));
-                //     if (cf == true) {
-                //         save = true;
-                //         this.setState({
-                //             deleteChildNodes: true
-                //         })
-                //     } else {
-                //     }
-                // } else {
-                //     save = true;
-                //     this.setState({
-                //         deleteChildNodes: false
-                //     })
-                // }
-                // if (save) {
-                //     this.formSubmitLoader();
-                //     if (this.state.lastRowDeleted == true ? true : this.state.modelingTabChanged ? this.checkValidation() : true) {
-                //         if (!this.state.isSubmitClicked) {
-                //             this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
-                //                 setTimeout(() => {
-                //                     if (this.state.addNodeFlag) {
-                //                         this.onAddButtonClick(this.state.currentItemConfig, false, null)
-                //                     } else {
-                //                         this.updateNodeInfoInJson(this.state.currentItemConfig)
-                //                     }
-                //                     this.setState({
-                //                         cursorItem: 0,
-                //                         highlightItem: 0,
-                //                         activeTab1: new Array(1).fill('1')
-                //                     })
-                //                 }, 0);
-                //             })
-                //             this.setState({ modelingTabChanged: false })
-                //         }
-                //     } else {
-                //         this.setState({ activeTab1: new Array(1).fill('2') })
-                //     }
-                // }
             }, 0)
         })
     }
@@ -5269,17 +5193,6 @@ export default class TreeTable extends Component {
                                                             </Input>
                                                         </InputGroup>
                                                     </FormGroup>
-                                                    <Picker
-                                                        ref={this.pickAMonth3}
-                                                        id="monthPicker"
-                                                        name="monthPicker"
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={this.state.singleValue2}
-                                                        key={JSON.stringify(this.state.singleValue2)}
-                                                        lang={pickerLang.months}
-                                                    >
-                                                        <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
-                                                    </Picker>
                                                 </Row>
                                             </div>
                                         </CardBody>
