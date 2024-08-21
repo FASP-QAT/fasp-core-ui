@@ -2959,7 +2959,7 @@ export default class TreeTable extends Component {
                             items.push({
                                 title: "Go to Tree",
                                 onclick: function () {
-                                    localStorage.setItem("openNodeId", rowData[11]);
+                                    localStorage.setItem("openNodeId", rowData[36]);
                                     window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
                                 }.bind(this)
                             });
