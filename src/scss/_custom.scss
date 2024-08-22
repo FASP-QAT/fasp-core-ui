@@ -14002,3 +14002,7 @@ label.arrow_label:before {
 .compareAndSelectPU {
   background-color: #e5e5e5 !important;
 }
+.compareAndSelectCollapsecol .jss>tbody>tr>td {
+  white-space: pre !important;
+  text-align: center !important;
+}

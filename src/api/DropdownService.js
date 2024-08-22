@@ -59,7 +59,7 @@ class DropdownService {
     );
   }
   getProcurementAgentDropdownList() {
-    return axios.get(`${API_URL}/api/dropdown/procurementAgent`,{});
+    return axios.get(`${API_URL}/api/dropdown/procurementAgent`, {});
   }
   getProgramPlanningUnitDropdownList(json) {
     return axios.post(
@@ -132,12 +132,11 @@ class DropdownService {
   getProgramListBasedOnVersionStatusAndVersionType(versionStatusId, versionTypeId) {
     return axios.get(`${API_URL}/api/dropdown/program/versionStatus/${versionStatusId}/versionType/${versionTypeId}`, {});
   }
-
-  getFundingSourceForProgramsDropdownList(json){
+  getFundingSourceForProgramsDropdownList(json) {
     return axios.post(`${API_URL}/api/dropdown/fundingSource/programs`, json, {}
     );
   }
-  getFundingSourceTypeForProgramsDropdownList(json){
+  getFundingSourceTypeForProgramsDropdownList(json) {
     return axios.post(`${API_URL}/api/dropdown/fundingSourceType/programs`, json, {}
     );
   }
