@@ -1974,7 +1974,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
-                        {this.state.importTableRows != 0 && this.state.forecastProgramId != 0 && this.state.forecastProgramId != "" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "28px" }}>
+                        {this.state.importTableRows != 0 && this.state.forecastProgramId != 0 && this.state.forecastProgramId != "" && <FormGroup className="col-md-3" style={{ "marginLeft": "20px", "marginTop": "28px" }}>
                             <Input
                                 className="form-check-input"
                                 type="checkbox"
