@@ -1993,15 +1993,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 </div>
 
                 <div className="consumptionDataEntryTable">
-                    <div className="" id="spProgramVersionTable" style={{ display: this.state.loading ? "none" : "block", width: '60%' }}>
+                    <div className="" id="spProgramVersionTable" style={{ display: this.state.loading ? "none" : "block", width: '100%' }}>
                     </div>
                     <FormGroup>
                         <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                     </FormGroup>
                 </div>
 
-                <div className="consumptionDataEntryTable datdEntryRow">
-                    <div id="mapPlanningUnit" className='TableWidth100' style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
+                <div className="consumptionDataEntryTable datdEntryRow mt-5 momJexcelPagination">
+                    <div id="mapPlanningUnit" className='TableWidth100 mapPlanningUnitpaginationD' style={{ display: this.props.items.loading ? "none" : "block", width: '100%' }} >
                     </div>
                     <FormGroup>
                         <Button color="info" size="md" className="float-right mr-1" id="stepOneBtn" type="submit" onClick={() => this.formSubmit()} >{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button>

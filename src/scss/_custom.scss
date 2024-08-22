@@ -10935,3 +10935,12 @@ legend.scheduler-border {
   display: table;
   padding: 0px 0px 0px 3px;
 }
+
+.mapPlanningUnitpaginationD .jss_pagination_dropdown{
+  position: absolute;
+    bottom: 5px;
+    left: 0;
+}
+.mapPlanningUnitpaginationD .jss_pagination>div{
+  margin-left: 51px!important;
+}
