@@ -130,17 +130,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         csvRow.push('')
         csvRow.push('')
         const headers = [];
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanProgrmRegion').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastProgramRegion').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.program.region').replaceAll(' ', '%20'));
+        // headers.push(i18n.t('static.program.region').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.actualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.import.percentOfSupplyPlan').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.currentActualConsumption(ForecastModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.quantimed.importData').replaceAll(' ', '%20'));
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.buildCSVTable.map(ele => A.push(addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption != null ? ele.supplyPlanConsumption : "", ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption != null ? ele.currentQATConsumption : "", ele.import == true ? 'Yes' : 'No'])));
+        this.state.buildCSVTable.map(ele => A.push(addDoubleQuoteToRowContent([((ele.supplyPlanProgramWithRegion).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastProgramWithRegion).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption != null ? ele.supplyPlanConsumption : "",ele.percentOfSupplyPlan, ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption != null ? ele.currentQATConsumption : "", ele.import == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -351,7 +354,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 var datasetTransaction = transaction.objectStore('datasetData');
                 let forecastProgramVersionId = this.props.items.forecastProgramVersionId;
                 let forecastProgramId = this.props.items.forecastProgramId;
-                var datasetId=this.props.items.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0].id;
+                var datasetId = this.props.items.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0].id;
                 var datasetRequest = datasetTransaction.get(datasetId);
                 datasetRequest.onerror = function (event) {
                 }.bind(this);
@@ -566,8 +569,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
                         var tableJson = this.el.getJson(null, false);
-                        var listOfForecastPlanningUnits = [...new Set(tableJson.filter(c => c[8].toString() == "true").map(ele => (ele[1])))];
-                        var regionListForExtrapolate = [...new Set(tableJson.filter(c => c[8].toString() == "true").map(ele => (ele[10])))];
+                        var listOfForecastPlanningUnits = [...new Set(tableJson.filter(c => c[10].toString() == "true").map(ele => (ele[3])))];//changed
+                        var regionListForExtrapolate = [...new Set(tableJson.filter(c => c[10].toString() == "true").map(ele => (ele[13])))];//changed. set forecast regions
                         var programs = [];
                         var ImportListNotPink = [];
                         var ImportListPink = [];
@@ -580,13 +583,86 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                         let username = decryptedUser.username;
-                        for (var i = 0; i < tableJson.length; i++) {
+
+                        //sum/aggerate entries if matching fc pu / fc region/ month found
+                        let generatedDataNotPink = [];
+                        let generatedDataPink = [];
+                        for (var i = 0; i < tableJson.length; i++) {                           
+
                             var map1 = new Map(Object.entries(tableJson[i]));
-                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.id == map1.get("1"))[0];
+                            let month = map1.get("4");
+                            if (map1.get("11") == 0 && map1.get("10") == true) {
+                                //separate rows for generatedDataNotPink i.e ImportListNotPink
+                                
+                                if(generatedDataNotPink.length == 0) {
+                                    //push row in generatedData[] 
+                                    generatedDataNotPink.push(tableJson[i]);
+                                } else {
+                                    //check for matching fc pu / fc region/ month
+                                    let fcPlanningUnitId = map1.get("3");
+                                    let fcRegionId = map1.get("13");
+                                    let month = map1.get("4");
+
+                                    let matched = generatedDataNotPink.filter(c => c[3] == fcPlanningUnitId && c[13] == fcRegionId && new Date(c[4]).getTime() == new Date(month).getTime());
+
+                                    if(matched.length > 0) {
+                                        // perform sum of AmountOfActualConsumption, Converted Actual Cons. (SP Module) and update existng entry in generatedDataPink []
+                                        let matchedEntry = matched[0];
+                                        // console.log('existing AmountOfActualConsumption 14: ',matchedEntry[14]);
+                                        // console.log('new AmountOfActualConsumption 14: ',map1.get("14"));
+                                        matchedEntry[14] = Number(matchedEntry[14]) + Number(map1.get("14"));//sum of existing value + current value & updated existing entry
+
+                                        // console.log('existing Converted Actual Cons. 8: ',matchedEntry[8]);
+                                        // console.log('new Converted Actual Cons. 8: ',map1.get("8"));
+                                        matchedEntry[8] = Number(matchedEntry[8]) + Number(map1.get("8"));
+
+                                        // console.log('matched: ',matched[0]);
+                                    } else {
+                                        // push row in generatedDataNotPink []
+                                        generatedDataNotPink.push(tableJson[i]);
+                                    }
+                                    
+                                }
+                            
+                            } else if (map1.get("11") == 1 && map1.get("10") == true) {
+                                // separate rows for generatedDataPink i.e ImportListPink
+                                if(generatedDataPink.length == 0) {
+                                    //push row in generatedData[] 
+                                    generatedDataPink.push(tableJson[i]);
+                                } else {
+                                    //check for matching fc pu / fc region/ month
+                                    let fcPlanningUnitId = map1.get("3");
+                                    let fcRegionId = map1.get("13");
+                                    let month = map1.get("4");
+
+                                    let matched = generatedDataPink.filter(c => c[3] == fcPlanningUnitId && c[13] == fcRegionId && new Date(c[4]).getTime() == new Date(month).getTime());
+                                    if(matched.length > 0) {
+                                        // perform sum of AmountOfActualConsumption, Converted Actual Cons. (SP Module) and update existng entry in generatedDataPink []
+                                        let matchedEntry = matched[0];
+                                        matchedEntry[14] = Number(matchedEntry[14]) + Number(map1.get("14"));//sum of existing value + current value & updated existing entry
+
+                                        matchedEntry[8] = Number(matchedEntry[8]) + Number(map1.get("8"));
+
+                                    } else {
+                                        // push row in generatedDataPink []
+                                        generatedDataPink.push(tableJson[i]);
+                                    }
+                                }
+                            }                        
+                        }
+
+                        let finalDataList = [];
+                        finalDataList = generatedDataNotPink.concat(generatedDataPink);
+
+                        // console.log('finalDataList length: ',finalDataList.length);
+                        
+                        for (var i = 0; i < finalDataList.length; i++) {
+                            var map1 = new Map(Object.entries(finalDataList[i]));
+                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.id == map1.get("3"))[0];//changed
                             var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
-                            forecastingUnitObj.multiplier = map1.get("5");
-                            if (map1.get("9") == 0 && map1.get("8") == true) {
-                                let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("10")))[0];
+                            forecastingUnitObj.multiplier = map1.get("7");//changed
+                            if (map1.get("11") == 0 && map1.get("10") == true) {//changed
+                                let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("13")))[0];//do we need to add here selected fc regionid. changed
                                 let tempJson = {
                                     "actualConsumptionId": null,
                                     "planningUnit": {
@@ -604,16 +680,22 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         },
                                         "idString": '' + selectedPlanningUnitObj.id,
                                     },
-                                    "puMultiplier": selectedPlanningUnitObj.multiplier,
+                                    // "puMultiplier": selectedPlanningUnitObj.multiplier,//use multiplier entered by user for fc pu
+                                    "puMultiplier": map1.get("7"),
                                     "region": {
-                                        "id": map1.get("10"),
+                                        "id": map1.get("13"),//fc regionId. check. changed
                                         "label": regionObj.label,
-                                        "idString": '' + map1.get("10")
-                                    },
-                                    "month": map1.get("3"),
-                                    "amount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
-                                    "adjustedAmount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
-                                    "puAmount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                                        "idString": '' + map1.get("13")//check. changed
+                                    },                                    
+                                    "month": map1.get("4"),//changed
+
+                                    // "amount": parseInt(this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),//changed
+                                    // "adjustedAmount": parseInt(this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),//changed
+                                    // "puAmount": parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),//changed
+                                    
+                                    "amount": Number(map1.get("14")),//changed
+                                    "adjustedAmount": Number(map1.get("14")),//changed
+                                    "puAmount": Number(map1.get("8")),//changed                                    
                                     "reportingRate": null,
                                     "daysOfStockOut": null,
                                     "exclude": false,
@@ -625,12 +707,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 }
                                 ImportListNotPink.push(tempJson);
                             }
-                            if (map1.get("9") == 1 && map1.get("8") == true) {
+                            if (map1.get("11") == 1 && map1.get("10") == true) {//changed
                                 let tempJsonPink = {
-                                    regionId: map1.get("10"),
-                                    planningUnitId: map1.get("1"),
-                                    month: map1.get("3"),
-                                    amount: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    regionId: map1.get("13"),//changed
+                                    planningUnitId: map1.get("3"), //changed
+                                    month: map1.get("4"),//changed
+                                    // amount: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),//changed
+                                    amount: Number(map1.get("14")),//changed
                                 }
                                 ImportListPink.push(tempJsonPink);
                             }
@@ -714,21 +797,66 @@ export default class StepThreeImportMapPlanningUnits extends Component {
      * Reterives actual consumption data from server
      */
     filterData() {
+        this.props.updateStepOneData("spProgramVersionChanged", false);
+        
         let forecastPlanningUnitList = this.props.items.stepOneData.filter(c => c.forecastPlanningUnitId != -1);
+        //generate data for ActualConsumptionDataInput
+        let programDataList = [];
+        let ActualConsumptionData = '';
+        let oldProgramId = 0;
+        // let planningUnitIds = [];
+        for (var i = 0; i < forecastPlanningUnitList.length; i++) {
+            let newProgramId = forecastPlanningUnitList[i].supplyPlanProgramId;
+            if (newProgramId != oldProgramId) {
+                //new sp program data
+                let ActualConsumptionData = {
+                    programId: forecastPlanningUnitList[i].supplyPlanProgramId,
+                    versionId: forecastPlanningUnitList[i].supplyPlanVersionId,
+                    planningUnitIds: [forecastPlanningUnitList[i].supplyPlanPlanningUnitId.toString()]
+                };
+
+                programDataList.push(ActualConsumptionData);
+                // planningUnitIds.push(forecastPlanningUnitList[i].supplyPlanPlanningUnitId.toString());
+            } else {
+                let obj = programDataList.filter(c => c.programId == newProgramId)[0];
+                obj.planningUnitIds.push(forecastPlanningUnitList[i].supplyPlanPlanningUnitId.toString());
+            }
+
+            oldProgramId = newProgramId;
+        }
+
+        for (var j = 0; j < programDataList.length; j++) {
+            let spProgramId = programDataList[j].programId;
+            let regionList = this.props.items.stepTwoData.filter(c => c.supplyPlanProgramId == spProgramId);
+            let regionIds = regionList.map(ele => ele.supplyPlanRegionId.toString());
+            programDataList[j].regionIds = regionIds;
+        }
+
         let supplyPlanPlanningUnitId = forecastPlanningUnitList.map(ele => ele.supplyPlanPlanningUnitId);
         let regionList = this.props.items.stepTwoData.filter(c => c.isRegionInForecastProgram == 1 && c.importRegion == 1);
         let regionIds = regionList.map(ele => ele.supplyPlanRegionId);
+
         let ActualConsumptionDataInput = {
-            programId: this.props.items.programId,
-            versionId: this.props.items.versionId,
+            programDataList: programDataList, //this will be multiple sp programId's
+            startDate: this.props.items.startDate,
+            stopDate: this.props.items.stopDate,
+        }
+
+        // console.log('ActualConsumptionDataInput: ' + JSON.stringify(ActualConsumptionDataInput));
+
+        /*let ActualConsumptionDataInput = {
+            programId: this.props.items.programId, //this will be multiple sp programId's
+            versionId: this.props.items.versionId, //this will be multiple sp versionId's
             planningUnitIds: supplyPlanPlanningUnitId,
             startDate: this.props.items.startDate,
             stopDate: this.props.items.stopDate,
-            regionIds: regionIds
-        }
+            regionIds: regionIds // now there will be separate region list for each sp program
+        }*/
         ProgramService.getActualConsumptionData(ActualConsumptionDataInput)
             .then(response => {
                 if (response.status == 200) {
+                    // console.log('ActualConsumptionDataOutput: ', response.data);
+                    // const data = response.data;//getting data in the form of key-value pair
                     this.setState({
                         actualConsumptionData: response.data,
                         selSource: response.data
@@ -785,43 +913,64 @@ export default class StepThreeImportMapPlanningUnits extends Component {
      * Constructs and initializes a jexcel table using the provided data and options.
      */
     buildJexcel() {
-        var papuList = this.state.selSource;
+        var dataMap = this.state.selSource;//getting data in the form of key-value pair
         var data = [];
         var papuDataArr = [];
         var buildCSVTable = [];
         var count = 0;
-        if (papuList.length != 0) {
-            for (var j = 0; j < papuList.length; j++) {
-                let stepOneSelectedObject = this.props.items.stepOneData.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
+
+        Object.keys(dataMap).forEach(key => {
+            // console.log(`Key: ${key}`);
+            let pgmVerKeyArr = key.split('~');
+            let programId = pgmVerKeyArr[0];
+            let version = pgmVerKeyArr[1];
+
+            let stepOneSelectedObjectList = this.props.items.stepOneData.filter(c => c.supplyPlanProgramId == programId && c.supplyPlanVersionId == version);
+            var papuList = dataMap[key];
+            for(var j=0; j < papuList.length; j++) {
+                let stepOneSelectedObject = stepOneSelectedObjectList.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
+                let stepTwoSelectedRegionObject = this.props.items.stepTwoData.filter(c => c.supplyPlanProgramId == programId && c.supplyPlanRegionId == papuList[j].region.id)[0];
                 let selectedForecastProgram = this.props.items.datasetList.filter(c => c.programId == this.props.items.forecastProgramId && c.versionId == this.props.items.forecastProgramVersionId)[0];
-                let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.supplyPlanPlanningUnitId)
+                let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.planningUnit.id == stepOneSelectedObject.supplyPlanPlanningUnitId && c.region.id == stepTwoSelectedRegionObject.forecastRegionId);//check with dolly
+                let supplyPlanProgramCode = stepOneSelectedObject.supplyPlanProgramCode;
                 data = [];
-                data[0] = papuList[j].planningUnit.id
-                data[1] = stepOneSelectedObject.forecastPlanningUnitId
-                data[2] = getLabelText(papuList[j].region.label, this.state.lang)
-                data[3] = papuList[j].month
-                data[4] = papuList[j].actualConsumption
-                data[5] = stepOneSelectedObject.multiplier
-                data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2)
-                data[7] = (match.length > 0 ? match[0].amount : '')
-                data[8] = true
-                data[9] = (match.length > 0 ? 1 : 0)
-                data[10] = papuList[j].region.id
+                data[0] = supplyPlanProgramCode + ' ('+stepTwoSelectedRegionObject.supplyPlanRegionLabelTxt+')';//SP Program (Region)
+                data[1] = selectedForecastProgram.programCode + ' ('+stepTwoSelectedRegionObject.forecastRegionLabelTxt+')';//FC Program (Region)
+                data[2] = papuList[j].planningUnit.id; //SP PU
+                data[3] = stepOneSelectedObject.forecastPlanningUnitId; //FC PU
+                data[4] = papuList[j].month;
+                data[5] = papuList[j].actualConsumption; //Actual Consumption. (SP Module)
+                data[6] = stepTwoSelectedRegionObject.percentOfSupplyPlan;
+                data[7] = stepOneSelectedObject.multiplier; //conversion factor
+                let amtOfActualConsumption = (papuList[j].actualConsumption * (stepTwoSelectedRegionObject.percentOfSupplyPlan/100));
+                data[8] = (amtOfActualConsumption * stepOneSelectedObject.multiplier).toFixed(2);//Converted Actual Cons. (SP Module)
+                data[9] = (match.length > 0 ? match[0].amount : '') //Current Actual Cons. (FC Module)
+                data[10] = true; //import
+                data[11] = (match.length > 0 ? 1 : 0); //duplicate
+                data[12] = papuList[j].region.id;//sp regionId
+                data[13] = stepTwoSelectedRegionObject.forecastRegionId;//Forecast RegionId
+                data[14] = amtOfActualConsumption.toFixed(2); //AmountOfActualConsumption
+                // data[2] = getLabelText(papuList[j].region.label, this.state.lang) //region
                 papuDataArr[count] = data;
                 count++;
                 buildCSVTable.push({
-                    supplyPlanPlanningUnit: getLabelText(papuList[j].planningUnit.label, this.state.lang),
+                    supplyPlanProgramWithRegion: data[0],
+                    forecastProgramWithRegion: data[1],
+                    supplyPlanPlanningUnit: getLabelText(papuList[j].planningUnit.label, this.state.lang) +" | "+ papuList[j].planningUnit.id,
                     forecastPlanningUnit: this.props.items.planningUnitListJexcel.filter(c => c.id == stepOneSelectedObject.forecastPlanningUnitId)[0].name,
-                    region: getLabelText(papuList[j].region.label, this.state.lang),
                     month: papuList[j].month,
                     supplyPlanConsumption: papuList[j].actualConsumption,
+                    percentOfSupplyPlan: stepTwoSelectedRegionObject.percentOfSupplyPlan,
                     multiplier: stepOneSelectedObject.multiplier,
-                    convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2),
+                    convertedConsumption: data[8],
+                    // region: getLabelText(papuList[j].region.label, this.state.lang),
                     currentQATConsumption: (match.length > 0 ? match[0].amount : ''),
                     import: true
-                })
-            }
-        }
+                })                
+            }        
+            
+        });
+        
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
         this.el = jexcel(document.getElementById("mapRegion"), '');
@@ -836,7 +985,20 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             data: data,
             columnDrag: false,
             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+            //total 15 column i.e 0 to 14
             columns: [
+                {
+                    title: i18n.t('static.importFromQATSupplyPlan.supplyPlanProgrmRegion'),
+                    type: 'text',
+                    textEditor: true,
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.importFromQATSupplyPlan.forecastProgramRegion'),
+                    type: 'text',
+                    textEditor: true,
+                    readOnly: true
+                },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'dropdown',
@@ -849,12 +1011,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     source: planningUnitListJexcel,
                     readOnly: true
                 },
-                {
-                    title: i18n.t('static.program.region'),
-                    type: 'text',
-                    textEditor: true,
-                    readOnly: true
-                },
+                // {
+                //     title: i18n.t('static.program.region'),
+                //     type: 'text',
+                //     textEditor: true,
+                //     readOnly: true
+                // },
                 {
                     title: i18n.t('static.inventoryDate.inventoryReport'),
                     type: 'calendar',
@@ -868,6 +1030,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     title: i18n.t('static.importFromQATSupplyPlan.actualConsumption(SupplyPlanModule)'),
                     type: 'numeric',
                     mask: '#,##',
+                    textEditor: true,
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.import.percentOfSupplyPlan'),
+                    type: 'text',
                     textEditor: true,
                     readOnly: true
                 },
@@ -901,9 +1069,17 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'hidden'
                 },
                 {
-                    title: 'regionId',
+                    title: 'spRegionId',
                     type: 'hidden'
                 },
+                {
+                    title: 'ForecastRegionId',
+                    type: 'hidden'
+                },
+                {
+                    title: 'AmountOfActualConsumption',
+                    type: 'hidden'
+                }
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {

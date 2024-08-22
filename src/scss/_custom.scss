@@ -13989,6 +13989,15 @@ label.arrow_label:before {
 .compareAndSelectPU {
   background-color: #e5e5e5 !important;
 }
+
+.mapPlanningUnitpaginationD .jss_pagination_dropdown{
+  position: absolute;
+    bottom: 5px;
+    left: 0;
+}
+.mapPlanningUnitpaginationD .jss_pagination>div{
+  margin-left: 51px!important;
+}
 .momJexcelPagination.jss_pagination_dropdown {
   margin-left: 4px;
   margin-right: 4px;
