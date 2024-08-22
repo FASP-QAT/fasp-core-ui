@@ -828,7 +828,8 @@ export default class MapPlanningUnits extends Component {
                                 title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                 type: 'numeric',
                                 textEditor: true,
-                                mask: '#,##',
+                                decimal: '.',
+                                mask: '#,##.00',
                                 disabledMaskOnEdition: true,
                                 tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
                                 width: 130

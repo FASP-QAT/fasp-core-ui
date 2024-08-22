@@ -426,6 +426,7 @@ class AnnualShipmentCost extends Component {
                         }),
                         programId: localStorage.getItem("sesProgramIdReport")
                     }, () => {
+                        this.getFundingSourceList()
                         this.getProcurementAgentList()
                         this.filterVersion();
                     })
@@ -512,7 +513,7 @@ class AnnualShipmentCost extends Component {
                     // doc.text(doc.internal.pageSize.width / 8, 130, fundingSourceTypeText)
 
                     var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 130 , fundingSourceText)
+                    doc.text(doc.internal.pageSize.width / 8, 130, fundingSourceText)
 
                     var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                     doc.text(doc.internal.pageSize.width / 8, 140 + (fundingSourceText.length * 10), procurementAgentText)
@@ -734,9 +735,9 @@ class AnnualShipmentCost extends Component {
         csvRow.push(
             '"' +
             (
-              i18n.t("static.program.program") +
-              " : " +
-              document.getElementById("programId").selectedOptions[0].text
+                i18n.t("static.program.program") +
+                " : " +
+                document.getElementById("programId").selectedOptions[0].text
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -745,8 +746,8 @@ class AnnualShipmentCost extends Component {
             '"' +
             (
                 i18n.t("static.report.versionFinal*") +
-              " : " +
-              document.getElementById("versionId").selectedOptions[0].text
+                " : " +
+                document.getElementById("versionId").selectedOptions[0].text
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -755,8 +756,8 @@ class AnnualShipmentCost extends Component {
             '"' +
             (
                 i18n.t("static.common.reportbase") +
-              " : " +
-              document.getElementById("view").selectedOptions[0].text
+                " : " +
+                document.getElementById("view").selectedOptions[0].text
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -784,9 +785,9 @@ class AnnualShipmentCost extends Component {
         csvRow.push(
             '"' +
             (
-            i18n.t("static.budget.fundingsource") +
-            " : " +
-            this.state.fundingSourceLabels.join('; ').toString()
+                i18n.t("static.budget.fundingsource") +
+                " : " +
+                this.state.fundingSourceLabels.join('; ').toString()
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -794,9 +795,9 @@ class AnnualShipmentCost extends Component {
         csvRow.push(
             '"' +
             (
-            i18n.t("static.procurementagent.procurementagent") +
-            " : " +
-            this.state.procurementAgentLabels.join('; ').toString()
+                i18n.t("static.procurementagent.procurementagent") +
+                " : " +
+                this.state.procurementAgentLabels.join('; ').toString()
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -804,9 +805,9 @@ class AnnualShipmentCost extends Component {
         csvRow.push(
             '"' +
             (
-            i18n.t("static.planningunit.planningunit") +
-            " : " +
-            this.state.planningUnitLabels.join('; ').toString()
+                i18n.t("static.planningunit.planningunit") +
+                " : " +
+                this.state.planningUnitLabels.join('; ').toString()
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -814,9 +815,9 @@ class AnnualShipmentCost extends Component {
         csvRow.push(
             '"' +
             (
-            i18n.t("static.common.status") +
-            " : " +
-            this.state.statusLabels.join('; ').toString()
+                i18n.t("static.common.status") +
+                " : " +
+                this.state.statusLabels.join('; ').toString()
             ).replaceAll(" ", "%20") +
             '"'
         );
@@ -829,9 +830,9 @@ class AnnualShipmentCost extends Component {
         var tempData = this.state.outPutList;
         var data = tempData.sort((a, b) => {
             if (a.PROCUREMENT_AGENT_ID === b.PROCUREMENT_AGENT_ID) {
-              return a.FUNDING_SOURCE_ID - b.FUNDING_SOURCE_ID;
+                return a.FUNDING_SOURCE_ID - b.FUNDING_SOURCE_ID;
             } else {
-              return a.PROCUREMENT_AGENT_ID - b.PROCUREMENT_AGENT_ID;
+                return a.PROCUREMENT_AGENT_ID - b.PROCUREMENT_AGENT_ID;
             }
         });
         var tempB = [];
@@ -856,7 +857,7 @@ class AnnualShipmentCost extends Component {
             tempB.push(record.procurementAgent.replaceAll(",", " ").replaceAll(" ", "%20"));
             tempB.push(record.fundingsource.replaceAll(",", " ").replaceAll(" ", "%20"));
             tempB.push(record.planningUnit.replaceAll(",", " ").replaceAll(" ", "%20"));
-            
+
             var total = 0
             for (var x = 0; x < year.length; x++) {
                 for (var n = 0; n < keys.length; n++) {
@@ -864,13 +865,13 @@ class AnnualShipmentCost extends Component {
                         total = Number(total) + Number(values[n])
                         totalAmount[x] = totalAmount[x] == null ? Number(values[n]) : Number(totalAmount[x]) + Number(values[n])
                         GrandTotalAmount[x] = GrandTotalAmount[x] == null ? Number(values[n]) : Number(GrandTotalAmount[x]) + Number(values[n])
-                        tempB.push(formatter(values[n],0).toString().replaceAll(",", "").replaceAll(" ", "%20"));                        
+                        tempB.push(formatter(values[n], 0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
                     }
                 }
             }
-            tempB.push(formatter(roundN2(total),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+            tempB.push(formatter(roundN2(total), 0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
             B.push(tempB)
-            
+
             tempB = [];
             totalAmount[year.length] = totalAmount[x] == null ? total : totalAmount[year.length] + total
             GrandTotalAmount[year.length] = GrandTotalAmount[year.length] == null ? total : GrandTotalAmount[year.length] + total
@@ -882,7 +883,7 @@ class AnnualShipmentCost extends Component {
                     var Gtotal = 0
                     for (var l = 0; l < totalAmount.length; l++) {
                         Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                        tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+                        tempB.push(formatter(roundN2(totalAmount[l]), 0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
                         totalAmount[l] = 0;
                     }
                     B.push(tempB);
@@ -895,7 +896,7 @@ class AnnualShipmentCost extends Component {
                 var Gtotal = 0
                 for (var l = 0; l < totalAmount.length; l++) {
                     Gtotal = Number(Gtotal) + Number(totalAmount[l])
-                    tempB.push(formatter(roundN2(totalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+                    tempB.push(formatter(roundN2(totalAmount[l]), 0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
                 }
                 B.push(tempB);
             }
@@ -907,13 +908,13 @@ class AnnualShipmentCost extends Component {
         var Gtotal = 0
         for (var l = 0; l < GrandTotalAmount.length; l++) {
             Gtotal = Gtotal + GrandTotalAmount[l]
-            tempB.push(formatter(roundN2(GrandTotalAmount[l]),0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
+            tempB.push(formatter(roundN2(GrandTotalAmount[l]), 0).toString().replaceAll(",", "").replaceAll(" ", "%20"));
         }
         B.push(tempB);
 
         for (var i = 0; i < B.length; i++) {
             csvRow.push(B[i].join(","));
-            if(B[i][0] == "Total" || B[i][0] == i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20")) {
+            if (B[i][0] == "Total" || B[i][0] == i18n.t('static.planningunit.planningunit').replaceAll(" ", "%20")) {
                 csvRow.push("");
             }
         }
@@ -922,11 +923,11 @@ class AnnualShipmentCost extends Component {
         a.href = "data:attachment/csv," + csvString;
         a.target = "_Blank";
         a.download =
-        i18n.t("static.report.annualshipmentcost") +
-        makeText(this.state.rangeValue.from) +
-        " ~ " +
-        makeText(this.state.rangeValue.to) +
-        ".csv";
+            i18n.t("static.report.annualshipmentcost") +
+            makeText(this.state.rangeValue.from) +
+            " ~ " +
+            makeText(this.state.rangeValue.to) +
+            ".csv";
         document.body.appendChild(a);
         a.click();
     }
@@ -1357,7 +1358,8 @@ class AnnualShipmentCost extends Component {
     getFundingSourceList() {
         const { fundingSources } = this.state
         if (localStorage.getItem("sessionType") === 'Online') {
-            DropdownService.getFundingSourceDropdownList()
+            var programIds = [Number(document.getElementById("programId").value)];
+            DropdownService.getFundingSourceForProgramsDropdownList(programIds)
                 .then(response => {
                     var listArray = response.data;
                     // console.log('fs obj : ', listArray[0]);
@@ -1367,7 +1369,9 @@ class AnnualShipmentCost extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
-                        fundingSources: response.data
+                        fundingSources: response.data,
+                        fundingSourceValues: [],
+                        fundingSourceLabels: []
                     })
                 }).catch(
                     error => {
@@ -1407,12 +1411,14 @@ class AnnualShipmentCost extends Component {
                 fSourceRequest.onerror = function (event) {
                 }.bind(this);
                 fSourceRequest.onsuccess = function (event) {
-                    for (var i = 0; i < fSourceRequest.result.length; i++) {
+                    let programId = document.getElementById("programId").value;
+                    var fundingSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(programId)));
+                    for (var i = 0; i < fundingSourceResult.length; i++) {
                         var arr = {
-                            id: fSourceRequest.result[i].fundingSourceId,
-                            label: fSourceRequest.result[i].label,
-                            code: fSourceRequest.result[i].fundingSourceCode,
-                            fundingSourceType: fSourceRequest.result[i].fundingSourceType
+                            id: fundingSourceResult[i].fundingSourceId,
+                            label: fundingSourceResult[i].label,
+                            code: fundingSourceResult[i].fundingSourceCode,
+                            fundingSourceType: fundingSourceResult[i].fundingSourceType
                         }
                         fSourceResult[i] = arr
                     }
@@ -1421,7 +1427,9 @@ class AnnualShipmentCost extends Component {
                             a = a.code.toLowerCase();
                             b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
-                        })
+                        }),
+                        fundingSourceValues: [],
+                        fundingSourceLabels: []
                     });
                 }.bind(this)
             }.bind(this)
@@ -1630,7 +1638,7 @@ class AnnualShipmentCost extends Component {
     componentDidMount() {
         this.getPrograms();
         // this.getFundingSourceType();
-        this.getFundingSourceList()
+        // this.getFundingSourceList()
         this.getShipmentStatusList()
     }
     /**
@@ -1643,6 +1651,7 @@ class AnnualShipmentCost extends Component {
             versionId: ''
         }, () => {
             localStorage.setItem("sesVersionIdReport", '');
+            this.getFundingSourceList()
             this.getProcurementAgentList()
             this.filterVersion();
         })

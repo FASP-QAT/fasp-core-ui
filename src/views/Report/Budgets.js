@@ -157,27 +157,30 @@ class Budgets extends Component {
      */
     getFundingSourceType = () => {
         //Fetch realmId
-        let realmId = AuthenticationService.getRealmId();
-        //Fetch all funding source type list
-        FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+        let programIds = this.state.programValues.map((ele) =>
+            Number(ele.value)
+        );
+                DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
             .then(response => {
                 if (response.status == 200) {
                     var fundingSourceTypeValues = [];
                     var fundingSourceTypes = response.data;
                     fundingSourceTypes.sort(function (a, b) {
-                        a = a.fundingSourceTypeCode.toLowerCase();
-                        b = b.fundingSourceTypeCode.toLowerCase();
+                        a = a.code.toLowerCase();
+                        b = b.code.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
                     })
 
                     fundingSourceTypes.map(ele => {
-                        fundingSourceTypeValues.push({ label: ele.fundingSourceTypeCode, value: ele.fundingSourceTypeId })
+                        fundingSourceTypeValues.push({ label: ele.code, value: ele.id })
                     })
 
                     this.setState({
                         fundingSourceTypes: fundingSourceTypes, loading: false,
                         fundingSourceTypeValues: fundingSourceTypeValues,
                         fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
+                    },()=>{
+                        this.filterData();
                     })
                 } else {
                     this.setState({
@@ -274,7 +277,10 @@ class Budgets extends Component {
      */
     getFundingSource = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
-            DropdownService.getFundingSourceDropdownList()
+            let programIds = this.state.programValues.map((ele) =>
+            Number(ele.value)
+        );
+                DropdownService.getFundingSourceForProgramsDropdownList(programIds)
                 .then(response => {
                     var fundingSourceValues = [];
                     var fundingSources = response.data;
@@ -292,6 +298,7 @@ class Budgets extends Component {
                         fundingSourceValues: fundingSourceValues,//by default all fs will be selected
                         fundingSourceLabels: fundingSourceValues.map(ele => ele.label)
                     }, () => {
+                        this.filterData();
                     })
                 }).catch(
                     error => {
@@ -613,8 +620,6 @@ class Budgets extends Component {
      */
     componentDidMount() {
         this.getPrograms();
-        this.getFundingSourceType();
-        this.getFundingSource();
     }
     /**
      * Formats a numerical value into a string with thousands separators.
@@ -638,7 +643,8 @@ class Budgets extends Component {
             programValues: programIds.map(ele => ele),
             programLabels: programIds.map(ele => ele.label)
         }, () => {
-            this.filterData()
+            this.getFundingSourceType();
+            this.getFundingSource();
         })
     }
     /**
@@ -863,7 +869,7 @@ class Budgets extends Component {
                                             options={fundingSourceTypes.length > 0
                                                 && fundingSourceTypes.map((item, i) => {
                                                     return (
-                                                        { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                                        { label: item.code, value: item.id }
                                                     )
                                                 }, this)}
                                             disabled={this.state.loading}
