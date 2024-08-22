@@ -3389,5 +3389,9 @@
     "static.tree.invalidNodeError": "Your node <nodeName> has node type <nodeType> and the new parent has node type <parentNodeType> which is not allowed. Please edit node type",
     "static.compareAndSelect.selectMultipleTree":"Select Multiple Tree",
     "static.compareAndSelect.orMore":"or more",
-    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts"
+    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts",
+    "static.import.percentOfSupplyPlan":"% of Supply Plan",
+    "static.import.forecastRegionFor":"Forecast Region for",
+    "static.importFromQATSupplyPlan.supplyPlanProgrmRegion":"Supply Plan Program (Region)",
+    "static.importFromQATSupplyPlan.forecastProgramRegion":"Forecast Program (Region)"
 }
