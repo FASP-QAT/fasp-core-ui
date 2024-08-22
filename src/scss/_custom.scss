@@ -232,7 +232,8 @@ body {
   border-top: 1px solid #4d515a!important;
   border-left: 1px solid #4d515a!important;
   border-right: 1px solid #4d515a!important;
-  border-bottom: 1px solid transparent;
+  // border-bottom: 1px solid transparent;
+  border-bottom: 1px solid #4d515a!important;
   box-sizing: border-box;
   padding: 4px;
   line-height: 1em;
@@ -603,7 +604,7 @@ body{
 .jss > tbody > tr > td.productValidationSubTotalClass {
   background-color: #ccc !important;
   font-weight: bold !important;
-  color: #000;
+  color: #000!important;
 }
 .darkModePicker .month-picker label{
   color:#000 !important;
@@ -1092,6 +1093,10 @@ a {
 .WhiteText{
   color: #e4e5e6;
 }
+.compareAndSelectPU {
+  background-color: #e5e5e5 !important;
+  color: #000;
+}
 .close {
   float: right;
   font-size: 1.3125rem;
@@ -1107,6 +1112,10 @@ a {
 .form-control:focus {
   color: #e4e5e6;
 }
+.placeholder.TreeTemplateHeight svg path {
+  stroke: #e4e5e6 !important;
+}
+
 // .month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
 //   background-color: #d3d3d3;
 //   color: #000;
@@ -4460,7 +4469,12 @@ h6 {
 .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(1) {
   width: 10px !important;
 }
-
+.ReportSearchMarginTopSPVR{
+  margin-top: -42px;
+}
+.shipmentconsumptionSearchMarginTop {
+  margin-top: -51px;
+}
 .FortablewidthMannualtaggingtable1 .react-bootstrap-table .table thead tr th:nth-child(2) {
   width: 50px !important;
 }
@@ -4503,6 +4517,17 @@ h6 {
   top: 50%;
   transform: translate(0, -50%);
   content: '-';
+}
+.ReportSearchMarginTop {
+  margin-top: -51px;
+}
+
+.ReportSearchMarginTopSPVR {
+  margin-top: -42px;
+}
+
+.shipmentconsumptionSearchMarginTop {
+  margin-top: -51px;
 }
 
 .accordion-toggle.collapsed .expand-button:after {
@@ -8309,7 +8334,7 @@ label.arrow_label:before {
   --rmsc-selected: #e2e6ea;
   --rmsc-border: #e4e7ea !important;
   --rmsc-gray: #697069 !important;
-  --rmsc-bg: #323a49;
+  --rmsc-bg: #fff;
   --rmsc-p: 10px;
   --rmsc-radius: 0.2rem !important;
   // color: #e4e7ea !important;
@@ -13929,6 +13954,12 @@ label.arrow_label:before {
   align-items: center;
 }
 
+.legendcommitversionTextStock {
+  text-align: left;
+  display: table;
+  padding: 0px 0px 0px 3px;
+}
+
 .compareAndSelectCollapsecol .jss>tbody>tr>td {
   white-space: pre !important;
   text-align: center !important;
@@ -13962,4 +13993,21 @@ label.arrow_label:before {
 
 .compareAndSelectPU {
   background-color: #e5e5e5 !important;
+}
+.momJexcelPagination.jss_pagination_dropdown {
+  margin-left: 4px;
+  margin-right: 4px;
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+}
+.momJexcelPagination.jss_pagination>div {
+  padding-left: 56px!important;
+}
+.compareAndSelectPU {
+  background-color: #e5e5e5 !important;
+}
+.compareAndSelectCollapsecol .jss>tbody>tr>td {
+  white-space: pre !important;
+  text-align: center !important;
 }
