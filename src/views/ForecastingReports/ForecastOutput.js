@@ -791,7 +791,7 @@ class ForecastOutput extends Component {
                                                 // let treeId = selectedForecastMapObjIn.treeId;
                                                 // let scenarioId = selectedForecastMapObjIn.scenarioId;
                                                 let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
-                                                if (selectedForecastMapObjIn.treeAndScenario.length > 0) {
+                                                if (selectedForecastMapObjIn.treeAndScenario!=undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) {
                                                     var treeAndScenario = selectedForecastMapObjIn.treeAndScenario;
                                                     var selectedScenarioId = "";
                                                     let myTempData = [];
@@ -904,7 +904,7 @@ class ForecastOutput extends Component {
                                                 if (selectedForecastMap[keys[j]] != undefined && selectedForecastMap[keys[j]] != '' && selectedForecastMap[keys[j]] != null) {
                                                     let selectedForecastMapObjIn = (selectedForecastMap[keys[j]]);
                                                     let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
-                                                    if (selectedForecastMapObjIn.treeAndScenario.length > 0) {
+                                                    if (selectedForecastMapObjIn.treeAndScenario!=undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) {
                                                         var treeAndScenario = selectedForecastMapObjIn.treeAndScenario;
                                                         var selectedScenarioId = "";
                                                         let myTempData = [];
