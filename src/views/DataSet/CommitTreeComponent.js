@@ -1529,7 +1529,7 @@ export default class CommitTreeComponent extends React.Component {
                                     var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
                                     var selectedScenarioId="";
                                     var ce = regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId) : [];
-                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.treeAndScenario.length>0) {
+                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.treeAndScenario!=undefined && regionalSelectedForecastData.treeAndScenario.length>0) {
                                         var treeAndScenario=regionalSelectedForecastData.treeAndScenario;
                                         for(var tas=0;tas<treeAndScenario.length;tas++){
                                             var treeFilter = treeScenarioList.filter(c => c.scenarioId == treeAndScenario[tas].scenarioId && c.treeId == treeAndScenario[tas].treeId);
@@ -1545,7 +1545,7 @@ export default class CommitTreeComponent extends React.Component {
                                     }
 
                                     var total = 0;
-                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.treeAndScenario.length>0) {
+                                    if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.treeAndScenario!=undefined && regionalSelectedForecastData.treeAndScenario.length>0) {
                                         var treeAndScenario=regionalSelectedForecastData.treeAndScenario;
                                         var count=0;
                                         for(var tas=0;tas<treeAndScenario.length;tas++){
@@ -1585,7 +1585,7 @@ export default class CommitTreeComponent extends React.Component {
                                     console.log("regionalSelectedForecastData1 Test@123",regionalSelectedForecastData1)
                                     var selectedScenarioId1="";
                                     var ce1 = regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId) : [];
-                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
+                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario!=undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
                                         var treeAndScenario1=regionalSelectedForecastData1.treeAndScenario;
                                         for(var tas1=0;tas1<treeAndScenario1.length;tas1++){
                                             var treeFilter1 = treeScenarioList1.filter(c => c.scenarioId == treeAndScenario1[tas1].scenarioId && c.treeId == treeAndScenario1[tas1].treeId);
@@ -1601,7 +1601,7 @@ export default class CommitTreeComponent extends React.Component {
                                     }
 
                                     var total1 = 0;
-                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
+                                    if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario!=undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
                                         var treeAndScenario1=regionalSelectedForecastData1.treeAndScenario;
                                         var count1=0;
                                         for(var tas1=0;tas1<treeAndScenario1.length;tas1++){
@@ -1639,7 +1639,7 @@ export default class CommitTreeComponent extends React.Component {
                                     var regionalSelectedForecastData2 = selectedForecastData2[regionSet[k]];
                                     var selectedScenarioId2="";
                                     var ce2 = regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.consumptionExtrapolationId != null ? consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId) : [];
-                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.treeAndScenario.length>0) {
+                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.treeAndScenario!=undefined && regionalSelectedForecastData2.treeAndScenario.length>0) {
                                         var treeAndScenario2=regionalSelectedForecastData2.treeAndScenario;
                                         for(var tas2=0;tas2<treeAndScenario2.length;tas2++){
                                             var treeFilter2 = treeScenarioList2.filter(c => c.scenarioId == treeAndScenario2[tas2].scenarioId && c.treeId == treeAndScenario2[tas2].treeId);
@@ -1655,7 +1655,7 @@ export default class CommitTreeComponent extends React.Component {
                                     }
 
                                     var total2 = 0;
-                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.treeAndScenario.length>0) {
+                                    if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.treeAndScenario!=undefined && regionalSelectedForecastData2.treeAndScenario.length>0) {
                                         var treeAndScenario2=regionalSelectedForecastData2.treeAndScenario;
                                         var count2=0;
                                         for(var tas2=0;tas2<treeAndScenario2.length;tas2++){

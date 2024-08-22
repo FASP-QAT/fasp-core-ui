@@ -392,7 +392,7 @@ class CompareVersion extends Component {
                             var total = 0;
                             var label = { label_en: "", label_fr: "", label_pr: "", label_sp: "" };
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
-                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario.length > 0) {
+                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario!=undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario.length > 0) {
                                     var treeAndScenario = planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario;
                                     var count = 0;
                                     var selectedScenarioId_en = "";
@@ -582,7 +582,7 @@ class CompareVersion extends Component {
                             var total = 0;
                             var label = { label_en: "", label_fr: "", label_pr: "", label_sp: "" };
                             if (planningUnitList[pu].selectedForecastMap != undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId] != undefined) {
-                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario.length > 0) {
+                                if (planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario!=undefined && planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario.length > 0) {
                                     var treeAndScenario = planningUnitList[pu].selectedForecastMap[regionList[r].regionId].treeAndScenario;
                                     var count = 0;
                                     var selectedScenarioId_en = "";
