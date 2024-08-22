@@ -828,7 +828,8 @@ export default class MapPlanningUnits extends Component {
                                 title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
                                 type: 'numeric',
                                 textEditor: true,
-                                mask: '#,##',
+                                decimal: '.',
+                                mask: '#,##.00',
                                 disabledMaskOnEdition: true,
                                 tooltip: i18n.t("static.programPU.localProcurementAgentTooltip"),
                                 width: 130
@@ -862,7 +863,8 @@ export default class MapPlanningUnits extends Component {
                                 regex: {
                                     ex: JEXCEL_INTEGER_REGEX,
                                     text: i18n.t('static.message.invalidnumber')
-                                }
+                                },
+                                tooltip:i18n.t("static.programPlanningUnit.forecastErrorTooltip")
                             },
                             {
                                 title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -1194,7 +1196,7 @@ export default class MapPlanningUnits extends Component {
         tr.children[10].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[14].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
-        tr.children[13].classList.add('AsteriskTheadtrTd');
+        tr.children[13].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[15].classList.add('InfoTr');
         tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
         var cell1 = instance.worksheets[0].getCell(`G1`)

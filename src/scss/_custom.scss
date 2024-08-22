@@ -4183,7 +4183,9 @@ h6 {
 .ReportSearchMarginTop {
   margin-top: -51px;
 }
-
+.ReportSearchMarginTopSPVR{
+  margin-top: -42px;
+}
 .shipmentconsumptionSearchMarginTop {
   margin-top: -51px;
 
@@ -10943,4 +10945,18 @@ legend.scheduler-border {
 }
 .mapPlanningUnitpaginationD .jss_pagination>div{
   margin-left: 51px!important;
+}
+.momJexcelPagination.jss_pagination_dropdown {
+  margin-left: 4px;
+  margin-right: 4px;
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+}
+.momJexcelPagination.jss_pagination>div {
+  padding-left: 56px!important;
+}
+.compareAndSelectCollapsecol .jss>tbody>tr>td {
+  white-space: pre !important;
+  text-align: center !important;
 }

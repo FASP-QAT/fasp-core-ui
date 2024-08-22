@@ -182,5 +182,9 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('datasetDataServer')){
             storeOS = db1.createObjectStore('datasetDataServer', { keyPath: 'id'});
         }
-    };
+        if (!db1.objectStoreNames.contains('fundingSourceType')) {
+            storeOS = db1.createObjectStore('fundingSourceType', { keyPath: 'fundingSourceTypeId', autoIncrement: true });
+        }
+        // console.log('Object stores:', db1.objectStoreNames);
+    };    
 }

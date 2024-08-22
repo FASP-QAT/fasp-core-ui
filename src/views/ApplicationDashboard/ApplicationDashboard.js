@@ -296,7 +296,8 @@ class ApplicationDashboard extends Component {
             programId: filteredGetRequestList[i].programId,
             versionId: filteredGetRequestList[i].version,
             id: filteredGetRequestList[i].id,
-            loading: false
+            loading: false,
+            cutOffDate:filteredGetRequestList[i].cutOffDate!=undefined && filteredGetRequestList[i].cutOffDate!=null && filteredGetRequestList[i].cutOffDate!=""?filteredGetRequestList[i].cutOffDate:""
           });
         }
         this.setState({
@@ -922,7 +923,7 @@ class ApplicationDashboard extends Component {
                           </Dropdown>
                         </ButtonGroup>
                       </div>
-                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion}</div>
+                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":"")}</div>
                       <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
                       <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
                     </div>

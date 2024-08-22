@@ -57,7 +57,7 @@
     "jspdf": "^1.5.3",
     "jspdf-autotable": "^3.5.3",
     "jspreadsheet": "^8.7.0",
-    "jsuites": "^5.0.29",
+    "jsuites": "^5.4.6",
     "jszip": "^3.2.2",
     "jwt-decode": "^2.2.0",
     "mathjs": "^10.0.2",

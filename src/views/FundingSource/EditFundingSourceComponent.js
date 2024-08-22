@@ -6,11 +6,17 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
 import FundingSourceService from "../../api/FundingSourceService";
 import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import classNames from 'classnames';
+import Select from 'react-select';
+import ProgramService from "../../api/ProgramService";
 // Initial values for form fields
 let initialValues = {
     fundingSource: "",
     fundingSourceCode: "",
+    fundingSourceTypeId: "",
+    programId: []
 }
 // Localized entity name
 const entityname = i18n.t('static.fundingsource.fundingsource');
@@ -21,6 +27,8 @@ const entityname = i18n.t('static.fundingsource.fundingsource');
  */
 const validationSchema = function (values) {
     return Yup.object().shape({
+        fundingSourceTypeId: Yup.string()
+            .required(i18n.t('static.funderType.funderTypeText')),
         fundingSource: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.fundingsource.fundingsourcetext')),
@@ -36,6 +44,10 @@ class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            fundingSourceTypes: [],
+            programId: '',
+            programList: [],
+            proramListArray: [],
             fundingSource: {
                 realm: {
                     label: {
@@ -52,6 +64,10 @@ class EditFundingSourceComponent extends Component {
                     label_fr: '',
                 },
                 fundingSourceCode: '',
+                fundingSourceType: {
+                    id: ''
+                },
+                programList: []
             },
             message: '',
             lang: localStorage.getItem('lang'),
@@ -62,6 +78,8 @@ class EditFundingSourceComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.programChange = this.programChange.bind(this);
+        this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
     /**
      * Fetches Funding source details on component mount.
@@ -73,6 +91,14 @@ class EditFundingSourceComponent extends Component {
                 this.setState({
                     fundingSource: response.data, loading: false
                 });
+                var proramListArray = [];
+                let { fundingSource } = this.state;
+                for (var i = 0; i < this.state.fundingSource.programList.length; i++) {
+                    if (this.state.fundingSource.programList[i].id != 0) {
+                        proramListArray[i] = { value: this.state.fundingSource.programList[i].id, label: getLabelText(this.state.fundingSource.programList[i].label, this.state.lang) }
+                    }
+                }
+                this.setState({ programId: proramListArray })
             }
             else {
                 this.setState({
@@ -121,6 +147,73 @@ class EditFundingSourceComponent extends Component {
                 }
             }
         );
+        //Fetch realmId
+        let realmId = AuthenticationService.getRealmId();
+
+        //Fetch all funding source type list
+        //this.state.fundingSource.realm.id
+        FundingSourceService.getFundingSourceTypeListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSourceTypes: listArray.filter(c => c.active == true && realmId == c.realm.id), loading: false,
+                    },()=>{
+                        //Fetch program list by realmId
+                        this.getProgramByRealmId(realmId)
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
     }
     /**
      * Hides the message in div2 after 30 seconds.
@@ -148,11 +241,125 @@ class EditFundingSourceComponent extends Component {
         if (event.target.name == "allowedInBudget") {
             fundingSource.allowedInBudget = event.target.id === "allowedInBudget2" ? false : true;
         }
+        if (event.target.name == "fundingSourceTypeId") {
+            fundingSource.fundingSourceType.id = event.target.value;
+        }
+        if (event.target.name == "programId") {
+            fundingSource.programList.id = event.target.value;
+        }
         this.setState({
             fundingSource
         },
             () => { });
     };
+    /**
+     * Handles change in Program dropdown & filters the program list
+     * @param {*} programId - The change event.
+     */
+    programChange(programId) {
+        var selectedArray = [];
+        for (var p = 0; p < programId.length; p++) {
+            selectedArray.push(programId[p].value);
+        }
+        if (selectedArray.includes("-1")) {
+            this.setState({ programId: [] });
+            var list = this.state.programList.filter(c => c.value != -1)
+            this.setState({ programId: list });
+            var programId = list;
+        } else {
+            this.setState({ programId: programId });
+            var programId = programId;
+        }
+        let { fundingSource } = this.state;
+        var programIdArray = [];
+        for (var i = 0; i < programId.length; i++) {
+            programIdArray[i] = {
+                id: programId[i].value
+            }
+        }
+        fundingSource.programList = programIdArray;
+        this.setState({
+            fundingSource,
+        },
+            () => { });
+    }
+    /**
+     * Fetch program list by realmId
+     * @param {*} e - The realmId
+     */
+    getProgramByRealmId(e) {
+        if (e != 0) {
+            ProgramService.getProgramList(e)
+                .then(response => {
+                    if (response.status == 200) {
+                        var programList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                        for (var i = 0; i < response.data.length; i++) {
+                            programList[i + 1] = { value: response.data[i].programId, label: getLabelText(response.data[i].label, this.state.lang) }
+                        }
+                        var listArray = programList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            programList: listArray,
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode, loading: false
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        } else {
+            this.setState({
+                programList: {}, loading: false
+            })
+        }
+    }
     /**
      * Capitalizes the first letter of the funding source name.
      * @param {string} str - The funding source name.
@@ -168,6 +375,15 @@ class EditFundingSourceComponent extends Component {
      * @returns {JSX.Element} - Funding source form.
      */
     render() {
+        const { fundingSourceTypes } = this.state;
+        let fundingSourceTypeList = fundingSourceTypes.length > 0
+            && fundingSourceTypes.map((item, i) => {
+                return (
+                    <option key={i} value={item.fundingSourceTypeId}>
+                        {getLabelText(item.label, this.state.lang)} ({item.fundingSourceTypeCode})
+                    </option>
+                )
+            }, this);
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -179,7 +395,9 @@ class EditFundingSourceComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     fundingSource: this.state.fundingSource.label.label_en,
-                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode
+                                    fundingSourceCode: this.state.fundingSource.fundingSourceCode,
+                                    fundingSourceTypeId: this.state.fundingSource.fundingSourceType.id,
+                                    programId: this.state.fundingSource.programList
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -248,7 +466,9 @@ class EditFundingSourceComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        setFieldTouched,
+                                        setFieldValue
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm' autocomplete="off">
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -263,6 +483,47 @@ class EditFundingSourceComponent extends Component {
                                                         value={getLabelText(this.state.fundingSource.realm.label, this.state.lang)}
                                                     >
                                                     </Input>
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone">
+                                                    <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.programId && this.state.fundingSource.programList.length != 0 },
+                                                            { 'is-invalid': (touched.programId && !!errors.programId) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("programId", e);
+                                                            this.programChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("programId", true)}
+                                                        name="programId"
+                                                        id="programId"
+                                                        multi
+                                                        options={this.state.programList}
+                                                        value={this.state.programId}
+                                                    />
+                                                    <FormFeedback className="red">{errors.programId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="select"
+                                                        bsSize="sm"
+                                                        name="fundingSourceTypeId"
+                                                        id="fundingSourceTypeId"
+                                                        valid={!errors.fundingSourceTypeId && this.state.fundingSource.fundingSourceType.id != ''}
+                                                        invalid={touched.fundingSourceTypeId && !!errors.fundingSourceTypeId}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.fundingSource.fundingSourceType.id}
+                                                        required
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {fundingSourceTypeList}
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.fundingSourceTypeId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}<span className="red Reqasterisk">*</span> </Label>

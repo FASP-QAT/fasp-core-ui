@@ -1909,7 +1909,7 @@ export default class ListTreeComponent extends Component {
                                     f = 1;
                                 }
                             }
-                            if(this.state.onlyDownloadedProgram) {
+                            if(this.state.onlyDownloadedProgram && proList.filter(c=>c.id==programData.id).length==0) {
                                 proList.push(programData)
                             } else {
                                 if (f == 0) {
@@ -2098,7 +2098,12 @@ export default class ListTreeComponent extends Component {
         this.setState({ loading: true })
         const lan = 'en';
         const { versions } = this.state
-        var verList = versions;
+        var verList;
+        if(this.state.onlyDownloadedProgram) {
+            verList = [];
+        } else {
+            verList = versions;
+        }
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);

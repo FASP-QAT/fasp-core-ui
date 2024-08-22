@@ -1603,7 +1603,7 @@ export default class PlanningUnitSetting extends Component {
                             "higherThenConsumptionThreshold": null,
                             "lowerThenConsumptionThreshold": null,
                             "planningUnitNotes": map1.get("16"),
-                            "consumptionDataType": 3,
+                            "consumptionDataType": 1,
                             "otherUnit": null,
                             "selectedForecastMap": map1.get("13"),
                             "createdBy": null,

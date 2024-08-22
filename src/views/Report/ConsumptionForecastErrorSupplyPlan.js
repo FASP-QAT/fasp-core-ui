@@ -14,7 +14,7 @@ import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, API_URL } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { PercentageFormatter, addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent, isSiteOnline, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { PercentageFormatter, addDoubleQuoteToRowContent, filterOptions, hideFirstComponent, hideSecondComponent, isSiteOnline, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import NumberFormat from 'react-number-format';
 import i18n from '../../i18n'
@@ -378,6 +378,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
+                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
                         verList.push(version)
                     }
                 }
@@ -619,6 +620,18 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 })
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
+                var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+                var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+                var rangeValue = this.state.rangeValue;
+                if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                    var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                    // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+                }
+                this.setState({
+                    minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                    rangeValue: rangeValue,
+                })
                 var proList = [];
                 if (versionId.includes('Local')) {
                     const lan = 'en';
@@ -2283,7 +2296,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
                     </option>
                 )
             }, this);
@@ -2616,6 +2629,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -2629,7 +2643,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         //theme="light"
-                                                        key={JSON.stringify(rangeValue)}
+                                                        key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
                                                         <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
@@ -2724,6 +2738,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             value={this.state.forecastingUnitIds}
                                                             onChange={(e) => { this.setForecastingUnit(e); }}
                                                             options={fuList && fuList.length > 0 ? fuList : []}
+                                                            filterOptions={filterOptions}
                                                         />}
                                                     </div>
                                                 </FormGroup>
@@ -2758,6 +2773,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                             value={this.state.planningUnitIds}
                                                             onChange={(e) => { this.setPlanningUnit(e); }}
                                                             options={puList && puList.length > 0 ? puList : []}
+                                                            filterOptions={filterOptions}
                                                         />}
                                                     </div>
                                                 </FormGroup>
