@@ -31,7 +31,7 @@ export function dataCheck(props, datasetJson) {
             for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
                 for (var drl = 0; drl < datasetRegionList.length; drl++) {
                     var regionId = datasetRegionList[drl].regionId;
-                    if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
+                    if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeAndScenario!=undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeAndScenario.filter(c=>c.scenarioId==scenarioList[ndm].id && c.treeId==PgmTreeList[tl].treeId).length>0) || (!props.state.includeOnlySelectedForecasts)) {
                         if (treeScenarioNotes.findIndex(c => c.treeId == PgmTreeList[tl].treeId && c.scenarioId == scenarioList[ndm].id) == -1) {
                             treeScenarioNotes.push({
                                 tree: PgmTreeList[tl].label,
@@ -62,7 +62,7 @@ export function dataCheck(props, datasetJson) {
                 for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
                     for (var drl = 0; drl < datasetRegionList.length; drl++) {
                         var regionId = datasetRegionList[drl].regionId;
-                        if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
+                        if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeAndScenario!=undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeAndScenario.filter(c=>c.scenarioId == scenarioList[ndm].id && c.treeId == PgmTreeList[tl].treeId).length>0) || (!props.state.includeOnlySelectedForecasts)) {
                             if (treeNodeList.findIndex(c => c.nodeDataId == (nodeDataMap[scenarioList[ndm].id])[0].nodeDataId && c.treeId==PgmTreeList[tl].treeId && c.scenarioId==scenarioList[ndm].id) == -1) {
                                 if (payload.nodeType.id == 5) {
                                     var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
@@ -266,7 +266,7 @@ export function dataCheck(props, datasetJson) {
         var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
         var regionArray = [];
         for (var drl = 0; drl < datasetRegionList.length; drl++) {
-            if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
+            if (selectedForecast[datasetRegionList[drl].regionId] == undefined || selectedForecast[datasetRegionList[drl].regionId].treeAndScenario==undefined || (selectedForecast[datasetRegionList[drl].regionId].treeAndScenario.length == 0 && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
                 regionArray.push({ id: datasetRegionList[drl].regionId, label: getLabelText(datasetRegionList[drl].label, props.state.lang) });
             }
         }

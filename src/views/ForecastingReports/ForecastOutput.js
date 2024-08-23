@@ -439,7 +439,7 @@ class ForecastOutput extends Component {
             propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1).toFixed(2))
             return (A.push(addDoubleQuoteToRowContent([
                 ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
-                ((ele.scenario.label != null ? ele.scenario.label : "").replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
+                ((ele.scenario.label != null ? ele.scenario.label.replaceAll(",",";\r") : "").replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
             ].concat(propertyName))))
         }
         );
@@ -461,7 +461,7 @@ class ForecastOutput extends Component {
             return (
                 A.push(addDoubleQuoteToRowContent([
                     ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
-                    ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'),
+                    (ele.scenario.label!=null?((ele.scenario.label).replaceAll(",",";\r").replaceAll(',', ' ')).replaceAll(' ', '%20').replaceAll('#', '%23'):ele.scenario.label),
                 ].concat(propertyName)))
             )
         }
@@ -575,7 +575,7 @@ class ForecastOutput extends Component {
             A = [];
             A.push(
                 ((getLabelText(ele.objUnit.label, this.state.lang))),
-                ((ele.scenario.label))
+                (ele.scenario.label!=null?(ele.scenario.label.replaceAll(",",";\r")):ele.scenario.label)
             )
             A = A.concat(propertyName)
             data.push(A);
@@ -603,7 +603,7 @@ class ForecastOutput extends Component {
             A = [];
             A.push(
                 ((getLabelText(ele.objUnit.label, this.state.lang))),
-                ((ele.scenario.label))
+                (ele.scenario.label!=null?(ele.scenario.label.replaceAll(",",";\r")):ele.scenario.label)
             )
             A = A.concat(propertyName)
             data.push(A);
@@ -2605,7 +2605,7 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="Secondcolum sticky-col first-col clone" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             <td className="sticky-col first-col clone Thirdcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
-                                                                            <td className='text-left sticky-col first-col clone fourthcolum'>{item.scenario.label}</td>
+                                                                            <td className='text-left sticky-col first-col clone fourthcolum'>{item.scenario.label!=null?item.scenario.label.replaceAll(",",";\r"):item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={Number(item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toFixed(2)} /> : ""}</td>
                                                                             ))}
@@ -2628,7 +2628,7 @@ class ForecastOutput extends Component {
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="Secondcolum sticky-col first-col clone" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             <td className="sticky-col first-col clone Thirdcolum" style={{ textAlign: 'left' }}>{item.graphId != -1 && <i class="fa fa-circle" style={{ color: backgroundColor[this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id).length > 0 ? this.state.graphConsumptionData.filter(c => c.display == true && c.objUnit.id == item.objUnit.id)[0].graphId : 0] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
-                                                                            <td className='text-left sticky-col first-col clone fourthcolum'>{item.scenario.label}</td>
+                                                                            <td className='text-left sticky-col first-col clone fourthcolum'>{item.scenario.label!=null?item.scenario.label.replaceAll(",",";\r"):item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={Number(item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toFixed(2)} /> : ""}</td>
                                                                             ))}

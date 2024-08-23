@@ -3387,9 +3387,7 @@
     "static.common.darktheme":"Dark Theme",
     "static.tree.copyModeling": "Use same modeling information",
     "static.tree.invalidNodeError": "Your node <nodeName> has node type <nodeType> and the new parent has node type <parentNodeType> which is not allowed. Please edit node type",
-    "static.compareAndSelect.selectMultipleTree":"Select Multiple Tree",
     "static.compareAndSelect.orMore":"or more",
-    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts",
     "static.import.percentOfSupplyPlan":"% of Supply Plan",
     "static.import.forecastRegionFor":"Forecast Region for",
     "static.importFromQATSupplyPlan.supplyPlanProgrmRegion":"Supply Plan Program (Region)",
@@ -3401,5 +3399,10 @@
     "static.extrapolation.extrapolateUsingOptimizedArimaAndTes": "Extrapolate with optimized ARIMA & TES",
     "static.extrapolation.bulkExtrapolationSuccess": "Bulk Extraploation done successfully",
     "static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams": "Extrapolate ARIMA & TES using default parameters",
-    "static.extrapolation.extrapolation": "Extraploations"
+    "static.extrapolation.extrapolation": "Extraploations",
+    "static.compareAndSelect.selectMultipleTree":"Select Multiple Trees",
+    "static.compareAndSelect.selectOneOrMore":"Select one or more forecasts for",
+    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts",
+    "static.tooltip.selectMultipleTree":"If checked, user can multi-select tree forecasts (not consumption forecasts) as their final forecast, which will aggregate the monthly forecast quantities.",
+    "static.compareAndSelect.totalAggregated":"Total Aggregated Tree Quantity"
 }
