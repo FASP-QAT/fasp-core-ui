@@ -15,7 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionForErp, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { filterOptions, generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, BATCH_PREFIX, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, NONE_SELECTED_DATA_SOURCE_ID, PROGRAM_TYPE_SUPPLY_PLAN, PSM_PROCUREMENT_AGENT_ID, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, SHIPMENT_MODIFIED, STRING_TO_DATE_FORMAT, TBD_FUNDING_SOURCE, USD_CURRENCY_ID } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService.js';
@@ -1415,7 +1415,7 @@ export default class ManualTagging extends Component {
                 for (var uq = 0; uq < getUniqueOrderNoAndPrimeLineNoList.length; uq++) {
                     qty1 = 0;
                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
-                        qty1 += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
+                        qty1 += Number(item[10]) * Number(this.state.instance.getValue(`V${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
                     })
                     qty += Math.round(qty1);
                 }
@@ -1766,7 +1766,7 @@ export default class ManualTagging extends Component {
                                                     var curUser = AuthenticationService.getLoggedInUserId();
                                                     var username = AuthenticationService.getLoggedInUsername();
                                                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
-                                                        shipmentQty += Number(item[10]) * Number(this.state.instance.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
+                                                        shipmentQty += Number(item[10]) * Number(this.state.instance.getValue(`V${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""));
                                                         shipmentARUQty += Number(item[10]);
                                                         var batchNo = item[7];
                                                         var expiryDate = item[8];
@@ -4763,6 +4763,7 @@ export default class ManualTagging extends Component {
                                                         value={this.state.productCategoryValues}
                                                         onChange={(e) => { this.handleProductCategoryChange(e) }}
                                                         options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -4816,6 +4817,7 @@ export default class ManualTagging extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>}
@@ -4831,6 +4833,7 @@ export default class ManualTagging extends Component {
                                                     onChange={(e) => { this.filterData(e) }}
                                                     options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                                     labelledBy={i18n.t('static.common.select')}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>}

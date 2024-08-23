@@ -26,7 +26,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { consumptionExtrapolationNotesClicked, exportPDF, missingMonthsClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
-import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { filterOptions, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1490,6 +1490,7 @@ class VersionSettingsComponent extends Component {
                                             onChange={(e) => { this.handleChangeProgram(e) }}
                                             options={programMultiList && programMultiList.length > 0 ? programMultiList : []}
                                             labelledBy={i18n.t('static.common.pleaseSelect')}
+                                            filterOptions={filterOptions}
                                         />
                                     </div>
                                 </FormGroup>
