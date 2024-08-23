@@ -15,7 +15,8 @@ import {
   Form,
   FormGroup, Input, InputGroup, Label,
   Modal, ModalBody, ModalFooter, ModalHeader,
-  Table
+  Table,
+  Popover, PopoverBody
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
@@ -97,6 +98,7 @@ class StockStatus extends Component {
       realmCountryPlanningUnitLabels: [],
       planningUnitList: [],
       realmCountryPlanningUnitList: [],
+      shipmentPopup: false
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -106,6 +108,7 @@ class StockStatus extends Component {
     this.yAxisChange = this.yAxisChange.bind(this);
     this.setViewById = this.setViewById.bind(this);
     this.fetchData = this.fetchData.bind(this);
+    this.toggleShipmentPopup = this.toggleShipmentPopup.bind(this);
   }
   /**
    * Handles the change event for the program selection.
@@ -183,6 +186,14 @@ class StockStatus extends Component {
    * Toggles the value of the 'show' state variable.
    */
   toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+  /**eact
+   * Toggle info for shipment details
+   */
+  toggleShipmentPopup() {
+    this.setState({
+      shipmentPopup: !this.state.shipmentPopup,
+    });
+}
   /**
    * Returns the CSS class name for formatting text color in a row.
    * @param {Object} row - The row object.
@@ -1261,12 +1272,12 @@ class StockStatus extends Component {
       loading: false
     }, () => {
       if (viewById == 2) {
-        document.getElementById("forecastingUnitDiv").style.display = "block";
+        document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
         document.getElementById("planningUnitDiv").style.display = "none";
         // this.fetchData();
       } else {
         document.getElementById("planningUnitDiv").style.display = "block";
-        document.getElementById("forecastingUnitDiv").style.display = "none";
+        document.getElementById("realmCountryPlanningUnitDiv").style.display = "none";
         // this.fetchData();
       }
     })
@@ -1277,8 +1288,17 @@ class StockStatus extends Component {
   */
   yAxisChange(e) {
     var yaxisEquUnit = e.target.value;
+    var planningUnitList = this.state.planningUnitList;
+    var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
+    var validFu = this.state.equivalencyUnitList.filter(x => x.id == e.target.value)[0].forecastingUnitIds;
+    planningUnitList = planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+    realmCountryPlanningUnitList = realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
     this.setState({
       yaxisEquUnit: yaxisEquUnit,
+      planningUnitList: planningUnitList,
+      realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+      planningUnitId: [],
+      realmCountryPlanningUnitId: [],
       // planningUnits: [],
       // planningUnitIds: [],
       // planningUnitValues: [],
@@ -1292,7 +1312,7 @@ class StockStatus extends Component {
       // dataList: [],
       // loading: false
     }, () => {
-      if (yaxisEquUnit > 0) {//Yes
+      if (yaxisEquUnit > 0) {//Yes        
         // this.getPlanningUnitAndForcastingUnit();
       } else {//NO
         // this.getPlanningUnitAndForcastingUnit();
@@ -1318,7 +1338,7 @@ class StockStatus extends Component {
       var inventoryList = [];
       var consumptionList = [];
           var shipmentList = [];
-          var responseData = response.data[0];
+          var responseData = response.data;
           let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
           var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
           filteredResponseData.map(c => {
@@ -1854,7 +1874,7 @@ class StockStatus extends Component {
       datasets: datasets,
     };
     const { rangeValue } = this.state
-    var ppu = (this.state.planningUnits.filter(c => c.id == document.getElementById("planningUnitId").value)[0])
+    var ppu = (this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id))[0])
     return (
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} />
@@ -1957,17 +1977,17 @@ class StockStatus extends Component {
                             name="viewById"
                             value={"2"}
                             checked={this.state.viewById == 2}
-                            title={i18n.t('static.dashboard.forecastingunit')}
+                            title={i18n.t('static.planningunit.countrysku')}
                             onChange={this.setViewById}
                           />
                           <Label
                             className="form-check-label"
                             // check htmlFor="inline-radio1"
-                            title={i18n.t('static.dashboard.forecastingunit')}>
-                            {i18n.t('static.dashboard.forecastingunit')}
+                            title={i18n.t('static.planningunit.countrysku')}>
+                            {i18n.t('static.planningunit.countrysku')}
                           </Label>
                         </FormGroup>
-                        <FormGroup id="forecastingUnitDiv" style={{ display: "none" }}>
+                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none" }}>
                           <div className="controls">
                             <MultiSelect
                               bsSize="sm"
@@ -2086,7 +2106,7 @@ class StockStatus extends Component {
                       <tr>
                         <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>
                         <th className="text-center" colSpan="1"> {i18n.t('static.report.stock')} </th>
-                        <th className="text-center" colSpan="2"> {i18n.t('static.supplyPlan.consumption')} </th>
+                        <th className="text-center" colSpan={this.state.programId.length > 1 ? "3" : "2"}> {i18n.t('static.supplyPlan.consumption')} </th>
                         <th className="text-center" colSpan="2"> {i18n.t('static.shipment.shipment')} </th>
                         <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th>
                       </tr>
@@ -2094,13 +2114,14 @@ class StockStatus extends Component {
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
                         <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
+                        {this.state.programId.length > 1 && <th className="text-center" style={{ width: "200px" }}> Consensus </th>}
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
                         <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty')}</th>
+                        <th className="text-center" style={{ width: "200px" }}>{this.state.stockStatusList.length > 0 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
                       </tr>
                     </thead>
@@ -2120,12 +2141,16 @@ class StockStatus extends Component {
                             </td> <td>
                               {formatter(this.state.stockStatusList[idx].actualConsumptionQty, 0)}
                             </td>
+                            {this.state.programId.length > 1 && <td>
+                              {formatter(this.state.stockStatusList[idx].actualConsumption ? this.state.stockStatusList[idx].actualConsumptionQty : this.state.stockStatusList[idx].forecastedConsumptionQty, 0)}
+                            </td>}
                             <td>
                               {formatter(this.state.stockStatusList[idx].shipmentQty, 0)}
                             </td>
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
-                                return (<tr  ><td padding="0">{formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
+                                return (<tr  >
+                                  <td padding="0" id={"shipmentPopup"+idx+index}>{formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null
@@ -2146,7 +2171,13 @@ class StockStatus extends Component {
                                   }   ${item.primeLineNo == null
                                     ? ""
                                     : "-" + item.primeLineNo
-                                  }`}</td></tr>)
+                                  }`}
+                                  <div>
+                                    <Popover placement="top" isOpen={this.state.shipmentPopup} target={"shipmentPopup"+idx+index} trigger="hover" toggle={this.toggleShipmentPopup}>
+                                      <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
+                                    </Popover>
+                                  </div>
+                                </td></tr>)
                               })}</table>
                             </td>
                             <td>
@@ -2197,7 +2228,7 @@ class StockStatus extends Component {
                         name="planningUnitIdsExport"
                         id="planningUnitIdsExport"
                         filterOptions={filterOptions}
-                        options={this.state.planningUnitsMulti && this.state.planningUnitsMulti.length > 0 ? this.state.planningUnitsMulti : []}
+                        options={this.state.planningUnitList && this.state.planningUnitList.length > 0 ? this.state.planningUnitList : []}
                         value={this.state.planningUnitIdsExport}
                         onChange={(e) => { this.setPlanningUnitIdsExport(e) }}
                         labelledBy={i18n.t('static.common.select')}
