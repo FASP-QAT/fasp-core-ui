@@ -3348,6 +3348,8 @@
     "static.compareAndSelect.selectMultipleTree":"Select Multiple Trees",
     "static.compareAndSelect.selectOneOrMore":"Select one or more forecasts for",
     "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts",
-    "static.tooltip.selectMultipleTree":"If checked, user can multi-select tree forecasts (not consumption forecasts) as their final forecast, which will aggregate the monthly forecast quantities.",
-    "static.compareAndSelect.totalAggregated":"Total Aggregated Tree Quantity"
+    "static.tooltip.selectMultipleTree":"If checked, user can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the monthly forecast quantities.",
+    "static.compareAndSelect.totalAggregated":"Total Selected Forecast",
+    "static.compareAndSelect.note":"Note: Graph and data table only update after submitting",
+    "static.forecastSummaryTooltip.selectForecast":"User can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the total forecast quantities."
 }

@@ -193,7 +193,8 @@ class CompareAndSelectScenario extends Component {
         if (cont == true) {
             this.setState({
                 toggleMultiselect: e.target.checked,
-                loading: true
+                loading: true,
+                dataChangedFlag:0
             }, () => {
                 this.showData()
             })
@@ -796,12 +797,18 @@ class CompareAndSelectScenario extends Component {
                 let treeScenarioList1 = this.state.treeScenarioList;
                 let dataArray = [];
                 let count = 0;
+                var total=0;
+                var count1=0;
                 for (var j = 0; j < treeScenarioList1.length; j++) {
                     data = [];
+                    if(this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString())){
+                        count1+=1;
+                        total+=Number(Number(totalArray[j]).toFixed(2))
+                    }
                     data[0] = this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString()) ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
-                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
+                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
                     data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
                     data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
                     data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
@@ -810,6 +817,17 @@ class CompareAndSelectScenario extends Component {
                     dataArray.push(data)
                     count++;
                 }
+                // data=[];
+                // data[0] ="";
+                // data[1] = "";
+                // data[2] ="";
+                // data[3] = "Total Aggregated Trees";
+                // data[4] = "1234";
+                // data[5]="";
+                // data[6] ="";
+                // data[7] ="";
+                // data[8] ="";
+                // dataArray.push(data);
                 let columns = [];
                 columns.push({ title: i18n.t('static.common.select'), type: this.state.toggleMultiselect ? 'checkbox' : 'radio', width: 50 });
                 columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 50 });
@@ -862,6 +880,19 @@ class CompareAndSelectScenario extends Component {
                     columns: columns,
                     onload: this.loadedTable1,
                     onchange: this.changeTable1,
+                    // footers: this.state.toggleMultiselect?[
+                    //     [
+                    //         '',
+                    //         '',
+                    //         '',
+                    //         i18n.t("static.compareAndSelect.totalAggregated"),
+                    //         count1>0?Number(total).toFixed(2):"",
+                    //         '',
+                    //         '',
+                    //         '',
+                    //         ''
+                    //     ]
+                    // ]:[],
                     pagination: false,
                     search: false,
                     columnSorting: true,
@@ -2645,27 +2676,6 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4" style={{ "marginLeft": "20px", "marginTop": "28px" }}>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="toggleMultiselect"
-                                                    name="toggleMultiselect"
-                                                    checked={this.state.toggleMultiselect}
-                                                    onClick={(e) => { this.setToggleMultiselect(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    {i18n.t('static.compareAndSelect.selectMultipleTree')}
-                                                </Label>
-                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleMultipleTreeInfo} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                            </FormGroup>
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverMultipleTreeInfo} target="Popover2" trigger="hover" toggle={this.toggleMultipleTreeInfo}>
-                                                    <PopoverBody>{i18n.t('static.tooltip.selectMultipleTree')}</PopoverBody>
-                                                </Popover>
-                                            </div>
                                         </div>
                                     </div>
                                 </Form>
@@ -2707,6 +2717,27 @@ class CompareAndSelectScenario extends Component {
                                                 <>
                                                     {!this.state.toggleMultiselect ? <ul style={{ marginLeft: '-2.5rem' }}><span className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => this.state.selectedTreeScenarioId.includes(c.id.toString())).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " "}<b>{getLabelText(this.state.planningUnitLabel, this.state.lang)}</b>{" "}{i18n.t('static.compareAndSelect.andRegion')}{" "}<b>{this.state.regionName}</b></span><br /></ul> :
                                                         <ul style={{ marginLeft: '-2.5rem' }}><span className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => this.state.selectedTreeScenarioId.includes(c.id.toString())).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOneOrMore') + " "}<b>{getLabelText(this.state.planningUnitLabel, this.state.lang)}</b>{" "}{i18n.t('static.compareAndSelect.andRegion')}{" "}<b>{this.state.regionName}</b></span><br /></ul>}
+                                                        <FormGroup className="col-md-4" style={{ marginLeft: '0.4rem' }}>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="toggleMultiselect"
+                                                    name="toggleMultiselect"
+                                                    checked={this.state.toggleMultiselect}
+                                                    onClick={(e) => { this.setToggleMultiselect(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    {i18n.t('static.compareAndSelect.selectMultipleTree')}
+                                                </Label>
+                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleMultipleTreeInfo} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                            </FormGroup>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverMultipleTreeInfo} target="Popover2" trigger="hover" toggle={this.toggleMultipleTreeInfo}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.selectMultipleTree')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                                     <ul className="legendcommitversion">
                                                         <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
@@ -2715,6 +2746,7 @@ class CompareAndSelectScenario extends Component {
                                                     <div className="RemoveStriped removeOddColor">
                                                         <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                                     </div>
+                                                    {/* <span><b>Total Forecast Qty</b> : 1234</span> */}
                                                     <br></br>
                                                     <FormGroup className="col-md-12">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
@@ -2989,6 +3021,7 @@ class CompareAndSelectScenario extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <b>{i18n.t('static.compareAndSelectNote')}</b>
                                                                 <div className="col-md-12">
                                                                     <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
