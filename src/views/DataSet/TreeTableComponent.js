@@ -792,6 +792,7 @@ export default class TreeTable extends Component {
         this.onChangePageTab2 = this.onChangePageTab2.bind(this);
         this.checkValidationTab1 = this.checkValidationTab1.bind(this);
         this.checkValidationTab2 = this.checkValidationTab2.bind(this);
+        this.setProgramId = this.setProgramId.bind(this);
     }
     /**
      * Calculates the planning unit usage per visit (PU per visit) based on the current scenario configuration and usage type.
@@ -1602,6 +1603,217 @@ export default class TreeTable extends Component {
         });
     }
     /**
+     * Retrieves data from the payload based on the provided item configuration and type.
+     * @param {Object} itemConfig - The configuration object of the item
+     * @param {number} type - The type of data retrieval operation
+     * @returns {any} - The retrieved data
+     */
+    getPayloadData(itemConfig, type) {
+        var data = [];
+        data = itemConfig.payload.nodeDataMap;
+        var scenarioId = document.getElementById('scenarioId').value;
+        if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
+            if (type == 4 || type == 5 || type == 6) {
+                var result = false;
+                if (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.length > 0) {
+                    var nodeDataModelingList = itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                    if (type == 4) {
+                        if (nodeDataModelingList.filter(x => x.increaseDecrease == 1).length > 0) {
+                            result = true;
+                        } else {
+                            var arr = [];
+                            if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                            } else {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                            }
+                            if (arr.length > 0) {
+                                for (var i = 0; i <= arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                        if (nodeDataModelingList.length > 0) {
+                                            var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
+                                            if (nodedata != null && nodedata != "") {
+                                                result = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } if (type == 6) {
+                        if (nodeDataModelingList.filter(x => x.increaseDecrease == -1).length > 0) {
+                            result = true;
+                        }
+                    }
+                    else if (type == 5) {
+                        var filteredData = nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
+                        if (filteredData.length > 0) {
+                            result = true;
+                        } else {
+                            var arr = [];
+                            if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                            } else {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                            }
+                            if (arr.length > 0) {
+                                for (var i = 0; i <= arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                        if (nodeDataModelingList.length > 0) {
+                                            var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
+                                            if (nodedata != null && nodedata != "") {
+                                                result = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (type == 4 || type == 5) {
+                        var arr = [];
+                        if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                            arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                        } else {
+                            arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                        }
+                        if (arr.length > 0) {
+                            for (var i = 0; i <= arr.length; i++) {
+                                if (arr[i] != null) {
+                                    var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                    if (nodeDataModelingList.length > 0) {
+                                        var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
+                                        if (nodedata != null && nodedata != "") {
+                                            result = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+            else {
+                if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
+                    if (type == 1) {
+                        return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2));
+                    } else if (type == 3) {
+                        var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                        if (childList.length > 0) {
+                            var sum = 0;
+                            childList.map(c => {
+                                sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            })
+                            return sum.toFixed(2);
+                        } else {
+                            return "";
+                        }
+                    } else {
+                        return "";
+                    }
+                } else {
+                    if (type == 1) {
+                        if (itemConfig.payload.nodeType.id == 4) {
+                            var usageType = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+                            var val = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth;
+                            var val1 = "/" + 'Month';
+                            var val2 = ", ";
+                            if (usageType == 1) {
+                                var usagePeriodId;
+                                var usageTypeId;
+                                var usageFrequency;
+                                var nodeTypeId = itemConfig.payload.nodeType.id;
+                                var scenarioId = this.state.selectedScenario;
+                                var repeatUsagePeriodId;
+                                var oneTimeUsage;
+                                if (nodeTypeId == 5) {
+                                } else {
+                                    usageTypeId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+                                    if (usageTypeId == 1) {
+                                        oneTimeUsage = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+                                    }
+                                    if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
+                                        usagePeriodId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+                                    }
+                                    usageFrequency = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+                                }
+                                var noOfMonthsInUsagePeriod = 0;
+                                if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+                                    var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+                                    if (usageTypeId == 2) {
+                                        var div = (convertToMonth * usageFrequency);
+                                        if (div != 0) {
+                                            noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
+                                        }
+                                    } else {
+                                        var noOfFUPatient;
+                                        if (itemConfig.payload.nodeType.id == 4) {
+                                            noOfFUPatient = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                                        } else {
+                                            noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                                        }
+                                        noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                    }
+                                    if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                                        repeatUsagePeriodId = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                                        if (repeatUsagePeriodId != "") {
+                                            convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                                        } else {
+                                            convertToMonth = 0;
+                                        }
+                                    }
+                                    var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                                    val = noFURequired;
+                                    val1 = ""
+                                    val2 = " * "
+                                } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+                                    if (itemConfig.payload.nodeType.id == 4) {
+                                        noFURequired = (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                        val = noFURequired;
+                                        val1 = "";
+                                        val2 = " * "
+                                    } else {
+                                        noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "");
+                                        val = noFURequired;
+                                        val1 = "";
+                                        val2 = " * "
+                                    }
+                                }
+                            }
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2)) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(Number(val).toFixed(3)) : addCommasTwoDecimal(Number(val).toFixed(2))) + val1;
+                        } else if (itemConfig.payload.nodeType.id == 5) {
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2)) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
+                        } else {
+                            return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue).toFixed(2)) + "% of parent";
+                        }
+                    } else if (type == 3) {
+                        var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                        if (childList.length > 0) {
+                            var sum = 0;
+                            childList.map(c => {
+                                sum += Number(c.payload.nodeDataMap.hasOwnProperty(scenarioId) ? (c.payload.nodeDataMap[scenarioId])[0].displayDataValue : 0)
+                            })
+                            return sum.toFixed(2);
+                        } else {
+                            return "";
+                        }
+                    } else {
+                        return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue).toFixed(2)) : "");
+                    }
+                }
+            }
+        } else {
+            return "";
+        }
+    }
+    /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
      * @param {*} cell This is the object of the DOM element
@@ -2162,7 +2374,20 @@ export default class TreeTable extends Component {
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
             
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
-            data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
+            data[2] = `<div>
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        <b>
+                            ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
+                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : "" }
+                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<i><img src=${AggregationNode} className="AggregationNodeSize" /></i>' : ""}
+                        </b>
+                    </div>`; 
             data[3] = items[i].payload.label.label_en;
             data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId;
             data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
@@ -2197,7 +2422,7 @@ export default class TreeTable extends Component {
                     },
                     {
                         title: i18n.t('static.ManageTree.NodeType'),
-                        type: 'text',
+                        type: 'html',
                     },
                     {
                         title: i18n.t('static.tree.nodeTitle'),
@@ -2698,7 +2923,20 @@ export default class TreeTable extends Component {
             var currentScenarioParent = this.state.items.filter(ele => ele.id == items[i].parent).length > 0 ? this.state.items.filter(ele => ele.id == items[i].parent)[0] : "";
             data[0] = items[i].id;
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
-            data[2] = getLabelText(this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].label, this.state.lang);
+            data[2] = `<div>
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        <b>
+                            ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
+                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : "" }
+                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<i><img src=${AggregationNode} className="AggregationNodeSize" /></i>' : ""}
+                        </b>
+                    </div>`; 
             data[3] = items[i].payload.label.label_en;
             data[4] = moment(currentScenario.month).format("YYYY-MM-DD");
             data[5] = currentScenario.dataValue; //Percentage of Parent
@@ -2760,7 +2998,7 @@ export default class TreeTable extends Component {
                     },
                     { //c
                         title: i18n.t('static.ManageTree.NodeType'),
-                        type: 'text',
+                        type: 'html',
                     },
                     { //d
                         title: i18n.t('static.tree.nodeTitle'),
@@ -4235,6 +4473,37 @@ export default class TreeTable extends Component {
         })
     }
     /**
+     * Sets program Id
+     * @param {*} e The event object triggered by the change in input fields.
+     */
+    setProgramId(e) {
+        this.setState({
+            programId: e,
+            treeId: "",
+            selectedScenario: ""
+        }, () => {
+            this.getTreeList();
+            this.getDatasetList();
+            this.getRegionList();
+            if (this.state.treeTabl1El != "") {
+                jexcel.destroy(document.getElementById('tableDiv'), true);
+                if (this.state.treeTabl1El != "") {
+                    if (document.getElementById('tableDiv') != null) {
+                        jexcel.destroy(document.getElementById('tableDiv'), true);
+                    }
+                }
+            }
+            if (this.state.treeTabl2El != "") {
+                jexcel.destroy(document.getElementById('tableDiv2'), true);
+                if (this.state.treeTabl2El != "") {
+                    if (document.getElementById('tableDiv2') != null) {
+                        jexcel.destroy(document.getElementById('tableDiv2'), true);
+                    }
+                }
+            }
+        })
+    }
+    /**
      * Toggles the active tab in the modal.
      * @param {number} tabPane - The index of the tab pane to toggle.
      * @param {number} tab - The new active tab index.
@@ -5253,7 +5522,7 @@ export default class TreeTable extends Component {
                                                                 id="datasetId"
                                                                 bsSize="sm"
                                                                 value={this.state.programId}
-                                                                onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                                                onChange={(e) => { this.setProgramId(e.target.value) }}
                                                             >
                                                                 <option value="">{i18n.t('static.mt.selectProgram')}</option>
                                                                 {datasets}
