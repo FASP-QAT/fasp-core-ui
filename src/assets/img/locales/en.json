@@ -3345,7 +3345,9 @@
     "static.compareAndSelect.forecastSelected": "Forecast selected",
     "static.compareAndSelect.forecastNotSelected": "Forecast not selected",
     "static.compareAndSelect.showPUPanel": "Show Planning Unit panel",
-    "static.compareAndSelect.selectMultipleTree":"Select Multiple Tree",
-    "static.compareAndSelect.orMore":"or more",
-    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts"
+    "static.compareAndSelect.selectMultipleTree":"Select Multiple Trees",
+    "static.compareAndSelect.selectOneOrMore":"Select one or more forecasts for",
+    "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts",
+    "static.tooltip.selectMultipleTree":"If checked, user can multi-select tree forecasts (not consumption forecasts) as their final forecast, which will aggregate the monthly forecast quantities.",
+    "static.compareAndSelect.totalAggregated":"Total Aggregated Tree Quantity"
 }

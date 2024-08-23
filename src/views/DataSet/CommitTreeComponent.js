@@ -1535,7 +1535,7 @@ export default class CommitTreeComponent extends React.Component {
                                             var treeFilter = treeScenarioList.filter(c => c.scenarioId == treeAndScenario[tas].scenarioId && c.treeId == treeAndScenario[tas].treeId);
                                             if(treeFilter.length>0){
                                                 if(selectedScenarioId!=""){
-                                                    selectedScenarioId+=",\r";
+                                                    selectedScenarioId+=";\r";
                                                 }
                                                 selectedScenarioId+=treeFilter[0].treeLabel+" ~ "+treeFilter[0].scenarioLabel;
                                             }
@@ -1591,7 +1591,7 @@ export default class CommitTreeComponent extends React.Component {
                                             var treeFilter1 = treeScenarioList1.filter(c => c.scenarioId == treeAndScenario1[tas1].scenarioId && c.treeId == treeAndScenario1[tas1].treeId);
                                             if(treeFilter1.length>0){
                                                 if(selectedScenarioId1!=""){
-                                                    selectedScenarioId1+=",\r";
+                                                    selectedScenarioId1+=";\r";
                                                 }
                                                 selectedScenarioId1+=treeFilter1[0].treeLabel+" ~ "+treeFilter1[0].scenarioLabel;
                                             }
@@ -1645,7 +1645,7 @@ export default class CommitTreeComponent extends React.Component {
                                             var treeFilter2 = treeScenarioList2.filter(c => c.scenarioId == treeAndScenario2[tas2].scenarioId && c.treeId == treeAndScenario2[tas2].treeId);
                                             if(treeFilter2.length>0){
                                                 if(selectedScenarioId2!=""){
-                                                    selectedScenarioId2+=",\r";
+                                                    selectedScenarioId2+=";\r";
                                                 }
                                                 selectedScenarioId2+=treeFilter2[0].treeLabel+" ~ "+treeFilter2[0].scenarioLabel;
                                             }
