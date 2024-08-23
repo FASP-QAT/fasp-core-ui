@@ -236,6 +236,16 @@ class ListProcurementAgentComponent extends Component {
                                 }.bind(this)
                             });
                         }
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_FORECASTING_UNIT')) {
+                            items.push({
+                                title: i18n.t('static.program.mapForecastingUnit'),
+                                onclick: function () {
+                                    this.props.history.push({
+                                        pathname: `/procurementAgent/mapProcurementAgentForecastingUnit/${this.el.getValueFromCoords(0, y)}`,
+                                    });
+                                }.bind(this)
+                            });
+                        }
                         if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
                             items.push({
                                 title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),

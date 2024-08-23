@@ -818,6 +818,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/procurementAgent/mapProcurementAgentForecastingUnit/:procurementAgentId":
+                        if (bfunction.includes("ROLE_BF_MAP_FORECASTING_UNIT")) {
+                            return true;
+                        }
+                        break;                        
                     case "/programProduct/addProgramProduct":
                     case "/programProduct/addProgramProduct/:programId/:color/:message":
                         if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
