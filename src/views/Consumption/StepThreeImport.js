@@ -585,8 +585,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         let username = decryptedUser.username;
 
                         //sum/aggerate entries if matching fc pu / fc region/ month found
-                        let generatedDataNotPink = [];
-                        let generatedDataPink = [];
+                        let generatedDataNotPink = [];//means actual consumption not present in Forecast program
+                        let generatedDataPink = [];//means Current Actual Consumption present in Forecast program
                         for (var i = 0; i < tableJson.length; i++) {                           
 
                             var map1 = new Map(Object.entries(tableJson[i]));
@@ -610,11 +610,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         let matchedEntry = matched[0];
                                         // console.log('existing AmountOfActualConsumption 14: ',matchedEntry[14]);
                                         // console.log('new AmountOfActualConsumption 14: ',map1.get("14"));
-                                        matchedEntry[14] = Number(matchedEntry[14]) + Number(map1.get("14"));//sum of existing value + current value & updated existing entry
+                                        // matchedEntry[14] = Number(matchedEntry[14]) + Number(map1.get("14"));//sum of existing value + current value & updated existing entry
 
                                         // console.log('existing Converted Actual Cons. 8: ',matchedEntry[8]);
                                         // console.log('new Converted Actual Cons. 8: ',map1.get("8"));
-                                        matchedEntry[8] = Number(matchedEntry[8]) + Number(map1.get("8"));
+                                        matchedEntry[8] = Number(matchedEntry[8]) + Number(map1.get("8"));//sum of existing value + current value & updated existing entry
 
                                         // console.log('matched: ',matched[0]);
                                     } else {
@@ -639,9 +639,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     if(matched.length > 0) {
                                         // perform sum of AmountOfActualConsumption, Converted Actual Cons. (SP Module) and update existng entry in generatedDataPink []
                                         let matchedEntry = matched[0];
-                                        matchedEntry[14] = Number(matchedEntry[14]) + Number(map1.get("14"));//sum of existing value + current value & updated existing entry
+                                        // matchedEntry[14] = Number(matchedEntry[14]) + Number(map1.get("14"));//sum of existing value + current value & updated existing entry
 
-                                        matchedEntry[8] = Number(matchedEntry[8]) + Number(map1.get("8"));
+                                        matchedEntry[8] = Number(matchedEntry[8]) + Number(map1.get("8"));//sum of existing value + current value & updated existing entry
 
                                     } else {
                                         // push row in generatedDataPink []
@@ -693,8 +693,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     // "adjustedAmount": parseInt(this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),//changed
                                     // "puAmount": parseInt(this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),//changed
                                     
-                                    "amount": Number(map1.get("14")),//changed
-                                    "adjustedAmount": Number(map1.get("14")),//changed
+                                    "amount": Number(map1.get("8")),//changed
+                                    "adjustedAmount": Number(map1.get("8")),//changed
                                     "puAmount": Number(map1.get("8")),//changed                                    
                                     "reportingRate": null,
                                     "daysOfStockOut": null,
@@ -713,7 +713,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     planningUnitId: map1.get("3"), //changed
                                     month: map1.get("4"),//changed
                                     // amount: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),//changed
-                                    amount: Number(map1.get("14")),//changed
+                                    amount: Number(map1.get("8")),//changed
                                 }
                                 ImportListPink.push(tempJsonPink);
                             }
@@ -943,14 +943,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[6] = stepTwoSelectedRegionObject.percentOfSupplyPlan;
                 data[7] = stepOneSelectedObject.multiplier; //conversion factor
                 let amtOfActualConsumption = (papuList[j].actualConsumption * (stepTwoSelectedRegionObject.percentOfSupplyPlan/100));
-                data[8] = (amtOfActualConsumption * stepOneSelectedObject.multiplier).toFixed(2);//Converted Actual Cons. (SP Module)
+                let convertedActualConsumption = (amtOfActualConsumption * stepOneSelectedObject.multiplier).toFixed(2);
+                data[8] = convertedActualConsumption;//Converted Actual Cons. (SP Module)
                 data[9] = (match.length > 0 ? match[0].amount : '') //Current Actual Cons. (FC Module)
                 data[10] = true; //import
                 data[11] = (match.length > 0 ? 1 : 0); //duplicate
                 data[12] = papuList[j].region.id;//sp regionId
                 data[13] = stepTwoSelectedRegionObject.forecastRegionId;//Forecast RegionId
                 data[14] = amtOfActualConsumption.toFixed(2); //AmountOfActualConsumption
-                // data[2] = getLabelText(papuList[j].region.label, this.state.lang) //region
                 papuDataArr[count] = data;
                 count++;
                 buildCSVTable.push({
