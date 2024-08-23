@@ -3393,5 +3393,13 @@
     "static.import.percentOfSupplyPlan":"% of Supply Plan",
     "static.import.forecastRegionFor":"Forecast Region for",
     "static.importFromQATSupplyPlan.supplyPlanProgrmRegion":"Supply Plan Program (Region)",
-    "static.importFromQATSupplyPlan.forecastProgramRegion":"Forecast Program (Region)"
+    "static.importFromQATSupplyPlan.forecastProgramRegion":"Forecast Program (Region)",
+    "static.extrapolation.bulkExtrapolation": "Bulk Extraploation",
+    "static.extrapolation.optimizeTES&ARIMA": "Optimize TES & ARIMA",
+    "static.extrapolation.missingTES&ARIMA": "Missing TES & ARIMA",
+    "static.extrapolation.extrapolateUsingDefaultParams": "Extrapolate using default parameters",
+    "static.extrapolation.extrapolateUsingOptimizedArimaAndTes": "Extrapolate with optimized ARIMA & TES",
+    "static.extrapolation.bulkExtrapolationSuccess": "Bulk Extraploation done successfully",
+    "static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams": "Extrapolate ARIMA & TES using default parameters",
+    "static.extrapolation.extrapolation": "Extraploations"
 }

@@ -1,7 +1,9 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 let m = 0;
 let c = 0;
-export function calculateSemiAverages(inputData, noOfProjectionMonths, props, page, regionId,planningUnitId) {
+export function calculateSemiAverages(inputData, noOfProjectionMonths, props, page, regionId, planningUnitId) {
+    console.log("inside semi avg")
+
     const data = inputData;
     const noOfMonthsForProjection = noOfProjectionMonths;
     let actualMonths = 0;
@@ -23,7 +25,7 @@ export function calculateSemiAverages(inputData, noOfProjectionMonths, props, pa
     if (page == "DataEntry") {
         var semiAvgData = { "data": data, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
         props.updateSemiAveragesData(semiAvgData);
-    }else if (page == "importFromQATSP") {
+    } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
         var semiAvgData = { "data": data, "PlanningUnitId": planningUnitId, "regionId": regionId }
         props.updateSemiAveragesData(semiAvgData);
     } else {

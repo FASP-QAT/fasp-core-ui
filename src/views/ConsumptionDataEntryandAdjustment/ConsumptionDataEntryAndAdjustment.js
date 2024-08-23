@@ -146,7 +146,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       countRecived: 0,
       isTableLoaded: "",
       consumptionNotesForValidation: "",
-      monthArray:[],
+      monthArray: [],
       versionId: -1,
       versions: [],
       isDisabled: false,
@@ -170,10 +170,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.updateArimaData = this.updateArimaData.bind(this);
     this.formulaChanged = this.formulaChanged.bind(this);
     this.pickAMonth2 = React.createRef();
-    this.roundingForPuQty=this.roundingForPuQty.bind(this);
+    this.roundingForPuQty = this.roundingForPuQty.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
+    this.addPUForArimaAndTesWhileOffline = this.addPUForArimaAndTesWhileOffline.bind(this);
   }
   /**
    * Rounds the given pu quantity (puQty) to 4 decimal places if it's less than 1,
@@ -181,12 +182,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * @param {*} puQty 
    * @returns 
    */
-  roundingForPuQty(puQty){
-    if(puQty!==""){
-      if(puQty<1){
-        puQty=Number(puQty).toFixed(4);
-      }else{
-        puQty=Math.round(puQty);
+  roundingForPuQty(puQty) {
+    if (puQty !== "") {
+      if (puQty < 1) {
+        puQty = Number(puQty).toFixed(4);
+      } else {
+        puQty = Math.round(puQty);
       }
     }
     return puQty;
@@ -429,6 +430,32 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
   }
   /**
+     * Add PUs in local storage that were not extrapolated with ARIMA & TES while offline.
+     */
+  addPUForArimaAndTesWhileOffline(regionObj, puObj) {
+    var tempForecastProgramId = this.state.datasetId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+      var planningUnitBulkExtrapolationTransaction = transaction.objectStore('planningUnitBulkExtrapolation');
+      var planningUnitBulkExtrapolationRequest = planningUnitBulkExtrapolationTransaction.get(tempForecastProgramId);
+      planningUnitBulkExtrapolationRequest.onerror = function (event) {
+      }.bind(this);
+      planningUnitBulkExtrapolationRequest.onsuccess = function (event) {
+        var obj = {
+          region: regionObj,
+          planningUnit: puObj,
+          programId: tempForecastProgramId
+        }
+        planningUnitBulkExtrapolationTransaction.put(obj);
+
+      }.bind(this);
+    }.bind(this);
+  }
+  /**
    * Builds data for extrapolation and runs extrapolation methods
    */
   ExtrapolatedParameters() {
@@ -437,6 +464,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var datasetJson = this.state.datasetJson;
       var regionList = this.state.regionList;
       var count = 0;
+      var puObj = [];
+      var regionObj = []
       for (var i = 0; i < regionList.length; i++) {
         var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.selectedConsumptionUnitId && c.region.id == regionList[i].regionId);
         if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
@@ -481,7 +510,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             count++;
             calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "DataEntry", regionList[i].regionId);
           }
+          if (localStorage.getItem("sessionType") === "Offline" && (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 || ((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)))) {
+            if (!regionObj.includes(regionList[i].regionId)) {
+              // Add the value to the array if it's not present
+              regionObj.push(regionList[i].regionId)
+            }
+            puObj.push(this.state.selectedConsumptionUnitId)
+          }
         }
+      }
+      if (regionObj != "" && puObj != "") {
+        this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
       }
       this.setState({
         count: count,
@@ -599,7 +638,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Saves extrapolation data in indexed DB
    */
   saveForecastConsumptionExtrapolation() {
-    var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
+    var tempDatasetId = this.state.datasetId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
     this.setState({
       loading: true
     })
@@ -1273,7 +1312,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Saves forecast consumption data in indexed db
    */
   saveConsumptionList() {
-    var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
+    var tempDatasetId = this.state.datasetId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
     this.setState({
       loading: true
     })
@@ -1512,7 +1551,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           cell.classList.add('readonly');
           elInstance.setStyle((colArr[j + 1]).concat(parseInt(count5)), "background-color", "yellow");
         }
-        if(this.state.isDisabled){
+        if (this.state.isDisabled) {
           var cell = elInstance.getCell((colArr[j + 1]).concat(parseInt(count5)))
           cell.classList.add('readonly');
           var cell = elInstance.getCell((colArr[j + 1]).concat(parseInt(count6)))
@@ -1571,42 +1610,42 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         })
       }
     }).catch(
-        error => {
-            if (error.message === "Network Error") {
-                this.setState({
-                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                    loading: false
-                });
-            } else {
-                switch (error.response ? error.response.status : "") {
-                    case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                    case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                    case 500:
-                    case 404:
-                    case 406:
-                        this.setState({
-                            message: error.response.data.messageCode,
-                            loading: false
-                        });
-                        break;
-                    case 412:
-                        this.setState({
-                            message: error.response.data.messageCode,
-                            loading: false
-                        });
-                        break;
-                    default:
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                        break;
-                }
+      error => {
+        if (error.message === "Network Error") {
+          this.setState({
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+            loading: false
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false
+              });
+              break;
+            case 412:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false
+              });
+              break;
+            default:
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+              break;
           }
+        }
       }
     );
     }
@@ -1619,43 +1658,43 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         })
       }
     }).catch(
-        error => {
-            if (error.message === "Network Error") {
-                this.setState({
-                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                    loading: false
-                });
-            } else {
-                switch (error.response ? error.response.status : "") {
-                    case 401:
-                        this.props.history.push(`/login/static.message.sessionExpired`)
-                        break;
-                    case 403:
-                        this.props.history.push(`/accessDenied`)
-                        break;
-                    case 500:
-                    case 404:
-                    case 406:
-                        this.setState({
-                            message: error.response.data.messageCode,
-                            loading: false
-                        });
-                        break;
-                    case 412:
-                        this.setState({
-                            message: error.response.data.messageCode,
-                            loading: false
-                        });
-                        break;
-                    default:
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                        break;
-                }
-            }
+      error => {
+        if (error.message === "Network Error") {
+          this.setState({
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+            loading: false
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false
+              });
+              break;
+            case 412:
+              this.setState({
+                message: error.response.data.messageCode,
+                loading: false
+              });
+              break;
+            default:
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+              break;
+          }
         }
+      }
     );
       }
     if(localStorage.getItem('sessionType') === 'Online'){
@@ -1667,42 +1706,42 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             loading: false
           })
         }
-    }).catch(
-      error => {
+      }).catch(
+        error => {
           if (error.message === "Network Error") {
-              this.setState({
-                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                  loading: false
-              });
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
           } else {
-              switch (error.response ? error.response.status : "") {
-                  case 401:
-                      this.props.history.push(`/login/static.message.sessionExpired`)
-                      break;
-                  case 403:
-                      this.props.history.push(`/accessDenied`)
-                      break;
-                  case 500:
-                  case 404:
-                  case 406:
-                      this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false
-                      });
-                      break;
-                  case 412:
-                      this.setState({
-                          message: error.response.data.messageCode,
-                          loading: false
-                      });
-                      break;
-                  default:
-                      this.setState({
-                          message: 'static.unkownError',
-                          loading: false
-                      });
-                      break;
-              }
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
           }
       }
     );
@@ -1958,21 +1997,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   changeOnlyDownloadedProgram(event) {
     var flag = event.target.checked ? 1 : 0
     if (flag) {
-        this.setState({
-            datasetId: this.state.versionId.toString().includes('Local') ? this.state.datasetId : "",
-            showSmallTable: this.state.versionId.toString().includes('Local') ? true : false,
-            onlyDownloadedProgram: true,
-            loading: false
-        }, () => {
-            this.getPrograms();
-        })
+      this.setState({
+        datasetId: this.state.versionId.toString().includes('Local') ? this.state.datasetId : "",
+        showSmallTable: this.state.versionId.toString().includes('Local') ? true : false,
+        onlyDownloadedProgram: true,
+        loading: false
+      }, () => {
+        this.getPrograms();
+      })
     } else {
-        this.setState({
-            onlyDownloadedProgram: false,
-            loading: false
-        }, () => {
-            this.getPrograms();
-        })
+      this.setState({
+        onlyDownloadedProgram: false,
+        loading: false
+      }, () => {
+        this.getPrograms();
+      })
     }
   }
   /**
@@ -1981,157 +2020,157 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   getPrograms() {
     this.setState({ loading: true })
     if (localStorage.getItem('sessionType') === 'Online') {
-        let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
-            .then(response => {
-                var proList = [];
-                if (response.status == 200) {
-                    for (var i = 0; i < response.data.length; i++) {
-                        var programJson = {
-                            id: response.data[i].id,
-                            label: response.data[i].label,
-                            name: response.data[i].code
-                        }
-                        proList[i] = programJson
-                    }
-                    this.setState({
-                        datasetList: proList,
-                        loading: false,
-                        allProgramList: proList
-                    }, () => {
-                        this.consolidatedProgramList();
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode, loading: false
-                    }, () => {
-                        this.hideSecondComponent();
-                    })
-                }
-            }).catch(
-                error => {
-                    this.consolidatedProgramList();
-                }
-            );
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+        .then(response => {
+          var proList = [];
+          if (response.status == 200) {
+            for (var i = 0; i < response.data.length; i++) {
+              var programJson = {
+                id: response.data[i].id,
+                label: response.data[i].label,
+                name: response.data[i].code
+              }
+              proList[i] = programJson
+            }
+            this.setState({
+              datasetList: proList,
+              loading: false,
+              allProgramList: proList
+            }, () => {
+              this.consolidatedProgramList();
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode, loading: false
+            }, () => {
+              this.hideSecondComponent();
+            })
+          }
+        }).catch(
+          error => {
+            this.consolidatedProgramList();
+          }
+        );
     } else {
-        this.setState({ loading: false })
-        this.consolidatedProgramList()
+      this.setState({ loading: false })
+      this.consolidatedProgramList()
     }
   }
   /**
    * Consolidates server and local version of all programs
    */
   consolidatedProgramList = () => {
-      this.setState({ loading: true })
-      const lan = 'en';
-      const { datasetList } = this.state
-      var proList;
-      if(this.state.onlyDownloadedProgram) {
-          proList = [];
-      } else {
-          proList = datasetList;
-      }
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['datasetData'], 'readwrite');
-          var program = transaction.objectStore('datasetData');
-          var getRequest = program.getAll();
-          getRequest.onerror = function (event) {
-          };
-          getRequest.onsuccess = function (event) {
-              var myResult = [];
-              
-                  myResult = getRequest.result;
-                  var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                  var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                  let downloadedProgramData = [];
-                  for (var i = 0; i < myResult.length; i++) {
-                      if (myResult[i].userId == userId) {
-                          var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                          var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                          var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                          var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                          programData.code = programData.programCode;
-                          programData.id = programData.programId;
-                          var planningUnitList = programData.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
-                          var regionList = programData.regionList;
-                          planningUnitList.sort((a, b) => {
-                              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-                              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-                              return itemLabelA > itemLabelB ? 1 : -1;
-                          });
-                          regionList.sort((a, b) => {
-                              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                              return itemLabelA > itemLabelB ? 1 : -1;
-                          });
-                          var forecastProgramJson = {
-                              name: programData.programCode,
-                              id: myResult[i].id.split("_")[0],
-                              regionList: regionList,
-                              planningUnitList: planningUnitList,
-                              dataset: programData
-                          }
-                          var f = 0
-                          for (var k = 0; k < this.state.datasetList.length; k++) {
-                              if (this.state.datasetList[k].id == programData.programId) {
-                                  f = 1;
-                              }
-                          }
-                          if(this.state.onlyDownloadedProgram) {
-                              proList.push(forecastProgramJson)
-                          } else {
-                              if (f == 0) {
-                                  proList.push(forecastProgramJson)
-                              } else if(f == 1) {
-                                  proList[proList.findIndex(m => m.id=== programData.programId)] = forecastProgramJson;
-                              }
-                          }
-                          downloadedProgramData.push(forecastProgramJson);
-                      }
-                  }
-                  var lang = this.state.lang;
-                  if (proList.length == 1) {
-                      this.setState({
-                          datasetList: proList.sort(function (a, b) {
-                              a = (a.name).toLowerCase();
-                              b = (b.name).toLowerCase();
-                              return a < b ? -1 : a > b ? 1 : 0;
-                          }),
-                          loading: false,
-                          downloadedProgramData: downloadedProgramData,
-                          downloadedProgramList: downloadedProgramData.sort(function (a, b) {
-                              a = (a.name).toLowerCase();
-                              b = (b.name).toLowerCase();
-                              return a < b ? -1 : a > b ? 1 : 0;
-                          })
-                      }, () => {
-                          this.filterVersion();
-                      })
-                  } else {
-                          this.setState({
-                              datasetList: proList.sort(function (a, b) {
-                                  a = (a.name).toLowerCase();
-                                  b = (b.name).toLowerCase();
-                                  return a < b ? -1 : a > b ? 1 : 0;
-                              }),
-                              downloadedProgramData: downloadedProgramData,
-                              downloadedProgramList: downloadedProgramData.sort(function (a, b) {
-                                  a = (a.name).toLowerCase();
-                                  b = (b.name).toLowerCase();
-                                  return a < b ? -1 : a > b ? 1 : 0;
-                              }),
-                              loading: false
-                          }, () => {
-                              this.filterVersion();
-                          })
-                  }
-              
-          }.bind(this);
+    this.setState({ loading: true })
+    const lan = 'en';
+    const { datasetList } = this.state
+    var proList;
+    if (this.state.onlyDownloadedProgram) {
+      proList = [];
+    } else {
+      proList = datasetList;
+    }
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['datasetData'], 'readwrite');
+      var program = transaction.objectStore('datasetData');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        let downloadedProgramData = [];
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+            programData.code = programData.programCode;
+            programData.id = programData.programId;
+            var planningUnitList = programData.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
+            var regionList = programData.regionList;
+            planningUnitList.sort((a, b) => {
+              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            regionList.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            var forecastProgramJson = {
+              name: programData.programCode,
+              id: myResult[i].id.split("_")[0],
+              regionList: regionList,
+              planningUnitList: planningUnitList,
+              dataset: programData
+            }
+            var f = 0
+            for (var k = 0; k < this.state.datasetList.length; k++) {
+              if (this.state.datasetList[k].id == programData.programId) {
+                f = 1;
+              }
+            }
+            if (this.state.onlyDownloadedProgram) {
+              proList.push(forecastProgramJson)
+            } else {
+              if (f == 0) {
+                proList.push(forecastProgramJson)
+              } else if (f == 1) {
+                proList[proList.findIndex(m => m.id === programData.programId)] = forecastProgramJson;
+              }
+            }
+            downloadedProgramData.push(forecastProgramJson);
+          }
+        }
+        var lang = this.state.lang;
+        if (proList.length == 1) {
+          this.setState({
+            datasetList: proList.sort(function (a, b) {
+              a = (a.name).toLowerCase();
+              b = (b.name).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            loading: false,
+            downloadedProgramData: downloadedProgramData,
+            downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+              a = (a.name).toLowerCase();
+              b = (b.name).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          }, () => {
+            this.filterVersion();
+          })
+        } else {
+          this.setState({
+            datasetList: proList.sort(function (a, b) {
+              a = (a.name).toLowerCase();
+              b = (b.name).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            downloadedProgramData: downloadedProgramData,
+            downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+              a = (a.name).toLowerCase();
+              b = (b.name).toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            }),
+            loading: false
+          }, () => {
+            this.filterVersion();
+          })
+        }
+
       }.bind(this);
+    }.bind(this);
   }
   /**
      * Sets selected version
@@ -2141,199 +2180,199 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
     versionId = parseInt(versionId);
     if (versionId != '' || versionId != undefined) {
-        this.setState({
-            planningUnitList: [],
-            planningUnitId: "",
-            regionList: [],
-            regionId: "",
-            showData: false,
-            dataEl: "",
-            versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
-        }, () => {
-            this.getDatasetData();
-        })
+      this.setState({
+        planningUnitList: [],
+        planningUnitId: "",
+        regionList: [],
+        regionId: "",
+        showData: false,
+        dataEl: "",
+        versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
+      }, () => {
+        this.getDatasetData();
+      })
     } else {
-        localStorage.setItem("sesVersionId", event.target.value);
-        this.setState({
-            planningUnitList: [],
-            planningUnitId: "",
-            regionList: [],
-            regionId: "",
-            showData: false,
-            dataEl: "",
-            versionId: event.target.value
-        }, () => {
-            this.getDatasetData();
-        })
+      localStorage.setItem("sesVersionId", event.target.value);
+      this.setState({
+        planningUnitList: [],
+        planningUnitId: "",
+        regionList: [],
+        regionId: "",
+        showData: false,
+        dataEl: "",
+        versionId: event.target.value
+      }, () => {
+        this.getDatasetData();
+      })
     }
   }
   /**
    * Retrieves list of all available version for selected forecast program
    */
   getVersionIds() {
-      let programId = this.state.datasetId;
-      let datasetId = this.state.datasetId;
-      if (programId != 0) {
-          const program = this.state.datasetList.filter(c => c.id == datasetId)
-          if (program.length == 1) {
-              if (localStorage.getItem("sessionType") === 'Online') {
-                  DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
-                      .then(response => {
-                          this.setState({
-                              versions: []
-                          }, () => {
-                              this.setState({
-                                  versions: response.data
-                              }, () => { this.consolidatedVersionList(programId) });
-                          });
-                      }).catch(
-                          error => {
-                              this.setState({
-                                  programs: [], loading: false
-                              })
-                              if (error.message === "Network Error") {
-                                  this.setState({
-                                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                      loading: false
-                                  });
-                              } else {
-                                  switch (error.response ? error.response.status : "") {
-                                      case 401:
-                                          this.props.history.push(`/login/static.message.sessionExpired`)
-                                          break;
-                                      case 403:
-                                          this.props.history.push(`/accessDenied`)
-                                          break;
-                                      case 500:
-                                      case 404:
-                                      case 406:
-                                          this.setState({
-                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                              loading: false
-                                          });
-                                          break;
-                                      case 412:
-                                          this.setState({
-                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                              loading: false
-                                          });
-                                          break;
-                                      default:
-                                          this.setState({
-                                              message: 'static.unkownError',
-                                              loading: false
-                                          });
-                                          break;
-                                  }
-                              }
-                          }
-                      );
-              } else {
-                  this.setState({
-                      versions: [],
-                  }, () => {
-                      this.consolidatedVersionList(programId)
-                  })
-              }
-          } else {
+    let programId = this.state.datasetId;
+    let datasetId = this.state.datasetId;
+    if (programId != 0) {
+      const program = this.state.datasetList.filter(c => c.id == datasetId)
+      if (program.length == 1) {
+        if (localStorage.getItem("sessionType") === 'Online') {
+          DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+            .then(response => {
               this.setState({
-                  versions: [],
-              }, () => { })
-          }
-      } else {
+                versions: []
+              }, () => {
+                this.setState({
+                  versions: response.data
+                }, () => { this.consolidatedVersionList(programId) });
+              });
+            }).catch(
+              error => {
+                this.setState({
+                  programs: [], loading: false
+                })
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
+                }
+              }
+            );
+        } else {
           this.setState({
-              versions: [],
-              planningUnitList: [],
-              regionList: []
-          }, () => { })
+            versions: [],
+          }, () => {
+            this.consolidatedVersionList(programId)
+          })
+        }
+      } else {
+        this.setState({
+          versions: [],
+        }, () => { })
       }
+    } else {
+      this.setState({
+        versions: [],
+        planningUnitList: [],
+        regionList: []
+      }, () => { })
+    }
   }
   /**
    * Retrieves version list of the selected program
    */
   filterVersion() {
-      this.setState({ loading: true })
-      let programId = this.state.datasetId;
-      if (programId != 0) {
-          const program = this.state.datasetList.filter(c => c.id == programId)
-          if (program.length == 1) {
-              if (localStorage.getItem('sessionType') === 'Online') {
-                  DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
-                      .then(response => {
-                          this.setState({
-                              versions: []
-                          }, () => {
-                              this.setState({
-                                  versions: response.data
-                              }, () => { this.consolidatedVersionList(programId) });
-                          });
-                      }).catch(
-                          error => {
-                              this.setState({
-                                  programs: [], loading: false
-                              })
-                              if (error.message === "Network Error") {
-                                  this.setState({
-                                      message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                      loading: false
-                                  });
-                              } else {
-                                  switch (error.response ? error.response.status : "") {
-                                      case 401:
-                                          this.props.history.push(`/login/static.message.sessionExpired`)
-                                          break;
-                                      case 403:
-                                          this.props.history.push(`/accessDenied`)
-                                          break;
-                                      case 500:
-                                      case 404:
-                                      case 406:
-                                          this.setState({
-                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                              loading: false
-                                          });
-                                          break;
-                                      case 412:
-                                          this.setState({
-                                              message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                              loading: false
-                                          });
-                                          break;
-                                      default:
-                                          this.setState({
-                                              message: 'static.unkownError',
-                                              loading: false
-                                          });
-                                          break;
-                                  }
-                              }
-                          }
-                      );
-              } else {
-                  this.setState({
-                      versions: [],
-                      loading: false
-                  }, () => {
-                      this.consolidatedVersionList(programId)
-                  })
-              }
-          } else {
+    this.setState({ loading: true })
+    let programId = this.state.datasetId;
+    if (programId != 0) {
+      const program = this.state.datasetList.filter(c => c.id == programId)
+      if (program.length == 1) {
+        if (localStorage.getItem('sessionType') === 'Online') {
+          DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+            .then(response => {
               this.setState({
-                  versions: [],
-                  loading: false
-              }, () => { })
-          }
-      } else {
-          this.setState({
-              versions: [],
-              loading:false
-          }, () => {
-              if(document.getElementById("tableDiv")){
-                  this.el = jexcel(document.getElementById("tableDiv"), '');
-                  jexcel.destroy(document.getElementById("tableDiv"), true);
+                versions: []
+              }, () => {
+                this.setState({
+                  versions: response.data
+                }, () => { this.consolidatedVersionList(programId) });
+              });
+            }).catch(
+              error => {
+                this.setState({
+                  programs: [], loading: false
+                })
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
+                }
               }
+            );
+        } else {
+          this.setState({
+            versions: [],
+            loading: false
+          }, () => {
+            this.consolidatedVersionList(programId)
           })
+        }
+      } else {
+        this.setState({
+          versions: [],
+          loading: false
+        }, () => { })
       }
+    } else {
+      this.setState({
+        versions: [],
+        loading: false
+      }, () => {
+        if (document.getElementById("tableDiv")) {
+          this.el = jexcel(document.getElementById("tableDiv"), '');
+          jexcel.destroy(document.getElementById("tableDiv"), true);
+        }
+      })
+    }
   }
   /**
    * Gets consolidated list of all versions for a forecast program
@@ -2508,7 +2547,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             showDetailTable: false,
             dataEl: "",
             isTableLoaded: "",
-            loading:false
+            loading: false
           })
         }
       })
@@ -2521,7 +2560,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let programId = this.state.datasetId;
     let versionId = this.state.versionId;
     if (versionId.toString().includes('Local')) {
-      var tempDatasetId = this.state.datasetId+"_v"+this.state.versionId.split(" (")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
+      var tempDatasetId = this.state.datasetId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
       this.setState({
         loading: true,
         isDisabled: false
@@ -2799,12 +2838,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 this.buildDataJexcel(localStorage.getItem("sesDatasetPlanningUnitId"), 0)
               }
             })
-            this.setState({ 
+            this.setState({
               datasetJson: datasetJson,
-              loading: false 
+              loading: false
             })
           }
-      });
+        });
     }
   }
   /**
@@ -3010,28 +3049,28 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * @param {object} value - The new range value selected by the user.
    */
   handleAMonthDissmis2 = (value) => {
-    if(this.state.datasetId!=""){
-    var cont = false;
-    if (this.state.consumptionChanged) {
-      var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
-      if (cf == true) {
-        cont = true;
+    if (this.state.datasetId != "") {
+      var cont = false;
+      if (this.state.consumptionChanged) {
+        var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+        if (cf == true) {
+          cont = true;
+        } else {
+        }
       } else {
+        cont = true;
       }
-    } else {
-      cont = true;
-    }
-    if (cont == true) {
-      this.setState({
-        consumptionChanged: false
-      }, () => {
-        this.setState({ singleValue2: value, }, () => {
-          localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
-          this.getDatasetData()
+      if (cont == true) {
+        this.setState({
+          consumptionChanged: false
+        }, () => {
+          this.setState({ singleValue2: value, }, () => {
+            localStorage.setItem("sesDataentryStartDateRange", JSON.stringify(value))
+            this.getDatasetData()
+          })
         })
-      })
+      }
     }
-  }
   }
   /**
    * Generates a table based on the state data.
@@ -3292,7 +3331,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
-              {this.state.datasetId!=="" && <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+              {this.state.datasetId !== "" && <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
             </div>
           </div>
           <Formik
@@ -3419,7 +3458,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.common.for')} {i18n.t('static.dashboard.planningunitheader')}: <b>{getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}</b>
                                       </Label><br />
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
-                                        {!this.state.isDisabled &&<a className="card-header-action">
+                                        {!this.state.isDisabled && <a className="card-header-action">
                                           {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
                                         </a>}
                                       </Label><br />
@@ -3762,7 +3801,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Resets the consumption data when reset button is clicked.
    */
   resetClicked() {
-    if(this.state.datasetId!=""){
+    if (this.state.datasetId != "") {
       this.buildDataJexcel(this.state.selectedConsumptionUnitId, 0)
     }
   }
