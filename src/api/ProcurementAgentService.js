@@ -17,12 +17,20 @@ class ProcurementAgentService {
         return axios.get(`${API_URL}/api/procurementAgent/${json}/planningUnit/all`, {}
         );
     }
+    getProcurementAgentForecastingUnitList(json) {
+        return axios.get(`${API_URL}/api/procurementAgent/${json}/forecastingUnit/all`, {}
+        );
+    }
     getCountrySpecificPricesList(json) {
         return axios.post(`${API_URL}/api/program/planningUnit/procurementAgent/`,json, {}
         );
     }
     addprocurementAgentPlanningUnitMapping(json) {
         return axios.put(`${API_URL}/api/procurementAgent/planningUnit`, json, {}
+        );
+    }
+    addprocurementAgentForecastingUnitMapping(json) {
+        return axios.put(`${API_URL}/api/procurementAgent/forecastingUnit`, json, {}
         );
     }
     savePlanningUnitProgramPriceForProcurementAgent(json) {
