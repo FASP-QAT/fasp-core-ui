@@ -385,7 +385,11 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             } else {
                                                 noOfFUPatient = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", "");
                                             }
-                                            noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                            if(nodeDataMapForScenario.fuNode.oneTimeDispensing!=undefined && nodeDataMapForScenario.fuNode.oneTimeDispensing!=null && nodeDataMapForScenario.fuNode.oneTimeDispensing.toString()!="" && nodeDataMapForScenario.fuNode.oneTimeDispensing.toString() == "false") {
+                                                noOfMonthsInUsagePeriod = (((usageFrequency / convertToMonth) * nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "")) / nodeDataMapForScenario.fuNode.noOfPersons.toString().replaceAll(",", ""))
+                                            } else { 
+                                                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                                            }
                                         }
                                         if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
                                             repeatUsagePeriodId = nodeDataMapForScenario.fuNode.repeatUsagePeriod.usagePeriodId;
