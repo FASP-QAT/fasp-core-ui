@@ -998,9 +998,9 @@ class ForecastSummary extends Component {
                                                 notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes);
                                             }
                                         }
-                                        if (((selectedForecastMapObjIn.treeAndScenario!=undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
+                                        if (((selectedForecastMapObjIn.treeAndScenario != undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
                                             let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
-                                            if (selectedForecastMapObjIn.treeAndScenario!=undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) {//scenarioId
+                                            if (selectedForecastMapObjIn.treeAndScenario != undefined && selectedForecastMapObjIn.treeAndScenario.length > 0) {//scenarioId
                                                 var treeAndScenario = selectedForecastMapObjIn.treeAndScenario;
                                                 var selectedScenarioId = "";
                                                 for (let tas = 0; tas < treeAndScenario.length; tas++) {
@@ -1215,7 +1215,7 @@ class ForecastSummary extends Component {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                                                 var selectedForecast = "";
                                                 if (filterForecastSelected != undefined) {
-                                                    if (filterForecastSelected.treeAndScenario!=undefined && filterForecastSelected.treeAndScenario.length > 0) {
+                                                    if (filterForecastSelected.treeAndScenario != undefined && filterForecastSelected.treeAndScenario.length > 0) {
                                                         var treeAndScenario = filterForecastSelected.treeAndScenario;
                                                         for (var tas = 0; tas < treeAndScenario.length; tas++) {
                                                             if (selectedForecast != "") {
@@ -1364,6 +1364,14 @@ class ForecastSummary extends Component {
                                                         ele.classList.add('regionBold');
                                                     }
                                                 }
+                                            }
+                                            var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+                                            var tr = asterisk.firstChild.nextSibling;
+                                            var colCount = 3;
+                                            for (var k = 1; k <= regRegionList.length; k++) {
+                                                tr.children[k + colCount].classList.add('InfoTr');
+                                                tr.children[k + colCount].title = i18n.t('static.forecastSummaryTooltip.selectForecast');
+                                                colCount = colCount + 2;
                                             }
                                         },
                                         license: JEXCEL_PRO_KEY,
@@ -1593,6 +1601,14 @@ class ForecastSummary extends Component {
                                                 ele.classList.add('regionBold');
                                             }
                                         }
+                                    }
+                                    var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+                                    var tr = asterisk.firstChild.nextSibling;
+                                    var colCount = 3;
+                                    for (var k = 1; k <= uniqueRegionList.length; k++) {
+                                        tr.children[k + colCount].classList.add('InfoTr');
+                                        tr.children[k + colCount].title = i18n.t('static.forecastSummaryTooltip.selectForecast');
+                                        colCount = colCount + 2;
                                     }
                                 },
                                 license: JEXCEL_PRO_KEY,
@@ -2373,7 +2389,7 @@ class ForecastSummary extends Component {
                         if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
                             dataList.push({
                                 planningUnit: json[j][1],
-                                treeAndScenario:[],
+                                treeAndScenario: [],
                                 consumptionExtrapolationId: null,
                                 totalForecast: '',
                                 notes: '',
@@ -2411,7 +2427,7 @@ class ForecastSummary extends Component {
                     for (var dl = 0; dl < dataList.length; dl++) {
                         var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id && c.active.toString() == "true");
                         var pu = planningUnitList1[index];
-                        if (dataList[dl].treeAndScenario.length==0 && dataList[dl].consumptionExtrapolationId == null) {
+                        if (dataList[dl].treeAndScenario.length == 0 && dataList[dl].consumptionExtrapolationId == null) {
                             pu.selectedForecastMap[dataList[dl].region.regionId] = {};
                             planningUnitList1[index] = pu;
                         } else {
