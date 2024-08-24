@@ -127,12 +127,13 @@ class ListProcurementAgentComponent extends Component {
             data[3] = getLabelText(procurementAgentList[j].label, this.state.lang)
             data[4] = procurementAgentList[j].procurementAgentCode;
             data[5] = procurementAgentList[j].colorHtmlCode;
-            data[6] = procurementAgentList[j].submittedToApprovedLeadTime;
-            data[7] = procurementAgentList[j].approvedToShippedLeadTime;
-            data[8] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-            data[9] = procurementAgentList[j].lastModifiedBy.username;
-            data[10] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[11] = procurementAgentList[j].active;
+            data[6] = procurementAgentList[j].colorHtmlDarkCode;
+            data[7] = procurementAgentList[j].submittedToApprovedLeadTime;
+            data[8] = procurementAgentList[j].approvedToShippedLeadTime;
+            data[9] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
+            data[10] = procurementAgentList[j].lastModifiedBy.username;
+            data[11] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[12] = procurementAgentList[j].active;
             procurementAgentArray[count] = data;
             count++;
         }
@@ -170,6 +171,10 @@ class ListProcurementAgentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.procurementagent.procurementAgentColorCode'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.procurementagent.procurementAgentColorCodeDarkMode'),
                     type: 'text',
                 },
                 {

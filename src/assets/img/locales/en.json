@@ -3409,5 +3409,6 @@
     "static.forecastSummaryTooltip.selectForecast":"User can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the total forecast quantities.",
     "static.program.mapForecastingUnit":"Map Forecasting Unit",
     "static.dashboard.procurementAgentForecastingUnit": "Procurement Agent Forecasting Unit",
-    "static.planningUnit.duplicateForecastingUnit": "Duplicate Forecasting Unit Details Found"
+    "static.planningUnit.duplicateForecastingUnit": "Duplicate Forecasting Unit Details Found",
+    "static.procurementagent.procurementAgentColorCodeDarkMode":"Color Code Dark Mode"
 }
