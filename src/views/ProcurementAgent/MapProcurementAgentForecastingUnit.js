@@ -130,7 +130,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                                                             data[1] = parseInt(papuList[j].forecastingUnit.id);
                                                             data[2] = papuList[j].skuCode;
                                                             data[3] = papuList[j].active;
-                                                            data[4] = papuList[j].procurementAgentPlanningUnitId;
+                                                            data[4] = papuList[j].procurementAgentForecastingUnitId;
                                                             data[5] = 0;
                                                             papuDataArr[count] = data;
                                                             count++;
@@ -512,7 +512,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("5")) === 1) {
+                // if (parseInt(map1.get("5")) === 1) {
                     let json = {
                         forecastingUnit: {
                             id: parseInt(map1.get("1")),
@@ -525,10 +525,13 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                         procurementAgentForecastingUnitId: parseInt(map1.get("4"))
                     }
                     changedpapuList.push(json);
-                }
+                // }
             }
             ProcurementAgentService.addprocurementAgentForecastingUnitMapping(changedpapuList)
                 .then(response => {
+                    this.setState({
+                        changed:false
+                    })
                     if (response.status == "200") {
                         this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                     } else {
@@ -627,7 +630,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
      */
     changed = function (instance, cell, x, y, value) {
         this.setState({
-            changed: 1
+            changed: true
         })
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
@@ -670,7 +673,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(12, y);
+            var value = this.el.getValueFromCoords(5, y);
             if (parseInt(value) == 1) {
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
@@ -706,8 +709,8 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         return valid;
     }
     /**
-     * Renders the Procurement agent planning unit mapping list.
-     * @returns {JSX.Element} - Procurement agent planning unit mapping list.
+     * Renders the Procurement agent forecasting unit mapping list.
+     * @returns {JSX.Element} - Procurement agent forecasting unit mapping list.
      */
     render() {
         jexcel.setDictionary({
