@@ -586,7 +586,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                     }
                 );
             }else{
-                this,setState({
+                this.setState({
                     message:i18n.t("static.pafu.noNewChangesFound"),
                     color:"red"
                 },()=>{
