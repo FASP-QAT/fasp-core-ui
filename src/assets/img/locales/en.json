@@ -3410,5 +3410,6 @@
     "static.program.mapForecastingUnit":"Map Forecasting Unit",
     "static.dashboard.procurementAgentForecastingUnit": "Procurement Agent Forecasting Unit",
     "static.planningUnit.duplicateForecastingUnit": "Duplicate Forecasting Unit Details Found",
-    "static.procurementagent.procurementAgentColorCodeDarkMode":"Color Code Dark Mode"
+    "static.procurementagent.procurementAgentColorCodeDarkMode":"Color Code Dark Mode",
+    "static.pafu.noNewChangesFound":"No new changes found"
 }

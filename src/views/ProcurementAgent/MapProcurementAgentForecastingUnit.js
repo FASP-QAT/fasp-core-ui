@@ -492,8 +492,8 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                 var index = (instance).getValue(`L${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(0, data[i].y, this.props.match.params.procurementAgentId, true);
-                    (instance).setValueFromCoords(3, data[i].y, 0, true);
-                    (instance).setValueFromCoords(4, data[i].y, 1, true);
+                    (instance).setValueFromCoords(4, data[i].y, 0, true);
+                    (instance).setValueFromCoords(5, data[i].y, 1, true);
                     z = data[i].y;
                 }
             }
@@ -507,10 +507,11 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         var validation = this.checkValidation();
         var duplicateValidationSKUCode = this.checkDuplicateSKUCode();
         if (validation == true && duplicateValidation == true && duplicateValidationSKUCode==true) {
+            var tableJson = this.el.getJson(null, false);
+            if(tableJson.filter(c=>c[5]==1).length>0){
             this.setState({
                 loading: false
             })
-            var tableJson = this.el.getJson(null, false);
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -584,6 +585,14 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                         }
                     }
                 );
+            }else{
+                this,setState({
+                    message:i18n.t("static.pafu.noNewChangesFound"),
+                    color:"red"
+                },()=>{
+                    hideSecondComponent()
+                })
+            }
         } else {
         }
     }
@@ -686,8 +695,8 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                 }
             }
         }
-        if (x != 12) {
-            this.el.setValueFromCoords(12, y, 1, true);
+        if (x != 5) {
+            this.el.setValueFromCoords(5, y, 1, true);
         }
     }.bind(this);
     /**
@@ -798,6 +807,9 @@ export default class MapProcurementAgentForecastingUnit extends Component {
             cont = true;
         }
         if (cont == true) {
+            this.setState({
+                changed:false
+            })
             this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
         }
     }
