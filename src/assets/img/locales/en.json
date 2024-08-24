@@ -3352,5 +3352,6 @@
     "static.pipeline.pipelineConvertorLinux": "Linux.",
     "static.program.mapForecastingUnit":"Map Forecasting Unit",
     "static.dashboard.procurementAgentForecastingUnit": "Procurement Agent Forecasting Unit",
-    "static.planningUnit.duplicateForecastingUnit": "Duplicate Forecasting Unit Details Found"
+    "static.planningUnit.duplicateForecastingUnit": "Duplicate Forecasting Unit Details Found",
+    "static.pafu.noNewChangesFound":"No new changes found"
 }
