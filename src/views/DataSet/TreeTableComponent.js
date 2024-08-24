@@ -1966,6 +1966,10 @@ export default class TreeTable extends Component {
                     cell.classList.add('readonly');
                 }
                 if(rowData[22] == 1) {
+                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
                     var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
@@ -2084,6 +2088,10 @@ export default class TreeTable extends Component {
                     cell.classList.add('readonly');
                 }
                 if(rowData[22] == 1) {
+                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
                     var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
@@ -2244,19 +2252,32 @@ export default class TreeTable extends Component {
             }
         }
         if(x == 22) {
+            let typeOfUse = this.el.getValueFromCoords(14, y);
             if(value == 1) {
+                var cell1 = this.el.getCell(`U${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`V${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
+                this.el.setValueFromCoords(20, y, "", true);
+                this.el.setValueFromCoords(21, y, "", true);
                 this.el.setValueFromCoords(22, y, 1, true);
                 this.el.setValueFromCoords(23, y, "", true);
                 this.el.setValueFromCoords(24, y, "", true);
             } else if(value == 0) {
-                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                var cell1 = this.el.getCell(`U${parseInt(y) + 1}`)
                 cell1.classList.remove('readonly');
-                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                var cell1 = this.el.getCell(`V${parseInt(y) + 1}`)
                 cell1.classList.remove('readonly');
+                if(typeOfUse == 1) {
+                    var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                    cell1.classList.remove('readonly');
+                    var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                    cell1.classList.remove('readonly');
+                }
                 this.el.setValueFromCoords(22, y, 0, true);
             }
         }
@@ -2651,8 +2672,11 @@ export default class TreeTable extends Component {
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
+                                if(json[i][14] == 2 || (json[i][14] == 1 && json[i][22] == 0)) {
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod = {};
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
+                                }
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
                                 if(json[i][14] == 1 && json[i][22] == 0) {
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
@@ -2820,30 +2844,30 @@ export default class TreeTable extends Component {
                     var col = ('S').concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
-                }
-                if(this.el.getValueFromCoords(20, y) === "") {
-                    var col = ('U').concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    var col = ('U').concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                if(this.el.getValueFromCoords(21, y) === "") {
-                    var col = ('V').concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    var col = ('V').concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
+                }                
                 if(this.el.getValueFromCoords(22, y) == 0 && this.el.getValueFromCoords(14, y) == 1) {
+                    if(this.el.getValueFromCoords(20, y) === "") {
+                        var col = ('U').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('U').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    if(this.el.getValueFromCoords(21, y) === "") {
+                        var col = ('V').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('V').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
                     if(this.el.getValueFromCoords(23, y) == "") {
                         var col = ('X').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
@@ -2866,7 +2890,45 @@ export default class TreeTable extends Component {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
+                } else if(this.el.getValueFromCoords(14, y) == 2) {
+                    if(this.el.getValueFromCoords(20, y) == "") {
+                        var col = ('U').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('U').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    if(this.el.getValueFromCoords(21, y) === "") {
+                        var col = ('V').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('V').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    var col = ('X').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+
+                    var col = ('Y').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 } else {
+                    var col = ('U').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+
+                    var col = ('V').concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+
                     var col = ('X').concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -2956,7 +3018,7 @@ export default class TreeTable extends Component {
             data[18] = fuNode ? currentScenario.fuNode.noOfForecastingUnitsPerPerson : ""; // Requires
             data[19] = fuNode ? currentScenario.fuNode.forecastingUnit.unit.id : ""; // Forecasting Units Unit unitList
             data[20] = fuNode ? currentScenario.fuNode.usageFrequency : ""; // Every
-            data[21] = fuNode ? currentScenario.fuNode.usagePeriod.usagePeriodId : ""; // Usage Period usagePeriodList
+            data[21] = fuNode ? currentScenario.fuNode.usagePeriod == null ? "" : currentScenario.fuNode.usagePeriod.usagePeriodId : ""; // Usage Period usagePeriodList
             data[22] = fuNode ? currentScenario.fuNode.oneTimeUsage.toString() == "false" ? 0 : 1 : ""; // Single Use
             data[23] = fuNode ? currentScenario.fuNode.repeatUsagePeriod == null ? "" : currentScenario.fuNode.repeatCount : ""; // For
             data[24] = fuNode ? currentScenario.fuNode.repeatUsagePeriod == null ? "" : currentScenario.fuNode.repeatUsagePeriod.usagePeriodId : ""; // Period usagePeriodList
