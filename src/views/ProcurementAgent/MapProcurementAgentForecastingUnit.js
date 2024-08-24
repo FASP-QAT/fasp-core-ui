@@ -48,6 +48,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         this.addRow = this.addRow.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.checkDuplicateForecastingUnit = this.checkDuplicateForecastingUnit.bind(this);
+        this.checkDuplicateSKUCode = this.checkDuplicateSKUCode.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.changed = this.changed.bind(this);
@@ -504,7 +505,8 @@ export default class MapProcurementAgentForecastingUnit extends Component {
     formSubmit = function () {
         var duplicateValidation = this.checkDuplicateForecastingUnit();
         var validation = this.checkValidation();
-        if (validation == true && duplicateValidation == true) {
+        var duplicateValidationSKUCode = this.checkDuplicateSKUCode();
+        if (validation == true && duplicateValidation == true && duplicateValidationSKUCode==true) {
             this.setState({
                 loading: false
             })
@@ -599,6 +601,29 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         if (hasDuplicate) {
             this.setState({
                 message: i18n.t('static.planningUnit.duplicateForecastingUnit'),
+            },
+                () => {
+                    hideSecondComponent();
+                })
+            return false;
+        } else {
+            return true;
+        }
+    }
+    /**
+     * Function to check for duplicate sku code.
+     * @returns Returns true if there are no duplicates, false otherwise.
+     */
+    checkDuplicateSKUCode = function () {
+        var tableJson = this.el.getJson(null, false);
+        let tempArray = tableJson;
+        var hasDuplicate = false;
+        tempArray.map(v => parseInt(v[Object.keys(v)[2]])).sort().sort((a, b) => {
+            if (a === b) hasDuplicate = true
+        })
+        if (hasDuplicate) {
+            this.setState({
+                message: i18n.t('static.realmCountryPlanningUnit.duplicateSKU'),
             },
                 () => {
                     hideSecondComponent();
