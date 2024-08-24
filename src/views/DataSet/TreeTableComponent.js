@@ -2406,7 +2406,7 @@ export default class TreeTable extends Component {
                             ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
                             ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : "" }
                             ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<i><img src=${AggregationNode} className="AggregationNodeSize" /></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<i><img src="/Aggregation-icon.png" className="AggregationNodeSize" /></i>' : ""}
                         </b>
                     </div>`; 
             data[3] = items[i].payload.label.label_en;
@@ -2996,7 +2996,7 @@ export default class TreeTable extends Component {
                             ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
                             ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : "" }
                             ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<i><img src=${AggregationNode} className="AggregationNodeSize" /></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<i><img src="/Aggregation-icon.png" className="AggregationNodeSize" /></i>' : ""}
                         </b>
                     </div>`; 
             data[3] = items[i].payload.label.label_en;
