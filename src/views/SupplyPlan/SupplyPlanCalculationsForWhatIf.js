@@ -481,6 +481,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 if (inventoryListForRegion[inv].actualQty !== "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
                                     actualStockCount += Math.round(Number(inventoryListForRegion[inv].actualQty) * Number(inventoryListForRegion[inv].multiplier));
                                 }
+                                if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
+                                    adjustmentQty += Math.round(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
+                                }
                                 var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
                                 for (var b = 0; b < batchListForInventory.length; b++) {
                                     var batchNo = batchListForInventory[b].batch.batchNo;
@@ -499,7 +502,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                                 openingBalance: 0,
                                                 openingBalanceWps: 0,
                                                 consumption: 0,
-                                                adjustment: 0,
+                                                adjustment: Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)),
                                                 stock: Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)),
                                                 shipment: 0,
                                                 shipmentWps: 0,
@@ -665,7 +668,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             - Number(myArray[a].expiredQty)
                             + Number(myArray[a].shipment);
                         var consumption = Number(myArray[a].consumption);
-                        var adjustment = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                        var adjustment = Number(myArray[a].adjustment);
                         if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
                             if ((Number(tempOB) + Number(adjustment)) >= 0) {
                                 unallocatedLEFO += Number(adjustment);
@@ -1047,16 +1050,21 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
                     }
                     var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
-                    if (closingBalance - diffBetweenTrueDemandAndConsumption < 0) {
-                        unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
-                        closingBalance = 0;
-                    } else {
+                    if (regionsReportingActualInventory != totalNoOfRegions) {
+                        if (closingBalance <= 0) {
+                            unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
+                            closingBalance = 0;
+                        } else {
+                            unmetDemandQty = diffBetweenTrueDemandAndConsumption;
+                        }
+                        if (closingBalanceWps <= 0) {
+                            unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
+                            closingBalanceWps = 0;
+                        } else {
+                            unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
+                        }
+                    } else{
                         unmetDemandQty = diffBetweenTrueDemandAndConsumption;
-                    }
-                    if (closingBalanceWps - diffBetweenTrueDemandAndConsumption < 0) {
-                        unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
-                        closingBalanceWps = 0;
-                    } else {
                         unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
                     }
                     var mos = "";
