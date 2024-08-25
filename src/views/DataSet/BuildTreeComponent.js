@@ -10070,6 +10070,7 @@ export default class BuildTree extends Component {
         const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var chartOptions = {
             title: {
                 display: true,
@@ -10103,7 +10104,9 @@ export default class BuildTree extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 1,
+                            color:gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'left',
                     }
@@ -10113,7 +10116,9 @@ export default class BuildTree extends Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color:gridLineColor,
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -10217,7 +10222,8 @@ export default class BuildTree extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 1,
+                            color: gridLineColor,
                         },
                         position: 'left',
                     },
@@ -10239,7 +10245,9 @@ export default class BuildTree extends Component {
                             min: 0,
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'right',
                     }
@@ -10249,7 +10257,9 @@ export default class BuildTree extends Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },

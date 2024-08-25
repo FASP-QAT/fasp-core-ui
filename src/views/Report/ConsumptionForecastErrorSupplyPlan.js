@@ -2336,6 +2336,7 @@ observer.observe(document.documentElement, {
             const { isDarkMode } = this.state;
             const colors = isDarkMode ? darkModeColors : lightModeColors;
             const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+            const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             
         var chartOptions = {
             title: {
@@ -2374,7 +2375,9 @@ observer.observe(document.documentElement, {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                     },
@@ -2397,7 +2400,9 @@ observer.observe(document.documentElement, {
                             // max: 100
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'right',
 
@@ -2408,7 +2413,9 @@ observer.observe(document.documentElement, {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },

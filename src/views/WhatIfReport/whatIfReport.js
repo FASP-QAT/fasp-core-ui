@@ -4774,6 +4774,7 @@ export default class WhatIfReportComponent extends React.Component {
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
     const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartOptions = {
             title: {
                 display: true,
@@ -4797,7 +4798,10 @@ export default class WhatIfReportComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 },
@@ -4814,7 +4818,10 @@ export default class WhatIfReportComponent extends React.Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'right',
                 }
@@ -4824,7 +4831,10 @@ export default class WhatIfReportComponent extends React.Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -4884,7 +4894,10 @@ export default class WhatIfReportComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 }
@@ -4894,7 +4907,10 @@ export default class WhatIfReportComponent extends React.Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },

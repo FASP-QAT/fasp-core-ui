@@ -3721,7 +3721,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-        // const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const options = {
             title: {
                 display: true,
@@ -3749,14 +3749,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
                             }
                             return x1 + x2;
-                        }
+                        },
+                        
+                    },
+                    gridLines:{
+                        color: gridLineColor,
                     }
                 }],
                 xAxes: [
                     {
                         id: 'xAxis1',
                         gridLines: {
-                            color: "rgba(0, 0, 0, 0)",
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor,
+                            lineWidth: 0
                         },
                         ticks: {
                             fontColor:fontColor,
@@ -3773,6 +3779,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         id: 'xAxis2',
                         gridLines: {
                             drawOnChartArea: false,
+                            
                         },
                         ticks: {
                             fontColor:fontColor,

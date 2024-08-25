@@ -2317,6 +2317,7 @@ class CompareAndSelectScenario extends Component {
 
         const { isDarkMode } = this.state;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var chartOptions = {
             title: {
                 display: true,
@@ -2341,7 +2342,10 @@ class CompareAndSelectScenario extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0,
+                            drawBorder: true, 
+                            lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                     }
@@ -2350,7 +2354,9 @@ class CompareAndSelectScenario extends Component {
                     {
                         id: 'xAxis1',
                         gridLines: {
-                            color: "rgba(0, 0, 0, 0)",
+                            lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         ticks: {
                             fontColor: fontColor,
