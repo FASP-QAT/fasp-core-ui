@@ -180,6 +180,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
         this.state = {
+            isDarkMode: false,
             popoverOpenConfidenceLevel: false,
             popoverOpenConfidenceLevel1: false,
             popoverOpenConfidenceLevel2: false,
@@ -365,6 +366,21 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         });
         this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
+// Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+    
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+    
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+
         var db1;
         getDatabase();
         this.getPrograms();
@@ -3691,21 +3707,37 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </li>
             )
         }, this);
+        const darkModeColors = [
+            '#d4bbff', // Color 1 
+            '#ba4e00'    
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+            '#651D32'
+        ];
+        
+
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        // const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const options = {
             title: {
                 display: true,
-                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text + " " + i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0] : ""
+                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text + " " + i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0] : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.report.consupmtionqty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -3727,7 +3759,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             color: "rgba(0, 0, 0, 0)",
                         },
                         ticks: {
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
@@ -3743,6 +3775,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             drawOnChartArea: false,
                         },
                         ticks: {
+                            fontColor:fontColor,
                             callback: function (label) {
                                 var xAxis2 = label
                                 xAxis2 += '';
@@ -3787,7 +3820,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: "black"
+                    fontColor:fontColor
                 }
             }
         }
@@ -3812,7 +3845,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             lineTension: 0,
             label: i18n.t('static.extrapolation.adjustedActuals'),
             backgroundColor: 'transparent',
-            borderColor: '#002F6C',
+            borderColor: colors[0], // Use the first color in the array
+            // borderColor: '#002F6C',
             ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',
@@ -3988,7 +4022,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t("static.extrapolation.arimaLower"),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: colors[1], 
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -4007,7 +4041,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: colors[1], 
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -4024,7 +4058,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t("static.extrapolation.arimaUpper"),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: colors[1], 
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {

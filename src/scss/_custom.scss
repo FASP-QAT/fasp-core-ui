@@ -4,13 +4,28 @@
   --font-color: #212721;
   --background-color: #e4e5e6;
   --link-color: cornflowerblue;
+  --grid-line-color: #444;
   // font-size: 14px !important;
 }
+
+// html[data-theme="dark"] {
+//   --font-color: white;
+//   --background-color: #333;
+  
+// }
+
+// html[data-theme="light"] {
+//   --font-color: black;
+//   --background-color: #fff;
+ 
+// }
+
 
 [data-theme="dark"] {
   // --font-color: #e4e5e6;
   --background-color: #1d222b;
   --link-color: lightblue;
+  --grid-line-color: #e0e0e0;
   // font-size: 14px !important;
 }
 
@@ -144,8 +159,8 @@ body {
 .jss>thead>tr>td {
   border-top: 1px solid #4d515a;
   border-left: 1px solid #4d515a;
-  border-right: 1px solid #4d515a;
-  border-bottom: 1px solid transparent;
+  // border-right: 1px solid #4d515a;
+  // border-bottom: 1px solid transparent;
   background-color: #f3f3f3;
   padding: 6px;
   cursor: pointer;
@@ -231,9 +246,9 @@ body {
 .jss>tbody>tr>td {
   border-top: 1px solid #4d515a!important;
   border-left: 1px solid #4d515a!important;
-  border-right: 1px solid #4d515a!important;
+  // border-right: 1px solid #4d515a!important;
   // border-bottom: 1px solid transparent;
-  border-bottom: 1px solid #4d515a!important;
+  // border-bottom: 1px solid #4d515a!important;
   box-sizing: border-box;
   padding: 4px;
   line-height: 1em;
@@ -403,6 +418,7 @@ label.arrow_label:before {
   color: #e4e5e6;
   background-color: #212631;
 }
+
 @media screen and (min-width: 768px) {
   .month-picker > .rmp-container .rmp-popup .rmp-pad {
       background: #212631 !important;
@@ -825,7 +841,7 @@ select>.Select-control .Select-value,
   border-radius: 5px;
 }
 .chart-wrapper canvas {
-  background-color: #e4e5e6; /* Dark background color */
+  // background-color: #e4e5e6; /* Dark background color */
   padding: 10px;
   margin-bottom: 20px;
   // border-radius: 10px;
@@ -882,7 +898,7 @@ select>.Select-control .Select-value,
 .modal-body table {
   color: #e4e5e6 !important;
   background: #23282c !important;
-  border: none!important;
+  // border: none!important;
 }
 .modal-body table h3{
   color: #20a8d8!important;
@@ -1080,7 +1096,8 @@ select>.Select-control .Select-value,
   font-weight: 700;
 }
 a {
-  color: #205493;
+  // color: #205493;
+  color: #20a8d8;
   text-decoration: none;
   background-color: transparent;
   // text-decoration: underline;
@@ -1114,6 +1131,10 @@ a {
 }
 .placeholder.TreeTemplateHeight svg path {
   stroke: #e4e5e6 !important;
+}
+.month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
+  background-color: #d3d3d3;
+  color: #444;
 }
 
 // .month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {

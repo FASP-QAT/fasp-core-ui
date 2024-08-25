@@ -527,6 +527,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth1 = React.createRef()
         this.pickAMonth6 = React.createRef()
         this.state = {
+            isDarkMode: false,
             isBranchTemplateModalOpen: false,
             branchTemplateList: [],
             isValidError: '',
@@ -7298,6 +7299,21 @@ export default class CreateTreeTemplate extends Component {
      * Reterives node type, usage template, procurement agent, forecast method, unit, usage period, usage type, tracer category, modeling type and tree template list on component mount
      */
     componentDidMount() {
+         // Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+    
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+    
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+    
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         this.procurementAgentList();
@@ -9453,10 +9469,21 @@ export default class CreateTreeTemplate extends Component {
      * @returns {JSX.Element} - Node details and modeling data.
      */
     tabPane1() {
+        const darkModeColors = [
+            '#d4bbff',   
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1    
+        ]; 
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         var chartOptions = {
             title: {
                 display: true,
-                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -9465,12 +9492,12 @@ export default class CreateTreeTemplate extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -9492,7 +9519,7 @@ export default class CreateTreeTemplate extends Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -9524,7 +9551,7 @@ export default class CreateTreeTemplate extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: fontColor
                 }
             }
         }
@@ -9539,7 +9566,7 @@ export default class CreateTreeTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -9563,7 +9590,8 @@ export default class CreateTreeTemplate extends Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -9577,12 +9605,12 @@ export default class CreateTreeTemplate extends Component {
                                         : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                             : ""
                                 : "",
-                            fontColor: 'black'
+                                fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -9606,12 +9634,12 @@ export default class CreateTreeTemplate extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: "% of " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value + " %";
                                 return cell1;
@@ -9626,7 +9654,7 @@ export default class CreateTreeTemplate extends Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -9663,7 +9691,7 @@ export default class CreateTreeTemplate extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: fontColor
                 }
             }
         }
@@ -9677,7 +9705,7 @@ export default class CreateTreeTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: Colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,

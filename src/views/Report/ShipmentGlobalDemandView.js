@@ -36,152 +36,152 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
-const pickerLang = {
-    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-    from: 'From', to: 'To',
-}
-const options = {
-    plugins: {
-        datalabels: {
-            formatter: (value, context) => {
-                return ``;
-            },
-        },
-    },
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            stacked: true,
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.shipment.qty'),
-                fontColor: 'black',
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-                }
-            },
-            gridLines: {
-                display: false
-            }
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.common.product'),
-            ticks: {
-                callback: function (value) {
-                    return (value.length > 40) ? value.substr(0, 40) + "..." : value;
-                },
-            }
-        }],
-    },
-    tooltips: {
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-            label: function (tooltipItem, data) {
-                let label = data.labels[tooltipItem.index];
-                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                var cell1 = value
-                cell1 += '';
-                var x = cell1.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-            }
-        }
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-const options1 = {
-    plugins: {
-        datalabels: {
-            formatter: (value, context) => {
-                return ``;
-            },
-        },
-    },
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            stacked: true,
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.shipment.qty'),
-                fontColor: 'black',
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-                }
-            },
-            gridLines: {
-                display: false
-            }
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.common.product')
-        }],
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
+ const pickerLang = {
+     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+     from: 'From', to: 'To',
+ }
+// const options = {
+//     plugins: {
+//         datalabels: {
+//             formatter: (value, context) => {
+//                 return ``;
+//             },
+//         },
+//     },
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+//         fontColor: 'black'
+//     },
+//     scales: {
+//         xAxes: [{
+//             stacked: true,
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.shipment.qty'),
+//                 fontColor: 'black',
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 beginAtZero: true,
+//                 fontColor: 'black',
+//                 callback: function (value) {
+//                     var cell1 = value
+//                     cell1 += '';
+//                     var x = cell1.split('.');
+//                     var x1 = x[0];
+//                     var x2 = x.length > 1 ? '.' + x[1] : '';
+//                     var rgx = /(\d+)(\d{3})/;
+//                     while (rgx.test(x1)) {
+//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                     }
+//                     return x1 + x2;
+//                 }
+//             },
+//             gridLines: {
+//                 display: false
+//             }
+//         }],
+//         yAxes: [{
+//             stacked: true,
+//             labelString: i18n.t('static.common.product'),
+//             ticks: {
+//                 callback: function (value) {
+//                     return (value.length > 40) ? value.substr(0, 40) + "..." : value;
+//                 },
+//             }
+//         }],
+//     },
+//     tooltips: {
+//         enabled: false,
+//         custom: CustomTooltips,
+//         callbacks: {
+//             label: function (tooltipItem, data) {
+//                 let label = data.labels[tooltipItem.index];
+//                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+//                 var cell1 = value
+//                 cell1 += '';
+//                 var x = cell1.split('.');
+//                 var x1 = x[0];
+//                 var x2 = x.length > 1 ? '.' + x[1] : '';
+//                 var rgx = /(\d+)(\d{3})/;
+//                 while (rgx.test(x1)) {
+//                     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                 }
+//                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+//             }
+//         }
+//     },
+//     maintainAspectRatio: false
+//     ,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor: 'black'
+//         }
+//     }
+// }
+// const options1 = {
+//     plugins: {
+//         datalabels: {
+//             formatter: (value, context) => {
+//                 return ``;
+//             },
+//         },
+//     },
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+//         fontColor: 'black'
+//     },
+//     scales: {
+//         xAxes: [{
+//             stacked: true,
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.shipment.qty'),
+//                 fontColor: 'black',
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 beginAtZero: true,
+//                 fontColor: 'black',
+//                 callback: function (value) {
+//                     var cell1 = value
+//                     cell1 += '';
+//                     var x = cell1.split('.');
+//                     var x1 = x[0];
+//                     var x2 = x.length > 1 ? '.' + x[1] : '';
+//                     var rgx = /(\d+)(\d{3})/;
+//                     while (rgx.test(x1)) {
+//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                     }
+//                     return x1 + x2;
+//                 }
+//             },
+//             gridLines: {
+//                 display: false
+//             }
+//         }],
+//         yAxes: [{
+//             stacked: true,
+//             labelString: i18n.t('static.common.product')
+//         }],
+//     },
+//     maintainAspectRatio: false,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor: 'black'
+//         }
+//     }
+// }
 /*const optionsPie = {
     title: {
         display: true,
@@ -225,6 +225,7 @@ class ShipmentGlobalDemandView extends Component {
                     position: 'bottom'
                 }
             }],
+            isDarkMode:false,
             dropdownOpen: false,
             radioSelected: 2,
             lang: localStorage.getItem('lang'),
@@ -861,6 +862,22 @@ class ShipmentGlobalDemandView extends Component {
      * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
+
         Chart.plugins.register({
             afterDraw: function (chart) {
                 if (chart.config.type === 'pie') {
@@ -1814,6 +1831,169 @@ class ShipmentGlobalDemandView extends Component {
      * @returns {JSX.Element} - Shipment Global Demand View report table.
      */
     render() {
+        const { isDarkMode } = this.state;
+// const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+        const options = {
+            plugins: {
+                datalabels: {
+                    formatter: (value, context) => {
+                        return ``;
+                    },
+                },
+            },
+            title: {
+                display: true,
+                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                fontColor:fontColor
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor:fontColor,
+                        fontStyle: "normal",
+                        fontSize: "12"
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor:fontColor,
+                        callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+                        }
+                    },
+                    gridLines: {
+                        display: false,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor,
+                        lineWidth: 0,
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    labelString: i18n.t('static.common.product'),
+                    fontColor:fontColor,
+                    ticks: {
+                        fontColor:fontColor,
+                        callback: function (value) {
+                            return (value.length > 40) ? value.substr(0, 40) + "..." : value;
+                        },
+                    },
+                    gridLines:{
+                        color: gridLineColor,
+                    }
+                }],
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor:fontColor
+                }
+            }
+        }
+        const options1 = {
+            plugins: {
+                datalabels: {
+                    formatter: (value, context) => {
+                        return ``;
+                    },
+                },
+            },
+            title: {
+                display: true,
+                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                fontColor:fontColor
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor:fontColor,
+                        fontStyle: "normal",
+                        fontSize: "12"
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor:fontColor,
+                        callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+                        }
+                    },
+                    gridLines: {
+                        display: true,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor,
+                        lineWidth: 0, 
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    labelString: i18n.t('static.common.product'),
+                    fontColor:fontColor,
+                    gridLines:{
+                        
+        borderColor: 'red'
+      
+                    },
+                }],
+            },
+            maintainAspectRatio: false,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor:fontColor,
+                }
+            }
+        }
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -1883,6 +2063,11 @@ class ShipmentGlobalDemandView extends Component {
             }
             ]
         };
+        
+        // const { isDarkMode } = this.state;
+// const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+// const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+// const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartDataForPie = {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
@@ -1896,14 +2081,36 @@ class ShipmentGlobalDemandView extends Component {
                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
                     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
                 ],
+                // darkModeColors : [
+                //     '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+                //     '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                //     '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+                //     '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                //     '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+                // ],
+                // lightModeColors : [
+                //    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                // ],
+                
+        
                 legend: {
-                    position: 'bottom'
+                    position: 'bottom',
+                    fontColor:fontColor,
                 }
             }],
         }
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
+            fontColor:fontColor,
         }
         const { rangeValue } = this.state
         const checkOnline = localStorage.getItem('sessionType');
@@ -1912,13 +2119,15 @@ class ShipmentGlobalDemandView extends Component {
             title: {
                 display: true,
                 text: this.state.groupByFundingSourceType ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
-                fontColor: 'black',
+                fontColor:fontColor,
                 padding: 30
             },
             legend: {
                 position: 'bottom',
+                fontColor:fontColor,
                 labels: {
-                    padding: 25
+                    padding: 25,
+                    fontColor:fontColor,
                 }
             },
             tooltips: {
