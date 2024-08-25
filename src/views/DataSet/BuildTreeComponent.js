@@ -11044,7 +11044,7 @@ export default class BuildTree extends Component {
                                                                         id="sharePlanningUnitTrue"
                                                                         name="sharePlanningUnit"
                                                                         value={true}
-                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit == true || this.state.currentScenario.puNode.sharePlanningUnit == "true"}
+                                                                        checked={this.state.currentScenario.puNode.sharePlanningUnit == "" || this.state.currentScenario.puNode.sharePlanningUnit == true || this.state.currentScenario.puNode.sharePlanningUnit == "true"}
                                                                         onChange={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
