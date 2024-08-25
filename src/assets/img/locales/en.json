@@ -3349,5 +3349,8 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.supplyPlan.totalAdjustment": "Total Adjustment",
+    "static.supplyPlan.manualAdjustment":"Adjustment (manual)",
+    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)"
 }
