@@ -148,6 +148,7 @@ export default class WhatIfReportComponent extends React.Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
+            isDarkMode:false,
             loading: true,
             monthsArray: [],
             programList: [],
@@ -2522,6 +2523,23 @@ export default class WhatIfReportComponent extends React.Component {
      * This function is used to get list of programs that user has downloaded
      */
     componentDidMount() {
+
+        // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
+
+
         var fields = document.getElementsByClassName("totalShipments");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -4206,10 +4224,23 @@ export default class WhatIfReportComponent extends React.Component {
      * @returns The supply plan data in tabular format
      */
     tabPane() {
+        const darkModeColors = [
+            '#d4bbff',  
+            '#fff1f1',   
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+            '#cfcdc9',    
+        ];
+        const { isDarkMode } = this.state;
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         const chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : ""
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -4217,12 +4248,12 @@ export default class WhatIfReportComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
@@ -4237,12 +4268,12 @@ export default class WhatIfReportComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -4252,7 +4283,7 @@ export default class WhatIfReportComponent extends React.Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -4288,14 +4319,15 @@ export default class WhatIfReportComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : ""
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -4303,12 +4335,12 @@ export default class WhatIfReportComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
@@ -4321,7 +4353,7 @@ export default class WhatIfReportComponent extends React.Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -4357,7 +4389,7 @@ export default class WhatIfReportComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -4418,12 +4450,12 @@ export default class WhatIfReportComponent extends React.Component {
                     label: i18n.t('static.supplyPlan.delivered'),
                     stack: 1,
                     yAxisID: 'A',
-                    backgroundColor: '#002f6c',
-                    borderColor: '#002f6c',
-                    pointBackgroundColor: '#002f6c',
-                    pointBorderColor: '#002f6c',
-                    pointHoverBackgroundColor: '#002f6c',
-                    pointHoverBorderColor: '#002f6c',
+                    backgroundColor: colors[0],
+                    borderColor: colors[0],
+                    pointBackgroundColor: colors[0],
+                    pointBorderColor: colors[0],
+                    pointHoverBackgroundColor: colors[0],
+                    pointHoverBorderColor: colors[0],
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -4479,6 +4511,7 @@ export default class WhatIfReportComponent extends React.Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
+                    backgroundColor: colors[1],
                     borderColor: '#cfcdc9',
                     borderStyle: 'dotted',
                     ticks: {

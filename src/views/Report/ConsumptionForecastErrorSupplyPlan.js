@@ -44,6 +44,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         dt.setMonth(dt.getMonth() - 10);
 
         this.state = {
+            isDarkMode:false,
             lang: localStorage.getItem("lang"),
             consumptionUnitShowArr: [],
             programId: '',
@@ -147,6 +148,21 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
      * Calls the get programs function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         this.getPrograms();
     }
     /**
@@ -2253,8 +2269,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
             }, this);
 
+            const darkModeColors = [
+                '#d4bbff', // Color 1 
+            ];
+            
+            const lightModeColors = [
+                '#002F6C',  // Color 1
+            ];
+            
 
-
+            const { isDarkMode } = this.state;
+            const colors = isDarkMode ? darkModeColors : lightModeColors;
+            const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+            
         var chartOptions = {
             title: {
                 display: true,
@@ -2262,7 +2289,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId).length > 0 ?
                         this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
                     this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
-                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : '')
+                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : ''),
+                        fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -2271,12 +2299,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit'))),
-                            fontColor: 'black'
+                            fontColor:fontColor
                         },
                         stacked: true,//stacked
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -2300,12 +2328,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: "Forecast Error",
-                            fontColor: 'black'
+                            fontColor:fontColor,
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += ' %';
@@ -2322,7 +2350,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -2361,14 +2389,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]     
 
         var elInstance = this.state.dataList;
         if (elInstance != undefined) {
@@ -2412,7 +2440,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 data: consumptionForecastValue,
                 stack: 3,
                 yAxisID: 'A',
-                backgroundColor: '#002F6C',
+                backgroundColor: colors[0],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',

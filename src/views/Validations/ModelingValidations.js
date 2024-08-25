@@ -51,6 +51,7 @@ class ModelingValidation extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
+            isDarkMode:false,
             popoverOpenLevelFeild: false,
             datasetId: "",
             datasetList: [],
@@ -986,6 +987,21 @@ class ModelingValidation extends Component {
      * This function is used to get the list of dataset(programs)
      */
     componentDidMount() {
+         // Detect initial theme
+         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+         this.setState({ isDarkMode });
+     
+         // Listening for theme changes
+         const observer = new MutationObserver(() => {
+             const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+             this.setState({ isDarkMode: updatedDarkMode });
+         });
+     
+         observer.observe(document.documentElement, {
+             attributes: true,
+             attributeFilter: ['data-theme'],
+         });
+
         this.setState({ loading: true });
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
@@ -1518,22 +1534,29 @@ class ModelingValidation extends Component {
             Show: " ",
             entries: " ",
         });
+        const lightModeColors = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+        const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#fff1f1"]
+      
+        const { isDarkMode } = this.state;
+        const colourArray = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         var chartOptions = {
             title: {
                 display: true,
-                text: (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") ? i18n.t("static.dashboard.modelingValidation") + " - " + this.state.datasetData.programCode + "~" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + " - " + (document.getElementById("levelId").selectedOptions[0].text) : ""
+                text: (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") ? i18n.t("static.dashboard.modelingValidation") + " - " + this.state.datasetData.programCode + "~" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + " - " + (document.getElementById("levelId").selectedOptions[0].text) : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.levelId != -1 && this.state.levelId != -2 ? this.state.levelUnit : i18n.t('static.dashboard.unit'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: true,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return this.state.displayBy == 1 ? value.toLocaleString() : value.toLocaleString() + " %";
                         }.bind(this)
@@ -1550,7 +1573,7 @@ class ModelingValidation extends Component {
                             color: "rgba(0, 0, 0, 0)",
                         },
                         ticks: {
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
@@ -1562,7 +1585,7 @@ class ModelingValidation extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : this.state.xAxisDisplayBy == 1 ? "" : i18n.t('static.modelingValidation.fiscalYear'),
-                            fontColor: 'black'
+                            fontColor:fontColor
                         }
                     },
                     {
@@ -1571,6 +1594,7 @@ class ModelingValidation extends Component {
                             drawOnChartArea: false,
                         },
                         ticks: {
+                            fontColor:fontColor,
                             callback: function (label) {
                                 var monthArrayList = [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))];
                                 var xAxis2 = label
@@ -1597,7 +1621,7 @@ class ModelingValidation extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             },
             tooltips: {
@@ -1626,7 +1650,8 @@ class ModelingValidation extends Component {
         }
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+        
+        // var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined && this.state.dataEl != "") {

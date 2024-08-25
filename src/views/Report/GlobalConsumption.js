@@ -35,81 +35,81 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const options = {
-  title: {
-    display: true,
-    text: i18n.t('static.dashboard.globalconsumption'),
-  },
-  scales: {
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
-        fontColor: 'black'
-      },
-      stacked: true,
-      ticks: {
-        beginAtZero: true,
-        fontColor: 'black',
-        callback: function (value) {
-          var cell1 = value
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
-      }
-    }],
-    xAxes: [{
-      ticks: {
-        fontColor: 'black',
-      }
-    }]
-  },
-  annotation: {
-    annotations: [{
-      type: 'triangle',
-      drawTime: 'beforeDatasetsDraw',
-      scaleID: 'x-axis-0',
-      value: 'Mar-2020',
-      backgroundColor: 'rgba(0, 255, 0, 0.1)'
-    }],
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips,
-    callbacks: {
-      label: function (tooltipItem, data) {
-        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }
-    }
-  },
-  maintainAspectRatio: false
-  ,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-      fontColor: 'black'
-    }
-  }
-}
+// const options = {
+//   title: {
+//     display: true,
+//     text: i18n.t('static.dashboard.globalconsumption'),
+//   },
+//   scales: {
+//     yAxes: [{
+//       scaleLabel: {
+//         display: true,
+//         labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
+//         fontColor: 'black'
+//       },
+//       stacked: true,
+//       ticks: {
+//         beginAtZero: true,
+//         fontColor: 'black',
+//         callback: function (value) {
+//           var cell1 = value
+//           cell1 += '';
+//           var x = cell1.split('.');
+//           var x1 = x[0];
+//           var x2 = x.length > 1 ? '.' + x[1] : '';
+//           var rgx = /(\d+)(\d{3})/;
+//           while (rgx.test(x1)) {
+//             x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//           }
+//           return x1 + x2;
+//         }
+//       }
+//     }],
+//     xAxes: [{
+//       ticks: {
+//         fontColor: 'black',
+//       }
+//     }]
+//   },
+//   annotation: {
+//     annotations: [{
+//       type: 'triangle',
+//       drawTime: 'beforeDatasetsDraw',
+//       scaleID: 'x-axis-0',
+//       value: 'Mar-2020',
+//       backgroundColor: 'rgba(0, 255, 0, 0.1)'
+//     }],
+//   },
+//   tooltips: {
+//     enabled: false,
+//     custom: CustomTooltips,
+//     callbacks: {
+//       label: function (tooltipItem, data) {
+//         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+//         var cell1 = value
+//         cell1 += '';
+//         var x = cell1.split('.');
+//         var x1 = x[0];
+//         var x2 = x.length > 1 ? '.' + x[1] : '';
+//         var rgx = /(\d+)(\d{3})/;
+//         while (rgx.test(x1)) {
+//           x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//         }
+//         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+//       }
+//     }
+//   },
+//   maintainAspectRatio: false
+//   ,
+//   legend: {
+//     display: true,
+//     position: 'bottom',
+//     labels: {
+//       usePointStyle: true,
+//       fontColor: 'black'
+//     }
+//   }
+// }
 /**
  * Component for Global Consumption Report.
  */
@@ -122,6 +122,7 @@ class GlobalConsumption extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode:false,
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -722,6 +723,22 @@ class GlobalConsumption extends Component {
    * Calls the get countrys function on page load
    */
   componentDidMount() {
+    // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
+
     this.getCountrys();
   }
   /**
@@ -769,6 +786,88 @@ class GlobalConsumption extends Component {
    * @returns {JSX.Element} - Global Consumption report table.
    */
   render() {
+
+    const { isDarkMode } = this.state;
+// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+// const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
+    const options = {
+      title: {
+        display: true,
+        text: i18n.t('static.dashboard.globalconsumption'),
+        fontColor:fontColor
+      },
+      scales: {
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
+            fontColor:fontColor
+          },
+          stacked: true,
+          ticks: {
+            beginAtZero: true,
+            fontColor:fontColor,
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          }
+        }],
+        xAxes: [{
+          ticks: {
+            fontColor:fontColor
+          }
+        }]
+      },
+      annotation: {
+        annotations: [{
+          type: 'triangle',
+          drawTime: 'beforeDatasetsDraw',
+          scaleID: 'x-axis-0',
+          value: 'Mar-2020',
+          backgroundColor: 'rgba(0, 255, 0, 0.1)'
+        }],
+      },
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+      },
+      maintainAspectRatio: false
+      ,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor:fontColor
+        }
+      }
+    }
     const { planningUnits } = this.state;
     let planningUnitList = [];
     planningUnitList = planningUnits.length > 0

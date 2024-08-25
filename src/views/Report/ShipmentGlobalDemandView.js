@@ -39,153 +39,153 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const options = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            stacked: true,
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.shipment.qty'),
-                fontColor: 'black',
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-                }
-            },
-            gridLines: {
-                display: false
-            }
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.common.product'),
-            ticks: {
-                callback: function (value) {
-                    return (value.length > 40) ? value.substr(0, 40) + "..." : value;
-                },
-            }
-        }],
-    },
-    tooltips: {
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-            label: function (tooltipItem, data) {
-                let label = data.labels[tooltipItem.index];
-                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                var cell1 = value
-                cell1 += '';
-                var x = cell1.split('.');
-                var x1 = x[0];
-                var x2 = x.length > 1 ? '.' + x[1] : '';
-                var rgx = /(\d+)(\d{3})/;
-                while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                }
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-            }
-        }
-    },
-    maintainAspectRatio: false
-    ,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-const options1 = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-        fontColor: 'black'
-    },
-    scales: {
-        xAxes: [{
-            stacked: true,
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.shipment.qty'),
-                fontColor: 'black',
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'black',
-                callback: function (value) {
-                    var cell1 = value
-                    cell1 += '';
-                    var x = cell1.split('.');
-                    var x1 = x[0];
-                    var x2 = x.length > 1 ? '.' + x[1] : '';
-                    var rgx = /(\d+)(\d{3})/;
-                    while (rgx.test(x1)) {
-                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                    }
-                    return x1 + x2;
-                }
-            },
-            gridLines: {
-                display: false
-            }
-        }],
-        yAxes: [{
-            stacked: true,
-            labelString: i18n.t('static.common.product')
-        }],
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
-const optionsPie = {
-    title: {
-        display: true,
-        text: i18n.t('static.fundingSourceHead.fundingSource'),
-        fontColor: 'black'
-    },
-    legend: {
-        position: 'bottom'
-    },
-    tooltips: {
-        callbacks: {
-            label: function (tooltipItems, data) {
-                return data.labels[tooltipItems.index] +
-                    " : " + " $ " +
-                    (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
-            }
-        }
-    },
-}
+// const options = {
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+//         fontColor: 'black'
+//     },
+//     scales: {
+//         xAxes: [{
+//             stacked: true,
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.shipment.qty'),
+//                 fontColor: 'black',
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 beginAtZero: true,
+//                 fontColor: 'black',
+//                 callback: function (value) {
+//                     var cell1 = value
+//                     cell1 += '';
+//                     var x = cell1.split('.');
+//                     var x1 = x[0];
+//                     var x2 = x.length > 1 ? '.' + x[1] : '';
+//                     var rgx = /(\d+)(\d{3})/;
+//                     while (rgx.test(x1)) {
+//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                     }
+//                     return x1 + x2;
+//                 }
+//             },
+//             gridLines: {
+//                 display: false
+//             }
+//         }],
+//         yAxes: [{
+//             stacked: true,
+//             labelString: i18n.t('static.common.product'),
+//             ticks: {
+//                 callback: function (value) {
+//                     return (value.length > 40) ? value.substr(0, 40) + "..." : value;
+//                 },
+//             }
+//         }],
+//     },
+//     tooltips: {
+//         enabled: false,
+//         custom: CustomTooltips,
+//         callbacks: {
+//             label: function (tooltipItem, data) {
+//                 let label = data.labels[tooltipItem.index];
+//                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+//                 var cell1 = value
+//                 cell1 += '';
+//                 var x = cell1.split('.');
+//                 var x1 = x[0];
+//                 var x2 = x.length > 1 ? '.' + x[1] : '';
+//                 var rgx = /(\d+)(\d{3})/;
+//                 while (rgx.test(x1)) {
+//                     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                 }
+//                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+//             }
+//         }
+//     },
+//     maintainAspectRatio: false
+//     ,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor: 'black'
+//         }
+//     }
+// }
+// const options1 = {
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+//         fontColor: 'black'
+//     },
+//     scales: {
+//         xAxes: [{
+//             stacked: true,
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.shipment.qty'),
+//                 fontColor: 'black',
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 beginAtZero: true,
+//                 fontColor: 'black',
+//                 callback: function (value) {
+//                     var cell1 = value
+//                     cell1 += '';
+//                     var x = cell1.split('.');
+//                     var x1 = x[0];
+//                     var x2 = x.length > 1 ? '.' + x[1] : '';
+//                     var rgx = /(\d+)(\d{3})/;
+//                     while (rgx.test(x1)) {
+//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                     }
+//                     return x1 + x2;
+//                 }
+//             },
+//             gridLines: {
+//                 display: false
+//             }
+//         }],
+//         yAxes: [{
+//             stacked: true,
+//             labelString: i18n.t('static.common.product')
+//         }],
+//     },
+//     maintainAspectRatio: false,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor: 'black'
+//         }
+//     }
+// }
+// const optionsPie = {
+//     title: {
+//         display: true,
+//         text: i18n.t('static.fundingSourceHead.fundingSource'),
+//         fontColor: 'black'
+//     },
+//     legend: {
+//         position: 'bottom'
+//     },
+//     tooltips: {
+//         callbacks: {
+//             label: function (tooltipItems, data) {
+//                 return data.labels[tooltipItems.index] +
+//                     " : " + " $ " +
+//                     (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
+//             }
+//         }
+//     },
+// }
 /**
  * Component for Shipment Global Demand View Report.
  */
@@ -205,6 +205,7 @@ class ShipmentGlobalDemandView extends Component {
                     position: 'bottom'
                 }
             }],
+            isDarkMode:false,
             dropdownOpen: false,
             radioSelected: 2,
             lang: localStorage.getItem('lang'),
@@ -813,6 +814,21 @@ class ShipmentGlobalDemandView extends Component {
      * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         if (localStorage.getItem("sessionType") === 'Online') {
             this.getCountrys();
             this.getFundingSource();
@@ -1479,6 +1495,177 @@ class ShipmentGlobalDemandView extends Component {
      * @returns {JSX.Element} - Shipment Global Demand View report table.
      */
     render() {
+        const { isDarkMode } = this.state;
+// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
+        const options = {
+            title: {
+                display: true,
+                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                fontColor:fontColor
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor:fontColor,
+                        fontStyle: "normal",
+                        fontSize: "12"
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor:fontColor,
+                        callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+                        }
+                    },
+                    gridLines: {
+                        display: false,
+                        color: gridLineColor,
+    zeroLineColor: gridLineColor 
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    fontColor:fontColor,
+                    labelString: i18n.t('static.common.product'),
+                    ticks: {
+                        callback: function (value) {
+                            return (value.length > 40) ? value.substr(0, 40) + "..." : value;
+                        },
+                    },
+                    gridLines: {
+                        drawBorder: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    }
+                    
+                }],
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
+            },
+            maintainAspectRatio: false
+            ,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor:fontColor
+                }
+            }
+        }
+        const options1 = {
+            title: {
+                display: true,
+                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                fontColor:fontColor
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.shipment.qty'),
+                        fontColor:fontColor,
+                        fontStyle: "normal",
+                        fontSize: "12"
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor:fontColor,
+                        callback: function (value) {
+                            var cell1 = value
+                            cell1 += '';
+                            var x = cell1.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                            }
+                            return x1 + x2;
+                        }
+                    },
+                    gridLines: {
+                        display: false,
+                        
+                            // drawBorder: true,
+                            // lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
+                        
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    fontColor:fontColor,
+                    labelString: i18n.t('static.common.product')
+                }],
+            },
+            maintainAspectRatio: false,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor:fontColor
+                }
+            }
+        }
+        const optionsPie = {
+            title: {
+                display: true,
+                text: i18n.t('static.fundingSourceHead.fundingSource'),
+                fontColor:fontColor
+            },
+            legend: {
+                position: 'bottom',
+                fontColor:fontColor
+            },
+            tooltips: {
+                callbacks: {
+                    label: function (tooltipItems, data) {
+                        return data.labels[tooltipItems.index] +
+                            " : " + " $ " +
+                            (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
+                    }
+                }
+            },
+        }
+
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {

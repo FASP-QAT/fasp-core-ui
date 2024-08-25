@@ -32,6 +32,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import { colors } from '@material-ui/core';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -51,6 +52,7 @@ class StockStatus extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode:false,
       PlanningUnitDataForExport: [],
       loading: true,
       dropdownOpen: false,
@@ -2413,6 +2415,21 @@ class StockStatus extends Component {
    * Calls the get programs function on page load
    */
   componentDidMount() {
+    // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
+
     this.getPrograms();
   }
   /**
@@ -2467,10 +2484,22 @@ class StockStatus extends Component {
           </option>
         )
       }, this);
+
+      const darkModeColors = [
+        '#d4bbff',   
+    ];
+    
+    const lightModeColors = [
+        '#002F6C',  // Color 1   
+    ];
+      const { isDarkMode } = this.state;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
     const options = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1,
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
@@ -2480,11 +2509,11 @@ class StockStatus extends Component {
             labelString: i18n.t('static.shipment.qty'),
             display: true,
             fontSize: "12",
-            fontColor: 'black'
+            fontColor: fontColor
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -2506,12 +2535,12 @@ class StockStatus extends Component {
           position: 'right',
           scaleLabel: {
             labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-            fontColor: 'black',
+            fontColor: fontColor,
             display: true,
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -2534,12 +2563,12 @@ class StockStatus extends Component {
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           ticks: {
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
@@ -2579,14 +2608,15 @@ class StockStatus extends Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor: fontColor,
         }
       }
     }
     const options1 = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1,
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
@@ -2596,11 +2626,11 @@ class StockStatus extends Component {
             labelString: i18n.t('static.shipment.qty'),
             display: true,
             fontSize: "12",
-            fontColor: 'black'
+            fontColor: fontColor
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -2622,12 +2652,12 @@ class StockStatus extends Component {
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           ticks: {
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
@@ -2669,7 +2699,7 @@ class StockStatus extends Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor: fontColor
         }
       }
     }
@@ -2728,7 +2758,7 @@ class StockStatus extends Component {
         label: i18n.t('static.supplyPlan.delivered'),
         yAxisID: 'A',
         stack: 1,
-        backgroundColor: '#002f6c',
+        backgroundColor: colors[0],
         borderColor: 'rgba(179,181,198,1)',
         pointBackgroundColor: 'rgba(179,181,198,1)',
         pointBorderColor: '#fff',

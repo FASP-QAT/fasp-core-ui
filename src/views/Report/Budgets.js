@@ -29,75 +29,11 @@ const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-const chartoptions =
-{
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.budget')
-    },
-    scales: {
-        yAxes: [{
-            id: 'A',
-            position: 'left',
-            scaleLabel: {
-                display: true,
-                fontSize: "12",
-                fontColor: 'blue'
-            },
-            ticks: {
-                beginAtZero: true,
-                fontColor: 'blue'
-            },
-        }],
-        xAxes: [{
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.supplyPlan.amountInUSD'),
-                fontColor: 'black',
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                fontColor: 'black',
-                callback: function (value) {
-                    if (value != null) {
-                        return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                    }
-                }
-            }
-        }]
-    },
-    tooltips: {
-        mode: 'index',
-        intersect: false,
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-            label: function (tooltipItem, data) {
-                let label = data.labels[tooltipItem.index];
-                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-            }
-        }
-    },
-    hover: {
-        mode: 'index',
-        intersect: false
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black'
-        }
-    }
-}
+
 /**
  * Component for Expired Inventory Report.
  */
-class Budgets extends Component {
+class Budgets extends Component {  
     constructor(props) {
         super(props);
         var dt = new Date();
@@ -105,6 +41,7 @@ class Budgets extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
+            isDarkMode:false,
             budgetList: [],
             lang: localStorage.getItem('lang'),
             message: '',
@@ -129,6 +66,9 @@ class Budgets extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.buildJexcel = this.buildJexcel.bind(this);
     }
+    
+    
+
     /**
      * Handles the dismiss of the range picker component.
      * Updates the component state with the new range value and triggers a data fetch.
@@ -481,6 +421,20 @@ class Budgets extends Component {
      * Calls the get programs and get funding source function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
         this.getPrograms()
         this.getFundingSource();
     }
@@ -529,6 +483,96 @@ class Budgets extends Component {
      * @returns {JSX.Element} - Budget report table.
      */
     render() {
+
+
+const darkModeColors = [
+    '#d4bbff', // Color 1 
+];
+
+const lightModeColors = [
+    '#002F6C',  // Color 1
+];
+const { isDarkMode } = this.state;
+const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
+const chartoptions =
+{
+    title: {
+        display: true,
+        text: i18n.t('static.dashboard.budget'),
+        fontColor:fontColor
+    },
+    scales: {
+        yAxes: [{
+            id: 'A',
+            position: 'left',
+            scaleLabel: {
+                display: true,
+                fontSize: "12",
+                fontColor:fontColor
+            },
+            ticks: {
+                beginAtZero: true,
+                fontColor:fontColor
+            },
+            gridLines: {
+                drawBorder: true, 
+                lineWidth: 1,
+                color: gridLineColor
+            },
+        }],
+        xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: i18n.t('static.supplyPlan.amountInUSD'),
+                fontColor:fontColor,
+                fontStyle: "normal",
+                fontSize: "12"
+            },
+            ticks: {
+                fontColor:fontColor,
+                callback: function (value) {
+                    if (value != null) {
+                        return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                    }
+                }
+            },
+            gridLines: {
+                drawBorder: true, 
+                lineWidth: 1,
+                color: gridLineColor
+            },
+        }]
+    },
+    tooltips: {
+        mode: 'index',
+        intersect: false,
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+            label: function (tooltipItem, data) {
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            }
+        }
+    },
+    hover: {
+        mode: 'index',
+        intersect: false
+    },
+    maintainAspectRatio: false,
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+            fontColor:fontColor
+        }
+    }
+}
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {
@@ -568,7 +612,7 @@ class Budgets extends Component {
                     label: i18n.t('static.budget.allocatedShipmentOrdered'),
                     type: 'horizontalBar',
                     stack: 1,
-                    backgroundColor: '#002f6c',
+                    backgroundColor: colors[0],
                     borderColor: 'rgba(179,181,198,1)',
                     pointBackgroundColor: 'rgba(179,181,198,1)',
                     pointBorderColor: '#fff',

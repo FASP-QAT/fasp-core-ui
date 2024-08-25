@@ -53,6 +53,7 @@ class CompareAndSelectScenario extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
+            isDarkMode:false,
             datasetList: [],
             planningUnitList: [],
             versions: [],
@@ -1130,6 +1131,21 @@ class CompareAndSelectScenario extends Component {
      * Calls getDatasets function on component mount
      */
     componentDidMount() {
+        // Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+    
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+    
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+    
         this.getDatasets();
     }
     /**
@@ -1690,10 +1706,14 @@ class CompareAndSelectScenario extends Component {
             Show: " ",
             entries: " ",
         });
+
+        const { isDarkMode } = this.state;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         var chartOptions = {
             title: {
                 display: true,
-                text: ((this.state.viewById == 1 || this.state.viewById == 3) && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].label, this.state.lang) : "") + " ( " + this.state.regionName + " )"
+                text: ((this.state.viewById == 1 || this.state.viewById == 3) && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].label, this.state.lang) : "") + " ( " + this.state.regionName + " )",
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -1702,18 +1722,18 @@ class CompareAndSelectScenario extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.unit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].unit.label, this.state.lang) : this.state.equivalencyUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].equivalencyUnit.label, this.state.lang) : "",
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 return value.toLocaleString();
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
                         },
                         position: 'left',
                     }
@@ -1725,7 +1745,7 @@ class CompareAndSelectScenario extends Component {
                             color: "rgba(0, 0, 0, 0)",
                         },
                         ticks: {
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
@@ -1741,6 +1761,7 @@ class CompareAndSelectScenario extends Component {
                             drawOnChartArea: false,
                         },
                         ticks: {
+                            fontColor: fontColor,
                             callback: function (label) {
                                 var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
                                 var xAxis2 = label
@@ -1789,7 +1810,7 @@ class CompareAndSelectScenario extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: fontColor
                 }
             }
         }
