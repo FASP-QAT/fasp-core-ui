@@ -849,6 +849,7 @@ export default class SupplyPlanComponent extends React.Component {
             const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var chartOptions = {
             title: {
                 display: true,
@@ -872,7 +873,10 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 },
@@ -889,7 +893,10 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor:fontColor,
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'right',
                 }
@@ -899,7 +906,10 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -959,7 +969,10 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 }
@@ -969,7 +982,10 @@ export default class SupplyPlanComponent extends React.Component {
                         fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -1065,11 +1081,11 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 1,
                     yAxisID: 'A',
                     backgroundColor: colors[0],
-                    borderColor: 'rgba(179,181,198,1)',
-                    pointBackgroundColor: 'rgba(179,181,198,1)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(179,181,198,1)',
+                    borderColor: colors[0],
+                    pointBackgroundColor: colors[0],
+                    pointBorderColor: colors[0],
+                    pointHoverBackgroundColor: colors[0],
+                    pointHoverBorderColor: colors[0],
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {

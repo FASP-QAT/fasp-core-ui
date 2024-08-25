@@ -2214,8 +2214,9 @@ class ForecastOutput extends Component {
                         },
                         gridLines: {
                             drawBorder: true, 
-                            lineWidth: 0,
-                            color: gridLineColor
+                            lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                     }
@@ -2226,8 +2227,9 @@ class ForecastOutput extends Component {
                     },
                     gridLines: {
                         drawBorder: true,
-                         lineWidth: 0,
-                       color: gridLineColor
+                        lineWidth: 0, 
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },

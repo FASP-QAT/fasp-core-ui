@@ -4,7 +4,7 @@
   --font-color: #212721;
   --background-color: #e4e5e6;
   --link-color: cornflowerblue;
-  --grid-line-color: #444;
+  // --grid-line-color: #444;
   // font-size: 14px !important;
 }
 
@@ -25,7 +25,7 @@
   // --font-color: #e4e5e6;
   --background-color: #1d222b;
   --link-color: lightblue;
-  --grid-line-color: #e0e0e0;
+  // --grid-line-color: #e0e0e0;
   // font-size: 14px !important;
 }
 
@@ -237,10 +237,12 @@ body {
 }
 .jss_content .jss tbody tr:nth-of-type(odd) {
   background-color: #212631!important;
+  // background-color: #373c46!important;
   color: #e4e5e6;
 }
 .jss_content .jss tbody tr:nth-of-type(even) {
-  background-color: #23282c;
+  // background-color: #23282c;
+  background-color: #373c46;
   color: #e4e5e6;
 }
 .jss>tbody>tr>td {

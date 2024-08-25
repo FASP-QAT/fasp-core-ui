@@ -2495,6 +2495,7 @@ class StockStatus extends Component {
       const { isDarkMode } = this.state;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
     const options = {
       title: {
         display: true,
@@ -2527,7 +2528,8 @@ class StockStatus extends Component {
               return x1 + x2;
             }
           }, gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor ,
             lineWidth: 0
           }
         }, {
@@ -2555,7 +2557,8 @@ class StockStatus extends Component {
             }
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor ,
             lineWidth: 0
           }
         }],
@@ -2573,7 +2576,8 @@ class StockStatus extends Component {
             fontSize: "12"
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor,
             lineWidth: 0
           }
         }]
@@ -2644,7 +2648,8 @@ class StockStatus extends Component {
               return x1 + x2;
             }
           }, gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor,
             lineWidth: 0
           }
         }],
@@ -2662,7 +2667,8 @@ class StockStatus extends Component {
             fontSize: "12"
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor,
             lineWidth: 0
           }
         }]

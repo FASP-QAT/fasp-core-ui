@@ -1227,6 +1227,7 @@ observer.observe(document.documentElement, {
         const { isDarkMode } = this.state;
 // const colors = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+
         const options = {
             title: {
                 display: true,
