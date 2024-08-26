@@ -2453,7 +2453,15 @@ export default class ExtrapolateDataComponent extends React.Component {
         var listOfPlanningUnits = this.state.planningUnitValues;
         var puObj = [];
         var regionObj = []
-        this.setState({ totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length), startBulkExtrapolation: true, dataChanged: true }, () => {
+        this.setState({
+            totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length), startBulkExtrapolation: true,
+            dataChanged: true,
+            jsonDataMovingAvg: [],
+            jsonDataSemiAverage: [],
+            jsonDataLinearRegression: [],
+            jsonDataTes: [],
+            jsonDataArima: [],
+        }, () => {
             var programData = this.state.datasetJson;
             console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
             if (listOfPlanningUnits.length > 0) {
