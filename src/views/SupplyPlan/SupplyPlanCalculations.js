@@ -955,6 +955,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     } else {
                                         mosWps = 0;
                                     }
+                                    // Add logic for batch here
                                     var json = {
                                         programId: generalProgramJson.programId,
                                         versionId: generalProgramJson.currentVersion.versionId,

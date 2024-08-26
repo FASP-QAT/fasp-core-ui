@@ -3352,5 +3352,8 @@
     "static.pipeline.pipelineConvertorLinux": "Linux.",
     "static.supplyPlan.totalAdjustment": "Total Adjustment",
     "static.supplyPlan.manualAdjustment":"Adjustment (manual)",
-    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)"
+    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)",
+    "static.supplyPlan.projectedQuantity":"Projected Quantity",
+    "static.supplyPlan.actualQuantity":"Actual Quantity",
+    "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available"
 }
