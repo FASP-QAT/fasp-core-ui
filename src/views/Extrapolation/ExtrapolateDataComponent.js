@@ -366,16 +366,16 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         });
         this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
-// Detect initial theme
+        // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
-    
+
         // Listening for theme changes
         const observer = new MutationObserver(() => {
             const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
             this.setState({ isDarkMode: updatedDarkMode });
         });
-    
+
         observer.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['data-theme'],
@@ -2445,13 +2445,23 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
      * Builds data for extrapolation and runs extrapolation methods
      * @param {Object} id defines which submit has been clicked on
+     * @param {Object} event contains the Extrapolated modal parameters 
      */
-    ExtrapolatedParameters(id) {
+    ExtrapolatedParameters(id, event) {
+        event.stopPropagation();
         var regionList = this.state.regionValues;
         var listOfPlanningUnits = this.state.planningUnitValues;
         var puObj = [];
         var regionObj = []
-        this.setState({ totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length), startBulkExtrapolation: true, dataChanged: true }, () => {
+        this.setState({
+            totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length), startBulkExtrapolation: true,
+            dataChanged: true,
+            jsonDataMovingAvg: [],
+            jsonDataSemiAverage: [],
+            jsonDataLinearRegression: [],
+            jsonDataTes: [],
+            jsonDataArima: [],
+        }, () => {
             var programData = this.state.datasetJson;
             console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
             if (listOfPlanningUnits.length > 0) {
@@ -2559,10 +2569,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (regionObj != "" && puObj != "") {
                     this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
                 }
+                console.log("count1", count)
+
                 this.setState({
                     count: count
                 }, () => {
+                    console.log("count2", this.state.bulkExtrapolation, "==", this.state.optimizeTESAndARIMA, "==", this.state.missingTESAndARIMA)
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
+                    console.log("count3", count)
+
                     if (count == 0) {
                         this.setState({
                             startBulkExtrapolation: false,
@@ -2675,6 +2690,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             jsonDataArima: jsonDataArima,
             countRecived: this.state.countRecived++
         }, () => {
+            console.log("updateArimaData", this.state.jsonDataMovingAvg.length + "===" + this.state.jsonDataSemiAverage.length
+                + "===" + this.state.jsonDataLinearRegression.length
+                + "===" + this.state.jsonDataTes.length
+                + "===" + this.state.jsonDataArima.length
+                + "===" + this.state.count)
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
@@ -3720,14 +3740,14 @@ export default class ExtrapolateDataComponent extends React.Component {
         }, this);
         const darkModeColors = [
             '#d4bbff', // Color 1 
-            '#ba4e00'    
+            '#ba4e00'
         ];
-        
+
         const lightModeColors = [
             '#002F6C',  // Color 1
             '#651D32'
         ];
-        
+
 
         const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -3737,18 +3757,18 @@ export default class ExtrapolateDataComponent extends React.Component {
             title: {
                 display: true,
                 text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text + " " + i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0] : "",
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.report.consupmtionqty'),
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -3761,9 +3781,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                             }
                             return x1 + x2;
                         },
-                        
+
                     },
-                    gridLines:{
+                    gridLines: {
                         color: gridLineColor,
                     }
                 }],
@@ -3776,7 +3796,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             lineWidth: 0
                         },
                         ticks: {
-                            fontColor:fontColor,
+                            fontColor: fontColor,
                             autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
@@ -3790,10 +3810,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         id: 'xAxis2',
                         gridLines: {
                             drawOnChartArea: false,
-                            
+
                         },
                         ticks: {
-                            fontColor:fontColor,
+                            fontColor: fontColor,
                             callback: function (label) {
                                 var xAxis2 = label
                                 xAxis2 += '';
@@ -3838,7 +3858,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -4040,7 +4060,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t("static.extrapolation.arimaLower"),
                 backgroundColor: 'transparent',
-                borderColor: colors[1], 
+                borderColor: colors[1],
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -4059,7 +4079,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: colors[1], 
+                borderColor: colors[1],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -4076,7 +4096,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t("static.extrapolation.arimaUpper"),
                 backgroundColor: 'transparent',
-                borderColor: colors[1], 
+                borderColor: colors[1],
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -5093,22 +5113,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <ModalFooter>
                                         {this.state.bulkExtrapolation && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(1, e)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
                                             </div>
                                         }
                                         {localStorage.getItem('sessionType') === 'Online' && (this.state.bulkExtrapolation || this.state.missingTESAndARIMA) && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(2, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
                                             </div>
                                         }
                                         {this.state.optimizeTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(3)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(3, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
                                             </div>
                                         }
                                         {localStorage.getItem('sessionType') === 'Online' && this.state.missingTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(5)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(5, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
                                             </div>
                                         }
 
