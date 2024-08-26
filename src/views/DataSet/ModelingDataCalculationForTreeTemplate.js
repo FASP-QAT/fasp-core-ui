@@ -428,10 +428,18 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                                             totalValue = noFURequired * calculatedValue;
                                         } else {
                                             var calculatedValueForLastNMonths = 0;
-                                            var f = parentAndCalculatedValueArray.filter(c => c.month > (c.month <= 0 ? i - noOfMonths - 1 : i - noOfMonths) && c.month <= i);
-                                            f.map(item => {
-                                                calculatedValueForLastNMonths += item.calculatedValue;
+                                            var tempMonth=Number(noOfMonths)-Math.floor(Number(noOfMonths));
+                                            var f = parentAndCalculatedValueArray.filter(c => c.month > (c.month <= 0 ? i - Math.ceil(noOfMonths) - 1 : i - Math.ceil(noOfMonths)) && c.month <= i);
+                                            f.map((item,index) => {
+                                                if(f.length>1 && index!=f.length-1){
+                                                    calculatedValueForLastNMonths += item.calculatedValue;
+                                                }else if(f.length==1 || tempMonth==0){
+                                                    calculatedValueForLastNMonths += item.calculatedValue;
+                                                }
                                             })
+                                            if(f.length>=2){
+                                                calculatedValueForLastNMonths += tempMonth*f[f.length-1].calculatedValue;
+                                            }
                                             totalValue = noFURequired * calculatedValueForLastNMonths;
                                         }
                                     }

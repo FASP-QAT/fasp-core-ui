@@ -4793,8 +4793,19 @@ export default class CreateTreeTemplate extends Component {
             var tempNConvertToMonth = tempFuNode && tempFuNode.usagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth : 1;
             if(this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false") {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
+                var tempNoOfMonths=Number(tempMonth)-Math.floor(Number(tempMonth));
                 tempCalculatedValue = 0;
-                momListParent.filter(c => c.month > (c.month <= 0 ? momList[j].month - tempMonth - 1 : momList[j].month - tempMonth) && c.month <= momList[j].month).map(x => tempCalculatedValue = x.calculatedValue + tempCalculatedValue);
+                var f = momListParent.filter(c => c.month > (c.month <= 0 ? momList[j].month - tempMonth - 1 : momList[j].month - tempMonth) && c.month <= momList[j].month);
+                f.map((item,index) => {
+                    if(f.length>1 && (index!=f.length-1)){
+                        tempCalculatedValue += item.calculatedValue;
+                    }else if(f.length==1 || tempNoOfMonths==0){
+                        tempCalculatedValue += item.calculatedValue;
+                    }
+                })
+                if(f.length>=2){
+                    tempCalculatedValue += tempNoOfMonths*f[f.length-1].calculatedValue;
+                }
             }
             data[7] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((G${parseInt(j) + 1}*${(momListParentForMonth.length > 0 ? parseFloat(tempCalculatedValue) : 0)}/100)*N${parseInt(j) + 1},2)` : `=ROUND((G${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},4)`;
@@ -4802,7 +4813,7 @@ export default class CreateTreeTemplate extends Component {
             data[10] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(R${parseInt(j) + 1 - lagInMonths}<0,0,R${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(R${parseInt(j) + 1}<0,0,R${parseInt(j) + 1})`;
             data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`
             data[12] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
-            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false" ? (((tempFuNode.usageFrequency / tempNConvertToMonth) * tempFuNode.noOfForecastingUnitsPerPerson) / tempFuNode.noOfPersons): this.state.noFURequired)) : 1;
+            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false" ? tempNConvertToMonth * tempFuNode.usageFrequency * tempFuNode.noOfForecastingUnitsPerPerson: this.state.noFURequired)) : 1;
             data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;

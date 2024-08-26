@@ -387,6 +387,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var repeatUsagePeriodId;
                                             var oneTimeUsage;
                                             var noOfMonths = 1;
+                                            var tempNoOfMonths = 0; 
                                             usageTypeId = nodeDataMapForScenario.fuNode.usageType.id;
                                             if (usageTypeId == 1) {
                                                 oneTimeUsage = nodeDataMapForScenario.fuNode.oneTimeUsage;
@@ -454,10 +455,18 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     totalValue = noFURequired * calculatedValue;
                                                 } else {
                                                     var calculatedValueForLastNMonths = 0;
-                                                    var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(noOfMonths, 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
-                                                    f.map(item => {
-                                                        calculatedValueForLastNMonths += item.calculatedValue;
+                                                    var tempMonth=Number(noOfMonths)-Math.floor(Number(noOfMonths));
+                                                    var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(Math.ceil(noOfMonths), 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
+                                                    f.map((item,index) => {
+                                                        if(f.length>1 && index!=f.length-1){
+                                                            calculatedValueForLastNMonths += item.calculatedValue;
+                                                        }else if(f.length==1 || tempMonth==0){
+                                                            calculatedValueForLastNMonths += item.calculatedValue;
+                                                        }
                                                     })
+                                                    if(f.length>=2){
+                                                        calculatedValueForLastNMonths += tempMonth*f[f.length-1].calculatedValue;
+                                                    }
                                                     totalValue = noFURequired * calculatedValueForLastNMonths;
                                                 }
                                             }
