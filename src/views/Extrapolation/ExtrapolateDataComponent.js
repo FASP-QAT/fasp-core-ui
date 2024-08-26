@@ -2659,6 +2659,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             jsonDataTes: jsonDataTes,
             countRecived: this.state.countRecived++
         }, () => {
+            console.log("inside updateTESData")
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length

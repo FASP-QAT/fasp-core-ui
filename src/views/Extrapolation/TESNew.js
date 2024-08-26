@@ -27,6 +27,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     ExtrapolationService.tes(json)
         .then(response => {
             if (response.status == 200) {
+                console.log("inside tes success")
                 var responseData = response.data;
                 var output = [];
                 var count = 0;
@@ -50,11 +51,15 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 }
             }
         }).catch(error => {
+            console.log("inside tes error", error)
+
             if (page == "DataEntry") {
                 var tesData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateTESData(tesData);
             } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
                 var tesData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
+                console.log("inside tes error tesData", tesData)
+
                 props.updateTESData(tesData);
             } else {
                 if (!isTreeExtrapolation) {
