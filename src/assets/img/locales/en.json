@@ -3412,8 +3412,8 @@
     "static.procurementagent.procurementAgentColorCodeDarkMode":"Color Code Dark Mode",
     "static.pafu.noNewChangesFound":"No new changes found",
     "static.supplyPlan.totalAdjustment": "Total Adjustment",
-    "static.supplyPlan.manualAdjustment":"Adjustment (manual)",
-    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)",
+    "static.supplyPlan.manualAdjustment":"Manual Adjustment",
+    "static.supplyPlan.nationalAdjustment":"Automatic Adjustment",
     "static.extrapolation.extrapolation": "Extrapolations",
     "static.extrapolation.bulkExtrapolationNotPossible": "Extrapolation not possible as selected program planning units does not have enough data"
 }
