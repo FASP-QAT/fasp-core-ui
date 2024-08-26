@@ -27,8 +27,6 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
     ExtrapolationService.arima(json)
         .then(response => {
             if (response.status == 200) {
-                console.log("inside arima success")
-
                 var responseData = response.data;
                 var output = [];
                 var count = 0;
@@ -52,8 +50,6 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 }
             }
         }).catch(error => {
-            console.log("inside arima error", error)
-
             if (page == "DataEntry") {
                 var arimaData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);

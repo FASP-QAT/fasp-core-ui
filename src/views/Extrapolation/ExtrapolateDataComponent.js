@@ -2674,14 +2674,17 @@ export default class ExtrapolateDataComponent extends React.Component {
      * @param {Object} data The data to be added to the ARIMA data set.
      */
     updateArimaData(data) {
-        console.log("updateArimaData", data)
-
         var jsonDataArima = this.state.jsonDataArima;
         jsonDataArima.push(data);
         this.setState({
             jsonDataArima: jsonDataArima,
             countRecived: this.state.countRecived++
         }, () => {
+            console.log("updateArimaData", this.state.jsonDataMovingAvg.length + "===" + this.state.jsonDataSemiAverage.length
+                + "===" + this.state.jsonDataLinearRegression.length
+                + "===" + this.state.jsonDataTes.length
+                + "===" + this.state.jsonDataArima.length
+                + "===" + this.state.count)
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
