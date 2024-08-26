@@ -2538,12 +2538,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 }, () => {
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
                     if (count == 0) {
-                        console.log("count===>", count)
                         this.setState({
                             startBulkExtrapolation: false,
                             dataChanged: false,
                             messageColor: "red",
-                            message: "Extrapolation not possible as selected program does not have enough data",
+                            message: i18n.t("static.extrapolation.bulkExtrapolationNotPossible")
                         }, () => {
                             this.componentDidMount();
                         });
