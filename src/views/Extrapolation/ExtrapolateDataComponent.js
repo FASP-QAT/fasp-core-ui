@@ -2530,6 +2530,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         }
                     }
                 }
+                console.log("count", count)
                 if (regionObj != "" && puObj != "") {
                     this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
                 }
@@ -5021,7 +5022,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 type="checkbox"
                                                                 id="seasonality"
                                                                 name="seasonality"
-                                                                disabled={this.state.isDisabled}
+                                                                // disabled={this.state.isDisabled}
                                                                 checked={this.state.seasonality}
                                                                 onClick={(e) => { this.seasonalityCheckbox(e); }}
                                                             />
@@ -5058,7 +5059,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </div>
                                         }
 
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.ExtrapolatedParameters(4)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </ModalFooter>
                                 </Form>
                             )} />
