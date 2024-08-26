@@ -2445,8 +2445,10 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
      * Builds data for extrapolation and runs extrapolation methods
      * @param {Object} id defines which submit has been clicked on
+     * @param {Object} event contains the Extrapolated modal parameters 
      */
-    ExtrapolatedParameters(id) {
+    ExtrapolatedParameters(id, event) {
+        event.stopPropagation();
         var regionList = this.state.regionValues;
         var listOfPlanningUnits = this.state.planningUnitValues;
         var puObj = [];
@@ -5103,22 +5105,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <ModalFooter>
                                         {this.state.bulkExtrapolation && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(1, e)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
                                             </div>
                                         }
                                         {localStorage.getItem('sessionType') === 'Online' && (this.state.bulkExtrapolation || this.state.missingTESAndARIMA) && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(2, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
                                             </div>
                                         }
                                         {this.state.optimizeTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(3)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(3, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
                                             </div>
                                         }
                                         {localStorage.getItem('sessionType') === 'Online' && this.state.missingTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(5)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(5, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
                                             </div>
                                         }
 
