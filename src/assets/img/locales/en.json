@@ -102,7 +102,7 @@
     "static.sync.clickOkMsg": "* Click `OK` to download latest server version (overrides local version)",
     "static.report.planningUnitNotes": "Planning Unit Notes",
     "static.common.refreshPage": "Refresh page",
-    "static.tooltip.SelectAsForecast": "Select one forecast as the final forecast for each region and planning unit",
+    "static.tooltip.SelectAsForecast": "Select one or more forecasts as the final forecast for each Planning Unit and Region",
     "static.tooltip.startMonthForHistoricData": "To change the start month, please go back to the Node Data screen and change the month",
     "static.supplyPlan.container": "40' Container",
     "static.mapProcurementUnit.validGtinText": "Enter valid GTIN",
@@ -3351,5 +3351,6 @@
     "static.tooltip.selectMultipleTree":"If checked, user can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the monthly forecast quantities.",
     "static.compareAndSelect.totalAggregated":"Total Selected Forecast",
     "static.compareAndSelect.note":"Note: Graph and data table only update after submitting",
-    "static.forecastSummaryTooltip.selectForecast":"User can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the total forecast quantities."
+    "static.forecastSummaryTooltip.selectForecast":"User can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the total forecast quantities.",
+    "static.compareAndSelect.topNote":"Note: users can select multiple tree forecasts as their final forecast, which will aggregate the monthly forecast quantities. Users cannot select multiple consumption forecasts or a combination of tree and consumption forecasts as their final forecast."
 }
