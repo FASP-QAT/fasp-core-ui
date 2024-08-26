@@ -3399,7 +3399,6 @@
     "static.extrapolation.extrapolateUsingOptimizedArimaAndTes": "Extrapolate with optimized ARIMA & TES",
     "static.extrapolation.bulkExtrapolationSuccess": "Bulk Extraploation done successfully",
     "static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams": "Extrapolate ARIMA & TES using default parameters",
-    "static.extrapolation.extrapolation": "Extraploations",
     "static.compareAndSelect.selectMultipleTree":"Select Multiple Trees",
     "static.compareAndSelect.selectOneOrMore":"Select one or more forecasts for",
     "static.forecastSummary.eitherTreeOrConsumptionValidation":"Multi-select is only available for tree forecasts",
@@ -3414,5 +3413,7 @@
     "static.pafu.noNewChangesFound":"No new changes found",
     "static.supplyPlan.totalAdjustment": "Total Adjustment",
     "static.supplyPlan.manualAdjustment":"Adjustment (manual)",
-    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)"
+    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)",
+    "static.extrapolation.extrapolation": "Extrapolations",
+    "static.extrapolation.bulkExtrapolationNotPossible": "Extrapolation not possible as selected program planning units does not have enough data"
 }

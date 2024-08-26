@@ -585,7 +585,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                if (myResult.region != "" || myResult.planningUnit != "") {
+                if (myResult != undefined && (myResult.region != "" || myResult.planningUnit != "")) {
                     this.setState({ showMissingTESANDARIMA: true });
                     if (myResult.region != "") {
                         this.setState({ regionValues: myResult.region });
@@ -2562,6 +2562,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                     count: count
                 }, () => {
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
+                    if (count == 0) {
+                        this.setState({
+                            startBulkExtrapolation: false,
+                            dataChanged: false,
+                            messageColor: "red",
+                            message: i18n.t("static.extrapolation.bulkExtrapolationNotPossible")
+                        }, () => {
+                            this.componentDidMount();
+                        });
+                    }
                 })
             }
         })
@@ -5055,6 +5065,24 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
                                                                 labelledBy={i18n.t('static.common.regiontext')}
                                                             />
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <div className="tab-ml-1 ml-lg-5" style={{ marginTop: '9px' }}>
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="checkbox"
+                                                                id="seasonality"
+                                                                name="seasonality"
+                                                                disabled={this.state.isDisabled}
+                                                                checked={this.state.seasonality}
+                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                            </Label>
                                                         </div>
                                                     </FormGroup>
                                                 </div>
