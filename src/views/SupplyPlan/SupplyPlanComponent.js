@@ -901,7 +901,7 @@ export default class SupplyPlanComponent extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
     }
-    toggleInventoryActualBatchInfo(batchInfoList,isActual){
+    toggleInventoryActualBatchInfo(batchInfoList,isActual,count){
         var cont = false;
         if (this.state.actualInventoryChanged) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -920,14 +920,59 @@ export default class SupplyPlanComponent extends React.Component {
             actualInventoryBatchTotalNotMatching:"",
             ledgerForBatch:[]
         },()=>{
-            var batchList=[];
+            var batchListForJexcel=[];
             var editable=isActual;
-            this.state.batchInfoInInventoryPopUp.map(item=>{
-                batchList.push({
-                    name: item.batchNo,
-                    id: item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD"),
-                })
-            })
+            // this.state.batchInfoInInventoryPopUp.map(item=>{
+            //     batchList.push({
+            //         name: item.batchNo,
+            //         id: item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD"),
+            //     })
+            // })
+            var programJson = this.state.programJson;
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        var batchInfoListForProgram = programJson.batchInfoList;
+        var batchList = [];
+        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true");
+        var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
+        var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(inventory => inventory.batchInfoList);
+        var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
+        for (var sl = 0; sl < shipmentList.length; sl++) {
+            var bdl = shipmentList[sl].batchInfoList;
+            for (var bd = 0; bd < bdl.length; bd++) {
+                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                if (index == -1) {
+                    var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                    var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                    var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                    var shipmentTotal=0;
+                    var consumptionTotal=0;
+                    var inventoryTotal=0;
+                    shipmentBatchListFiltered.map(item=>{
+                        shipmentTotal+=Number(item.shipmentQty);
+                    })
+                    consumptionBatchListFiltered.map(item=>{
+                        consumptionTotal+=Number(item.consumptionQty);
+                    })
+                    inventoryBatchListFiltered.map(item=>{
+                        inventoryTotal+=Number(item.adjustmentQty)
+                    })                        
+                    var batchDetailsToPush = batchInfoListForProgram.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                    if (batchDetailsToPush.length > 0) {
+                        batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
+                        batchList.push(batchDetailsToPush[0]);
+                        if(moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM")>moment(this.state.monthsArray[count].startDate).format("YYYY-MM")){
+                        batchListForJexcel.push({
+                            name: batchDetailsToPush[0].batchNo,
+                            id: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM-DD"),
+                        })
+                    }
+                    }
+                }
+            }
+        }
+        this.setState({
+            actualBatchList:batchList
+        })
             let batchInfoList = this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0);
             let dataArray = [];
             var total=0;
@@ -957,7 +1002,7 @@ export default class SupplyPlanComponent extends React.Component {
                         title: i18n.t("static.supplyPlan.batchId"),
                         type: 'dropdown',
                         width:200,
-                        source:batchList
+                        source:batchListForJexcel
                     },
                     {
                         title: i18n.t('static.report.createdDate'),
@@ -1009,7 +1054,7 @@ export default class SupplyPlanComponent extends React.Component {
                     if(x==0){
                         var valid=checkValidtion("text", "A", y, value, this.state.actualInventoryEl);
                         if(valid){
-                            var batchDetails=this.state.batchInfoInInventoryPopUp.filter(item=>(item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD"))==value)[0];
+                            var batchDetails=this.state.actualBatchList.filter(item=>(item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD"))==value)[0];
                             instance.setValueFromCoords(1,y,moment(batchDetails.createdDate).format(DATE_FORMAT_CAP),true);
                             instance.setValueFromCoords(2,y,moment(batchDetails.expiryDate).format(DATE_FORMAT_CAP),true);
                             instance.setValueFromCoords(3,y,(batchDetails.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no"),true);
@@ -1121,42 +1166,6 @@ export default class SupplyPlanComponent extends React.Component {
         var valid = true;
         var tempJson=[];
         var total=0;
-        var programJson = this.state.programJson;
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var batchInfoList = programJson.batchInfoList;
-        var batchList = [];
-        var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true");
-        var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
-        var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(inventory => inventory.batchInfoList);
-        var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
-        for (var sl = 0; sl < shipmentList.length; sl++) {
-            var bdl = shipmentList[sl].batchInfoList;
-            for (var bd = 0; bd < bdl.length; bd++) {
-                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                if (index == -1) {
-                    var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                    var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                    var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                    var shipmentTotal=0;
-                    var consumptionTotal=0;
-                    var inventoryTotal=0;
-                    shipmentBatchListFiltered.map(item=>{
-                        shipmentTotal+=Number(item.shipmentQty);
-                    })
-                    consumptionBatchListFiltered.map(item=>{
-                        consumptionTotal+=Number(item.consumptionQty);
-                    })
-                    inventoryBatchListFiltered.map(item=>{
-                        inventoryTotal+=Number(item.adjustmentQty)
-                    })                        
-                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                    if (batchDetailsToPush.length > 0) {
-                        batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
-                        batchList.push(batchDetailsToPush[0]);
-                    }
-                }
-            }
-        }
         for(var j=0;j<json.length;j++){
             var validation = checkValidtion("text", "A", j, json[j][0], this.state.actualInventoryEl);;
             if (validation == false) {
@@ -1172,7 +1181,7 @@ export default class SupplyPlanComponent extends React.Component {
             if (validation == false) {
                 valid = false;
             }
-            var batchDetails=batchList.filter(c => (c.batchNo == (json[j][0]).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((json[j][0]).split("~")[1]).format("YYYY-MM")));
+            var batchDetails=this.state.actualBatchList.filter(c => (c.batchNo == (json[j][0]).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((json[j][0]).split("~")[1]).format("YYYY-MM")));
             if(batchDetails.length>0){
                 if(batchDetails[0].qtyAvailable<Number(this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true).toString().replaceAll(",",""))){
                     inValid("F", j, i18n.t('static.supplyPlan.qtyNotAvailable'), this.state.actualInventoryEl);
@@ -2273,7 +2282,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList,item.isActual) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList,item.isActual,count) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
@@ -3992,7 +4001,7 @@ export default class SupplyPlanComponent extends React.Component {
     showInventoryForThatMonth(){
         localStorage.setItem('inventoryDateForBatch','');
         this.toggleLarge('Adjustments', '', '', '', '', '', '', 0);
-        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList,this.state.closingBalanceArray[0].isActual);
+        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList,this.state.closingBalanceArray[0].isActual,0);
     }
     /**
      * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
