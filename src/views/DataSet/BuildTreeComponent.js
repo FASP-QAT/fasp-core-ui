@@ -3267,17 +3267,21 @@ export default class BuildTree extends Component {
             selectedScenario: scenarioId,
             selectedScenarioLabel: selectedText,
         }, () => {
-            if(localStorage.getItem("openNodeId")) {
-                let tempData = {
-                    context: '',
-                    parentItem: ''
-                };
-                tempData.context = this.state.items.filter(t => t.id == localStorage.getItem("openNodeId"))[0];
-                tempData.parentItem = this.state.items.filter(t => t.id == tempData.context.parent)[0];
+            try {
+                if(localStorage.getItem("openNodeId")) {
+                    let tempData = {
+                        context: '',
+                        parentItem: ''
+                    };
+                    tempData.context = this.state.items.filter(t => t.id == localStorage.getItem("openNodeId"))[0];
+                    tempData.parentItem = this.state.items.filter(t => t.id == tempData.context.parent)[0];
+                    localStorage.removeItem("openNodeId");
+                    setTimeout(() => {
+                        this.onCursoChanged("", tempData);
+                    }, 2000)
+                }
+            } catch(e) {
                 localStorage.removeItem("openNodeId");
-                setTimeout(() => {
-                    this.onCursoChanged("", tempData);
-                }, 2000)
             }
             this.handleAMonthDissmis3(this.state.singleValue2, 0);
         });

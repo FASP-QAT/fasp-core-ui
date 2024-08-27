@@ -2410,7 +2410,7 @@ export default class TreeTable extends Component {
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
-            data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId;
+            data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId).length > 0 ? this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId : items[i].payload.nodeUnit.unitId;
             data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
             data[6] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : currentScenario.dataValue == "" ? 0 : currentScenario.dataValue;
             data[7] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]) == "" ? 0 : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
@@ -2549,15 +2549,9 @@ export default class TreeTable extends Component {
                             curItem.context = items.filter(c => c.id == json[i][11])[0];
                             curItem.context.payload.label.label_en = json[i][3];
                             curItem.context.payload.nodeUnit.id = json[i][4];
-                            // var nodeUnit = document.getElementById("nodeUnitId");
-                            // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
-                            // var label = {
-                            //     label_en: selectedText,
-                            //     label_fr: '',
-                            //     label_sp: '',
-                            //     label_pr: ''
-                            // }
-                            // curItem.context.payload.nodeUnit.label = label;
+                            curItem.context.payload.nodeUnit.unitId = json[i][4];
+                            curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][5];
                             if (json[i][10] == 3) {
                                 var value = json[i][6];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
