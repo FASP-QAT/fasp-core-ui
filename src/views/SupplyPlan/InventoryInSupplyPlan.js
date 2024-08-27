@@ -410,7 +410,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             if (y == null) {
                             } else {
                                 var rowData = obj.getRowData(y)
-                                if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "") {
+                                if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && this.props.items.inventoryType==2) {
                                     items.push({
                                         title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                         onclick: function () {
@@ -763,7 +763,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var asterisk = document.getElementById("adjustmentsTable").children[2].firstChild.children[1].firstChild.firstChild.firstChild.firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[2].classList.add('AsteriskTheadtrTd');
@@ -1189,6 +1189,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             valid = false;
                         } else {
                             positiveValidation("D", y, elInstance);
+                        }
+                    }
+                    var batchDetails=this.props.items.batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")));
+                    if(batchDetails.length>0 && Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())<0){
+                        if(batchDetails[0].qtyAvailable<Number(0-Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))){
+                            inValid("D", y, i18n.t('static.supplyPlan.qtyNotAvailable'), elInstance);
+                            valid=false;
                         }
                     }
                 }

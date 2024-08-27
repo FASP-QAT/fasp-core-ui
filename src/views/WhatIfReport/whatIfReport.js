@@ -4524,13 +4524,32 @@ export default class WhatIfReportComponent extends React.Component {
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
             var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+            var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
+            var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(inventory => inventory.batchInfoList);
+            var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
             for (var sl = 0; sl < shipmentList.length; sl++) {
                 var bdl = shipmentList[sl].batchInfoList;
                 for (var bd = 0; bd < bdl.length; bd++) {
                     var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                     if (index == -1) {
+                        var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var shipmentTotal=0;
+                        var consumptionTotal=0;
+                        var inventoryTotal=0;
+                        shipmentBatchListFiltered.map(item=>{
+                            shipmentTotal+=Number(item.shipmentQty);
+                        })
+                        consumptionBatchListFiltered.map(item=>{
+                            consumptionTotal+=Number(item.consumptionQty);
+                        })
+                        inventoryBatchListFiltered.map(item=>{
+                            inventoryTotal+=Number(item.adjustmentQty)
+                        })
                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                         if (batchDetailsToPush.length > 0) {
+                            batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
                             batchList.push(batchDetailsToPush[0]);
                         }
                     }
@@ -4591,13 +4610,32 @@ export default class WhatIfReportComponent extends React.Component {
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
             var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+            var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
+            var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(inventory => inventory.batchInfoList);
+            var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
             for (var sl = 0; sl < shipmentList.length; sl++) {
                 var bdl = shipmentList[sl].batchInfoList;
                 for (var bd = 0; bd < bdl.length; bd++) {
                     var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                     if (index == -1) {
+                        var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var shipmentTotal=0;
+                        var consumptionTotal=0;
+                        var inventoryTotal=0;
+                        shipmentBatchListFiltered.map(item=>{
+                            shipmentTotal+=Number(item.shipmentQty);
+                        })
+                        consumptionBatchListFiltered.map(item=>{
+                            consumptionTotal+=Number(item.consumptionQty);
+                        })
+                        inventoryBatchListFiltered.map(item=>{
+                            inventoryTotal+=Number(item.adjustmentQty)
+                        })
                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                         if (batchDetailsToPush.length > 0) {
+                            batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
                             batchList.push(batchDetailsToPush[0]);
                         }
                     }
@@ -6276,7 +6314,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr bgcolor='#d9d9d9'>
-                                            <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                            <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                     if (count < 7) {
