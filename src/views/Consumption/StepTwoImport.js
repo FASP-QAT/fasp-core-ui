@@ -421,7 +421,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
-            onload: loadedForNonEditableTables,
+            onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -434,7 +434,25 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             isChanged1: true
         })
         this.props.updateStepOneData("loading", false);
+        var validation = this.checkValidation();//to heighlight mandatory fields
     }
+
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance - This is the DOM Element where sheet is created
+     * @param {*} cell - This is the object of the DOM element
+     * @param {*} x - Row Number
+     * @param {*} y - Column Number
+     * @param {*} value - Cell Value 
+     */
+    loaded = function (instance, cell, x, y, value) {
+        loadedForNonEditableTables(instance, cell);
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.percentOfSupplyPlanInfo');
+    }
+
     /**
      * Build options for import and do not import region dropdown
      */
