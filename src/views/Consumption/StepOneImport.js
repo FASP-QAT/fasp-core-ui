@@ -11,7 +11,7 @@ import {
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { checkValidation, changed, jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { checkValidation, changed, jExcelLoadedFunction, loadedForNonEditableTables, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { contrast, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -496,7 +496,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 let programJson = {
                     programId: programId,
                     programCode: programCode,
-                    versionId: versionId
+                    versionId: versionId,
+                    rowSequence: i
                 };
                 
 
@@ -804,8 +805,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var papuDataArr = [];
         var count = 0;
 
-        data[0] = '';
+        data[0] = '0';
         data[1] = '';
+        data[2] = '';
         papuDataArr[0] = data;
 
         // if (this.state.table1Instance != "" && this.state.table1Instance != undefined) {
@@ -839,6 +841,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     source: this.state.filteredSupplyPlanProgramList,
                     filter: this.supplyPlanProgramsForDropdown,
                     required: true,
+                    height: '30px',
                     regex: {
                         ex: /^\S+(?: \S+)*$/,
                         text: i18n.t("static.message.spacetext")
@@ -864,12 +867,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: true,
             onchange: this.changed2,
+            oninsertrow: function (el, x, y, source, value, id) {
+                el.setStyle(('B').concat(x+2), "height", "25px");
+            },
             // onchange: this.handleChange.bind(this),//remove this function
             copyCompatibility: true,
             allowManualInsertRow: false,
             parseFormulas: true,
             // oneditionend: this.oneditionend,
-            // onload: this.loaded,
+            onload: function (instance, cell, x, y, value) {
+                var elInstance = instance.worksheets[0];
+                // var json = elInstance.getJson();
+                elInstance.setStyle(('B').concat(1), "height", "25px");
+                jExcelLoadedFunctionWithoutPagination(instance);
+            },
             editable: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
@@ -1019,6 +1030,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
      */
     buildJexcel() {
         var papuList = this.state.selSource; // planning unit list of SP program
+        papuList.sort((a, b) => {
+            var item1 = a.program.rowSequence;
+            var item2 = b.program.rowSequence;
+            return item1 > item2 ? 1 : -1;
+        });
         // console.log('papuList: ', papuList);
         var data = [];
         var papuDataArr = [];
