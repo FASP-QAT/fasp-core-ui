@@ -3352,5 +3352,5 @@
     "static.compareAndSelect.totalAggregated":"Total Selected Forecast",
     "static.compareAndSelect.note":"Note: Graph and data table only update after submitting",
     "static.forecastSummaryTooltip.selectForecast":"User can select multiple tree forecasts (not consumption) as their final forecast, which will aggregate the total forecast quantities.",
-    "static.compareAndSelect.topNote":"Note: users can select multiple tree forecasts as their final forecast, which will aggregate the monthly forecast quantities. Users cannot select multiple consumption forecasts or a combination of tree and consumption forecasts as their final forecast."
+    "static.compareAndSelect.topNote":"Users can select multiple tree forecasts as their final forecast, which will aggregate the monthly forecast quantities. Users cannot select multiple consumption forecasts or a combination of tree and consumption forecasts as their final forecast."
 }
