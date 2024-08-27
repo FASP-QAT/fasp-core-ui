@@ -334,6 +334,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
               align: "left",
             }
           );
+          /*
           var planningText = doc.splitTextToSize(
             i18n.t("static.dashboard.country") +
             " : " +
@@ -357,6 +358,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             (doc.internal.pageSize.width * 3) / 4
           );
           doc.text(doc.internal.pageSize.width / 8, len, planningText);
+          */
         }
       }
     };
@@ -365,6 +367,43 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     const orientation = "landscape";
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
+
+    doc.setFontSize(8);
+    doc.setTextColor("#002f6c");
+    let y = 130;
+    var countryText = doc.splitTextToSize(i18n.t("static.dashboard.country") + " : " + this.state.countryLabels.join(" , "),(doc.internal.pageSize.width * 3) / 4);
+    for (var i = 0; i < countryText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+      };
+      doc.text(doc.internal.pageSize.width / 8, y, countryText[i]);
+      y = y + 10;
+    }
+
+    y = y + 10;    
+    var programText = doc.splitTextToSize(i18n.t("static.program.program") + " : " + this.state.programLabels.join("; "),(doc.internal.pageSize.width * 3) / 4);
+    for (var i = 0; i < programText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+      };
+      doc.text(doc.internal.pageSize.width / 8, y, programText[i]);
+      y = y + 10;
+    }
+
+    y = y + 10;
+    var tracerCategoryText = doc.splitTextToSize(i18n.t("static.tracercategory.tracercategory") + " : " + this.state.tracerCategoryLabels.join("; "),(doc.internal.pageSize.width * 3) / 4);
+    for (var i = 0; i < tracerCategoryText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+      };
+      doc.text(doc.internal.pageSize.width / 8, y, tracerCategoryText[i]);
+      y = y + 10;
+    }
+    y = y + 10;
+
     doc.setFontSize(10);
     const headers = [
       [
@@ -379,6 +418,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       ],
     ];
     var data = [];
+    console.log('this.state.data[0]: ',this.state.data[0]);
+    console.log('this.state.data[1]: ',this.state.data[1]);
     this.state.data.map((elt) =>
       elt.programData.map((p) =>
         data.push([
@@ -395,10 +436,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         ])
       )
     );
-    var startY =
-      150 +
-      this.state.countryValues.length * 2 +
-      this.state.tracerCategoryLabels.length * 3;
+    // var startY =
+    //   150 +
+    //   this.state.countryValues.length * 2 +
+    //   this.state.tracerCategoryLabels.length * 3;
+
+    let startY = y + 10;
+
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,
@@ -879,6 +923,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     let planningUnits = [
       ...new Set(filteredData.map((ele) => ele.planningUnit)),
     ];
+    planningUnits.sort((a, b) => {
+      var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+      var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+      return itemLabelA > itemLabelB ? 1 : -1;
+    });
+    console.log('planningUnits[0]: ',planningUnits[0]);
+
     let programs = [
       ...new Set(
         filteredData
@@ -886,6 +937,14 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           .flat(1)
       ),
     ];
+
+    //sort programs alphabetically
+    programs.sort((a, b) => {
+      var itemLabelA = a.toUpperCase();
+      var itemLabelB = b.toUpperCase();
+      return itemLabelA > itemLabelB ? 1 : -1;
+    });
+
     this.setState({
       data: filteredData,
       programLst: programs,
