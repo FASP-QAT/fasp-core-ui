@@ -733,6 +733,16 @@ class StockStatus extends Component {
     }
     ReportService.getStockStatusData(inputjson)
       .then(response => {
+        let tempOutput;
+        if(this.state.isAggregate.toString() == "true") {
+          var tempKey = this.state.programId.map(ele => ele.value).toString()+"~"+this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString();
+          tempOutput = {
+            tempKey: response.data
+          }
+        } else {
+          tempOutput = response.data
+        }
+        console.log("Hello",tempOutput)
         var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
           a = a.label.toLowerCase();
           b = b.label.toLowerCase();
