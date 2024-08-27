@@ -4754,6 +4754,8 @@ export default class TreeTable extends Component {
                     selectedScenarioLabel: '',
                     currentScenario: [],
                     scenarioList: []
+                }, () => {
+                    this.handleAMonthDissmis3(this.state.singleValue2, 0);
                 });
             } else {
                 this.setState({
@@ -5291,7 +5293,7 @@ export default class TreeTable extends Component {
      */
     handleAMonthDissmis3 = (value, type) => {
         var date = value.year + "-" + value.month + "-" + "01"
-        // this.updateTreeData(date);
+        this.updateTreeData(date);
         if (moment(date).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") && moment(date).format("YYYY-MM") <= moment(this.state.forecastStopDate).format("YYYY-MM")) {
             this.setState({ singleValue2: value, }, () => {
             })
