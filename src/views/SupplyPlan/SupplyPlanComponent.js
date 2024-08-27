@@ -1101,8 +1101,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     this.addActualInventory();
                                 }.bind(this)
                             });
-                        }
-                        if (obj.getRowData(y)[6] == 1) {
                             items.push({
                                 title: i18n.t("static.common.deleterow"),
                                 onclick: function () {
