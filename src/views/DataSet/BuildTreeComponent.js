@@ -7398,6 +7398,7 @@ export default class BuildTree extends Component {
                 child.parent = this.state.copyModalParentNode;
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
+                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level+1;
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == this.state.copyModalParentNode) : items.filter(c => c.parent == this.state.copyModalParentNode);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7417,6 +7418,7 @@ export default class BuildTree extends Component {
                 child.id = nodeId;
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
+                child.level = child.parent.level+1;
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == parentNode.newId) : items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
