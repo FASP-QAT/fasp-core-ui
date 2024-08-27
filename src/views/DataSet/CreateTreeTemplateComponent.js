@@ -2604,6 +2604,17 @@ export default class CreateTreeTemplate extends Component {
         }
         copyModalTreeList = this.state.treeTemplateList;
         copyModalParentLevelList = this.state.treeTemplate.levelList;
+        if(this.state.copyModalNode.payload.nodeType.id == 5) {
+            let allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
+            let invalidLevel = [];
+            for(let i = 0; i < copyModalParentLevelList.length; i++) {
+                let tempCopyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevelList[i].levelNo).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
+                if(tempCopyModalParentNodeList.length == 0) {
+                    invalidLevel.push(copyModalParentLevelList[i])
+                }
+            }
+            copyModalParentLevelList = copyModalParentLevelList.filter(x => !invalidLevel.includes(x))
+        }
         if(val == 1) {
             if(this.state.copyModalNode.level != 0){
                 copyModalParentLevel = this.state.copyModalNode.level-1;
