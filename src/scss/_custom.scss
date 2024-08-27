@@ -10937,3 +10937,67 @@ legend.scheduler-border {
   display: table;
   padding: 0px 0px 0px 3px;
 }
+
+.TreeTable .jss>thead>tr>td:nth-child(3) {
+  width: 150px !important;
+  left: 0 !important;
+  z-index: 4 !important;
+  position: sticky !important;
+}
+
+.TreeTable .jss>tbody>tr>td:nth-child(3) {
+  width: 150px !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  // background: #fff;
+}
+
+.TreeTable .jss>thead>tr>td:nth-child(4) {
+  width: 150px !important;
+  left: 150px !important;
+  z-index: 4 !important;
+  position: sticky !important;
+}
+
+.TreeTable .jss>tbody>tr>td:nth-child(4) {
+  width: 150px !important;
+  left: 150px !important;
+  position: sticky !important;
+  // background: #fff;
+}
+
+.TreeTable .jss>thead>tr>td:nth-child(5) {
+  width: 150px !important;
+  left: 300px !important;
+  z-index: 4 !important;
+  position: sticky !important;
+}
+
+.TreeTable .jss>tbody>tr>td:nth-child(5) {
+  width: 150px !important;
+  left: 300px !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  background: #fff;
+}
+
+.TreeTable .jexcel>thead {
+  position: sticky;
+  top: 0;
+}
+
+.TreeTable .jexcel_content {
+  max-height: calc(100vh - 300px) !important;
+  overflow-x: auto;
+}
+
+.TreeTable .jexcel_content {
+  max-height: calc(100vh - 262px) !important;
+  overflow: scroll !important;
+}
+
+.TreeTable .jss_content {
+  max-height: calc(100vh - 262px) !important;
+  overflow: scroll !important;
+}
