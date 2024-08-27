@@ -4975,7 +4975,7 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             </tr>
                                             <tr bgcolor='#d9d9d9'>
-                                                <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                                <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                         if (count < 7) {
