@@ -3416,10 +3416,10 @@
     "static.supplyPlan.nationalAdjustment":"Automatic Adjustment",
     "static.extrapolation.extrapolation": "Extrapolations",
     "static.extrapolation.bulkExtrapolationNotPossible": "Extrapolation not possible as selected program planning units does not have enough data",
-    "static.compareAndSelect.topNote":"Note: users can select multiple tree forecasts as their final forecast, which will aggregate the monthly forecast quantities. Users cannot select multiple consumption forecasts or a combination of tree and consumption forecasts as their final forecast.",
     "static.tooltip.percentOfSupplyPlanInfo": "Percentage of monthly actual consumption quantity from the Supply Plan program that will be imported into the Forecast program",
     "static.treeTable.tabNotes": "Note: Calculated values only update after submitting" ,
     "static.supplyPlan.projectedQuantity":"Projected Quantity",
     "static.supplyPlan.actualQuantity":"Actual Quantity",
-    "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available"
+    "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available",
+    "static.compareAndSelect.topNote":"Users can select multiple tree forecasts as their final forecast, which will aggregate the monthly forecast quantities. Users cannot select multiple consumption forecasts or a combination of tree and consumption forecasts as their final forecast."
 }

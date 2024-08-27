@@ -843,7 +843,7 @@ class CompareAndSelectScenario extends Component {
                             '',
                             '',
                             i18n.t("static.compareAndSelect.totalAggregated"),
-                            count1>0?Number(total).toFixed(2):"",
+                            count1>0?formatter(Number(total).toFixed(2)):"",
                             '',
                             '',
                             '',
@@ -1672,7 +1672,7 @@ class CompareAndSelectScenario extends Component {
                             '',
                             '',
                             i18n.t("static.compareAndSelect.totalAggregated"),
-                            count>0?Number(total).toFixed(2):"",
+                            count>0?formatter(Number(total).toFixed(2)):"",
                             '',
                             '',
                             '',
@@ -1683,11 +1683,24 @@ class CompareAndSelectScenario extends Component {
                 if (j != y) {
                     instance.setValueFromCoords(x, j, (selectedTreeScenarioId.includes(elInstance.getRowData(j)[8].toString()) ? true : false), true);
                 }
-                if (selectedTreeScenarioId.includes(rowData[8].toString())) {
+                var rowData = elInstance.getRowData(j);
+                if (this.state.treeScenarioList[j].readonly) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                         try{
-                            cell.classList.remove('notSelectedForecast');
+                            cell.classList.remove('notSelectedForecast');     
+                        }catch(err){}
+                        try{
+                            cell.classList.remove('selectedForecast');     
+                        }catch(err){}
+                        cell.classList.add('readonlyForecast');
+                        cell.classList.add('readonly');
+                    }
+                } else if (selectedTreeScenarioId.includes(rowData[8].toString())) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        try{
+                            cell.classList.remove('notSelectedForecast');    
                         }catch(err){}
                         cell.classList.add('selectedForecast');
                     }
@@ -1695,10 +1708,30 @@ class CompareAndSelectScenario extends Component {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                         try{
-                            cell.classList.remove('selectedForecast');
+                            cell.classList.remove('selectedForecast');    
                         }catch(err){}
                         cell.classList.add('notSelectedForecast');
                     }
+                }
+                if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
+                    var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                    try{
+                        cell.classList.remove('notLowestError');    
+                    }catch(err){}
+                    cell.classList.add('lowestError');
+                } else {
+                    var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                    try{
+                        cell.classList.remove('lowestError');    
+                    }catch(err){}
+                    cell.classList.add('notLowestError');
+                }
+                if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    try{
+                        cell.classList.remove(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? this.state.finalData[j].compareToConsumptionForecastClass:"compareAndSelectRed");
+                    }catch(err){}
+                    cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? "compareAndSelectRed" : this.state.finalData[j].compareToConsumptionForecastClass);
                 }
             }
             this.setState({
@@ -2751,7 +2784,7 @@ class CompareAndSelectScenario extends Component {
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                                     </ul><br />
-                                                    <ul style={{ marginLeft: '-2.5rem', marginTop: '-7px' }}><span className='DarkThColr'>{i18n.t('static.compareAndSelect.topNote')}</span><br /></ul>
+                                                    <ul style={{ marginLeft: '-2.5rem', marginTop: '-7px' }}><span className='DarkThColr'><b>{i18n.t("static.versionSettings.note")+": "}</b>{i18n.t('static.compareAndSelect.topNote')}</span><br /></ul>
                                                     <div className="RemoveStriped removeOddColor">
                                                         <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                                     </div>
