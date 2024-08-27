@@ -349,9 +349,9 @@ class StockStatus extends Component {
           doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
           splittext = doc.splitTextToSize(i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
           doc.text(doc.internal.pageSize.width / 8, 60, splittext)
-          doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")), doc.internal.pageSize.width / 10, 80, {
-            align: 'left'
-          })
+          // doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")), doc.internal.pageSize.width / 10, 80, {
+          //   align: 'left'
+          // })
         }
       }
     }
@@ -372,41 +372,41 @@ class StockStatus extends Component {
         doc.setFontSize(8)
         doc.setTextColor("#002f6c");
         var ppu1 = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
-          align: 'left'
-        })
-        doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
-          align: 'left'
-        })
-        doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
-          align: 'left'
-        })
-        if (ppu1.planBasedOn == 1) {
-          doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
-            align: 'left'
-          })
-        } else {
-          doc.text(i18n.t('static.product.minQuantity') + ' : ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, 120, {
-            align: 'left'
-          })
-        }
-        doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
-          align: 'left'
-        })
-        if (ppu1.planBasedOn == 1) {
-          doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
-            align: 'left'
-          })
-        } else {
-          doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, 140, {
-            align: 'left'
-          })
-        }
-        if(ppu1.notes!=null && ppu1.notes!=undefined && ppu1.notes.length>0){
-          doc.text(i18n.t('static.program.notes') + ' : ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
-            align: 'left'
-          })
-        }
+        // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
+        //   align: 'left'
+        // })
+        // doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
+        //   align: 'left'
+        // })
+        // doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
+        //   align: 'left'
+        // })
+        // if (ppu1.planBasedOn == 1) {
+        //   doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
+        //     align: 'left'
+        //   })
+        // } else {
+        //   doc.text(i18n.t('static.product.minQuantity') + ' : ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, 120, {
+        //     align: 'left'
+        //   })
+        // }
+        // doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
+        //   align: 'left'
+        // })
+        // if (ppu1.planBasedOn == 1) {
+        //   doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
+        //     align: 'left'
+        //   })
+        // } else {
+        //   doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, 140, {
+        //     align: 'left'
+        //   })
+        // }
+        // if(ppu1.notes!=null && ppu1.notes!=undefined && ppu1.notes.length>0){
+        //   doc.text(i18n.t('static.program.notes') + ' : ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
+        //     align: 'left'
+        //   })
+        // }
         var canv = document.getElementById("cool-canvas" + count)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
         doc.addImage(canvasImg1, 'png', 50, 160, 750, 300, "a" + count, 'CANVAS')
@@ -738,12 +738,10 @@ class StockStatus extends Component {
           b = b.label.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
-        console.log("Hello",sortedPlanningUnitData)
-        console.log("Hello1",response.data)
         sortedPlanningUnitData.map(plannningUnitItem => {
-          var planningUnitItemFilter = response.data.filter(c => c[0].planningUnit.id == plannningUnitItem.value)[0];
+          var planningUnitItemFilter = response.data; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
           let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-          var filteredPlanningUnitData = planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
+          var filteredPlanningUnitData = response.data; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
             datasets: [
@@ -945,7 +943,7 @@ class StockStatus extends Component {
           var chartOptions = {
             title: {
               display: true,
-              text: (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")) + " - " + getLabelText(planningUnitItemFilter[0].planningUnit.label, this.state.lang)
+              text: "" //(this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")) + " - " + getLabelText(planningUnitItemFilter[0].planningUnit.label, this.state.lang)
             },
             scales: {
               yAxes: [{
@@ -1057,7 +1055,7 @@ class StockStatus extends Component {
           var data = planningUnitItemFilter;
           let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
           var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-          var planningUnit = planningUnitItemFilter[0].planningUnit
+          var planningUnit = planningUnitItemFilter.planningUnit
           var conList = [];
           var invList = [];
           var shipList = [];
@@ -1091,48 +1089,49 @@ class StockStatus extends Component {
           }, 2000)
         })
       }
-      ).catch(
-        error => {
-          this.setState({
-            stockStatusList: [], loading: false
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
+      )
+      // .catch(
+      //   error => {
+      //     this.setState({
+      //       stockStatusList: [], loading: false
+      //     })
+      //     if (error.message === "Network Error") {
+      //       this.setState({
+      //         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+      //         loading: false
+      //       });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 401:
+      //           this.props.history.push(`/login/static.message.sessionExpired`)
+      //           break;
+      //         case 403:
+      //           this.props.history.push(`/accessDenied`)
+      //           break;
+      //         case 500:
+      //         case 404:
+      //         case 406:
+      //           this.setState({
+      //             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+      //             loading: false
+      //           });
+      //           break;
+      //         case 412:
+      //           this.setState({
+      //             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+      //             loading: false
+      //           });
+      //           break;
+      //         default:
+      //           this.setState({
+      //             message: 'static.unkownError',
+      //             loading: false
+      //           });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
 
   }
   /**
@@ -1330,7 +1329,6 @@ class StockStatus extends Component {
       planningUnitList = planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
       realmCountryPlanningUnitList = realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
     }
-    console.log("Hello",realmCountryPlanningUnitList);
     this.setState({
       yaxisEquUnit: yaxisEquUnit,
       planningUnitList: planningUnitList,
@@ -1372,7 +1370,6 @@ class StockStatus extends Component {
       "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
     }
     ReportService.getStockStatusData(inputjson).then((response) => {
-      console.log("Hello",response)
       var inventoryList = [];
       var consumptionList = [];
           var shipmentList = [];
