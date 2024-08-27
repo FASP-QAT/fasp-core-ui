@@ -35,6 +35,7 @@ import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import RealmCountryService from '../../api/RealmCountryService.js';
+import PlanningUnitService from '../../api/PlanningUnitService.js';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -103,7 +104,8 @@ class StockStatus extends Component {
       realmCountryPlanningUnitList: [],
       realmCountryPlanningUnitListAll: [],
       shipmentPopup: false,
-      isAggregate: false
+      isAggregate: false,
+      PlanningUnitIdDataForExport: ""
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -349,9 +351,11 @@ class StockStatus extends Component {
           doc.text(doc.internal.pageSize.width * 3 / 4, 60, splittext)
           splittext = doc.splitTextToSize(i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
           doc.text(doc.internal.pageSize.width / 8, 60, splittext)
-          // doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")), doc.internal.pageSize.width / 10, 80, {
-          //   align: 'left'
-          // })
+          if(this.state.isAggregate == "false" || this.state.isAggregate == false) {
+            doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == this.state.ProgramIdForExport)[0].programCode + " " + i18n.t("static.supplyPlan.v")), doc.internal.pageSize.width / 10, 80, {
+              align: 'left'
+            })
+          }
         }
       }
     }
@@ -371,42 +375,45 @@ class StockStatus extends Component {
         }
         doc.setFontSize(8)
         doc.setTextColor("#002f6c");
-        var ppu1 = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
-        //   align: 'left'
-        // })
-        // doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
-        //   align: 'left'
-        // })
-        // doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
-        //   align: 'left'
-        // })
-        // if (ppu1.planBasedOn == 1) {
-        //   doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
-        //     align: 'left'
-        //   })
-        // } else {
-        //   doc.text(i18n.t('static.product.minQuantity') + ' : ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, 120, {
-        //     align: 'left'
-        //   })
-        // }
-        // doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
-        //   align: 'left'
-        // })
-        // if (ppu1.planBasedOn == 1) {
-        //   doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
-        //     align: 'left'
-        //   })
-        // } else {
-        //   doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, 140, {
-        //     align: 'left'
-        //   })
-        // }
-        // if(ppu1.notes!=null && ppu1.notes!=undefined && ppu1.notes.length>0){
-        //   doc.text(i18n.t('static.program.notes') + ' : ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
-        //     align: 'left'
-        //   })
-        // }
+        var ppu1 = this.state.PlanningUnitIdDataForExport.filter(c => c.id == this.state.PlanningUnitDataForExport)[0];
+        // console.log(("Hello",ppu1,this.state.planningUnits))
+        if(this.state.isAggregate == "false" || this.state.isAggregate == false) {
+          // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(ppu1.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
+          //   align: 'left'
+          // })
+          doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.report.shelfLife') + ' : ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
+            align: 'left'
+          })
+          if (ppu1.planBasedOn == 1) {
+            doc.text(i18n.t('static.supplyPlan.minStockMos') + ' : ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
+              align: 'left'
+            })
+          } else {
+            doc.text(i18n.t('static.product.minQuantity') + ' : ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, 120, {
+              align: 'left'
+            })
+          }
+          doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
+            align: 'left'
+          })
+          if (ppu1.planBasedOn == 1) {
+            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
+              align: 'left'
+            })
+          } else {
+            doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, 140, {
+              align: 'left'
+            })
+          }
+          if(ppu1.notes!=null && ppu1.notes!=undefined && ppu1.notes.length>0){
+            doc.text(i18n.t('static.program.notes') + ' : ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
+              align: 'left'
+            })
+          }
+        }
         var canv = document.getElementById("cool-canvas" + count)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
         doc.addImage(canvasImg1, 'png', 50, 160, 750, 300, "a" + count, 'CANVAS')
@@ -719,6 +726,8 @@ class StockStatus extends Component {
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
     report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
     var PlanningUnitDataForExport = [];
+    var PlanningUnitIdForExport;
+    var ProgramIdForExport;
     this.setState({ loading: true })
     var inputjson = {
       "aggregate": this.state.isAggregate == "true" ? true : false, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
@@ -735,23 +744,26 @@ class StockStatus extends Component {
       .then(response => {
         let tempOutput;
         if(this.state.isAggregate.toString() == "true") {
-          var tempKey = this.state.programId.map(ele => ele.value).toString()+"~"+this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString();
+          var tempKey = this.state.programId.map(ele => ele.value).toString()+"~"+(this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString());
           tempOutput = {
-            tempKey: response.data
+            [tempKey]: response.data
           }
         } else {
           tempOutput = response.data
         }
-        console.log("Hello",tempOutput)
+        var tempOutputIndex = Object.keys(tempOutput);
+        var tempOutputProgramId = tempOutputIndex.map(a => a.split("~")[0]);
+        var tempOutputPlanningUnitId = tempOutputIndex.map(a => a.split("~")[1]);
+        tempOutput = Object.values(tempOutput);
         var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
           a = a.label.toLowerCase();
           b = b.label.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
-        sortedPlanningUnitData.map(plannningUnitItem => {
-          var planningUnitItemFilter = response.data; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
+        tempOutput.map((plannningUnitItem, outputIndex) => {
+          var planningUnitItemFilter = plannningUnitItem; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
           let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-          var filteredPlanningUnitData = response.data; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
+          var filteredPlanningUnitData = plannningUnitItem; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
             datasets: [
@@ -1065,7 +1077,7 @@ class StockStatus extends Component {
           var data = planningUnitItemFilter;
           let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
           var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-          var planningUnit = planningUnitItemFilter.planningUnit
+          var planningUnit = this.state.planningUnitListAll.filter(e => e.id == tempOutputPlanningUnitId[outputIndex])[0];
           var conList = [];
           var invList = [];
           var shipList = [];
@@ -1084,19 +1096,29 @@ class StockStatus extends Component {
             shList: shipList,
           }
           PlanningUnitDataForExport.push(planningUnitexport)
+          PlanningUnitIdForExport = tempOutputPlanningUnitId[outputIndex]
+          ProgramIdForExport = tempOutputProgramId[outputIndex]
         })
         this.setState({
           PlanningUnitDataForExport: PlanningUnitDataForExport,
+          PlanningUnitIdForExport: PlanningUnitIdForExport,
+          ProgramIdForExport: ProgramIdForExport,
           message: '', loading: false
         }, () => {
-          setTimeout(() => {
-            if (report == 1) {
-              this.exportPDF()
-              document.getElementById("bars_div").style.display = 'none';
-            } else {
-              this.exportCSV()
-            }
-          }, 2000)
+          PlanningUnitService.getPlanningUnitById(this.state.PlanningUnitDataForExport).then(response => {
+            this.setState({
+              PlanningUnitIdDataForExport: response.data
+            }, () => {
+              setTimeout(() => {
+                if (report == 1) {
+                  this.exportPDF()
+                  document.getElementById("bars_div").style.display = 'none';
+                } else {
+                  this.exportCSV()
+                }
+              }, 2000)
+            })
+          })
         })
       }
       )
