@@ -77,7 +77,9 @@ class StockStatus extends Component {
       planningUnitNotes:"",
       viewById: 1,
       planningUnitId: [],
+      planningUnitIdExport: [],
       realmCountryPlanningUnitId: [],
+      realmCountryPlanningUnitIdExport: [],
       planningUnitIds: [],
       forecastingUnitId: "",
       forecastingUnitIds: [],
@@ -97,8 +99,11 @@ class StockStatus extends Component {
       realmCountryPlanningUnitValues: [],
       realmCountryPlanningUnitLabels: [],
       planningUnitList: [],
+      planningUnitListAll: [],
       realmCountryPlanningUnitList: [],
-      shipmentPopup: false
+      realmCountryPlanningUnitListAll: [],
+      shipmentPopup: false,
+      isAggregate: false
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -109,6 +114,14 @@ class StockStatus extends Component {
     this.setViewById = this.setViewById.bind(this);
     this.fetchData = this.fetchData.bind(this);
     this.toggleShipmentPopup = this.toggleShipmentPopup.bind(this);
+    this.setIsAggregate = this.setIsAggregate.bind(this);
+    this.setPlanningUnitExport = this.setPlanningUnitExport.bind(this);
+    this.setRealmCountryPlanningUnitExport = this.setRealmCountryPlanningUnitExport.bind(this);
+  }
+  setIsAggregate(e) {
+    this.setState({
+      isAggregate: e.target.value
+    })
   }
   /**
    * Handles the change event for the program selection.
@@ -135,6 +148,8 @@ class StockStatus extends Component {
       ReportService.getDropdownListByProgramIds(this.state.programId.map(ele => ele.value)).then(response => {
         this.setState({
           equivalencyUnitList: response.data.equivalencyUnitList,
+          planningUnitListAll: response.data.planningUnitList,
+          realmCountryPlanningUnitListAll: response.data.realmCountryPlanningUnitList,
           planningUnitList: response.data.planningUnitList,
           realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList
         })
@@ -701,24 +716,30 @@ class StockStatus extends Component {
     this.setState({
       exportModal: false
     })
-    let programId = document.getElementById("programId").value;
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
     report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
     var PlanningUnitDataForExport = [];
     this.setState({ loading: true })
     var inputjson = {
-      "programId": programId,
-      "startDate": startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
+      "aggregate": this.state.isAggregate == "true" ? true : false, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
+      "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
+      "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
+      "startDate":  startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
       "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-      "planningUnitIds": [...new Set(this.state.planningUnitIdsExport.map(item => item.value))],
+      "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
+      "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value) : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value),
+      "reportingUnitId": this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString(), // Will be used only if aggregate is false
+      "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
     }
     ReportService.getStockStatusData(inputjson)
       .then(response => {
-        var sortedPlanningUnitData = this.state.planningUnitIdsExport.sort(function (a, b) {
+        var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
           a = a.label.toLowerCase();
           b = b.label.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
+        console.log("Hello",sortedPlanningUnitData)
+        console.log("Hello1",response.data)
         sortedPlanningUnitData.map(plannningUnitItem => {
           var planningUnitItemFilter = response.data.filter(c => c[0].planningUnit.id == plannningUnitItem.value)[0];
           let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
@@ -1191,6 +1212,7 @@ class StockStatus extends Component {
       var tempPUList = e.filter(puItem => !this.state.planningUnitId.map(ele => ele).includes(puItem));
       this.setState({
         planningUnitId: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList,
+        planningUnitIdExport: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList,
         show: false,
         dataList: [],
         consumptionAdjForStockOutId: false,
@@ -1203,6 +1225,7 @@ class StockStatus extends Component {
       if (this.state.yaxisEquUnit > 0) {
         this.setState({
           planningUnitId: e.map(ele => ele),
+          planningUnitIdExport: e.map(ele => ele),
           show: false,
           dataList: [],
           consumptionAdjForStockOutId: false,
@@ -1214,12 +1237,18 @@ class StockStatus extends Component {
       }
     }
   }
+  setPlanningUnitExport(e) {
+    this.setState({
+      planningUnitIdExport: e.map(ele => ele),
+    })
+  }
   setRealmCountryPlanningUnit(e) {
     if (this.state.yaxisEquUnit == -1) {
       var selectedText = e.map(item => item.label);
       var tempRCPUList = e.filter(rcpuItem => !this.state.planningUnitId.map(ele => ele).includes(rcpuItem));
       this.setState({
         realmCountryPlanningUnitId: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempRCPUList,
+        realmCountryPlanningUnitIdExport: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempRCPUList,
         show: false,
         dataList: [],
         consumptionAdjForStockOutId: false,
@@ -1232,6 +1261,7 @@ class StockStatus extends Component {
       if (this.state.yaxisEquUnit > 0) {
         this.setState({
           realmCountryPlanningUnitId: e.map(ele => ele),
+          realmCountryPlanningUnitIdExport: e.map(ele => ele),
           show: false,
           dataList: [],
           consumptionAdjForStockOutId: false,
@@ -1242,6 +1272,11 @@ class StockStatus extends Component {
         })
       }
     }
+  }
+  setRealmCountryPlanningUnitExport(e) {
+    this.setState({
+      realmCountryPlanningUnitIdExport: e.map(ele => ele),
+    })
   }
   /**
   * Sets the y-axis equivalent unit ID and triggers data fetching.
@@ -1288,11 +1323,14 @@ class StockStatus extends Component {
   */
   yAxisChange(e) {
     var yaxisEquUnit = e.target.value;
-    var planningUnitList = this.state.planningUnitList;
-    var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
-    var validFu = this.state.equivalencyUnitList.filter(x => x.id == e.target.value)[0].forecastingUnitIds;
-    planningUnitList = planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
-    realmCountryPlanningUnitList = realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+    var planningUnitList = this.state.planningUnitListAll;
+    var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitListAll;
+    if(yaxisEquUnit != -1) {
+      var validFu = this.state.equivalencyUnitList.filter(x => x.id == e.target.value)[0].forecastingUnitIds;
+      planningUnitList = planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+      realmCountryPlanningUnitList = realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+    }
+    console.log("Hello",realmCountryPlanningUnitList);
     this.setState({
       yaxisEquUnit: yaxisEquUnit,
       planningUnitList: planningUnitList,
@@ -2220,11 +2258,65 @@ class StockStatus extends Component {
               <ModalBody>
                 <>
                   <FormGroup className="col-md-12">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.product.product')}
-                      <span className="reportdown-box-icon  fa fa-sort-desc"></span>
-                    </Label>
                     <div className="controls ">
-                      <MultiSelect
+                      {this.state.programId.length > 1 || (this.state.viewById == 1 ? this.state.planningUnitIdExport.length > 1 : this.state.realmCountryPlanningUnitIdExport.length > 1 ) && <FormGroup>
+                        <Label className="P-absltRadio">Do you want to aggregate?</Label>
+                        <FormGroup check inline>
+                          <Input
+                            className="form-check-input"
+                            type="radio"
+                            id="isAggregateTrue"
+                            name="isAggregate"
+                            value={true}
+                            checked={this.state.isAggregate == true || this.state.isAggregate == "true"}
+                            onChange={(e) => { this.setIsAggregate(e) }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="isAggregateTrue">
+                            {i18n.t('static.program.yes')}
+                          </Label>
+                        </FormGroup>
+                        <FormGroup check inline>
+                          <Input
+                            className="form-check-input"
+                            type="radio"
+                            id="isAggregateFalse"
+                            name="isAggregate"
+                            value={false}
+                            checked={this.state.isAggregate == false || this.state.isAggregate == "false"}
+                            onChange={(e) => { this.setIsAggregate(e) }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="isAggregateFalse">
+                            {i18n.t('static.program.no')}
+                          </Label>
+                        </FormGroup>
+                      </FormGroup>}
+                      {this.state.viewById == 1 &&  <FormGroup className="col-md-12">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                        <MultiSelect
+                          bsSize="sm"
+                          name="planningUnitIdExport"
+                          id="planningUnitIdExport"
+                          value={this.state.planningUnitIdExport}
+                          onChange={(e) => { this.setPlanningUnitExport(e); }}
+                          options={puList && puList.length > 0 ? puList : []}
+                        />
+                      </FormGroup>}
+                      {this.state.viewById == 2 && <FormGroup className="col-md-12">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.countrysku')}</Label>
+                        <MultiSelect
+                          bsSize="sm"
+                          name="realmCountryPlanningUnitIdExport"
+                          id="realmCountryPlanningUnitIdExport"
+                          value={this.state.realmCountryPlanningUnitIdExport}
+                          onChange={(e) => { this.setRealmCountryPlanningUnitExport(e); }}
+                          options={rcpuList && rcpuList.length > 0 ? rcpuList : []}
+                        />
+                      </FormGroup>}
+                      {/* <MultiSelect
                         name="planningUnitIdsExport"
                         id="planningUnitIdsExport"
                         filterOptions={filterOptions}
@@ -2232,7 +2324,7 @@ class StockStatus extends Component {
                         value={this.state.planningUnitIdsExport}
                         onChange={(e) => { this.setPlanningUnitIdsExport(e) }}
                         labelledBy={i18n.t('static.common.select')}
-                      />
+                      /> */}
                     </div>
                   </FormGroup>
                 </>
