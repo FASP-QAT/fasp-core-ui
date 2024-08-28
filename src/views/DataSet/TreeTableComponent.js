@@ -790,8 +790,6 @@ export default class TreeTable extends Component {
         this.resetTab2Data = this.resetTab2Data.bind(this);
         this.onChangePageTab1 = this.onChangePageTab1.bind(this);
         this.onChangePageTab2 = this.onChangePageTab2.bind(this);
-        this.onSortTab2 = this.onSortTab2.bind(this);
-        this.onSortTab1 = this.onSortTab1.bind(this);
         this.checkValidationTab1 = this.checkValidationTab1.bind(this);
         this.checkValidationTab2 = this.checkValidationTab2.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
@@ -1933,54 +1931,6 @@ export default class TreeTable extends Component {
             }
         }
     }
-    onSortTab1(el, pageNo, oldPageNo) {
-        var elInstance = el;
-        var json = elInstance.getJson(null, false);
-        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-        if (jsonLength == undefined) {
-            jsonLength = 15
-        }
-        if (json.length < jsonLength) {
-            jsonLength = json.length;
-        }
-        for (var j = 0; j < jsonLength; j++) {
-            var rowData = elInstance.getRowData(j);
-            if (rowData[10] == 1) {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-            } else if (rowData[10] == 2) {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-            } else if (rowData[10] == 3) {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-            }
-        }
-    }
     /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
@@ -2149,127 +2099,6 @@ export default class TreeTable extends Component {
         }
         var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var j = start; j < jsonLength; j++) {
-            var rowData = elInstance.getRowData(j);
-            if (rowData[35] == 4) {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                if (rowData[14] == 2) {
-                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                }
-                if (rowData[20] == 1) {
-                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                }
-                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-            } else if (rowData[35] == 5) {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-            }
-        }
-    }
-    onSortTab2(el, pageNo, oldPageNo) {
-        var elInstance = el;
-        var json = elInstance.getJson(null, false);
-        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
-        if (jsonLength == undefined) {
-            jsonLength = 15
-        }
-        if (json.length < jsonLength) {
-            jsonLength = json.length;
-        }
-        for (var j = 0; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
             if (rowData[35] == 4) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
@@ -2726,8 +2555,45 @@ export default class TreeTable extends Component {
             license: JEXCEL_PRO_KEY,
             onload: this.loadedTab1,
             onchange: this.onChangeTab1Data,
-            onsort: this.onSortTab1,
             onchangepage: this.onChangePageTab1,
+            updateTable: function (el, cell, x, j, source, value, id) {
+                var elInstance = el;
+                var rowData = elInstance.getRowData(j);
+                if (rowData[10] == 1) {
+                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else if (rowData[10] == 2) {
+                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else if (rowData[10] == 3) {
+                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+            },
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var rowData = obj.getRowData(y)
@@ -3458,8 +3324,118 @@ export default class TreeTable extends Component {
             license: JEXCEL_PRO_KEY,
             onload: this.loadedTab2,
             onchange: this.onChangeTab2Data,
-            onsort: this.onSortTab2,
             onchangepage: this.onChangePageTab2,
+            updateTable: function (el, cell, x, j, source, value, id) {
+                var elInstance = el;
+                var rowData = elInstance.getRowData(j);
+                if (rowData[35] == 4) {
+                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    if (rowData[14] == 2) {
+                        var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    if (rowData[20] == 1) {
+                        var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                } else if (rowData[35] == 5) {
+                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+            },
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var rowData = obj.getRowData(y)
