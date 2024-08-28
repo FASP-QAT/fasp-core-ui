@@ -70,7 +70,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             datasetId: 0,
             listOfPlanningUnits: [],
             datasetDataUnencrypted: {},
-            regionListForExtrapolate: []
+            regionListForExtrapolate: [],
+            spProgramCodeVersionArr: []
         }
         this.buildJexcel = this.buildJexcel.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
@@ -653,7 +654,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                         let finalDataList = [];
                         finalDataList = generatedDataNotPink.concat(generatedDataPink);
-
+                        let planningUnitIdsArr = [];
                         // console.log('finalDataList length: ',finalDataList.length);
                         
                         for (var i = 0; i < finalDataList.length; i++) {
@@ -662,6 +663,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
                             forecastingUnitObj.multiplier = map1.get("7");//changed
                             if (map1.get("11") == 0 && map1.get("10") == true) {//changed
+                                planningUnitIdsArr.push(selectedPlanningUnitObj.id);
                                 let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("13")))[0];//do we need to add here selected fc regionid. changed
                                 let tempJson = {
                                     "actualConsumptionId": null,
@@ -714,10 +716,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     month: map1.get("4"),//changed
                                     // amount: this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),//changed
                                     amount: Number(map1.get("8")),//changed
+                                    adjustedAmount: Number(map1.get("8")),
+                                    puAmount: Number(map1.get("8"))
                                 }
                                 ImportListPink.push(tempJsonPink);
+                                planningUnitIdsArr.push(map1.get("3"));
                             }
                         }
+
                         var program = (this.props.items.datasetList1.filter(x => x.programId == this.props.items.forecastProgramId && x.version == this.props.items.forecastProgramVersionId)[0]);
                         var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -729,6 +735,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 let indexObj = originalConsumptionList[index];
                                 indexObj.amount = ImportListPink[i].amount;
+                                indexObj.adjustedAmount = ImportListPink[i].adjustedAmount;
+                                indexObj.puAmount = ImportListPink[i].puAmount;
                                 indexObj.createdBy = {
                                     userId: curUser
                                 };
@@ -736,7 +744,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 originalConsumptionList[index] = indexObj;
                             }
                         }
-                        programData.actualConsumptionList = originalConsumptionList.concat(ImportListNotPink);
+                        programData.actualConsumptionList = originalConsumptionList.concat(ImportListNotPink);                       
+
+                        var uniquePlanningUnitIds = [...new Set(planningUnitIdsArr.map(ele => ele))];
+
+                        //itterate set & update consumptionNotes for pu ids (in forecast program)
+                        let consumptionNotes = 'Data imported and aggregated from '+ this.state.spProgramCodeVersionArr.join(', ');
+                        uniquePlanningUnitIds.map(ele => {
+                            let puObjs = programData.planningUnitList.filter(c => c.planningUnit.id == ele);
+                            if(puObjs.length > 0) {
+                                puObjs[0].consumptionNotes = consumptionNotes;
+                            }
+                        });
+                        
                         var programDataWithoutEncrypt = programData;
                         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                         program.programData = programData;
@@ -918,6 +938,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var papuDataArr = [];
         var buildCSVTable = [];
         var count = 0;
+        var spProgramCodeVersionArr = [];
 
         Object.keys(dataMap).forEach(key => {
             // console.log(`Key: ${key}`);
@@ -926,6 +947,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             let version = pgmVerKeyArr[1];
 
             let stepOneSelectedObjectList = this.props.items.stepOneData.filter(c => c.supplyPlanProgramId == programId && c.supplyPlanVersionId == version);
+            spProgramCodeVersionArr.push(stepOneSelectedObjectList[0].supplyPlanProgramCode + '-v' +version +' [SP]');
             var papuList = dataMap[key];
             for(var j=0; j < papuList.length; j++) {
                 let stepOneSelectedObject = stepOneSelectedObjectList.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
@@ -1111,7 +1133,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true, datasetId: this.props.items.forecastProgramId
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true, datasetId: this.props.items.forecastProgramId, spProgramCodeVersionArr: spProgramCodeVersionArr
         }, () => {
             this.props.updateStepOneData("loading", false);
             this.changeColor();
