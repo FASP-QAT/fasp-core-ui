@@ -1584,7 +1584,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         var map = new Map(Object.entries(json[i]));
                         var planningUnitValue = map.get("7");
                         var spProgramId2 = map.get("13");
-                        if (planningUnitValue == value && y != i && i > y && spProgramId2 == spProgramId) {
+                        if (value != "" && planningUnitValue == value && y != i && i > y && spProgramId2 == spProgramId) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
