@@ -232,7 +232,7 @@ class StockStatus extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + this.state.programs.filter(c => c.programId == this.state.ProgramIdForExport)[0].programCode) + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     var A = ""
@@ -246,23 +246,25 @@ class StockStatus extends Component {
         if (index != 0) {
           csvRow.push("")
         }
-        csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(item.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-        var ppu = this.state.planningUnits.filter(c => c.planningUnit.id == item.planningUnit.id)[0];
-        csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
-        if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
-          csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
-        } else {
-          csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
-        }
-        csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ' : ' + ppu.shelfLife + '"'))
-        if (item.data.length > 0 && item.data[0].planBasedOn == 1) {
-          csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
-        } else {
-          csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
-        }
-        csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ' : ' + ppu.reorderFrequencyInMonths + '"'))
-        if(ppu.notes!=null && ppu.notes!=undefined && ppu.notes.length>0){
-          csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ppu.notes + '"'))
+        var ppu = this.state.PlanningUnitIdDataForExport;
+        if(this.state.isAggregate == "false" || this.state.isAggregate == false) {
+          csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + getLabelText(ppu.reportingUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')  
+          csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
+          if (item.data.length > 0 && ppu.planBasedOn == 1) {
+            csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
+          } else {
+            csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ' : ' + item.data[0].minStock + '"'))
+          }
+          csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ' : ' + ppu.shelfLife + '"'))
+          if (item.data.length > 0 && ppu.planBasedOn == 1) {
+            csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].maxMos + '"'))
+          } else {
+            csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ' : ' + item.data[0].distributionLeadTime + '"'))
+          }
+          csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ' : ' + ppu.reorderFrequencyInMonths + '"'))
+          if(ppu.notes!=null && ppu.notes!=undefined && ppu.notes.length>0){
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ppu.notes + '"'))
+          }
         }
         csvRow.push("")
         const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
@@ -352,7 +354,7 @@ class StockStatus extends Component {
           splittext = doc.splitTextToSize(i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width / 8);
           doc.text(doc.internal.pageSize.width / 8, 60, splittext)
           if(this.state.isAggregate == "false" || this.state.isAggregate == false) {
-            doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == this.state.ProgramIdForExport)[0].programCode + " " + i18n.t("static.supplyPlan.v")), doc.internal.pageSize.width / 10, 80, {
+            doc.text(i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == this.state.ProgramIdForExport)[0].programCode), doc.internal.pageSize.width / 10, 80, {
               align: 'left'
             })
           }
@@ -375,12 +377,11 @@ class StockStatus extends Component {
         }
         doc.setFontSize(8)
         doc.setTextColor("#002f6c");
-        var ppu1 = this.state.PlanningUnitIdDataForExport.filter(c => c.id == this.state.PlanningUnitDataForExport)[0];
-        // console.log(("Hello",ppu1,this.state.planningUnits))
+        var ppu1 = this.state.PlanningUnitIdDataForExport;
         if(this.state.isAggregate == "false" || this.state.isAggregate == false) {
-          // doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(ppu1.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
-          //   align: 'left'
-          // })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + getLabelText(ppu1.reportingUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
+            align: 'left'
+          })
           doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ' : ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
             align: 'left'
           })
@@ -728,12 +729,13 @@ class StockStatus extends Component {
     var PlanningUnitDataForExport = [];
     var PlanningUnitIdForExport;
     var ProgramIdForExport;
+    var PlanningUnitIdDataForExport;
     this.setState({ loading: true })
     var inputjson = {
       "aggregate": this.state.isAggregate == "true" ? true : false, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
       "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
       "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
-      "startDate":  startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
+      "startDate":  startDate.startOf('month').format('YYYY-MM-DD'),
       "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
       "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
       "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value) : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value),
@@ -763,7 +765,7 @@ class StockStatus extends Component {
         tempOutput.map((plannningUnitItem, outputIndex) => {
           var planningUnitItemFilter = plannningUnitItem; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
           let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
-          var filteredPlanningUnitData = plannningUnitItem; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
+          var filteredPlanningUnitData = this.state.isAggregate.toString() == "true" ? plannningUnitItem : plannningUnitItem.stockStatusVertical; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
             datasets: [
@@ -977,6 +979,7 @@ class StockStatus extends Component {
                   fontSize: "12",
                   fontColor: 'black'
                 },
+                stacked: true,
                 ticks: {
                   beginAtZero: true,
                   fontColor: 'black',
@@ -1074,15 +1077,20 @@ class StockStatus extends Component {
               }
             }
           }
-          var data = planningUnitItemFilter;
+          var data = this.state.isAggregate.toString() == "true" ? planningUnitItemFilter : planningUnitItemFilter.stockStatusVertical;
           let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
           var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
           var planningUnit = this.state.planningUnitListAll.filter(e => e.id == tempOutputPlanningUnitId[outputIndex])[0];
           var conList = [];
           var invList = [];
           var shipList = [];
-          filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
-          filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
+          if(this.state.isAggregate.toString() == "true") {
+            filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
+            filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
+          } else {
+            conList = planningUnitItemFilter.consumptionInfo;
+            invList = planningUnitItemFilter.inventoryInfo;
+          }
           filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
           var planningUnitexport = {
             planningUnit: planningUnit,
@@ -1094,31 +1102,28 @@ class StockStatus extends Component {
             inList: invList,
             coList: conList,
             shList: shipList,
+            planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : ""
           }
           PlanningUnitDataForExport.push(planningUnitexport)
           PlanningUnitIdForExport = tempOutputPlanningUnitId[outputIndex]
           ProgramIdForExport = tempOutputProgramId[outputIndex]
+          PlanningUnitIdDataForExport = this.state.isAggregate.toString() == "false" ? planningUnitItemFilter : "";
         })
         this.setState({
           PlanningUnitDataForExport: PlanningUnitDataForExport,
           PlanningUnitIdForExport: PlanningUnitIdForExport,
           ProgramIdForExport: ProgramIdForExport,
+          PlanningUnitIdDataForExport: PlanningUnitIdDataForExport,
           message: '', loading: false
         }, () => {
-          PlanningUnitService.getPlanningUnitById(this.state.PlanningUnitDataForExport).then(response => {
-            this.setState({
-              PlanningUnitIdDataForExport: response.data
-            }, () => {
-              setTimeout(() => {
-                if (report == 1) {
-                  this.exportPDF()
-                  document.getElementById("bars_div").style.display = 'none';
-                } else {
-                  this.exportCSV()
-                }
-              }, 2000)
-            })
-          })
+          setTimeout(() => {
+            if (report == 1) {
+              this.exportPDF()
+              document.getElementById("bars_div").style.display = 'none';
+            } else {
+              this.exportCSV()
+            }
+          }, 2000)
         })
       }
       )
@@ -1394,7 +1399,7 @@ class StockStatus extends Component {
       "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
       "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
       "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
-      "startDate":  startDate.startOf('month').subtract(1, 'months').format('YYYY-MM-DD'),
+      "startDate":  startDate.startOf('month').format('YYYY-MM-DD'),
       "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
       "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
       "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
@@ -1781,78 +1786,99 @@ class StockStatus extends Component {
         pointBorderColor: '#ba0c2f',
         pointRadius: 3
       },
-      {
-        label: i18n.t('static.supplyPlan.delivered'),
-        yAxisID: 'A',
-        stack: 1,
-        backgroundColor: '#002f6c',
-        borderColor: '#002f6c',
-        pointBackgroundColor: '#002f6c',
-        pointBorderColor: '#002f6c',
-        pointHoverBackgroundColor: '#002f6c',
-        pointHoverBorderColor: '#002f6c',
-        data: this.state.stockStatusList.map((item, index) => {
-          let count = 0;
-          (item.shipmentInfo.map((ele, index) => {
-            ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
-          }))
-          return count
-        })
-      },
-      {
-        label: i18n.t('static.supplyPlan.shipped'),
-        yAxisID: 'A',
-        stack: 1,
-        backgroundColor: '#49a4a1',
-        borderColor: '#49a4a1',
-        pointBackgroundColor: '#49a4a1',
-        pointBorderColor: '#49a4a1',
-        pointHoverBackgroundColor: '#49a4a1',
-        pointHoverBorderColor: '#49a4a1',
-        data: this.state.stockStatusList.map((item, index) => {
-          let count = 0;
-          (item.shipmentInfo.map((ele, index) => {
-            (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
-          }))
-          return count
-        })
-      },
-      {
-        label: i18n.t('static.supplyPlan.approved'),
-        yAxisID: 'A',
-        stack: 1,
-        backgroundColor: '#0067B9',
-        borderColor: '#0067B9',
-        pointBackgroundColor: '#0067B9',
-        pointBorderColor: '#0067B9',
-        pointHoverBackgroundColor: '#0067B9',
-        pointHoverBorderColor: '#0067B9',
-        data: this.state.stockStatusList.map((item, index) => {
-          let count = 0;
-          (item.shipmentInfo.map((ele, index) => {
-            (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
-          }))
-          return count
-        })
-      },
-      {
-        label: i18n.t('static.supplyPlan.planned'),
-        backgroundColor: '#A7C6ED',
-        borderColor: '#A7C6ED',
-        pointBackgroundColor: '#A7C6ED',
-        pointBorderColor: '#A7C6ED',
-        pointHoverBackgroundColor: '#A7C6ED',
-        pointHoverBorderColor: '#A7C6ED',
-        yAxisID: 'A',
-        stack: 1,
-        data: this.state.stockStatusList.map((item, index) => {
-          let count = 0;
-          (item.shipmentInfo.map((ele, index) => {
-            (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
-          }))
-          return count
-        })
-      },
+      this.state.programId.map((e, i) => {
+        return {
+          label: i18n.t('static.supplyPlan.delivered'),
+          yAxisID: 'A',
+          stack: 1,
+          backgroundColor: '#002f6c',
+          borderColor: '#002f6c',
+          pointBackgroundColor: '#002f6c',
+          pointBorderColor: '#002f6c',
+          pointHoverBackgroundColor: '#002f6c',
+          pointHoverBorderColor: '#002f6c',
+          data: this.state.stockStatusList.map((item, index) => {
+            let count = 0;
+            (item.shipmentInfo.map((ele, index) => {
+              ele.program.id == e.value ? count = count + Number(ele.shipmentQty) : count = count
+            }))
+            console.log("Hello",e,count)
+            return count
+          })
+        }
+      }),
+      // {
+      //   label: i18n.t('static.supplyPlan.delivered'),
+      //   yAxisID: 'A',
+      //   stack: 1,
+      //   backgroundColor: '#002f6c',
+      //   borderColor: '#002f6c',
+      //   pointBackgroundColor: '#002f6c',
+      //   pointBorderColor: '#002f6c',
+      //   pointHoverBackgroundColor: '#002f6c',
+      //   pointHoverBorderColor: '#002f6c',
+      //   data: this.state.stockStatusList.map((item, index) => {
+      //     let count = 0;
+      //     (item.shipmentInfo.map((ele, index) => {
+      //       ele.shipmentStatus.id == 7 ? count = count + Number(ele.shipmentQty) : count = count
+      //     }))
+      //     return count
+      //   })
+      // },
+      // {
+      //   label: i18n.t('static.supplyPlan.shipped'),
+      //   yAxisID: 'A',
+      //   stack: 1,
+      //   backgroundColor: '#49a4a1',
+      //   borderColor: '#49a4a1',
+      //   pointBackgroundColor: '#49a4a1',
+      //   pointBorderColor: '#49a4a1',
+      //   pointHoverBackgroundColor: '#49a4a1',
+      //   pointHoverBorderColor: '#49a4a1',
+      //   data: this.state.stockStatusList.map((item, index) => {
+      //     let count = 0;
+      //     (item.shipmentInfo.map((ele, index) => {
+      //       (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + Number(ele.shipmentQty) : count = count
+      //     }))
+      //     return count
+      //   })
+      // },
+      // {
+      //   label: i18n.t('static.supplyPlan.approved'),
+      //   yAxisID: 'A',
+      //   stack: 1,
+      //   backgroundColor: '#0067B9',
+      //   borderColor: '#0067B9',
+      //   pointBackgroundColor: '#0067B9',
+      //   pointBorderColor: '#0067B9',
+      //   pointHoverBackgroundColor: '#0067B9',
+      //   pointHoverBorderColor: '#0067B9',
+      //   data: this.state.stockStatusList.map((item, index) => {
+      //     let count = 0;
+      //     (item.shipmentInfo.map((ele, index) => {
+      //       (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + Number(ele.shipmentQty) : count = count
+      //     }))
+      //     return count
+      //   })
+      // },
+      // {
+      //   label: i18n.t('static.supplyPlan.planned'),
+      //   backgroundColor: '#A7C6ED',
+      //   borderColor: '#A7C6ED',
+      //   pointBackgroundColor: '#A7C6ED',
+      //   pointBorderColor: '#A7C6ED',
+      //   pointHoverBackgroundColor: '#A7C6ED',
+      //   pointHoverBorderColor: '#A7C6ED',
+      //   yAxisID: 'A',
+      //   stack: 1,
+      //   data: this.state.stockStatusList.map((item, index) => {
+      //     let count = 0;
+      //     (item.shipmentInfo.map((ele, index) => {
+      //       (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + Number(ele.shipmentQty) : count = count
+      //     }))
+      //     return count
+      //   })
+      // },
       {
         label: i18n.t('static.report.stock'),
         yAxisID: 'A',
@@ -2138,9 +2164,13 @@ class StockStatus extends Component {
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
                           </div>
                           <div id="bars_div" style={{ display: "none" }}>
-                            {this.state.PlanningUnitDataForExport.map((ele, index) => {
+                            {this.state.isAggregate.toString() == "true" && this.state.PlanningUnitDataForExport.map((ele, index) => {
                               return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
                                 {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                            })}
+                            {this.state.isAggregate.toString() == "false" && this.state.PlanningUnitDataForExport.map((ele, index) => {
+                              return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                           </div>
                         </div>
@@ -2217,7 +2247,7 @@ class StockStatus extends Component {
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
                                 return (<tr  >
-                                  <td padding="0" id={"shipmentPopup"+idx+index}>{formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
+                                  <td title={getLabelText(item.planningUnit.label, this.state.lang)+" - "+item.planningUnit.id} padding="0" id={"shipmentPopup"+idx+index}>{item.program.code + ` | ` + formatter(item.shipmentQty, 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
                                   item.primeLineNo == null &&
                                   item.roNo == null &&
                                   item.roPrimeLineNo == null
@@ -2239,11 +2269,11 @@ class StockStatus extends Component {
                                     ? ""
                                     : "-" + item.primeLineNo
                                   }`}
-                                  <div>
+                                  {/* <div>
                                     <Popover placement="top" isOpen={this.state.shipmentPopup} target={"shipmentPopup"+idx+index} trigger="hover" toggle={this.toggleShipmentPopup}>
                                       <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
                                     </Popover>
-                                  </div>
+                                  </div> */}
                                 </td></tr>)
                               })}</table>
                             </td>
