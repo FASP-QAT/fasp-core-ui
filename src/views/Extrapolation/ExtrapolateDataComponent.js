@@ -2578,6 +2578,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolations: countR + 1,
             syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
@@ -2601,6 +2602,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolations: countR + 1,
             syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
@@ -2624,6 +2626,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolations: countR + 1,
             syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
@@ -2647,6 +2650,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolations: countR + 1,
             syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
@@ -2671,6 +2675,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolations: countR + 1,
             syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
