@@ -2114,7 +2114,7 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
@@ -2652,14 +2652,17 @@ export default class TreeTable extends Component {
                 {
                     title: i18n.t('static.tree.parent'),
                     type: 'text',
+                    width: '120'
                 },
                 {
                     title: i18n.t('static.ManageTree.NodeType'),
                     type: 'html',
+                    width: '100'
                 },
                 {
                     title: i18n.t('static.tree.nodeTitle'),
                     type: 'text',
+                    width: '120'
                 },
                 {
                     title: i18n.t('static.tree.nodeUnit'),
@@ -3255,17 +3258,17 @@ export default class TreeTable extends Component {
                 { // b
                     title: i18n.t('static.tree.parent'),
                     type: 'text',
-                    width: '150'
+                    width: '120'
                 },
                 { //c
                     title: i18n.t('static.ManageTree.NodeType'),
                     type: 'html',
-                    width: '150'
+                    width: '100'
                 },
                 { //d
                     title: i18n.t('static.tree.nodeTitle'),
                     type: 'text',
-                    width: '150'
+                    width: '120'
                 },
                 {//e
                     title: i18n.t('static.supplyPlan.startMonth'),

@@ -14043,8 +14043,8 @@ label.arrow_label:before {
 }
 
 .TreeTable .jss>thead>tr>td:nth-child(4) {
-  width: 120px !important;
-  min-width: 120px;
+  width: 100px !important;
+  min-width: 100px;
   cursor: unset !important;
   left: 120px !important;
   z-index: 4 !important;
@@ -14052,8 +14052,8 @@ label.arrow_label:before {
 }
 
 .TreeTable .jss>tbody>tr>td:nth-child(4) {
-  width: 120px !important;
-  min-width: 120px;
+  width: 100px !important;
+  min-width: 100px;
   left: 120px !important;
   position: sticky !important;
   // background: #fff;
@@ -14063,18 +14063,27 @@ label.arrow_label:before {
   width: 120px !important;
   min-width: 120px;
   cursor: unset !important;
-  left: 240px !important;
+  left: 220px !important;
   z-index: 4 !important;
   position: sticky !important;
 }
 
-.TreeTable .jss>tbody>tr>td:nth-child(5) {
+.TreeTable .jss>tbody>tr:nth-child(odd)>td:nth-child(5) {
   width: 120px !important;
   min-width: 120px;
-  left: 240px !important;
+  left: 220px !important;
   z-index: 2 !important;
   position: sticky !important;
-  background: #fff;
+  background: #e5edf5 !important;
+}
+
+.TreeTable .jss>tbody>tr:nth-child(even)>td:nth-child(5) {
+  width: 120px !important;
+  min-width: 120px;
+  left: 220px !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  background: #fff !important;
 }
 
 .TreeTable .jexcel>thead {
