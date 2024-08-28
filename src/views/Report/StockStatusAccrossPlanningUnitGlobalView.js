@@ -950,6 +950,19 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       programLst: programs,
       planningUnits: planningUnits,
     });
+
+    //create new data for pdf & csv report
+    var dataCopy = [...filteredData];
+    var unsortedDataList = [];
+    dataCopy.map((elt) =>
+      elt.programData.map((p) =>
+        {
+          p.planningUnit = elt.planningUnit
+          unsortedDataList.push(p);
+        }
+      )
+    );
+    console.log('unsortedDataList: ',unsortedDataList);
   };
   /**
    * Retrieves the list of countries based on the realm ID and updates the state with the list.
