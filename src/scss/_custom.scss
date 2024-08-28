@@ -3676,6 +3676,11 @@ input::placeholder {
   left: 100%;
   transform: translateX(-97%) scale(1);
 }
+.regionTdWidthAdjustments {
+  overflow: hidden !important;
+  min-width: 160px !important;
+  word-wrap: break-word !important;
+}
 
 ///data setup
 .progresdatatext1 {
