@@ -603,8 +603,13 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         var tableJson = this.el.getJson(null, false);
         var tempJson = [];
         tableJson.map((item, idx) => {
-            if (tempJson.filter(c => c[1] == item[1]).length > 0) {
+            var tmpIndex=tempJson.findIndex(c => c[1] == item[1]);
+            if (tmpIndex>=0) {
                 var col = ("B").concat(parseInt(idx) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.planningUnit.duplicateForecastingUnit'));
+                var col = ("B").concat(parseInt(tmpIndex) + 1);
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.planningUnit.duplicateForecastingUnit'));
@@ -636,8 +641,13 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         var tableJson = this.el.getJson(null, false);
         var tempJson = [];
         tableJson.map((item, idx) => {
-            if (tempJson.filter(c => c[2] == item[2]).length > 0) {
+            var tmpIndex=tempJson.findIndex(c => c[2] == item[2]);
+            if (tmpIndex>=0) {
                 var col = ("C").concat(parseInt(idx) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.realmCountryPlanningUnit.duplicateSKU'));
+                var col = ("C").concat(parseInt(tmpIndex) + 1);
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.realmCountryPlanningUnit.duplicateSKU'));
