@@ -1788,7 +1788,7 @@ class StockStatus extends Component {
       },
       this.state.programId.map((e, i) => {
         return {
-          label: i18n.t('static.supplyPlan.delivered'),
+          label: e.label,
           yAxisID: 'A',
           stack: 1,
           backgroundColor: '#002f6c',
@@ -1802,7 +1802,6 @@ class StockStatus extends Component {
             (item.shipmentInfo.map((ele, index) => {
               ele.program.id == e.value ? count = count + Number(ele.shipmentQty) : count = count
             }))
-            console.log("Hello",e,count)
             return count
           })
         }
