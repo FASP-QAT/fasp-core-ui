@@ -749,7 +749,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         var uniquePlanningUnitIds = [...new Set(planningUnitIdsArr.map(ele => ele))];
 
                         //itterate set & update consumptionNotes for pu ids (in forecast program)
-                        let consumptionNotes = 'Data imported and aggregated from '+ this.state.spProgramCodeVersionArr.join(', ');
+                        let consumptionNotes = moment(this.props.items.startDate).format('MMM-YY')+" to "+moment(this.props.items.stopDate).format('MMM-YY') +' data imported and aggregated from '+ this.state.spProgramCodeVersionArr.join(', ');
                         uniquePlanningUnitIds.map(ele => {
                             let puObjs = programData.planningUnitList.filter(c => c.planningUnit.id == ele);
                             if(puObjs.length > 0) {
@@ -939,7 +939,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var buildCSVTable = [];
         var count = 0;
         var spProgramCodeVersionArr = [];
-
+        let planningUnitListJexcel = this.props.items.planningUnitListJexcel
+        planningUnitListJexcel.splice(0, 1);
         Object.keys(dataMap).forEach(key => {
             // console.log(`Key: ${key}`);
             let pgmVerKeyArr = key.split('~');
@@ -959,6 +960,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[0] = supplyPlanProgramCode + ' ('+stepTwoSelectedRegionObject.supplyPlanRegionLabelTxt+')';//SP Program (Region)
                 data[1] = selectedForecastProgram.programCode + ' ('+stepTwoSelectedRegionObject.forecastRegionLabelTxt+')';//FC Program (Region)
                 data[2] = papuList[j].planningUnit.id; //SP PU
+                if(planningUnitListJexcel.findIndex(c=>c.id==papuList[j].planningUnit.id)==-1){
+                    planningUnitListJexcel.push({
+                        name: getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + parseInt(papuList[j].planningUnit.id),
+                        id: parseInt(papuList[j].planningUnit.id),
+                    })
+                }
                 data[3] = stepOneSelectedObject.forecastPlanningUnitId; //FC PU
                 data[4] = papuList[j].month;
                 data[5] = papuList[j].actualConsumption; //Actual Consumption. (SP Module)
@@ -1001,8 +1008,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         jexcel.destroy(document.getElementById("mapImport"), true);
         var json = [];
         var data = papuDataArr;
-        let planningUnitListJexcel = this.props.items.planningUnitListJexcel
-        planningUnitListJexcel.splice(0, 1);
         var options = {
             data: data,
             columnDrag: false,
