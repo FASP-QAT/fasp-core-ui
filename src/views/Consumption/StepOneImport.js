@@ -498,11 +498,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     programCode: programCode,
                     versionId: versionId,
                     rowSequence: i
-                };
-                
+                };                
 
-                // console.log('sp programId: '+parseInt(map1.get("1")));
-                // console.log('sp versionId: '+parseInt(map1.get("2")));
                 if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
                     let selectedSupplyPlanProgram = this.state.programs.filter(c => c.programId == programId)[0];
                     let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
@@ -1119,7 +1116,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             });
                         } else {
                             data[6] = ''
-                            data[7] = ''
+                            data[7] = this.state.toggleDoNotImport? -1 : '';//change here for do not
                             data[8] = ''
                             data[9] = ''
                             data[10] = ''
@@ -1577,8 +1574,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
                 var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.id == value)[0];
-                
-                if (tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
+                if (value != "" && tracerCategoryId != selectedPlanningUnitObj.forecastingUnit.tracerCategory.id) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.common.tracerCategoryInvalidSelection'));
@@ -1601,22 +1597,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         // }
                     }
                 }
-                var col = ("J").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(9, y);
+                col = ("J").concat(parseInt(y) + 1);
+                var multiplierValue = this.el.getValueFromCoords(9, y);
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
-                if (value == "") {
+                if (multiplierValue == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    if (!(reg.test(value))) {
+                    if (!(reg.test(multiplierValue))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.planningUnitSetting.max10Digit4AfterDecimal'));
                         valid = false;
                     } else {
-                        if (isNaN(Number.parseInt(value)) || value <= 0) {
+                        if (isNaN(Number.parseInt(multiplierValue)) || multiplierValue <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
