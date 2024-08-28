@@ -790,6 +790,8 @@ export default class TreeTable extends Component {
         this.resetTab2Data = this.resetTab2Data.bind(this);
         this.onChangePageTab1 = this.onChangePageTab1.bind(this);
         this.onChangePageTab2 = this.onChangePageTab2.bind(this);
+        this.onSortTab2 = this.onSortTab2.bind(this);
+        this.onSortTab1 = this.onSortTab1.bind(this);
         this.checkValidationTab1 = this.checkValidationTab1.bind(this);
         this.checkValidationTab2 = this.checkValidationTab2.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
@@ -1820,6 +1822,20 @@ export default class TreeTable extends Component {
      */
     loadedTab1 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('InfoTr');
+        tr.children[2].title = i18n.t('static.tooltip.Parent');
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.NodeType');
+        tr.children[4].classList.add('InfoTr');
+        tr.children[4].title = i18n.t('static.tooltip.NodeTitle');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.tooltip.PercentageOfParent');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.tooltip.ParentValue');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[9].title = i18n.t('static.tooltip.NodeValue');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1917,6 +1933,54 @@ export default class TreeTable extends Component {
             }
         }
     }
+    onSortTab1(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if (rowData[10] == 1) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if (rowData[10] == 2) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if (rowData[10] == 3) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
     /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
@@ -1924,6 +1988,34 @@ export default class TreeTable extends Component {
      */
     loadedTab2 = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('InfoTr');
+        tr.children[2].title = i18n.t('static.tooltip.Parent');
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.NodeType');
+        tr.children[4].classList.add('InfoTr');
+        tr.children[4].title = i18n.t('static.tooltip.NodeTitle');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = i18n.t('static.tooltip.PercentageOfParent');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.tooltip.ParentValue');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.tooltip.NodeValue');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[9].title = i18n.t('static.tooltip.tracercategoryModelingType');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[10].title = i18n.t('static.tooltip.TypeOfUsePU');
+        tr.children[11].classList.add('InfoTr');
+        tr.children[11].title = i18n.t('static.tooltip.planningUnitNode');
+        tr.children[12].classList.add('InfoTr');
+        tr.children[12].title = i18n.t('static.tooltip.Conversionfactor');
+        tr.children[15].classList.add('InfoTr');
+        tr.children[15].title = i18n.t('static.tooltip.TypeOfUse');
+        tr.children[16].classList.add('InfoTr');
+        tr.children[16].title = i18n.t('static.tooltip.LagInMonthFUNode');
+        tr.children[21].classList.add('InfoTr');
+        tr.children[21].title = i18n.t('static.tooltip.SingleUse');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1958,17 +2050,17 @@ export default class TreeTable extends Component {
                 var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 if (rowData[14] == 2) {
-                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                 }
-                if (rowData[22] == 1) {
-                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
+                if (rowData[20] == 1) {
                     var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
@@ -2018,11 +2110,11 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
                 var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
@@ -2087,10 +2179,10 @@ export default class TreeTable extends Component {
                     var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                 }
-                if (rowData[22] == 1) {
-                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
+                if (rowData[20] == 1) {
                     var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
@@ -2140,11 +2232,132 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
                 var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
+    onSortTab2(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if (rowData[35] == 4) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                if (rowData[14] == 2) {
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+                if (rowData[20] == 1) {
+                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            } else if (rowData[35] == 5) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
@@ -2232,52 +2445,52 @@ export default class TreeTable extends Component {
         }
         if (x == 14) {
             if (value == 1) {
-                var cell1 = this.el.getCell(`W${parseInt(y) + 1}`)
-                cell1.classList.remove('readonly');
-                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
-                cell1.classList.remove('readonly');
-                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
-                cell1.classList.remove('readonly');
-                this.el.setValueFromCoords(22, y, 0, true);
-            } else if (value == 2) {
-                var cell1 = this.el.getCell(`W${parseInt(y) + 1}`)
-                cell1.classList.add('readonly');
-                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
-                cell1.classList.add('readonly');
-                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
-                cell1.classList.add('readonly');
-                this.el.setValueFromCoords(22, y, "", true);
-                this.el.setValueFromCoords(23, y, "", true);
-                this.el.setValueFromCoords(24, y, "", true);
-            }
-        }
-        if (x == 22) {
-            let typeOfUse = this.el.getValueFromCoords(14, y);
-            if (value == 1) {
                 var cell1 = this.el.getCell(`U${parseInt(y) + 1}`)
-                cell1.classList.add('readonly');
-                var cell1 = this.el.getCell(`V${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                this.el.setValueFromCoords(20, y, 0, true);
+            } else if (value == 2) {
+                var cell1 = this.el.getCell(`U${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 this.el.setValueFromCoords(20, y, "", true);
+                this.el.setValueFromCoords(23, y, "", true);
+                this.el.setValueFromCoords(24, y, "", true);
+            }
+        }
+        if (x == 20) {
+            let typeOfUse = this.el.getValueFromCoords(14, y);
+            if (value == 1) {
+                var cell1 = this.el.getCell(`V${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`W${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
+                var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
+                cell1.classList.add('readonly');
                 this.el.setValueFromCoords(21, y, "", true);
-                this.el.setValueFromCoords(22, y, 1, true);
+                this.el.setValueFromCoords(22, y, "", true);
+                this.el.setValueFromCoords(20, y, 1, true);
                 this.el.setValueFromCoords(23, y, "", true);
                 this.el.setValueFromCoords(24, y, "", true);
             } else if (value == 0) {
-                var cell1 = this.el.getCell(`U${parseInt(y) + 1}`)
-                cell1.classList.remove('readonly');
                 var cell1 = this.el.getCell(`V${parseInt(y) + 1}`)
+                cell1.classList.remove('readonly');
+                var cell1 = this.el.getCell(`W${parseInt(y) + 1}`)
                 cell1.classList.remove('readonly');
                 if (typeOfUse == 1) {
                     var cell1 = this.el.getCell(`X${parseInt(y) + 1}`)
                     cell1.classList.remove('readonly');
                     var cell1 = this.el.getCell(`Y${parseInt(y) + 1}`)
                     cell1.classList.remove('readonly');
-                    this.el.setValueFromCoords(22, y, 0, true);
+                    this.el.setValueFromCoords(20, y, 0, true);
                 }
             }
         }
@@ -2508,6 +2721,7 @@ export default class TreeTable extends Component {
             license: JEXCEL_PRO_KEY,
             onload: this.loadedTab1,
             onchange: this.onChangeTab1Data,
+            onsort: this.onSortTab1,
             onchangepage: this.onChangePageTab1,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -2657,13 +2871,13 @@ export default class TreeTable extends Component {
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths = json[i][15];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons = json[i][16];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson = json[i][18];
-                                if (json[i][14] == 2 || (json[i][14] == 1 && json[i][22] == 0)) {
-                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][20];
+                                if (json[i][14] == 2 || (json[i][14] == 1 && json[i][20] == 0)) {
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency = json[i][21];
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod = {};
-                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][21];
+                                    (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = json[i][22];
                                 }
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][22] == 0 ? "false" : "true";
-                                if (json[i][14] == 1 && json[i][22] == 0) {
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][20] == 0 ? "false" : "true";
+                                if (json[i][14] == 1 && json[i][20] == 0) {
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = json[i][23];
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod = {};
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = json[i][24];
@@ -2830,18 +3044,7 @@ export default class TreeTable extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 }
-                if (this.el.getValueFromCoords(22, y) == 0 && this.el.getValueFromCoords(14, y) == 1) {
-                    if (this.el.getValueFromCoords(20, y) === "") {
-                        var col = ('U').concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
-                        var col = ('U').concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
+                if (this.el.getValueFromCoords(20, y) == 0 && this.el.getValueFromCoords(14, y) == 1) {
                     if (this.el.getValueFromCoords(21, y) === "") {
                         var col = ('V').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
@@ -2850,6 +3053,17 @@ export default class TreeTable extends Component {
                         valid = false;
                     } else {
                         var col = ('V').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
+                    }
+                    if (this.el.getValueFromCoords(22, y) === "") {
+                        var col = ('W').concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else {
+                        var col = ('W').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
@@ -2876,25 +3090,25 @@ export default class TreeTable extends Component {
                         elInstance.setComments(col, "");
                     }
                 } else if (this.el.getValueFromCoords(14, y) == 2) {
-                    if (this.el.getValueFromCoords(20, y) == "") {
-                        var col = ('U').concat(parseInt(y) + 1);
+                    if (this.el.getValueFromCoords(21, y) == "") {
+                        var col = ('V').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
                     } else {
-                        var col = ('U').concat(parseInt(y) + 1);
+                        var col = ('V').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
-                    if (this.el.getValueFromCoords(21, y) === "") {
-                        var col = ('V').concat(parseInt(y) + 1);
+                    if (this.el.getValueFromCoords(22, y) === "") {
+                        var col = ('W').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
                     } else {
-                        var col = ('V').concat(parseInt(y) + 1);
+                        var col = ('W').concat(parseInt(y) + 1);
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
                     }
@@ -2906,11 +3120,11 @@ export default class TreeTable extends Component {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
                 } else {
-                    var col = ('U').concat(parseInt(y) + 1);
+                    var col = ('V').concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
 
-                    var col = ('V').concat(parseInt(y) + 1);
+                    var col = ('W').concat(parseInt(y) + 1);
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
 
@@ -3002,9 +3216,9 @@ export default class TreeTable extends Component {
             data[17] = fuNode ? items[i].payload.nodeUnit.id : ""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
             data[18] = fuNode ? currentScenario.fuNode.noOfForecastingUnitsPerPerson : ""; // Requires
             data[19] = fuNode ? currentScenario.fuNode.forecastingUnit.unit.id : ""; // Forecasting Units Unit unitList
-            data[20] = fuNode ? currentScenario.fuNode.usageFrequency : ""; // Every
-            data[21] = fuNode ? currentScenario.fuNode.usagePeriod == null ? "" : currentScenario.fuNode.usagePeriod.usagePeriodId : ""; // Usage Period usagePeriodList
-            data[22] = fuNode ? currentScenario.fuNode.usageType.id == 1 ? currentScenario.fuNode.oneTimeUsage.toString() == "false" ? 0 : 1 : "" : ""; // Single Use
+            data[20] = fuNode ? currentScenario.fuNode.usageType.id == 1 ? currentScenario.fuNode.oneTimeUsage.toString() == "false" ? 0 : 1 : "" : ""; // Single Use
+            data[21] = fuNode ? currentScenario.fuNode.usageFrequency : ""; // Every
+            data[22] = fuNode ? currentScenario.fuNode.usagePeriod == null ? "" : currentScenario.fuNode.usagePeriod.usagePeriodId : ""; // Usage Period usagePeriodList
             data[23] = fuNode ? currentScenario.fuNode.repeatUsagePeriod == null ? "" : currentScenario.fuNode.repeatCount : ""; // For
             data[24] = fuNode ? currentScenario.fuNode.repeatUsagePeriod == null ? "" : currentScenario.fuNode.repeatUsagePeriod.usagePeriodId : ""; // Period usagePeriodList
             data[25] = 0; // # of FU required for period
@@ -3134,6 +3348,11 @@ export default class TreeTable extends Component {
                     source: this.state.unitListForDropdown,
                     type: 'dropdown',
                 },
+                 {//w
+                    title: 'Single Use',
+                    source: this.state.booleanForDropdown,
+                    type: 'dropdown',
+                },
                 {//u
                     title: 'Every',
                     mask: '#,##0.00', decimal: '.',
@@ -3142,11 +3361,6 @@ export default class TreeTable extends Component {
                 {//v
                     title: 'Usage Period',
                     source: this.state.usagePeriodListForDropdown,
-                    type: 'dropdown',
-                },
-                {//w
-                    title: 'Single Use',
-                    source: this.state.booleanForDropdown,
                     type: 'dropdown',
                 },
                 {//x
@@ -3237,6 +3451,7 @@ export default class TreeTable extends Component {
             license: JEXCEL_PRO_KEY,
             onload: this.loadedTab2,
             onchange: this.onChangeTab2Data,
+            onsort: this.onSortTab2,
             onchangepage: this.onChangePageTab2,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -5593,7 +5808,7 @@ export default class TreeTable extends Component {
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{i18n.t('static.listTree.manageTreeTreeList')}</small></span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> {i18n.t('static.tree.or')} <a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`}  className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
                             </div>
                         </div>
                         <div className="row pt-lg-0 pr-lg-4">
