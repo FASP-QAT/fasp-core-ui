@@ -153,27 +153,30 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                                                     var options = {
                                                         data: data,
                                                         columnDrag: false,
-                                                        colWidths: [200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                         columns: [
                                                             {
                                                                 title: i18n.t('static.procurementagent.procurementagent'),
                                                                 type: 'dropdown',
                                                                 source: programs,
-                                                                readOnly: true
+                                                                readOnly: true,
+                                                                width: 300
                                                             },
                                                             {
                                                                 title: i18n.t('static.ManageTree.ForecastingUnit'),
                                                                 type: 'autocomplete',
                                                                 source: products,
-                                                                filter: this.filterProduct
+                                                                filter: this.filterProduct,
+                                                                width: 300
                                                             },
                                                             {
                                                                 title: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
                                                                 type: 'text',
+                                                                width: 300
                                                             },
                                                             {
                                                                 title: i18n.t('static.checkbox.active'),
-                                                                type: 'checkbox'
+                                                                type: 'checkbox',
+                                                                width: 80
                                                             },
                                                             {
                                                                 title: 'procurementAgentId',
@@ -299,7 +302,6 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                                         }
                                     }).catch(
                                         error => {
-                                            console.log("Error 1 Test@123", error)
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -347,7 +349,6 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                             }
                         }).catch(
                             error => {
-                                console.log("Error 2 Test@123", error)
                                 if (error.message === "Network Error") {
                                     this.setState({
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -395,7 +396,6 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error 3 Test@123", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -503,19 +503,19 @@ export default class MapProcurementAgentForecastingUnit extends Component {
      * Function to handle form submission and save data on server.
      */
     formSubmit = function () {
-        var duplicateValidation = this.checkDuplicateForecastingUnit();
         var validation = this.checkValidation();
+        var duplicateValidation = this.checkDuplicateForecastingUnit();
         var duplicateValidationSKUCode = this.checkDuplicateSKUCode();
-        if (validation == true && duplicateValidation == true && duplicateValidationSKUCode==true) {
+        if (validation == true && duplicateValidation == true && duplicateValidationSKUCode == true) {
             var tableJson = this.el.getJson(null, false);
-            if(tableJson.filter(c=>c[5]==1).length>0){
-            this.setState({
-                loading: false
-            })
-            let changedpapuList = [];
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                // if (parseInt(map1.get("5")) === 1) {
+            if (tableJson.filter(c => c[5] == 1).length > 0) {
+                this.setState({
+                    loading: false
+                })
+                let changedpapuList = [];
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    // if (parseInt(map1.get("5")) === 1) {
                     let json = {
                         forecastingUnit: {
                             id: parseInt(map1.get("1")),
@@ -528,68 +528,67 @@ export default class MapProcurementAgentForecastingUnit extends Component {
                         procurementAgentForecastingUnitId: parseInt(map1.get("4"))
                     }
                     changedpapuList.push(json);
-                // }
-            }
-            ProcurementAgentService.addprocurementAgentForecastingUnitMapping(changedpapuList)
-                .then(response => {
-                    this.setState({
-                        changed:false
-                    })
-                    if (response.status == "200") {
-                        this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
-                    } else {
+                    // }
+                }
+                ProcurementAgentService.addprocurementAgentForecastingUnitMapping(changedpapuList)
+                    .then(response => {
                         this.setState({
-                            message: response.data.messageCode, loading: false
-                        },
-                            () => {
-                                hideSecondComponent();
-                            })
-                    }
-                }).catch(
-                    error => {
-                        console.log("Error 4 Test@123", error)
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
+                            changed: false
+                        })
+                        if (response.status == "200") {
+                            this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
+                            this.setState({
+                                message: response.data.messageCode, loading: false
+                            },
+                                () => {
+                                    hideSecondComponent();
+                                })
+                        }
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
-            }else{
+                    );
+            } else {
                 this.setState({
-                    message:i18n.t("static.pafu.noNewChangesFound"),
-                    color:"red"
-                },()=>{
+                    message: i18n.t("static.pafu.noNewChangesFound"),
+                    color: "red"
+                }, () => {
                     hideSecondComponent()
                 })
             }
@@ -602,6 +601,16 @@ export default class MapProcurementAgentForecastingUnit extends Component {
      */
     checkDuplicateForecastingUnit = function () {
         var tableJson = this.el.getJson(null, false);
+        var tempJson = [];
+        tableJson.map((item, idx) => {
+            if (tempJson.filter(c => c[1] == item[1]).length > 0) {
+                var col = ("B").concat(parseInt(idx) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.planningUnit.duplicateForecastingUnit'));
+            }
+            tempJson.push(item);
+        })
         let tempArray = tableJson;
         var hasDuplicate = false;
         tempArray.map(v => parseInt(v[Object.keys(v)[1]])).sort().sort((a, b) => {
@@ -625,9 +634,19 @@ export default class MapProcurementAgentForecastingUnit extends Component {
      */
     checkDuplicateSKUCode = function () {
         var tableJson = this.el.getJson(null, false);
+        var tempJson = [];
+        tableJson.map((item, idx) => {
+            if (tempJson.filter(c => c[2] == item[2]).length > 0) {
+                var col = ("C").concat(parseInt(idx) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.realmCountryPlanningUnit.duplicateSKU'));
+            }
+            tempJson.push(item);
+        })
         let tempArray = tableJson;
         var hasDuplicate = false;
-        tempArray.map(v => parseInt(v[Object.keys(v)[2]])).sort().sort((a, b) => {
+        tempArray.map(v => (v[Object.keys(v)[2]])).sort().sort((a, b) => {
             if (a === b) hasDuplicate = true
         })
         if (hasDuplicate) {
@@ -808,7 +827,7 @@ export default class MapProcurementAgentForecastingUnit extends Component {
         }
         if (cont == true) {
             this.setState({
-                changed:false
+                changed: false
             })
             this.props.history.push(`/procurementAgent/listProcurementAgent/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
         }
