@@ -3076,7 +3076,7 @@ export default class TreeTable extends Component {
             data[5] = currentScenario.dataValue; //Percentage of Parent
             data[6] = currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == data[4]).length > 0 ? fuNode ? currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == data[4])[0].calculatedValue : currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == data[4])[0].calculatedMmdValue : 0; //Parent Value
             // data[7] = currentScenario.dataValue;//Node Value
-            data[7] = currentScenario.calculatedDataValue;
+            data[7] = data[6] * data[5] / 100; //currentScenario.calculatedDataValue;
             data[8] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
             data[9] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en; // Forecasting unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
