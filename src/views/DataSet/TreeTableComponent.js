@@ -2403,6 +2403,8 @@ export default class TreeTable extends Component {
         var currentItem = this.state.items.filter(ele => ele.id == nodeId)[0];
         var currentItemParent = this.state.items.filter(ele => ele.id == currentItem.parent).length > 0 ? this.state.items.filter(ele => ele.id == currentItem.parent)[0] : "";
         if (x == 4) {
+            let tempMonth = new Date(value);
+            this.el.setValueFromCoords(4, y, tempMonth.getFullYear()+"-"+(tempMonth.getMonth()+1)+"-01", true);
             this.el.setValueFromCoords(6, y, currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD")).length > 0 ? this.el.getValueFromCoords(35, y) == 4 ? currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD"))[0].calculatedValue : currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD"))[0].calculatedMmdValue : 0, true);
             this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y) * (this.el.getValueFromCoords(5, y) / 100), true);
         }
@@ -2623,7 +2625,7 @@ export default class TreeTable extends Component {
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
-            data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId).length > 0 ? this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId : items[i].payload.nodeUnit.unitId;
+            data[4] = items[i].payload.nodeType.id == 1 ? "" : this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId).length > 0 ? this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId : items[i].payload.nodeUnit.unitId;
             data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
             data[6] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : currentScenario.dataValue == "" ? 0 : currentScenario.dataValue;
             data[7] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]) == "" ? 0 : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
@@ -2768,7 +2770,8 @@ export default class TreeTable extends Component {
                             curItem.context.payload.nodeUnit.id = json[i][4];
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][5];
+                            let tempMonth = new Date(json[i][5]);
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear()+"-"+(tempMonth.getMonth()+1)+"-01";
                             if (json[i][10] == 3) {
                                 var value = json[i][6];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
@@ -2862,7 +2865,8 @@ export default class TreeTable extends Component {
                             // curItem.context.payload.label.label_en = json[i][3];
                             // curItem.context.payload.nodeUnit.id = json[i][4];
                             curItem.context.payload.label.label_en = json[i][3];
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = json[i][4];
+                            let tempMonth = new Date(json[i][4]);
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear()+"-"+(tempMonth.getMonth()+1)+"-01";
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
                             if (json[i][35] == 4) {
@@ -4968,6 +4972,7 @@ export default class TreeTable extends Component {
                     scenarioList: []
                 }, () => {
                     this.handleAMonthDissmis3(this.state.singleValue2, 0);
+                    this.toggleModal(0, this.state.activeTab1[0]);
                 });
             } else {
                 this.setState({
