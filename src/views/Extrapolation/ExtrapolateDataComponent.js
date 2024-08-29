@@ -366,6 +366,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (isExtrapolation == "true") {
             this.setState({
                 forecastProgramId: localStorage.getItem("sesDatasetId"),
+                versionId: localStorage.getItem("sesVersionId"),
                 messageColor: localStorage.getItem("messageColor"),
                 message: localStorage.getItem("message"),
                 isChanged1: false
@@ -375,6 +376,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         } else {
             this.setState({
                 forecastProgramId: "",
+                versionId: "",
                 messageColor: "",
                 message: "",
             })
@@ -2456,26 +2458,15 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolationsPercentage: 0
         }, () => {
             var programData = this.state.datasetJson;
-            console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
+            // console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
             if (listOfPlanningUnits.length > 0) {
-                // this.setState({ loading: true })
                 var datasetJson = programData;
-
-                // var extrapolateCompleted = 0;
                 for (let pu = 0; pu < listOfPlanningUnits.length; pu++) {
                     if (!listOfPlanningUnits[pu] || !listOfPlanningUnits[pu].value) {
                         console.warn(`Skipping undefined or null entry at index ${pu}`);
                         continue;
                     }
                     for (let i = 0; i < regionList.length; i++) {
-                        // setTimeout(() => {
-                        //     extrapolateCompleted++
-                        //     this.setState({
-                        //         syncedExtrapolations: extrapolateCompleted,
-                        //         syncedExtrapolationsPercentage: Math.floor(((extrapolateCompleted) / this.state.totalExtrapolatedCount) * 100)
-                        //     })
-                        // }, pu * i * 1000);
-                        // console.log("syncedExtrapolations", extrapolateCompleted)
                         var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
                         if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                             let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
@@ -2572,10 +2563,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (count == 0) {
                         this.setState({
                             startBulkExtrapolation: false,
-                            dataChanged: false,
-                            messageColor: "red",
-                            message: i18n.t("static.extrapolation.bulkExtrapolationNotPossible")
+                            dataChanged: false
                         }, () => {
+                            localStorage.setItem("isExtrapolation", true);
+                            localStorage.setItem("messageColor", "red");
+                            localStorage.setItem("message", i18n.t("static.extrapolation.bulkExtrapolationNotPossible"));
                             this.componentDidMount();
                         });
                     }
@@ -2604,7 +2596,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
                 this.saveForecastConsumptionBulkExtrapolation()
             }
         })
@@ -2629,7 +2620,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
                 this.saveForecastConsumptionBulkExtrapolation()
             }
         })
@@ -2654,7 +2644,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
                 this.saveForecastConsumptionBulkExtrapolation()
             }
         })
@@ -2679,7 +2668,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
                 this.saveForecastConsumptionBulkExtrapolation()
             }
         })
@@ -2704,7 +2692,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
                 this.saveForecastConsumptionBulkExtrapolation()
             }
         })
@@ -2713,13 +2700,13 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Saves extrapolation data in indexed DB for Bulk Extrapolation
      */
     saveForecastConsumptionBulkExtrapolation() {
-        console.log("saveForecastConsumptionBulkExtrapolation====>")
+        // console.log("saveForecastConsumptionBulkExtrapolation====>")
         this.setState({
             startBulkExtrapolation: false,
             dataChanged: false,
             loading: true
         }, () => {
-            console.log("startBulkExtrapolation end===>", this.state.startBulkExtrapolation)
+            // console.log("startBulkExtrapolation end===>", this.state.startBulkExtrapolation)
             var db1;
             var storeOS;
             getDatabase();
@@ -2929,16 +2916,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         putRequest.onerror = function (event) {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
-                            // this.setState({
-                            //     isChanged1: false,
-                            //     loading: false
-                            // }, () => {
                             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
+                            localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
                             localStorage.setItem("messageColor", "green");
                             localStorage.setItem("message", i18n.t('static.extrapolation.bulkExtrapolationSuccess'));
                             localStorage.setItem("isExtrapolation", true);
                             window.location.reload();
-                            // })
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);
@@ -2950,12 +2933,14 @@ export default class ExtrapolateDataComponent extends React.Component {
         event.stopPropagation();
         this.setState({
             startBulkExtrapolation: false,
-            dataChanged: false,
-            messageColor: "red",
-            message: i18n.t('static.actionCancelled'),
+            dataChanged: false
         }, () => {
-            hideFirstComponent();
-            this.componentDidMount();
+            localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
+            localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
+            localStorage.setItem("isExtrapolation", true);
+            localStorage.setItem("messageColor", "red");
+            localStorage.setItem("message", i18n.t("static.actionCancelled"));
+            window.location.reload();
         });
     }
 
