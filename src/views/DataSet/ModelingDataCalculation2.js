@@ -15,6 +15,7 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants';
  * @param {*} autoCalculate This is the flag used to check if auto calculate is checked or not
  */
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage, autoCalculate) {
+    return new Promise((resolve, reject) => {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -59,7 +60,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 ]
             }
             if (treeId != -1) {
-                treeList = treeList.filter(c => c.treeId == treeId);
+                treeList = treeList.filter(c => treeId.toString().split(",").includes(c.treeId.toString()));
             }
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
@@ -386,6 +387,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             var repeatUsagePeriodId;
                                             var oneTimeUsage;
                                             var noOfMonths = 1;
+                                            var tempNoOfMonths = 0; 
                                             usageTypeId = nodeDataMapForScenario.fuNode.usageType.id;
                                             if (usageTypeId == 1) {
                                                 oneTimeUsage = nodeDataMapForScenario.fuNode.oneTimeUsage;
@@ -449,10 +451,18 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     totalValue = noFURequired * calculatedValue;
                                                 } else {
                                                     var calculatedValueForLastNMonths = 0;
-                                                    var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(noOfMonths, 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
-                                                    f.map(item => {
-                                                        calculatedValueForLastNMonths += item.calculatedValue;
+                                                    var tempMonth=Number(noOfMonths)-Math.floor(Number(noOfMonths));
+                                                    var f = parentAndCalculatedValueArray.filter(c => c.month > moment(curDate).subtract(Math.ceil(noOfMonths), 'months').format("YYYY-MM-DD") && c.month <= moment(curDate).format("YYYY-MM-DD"));
+                                                    f.map((item,index) => {
+                                                        if(f.length>1 && index!=f.length-1){
+                                                            calculatedValueForLastNMonths += item.calculatedValue;
+                                                        }else if(f.length==1 || tempMonth==0){
+                                                            calculatedValueForLastNMonths += item.calculatedValue;
+                                                        }
                                                     })
+                                                    if(f.length>=2){
+                                                        calculatedValueForLastNMonths += tempMonth*f[f.length-1].calculatedValue;
+                                                    }
                                                     totalValue = noFURequired * calculatedValueForLastNMonths;
                                                 }
                                             }
@@ -741,6 +751,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 props.updateState("tempTreeId", treeId);
                 props.updateState("programId", page);
             }
+            resolve();
         }.bind(this)
     }.bind(this)
+    })
 }
