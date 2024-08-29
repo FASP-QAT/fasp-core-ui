@@ -317,6 +317,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             optimizeTESAndARIMAExtrapolation: false,
             totalExtrapolatedCount: 0,
             syncedExtrapolations: 0,
+            estimatedTime: 0,
             syncedExtrapolationsPercentage: 0,
             startBulkExtrapolation: false,
             showMissingTESANDARIMA: false
@@ -361,6 +362,23 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         });
         this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
+        var isExtrapolation = localStorage.getItem("isExtrapolation")
+        if (isExtrapolation == "true") {
+            this.setState({
+                forecastProgramId: localStorage.getItem("sesDatasetId"),
+                messageColor: localStorage.getItem("messageColor"),
+                message: localStorage.getItem("message"),
+                isChanged1: false
+            })
+            hideFirstComponent();
+            localStorage.setItem("isExtrapolation", false)
+        } else {
+            this.setState({
+                forecastProgramId: "",
+                messageColor: "",
+                message: "",
+            })
+        }
         var db1;
         getDatabase();
         this.getPrograms();
@@ -1391,7 +1409,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
         if (cont == true) {
             this.setState({ loading: true })
-            localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
             var forecastProgramId = document.getElementById("forecastProgramId").value;
             var versionId = document.getElementById("versionId").value;
             if (forecastProgramId != "" && versionId != "") {
@@ -2541,12 +2558,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                         }
                     }
                 }
-                // if (regionObj != "" && puObj != "") {
-                //     this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
-                // }
+                if (regionObj != "" && puObj != "") {
+                    this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
+                }
                 this.setState({
                     count: count,
-                    totalExtrapolatedCount: count
+                    totalExtrapolatedCount: count,
+                    estimatedTime: count * 3
                 }, () => {
                     console.log("count", count)
 
@@ -2698,12 +2716,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("saveForecastConsumptionBulkExtrapolation====>")
         this.setState({
             startBulkExtrapolation: false,
-            dataChanged: false
+            dataChanged: false,
+            loading: true
         }, () => {
             console.log("startBulkExtrapolation end===>", this.state.startBulkExtrapolation)
-            this.setState({
-                loading: true
-            })
             var db1;
             var storeOS;
             getDatabase();
@@ -2910,22 +2926,19 @@ export default class ExtrapolateDataComponent extends React.Component {
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
-                        this.setState({
-                            dataChanged: false
-                        })
                         putRequest.onerror = function (event) {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
-                            this.setState({
-                                isChanged1: false,
-                                messageColor: "green",
-                                message: i18n.t('static.extrapolation.bulkExtrapolationSuccess'),
-                                loading: false
-                            }, () => {
-                                // this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
-                                hideFirstComponent();
-                                this.componentDidMount();
-                            })
+                            // this.setState({
+                            //     isChanged1: false,
+                            //     loading: false
+                            // }, () => {
+                            localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
+                            localStorage.setItem("messageColor", "green");
+                            localStorage.setItem("message", i18n.t('static.extrapolation.bulkExtrapolationSuccess'));
+                            localStorage.setItem("isExtrapolation", true);
+                            window.location.reload();
+                            // })
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);
@@ -5106,7 +5119,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <Col xs="12" sm="12">
                             <Card>
                                 <CardHeader>
-                                    <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}</strong>
+                                    <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}<span className="float-right">{i18n.t('static.extrapolation.estimateTime')}{this.state.estimatedTime}</span></strong>
                                 </CardHeader>
                                 <CardBody>
                                     <div className="text-center">{this.state.syncedExtrapolationsPercentage}% ({this.state.syncedExtrapolations} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {i18next.t('static.extrapolation.extrapolation')})</div>

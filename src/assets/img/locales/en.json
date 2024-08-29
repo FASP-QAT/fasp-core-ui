@@ -3256,5 +3256,6 @@
     "static.extrapolation.bulkExtrapolationSuccess": "Bulk Extrapolation done successfully",
     "static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams": "Extrapolate ARIMA & TES using default parameters",
     "static.extrapolation.extrapolation": "Extrapolations",
-    "static.extrapolation.bulkExtrapolationNotPossible": "Extrapolation not possible as selected program planning units does not have enough data"
+    "static.extrapolation.bulkExtrapolationNotPossible": "Extrapolation not possible as selected program planning units does not have enough data",
+    "static.extrapolation.estimateTime": "Estimated time for extrapolation in seconds : "
 }
