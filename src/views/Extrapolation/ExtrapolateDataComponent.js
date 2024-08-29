@@ -319,6 +319,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             optimizeTESAndARIMAExtrapolation: false,
             totalExtrapolatedCount: 0,
             syncedExtrapolations: 0,
+            estimatedTime: 0,
             syncedExtrapolationsPercentage: 0,
             startBulkExtrapolation: false,
             showMissingTESANDARIMA: false
@@ -381,6 +382,23 @@ export default class ExtrapolateDataComponent extends React.Component {
             attributeFilter: ['data-theme'],
         });
 
+        var isExtrapolation = localStorage.getItem("isExtrapolation")
+        if (isExtrapolation == "true") {
+            this.setState({
+                forecastProgramId: localStorage.getItem("sesDatasetId"),
+                messageColor: localStorage.getItem("messageColor"),
+                message: localStorage.getItem("message"),
+                isChanged1: false
+            })
+            hideFirstComponent();
+            localStorage.setItem("isExtrapolation", false)
+        } else {
+            this.setState({
+                forecastProgramId: "",
+                messageColor: "",
+                message: "",
+            })
+        }
         var db1;
         getDatabase();
         this.getPrograms();
@@ -1416,7 +1434,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
         if (cont == true) {
             this.setState({ loading: true })
-            localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
             var forecastProgramId = document.getElementById("forecastProgramId").value;
             var versionId = document.getElementById("versionId").value;
             if (forecastProgramId != "" && versionId != "") {
@@ -2453,36 +2470,39 @@ export default class ExtrapolateDataComponent extends React.Component {
         var listOfPlanningUnits = this.state.planningUnitValues;
         var puObj = [];
         var regionObj = []
+        var count = 0;
         this.setState({
-            totalExtrapolatedCount: (listOfPlanningUnits.length * regionList.length), startBulkExtrapolation: true,
+            startBulkExtrapolation: true,
             dataChanged: true,
             jsonDataMovingAvg: [],
             jsonDataSemiAverage: [],
             jsonDataLinearRegression: [],
             jsonDataTes: [],
             jsonDataArima: [],
+            syncedExtrapolations: 0,
+            syncedExtrapolationsPercentage: 0
         }, () => {
             var programData = this.state.datasetJson;
             console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
             if (listOfPlanningUnits.length > 0) {
                 // this.setState({ loading: true })
                 var datasetJson = programData;
-                var count = 0;
-                var extrapolateCompleted = 0;
+
+                // var extrapolateCompleted = 0;
                 for (let pu = 0; pu < listOfPlanningUnits.length; pu++) {
                     if (!listOfPlanningUnits[pu] || !listOfPlanningUnits[pu].value) {
                         console.warn(`Skipping undefined or null entry at index ${pu}`);
                         continue;
                     }
                     for (let i = 0; i < regionList.length; i++) {
-                        setTimeout(() => {
-                            extrapolateCompleted++
-                            this.setState({
-                                syncedExtrapolations: extrapolateCompleted,
-                                syncedExtrapolationsPercentage: Math.floor(((extrapolateCompleted) / this.state.totalExtrapolatedCount) * 100)
-                            })
-                        }, pu * i * 1000);
-                        console.log("syncedExtrapolations", extrapolateCompleted)
+                        // setTimeout(() => {
+                        //     extrapolateCompleted++
+                        //     this.setState({
+                        //         syncedExtrapolations: extrapolateCompleted,
+                        //         syncedExtrapolationsPercentage: Math.floor(((extrapolateCompleted) / this.state.totalExtrapolatedCount) * 100)
+                        //     })
+                        // }, pu * i * 1000);
+                        // console.log("syncedExtrapolations", extrapolateCompleted)
                         var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
                         if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                             let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
@@ -2507,7 +2527,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             const monthsDiff = moment(new Date(moment(maxDate).format("YYYY-MM-DD") > moment(forecastMaxDate).format("YYYY-MM-DD") ? moment(maxDate).format("YYYY-MM-DD") : moment(forecastMaxDate).format("YYYY-MM-DD"))).diff(new Date(moment(minDate).format("YYYY-MM-DD") < moment(forecastMinDate).format("YYYY-MM-DD") ? moment(minDate).format("YYYY-MM-DD") : moment(forecastMinDate).format("YYYY-MM-DD")), 'months', true);
                             const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
                             //2 and 3 - Optimise TES and ARIMA, 5 - Extrapolate ARIMA & TES using default parameters
-                            if (id == 3 || id == 5) {
+                            if (id == 2 || id == 3 || id == 5) {
                                 this.setState({ optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false })
                                 if (id == 2) {
                                     if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
@@ -2565,16 +2585,18 @@ export default class ExtrapolateDataComponent extends React.Component {
                         }
                     }
                 }
-                console.log("count", count)
                 if (regionObj != "" && puObj != "") {
                     this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
                 }
                 console.log("count1", count)
 
                 this.setState({
-                    count: count
+                    count: count,
+                    totalExtrapolatedCount: count,
+                    estimatedTime: count * 3
                 }, () => {
-                    console.log("count2", this.state.bulkExtrapolation, "==", this.state.optimizeTESAndARIMA, "==", this.state.missingTESAndARIMA)
+                    console.log("count", count)
+
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
                     console.log("count3", count)
 
@@ -2600,18 +2622,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     updateMovingAvgData(data) {
         var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
         jsonDataMovingAvg.push(data);
-        var countR = this.state.countRecived
+        var countR = this.state.syncedExtrapolations
         this.setState({
             jsonDataMovingAvg: jsonDataMovingAvg,
-            countRecived: countR + 1
+            syncedExtrapolations: countR + 1,
+            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                this.saveForecastConsumptionBulkExtrapolation()
             }
         })
     }
@@ -2622,18 +2647,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     updateSemiAveragesData(data) {
         var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
         jsonDataSemiAverage.push(data);
-        var countR = this.state.countRecived
+        var countR = this.state.syncedExtrapolations
         this.setState({
             jsonDataSemiAverage: jsonDataSemiAverage,
-            countRecived: countR + 1
+            syncedExtrapolations: countR + 1,
+            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                this.saveForecastConsumptionBulkExtrapolation()
             }
         })
     }
@@ -2644,17 +2672,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     updateLinearRegressionData(data) {
         var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
         jsonDataLinearRegression.push(data);
+        var countR = this.state.syncedExtrapolations
         this.setState({
             jsonDataLinearRegression: jsonDataLinearRegression,
-            countRecived: this.state.countRecived++
+            syncedExtrapolations: countR + 1,
+            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                this.saveForecastConsumptionBulkExtrapolation()
             }
         })
     }
@@ -2665,17 +2697,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     updateTESData(data) {
         var jsonDataTes = this.state.jsonDataTes;
         jsonDataTes.push(data);
+        var countR = this.state.syncedExtrapolations
         this.setState({
             jsonDataTes: jsonDataTes,
-            countRecived: this.state.countRecived++
+            syncedExtrapolations: countR + 1,
+            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                this.saveForecastConsumptionBulkExtrapolation()
             }
         })
     }
@@ -2686,22 +2722,21 @@ export default class ExtrapolateDataComponent extends React.Component {
     updateArimaData(data) {
         var jsonDataArima = this.state.jsonDataArima;
         jsonDataArima.push(data);
+        var countR = this.state.syncedExtrapolations
         this.setState({
             jsonDataArima: jsonDataArima,
-            countRecived: this.state.countRecived++
+            syncedExtrapolations: countR + 1,
+            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
         }, () => {
-            console.log("updateArimaData", this.state.jsonDataMovingAvg.length + "===" + this.state.jsonDataSemiAverage.length
-                + "===" + this.state.jsonDataLinearRegression.length
-                + "===" + this.state.jsonDataTes.length
-                + "===" + this.state.jsonDataArima.length
-                + "===" + this.state.count)
+            localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
                 + this.state.jsonDataSemiAverage.length
                 + this.state.jsonDataLinearRegression.length
                 + this.state.jsonDataTes.length
                 + this.state.jsonDataArima.length
                 == this.state.count) {
-                setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                // setTimeout(() => { this.saveForecastConsumptionBulkExtrapolation() }, 0);
+                this.saveForecastConsumptionBulkExtrapolation()
             }
         })
     }
@@ -2712,12 +2747,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("saveForecastConsumptionBulkExtrapolation====>")
         this.setState({
             startBulkExtrapolation: false,
-            dataChanged: false
+            dataChanged: false,
+            loading: true
         }, () => {
             console.log("startBulkExtrapolation end===>", this.state.startBulkExtrapolation)
-            this.setState({
-                loading: true
-            })
             var db1;
             var storeOS;
             getDatabase();
@@ -2889,6 +2922,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 if (jsonDataArimaFilter.length > 0) {
                                     var jsonDataArima = jsonDataArimaFilter[0].data;
                                     for (var i = 0; i < jsonDataArima.length; i++) {
+                                        console.log("jsonDataArima[i].forecast", jsonDataArima[i].forecast)
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                     }
                                     consumptionExtrapolationList.push(
@@ -2923,22 +2957,19 @@ export default class ExtrapolateDataComponent extends React.Component {
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
-                        this.setState({
-                            dataChanged: false
-                        })
                         putRequest.onerror = function (event) {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
-                            this.setState({
-                                isChanged1: false,
-                                messageColor: "green",
-                                message: i18n.t('static.extrapolation.bulkExtrapolationSuccess'),
-                                loading: false
-                            }, () => {
-                                // this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
-                                // hideFirstComponent();
-                                // this.componentDidMount();
-                            })
+                            // this.setState({
+                            //     isChanged1: false,
+                            //     loading: false
+                            // }, () => {
+                            localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
+                            localStorage.setItem("messageColor", "green");
+                            localStorage.setItem("message", i18n.t('static.extrapolation.bulkExtrapolationSuccess'));
+                            localStorage.setItem("isExtrapolation", true);
+                            window.location.reload();
+                            // })
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);
@@ -2950,8 +2981,11 @@ export default class ExtrapolateDataComponent extends React.Component {
         event.stopPropagation();
         this.setState({
             startBulkExtrapolation: false,
-            dataChanged: false
+            dataChanged: false,
+            messageColor: "red",
+            message: i18n.t('static.actionCancelled'),
         }, () => {
+            hideFirstComponent();
             this.componentDidMount();
         });
     }
@@ -5144,7 +5178,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <Col xs="12" sm="12">
                             <Card>
                                 <CardHeader>
-                                    <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}</strong>
+                                    <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}<span className="float-right">{i18n.t('static.extrapolation.estimateTime')}{this.state.estimatedTime}</span></strong>
                                 </CardHeader>
                                 <CardBody>
                                     <div className="text-center">{this.state.syncedExtrapolationsPercentage}% ({this.state.syncedExtrapolations} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {i18next.t('static.extrapolation.extrapolation')})</div>
