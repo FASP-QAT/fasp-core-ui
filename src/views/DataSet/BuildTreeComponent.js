@@ -4260,7 +4260,7 @@ export default class BuildTree extends Component {
             data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[12] = this.state.currentScenario.manualChangesEffectFuture;
             data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false" ? tempNConvertToMonth * tempFuNode.usageFrequency * tempFuNode.noOfForecastingUnitsPerPerson : this.state.noFURequired)) : 1;
-            data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
+            data[14] = Math.floor(j / monthsPerVisit);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
                 var calculatedValueFromCurMonth = grandParentMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
@@ -4276,7 +4276,7 @@ export default class BuildTree extends Component {
                 if (Math.floor(j / monthsPerVisit) == 0) {
                     dataValue = (patients / monthsPerVisit) + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 } else {
-                    dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
+                    dataValue = (dataArray[j - monthsPerVisit][14]) + (j == 0 ? parseFloat(calculatedValueForCurMonth) - parseFloat(patients) : parseFloat(calculatedValueForCurMonth) - parseFloat(calculatedValueForPrevMonth))
                 }
                 data[15] = j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth;
                 data[16] = dataValue;
