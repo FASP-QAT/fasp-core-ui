@@ -105,6 +105,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       },
       loading: true,
       programLstFiltered: [],
+      sortedData: [],
     };
   }
   /**
@@ -205,29 +206,53 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         i18n.t("static.supplyPlan.maxStock").replaceAll(" ", "%20"),
       ]),
     ];
-    re = this.state.data;
-    for (var item = 0; item < re.length; item++) {
-      re[item].programData.map((p) =>
-        A.push([
-          addDoubleQuoteToRowContent([
-            re[item].planningUnit.id,
-            getLabelText(re[item].planningUnit.label, this.state.lang)
-              .replaceAll(",", "%20")
-              .replaceAll(" ", "%20"),
-            getLabelText(p.program.label, this.state.lang)
-              .replaceAll(",", "%20")
-              .replaceAll(" ", "%20"),
-            round(p.amc),
-            round(p.finalClosingBalance),
-            p.mos != null
-              ? roundN(p.mos)
-              : i18n.t("static.supplyPlanFormula.na"),
-            p.minMos,
-            p.maxMos,
-          ]),
-        ])
-      );
-    }
+    //old code
+    // re = this.state.data;
+    // for (var item = 0; item < re.length; item++) {
+    //   re[item].programData.map((p) =>
+    //     A.push([
+    //       addDoubleQuoteToRowContent([
+    //         re[item].planningUnit.id,
+    //         getLabelText(re[item].planningUnit.label, this.state.lang)
+    //           .replaceAll(",", "%20")
+    //           .replaceAll(" ", "%20"),
+    //         getLabelText(p.program.label, this.state.lang)
+    //           .replaceAll(",", "%20")
+    //           .replaceAll(" ", "%20"),
+    //         round(p.amc),
+    //         round(p.finalClosingBalance),
+    //         p.mos != null
+    //           ? roundN(p.mos)
+    //           : i18n.t("static.supplyPlanFormula.na"),
+    //         p.minMos,
+    //         p.maxMos,
+    //       ]),
+    //     ])
+    //   );
+    // }
+
+    //new code
+    this.state.sortedData.map((p) =>
+      A.push([
+        addDoubleQuoteToRowContent([
+          p.planningUnit.id,
+          getLabelText(p.planningUnit.label, this.state.lang)
+            .replaceAll(",", "%20")
+            .replaceAll(" ", "%20"),
+          getLabelText(p.program.label, this.state.lang)
+            .replaceAll(",", "%20")
+            .replaceAll(" ", "%20"),
+          round(p.amc),
+          round(p.finalClosingBalance),
+          p.mos != null
+            ? roundN(p.mos)
+            : i18n.t("static.supplyPlanFormula.na"),
+          p.minMos,
+          p.maxMos,
+        ]),
+      ])
+    );
+
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","));
     }
@@ -371,38 +396,130 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.setFontSize(8);
     doc.setTextColor("#002f6c");
     let y = 130;
-    var countryText = doc.splitTextToSize(i18n.t("static.dashboard.country") + " : " + this.state.countryLabels.join(" , "),(doc.internal.pageSize.width * 3) / 4);
+    var countryText = doc.splitTextToSize(i18n.t("static.dashboard.country") + " : " + this.state.countryLabels.join(", "), (doc.internal.pageSize.width * 3) / 4);
     for (var i = 0; i < countryText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
-          doc.addPage();
-          y = 80;
+        doc.addPage();
+        y = 80;
       };
       doc.text(doc.internal.pageSize.width / 8, y, countryText[i]);
       y = y + 10;
     }
 
-    y = y + 10;    
-    var programText = doc.splitTextToSize(i18n.t("static.program.program") + " : " + this.state.programLabels.join("; "),(doc.internal.pageSize.width * 3) / 4);
+    y = y + 10;
+    var programText = doc.splitTextToSize(i18n.t("static.program.program") + " : " + this.state.programLabels.join("; "), (doc.internal.pageSize.width * 3) / 4);
     for (var i = 0; i < programText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
-          doc.addPage();
-          y = 80;
+        doc.addPage();
+        y = 80;
       };
       doc.text(doc.internal.pageSize.width / 8, y, programText[i]);
       y = y + 10;
     }
 
     y = y + 10;
-    var tracerCategoryText = doc.splitTextToSize(i18n.t("static.tracercategory.tracercategory") + " : " + this.state.tracerCategoryLabels.join("; "),(doc.internal.pageSize.width * 3) / 4);
+    var tracerCategoryText = doc.splitTextToSize(i18n.t("static.tracercategory.tracercategory") + " : " + this.state.tracerCategoryLabels.join("; "), (doc.internal.pageSize.width * 3) / 4);
     for (var i = 0; i < tracerCategoryText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
-          doc.addPage();
-          y = 80;
+        doc.addPage();
+        y = 80;
       };
       doc.text(doc.internal.pageSize.width / 8, y, tracerCategoryText[i]);
       y = y + 10;
     }
     y = y + 10;
+
+    //boxes to represent color code of stock
+    doc.setDrawColor(0);
+    doc.setFillColor(186, 12, 47);
+    doc.rect(
+      doc.internal.pageSize.width / 8,
+      y,
+      15,
+      12,
+      "F"
+    );
+    doc.setFillColor(244, 133, 33);
+    doc.rect(
+      doc.internal.pageSize.width / 8 + 100,
+      y,
+      15,
+      12,
+      "F"
+    );
+    doc.setFillColor(17, 139, 112);
+    doc.rect(
+      doc.internal.pageSize.width / 8 + 200,
+      y,
+      15,
+      12,
+      "F"
+    );
+    doc.setFillColor(237, 185, 68);
+    doc.rect(
+      doc.internal.pageSize.width / 8 + 300,
+      y,
+      15,
+      12,
+      "F"
+    );
+    doc.setFillColor(207, 205, 201);
+    doc.rect(
+      doc.internal.pageSize.width / 8 + 400,
+      y,
+      15,
+      12,
+      "F"
+    );
+
+    //for color label
+    doc.text(
+      i18n.t(legendcolor[0].text),
+      doc.internal.pageSize.width / 8 + 20,
+      y+10,
+      {
+        align: "left",
+      }
+    );
+
+    doc.text(
+      i18n.t(legendcolor[1].text),
+      doc.internal.pageSize.width / 8 + 120,
+      y+10,
+      {
+        align: "left",
+      }
+    );
+
+    doc.text(
+      i18n.t(legendcolor[2].text),
+      doc.internal.pageSize.width / 8 + 220,
+      y+10,
+      {
+        align: "left",
+      }
+    );
+
+    doc.text(
+      i18n.t(legendcolor[3].text),
+      doc.internal.pageSize.width / 8 + 320,
+      y+10,
+      {
+        align: "left",
+      }
+    );
+
+    doc.text(
+      i18n.t(legendcolor[4].text),
+      doc.internal.pageSize.width / 8 + 420,
+      y+10,
+      {
+        align: "left",
+      }
+    );
+
+    // End of boxes
+    y = y + 20;
 
     doc.setFontSize(10);
     const headers = [
@@ -418,24 +535,62 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       ],
     ];
     var data = [];
-    console.log('this.state.data[0]: ',this.state.data[0]);
-    console.log('this.state.data[1]: ',this.state.data[1]);
-    this.state.data.map((elt) =>
-      elt.programData.map((p) =>
-        data.push([
-          elt.planningUnit.id,
-          getLabelText(elt.planningUnit.label, this.state.lang),
-          getLabelText(p.program.label, this.state.lang),
-          formatter(round(p.amc),0),
-          formatter(round(p.finalClosingBalance),0),
-          p.mos != null
-            ? formatter(roundN(p.mos),0)
-            : i18n.t("static.supplyPlanFormula.na"),
-          p.minMos,
-          p.maxMos,
-        ])
-      )
+
+    // this.state.data.map((elt) =>
+    //   elt.programData.map((p) =>
+    //     data.push([
+    //       elt.planningUnit.id,
+    //       getLabelText(elt.planningUnit.label, this.state.lang),
+    //       getLabelText(p.program.label, this.state.lang),
+    //       formatter(round(p.amc),0),
+    //       formatter(round(p.finalClosingBalance),0),
+    //       p.mos != null
+    //         ? formatter(roundN(p.mos),0)
+    //         : i18n.t("static.supplyPlanFormula.na"),
+    //       p.minMos,
+    //       p.maxMos,
+    //     ])
+    //   )
+    // );
+
+    this.state.sortedData.map((p) =>
+      data.push([
+        p.planningUnit.id,
+        getLabelText(p.planningUnit.label, this.state.lang),
+        getLabelText(p.program.label, this.state.lang),
+        formatter(round(p.amc), 0),
+        formatter(round(p.finalClosingBalance), 0),
+        p.mos != null
+          ? formatter(roundN(p.mos), 0)
+          : i18n.t("static.supplyPlanFormula.na"),
+        p.minMos,
+        p.maxMos,
+      ])
     );
+
+    const cellstyleWithData = (item) => {
+      if (item.mos != null && roundN(item.mos) == 0) {
+        return legendcolor[0].color;
+      } else if (
+        roundN(item.mos) != 0 &&
+        roundN(item.mos) != null &&
+        roundN(item.mos) < item.minMos
+      ) {
+        return legendcolor[1].color;
+      } else if (
+        roundN(item.mos) >= item.minMos &&
+        roundN(item.mos) <= item.maxMos
+      ) {
+        return legendcolor[2].color;
+      } else if (roundN(item.mos) > item.maxMos) {
+        return legendcolor[3].color;
+      } else if (item.mos == null) {
+        return legendcolor[4].color;
+      }
+    };
+    let dataColor;
+    dataColor = this.state.sortedData.map((ele) => cellstyleWithData(ele));
+
     // var startY =
     //   150 +
     //   this.state.countryValues.length * 2 +
@@ -452,6 +607,11 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       columnStyles: {
         1: { cellWidth: 181.89 },
         2: { cellWidth: 178 },
+      },
+      didParseCell: function (data) {
+        if (data.section == "body" && data.column.index == 5)
+          data.cell.styles.fillColor =
+            dataColor[data.row.index];
       },
     };
     doc.autoTable(content);
@@ -928,7 +1088,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
       return itemLabelA > itemLabelB ? 1 : -1;
     });
-    console.log('planningUnits[0]: ',planningUnits[0]);
 
     let programs = [
       ...new Set(
@@ -955,14 +1114,42 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     var dataCopy = [...filteredData];
     var unsortedDataList = [];
     dataCopy.map((elt) =>
-      elt.programData.map((p) =>
-        {
-          p.planningUnit = elt.planningUnit
-          unsortedDataList.push(p);
-        }
+      elt.programData.map((p) => {
+        p.planningUnit = elt.planningUnit
+        unsortedDataList.push(p);
+      }
       )
     );
-    console.log('unsortedDataList: ',unsortedDataList);
+
+    // unsortedDataList.sort((a, b) => {
+    //   var itemLabelA = getLabelText(a.program.label, this.state.lang).toUpperCase();
+    //   var itemLabelB = getLabelText(b.program.label, this.state.lang).toUpperCase();
+    //   return itemLabelA > itemLabelB ? 1 : -1;
+    // });
+
+    //sort alphabeltically by program, to group records by program, and then within each program, alphabetical by PU
+    unsortedDataList.sort((a, b) => {
+      // First, compare the program labels (alphabetically)
+      const programLabelA = getLabelText(a.program.label, this.state.lang).toUpperCase();
+      const programLabelB = getLabelText(b.program.label, this.state.lang).toUpperCase();
+
+      if (programLabelA < programLabelB) return -1;
+      if (programLabelA > programLabelB) return 1;
+
+      // If program labels are the same, compare the planning unit labels (alphabetically)
+      const planningUnitLabelA = a.planningUnit.label.label_en?.toUpperCase() || "";//handle cases where the label_en might be null or undefined.
+      const planningUnitLabelB = b.planningUnit.label.label_en?.toUpperCase() || "";
+
+      if (planningUnitLabelA < planningUnitLabelB) return -1;
+      if (planningUnitLabelA > planningUnitLabelB) return 1;
+
+      // If both are the same, return 0 (they are equal)
+      return 0;
+    });
+
+    this.setState({
+      sortedData: unsortedDataList
+    });
   };
   /**
    * Retrieves the list of countries based on the realm ID and updates the state with the list.
