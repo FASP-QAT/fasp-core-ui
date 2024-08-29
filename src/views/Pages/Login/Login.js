@@ -314,13 +314,13 @@ class Login extends Component {
                 </div>
               </Col>
               <Row>
-                <Col md="4">
+                <Col md="3">
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
                 </Col>
-                <Col md="7" lg="5">
-  <div className="red" style={{ marginBottom: '20px', marginTop:'-15px' }}>
+                <Col md="8" lg="6">
+  <div className="red" style={{ marginBottom: '20px', marginTop:'-25px' }}>
     {this.state.lang === 'en' ?
       <p><strong>IMPORTANT!</strong> Please upload any unsaved <u>Forecasting</u> data from your local computer to the server by EOD Wednesday <u>Sept. 4th, 2024</u>. <strong><u>Any Forecasting data not uploaded to the server by this date will be lost!</u></strong> The Forecasting program will need to be reloaded for continued use on <u>Sept. 5th, 2024</u>.</p> :
       this.state.lang === 'sp' ?

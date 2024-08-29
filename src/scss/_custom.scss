@@ -14042,6 +14042,29 @@ label.arrow_label:before {
   padding: 0px 0px 0px 3px;
 }
 
+.mapPlanningUnitpaginationD .jss_pagination_dropdown{
+  position: absolute;
+    bottom: 5px;
+    left: 0;
+}
+.mapPlanningUnitpaginationD .jss_pagination>div{
+  margin-left: 51px!important;
+}
+.momJexcelPagination.jss_pagination_dropdown {
+  margin-left: 4px;
+  margin-right: 4px;
+  position: absolute;
+  bottom: 7px;
+  left: 0;
+}
+.momJexcelPagination.jss_pagination>div {
+  padding-left: 56px!important;
+}
+.compareAndSelectCollapsecol .jss>tbody>tr>td {
+  white-space: pre !important;
+  text-align: center !important;
+}
+
 .TreeTable .jss>thead>tr>td:nth-child(3) {
   width: 120px !important;
   min-width: 120px;
