@@ -3435,5 +3435,6 @@
     "static.supplyPlan.actualQuantity":"Actual Quantity",
     "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available",
     "static.compareAndSelect.topNote":"Users can select multiple tree forecasts as their final forecast, which will aggregate the monthly forecast quantities. Users cannot select multiple consumption forecasts or a combination of tree and consumption forecasts as their final forecast.",
-    "static.extrapolation.estimateTime": "Estimated time for extrapolation in seconds : "
+    "static.extrapolation.estimateTime": "Estimated time for extrapolation in seconds : ",
+    "static.treeTable.rightClickNotes": "Right click on any row and click 'Open this node for editing' to open that specific node in a separate QAT window"
 }
