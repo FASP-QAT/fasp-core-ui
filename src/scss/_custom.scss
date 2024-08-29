@@ -1135,6 +1135,10 @@ a {
   background-color: transparent;
   // text-decoration: underline;
 }
+.a_textLink {
+  // color: #205493;
+  color: #20a8d8;
+}
 .hoverTd:hover {
   background-color: #4d515a;
   color: #000 !important;
@@ -1176,6 +1180,18 @@ a {
   line-height: 3.4rem;
   color: #e4e5e6 !important;
 }
+.CleanUpSize {
+  width: 16px;
+  height: 16px;
+  filter: invert(1) brightness(2);
+}
+.redColor {
+  color: #BA0C2F!important;
+}
+.greenColor {
+  color: #118b70 !important;
+}
+
 // .month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
 //   background-color: #d3d3d3;
 //   color: #000;
@@ -1201,7 +1217,10 @@ a {
 // }
 }
 /*Dark mode end*/
-
+.a_textLink {
+  // color: #205493;
+  color: #205493;
+}
 .countZero {
   background-color: #d9d9d9; /* Gray background */
   color: #000; /* White text */
