@@ -1909,7 +1909,7 @@ export default class ListTreeComponent extends Component {
                                     f = 1;
                                 }
                             }
-                            if(this.state.onlyDownloadedProgram) {
+                            if(this.state.onlyDownloadedProgram && proList.filter(c=>c.id==programData.id).length==0) {
                                 proList.push(programData)
                             } else {
                                 if (f == 0) {

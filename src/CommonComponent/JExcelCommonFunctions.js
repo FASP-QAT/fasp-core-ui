@@ -573,7 +573,7 @@ export function checkValidation(worksheets) {
                     valid = false;
                     columnValid = false;
                 }
-            }
+            }            
             if (columns[c].number === true && columnValid != false && value != "") {
                 if (isNaN(parseInt(value))) {
                     worksheets.setStyle(col, "background-color", "transparent");
