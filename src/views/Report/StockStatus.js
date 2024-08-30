@@ -247,7 +247,7 @@ class StockStatus extends Component {
         var ppu = item.PlanningUnitIdDataForExport;
         if (this.state.isAggregate == "false" || this.state.isAggregate == false) {
           csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + (this.state.programs.filter(c => c.programId == item.programId)[0].programCode)) + '"')
-          csvRow.push('"' + ((this.state.viewById == 1?i18n.t('static.planningunit.planningunit'):i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + getLabelText(ppu.reportingUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"');
+          csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + getLabelText(ppu.reportingUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"');
           csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ' : ' + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
           if (item.data.length > 0 && ppu.planBasedOn == 1) {
             csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + item.data[0].minMos + '"'))
@@ -264,12 +264,12 @@ class StockStatus extends Component {
           if (ppu.notes != null && ppu.notes != undefined && ppu.notes.length > 0) {
             csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + ppu.notes + '"'))
           }
-        }else{
+        } else {
           var programLabel = this.state.programId.map(ele => ele.label).toString();
           var reportingUnitList = this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport;
           var planningUnitLabel = reportingUnitList.map(ele => ele.label).toString();
           csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + programLabel) + '"')
-          csvRow.push('"' + ((this.state.viewById == 1?i18n.t('static.planningunit.planningunit'):i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + planningUnitLabel).replaceAll(' ', '%20') + '"');
+          csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + planningUnitLabel).replaceAll(' ', '%20') + '"');
         }
         csvRow.push("")
         const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
@@ -911,6 +911,14 @@ class StockStatus extends Component {
             this.state.programId.map((e, i) => {
               count += 1;
               reportingUnitList.map((r, j) => {
+                var viewBy = this.state.viewById;
+                var planningUnitId = "";
+                if (viewBy == 1) {
+                  planningUnitId = r.value;
+                } else {
+                  var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
+                  planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+                }
                 count += 1;
                 if (count > 10) {
                   count = 0;
@@ -928,7 +936,7 @@ class StockStatus extends Component {
                   data: filteredPlanningUnitData.map((item, index) => {
                     let count = 0;
                     (item.shipmentInfo.map((ele, index) => {
-                      ele.program.id == e.value && (this.state.viewById == 1 ? ele.planningUnit.id == r.value : ele.realmCountryPlanningUnit.id == r.value) ? count = count + Number(ele.shipmentQty) : count = count
+                      (ele.program.id == e.value && ele.planningUnit.id == planningUnitId) ? count = count + Number(ele.shipmentQty) : count = count
                     }))
                     return count
                   })
@@ -1988,6 +1996,14 @@ class StockStatus extends Component {
         this.state.programId.map((e, i) => {
           count += 1;
           reportingUnitList.map((r, j) => {
+            var viewBy = this.state.viewById;
+            var planningUnitId = "";
+            if (viewBy == 1) {
+              planningUnitId = r.value;
+            } else {
+              var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
+              planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+            }
             count += 1;
             if (count > 10) {
               count = 0;
@@ -2005,7 +2021,7 @@ class StockStatus extends Component {
               data: this.state.stockStatusList.map((item, index) => {
                 let count = 0;
                 (item.shipmentInfo.map((ele, index) => {
-                  ele.program.id == e.value && (this.state.viewById == 1 ? ele.planningUnit.id == r.value : ele.realmCountryPlanningUnit.id == r.value) ? count = count + Number(ele.shipmentQty) : count = count
+                  (ele.program.id == e.value && ele.planningUnit.id == planningUnitId) ? count = count + Number(ele.shipmentQty) : count = count
                 }))
                 return count
               })
