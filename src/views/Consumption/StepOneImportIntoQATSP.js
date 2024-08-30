@@ -967,6 +967,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
             return date
         }
         var formattedDate = addMonths(new Date(), -5);
+        console.log('at start');
+        console.log('forecastStartDate: ',forecastStartDate);
+        console.log('forecastStopDate: ',forecastStopDate);
+        console.log('monthsDiff: ',monthsDiff);
+
+        console.log('defaultForecastStartYear: ',defaultForecastStartYear);
+        console.log('defaultForecastStartMonth: ',defaultForecastStartMonth);
+        console.log('defaultForecastStopYear: ',defaultForecastStopYear);
+        console.log('defaultForecastStopMonth: ',defaultForecastStopMonth);
+        console.log('formattedDate: ',formattedDate);
         if ((new Date() > forecastStartDate && new Date() < forecastStopDate)) {
             isForecastAlreadyStarted = true;
             isForecastOver = false;
@@ -992,10 +1002,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
         }
         if (isWithinLast6Months) {
-            defaultForecastStartYear = "";
-            defaultForecastStartMonth = "";
-            defaultForecastStopYear = "";
-            defaultForecastStopMonth = "";
+            defaultForecastStartYear = formattedDate.getFullYear();
+            defaultForecastStartMonth = formattedDate.getMonth() + 1;
+            // defaultForecastStopYear = "";
+            // defaultForecastStopMonth = "";
             updatedForecastStartYear = formattedDate.getFullYear();
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
         }
@@ -1021,6 +1031,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartYear = forecastStartDate.getFullYear();
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
+
+        console.log('at end');
+        console.log('defaultForecastStartYear: ',defaultForecastStartYear);
+        console.log('defaultForecastStartMonth: ',defaultForecastStartMonth);
+        console.log('defaultForecastStopYear: ',defaultForecastStopYear);
+        console.log('defaultForecastStopMonth: ',defaultForecastStopMonth);
+        
+        console.log('isWithinLast6Months: ',isWithinLast6Months);
+        console.log('isForecastAlreadyStarted: ',isForecastAlreadyStarted);
+        console.log('isForecastOver: ',isForecastOver);
+        console.log('isFutureForecast: ',isFutureForecast);
         this.setState({
             toggleDoNotImport:false,
             versionId: event.target.value,
