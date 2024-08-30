@@ -2298,12 +2298,14 @@ class CompareAndSelectScenario extends Component {
                 }
             }
         }
+        console.log("val", val)
         this.setState({
             xAxisDisplayBy: displayBy,
             singleValue2: val,
             loading: false
         }, () => {
-            this.buildJexcel();
+            this.getData();
+            // this.buildJexcel();
             // this.expandCompressFuntion();
         })
     }
