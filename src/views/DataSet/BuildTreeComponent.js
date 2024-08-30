@@ -2743,7 +2743,7 @@ export default class BuildTree extends Component {
         }
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
-        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.map(x => x.level))];
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
         if(tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             copyModalParentLevelList = [];
             for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
@@ -2818,7 +2818,7 @@ export default class BuildTree extends Component {
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
-        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.map(x => x.level))];
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
         if(tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             copyModalParentLevelList = [];
             for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
