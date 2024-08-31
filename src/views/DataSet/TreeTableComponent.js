@@ -2109,7 +2109,7 @@ export default class TreeTable extends Component {
         var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
-            if (rowData[37] == 4) {
+            if (rowData[36] == 4) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2126,28 +2126,34 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 if (rowData[14] == 2) {
+                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                    var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                 }
-                if (rowData[22] == 1) {
+                if (rowData[21] == 1) {
+                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
                     var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                    var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                 }
+                var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
                 var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
@@ -2160,9 +2166,7 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AH").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-            } else if (rowData[37] == 5) {
+            } else if (rowData[36] == 5) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2181,6 +2185,10 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
                 var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
@@ -2189,13 +2197,13 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
+                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
                 var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
@@ -2212,8 +2220,6 @@ export default class TreeTable extends Component {
                 var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
-                cell.classList.add('readonly');
-                var cell = elInstance.getCell(("AH").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
             }
         }
