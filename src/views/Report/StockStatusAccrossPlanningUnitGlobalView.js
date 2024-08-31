@@ -644,9 +644,16 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
    * @param {array} programIds - The array of selected program IDs.
    */
   handleChangeProgram(programIds) {
-    programIds = programIds.sort(function (a, b) {
-      return parseInt(a.value) - parseInt(b.value);
+    // programIds = programIds.sort(function (a, b) {
+    //   return parseInt(a.value) - parseInt(b.value);
+    // });
+
+    programIds.sort((a, b) => {
+      var itemLabelA = a.label.toUpperCase();
+      var itemLabelB = b.label.toUpperCase();
+      return itemLabelA > itemLabelB ? 1 : -1;
     });
+
     this.setState(
       {
         programValues: programIds.map((ele) => ele),
@@ -771,9 +778,16 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
    * @param {Array} countrysId - An array containing the selected country IDs.
    */
   handleChange(countrysId) {
-    countrysId = countrysId.sort(function (a, b) {
-      return parseInt(a.value) - parseInt(b.value);
+    // countrysId = countrysId.sort(function (a, b) {
+    //   return parseInt(a.value) - parseInt(b.value);
+    // });
+
+    countrysId.sort((a, b) => {
+      var itemLabelA = a.label.toUpperCase();
+      var itemLabelB = b.label.toUpperCase();
+      return itemLabelA > itemLabelB ? 1 : -1;
     });
+
     this.setState(
       {
         countryValues: countrysId.map((ele) => ele),
