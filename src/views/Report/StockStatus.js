@@ -133,6 +133,11 @@ class StockStatus extends Component {
   programChange(event) {
     this.setState({
       programId: event.map(ele => ele),
+      planningUnitList: [],
+      realmCountryPlanningUnitList: [],
+      planningUnitId: [],
+      realmCountryPlanningUnitId: [],
+      stockStatusList: []
       // planningUnits: [],
       // planningUnitsMulti: [],
       // planningUnitLabel: "",
@@ -817,7 +822,7 @@ class StockStatus extends Component {
               yAxisID: 'A',
               type: 'line',
               stack: 7,
-              data: filteredPlanningUnitData.map((item, index) => (item.actualConsumptionQty)),
+              data: filteredPlanningUnitData.map((item, index) => (item.actualConsumption ? item.finalConsumptionQty : null)),
               fill: false,
               borderColor: 'rgb(75, 192, 192)',
               tension: 0.1,
@@ -907,7 +912,7 @@ class StockStatus extends Component {
             var reportingUnitList = this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport;
             graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
             var count = 0;
-            var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+            var colourArray = ["#002f6c", "#49A4A1", "#0067B9", "#A7C6ED", "#20a8d8", "#212721", "#d1e3f5", "#4dbd74", "#f86c6b"]
             this.state.programId.map((e, i) => {
               count += 1;
               reportingUnitList.map((r, j) => {
@@ -920,12 +925,12 @@ class StockStatus extends Component {
                   planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
                 }
                 count += 1;
-                if (count > 10) {
+                if (count > 9) {
                   count = 0;
                 }
                 datasets.push({
                   label: e.label + " - " + r.label,
-                  yAxisID: 'A',
+                  yAxisID: 'C',
                   stack: 1,
                   backgroundColor: colourArray[count],
                   borderColor: colourArray[count],
@@ -1031,6 +1036,37 @@ class StockStatus extends Component {
               yAxes: [{
                 id: 'A',
                 position: 'left',
+                // stacked: true,
+                scaleLabel: {
+                  labelString: i18n.t('static.shipment.qty'),
+                  display: true,
+                  fontSize: "12",
+                  fontColor: 'black'
+                },
+                stacked: true,
+                ticks: {
+                  beginAtZero: true,
+                  fontColor: 'black',
+                  callback: function (value) {
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+                  }
+                }, gridLines: {
+                  color: 'rgba(171,171,171,1)',
+                  lineWidth: 0
+                }
+              },
+              {
+                id: 'C',
+                position: 'left',
                 stacked: true,
                 scaleLabel: {
                   labelString: i18n.t('static.shipment.qty'),
@@ -1058,7 +1094,8 @@ class StockStatus extends Component {
                   color: 'rgba(171,171,171,1)',
                   lineWidth: 0
                 }
-              }, {
+              }
+              , {
                 id: 'B',
                 position: 'right',
                 scaleLabel: {
@@ -1095,7 +1132,7 @@ class StockStatus extends Component {
                   fontStyle: "normal",
                   fontSize: "12"
                 },
-                stacked: true,
+                // stacked: true,
                 ticks: {
                   fontColor: 'black',
                   fontStyle: "normal",
@@ -1333,6 +1370,66 @@ class StockStatus extends Component {
           this.fetchData();
         })
       }
+    }
+  }
+  /**
+    * Sets the planning unit based on the provided event data.
+    * @param {Object} e - Event data containing planning unit information.
+    */
+  setPlanningUnitSingle(e) {
+    var planningUnitId = e.target.value;
+    if (planningUnitId != "") {
+      var planningUnitLabel = document.getElementById("planningUnitId").selectedOptions[0].text.toString()
+      var planningUnit = [{
+        value: planningUnitId,
+        label: planningUnitLabel
+      }]
+      this.setState({
+        planningUnitId: planningUnit,
+        planningUnitIdExport: planningUnit,
+        show: false,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false
+      }, () => {
+        // document.getElementById("consumptionAdjusted").checked = false;
+        this.fetchData();
+      })
+    } else {
+      this.setState({
+        planningUnitId: [],
+        stockStatusList: []
+      })
+    }
+  }
+  /**
+    * Sets the planning unit based on the provided event data.
+    * @param {Object} e - Event data containing planning unit information.
+    */
+  setRealmCountryPlanningUnitSingle(e) {
+    var realmCountryPlanningUnitId = e.target.value;
+    if (realmCountryPlanningUnitId != "") {
+      var realmCountryPlanningUnitLabel = document.getElementById("realmCountryPlanningUnitId").selectedOptions[0].text.toString()
+      var realmCountryPlanningUnit = [{
+        value: realmCountryPlanningUnitId,
+        label: realmCountryPlanningUnitLabel
+      }]
+      this.setState({
+        realmCountryPlanningUnitId: realmCountryPlanningUnit,
+        realmCountryPlanningUnitIdExport: realmCountryPlanningUnit,
+        show: false,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false
+      }, () => {
+        // document.getElementById("consumptionAdjusted").checked = false;
+        this.fetchData();
+      })
+    } else {
+      this.setState({
+        realmCountryPlanningUnitId: [],
+        stockStatusList: []
+      })
     }
   }
   setPlanningUnitExport(e) {
@@ -1593,6 +1690,7 @@ class StockStatus extends Component {
     }, this);
     var reportingUnitList = (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId);
     var graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
+    console.log("this.state.stockStatusList Test@123",this.state.stockStatusList)
     const options = {
       title: {
         display: true,
@@ -1601,6 +1699,36 @@ class StockStatus extends Component {
       scales: {
         yAxes: [{
           id: 'A',
+          position: 'left',
+          // stacked: true,
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        },
+        {
+          id: 'C',
           position: 'left',
           stacked: true,
           scaleLabel: {
@@ -1628,7 +1756,8 @@ class StockStatus extends Component {
             color: 'rgba(171,171,171,1)',
             lineWidth: 0
           }
-        }, {
+        }
+        , {
           id: 'B',
           position: 'right',
           scaleLabel: {
@@ -1720,6 +1849,36 @@ class StockStatus extends Component {
         yAxes: [{
           id: 'A',
           position: 'left',
+          // stacked: true,
+          scaleLabel: {
+            labelString: i18n.t('static.shipment.qty'),
+            display: true,
+            fontSize: "12",
+            fontColor: 'black'
+          },
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'black',
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          }, gridLines: {
+            color: 'rgba(171,171,171,1)',
+            lineWidth: 0
+          }
+        },
+        {
+          id: 'C',
+          position: 'left',
           stacked: true,
           scaleLabel: {
             labelString: i18n.t('static.shipment.qty'),
@@ -1746,7 +1905,8 @@ class StockStatus extends Component {
             color: 'rgba(171,171,171,1)',
             lineWidth: 0
           }
-        }],
+        }
+      ],
         xAxes: [{
           scaleLabel: {
             display: true,
@@ -1755,7 +1915,6 @@ class StockStatus extends Component {
             fontStyle: "normal",
             fontSize: "12"
           },
-          stacked: true,
           ticks: {
             fontColor: 'black',
             fontStyle: "normal",
@@ -1844,7 +2003,7 @@ class StockStatus extends Component {
         yAxisID: 'A',
         type: 'line',
         stack: 7,
-        data: this.state.stockStatusList.map((item, index) => (item.actualConsumptionQty)),
+        data: this.state.stockStatusList.map((item, index) => (item.actualConsumption ? item.finalConsumptionQty : null)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
@@ -1852,7 +2011,8 @@ class StockStatus extends Component {
         pointStyle: 'point',
         pointBackgroundColor: '#ba0c2f',
         pointBorderColor: '#ba0c2f',
-        pointRadius: 3
+        pointRadius: 3,
+        yValueFormatString: "$#,##0",
       },
       {
         label: i18n.t('static.report.stock'),
@@ -1992,7 +2152,7 @@ class StockStatus extends Component {
         });
       } else {
         var count = 0;
-        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+        var colourArray = ["#002f6c", "#49A4A1", "#0067B9", "#A7C6ED", "#20a8d8", "#212721", "#d1e3f5", "#4dbd74", "#f86c6b"]
         this.state.programId.map((e, i) => {
           count += 1;
           reportingUnitList.map((r, j) => {
@@ -2005,12 +2165,12 @@ class StockStatus extends Component {
               planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
             }
             count += 1;
-            if (count > 10) {
+            if (count > 9) {
               count = 0;
             }
             datasets.push({
               label: e.label + " - " + r.label,
-              yAxisID: 'A',
+              yAxisID: 'C',
               stack: 1,
               backgroundColor: colourArray[count],
               borderColor: colourArray[count],
@@ -2106,6 +2266,7 @@ class StockStatus extends Component {
                             id="programId"
                             bsSize="sm"
                             options={programList.length > 0 ? programList : []}
+                            filterOptions={filterOptions}
                             value={this.state.programId}
                             onChange={(e) => { this.programChange(e); }}
                             labelledBy={i18n.t('static.common.select')}
@@ -2171,28 +2332,71 @@ class StockStatus extends Component {
                         </FormGroup>
                         <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none" }}>
                           <div className="controls">
-                            <MultiSelect
+                            {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
                               name="realmCountryPlanningUnitId"
                               id="realmCountryPlanningUnitId"
+                              filterOptions={filterOptions}
                               value={this.state.realmCountryPlanningUnitId}
                               onChange={(e) => { this.setRealmCountryPlanningUnit(e); }}
                               options={rcpuList && rcpuList.length > 0 ? rcpuList : []}
                               hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
-                            />
+                            />}
+                            {this.state.yaxisEquUnit == -1 && <InputGroup>
+                              <Input
+                                type="select"
+                                name="realmCountryPlanningUnitId"
+                                id="realmCountryPlanningUnitId"
+                                value={this.state.realmCountryPlanningUnitId.length > 0 ? this.state.realmCountryPlanningUnitId[0].value : ""}
+                                onChange={(e) => { this.setRealmCountryPlanningUnitSingle(e); }}
+                                bsSize="sm"
+                              >
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {rcpuList.length > 0
+                                  && rcpuList.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.value}>
+                                        {item.label}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup>}
                           </div>
                         </FormGroup>
                         <FormGroup id="planningUnitDiv">
                           <div className="controls">
-                            <MultiSelect
+                            {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
                               name="planningUnitId"
                               id="planningUnitId"
+                              filterOptions={filterOptions}
                               value={this.state.planningUnitId}
                               onChange={(e) => { this.setPlanningUnit(e); }}
                               options={puList && puList.length > 0 ? puList : []}
                               hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
-                            />
+                              showCheckboxes={this.state.yaxisEquUnit == -1 ? false : true}
+                            />}
+                            {this.state.yaxisEquUnit == -1 && <InputGroup>
+                              <Input
+                                type="select"
+                                name="planningUnitId"
+                                id="planningUnitId"
+                                value={this.state.planningUnitId.length > 0 ? this.state.planningUnitId[0].value : ""}
+                                onChange={(e) => { this.setPlanningUnitSingle(e); }}
+                                bsSize="sm"
+                              >
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {puList.length > 0
+                                  && puList.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.value}>
+                                        {item.label}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup>}
                           </div>
                         </FormGroup>
                       </FormGroup>
@@ -2406,6 +2610,7 @@ class StockStatus extends Component {
                           bsSize="sm"
                           name="planningUnitIdExport"
                           id="planningUnitIdExport"
+                          filterOptions={filterOptions}
                           value={this.state.planningUnitIdExport}
                           onChange={(e) => { this.setPlanningUnitExport(e); }}
                           options={puList && puList.length > 0 ? puList : []}
@@ -2418,6 +2623,7 @@ class StockStatus extends Component {
                           name="realmCountryPlanningUnitIdExport"
                           id="realmCountryPlanningUnitIdExport"
                           value={this.state.realmCountryPlanningUnitIdExport}
+                          filterOptions={filterOptions}
                           onChange={(e) => { this.setRealmCountryPlanningUnitExport(e); }}
                           options={rcpuList && rcpuList.length > 0 ? rcpuList : []}
                         />
