@@ -2225,6 +2225,17 @@ export default class TreeTable extends Component {
         if (x == 6) {
             this.el.setValueFromCoords(8, y, this.el.getValueFromCoords(6, y) * (this.el.getValueFromCoords(7, y) / 100), true);
         }
+        let nodeId = this.el.getValueFromCoords(11, y);
+        var currentItem = this.state.items.filter(ele => ele.id == nodeId)[0];
+        var currentItemParent = this.state.items.filter(ele => ele.id == currentItem.parent).length > 0 ? this.state.items.filter(ele => ele.id == currentItem.parent)[0] : "";
+        if (x == 5) {
+            let tempMonth = new Date(value);
+            this.el.setValueFromCoords(5, y, tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01", true);
+            if (this.el.getValueFromCoords(10, y) != 2) {
+                this.el.setValueFromCoords(7, y, currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(5, y)).format("YYYY-MM-DD")).length > 0 ? currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(5, y)).format("YYYY-MM-DD"))[0].calculatedValue : 0, true);
+                this.el.setValueFromCoords(8, y, this.el.getValueFromCoords(7, y) * (this.el.getValueFromCoords(6, y) / 100), true);
+            }
+        }
         this.setState({
             isTabDataChanged: true
         })
@@ -2242,7 +2253,7 @@ export default class TreeTable extends Component {
         var currentItemParent = this.state.items.filter(ele => ele.id == currentItem.parent).length > 0 ? this.state.items.filter(ele => ele.id == currentItem.parent)[0] : "";
         if (x == 4) {
             let tempMonth = new Date(value);
-            this.el.setValueFromCoords(4, y, tempMonth.getFullYear()+"-"+(tempMonth.getMonth()+1)+"-01", true);
+            this.el.setValueFromCoords(4, y, tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01", true);
             this.el.setValueFromCoords(6, y, currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD")).length > 0 ? this.el.getValueFromCoords(36, y) == 4 ? currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD"))[0].calculatedValue : currentItemParent.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(this.el.getValueFromCoords(4, y)).format("YYYY-MM-DD"))[0].calculatedMmdValue : 0, true);
             this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y) * (this.el.getValueFromCoords(5, y) / 100), true);
         }
@@ -2457,7 +2468,13 @@ export default class TreeTable extends Component {
             var level = items[i].level;
             var numberNode = items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2 ? false : true;
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
-
+            var aggregationNodeValue = "0";
+            if (items[i].payload.nodeType.id == 1) {
+                var aggregationNodeValueFilter = currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(currentScenario.month).format("YYYY-MM"));
+                if (aggregationNodeValueFilter.length > 0) {
+                    aggregationNodeValue = aggregationNodeValueFilter[0].calculatedValue;
+                }
+            }
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
                         ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
@@ -2478,7 +2495,7 @@ export default class TreeTable extends Component {
             data[5] = moment(currentScenario.month).format("YYYY-MM-DD");
             data[6] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : currentScenario.dataValue == "" ? 0 : currentScenario.dataValue;
             data[7] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]) == "" ? 0 : this.calculateParentValueFromMOMForJexcel(currentScenario.month, items[i]);
-            data[8] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : addCommasNodeValue(currentScenario.dataValue);
+            data[8] = numberNode ? currentScenario.calculatedDataValue == 0 ? "0" : addCommasNodeValue(currentScenario.calculatedDataValue) : items[i].payload.nodeType.id == 1 ? addCommasNodeValue(aggregationNodeValue) : addCommasNodeValue(currentScenario.dataValue);
             data[9] = currentScenario.notes;
             data[10] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
             data[11] = items[i].id;
@@ -2657,7 +2674,7 @@ export default class TreeTable extends Component {
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
                             let tempMonth = new Date(json[i][5]);
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear()+"-"+(tempMonth.getMonth()+1)+"-01";
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
                             if (json[i][10] == 3) {
                                 var value = json[i][6];
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
@@ -2752,7 +2769,7 @@ export default class TreeTable extends Component {
                             // curItem.context.payload.nodeUnit.id = json[i][4];
                             curItem.context.payload.label.label_en = json[i][3];
                             let tempMonth = new Date(json[i][4]);
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear()+"-"+(tempMonth.getMonth()+1)+"-01";
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
                             if (json[i][36] == 4) {
@@ -2769,7 +2786,7 @@ export default class TreeTable extends Component {
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod = {};
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = parseInt(json[i][23]);
                                 }
-                                if (json[i][14] == 1){
+                                if (json[i][14] == 1) {
                                     (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = json[i][21] == 0 ? "false" : "true";
                                 }
                                 if (json[i][14] == 1 && json[i][21] == 0) {
@@ -3107,7 +3124,7 @@ export default class TreeTable extends Component {
             data[12] = !fuNode ? this.qatCalculatedPUPerVisitForJexcel(items[i]) : ""; // # PU / Interval / Patient (Reference)
             data[13] = fuNode ? "" : currentScenario.puNode.puPerVisit; // # PU / Interval / Patient
             data[14] = fuNode ? currentScenario.fuNode.usageType.id : ""; // Type of Use
-            data[15] = fuNode ? (currentScenario.fuNode.usageType.id == 1 && currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (currentScenario.fuNode.oneTimeDispensing != undefined && currentScenario.fuNode.oneTimeDispensing != null && currentScenario.fuNode.oneTimeDispensing.toString() != "" ? currentScenario.fuNode.oneTimeDispensing.toString() == "false" ? 0 : 1 : 1) : "") : ""; // One Time Dispensing
+            data[15] = fuNode ? (currentScenario.fuNode.usageType.id == 1 && currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (currentScenario.fuNode.oneTimeDispensing != undefined && currentScenario.fuNode.oneTimeDispensing != null && currentScenario.fuNode.oneTimeDispensing.toString() != "" ? currentScenario.fuNode.oneTimeDispensing.toString() == "false" ? 0 : 1 : 1) : 0) : ""; // One Time Dispensing
             data[16] = fuNode ? currentScenario.fuNode.lagInMonths : ""; // Lag in months
             data[17] = fuNode ? currentScenario.fuNode.noOfPersons : ""; // Every
             data[18] = fuNode ? items[i].payload.nodeUnit.id : ""//items[i].parentItem.payload.nodeUnit.id : ""; // Unit nodeUnitListPlural
@@ -3250,7 +3267,7 @@ export default class TreeTable extends Component {
                     source: this.state.unitListForDropdown,
                     type: 'dropdown',
                 },
-                 {//w
+                {//w
                     title: 'Single Use',
                     source: this.state.booleanForDropdown,
                     type: 'dropdown',
@@ -3385,6 +3402,8 @@ export default class TreeTable extends Component {
                         cell.classList.add('readonly');
                         var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
                         cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
                     }
                     if (rowData[20] == 1) {
                         var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
@@ -3394,6 +3413,8 @@ export default class TreeTable extends Component {
                         var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
                         cell.classList.add('readonly');
                         var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
                         cell.classList.add('readonly');
                     }
                     var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
@@ -3428,6 +3449,8 @@ export default class TreeTable extends Component {
                     var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
@@ -4159,7 +4182,7 @@ export default class TreeTable extends Component {
             if (usageTypeId == 1) {
                 oneTimeUsage = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
             }
-        } else {
+        } else if (nodeTypeId == 4) {
             usageTypeId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
             if (usageTypeId == 1) {
                 oneTimeUsage = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
@@ -5808,7 +5831,7 @@ export default class TreeTable extends Component {
         }
         return <div className="">
             <Prompt
-                when={this.state.isTabDataChanged == true }
+                when={this.state.isTabDataChanged == true}
                 message={i18n.t("static.dataentry.confirmmsg")}
             />
             <AuthenticationServiceComponent history={this.props.history} />
@@ -5822,7 +5845,7 @@ export default class TreeTable extends Component {
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{i18n.t('static.listTree.manageTreeTreeList')}</small></span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> {i18n.t('static.tree.or')} <a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`}  className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> {i18n.t('static.tree.or')} <a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
                             </div>
                         </div>
                         <div className="row pt-lg-0 pr-lg-4">
