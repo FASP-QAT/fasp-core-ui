@@ -9414,11 +9414,11 @@ legend.scheduler-border {
   color: #BA0C2F;
 }
 
-.jss>thead>tr>.arrow-down:not(.AsteriskTheadtrTd)::after {
+.jss>thead>tr>.arrow-down:not(.AsteriskTheadtrTd,.InfoTr)::after {
   content: "" !important;
 }
 
-.jss>thead>tr>.arrow-up:not(.AsteriskTheadtrTd)::after {
+.jss>thead>tr>.arrow-up:not(.AsteriskTheadtrTd,.InfoTr)::after {
   content: "" !important;
 }
 
