@@ -12013,7 +12013,7 @@ export default class BuildTree extends Component {
                                                                 {treeList}
                                                             </Input>
                                                             <InputGroupAddon addonType="append" onClick={this.toggleCollapse}>
-                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-cog icons Iconinvert" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                     </FormGroup>

@@ -1232,8 +1232,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               <thead>
                                 <tr>
                                   <th
-                                    className="text-center Firstcolum1"
-                                    style={{ width: "27%",left:"0" }}
+                                    className="text-center Firstcolum1SSAPUGV" 
                                   >
                                     {i18n.t("static.planningunit.planningunit")}
                                   </th>

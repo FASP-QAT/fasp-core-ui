@@ -74,6 +74,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     super(props);
     var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
     this.state = {
+      isDarkMode:false,
       datasetList: [],
       datasetId: "",
       showInPlanningUnit: false,
@@ -1532,6 +1533,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Calls getDatasetList function on component mount
    */
   componentDidMount() {
+    // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
+
     hideSecondComponent();
     this.getDatasetList();
   }
@@ -2376,37 +2392,48 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </option>
         )
       }, this);
+
+      const { isDarkMode } = this.state;
+const colourArray = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
     var chartOptions = {
       title: {
         display: true,
-        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : ""
+        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
+        fontColor:fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
-            fontColor: 'black'
+            fontColor:fontColor
           },
           stacked: true,
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor:fontColor,
             callback: function (value) {
               return value.toLocaleString();
             }
           },
           gridLines: {
-            drawBorder: true, lineWidth: 0
+            drawBorder: true, lineWidth: 0,
+            color: gridLineColor,
+    zeroLineColor: gridLineColor 
           },
           position: 'left',
         }],
         xAxes: [{
           ticks: {
-            fontColor: 'black'
+            fontColor:fontColor,
           },
           gridLines: {
-            drawBorder: true, lineWidth: 0
+            drawBorder: true, lineWidth: 0,
+            color: gridLineColor,
+    zeroLineColor: gridLineColor 
           },
         }]
       },
@@ -2436,13 +2463,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor:fontColor
         }
       }
     }
     let bar = {}
     var datasetListForGraph = [];
-    var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+    const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#fff1f1"]
+  
+  const lightModeColors = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+  
+    // var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
     if (this.state.showDetailTable) {
       var elInstance = this.state.dataEl;
       if (elInstance != undefined) {
