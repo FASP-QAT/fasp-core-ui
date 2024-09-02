@@ -1377,6 +1377,22 @@ a {
   background-color: #e4e5e6;
   color: #212721;
 }
+.TreeTable .jss > tbody > tr:nth-child(odd) > td:nth-child(5) {
+  width: 120px !important;
+  min-width: 120px;
+  left: 220px !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  background: transparent !important; 
+}
+.TreeTable .jss > tbody > tr:nth-child(even) > td:nth-child(5) {
+  width: 120px !important;
+  min-width: 120px;
+  left: 220px !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  background: transparent !important;
+}
 // .month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
 //   background-color: #d3d3d3;
 //   color: #000;

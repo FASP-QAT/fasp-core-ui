@@ -1339,11 +1339,13 @@ export default class SupplyPlanComponent extends React.Component {
             }, this);
 
             const darkModeColors = [
-                '#d4bbff',      
+                '#d4bbff', 
+                '#fff1f1' ,   
             ];
             
             const lightModeColors = [
-                '#002F6C',  // Color 1    
+                '#002F6C',  // Color 1 
+                '#212721',   
             ];
             const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -1640,6 +1642,7 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
+                    backgroundColor: colors[1],
                     borderColor: '#cfcdc9',
                     borderStyle: 'dotted',
                     ticks: {

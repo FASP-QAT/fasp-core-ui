@@ -5104,7 +5104,7 @@ export default class WhatIfReportComponent extends React.Component {
                     type: 'line',
                     yAxisID: 'A',
                     backgroundColor: colors[1],
-                    borderColor: '#cfcdc9',
+                    borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
