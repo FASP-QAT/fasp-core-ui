@@ -4974,7 +4974,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <div className="col-md-10 pt-4 pb-3">
                                                             {this.state.showData && <ul className="legendcommitversion">
                                                                 <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.common.forecastPeriod')}{" "}<b>{"("}{i18n.t('static.supplyPlan.forecastedConsumption')}{")"}</b></i></span></li>
-                                                                <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
+                                                                <li><span className="legendcolor text-blackDBg"></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                                             </ul>}
                                                         </div>
                                                         <div className="row  mt-lg-3 mb-lg-3">

@@ -12151,7 +12151,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
+                                <div className="pt-lg-2 pl-lg-0"><i className='text-blackD'>{i18n.t('static.tree.tableDisplays')} <b>{
                                     this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                         this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
                                             this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
@@ -13191,7 +13191,7 @@ export default class BuildTree extends Component {
                                                                 {treeList}
                                                             </Input>
                                                             <InputGroupAddon addonType="append" onClick={this.toggleCollapse}>
-                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-cog icons Iconinvert" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                     </FormGroup>

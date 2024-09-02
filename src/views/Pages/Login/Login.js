@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Button, ButtonDropdown, CardBody, CardGroup, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
+// import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
 import image3 from '../../../assets/img/PEPFAR-logo.png';
 import imageHelp from '../../../assets/img/help-icon-login.png';
@@ -290,7 +290,8 @@ class Login extends Component {
   render() {
     return (
       <div className="main-content flex-row align-items-center bg-height">
-        <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
+        {/* <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}> */}
+        <div className="Login-component InnerBgImg" >
           <Container className="container-login">
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
@@ -456,7 +457,7 @@ class Login extends Component {
                           }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
                               <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
-                              <h5 id="div2" style={{color:"#000"}}>{i18n.t(this.state.message)}</h5>
+                              <h5 id="div2" className='Colorchangetheme'>{i18n.t(this.state.message)}</h5>
                               <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
                               <InputGroup className="mb-3">
                                 <InputGroupAddon addonType="prepend">
@@ -511,18 +512,18 @@ class Login extends Component {
                                     onChange={(e) => { this.dataChangeCheckbox(e) }}
                                   />
                                   <Label
-                                    className="form-check-label ml-2 darkModeclrblack"
+                                    className="form-check-label ml-2 darkModeclrblack darkModeclrblack1"
                                     check htmlFor="inline-radio2">
                                     <b>{i18n.t('static.login.loginOnline')}</b>
                                   </Label>
                                 </InputGroup>
                               </Row>}
                               <Row>
-                                <Col xs="6">
-                                  <Button type="submit" color="primary" className="px-4" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                <Col xs="6" className='DarkMode'>
+                                  <Button type="submit" color="primary" className="px-4 btn-primary" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                 </Col>
-                                <Col xs="6" className="text-right">
-                                  <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
+                                <Col xs="6" className="text-right DarkMode">
+                                  <Button type="button" color="link" className="px-0 btn-link" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
                                 </Col>
                               </Row>
                             </Form>
@@ -551,7 +552,7 @@ class Login extends Component {
                     commodities to save lives and create a healthier future for all. The project purchases
                     and delivers health commodities, offers comprehensive technical assistance to strengthen
                     national supply chain systems, and provides global supply chain leadership. For more
-                    information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
+                    information, visit <a className='DarkModeTexta' href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
                     official U.S. government information and does not represent the views or positions of the
                     Agency for International Development or the U.S. government.
                   </p>

@@ -855,7 +855,7 @@ const chartoptions =
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon" style={{ "marginBottom": "13px", "marginTop": "7px" }}>
-                        <span className="pl-0 pb-lg-2">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
+                        <span className="pl-0 pb-lg-2 text-blackD">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a className="card-header-action">

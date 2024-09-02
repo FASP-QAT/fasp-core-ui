@@ -1282,11 +1282,12 @@ const options = {
         //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
         //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         // ]
+        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
         var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (roundN(ele.mos) > 48 ? 48 : ele.mos != null ? roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (dateFormatterLanguage(ele.dt)))))
         const bar = {
             labels: dts,
-            datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor[index] }))
+            datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor1[index] }))
         }
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
