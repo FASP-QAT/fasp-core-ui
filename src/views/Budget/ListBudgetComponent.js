@@ -213,7 +213,7 @@ class ListBudgetComponent extends Component {
       data[10] = (budgetList[j].stopDate ? moment(budgetList[j].stopDate).format(`YYYY-MM-DD HH:mm:ss`) : null);
       data[11] = budgetList[j].lastModifiedBy.username;
       data[12] = (budgetList[j].lastModifiedDate ? moment(budgetList[j].lastModifiedDate).format(`YYYY-MM-DD HH:mm:ss`) : null)
-      data[13] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'));
+      data[13] = (budgetList[j].active ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive'));
       data[14] = budgetList[j].budgetAmt;
       data[15] = budgetList[j].usedUsdAmt;
       data[16] = budgetList[j].stopDate;
@@ -582,7 +582,7 @@ class ListBudgetComponent extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
+    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.filter(c=>this.state.programId==0 || this.state.programId==-1?1==1:[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId))).map((item, i) => {
       return (
         <option key={i} value={item.fundingSourceId}>
           {getLabelText(item.label, this.state.lang)}
@@ -691,7 +691,7 @@ class ListBudgetComponent extends Component {
                       >
                         <option value="">{i18n.t('static.common.all')}</option>
                         <option value="true" selected>{i18n.t('static.common.active')}</option>
-                        <option value="false">{i18n.t('static.common.disabled')}</option>
+                        <option value="false">{i18n.t('static.dataentry.inactive')}</option>
                       </Input>
                     </InputGroup>
                   </div>

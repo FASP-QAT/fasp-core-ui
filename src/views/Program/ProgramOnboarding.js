@@ -79,6 +79,8 @@ export default class ProgramOnboarding extends Component {
                 programNotes: '',
                 regionArray: [],
                 healthAreaArray: [],
+                procurementAgents:[],
+                fundingSources:[],
                 programPlanningUnits: [],
                 programTypeId: 1
             },
@@ -102,6 +104,8 @@ export default class ProgramOnboarding extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
+        this.updateFieldDataProcurementAgent = this.updateFieldDataProcurementAgent.bind(this);
+        this.updateFieldDataFundingSource = this.updateFieldDataFundingSource.bind(this);
         this.finishedStepOne = this.finishedStepOne.bind(this);
         this.finishedStepTwo = this.finishedStepTwo.bind(this);
         this.finishedStepThree = this.finishedStepThree.bind(this);
@@ -631,6 +635,32 @@ export default class ProgramOnboarding extends Component {
         this.setState({ program: program });
     }
     /**
+     * Handles the change event for  procurment agents.
+     * @param {Array} event - An array containing the selected procurement agent IDs.
+     */    
+    updateFieldDataProcurementAgent(value) {
+        let { program } = this.state;
+        var paArray = [];
+        for (var i = 0; i < value.length; i++) {
+            paArray[i] = value[i].value;
+        }
+        program.procurementAgents = paArray;
+        this.setState({ program: program });
+    }
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} event - An array containing the selected funding source Ids.
+     */    
+    updateFieldDataFundingSource(value) {
+        let { program } = this.state;
+        var fsArray = [];
+        for (var i = 0; i < value.length; i++) {
+            fsArray[i] = value[i].value;
+        }
+        program.fundingSources = fsArray;
+        this.setState({ program: program });
+    }
+    /**
      * Renders the program onboarding screen.
      * @returns {JSX.Element} - Program onboarding screen.
      */
@@ -741,7 +771,7 @@ export default class ProgramOnboarding extends Component {
                                         <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
                                     </div>
                                     <div id="stepSix">
-                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>
+                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state} updateFieldDataProcurementAgent={this.updateFieldDataProcurementAgent} updateFieldDataFundingSource={this.updateFieldDataFundingSource}></StepSix>
                                     </div>
                                     <div id="stepSeven">
                                         <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>

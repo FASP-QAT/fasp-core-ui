@@ -2,13 +2,12 @@ import jexcel from 'jspreadsheet';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { Search } from 'react-bootstrap-table2-toolkit';
-import { Button, Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
+import { Button, Card, CardBody, Col, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
-import ForecastingUnitService from '../../api/ForecastingUnitService';
+import { API_URL, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductService from '../../api/ProductService';
 import RealmService from '../../api/RealmService';
@@ -16,7 +15,11 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import csvicon from '../../assets/img/csv.png';
+import DropdownService from '../../api/DropdownService';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 // Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
 /**
@@ -26,7 +29,6 @@ export default class PlanningUnitListComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            forecastingUnits: [],
             planningUnitList: [],
             tracerCategories: [],
             productCategories: [],
@@ -35,13 +37,24 @@ export default class PlanningUnitListComponent extends Component {
             realmId: '',
             realms: [],
             loading: true,
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            exportModal: false,
+            loadingModal: false,
+            autocompleteData: [],
+            searchedValue: '',
+            autocompleteDataExport: [],
+            searchedValueExport: '',
+            autocompleteError: true,
+            forecastingUnitId:'',
+            forecastingUnitAutocompelete:null,
+            forecastingUnitExportAutocompelete:null,
         }
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
         this.dataChangeForRealm = this.dataChangeForRealm.bind(this);
+        this.dataChange = this.dataChange.bind(this)
     }
     /**
      * Clears the timeout when the component is unmounted.
@@ -54,41 +67,64 @@ export default class PlanningUnitListComponent extends Component {
      * Updates the state with the filtered forecasting units and planning units.
      */
     filterData() {
-        var forecastingUnitList = this.state.forecastingUnitListAll;
         var tracerCategoryId = document.getElementById("tracerCategoryId").value;
         var productCategoryId = document.getElementById("productCategoryId").value;
-        var pc = this.state.productCategoryListAll.filter(c => c.payload.productCategoryId == productCategoryId)[0]
-        var pcList = this.state.productCategoryListAll.filter(c => c.payload.productCategoryId == pc.payload.productCategoryId || c.parentId == pc.id);
-        var pcIdArray = [];
-        for (var pcu = 0; pcu < pcList.length; pcu++) {
-            pcIdArray.push(pcList[pcu].payload.productCategoryId);
-        }
-        if (tracerCategoryId != 0) {
-            forecastingUnitList = forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId);
-        }
-        if (productCategoryId != 0) {
-            forecastingUnitList = forecastingUnitList.filter(c => pcIdArray.includes(c.productCategory.id));
-        }
+        let forecastingUnitId = this.state.forecastingUnitId == "" ? null : this.state.forecastingUnitId;
         this.setState({
-            forecastingUnits: forecastingUnitList
+            loading: true
         })
-        let forecastingUnitId = document.getElementById("forecastingUnitId").value;
-        var planningUnitList = this.state.planningUnitList;
-        if (forecastingUnitId != 0) {
-            planningUnitList = planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId);
+        var json = {
+            productCategorySortOrder: productCategoryId,
+            tracerCategoryId: tracerCategoryId,
+            forecastingUnitId: forecastingUnitId
         }
-        if (tracerCategoryId != 0) {
-            planningUnitList = planningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
-        }
-        if (productCategoryId != 0) {
-            planningUnitList = planningUnitList.filter(c => pcIdArray.includes(c.forecastingUnit.productCategory.id));
-        }
-        const selSource = planningUnitList
-        this.setState({
-            selSource
-        }, () => {
-            this.buildJExcel();
-        });
+        PlanningUnitService.getPlanningUnitByTracerCategoryProductCategoryAndForecastingUnit(json).then(response => {
+            this.setState({
+                planningUnitList: response.data,
+                selSource: response.data,
+                loading: false
+            }, () => {
+                this.buildJExcel();
+            });
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
     }
     /**
      * Event handler for when the realm selection changes.
@@ -130,112 +166,9 @@ export default class PlanningUnitListComponent extends Component {
                                 });
                                 this.setState({
                                     tracerCategories: listArray,
-                                    tracerCategoryListAll: listArray
+                                    tracerCategoryListAll: listArray,
+                                    loading: false
                                 })
-                                ForecastingUnitService.getForcastingUnitByRealmId(realmId)
-                                    .then(response => {
-                                        if (response.status == 200) {
-                                            var listArray = response.data;
-                                            listArray.sort((a, b) => {
-                                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                                                return itemLabelA > itemLabelB ? 1 : -1;
-                                            });
-                                            PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
-                                                this.setState({
-                                                    planningUnitList: response.data,
-                                                    selSource: response.data,
-                                                    forecastingUnits: listArray,
-                                                    forecastingUnitListAll: listArray,
-                                                }, () => {
-                                                    this.buildJExcel();
-                                                });
-                                            }).catch(
-                                                error => {
-                                                    if (error.message === "Network Error") {
-                                                        this.setState({
-                                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                            loading: false
-                                                        });
-                                                    } else {
-                                                        switch (error.response ? error.response.status : "") {
-                                                            case 401:
-                                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                                break;
-                                                            case 403:
-                                                                this.props.history.push(`/accessDenied`)
-                                                                break;
-                                                            case 500:
-                                                            case 404:
-                                                            case 406:
-                                                                this.setState({
-                                                                    message: error.response.data.messageCode,
-                                                                    loading: false
-                                                                });
-                                                                break;
-                                                            case 412:
-                                                                this.setState({
-                                                                    message: error.response.data.messageCode,
-                                                                    loading: false
-                                                                });
-                                                                break;
-                                                            default:
-                                                                this.setState({
-                                                                    message: 'static.unkownError',
-                                                                    loading: false
-                                                                });
-                                                                break;
-                                                        }
-                                                    }
-                                                }
-                                            );
-                                        } else {
-                                            this.setState({
-                                                message: response.data.messageCode, loading: false
-                                            },
-                                                () => {
-                                                    hideSecondComponent();
-                                                })
-                                        }
-                                    }).catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                }
-                                            }
-                                        }
-                                    );
                             } else {
                                 this.setState({
                                     message: response.data.messageCode, loading: false
@@ -325,6 +258,88 @@ export default class PlanningUnitListComponent extends Component {
         }
     }
     /**
+     * Retrieves autocomplete suggestions for forecasting units based on the given term.
+     * @param {string} term - The search term to retrieve autocomplete suggestions for.
+     */
+    getAutocompleteForecastingUnit = (term,type) => {
+        var language = this.state.lang;
+        var autocompletejson = {
+            "searchText": term,
+            "language": language
+        }
+        if(term.length > 2) {
+            DropdownService.getAutocompleteForecastingUnit(autocompletejson)
+                .then(response => {
+                    var forecastingUnitList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        var label = response.data[i].label.label_en + '|' + response.data[i].id;
+                        forecastingUnitList[i] = { value: response.data[i].id, label: label }
+                    }
+                    var listArray = forecastingUnitList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    if(type==1){
+                        this.setState({
+                            autocompleteData: listArray,
+                        });
+                    }else{
+                        this.setState({
+                            autocompleteDataExport: listArray,
+                        });
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            }, () => {
+                                hideSecondComponent()
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    }, () => {
+                                        hideSecondComponent()
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }
+    }
+    /**
      * Builds the jexcel component to display role list.
      */
     buildJExcel() {
@@ -338,9 +353,10 @@ export default class PlanningUnitListComponent extends Component {
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
-            data[5] = planningUnitList[j].lastModifiedBy.username;
-            data[6] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[7] = planningUnitList[j].active;
+            data[5] = planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms;
+            data[6] = planningUnitList[j].lastModifiedBy.username;
+            data[7] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[8] = planningUnitList[j].active;
             planningUnitArray[count] = data;
             count++;
         }
@@ -374,6 +390,10 @@ export default class PlanningUnitListComponent extends Component {
                     type: 'text',
                 },
                 {
+                    title: i18n.t('static.program.noOfProgramsUsingPU'),
+                    type: 'text',
+                },
+                {
                     title: i18n.t('static.common.lastModifiedBy'),
                     type: 'text',
                 },
@@ -387,7 +407,7 @@ export default class PlanningUnitListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -530,6 +550,141 @@ export default class PlanningUnitListComponent extends Component {
         }
     }
     /**
+     * This function is called when user clicks on export to excel and shows the filters for user to select
+     */
+    toggleExport() {
+        this.setState({
+            exportModal: !this.state.exportModal,
+            productCategoryIdExport: document.getElementById("productCategoryId").value,
+            tracerCategoryIdExport: document.getElementById("tracerCategoryId").value,
+            forecastingUnitIdExport: this.state.forecastingUnitId,
+            forecastingUnitExportAutocompelete:this.state.forecastingUnitAutocompelete
+        })
+    }
+    dataChange(e) {
+        if (e.target.name == "productCategoryIdExport") {
+            this.setState({
+                "productCategoryIdExport": e.target.value
+            })
+        } else if (e.target.name == "tracerCategoryIdExport") {
+            this.setState({
+                "tracerCategoryIdExport": e.target.value
+            })
+        }
+    }
+    /**
+     * This function is used to get planning unit list and export that list into csv file
+     */
+    getDataforExport() {
+        this.setState({
+            loadingModal: true
+        })
+        var tracerCategoryId = document.getElementById("tracerCategoryIdExport").value;
+        var productCategoryId = document.getElementById("productCategoryIdExport").value;
+        let forecastingUnitId = this.state.forecastingUnitIdExport=="" ? null : this.state.forecastingUnitIdExport;
+        var json = {
+            productCategorySortOrder: productCategoryId,
+            tracerCategoryId: tracerCategoryId,
+            forecastingUnitId: forecastingUnitId
+        }
+        PlanningUnitService.getPlanningUnitByTracerCategoryProductCategoryAndForecastingUnit(json).then(response => {
+            if (response.status == 200) {
+                var csvRow = [];
+                csvRow.push('"' + (i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryIdExport").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+                csvRow.push('')
+                csvRow.push('"' + (i18n.t('static.tracercategory.tracercategory') + ' : ' + document.getElementById("tracerCategoryIdExport").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+                csvRow.push('')
+                csvRow.push('"' + (i18n.t('static.forecastingunit.forecastingunit') + ' : ' + document.getElementById("forecastingUnitIdExport").value).replaceAll(' ', '%20') + '"')
+                csvRow.push('')
+                csvRow.push('')
+                csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+                csvRow.push('')
+                var planningUnitList;
+                this.setState({
+                    exportModal: false,
+                })
+                if (response.data.length > 0) {
+                    var A = [];
+                    let tableHeadTemp = [];
+                    tableHeadTemp.push(i18n.t('static.dataEntry.planningUnitId').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.product.productName').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.planningUnit.associatedForecastingUnit').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.planningUnit.planningUnitOfMeasure').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.planningUnit.labelMultiplier').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.program.noOfProgramsUsingPU').replaceAll('#', '%23').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.common.lastModifiedBy').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.common.lastModifiedDate').replaceAll(' ', '%20'));
+                    tableHeadTemp.push(i18n.t('static.common.status').replaceAll(' ', '%20'));
+                    A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
+                    planningUnitList = response.data;
+                    for (var j = 0; j < planningUnitList.length; j++) {
+                        A.push([addDoubleQuoteToRowContent([planningUnitList[j].planningUnitId, (getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), getLabelText(planningUnitList[j].unit.label, this.state.lang).replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), (planningUnitList[j].multiplier).toString(), (planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms).toString(), planningUnitList[j].lastModifiedBy.username.replaceAll('#', '%23').replaceAll(',', ' ').replaceAll(' ', '%20'), moment(planningUnitList[j].lastModifiedDate).format(DATE_FORMAT_CAP), planningUnitList[j].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])])
+                    }
+                    for (var i = 0; i < A.length; i++) {
+                        csvRow.push(A[i].join(","))
+                    }
+                }
+                var csvString = csvRow.join("%0A")
+                var a = document.createElement("a")
+                a.href = 'data:attachment/csv,' + csvString
+                a.target = "_Blank"
+                a.download = i18n.t('static.dashboard.planningunit') + ".csv"
+                document.body.appendChild(a)
+                a.click()
+                this.setState({
+                    loadingModal: false
+                })
+            } else {
+                this.setState({
+                    exportModal: false,
+                    loadingModal: false
+                })
+            }
+        }).catch(
+            error => {
+                this.setState({
+                    exportModal: false,
+                    loadingModal: false
+                })
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+    }
+    /**
      * Renders the planning unit list.
      * @returns {JSX.Element} - Planning Unit list.
      */
@@ -547,15 +702,6 @@ export default class PlanningUnitListComponent extends Component {
                     </option>
                 )
             }, this);
-        const { forecastingUnits } = this.state;
-        let forecastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.forecastingUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
         const { tracerCategories } = this.state;
         let tracercategoryList = tracerCategories.length > 0
             && tracerCategories.map((item, i) => {
@@ -569,7 +715,7 @@ export default class PlanningUnitListComponent extends Component {
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.payload.productCategoryId}>
+                    <option key={i} value={item.sortOrder}>
                         {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
@@ -616,12 +762,13 @@ export default class PlanningUnitListComponent extends Component {
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
+                                <img className='ml-2' style={{ height: '25px', width: '25px', cursor: 'Pointer', marginTop: '-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.toggleExport()} />
                             </div>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-0 pt-lg-0">
-                        <Col md="9 pl-0" style={{ zIndex: '1' }}>
-                            <div className="row">
+                    <CardBody className="pb-lg-5 pt-lg-2">
+                        <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="d-md-flex  Selectdiv2 row">
                                 <FormGroup className="col-md-3" id="realmDiv">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                     <div className="controls">
@@ -648,7 +795,7 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="productCategoryId"
                                                 id="productCategoryId"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                            // onChange={this.filterData}
                                             >
                                                 {productCategoryList}
                                             </Input>
@@ -664,38 +811,126 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="tracerCategoryId"
                                                 id="tracerCategoryId"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                            // onChange={this.filterData}
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="">{i18n.t('static.common.all')}</option>
                                                 {tracercategoryList}
                                             </Input>
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                <FormGroup className="col-md-5">
+                                    <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
+                                    <Autocomplete
+                                        id="forecastingUnitId"
+                                        name="forecastingUnitId"
+                                        options={this.state.autocompleteData}
+                                        getOptionLabel={(option) => option.label || ""}
+                                        onChange={(event, value) => {
+                                            if (value != null) {
+                                                this.setState({ searchedValue: value.label,forecastingUnitId:value.value,forecastingUnitAutocompelete:value }, () => { })
+                                            } else {
+                                                this.setState({
+                                                    searchedValue: '',
+                                                    autocompleteData: [],
+                                                    forecastingUnitId:""
+                                                });
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.typeAtleast3')} {...params} variant="outlined"
+                                            onChange={(e) => {
+                                                this.getAutocompleteForecastingUnit(e.target.value,1)
+                                            }} />}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <button className="btn btn-info btn-md showdatabtn ml-2" style={{ "marginTop": '20px' }} onClick={this.filterData}>{i18n.t('static.jexcel.search')}</button>
+                                </FormGroup>
+                            </div>
+                        </Col><br/><br/>
+                        <div>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
+                        </div>
+                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                <div class="align-items-center">
+                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                    <div class="spinner-border blue ml-4" role="status">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </CardBody>
+                    <Modal isOpen={this.state.exportModal}
+                        className={'modal-md'}>
+                        <ModalHeader toggle={() => this.toggleExport()} className="modalHeaderSupplyPlan" id="shipmentModalHeader">
+                            <strong>{this.state.type == 1 ? i18n.t("static.supplyPlan.exportAsPDF") : i18n.t("static.supplyPlan.exportAsCsv")}</strong>
+                        </ModalHeader>
+                        <ModalBody>
+                            <div style={{ display: this.state.loadingModal ? "none" : "block" }}>
+                                <FormGroup className="col-md-12 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                     <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
-                                                name="forecastingUnitId"
-                                                id="forecastingUnitId"
+                                                name="productCategoryIdExport"
+                                                id="productCategoryIdExport"
                                                 bsSize="sm"
-                                                onChange={this.filterData}
+                                                value={this.state.productCategoryIdExport}
+                                                onChange={this.dataChange}
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {forecastingUnitList}
+                                                {productCategoryList}
                                             </Input>
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                                <FormGroup className="col-md-12">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryIdExport"
+                                                id="tracerCategoryIdExport"
+                                                bsSize="sm"
+                                                value={this.state.tracerCategoryIdExport}
+                                                onChange={this.dataChange}
+                                            >
+                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                {tracercategoryList}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-12">
+                                    <Label htmlFor="forecastingUnitIdExport">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
+                                    <Autocomplete
+                                        id="forecastingUnitIdExport"
+                                        name="forecastingUnitIdExport"
+                                        options={this.state.autocompleteDataExport}
+                                        defaultValue={this.state.forecastingUnitExportAutocompelete}
+                                        getOptionLabel={(option) => option.label || ""}
+                                        onChange={(event, value) => {
+                                            if (value != null) {
+                                                this.setState({ searchedValueExport: value.label,forecastingUnitIdExport:value.value }, () => { })
+                                            } else {
+                                                this.setState({
+                                                    searchedValueExport: '',
+                                                    autocompleteDataExport: []
+                                                });
+                                            }
+                                        }}
+                                        renderInput={(params) => <TextField placeholder={i18n.t('static.common.typeAtleast3')} {...params} variant="outlined"
+                                            onChange={(e) => {
+                                                this.getAutocompleteForecastingUnit(e.target.value,2)
+                                            }} />}
+                                    />
+                                </FormGroup>
                             </div>
-                        </Col>
-                        <div className="shipmentconsumptionSearchMarginTop consumptionDataEntryTable">
-                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
-                            <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div style={{ display: this.state.loadingModal ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "250px" }} >
                                     <div class="align-items-center">
                                         <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
                                         <div class="spinner-border blue ml-4" role="status">
@@ -703,8 +938,11 @@ export default class PlanningUnitListComponent extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </CardBody>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.getDataforExport()} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>
+                        </ModalFooter>
+                    </Modal>
                 </Card>
             </div>
         );

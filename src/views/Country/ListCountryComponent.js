@@ -163,7 +163,7 @@ export default class CountryListComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.common.disabled') }
+                        { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
             ],
@@ -337,7 +337,7 @@ export default class CountryListComponent extends Component {
                                         >
                                             <option value="">{i18n.t('static.common.all')}</option>
                                             <option value="true">{i18n.t('static.common.active')}</option>
-                                            <option value="false">{i18n.t('static.common.disabled')}</option>
+                                            <option value="false">{i18n.t('static.dataentry.inactive')}</option>
                                         </Input>
                                     </InputGroup>
                                 </div>

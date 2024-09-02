@@ -391,9 +391,14 @@ export default class EditProcurementUnit extends Component {
                                                         break;
                                                     case 500:
                                                     case 404:
-                                                    case 406:
                                                         this.setState({
                                                             message: error.response.data.messageCode,
+                                                            loading: false
+                                                        });
+                                                        break;
+                                                    case 406:
+                                                        this.setState({
+                                                            message: i18n.t('static.procurementAgentProcurementUnit.procurementUnitAlreadyExists'),
                                                             loading: false
                                                         });
                                                         break;
@@ -699,7 +704,7 @@ export default class EditProcurementUnit extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-active2">
-                                                            {i18n.t('static.common.disabled')}
+                                                            {i18n.t('static.dataentry.inactive')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>

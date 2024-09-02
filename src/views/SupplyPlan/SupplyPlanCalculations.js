@@ -18,7 +18,7 @@ import { convertSuggestedShipmentsIntoPlannedShipments } from '../SupplyPlan/Sup
  * @param {*} rebuild This is used to check if supply plan has to be rebuild or not
  * @param {*} rebuildQPL This is used to check if QPL has to be rebuild or not
  */
-export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL) {
+export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL,monthsInPastForAMC,monthsInFutureForAMC) {
     if (page == 'masterDataSync' && !rebuild) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
             problemListChild.qatProblemActions(programId, "loading", true);
@@ -120,8 +120,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
                                 var maxDate = invmax.isAfter(shipmax) && invmax.isAfter(conmax) ? invmax : shipmax.isAfter(invmax) && shipmax.isAfter(conmax) ? shipmax : conmax
                                 var minDate;
+                                var monthsInPastForAmc=programPlanningUnitList[ppL].monthsInPastForAmc;
+                                if(monthsInPastForAMC!=undefined){
+                                    monthsInPastForAmc=monthsInPastForAMC
+                                }
+                                var monthsInFutureForAmc=programPlanningUnitList[ppL].monthsInFutureForAmc;
+                                if(monthsInFutureForAMC!=undefined){
+                                    monthsInFutureForAmc=monthsInFutureForAMC
+                                }
                                 if (minimumDate != null) {
-                                    minDate = moment(minimumDate).subtract(programPlanningUnitList[ppL].monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
+                                    minDate = moment(minimumDate).subtract(monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
                                 } else {
                                     minDate = undefined;
                                 }
@@ -130,12 +138,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     let shipmin = moment.min(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
                                     let conmin = moment.min(consumptionListForMax.map(d => moment(d.consumptionDate)))
                                     minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
-                                    minDate = moment(minDate).subtract(programPlanningUnitList[ppL].monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
+                                    minDate = moment(minDate).subtract(monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
                                 }
                                 var FIRST_DATA_ENTRY_DATE = minDate;
                                 var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
                                 var firstDataEntryDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
-                                var lastDataEntryDate = moment(maxDate).add((programPlanningUnitList[ppL].monthsInPastForAmc), 'months').format("YYYY-MM-DD");
+                                var lastDataEntryDate = moment(maxDate).add((monthsInPastForAmc), 'months').format("YYYY-MM-DD");
                                 var lastDate = lastDataEntryDate;
                                 var dateAfterFiveYrs = moment(Date.now()).add(60, 'months').format("YYYY-MM-DD");
                                 var dateAfterTenYrs = moment(Date.now()).add(120, 'months').format("YYYY-MM-DD");
@@ -217,6 +225,17 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         openingBalanceWps = prevMonthSupplyPlan[0].closingBalanceWps;
                                     } else {
                                         openingBalanceWps = 0;
+                                    }
+                                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                                        var currentMonthSupplyPlan = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(createdDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id)
+                                        if(currentMonthSupplyPlan.length>0){
+                                            openingBalance=currentMonthSupplyPlan[0].openingBalance;
+                                            openingBalanceWps=currentMonthSupplyPlan[0].openingBalanceWps;
+                                        }else{
+                                            openingBalance=0;
+                                            openingBalanceWps=0;
+                                        }
                                     }
                                     if (moment(startDate).format("YYYY-MM-DD") > moment(lastDate).format("YYYY-MM-DD") && openingBalance == 0 && openingBalanceWps == 0) {
                                         lastDataEntryDate = startDate;
@@ -764,7 +783,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     batchDetails = myArray;
                                     var amcTotal = 0;
                                     var totalMonths = 0;
-                                    for (var ap = 1; ap <= programPlanningUnitList[ppL].monthsInPastForAmc; ap++) {
+                                    for (var ap = 1; ap <= monthsInPastForAmc; ap++) {
                                         var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
                                         var actualConsumptionQtyAmc = 0;
                                         var forecastedConsumptionQtyAmc = 0;
@@ -802,7 +821,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             }
                                         }
                                     }
-                                    for (var ap = 0; ap < programPlanningUnitList[ppL].monthsInFutureForAmc; ap++) {
+                                    for (var ap = 0; ap < monthsInFutureForAmc; ap++) {
                                         var amcDate = moment(startDate).add(ap, 'months').startOf('month').format("YYYY-MM-DD");
                                         var actualConsumptionQtyAmc = 0;
                                         var forecastedConsumptionQtyAmc = 0;
@@ -846,6 +865,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     } else {
                                         amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
                                     }
+                                    // var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                                    // if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
+                                        // amc=null;
+                                    // }
                                     var maxForMonths = 0;
                                     var realm = generalProgramJson.realmCountry.realm;
                                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -1143,7 +1166,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if (rangeValue.to.month <= 9) {
                                             stopDate = rangeValue.to.year + '-0' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                                         }
-                                        convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson2, programRequest)
+                                        convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson2, programRequest,monthsInPastForAmc,monthsInFutureForAmc)
                                     }
                                 } else if (page == "supplyPlan") {
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);

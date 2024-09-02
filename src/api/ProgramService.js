@@ -169,5 +169,15 @@ class ProgramService {
     getProgramListByProductCategoryIdList(productCategoryIds) {
         return axios.post(`${API_URL}/api/program/productCategoryList`, productCategoryIds, {});
     }
+    getProgramListAll() {
+        return axios.get(`${API_URL}/api/program/all`, {});
+    }
+    getNotesHistory(programId) {
+        return axios.get(`${API_URL}/api/program/data/version/trans/programId/${programId}/versionId/0`, {});
+    }
+    resetQPL(json) {
+        return axios.put(`${API_URL}/api/programVersion/resetProblem`, json, {}
+        );
+    }
 }
 export default new ProgramService()

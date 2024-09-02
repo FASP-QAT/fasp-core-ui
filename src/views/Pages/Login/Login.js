@@ -11,12 +11,13 @@ import * as Yup from 'yup';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
 import image3 from '../../../assets/img/PEPFAR-logo.png';
+import imageHelp from '../../../assets/img/help-icon-login.png';
 import i18n from '../../../i18n';
 import axios from 'axios';
 import { getDatabase } from "../../../CommonComponent/IndexedDbFunctions";
 import { isSiteOnline } from '../../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../../CommonComponent/getLabelText';
-import { API_URL, APP_VERSION_REACT, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, SECRET_KEY } from '../../../Constants.js';
+import { API_URL, APP_VERSION_REACT, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, SECRET_KEY, QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../../Constants.js';
 import MasterSyncService from '../../../api/MasterSyncService.js';
 import image1 from '../../../assets/img/QAT-login-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
@@ -312,11 +313,25 @@ class Login extends Component {
                   </ButtonDropdown>
                 </div>
               </Col>
-              <Col md="12">
+              <Row>
+                <Col md="3">
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+                </Col>
+                <Col md="8" lg="6">
+  <div className="red" style={{ marginBottom: '20px', marginTop:'-25px' }}>
+    {this.state.lang === 'en' ?
+      <p><strong>IMPORTANT!</strong> Please upload any unsaved <u>Forecasting</u> data from your local computer to the server by EOD Wednesday <u>Sept. 4th, 2024</u>. <strong><u>Any Forecasting data not uploaded to the server by this date will be lost!</u></strong> The Forecasting program will need to be reloaded for continued use on <u>Sept. 5th, 2024</u>.</p> :
+      this.state.lang === 'sp' ?
+      <p><strong>¡IMPORTANTE!</strong> Por favor, sube cualquier dato de <u>Pronóstico</u> no guardado desde tu computadora local al servidor antes del final del día miércoles <u>4 de septiembre de 2024</u>. <strong><u>¡Cualquier dato de Pronóstico que no se suba al servidor antes de esta fecha se perderá!</u></strong> El programa de Pronóstico necesitará ser recargado para su uso continuado el <u>5 de septiembre de 2024</u>.</p> :
+      this.state.lang === 'fr' ?
+      <p><strong>IMPORTANT!</strong> Veuillez télécharger toutes les données <u>de Prévision</u> non enregistrées de votre ordinateur local vers le serveur avant la fin de la journée du mercredi <u>4 septembre 2024</u>. <strong><u>Toutes les données de Prévision qui ne seront pas téléchargées sur le serveur d'ici cette date seront perdues!</u></strong> Le programme de Prévision devra être rechargé pour une utilisation continue à partir du <u>5 septembre 2024</u>.</p> :
+      <p><strong>IMPORTANTE!</strong> Por favor, faça o upload de qualquer dado de <u>Previsão</u> não salvo do seu computador local para o servidor até o final do dia na quarta-feira <u>4 de setembro de 2024</u>. <strong><u>Qualquer dado de Previsão não carregado no servidor até esta data será perdido!</u></strong> O programa de Previsão precisará ser recarregado para uso contínuo em <u>5 de setembro de 2024</u>.</p>
+    }
+  </div>
               </Col>
+              </Row>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <div className="p-4 Login-card card-marginTop" >
@@ -515,7 +530,17 @@ class Login extends Component {
                     </CardBody>
                   </div>
                 </CardGroup>
-                <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
+                <div className='row align-items-center'>
+                  <div className='col-md-6 col-sm-6'>
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} /> 
+                      {" "+i18n.t('static.ticket.header')}
+                    </a>
+                  </div>
+                  <div className='col-md-6 col-sm-12'>
+                    <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
+                  </div>
+                </div>
               </Col>
               <Col xs="12" className="Login-bttom ">
                 <CardBody>

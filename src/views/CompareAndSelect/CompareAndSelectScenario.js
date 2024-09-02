@@ -17,7 +17,8 @@ import {
     FormGroup, Input, InputGroup, Label,
     Modal,
     ModalBody,
-    ModalHeader
+    ModalHeader,
+    Table
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -129,11 +130,20 @@ class CompareAndSelectScenario extends Component {
             actualConsumptionListForMonth: [],
             changed: false,
             dataChangedFlag: 0,
+            showFits: false,
+            minActualMonth: '',
+            maxActualMonth: '',
             xAxisDisplayBy: 1,
             yearArray: [],
             consolidatedData: [],
             collapsedExpandArr: [],
             expandCompressBtn: true,
+            consumptionUnitShowArr: [],
+            uniqueProductCategories: [],
+            planningUnitListForTable: [],
+            expandCompressPUBtn: true,
+            showHidePU: true,
+            actualMinDate: "",
             calendarMonthList: ""
         };
         this.getDatasets = this.getDatasets.bind(this);
@@ -150,6 +160,7 @@ class CompareAndSelectScenario extends Component {
         this.loadedTable1 = this.loadedTable1.bind(this)
         this.changeTable1 = this.changeTable1.bind(this)
         this.handleYearRangeChange = this.handleYearRangeChange.bind(this);
+        this.getPlanningUnitsForTable = this.getPlanningUnitsForTable.bind(this);
         this.loadedCalendar = this.loadedCalendar.bind(this);
     }
     /**
@@ -179,16 +190,33 @@ class CompareAndSelectScenario extends Component {
         })
     }
     /**
-     * Sets the state to show or hide the forecast period based on the checked status of the target element.
+     * Sets the state to show or hide the forecast period and show fits based on the checked status of the target element.
      * @param {Event} e - The change event.
      * @returns {void}
      */
-    setShowForecastPeriod(e) {
-        this.setState({
-            showForecastPeriod: e.target.checked
-        }, () => {
-            this.setMonth1List()
-        })
+    setShowForecastPeriodOrFits(e) {
+        var checked = e.target.checked;
+        var stopDate = this.state.singleValue2.to.year + '-' + this.state.singleValue2.to.month + '-' + new Date(this.state.singleValue2.to.year, this.state.singleValue2.to.month, 0).getDate();
+        if (e.target.name == "showForecastPeriod") {
+            this.setState({
+                xAxisDisplayBy: 1,
+                showForecastPeriod: checked,
+                showFits: checked ? false : this.state.showFits,
+                minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
+                singleValue2: checked ? this.state.rangeValue : { from: { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+            }, () => {
+                this.setMonth1List()
+            })
+        } else if (e.target.name == "showFits") {
+            this.setState({
+                showFits: checked,
+                minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
+                singleValue2: { from: { year: Number(moment(checked ? this.state.minDate : this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(checked ? this.state.minDate : this.state.actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
+                showForecastPeriod: checked ? false : this.state.showForecastPeriod
+            }, () => {
+                this.setMonth1List()
+            })
+        }
     }
     /**
      * Sets the month list based on the selected range value or forecast period.
@@ -216,9 +244,12 @@ class CompareAndSelectScenario extends Component {
             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
             monthList.push(curDate);
         }
+        var rangeValue1 = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+
         this.setState({
             monthList1: monthList,
-            loading: false
+            loading: false,
+            singleValue2: rangeValue1
         }, () => {
             this.buildJexcel();
         })
@@ -293,11 +324,15 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             var count = 0;
             var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            var minActualMonth = '';
+            var maxActualMonth = '';
             if (selectedPlanningUnit[0].consuptionForecast.toString() == "true") {
                 for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                     if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
+                    minActualMonth = consumptionExtrapolation[ce].jsonProperties.startDate;
+                    maxActualMonth = consumptionExtrapolation[ce].jsonProperties.stopDate;
                     treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
                     colourArrayCount += 1;
                 }
@@ -306,7 +341,7 @@ class CompareAndSelectScenario extends Component {
                 for (var tl = 0; tl < treeList.length; tl++) {
                     var tree = treeList[tl];
                     var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
-                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
+                    var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList.filter(c => c.active.toString() == "true") : [];
                     for (var sl = 0; sl < scenarioList.length; sl++) {
                         try {
                             var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id] != undefined && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId && (c.payload).nodeType.id == 5);
@@ -367,15 +402,19 @@ class CompareAndSelectScenario extends Component {
                 forecastNotes: forecastNotes,
                 singleValue2: rangeValue,
                 minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
+                actualMinDate: actualMinDate,
                 showAllData: true,
-                loading: false
+                loading: false,
+                minActualMonth: minActualMonth,
+                maxActualMonth: maxActualMonth
             }, () => {
+                this.getPlanningUnitsForTable(this.state.datasetJson, this.state.regionId)
                 this.setMonth1List();
-                if (this.state.viewById == 1) {
-                    document.getElementById("planningUnitDiv").style.display = "block";
-                } else {
-                    document.getElementById("planningUnitDiv").style.display = "none";
-                }
+                // if (this.state.viewById == 1) {
+                //     document.getElementById("planningUnitDiv").style.display = "block";
+                // } else {
+                //     document.getElementById("planningUnitDiv").style.display = "none";
+                // }
                 this.scenarioOrderChanged(selectedTreeScenarioId)
             })
         } else {
@@ -430,9 +469,18 @@ class CompareAndSelectScenario extends Component {
             var consumptionDataForTree = [];
             var totalArray = [];
             var monthArrayForError = [];
-            if (consumptionData.length > 0) {
-                for (var i = 0; i < consumptionData.length; i++) {
-                    monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+            if (this.state.minActualMonth == '') {
+                if (consumptionData.length > 0) {
+                    for (var i = 0; i < consumptionData.length; i++) {
+                        monthArrayForError.push(moment(consumptionData[i].month).format("YYYY-MM-DD"));
+                    }
+                }
+            } else {
+                var createdDate = moment(this.state.minActualMonth).format("YYYY-MM-DD");
+                var minDate = moment(this.state.minActualMonth).format("YYYY-MM-DD");
+                for (var i = 0; moment(createdDate).format("YYYY-MM") < moment(this.state.maxActualMonth).format("YYYY-MM"); i++) {
+                    createdDate = moment(minDate).add(i, 'months').format("YYYY-MM-DD");
+                    monthArrayForError.push(createdDate);
                 }
             }
             var multiplier = 1;
@@ -592,7 +640,7 @@ class CompareAndSelectScenario extends Component {
                     scenario: treeScenarioList[tsList].scenario,
                     totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(2),
                     isLowest: min == actualDiff[tsList] && useForLowestError[tsList] ? 1 : 0,
-                    forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 && useForLowestError[tsList] ? (((actualDiff[tsList]) / totalActual) * 100).toFixed(4) : "",
+                    forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 && useForLowestError[tsList] ? (((actualDiff[tsList]) / totalActual)).toFixed(4) : "",
                     noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined && useForLowestError[tsList] ? countArray[tsList] + 1 : "",
                     compareToConsumptionForecastClass:
                         treeScenarioList[tsList].type == 'T' ?
@@ -672,12 +720,12 @@ class CompareAndSelectScenario extends Component {
                     count++;
                 }
                 let columns = [];
-                columns.push({ title: i18n.t('static.compareAndSelect.selectAsForecast'), type: 'radio', width: 80 });
-                columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 80 });
-                columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 100 });
+                columns.push({ title: i18n.t('static.common.select'), type: 'radio', width: 50 });
+                columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 50 });
+                columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 50 });
                 columns.push({ title: i18n.t('static.consumption.forcast'), type: 'html', readOnly: true, width: 150 });
                 columns.push({ type: 'numeric', title: i18n.t('static.compareAndSelect.totalForecast'), readOnly: true, mask: '#,##0.00', decimal: '.', width: 100 });
-                columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastError'), readOnly: true, width: 100 });
+                columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastError'), readOnly: true, width: 80 });
                 columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.forecastErrorMonths'), readOnly: true, width: 80 });
                 columns.push({ type: 'text', title: i18n.t('static.compareAndSelect.compareToConsumptionForecast'), readOnly: true, width: 150 });
                 columns.push({ type: 'hidden', title: 'tree scenario id' });
@@ -734,7 +782,7 @@ class CompareAndSelectScenario extends Component {
                     copyCompatibility: true,
                     allowExport: false,
                     position: 'top',
-                    filters: true,
+                    filters: false,
                     license: JEXCEL_PRO_KEY,
                     contextMenu: function (obj, x, y, e) {
                         return false;
@@ -780,12 +828,33 @@ class CompareAndSelectScenario extends Component {
             }
         })
     }
+
+    // Function to remove 'compareAndSelectPU' class from all <tr> elements
+    removeSelectedClass() {
+        var allTrElements = document.querySelectorAll('.planingUnitClass');
+        allTrElements.forEach(function (tr) {
+            tr.classList.remove('compareAndSelectPU');
+        });
+    }
+
     /**
      * Sets the planning unit ID in the component state based on the selected value.
      * @param {object} e - The event object containing the selected value.
      * @returns {void}
      */
     setPlanningUnitId(e) {
+        var trElement = document.querySelector('.planingUnitId-' + e);
+        // Check if the element exists before adding the class
+        if (trElement) {
+            this.removeSelectedClass();
+            trElement.classList.add('compareAndSelectPU');
+        } else {
+            // var pu = localStorage.getItem("sesDatasetPlanningUnitId")
+            // var trElement1 = document.querySelector('.planingUnitId-' + pu);
+            // trElement1.classList.add('compareAndSelectPU');
+            console.log('Element not found');
+        }
+
         var cont = false;
         if (this.state.dataChangedFlag == 1) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -799,14 +868,14 @@ class CompareAndSelectScenario extends Component {
         }
 
         if (cont == true) {
-            localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
+            localStorage.setItem("sesDatasetPlanningUnitId", e);
             this.setState({
                 dataChangedFlag: 0,
                 loading: true
             })
-            if (e.target.value > 0) {
-                var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e.target.value);
-                var planningUnitId = e.target.value;
+            if (e > 0) {
+                var name = this.state.planningUnitList.filter(c => c.planningUnit.id == e);
+                var planningUnitId = e;
                 var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
                 var viewById = this.state.viewById;
                 this.setState({
@@ -822,11 +891,11 @@ class CompareAndSelectScenario extends Component {
                     if (planningUnitId > 0) {
                         this.showData();
                     }
-                    if ((viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById) == 3) {
-                        document.getElementById("equivalencyUnitDiv").style.display = "block";
-                    } else if (viewById == 3) {
-                        document.getElementById("equivalencyUnitDiv").style.display = "none";
-                    }
+                    // if ((viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById) == 3) {
+                    //     document.getElementById("equivalencyUnitDiv").style.display = "block";
+                    // } else if (viewById == 3) {
+                    //     document.getElementById("equivalencyUnitDiv").style.display = "none";
+                    // }
                 })
             } else {
                 this.setState({
@@ -1363,6 +1432,9 @@ class CompareAndSelectScenario extends Component {
         }
     }
 
+    /**
+     * This function is used to expand and compress the year columns in table
+     */
     expandCompressFuntion = () => {
         var e = this.state.languageEl;
         var count = 4
@@ -1376,6 +1448,13 @@ class CompareAndSelectScenario extends Component {
             }
         }
         this.setState({ expandCompressBtn: !this.state.expandCompressBtn });
+    }
+
+    /**
+     * This function is used to expand and compress the planning unit table
+     */
+    expandCompressPUFuntion = () => {
+        this.setState({ expandCompressPUBtn: !this.state.expandCompressPUBtn, showHidePU: !this.state.showHidePU });
     }
 
     /**
@@ -1561,6 +1640,41 @@ class CompareAndSelectScenario extends Component {
             }
         }
     }
+
+    /**
+    * Build the Planning unit list based on forecast selected or not
+    * @param {object} datasetJson - The datasetJson object containing the dataset json.
+    * @param {object} regionId - The regionId object containing the region ID value.
+    */
+    getPlanningUnitsForTable(datasetJson, regionId) {
+        var puList = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
+        var planningUnitListForTable = []
+        for (var p = 0; p < puList.length; p++) {
+            var map = puList[p].selectedForecastMap[regionId];
+            var selectedForecastString = "";
+            if (map != undefined && map.consumptionExtrapolationId > 0) {
+                var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
+                selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
+                planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
+            } else if (map != undefined && map.scenarioId > 0 && map.treeId > 0) {
+                var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
+                var s = t != undefined ? t.scenarioList.filter(s => s.id == map.scenarioId)[0] : undefined;
+                selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
+                planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
+            } else {
+                selectedForecastString = ""
+                planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
+            }
+        }
+        this.setState({
+            planningUnitListForTable: planningUnitListForTable.sort(function (a, b) {
+                a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this))
+        })
+    }
+
     /**
      * Sets the dataset ID and updates the component state with associated data.
      * @param {object} event - The event object containing the dataset ID value.
@@ -1584,7 +1698,8 @@ class CompareAndSelectScenario extends Component {
             this.setState({ loading: true })
             this.setState({
                 datasetId: datasetId,
-                changed: false
+                changed: false,
+                consumptionUnitShowArr: []
             }, () => {
                 if (datasetId != "") {
                     localStorage.setItem("sesDatasetId", datasetId);
@@ -1656,6 +1771,7 @@ class CompareAndSelectScenario extends Component {
                         regionId = localStorage.getItem("sesDatasetRegionId");
                         regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
                     }
+                    this.getPlanningUnitsForTable(datasetJson, regionId);
                     this.setState({
                         datasetJson: datasetJson,
                         rangeValue: rangeValue,
@@ -1680,10 +1796,10 @@ class CompareAndSelectScenario extends Component {
                         forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
                         forecastStopDate: moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD"),
                         planningUnitId: planningUnitId,
-                        loading: false
+                        loading: false,
                     }, () => {
                         if (planningUnitId != "") {
-                            this.setPlanningUnitId(event);
+                            this.setPlanningUnitId(event.target.value);
                         } else {
                             this.setState({
                                 planningUnitId: "",
@@ -1736,7 +1852,8 @@ class CompareAndSelectScenario extends Component {
 
         if (cont == true) {
             this.setState({
-                dataChangedFlag: 0
+                dataChangedFlag: 0,
+                consumptionUnitShowArr: []
             });
             localStorage.setItem("sesDatasetRegionId", event.target.value);
             var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
@@ -1780,21 +1897,21 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             viewById: viewById,
         }, () => {
-            if (viewById == 1) {
-                document.getElementById("planningUnitDiv").style.display = "block";
-            } else {
-                document.getElementById("planningUnitDiv").style.display = "none";
-            }
-            if (viewById == 2) {
-                document.getElementById("forecastingUnitDiv").style.display = "block";
-            } else {
-                document.getElementById("forecastingUnitDiv").style.display = "none";
-            }
-            if (viewById == 3) {
-                document.getElementById("equivalencyUnitDiv").style.display = "block";
-            } else {
-                document.getElementById("equivalencyUnitDiv").style.display = "none";
-            }
+            // if (viewById == 1) {
+            //     document.getElementById("planningUnitDiv").style.display = "block";
+            // } else {
+            //     document.getElementById("planningUnitDiv").style.display = "none";
+            // }
+            // if (viewById == 2) {
+            //     document.getElementById("forecastingUnitDiv").style.display = "block";
+            // } else {
+            //     document.getElementById("forecastingUnitDiv").style.display = "none";
+            // }
+            // if (viewById == 3) {
+            //     document.getElementById("equivalencyUnitDiv").style.display = "block";
+            // } else {
+            //     document.getElementById("equivalencyUnitDiv").style.display = "none";
+            // }
             this.buildJexcel()
         })
     }
@@ -2188,7 +2305,7 @@ class CompareAndSelectScenario extends Component {
                         pointRadius: 3,
                         showInLegend: true,
                         data: this.state.xAxisDisplayBy == 1 ?
-                            this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null)) :
+                            this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))) :
                             collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(2) : null))
                     }
                 )
@@ -2329,7 +2446,6 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-
                                             <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.region')}</Label>
                                                 <div className="controls ">
@@ -2348,322 +2464,355 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="planningUnitId"
-                                                            id="planningUnitId"
-                                                            bsSize="sm"
-                                                            onChange={(e) => this.setPlanningUnitId(e)}
-                                                            value={this.state.planningUnitId}
-                                                            className="selectWrapText"
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {planningUnits}
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-
                                         </div>
                                     </div>
                                 </Form>
-                                <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                    {this.state.showAllData &&
-                                        <>
-                                            <ul style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
-                                            <ul className="legendcommitversion">
-                                                <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
-                                                <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
-                                                <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
-                                            </ul><br />
-                                            {/* {this.state.xAxisDisplayBy != 1 &&
-                                                <div onClick={this.expandCompressFuntion} style={{ paddingLeft: '400px' }}>
-                                                    {this.state.expandCompressBtn ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                <div class="pl-0">
+                                    {this.state.datasetId != "" && this.state.regionId != "" &&
+                                        <div onClick={this.expandCompressPUFuntion} style={{ display: this.state.loading ? "none" : "block", height: "45px" }}>
+                                            {this.state.expandCompressPUBtn ? <div><i className="fa fa-minus-square-o supplyPlanIcon" ></i> <span className="WhiteText">{i18n.t("static.compareAndSelect.selectForecast")}<br /> ✅ {i18n.t("static.compareAndSelect.forecastSelected")} <i class="fa fa-exclamation-triangle"></i> {i18n.t("static.compareAndSelect.forecastNotSelected")}</span></div> : <div><i className="fa fa-plus-square-o supplyPlanIcon" ></i>  <span style={{ color: "#20a8d8" }}><b>{i18n.t("static.compareAndSelect.showPUPanel")}</b></span></div>}
+                                        </div>
+                                    }
+                                    <div className="row">
+                                        {this.state.datasetId != "" && this.state.regionId != "" && this.state.showHidePU &&
+                                            <div className="col-md-3" style={{ display: this.state.loading ? "none" : "block" }}>
+                                                <div class="table-scroll">
+                                                    <div class="table-wrap DataEntryTable table-responsive">
+                                                        <Table className="table-bordered text-center overflowhide main-table " bordered size="sm">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="compareAndSelectPlanningUnitTableTdWidth sticky-col first-col clone ">{i18n.t('static.report.planningUnit')}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {this.state.planningUnitListForTable.map((ele, index) => {
+                                                                    return (<>
+                                                                        <tr>
+                                                                            <td className={"planingUnitId-" + ele.planningUnit.id + " planingUnitClass sticky-col first-col clone text-left hoverTd"} onClick={() => this.setPlanningUnitId(ele.planningUnit.id)}>
+                                                                                {ele.selectedForecast != "" ? <span>✅</span> : <i class="fa fa-exclamation-triangle"></i>}{" " + getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </>)
+                                                                })}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
                                                 </div>
-                                            } */}
-                                            <div className="RemoveStriped removeOddColor">
-                                                <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                             </div>
-                                            <br></br>
-                                            <FormGroup className="col-md-12">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                                <div className="controls">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="textarea"
-                                                            name="forecastNotes"
-                                                            id="forecastNotes"
-                                                            value={this.state.forecastNotes}
-                                                            onChange={(e) => { this.setForecastNotes(e); }}
-                                                            readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
-                                                            bsSize="sm"
-                                                        >
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                            <br></br>
-                                            <Col md="12 pl-0">
-                                                <div className="row">
-                                                    <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="viewById1"
-                                                                name="viewById"
-                                                                value={1}
-                                                                checked={this.state.viewById == 1}
-                                                                onChange={this.setViewById}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.report.planningUnit')}
-                                                            </Label>
-                                                        </FormGroup><br />
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="viewById2"
-                                                                name="viewById"
-                                                                value={2}
-                                                                checked={this.state.viewById == 2}
-                                                                onChange={this.setViewById}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.dashboard.forecastingunit')}
-                                                            </Label>
-                                                        </FormGroup><br />
-                                                        <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="viewById3"
-                                                                name="viewById"
-                                                                value={3}
-                                                                checked={this.state.viewById == 3}
-                                                                onChange={this.setViewById}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-active1">
-                                                                {i18n.t('static.equivalancyUnit.equivalancyUnit')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                        }
+                                        <div className={this.state.showHidePU ? "col-md-9" : "col-md-12"} style={{ display: this.state.loading ? "none" : "block" }}>
+                                            {this.state.showAllData &&
+                                                <>
+                                                    <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
+                                                    <ul className="legendcommitversion">
+                                                        <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
+                                                        <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                        <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
+                                                    </ul><br />
+                                                    <div className="RemoveStriped removeOddColor">
+                                                        <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
+                                                    </div>
+                                                    <br></br>
+                                                    <FormGroup className="col-md-12">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
                                                         <div className="controls">
                                                             <InputGroup>
                                                                 <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
+                                                                    type="textarea"
+                                                                    name="forecastNotes"
+                                                                    id="forecastNotes"
+                                                                    value={this.state.forecastNotes}
+                                                                    onChange={(e) => { this.setForecastNotes(e); }}
+                                                                    readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
                                                                     bsSize="sm"
-                                                                    disabled={true}
-                                                                    onChange={(e) => this.setPlanningUnitId(e)}
-                                                                    value={this.state.planningUnitId}
-                                                                    className="selectWrapText removeDropdownArrow"
                                                                 >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {planningUnits}
                                                                 </Input>
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="foreccastingUnitId"
-                                                                    id="forecastingUnitId"
-                                                                    value={this.state.forecastingUnitId}
-                                                                    disabled={true}
-                                                                    onChange={this.setForecastingUnit}
-                                                                    bsSize="sm"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {forecastingUnits}
-                                                                </Input>
-                                                            </InputGroup>
+                                                    <br></br>
+                                                    <Col md="12 pl-0">
+                                                        <div className="row">
+                                                            <FormGroup>
+                                                                <Label className="P-absltRadio">{i18n.t('static.compareAndSelect.yAxisIn')}&nbsp;&nbsp;</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById1"
+                                                                        name="viewById"
+                                                                        value={1}
+                                                                        checked={this.state.viewById == 1}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.report.planningUnit')}
+                                                                    </Label>
+                                                                </FormGroup><br />
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById2"
+                                                                        name="viewById"
+                                                                        value={2}
+                                                                        checked={this.state.viewById == 2}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.dashboard.forecastingunit')}
+                                                                    </Label>
+                                                                </FormGroup><br />
+                                                                <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="viewById3"
+                                                                        name="viewById"
+                                                                        value={3}
+                                                                        checked={this.state.viewById == 3}
+                                                                        onChange={this.setViewById}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-active1">
+                                                                        {i18n.t('static.equivalancyUnit.equivalancyUnit')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="planningUnitId"
+                                                                            id="planningUnitId"
+                                                                            bsSize="sm"
+                                                                            disabled={true}
+                                                                            value={this.state.planningUnitId}
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {planningUnits}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="foreccastingUnitId"
+                                                                            id="forecastingUnitId"
+                                                                            value={this.state.forecastingUnitId}
+                                                                            disabled={true}
+                                                                            onChange={this.setForecastingUnit}
+                                                                            bsSize="sm"
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {forecastingUnits}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            className="selectWrapText removeDropdownArrow"
+                                                                            name="equivalencyUnitId"
+                                                                            id="equivalencyUnitId"
+                                                                            value={this.state.equivalencyUnitId}
+                                                                            onChange={this.setEquivalencyUnit}
+                                                                            bsSize="sm"
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {equivalencies}
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+
+                                                            <FormGroup className="col-md-4">
+                                                                <div className="col-md-12">
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="showForecastPeriod"
+                                                                        name="showForecastPeriod"
+                                                                        checked={this.state.showForecastPeriod}
+                                                                        onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
+                                                                    </Label>
+                                                                </div>
+                                                                <div className="col-md-12">
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="checkbox"
+                                                                        id="showFits"
+                                                                        name="showFits"
+                                                                        checked={this.state.showFits}
+                                                                        onClick={(e) => { this.setShowForecastPeriodOrFits(e); }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        {i18n.t('static.extrapolations.showFits')}
+                                                                    </Label>
+                                                                </div>
+                                                            </FormGroup>
+                                                            {/* {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
+                                                                <FormGroup className="col-md-3 compareAndSelectDatePicker">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref={this.pickAMonth3}
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            lang={pickerLang}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
+                                                                        </Picker>
+                                                                    </div>
+                                                                </FormGroup>
+                                                            } */}
+                                                            <FormGroup className="col-md-5">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="xAxisDisplayBy"
+                                                                            id="xAxisDisplayBy"
+                                                                            bsSize="sm"
+                                                                            value={this.state.xAxisDisplayBy}
+                                                                            disabled={this.state.showForecastPeriod}
+                                                                            onChange={(e) => { this.setXAxisDisplayBy(e); }}
+                                                                        >
+                                                                            <option value="1">{i18n.t('static.ManageTree.Month')}</option>
+                                                                            <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
+                                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
+                                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
+                                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
+                                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
+                                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
+                                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
+                                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
+                                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
+                                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
+                                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
+                                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
+                                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
+                                                                        </Input>
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+                                                            {!this.state.showForecastPeriod && <FormGroup className="col-md-3 pickerRangeBox">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                                </Label>
+                                                                {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
+                                                                    <div className="controls edit">
+                                                                        <Picker
+                                                                            ref="pickRange"
+                                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                                            value={this.state.singleValue2}
+                                                                            lang={pickerLang}
+                                                                            key={JSON.stringify(this.state.singleValue2)}
+                                                                            onDismiss={this.handleAMonthDissmis2}
+                                                                        >
+                                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                                        </Picker>
+                                                                    </div>
+                                                                )}
+                                                                {(this.state.xAxisDisplayBy == 2) && (
+                                                                    <div className="controls box">
+                                                                        <RangePicker
+                                                                            picker="year"
+                                                                            allowClear={false}
+                                                                            disabledDate={(current) => current && (current.year() < this.state.minDate.year || current.year() > this.state.maxDateForSingleValue.year)}
+                                                                            id="date"
+                                                                            name="date"
+                                                                            onChange={this.handleYearRangeChange}
+                                                                            value={[
+                                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                                moment(this.state.singleValue2.to.year.toString()),
+                                                                            ]}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                                {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
+                                                                    <div className="controls box">
+                                                                        <RangePicker
+                                                                            picker="year"
+                                                                            allowClear={false}
+                                                                            disabledDate={(current) => current && (current.year() < this.state.minDate.year || current.year() > this.state.maxDateForSingleValue.year)}
+                                                                            id="date"
+                                                                            name="date"
+                                                                            onChange={this.handleYearRangeChange}
+                                                                            value={[
+                                                                                moment(this.state.singleValue2.from.year.toString()),
+                                                                                moment(this.state.singleValue2.to.year.toString()),
+                                                                            ]}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </FormGroup>}
                                                         </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
-                                                        <div className="controls">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    className="selectWrapText removeDropdownArrow"
-                                                                    name="equivalencyUnitId"
-                                                                    id="equivalencyUnitId"
-                                                                    value={this.state.equivalencyUnitId}
-                                                                    onChange={this.setEquivalencyUnit}
-                                                                    bsSize="sm"
-                                                                >
-                                                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                                                    {equivalencies}
-                                                                </Input>
-                                                            </InputGroup>
+
+                                                        <div className={"row check inline pt-lg-3 pl-lg-3"}>
+
+                                                            {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
+                                                                <div className="col-md-12">
+                                                                    <div className="chart-wrapper chart-graph-report">
+                                                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
+                                                                        <div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-12">
+                                                                    <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                                        {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                                    </button>
+                                                                </div>
+                                                            </div>}
                                                         </div>
-                                                    </FormGroup>
-                                                    {this.state.xAxisDisplayBy == 1 &&
-                                                        <FormGroup className="col-md-2">
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                id="showForecastPeriod"
-                                                                name="showForecastPeriod"
-                                                                checked={this.state.showForecastPeriod}
-                                                                onClick={(e) => { this.setShowForecastPeriod(e); }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
-                                                            </Label>
-                                                        </FormGroup>}
-                                                    <FormGroup className="col-md-5">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.consumption.forcast')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
-                                                        <div className="controls ">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="xAxisDisplayBy"
-                                                                    id="xAxisDisplayBy"
-                                                                    bsSize="sm"
-                                                                    value={this.state.xAxisDisplayBy}
-                                                                    disabled={this.state.showForecastPeriod}
-                                                                    onChange={(e) => { this.setXAxisDisplayBy(e); }}
-                                                                >
-                                                                    <option value="1">{i18n.t('static.ManageTree.Month')}</option>
-                                                                    <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
-                                                                    <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                                    <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
-                                                                    <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
-                                                                    <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
-                                                                    <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
-                                                                    <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
-                                                                    <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
-                                                                    <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
-                                                                    <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
-                                                                    <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
-                                                                    <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
-                                                                    <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3 pickerRangeBox">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
-                                                            <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
-                                                        </Label>
-                                                        {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
-                                                            <div className="controls edit">
-                                                                <Picker
-                                                                    ref="pickRange"
-                                                                    years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                    value={this.state.singleValue2}
-                                                                    lang={pickerLang}
-                                                                    key={JSON.stringify(this.state.singleValue2)}
-                                                                    onDismiss={this.handleAMonthDissmis2}
-                                                                >
-                                                                    <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
-                                                                </Picker>
+                                                        <div style={{ display: this.state.show ? "block" : "none" }}>
+                                                            <div className="row">
+                                                                <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
+                                                                    <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        )}
-                                                        {(this.state.xAxisDisplayBy == 2) && (
-                                                            <div className="controls box">
-                                                                <RangePicker
-                                                                    picker="year"
-                                                                    allowClear={false}
-                                                                    id="date"
-                                                                    disabledDate={(current) => current && (current.year() < this.state.minDate.year || current.year() > this.state.maxDateForSingleValue.year)}
-                                                                    name="date"
-                                                                    onChange={this.handleYearRangeChange}
-                                                                    value={[
-                                                                        moment(this.state.singleValue2.from.year.toString()),
-                                                                        moment(this.state.singleValue2.to.year.toString()),
-                                                                    ]}
-                                                                />
-                                                            </div>
-                                                        )}
-                                                        {(this.state.xAxisDisplayBy != 1 && this.state.xAxisDisplayBy != 2) && (
-                                                            <div className="controls box">
-                                                                <RangePicker
-                                                                    picker="year"
-                                                                    allowClear={false}
-                                                                    id="date"
-                                                                    name="date"
-                                                                    disabledDate={(current) => current && (current.year() < this.state.minDate.year || current.year() > this.state.maxDateForSingleValue.year)}
-                                                                    onChange={this.handleYearRangeChange}
-                                                                    value={[
-                                                                        moment(this.state.singleValue2.from.year.toString()),
-                                                                        moment(this.state.singleValue2.to.year.toString()),
-                                                                    ]}
-                                                                />
-                                                            </div>
-                                                        )}
-                                                    </FormGroup>
-                                                    }
-                                                    {/* {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                        <div className="controls edit">
-                                                            <Picker
-                                                                ref={this.pickAMonth3}
-                                                                years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                                value={this.state.singleValue2}
-                                                                key={JSON.stringify(this.state.singleValue2)}
-                                                                lang={pickerLang}
-                                                                onDismiss={this.handleAMonthDissmis2}
-                                                            >
-                                                                <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox3} />
-                                                            </Picker>
-                                                        </div>
-                                                    </FormGroup>} */}
-                                                    {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
-                                                        <div className="col-md-12">
-                                                            <div className="chart-wrapper chart-graph-report">
-                                                                <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                                                <div>
+                                                            <div className="row">
+                                                                <div className="col-md-12 pl-0 pr-0">
+                                                                    <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-12">
-                                                            <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                                            </button>
-                                                        </div>
-                                                    </div>}
-                                                </div>
-                                                <div style={{ display: this.state.show ? "block" : "none" }}>
-                                                    <div className="row">
-                                                        <div className="pl-0 pr-0 ModelingValidationTable ModelingTableMargin TableWidth100">
-                                                            <div id="calendarTable" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.xAxisDisplayBy != 1 && !this.state.loading ? "block" : "none" }}>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="row">
-                                                        <div className="col-md-12 pl-0 pr-0">
-                                                            <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable PeginationBottom" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </Col>
-                                        </>}</div>
+                                                    </Col>
+                                                </>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
                                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
@@ -2675,7 +2824,7 @@ class CompareAndSelectScenario extends Component {
                                 </div>
                             </div>
                         </div>
-                    </CardBody>
+                    </CardBody >
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -2683,7 +2832,7 @@ class CompareAndSelectScenario extends Component {
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
-                </Card>
+                </Card >
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">

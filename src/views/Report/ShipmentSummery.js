@@ -59,7 +59,8 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import FundingSourceService from "../../api/FundingSourceService.js";
 const ref = React.createRef();
 const options = {
   title: {
@@ -202,6 +203,7 @@ class ShipmentSummery extends Component {
       programId: "",
       versionId: "",
       fundingSources: [],
+      // fundingSourcesOriginal: [],//implemented for funding source type changes
       fundingSourceValues: [],
       fundingSourceLabels: [],
       budgets: [],
@@ -209,6 +211,9 @@ class ShipmentSummery extends Component {
       budgetLabels: [],
       filteredBudgetList: [],
       lang: localStorage.getItem("lang"),
+      fundingSourceTypes: [],
+      fundingSourceTypeValues: [],
+      fundingSourceTypeLabels: [],
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -219,6 +224,7 @@ class ShipmentSummery extends Component {
     this.buildJExcel = this.buildJExcel.bind(this);
     this.loaded = this.loaded.bind(this);
     this.selected = this.selected.bind(this);
+    this.getFundingSourceType = this.getFundingSourceType.bind(this);
   }
   /**
    * Exports the data to a CSV file.
@@ -268,6 +274,18 @@ class ShipmentSummery extends Component {
         '"'
       )
     );
+    // csvRow.push("");
+    // this.state.fundingSourceTypeLabels.map((ele) =>
+    //   csvRow.push(
+    //     '"' +
+    //     (
+    //       i18n.t("static.funderTypeHead.funderType") +
+    //       " : " +
+    //       ele.toString()
+    //     ).replaceAll(" ", "%20") +
+    //     '"'
+    //   )
+    // );
     csvRow.push("");
     this.state.fundingSourceLabels.map((ele) =>
       csvRow.push(
@@ -521,21 +539,42 @@ class ShipmentSummery extends Component {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal')
     doc.setTextColor("#002f6c");
-    var y = 190;
+    // var y = 190;
+    var y = 170;
+
+    // var fundingSourceTypeText = doc.splitTextToSize(
+    //   i18n.t("static.funderTypeHead.funderType") +
+    //   " : " +
+    //   this.state.fundingSourceTypeLabels.join("; "),
+    //   (doc.internal.pageSize.width * 3) / 4
+    // );
+    // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceTypeText);
+    // y = y + fundingSourceTypeText.length * 10 + 10;
+
     var fundingSourceText = doc.splitTextToSize(
       i18n.t("static.budget.fundingsource") +
       " : " +
       this.state.fundingSourceLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
-    doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+    // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+    for (var i = 0; i < fundingSourceText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 100;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+      y = y + 10;
+    }
+    y = y + 10;
+
     var budgetText = doc.splitTextToSize(
       i18n.t("static.budgetHead.budget") +
       " : " +
       this.state.budgetLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
-    y = y + 5;
+    // y = y + 5;
     for (var i = 0; i < budgetText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
@@ -544,7 +583,7 @@ class ShipmentSummery extends Component {
       doc.text(doc.internal.pageSize.width / 8, y, budgetText[i]);
       y = y + 10;
     }
-    y = y + 20;
+    y = y + 10;
     var planningText = doc.splitTextToSize(
       i18n.t("static.planningunit.planningunit") +
       " : " +
@@ -621,8 +660,8 @@ class ShipmentSummery extends Component {
       ele.budget.code,
       getLabelText(ele.shipmentStatus.label, this.state.lang),
       this.state.viewById == 1
-        ? formatter(ele.shipmentQty,0)
-        : formatter(Number(ele.shipmentQty) * ele.multiplier,0),
+        ? formatter(ele.shipmentQty, 0)
+        : formatter(Number(ele.shipmentQty) * ele.multiplier, 0),
       moment(ele.expectedDeliveryDate).format("YYYY-MM-DD"),
       ele.productCost
         .toFixed(2)
@@ -656,11 +695,152 @@ class ShipmentSummery extends Component {
     doc.save(i18n.t("static.report.shipmentDetailReport") + ".pdf");
   };
   /**
+     * Retrieves the list of funding sources types.
+     */
+  getFundingSourceType = () => {
+    //Fetch realmId
+    let realmId = AuthenticationService.getRealmId();
+    if (localStorage.getItem("sessionType") === 'Online') {
+      //Fetch funding source type list by realmId
+      FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
+        .then(response => {
+          if (response.status == 200) {
+            var fundingSourceTypeValues = [];
+            var fundingSourceTypes = response.data;
+            fundingSourceTypes.sort(function (a, b) {
+              a = a.fundingSourceTypeCode.toLowerCase();
+              b = b.fundingSourceTypeCode.toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+
+            this.setState({
+              fundingSourceTypes: fundingSourceTypes, loading: false,
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode, loading: false
+            },
+              () => {
+                // this.hideSecondComponent();
+              })
+          }
+        }).catch(
+          error => {
+            this.setState({
+              fundingSourceTypes: [], loading: false
+            }, () => {
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
+      //offline
+      var db3;
+      var fSourceTypeResult = [];
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db3 = e.target.result;
+        var fSourceTypeTransaction = db3.transaction(['fundingSourceType'], 'readwrite');
+        var fSourceTypeOs = fSourceTypeTransaction.objectStore('fundingSourceType');
+        var fSourceTypeRequest = fSourceTypeOs.getAll();
+        fSourceTypeRequest.onerror = function (event) {
+        }.bind(this);
+        fSourceTypeRequest.onsuccess = function (event) {
+          fSourceTypeResult = fSourceTypeRequest.result.filter(c => c.realm.id == realmId);
+          this.setState({
+            fundingSourceTypes: fSourceTypeResult.sort(function (a, b) {
+              a = a.fundingSourceTypeCode.toLowerCase();
+              b = b.fundingSourceTypeCode.toLowerCase();
+              return a < b ? -1 : a > b ? 1 : 0;
+            })
+          });
+        }.bind(this)
+      }.bind(this)
+    }
+  }
+
+  // handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+
+  //   fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
+  //     return parseInt(a.value) - parseInt(b.value);
+  //   })
+  //   this.setState({
+  //     fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
+  //     fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
+  //   }, () => {
+  //     var filteredFundingSourceArr = [];
+  //     var fundingSources = this.state.fundingSourcesOriginal;//original fs list
+  //     for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+  //       for (var j = 0; j < fundingSources.length; j++) {
+  //         if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
+  //           filteredFundingSourceArr.push(fundingSources[j]);
+  //         }
+  //       }
+  //     }
+
+  //     if (filteredFundingSourceArr.length > 0) {
+  //       filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
+  //         a = a.code.toLowerCase();
+  //         b = b.code.toLowerCase();
+  //         return a < b ? -1 : a > b ? 1 : 0;
+  //       });
+  //     }
+  //     this.setState({
+  //       fundingSources: filteredFundingSourceArr,
+  //       fundingSourceValues: [],
+  //       fundingSourceLabels: [],
+  //     }, () => {
+  //       this.fetchData();
+  //     });
+
+  //   })
+  // }
+
+  /**
    * Retrieves the list of funding sources.
    */
   getFundingSourceList() {
     if (localStorage.getItem("sessionType") === 'Online') {
-      DropdownService.getFundingSourceDropdownList()
+      this.setState({
+        loading:true
+      })
+      var programIds = [Number(this.state.programId)];
+      DropdownService.getFundingSourceForProgramsDropdownList(programIds)
         .then((response) => {
           var listArray = response.data;
           listArray.sort((a, b) => {
@@ -671,6 +851,10 @@ class ShipmentSummery extends Component {
           this.setState(
             {
               fundingSources: listArray,
+              loading:false,
+              fundingSourceValues: [],
+              fundingSourceLabels: [],
+              filteredBudgetList: [],
             },
             () => {
               this.getBudgetList();
@@ -724,13 +908,14 @@ class ShipmentSummery extends Component {
         fSourceRequest.onerror = function (event) {
         }.bind(this);
         fSourceRequest.onsuccess = function (event) {
-          fSourceResult = fSourceRequest.result;
+          fSourceResult = fSourceRequest.result.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId)));
           var fundingSource = [];
           for (var i = 0; i < fSourceResult.length; i++) {
             var arr = {
               id: fSourceResult[i].fundingSourceId,
               code: fSourceResult[i].fundingSourceCode,
               label: fSourceResult[i].label,
+              fundingSourceType: fSourceRequest.result[i].fundingSourceType
             };
             fundingSource[i] = arr;
           }
@@ -741,6 +926,9 @@ class ShipmentSummery extends Component {
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
+              fundingSourceValues: [],
+              fundingSourceLabels: [],
+              filteredBudgetList: [],
             },
             () => {
               this.getBudgetList();
@@ -754,7 +942,7 @@ class ShipmentSummery extends Component {
    * Retrieves the list of budgets.
    */
   getBudgetList() {
-    var programId = localStorage.getItem("sesProgramIdReport");
+    var programId = this.state.programId;
     if (this.state.programId != "" && this.state.programId != 0 && programId != "") {
       if (localStorage.getItem("sessionType") === 'Online') {
         DropdownService.getBudgetDropdownBasedOnProgram(programId)
@@ -999,7 +1187,7 @@ class ShipmentSummery extends Component {
           });
       }
       else {
-        var programId = localStorage.getItem("sesProgramIdReport");
+        var programId = this.state.programId;
         var db3;
         var fSourceResult = [];
         getDatabase();
@@ -1053,7 +1241,7 @@ class ShipmentSummery extends Component {
         fundingSourceValues: [],
         fundingSourceLabels: [],
         filteredBudgetList: [],
-      },()=>{
+      }, () => {
         this.fetchData();
       })
     }
@@ -1446,6 +1634,7 @@ class ShipmentSummery extends Component {
               programId: localStorage.getItem("sesProgramIdReport"),
             },
             () => {
+              this.getFundingSourceList();
               this.filterVersion();
             }
           );
@@ -1642,6 +1831,7 @@ class ShipmentSummery extends Component {
             var programData = databytes.toString(CryptoJS.enc.Utf8);
             var version = JSON.parse(programData).currentVersion;
             version.versionId = `${version.versionId} (Local)`;
+            version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
             verList.push(version);
           }
         }
@@ -1714,6 +1904,17 @@ class ShipmentSummery extends Component {
           });
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
+          var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+          var rangeValue = this.state.rangeValue;
+          if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+              var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+              rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+          }
+          this.setState({
+            minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+            rangeValue: rangeValue
+          })
           if (versionId.includes("Local")) {
             var db1;
             getDatabase();
@@ -1875,7 +2076,7 @@ class ShipmentSummery extends Component {
    */
   componentDidMount() {
     this.getPrograms();
-    this.getFundingSourceList();
+    this.getFundingSourceType();
   }
   /**     
    * Sets the selected program ID selected by the user.
@@ -1889,6 +2090,7 @@ class ShipmentSummery extends Component {
       },
       () => {
         localStorage.setItem("sesVersionIdReport", "");
+        this.getFundingSourceList();
         this.filterVersion();
         this.getBudgetList();
       }
@@ -1905,6 +2107,18 @@ class ShipmentSummery extends Component {
           versionId: event.target.value,
         },
         () => {
+            var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+            var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+            var rangeValue = this.state.rangeValue;
+            if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
+                rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+            }
+            this.setState({
+              minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+              rangeValue: rangeValue
+            })
           localStorage.setItem("sesVersionIdReport", this.state.versionId);
           this.fetchData();
         }
@@ -2570,7 +2784,7 @@ class ShipmentSummery extends Component {
             {item.versionStatus.id == 2 && item.versionType.id == 2
               ? item.versionId + "*"
               : item.versionId}{" "}
-            ({moment(item.createdDate).format(`MMM DD YYYY`)})
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
           </option>
         );
       }, this);
@@ -2583,9 +2797,18 @@ class ShipmentSummery extends Component {
           value: item.id,
         };
       }, this);
+    // const { fundingSourceTypes } = this.state;
     const { fundingSources } = this.state;
     const { filteredBudgetList } = this.state;
     const { rangeValue } = this.state;
+
+    let fundingSourceListDD = fundingSources.length > 0 &&
+      fundingSources.map((item, i) => {
+        return {
+          label: item.code,
+          value: item.id,
+        };
+      }, this);
 
     const bar = {
       labels: this.state.shipmentDetailsMonthList.map((item, index) =>
@@ -2733,6 +2956,7 @@ class ShipmentSummery extends Component {
                             }}
                             value={rangeValue}
                             lang={pickerLang}
+                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                             onDismiss={this.handleRangeDissmis}
                           >
                             <MonthBox
@@ -2812,6 +3036,7 @@ class ShipmentSummery extends Component {
                             id="planningUnitId"
                             bsSize="md"
                             value={this.state.planningUnitValues}
+                            filterOptions={filterOptions}
                             onChange={(e) => {
                               this.handlePlanningUnitChange(e);
                             }}
@@ -2847,6 +3072,27 @@ class ShipmentSummery extends Component {
                           </InputGroup>
                         </div>
                       </FormGroup>
+                      {/* <FormGroup className="col-md-3" >
+                        <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
+                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                        <div className="controls">
+                          <MultiSelect
+                            name="fundingSourceTypeId"
+                            id="fundingSourceTypeId"
+                            bsSize="md"
+                            // filterOptions={this.filterOptions}
+                            value={this.state.fundingSourceTypeValues}
+                            onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
+                            options={fundingSourceTypes.length > 0
+                              && fundingSourceTypes.map((item, i) => {
+                                return (
+                                  { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
+                                )
+                              }, this)}
+                            disabled={this.state.loading}
+                          />
+                        </div>
+                      </FormGroup> */}
                       <FormGroup className="col-md-3" id="fundingSourceDiv">
                         <Label htmlFor="appendedInputButton">
                           {i18n.t("static.budget.fundingsource")}
@@ -2858,14 +3104,14 @@ class ShipmentSummery extends Component {
                             id="fundingSourceId"
                             bsSize="md"
                             value={this.state.fundingSourceValues}
+                            filterOptions={filterOptions}
                             onChange={(e) => {
                               this.handleFundingSourceChange(e);
                             }}
                             options={
-                              fundingSources.length > 0 &&
-                              fundingSources.map((item, i) => {
-                                return { label: item.code, value: item.id };
-                              }, this)
+                              fundingSourceListDD && fundingSourceListDD.length > 0
+                                ? fundingSourceListDD
+                                : []
                             }
                             disabled={this.state.loading}
                           />
@@ -2883,6 +3129,7 @@ class ShipmentSummery extends Component {
                               id="budgetId"
                               bsSize="md"
                               value={this.state.budgetValues}
+                              filterOptions={filterOptions}
                               onChange={(e) => {
                                 this.handleBudgetChange(e);
                               }}

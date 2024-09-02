@@ -50,8 +50,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var adjustmentType = this.props.items.inventoryType;
-                (instance).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
-                (instance).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*H${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(8, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*S${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*S${parseInt(data[i].y) + 1},0)`, true);
                 (instance).setValueFromCoords(4, data[i].y, adjustmentType, true);
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
@@ -64,7 +64,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
             }
             if (data[i].x == 0 && data[i].value != "") {
-                (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+                var minDate=this.props.items.generalProgramJson.cutOffDate!=undefined && this.props.items.generalProgramJson.cutOffDate!=null && this.props.items.generalProgramJson.cutOffDate!=""?moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD"):moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD");
+                if(moment(data[i].value).format("YYYY-MM")>=moment(minDate).format("YYYY-MM")){
+                    (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
+                }else{
+                    (instance).setValueFromCoords(0, data[i].y, "", true);
+                }
             }
             if (data[i].x == 3) {
                 var aruList = this.state.realmCountryPlanningUnitList.filter(c => (c.name == data[i].value || getLabelText(c.label, this.state.lang) == data[i].value) && c.active.toString() == "true");
@@ -95,8 +100,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
         } else if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
-        } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
         } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
         } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
@@ -168,7 +171,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             name: getLabelText(rcpuResult[k].label, this.props.items.lang),
                             id: rcpuResult[k].realmCountryPlanningUnitId,
                             multiplier: rcpuResult[k].multiplier,
-                            active: rcpuResult[k].active
+                            active: rcpuResult[k].active,
+                            conversionNumber:rcpuResult[k].conversionNumber,
+                            conversionMethod:rcpuResult[k].conversionMethod,
                         }
                         realmCountryPlanningUnitList.push(rcpuJson);
                     }
@@ -262,6 +267,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     }
                     inventoryList = inventoryList.sort(function (a, b) { return ((new Date(a.inventoryDate) - new Date(b.inventoryDate)) || (a.region.id - b.region.id) || (a.realmCountryPlanningUnit.id - b.realmCountryPlanningUnit.id)) })
                     for (var j = 0; j < inventoryList.length; j++) {
+                        var rcpuForTable=realmCountryPlanningUnitList.filter(c=>c.id==inventoryList[j].realmCountryPlanningUnit.id);
                         data = [];
                         data[0] = inventoryList[j].inventoryDate; 
                         data[1] = inventoryList[j].region.id; 
@@ -270,9 +276,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[4] = adjustmentType; 
                         data[5] = Math.round(inventoryList[j].adjustmentQty); 
                         data[6] = Math.round(inventoryList[j].actualQty); 
-                        data[7] = inventoryList[j].multiplier; 
-                        data[8] = `=ROUND(F${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; 
-                        data[9] = `=ROUND(G${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; 
+                        data[7] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                        data[8] = `=ROUND(F${parseInt(j) + 1}*S${parseInt(j) + 1},0)`; 
+                        data[9] = `=ROUND(G${parseInt(j) + 1}*S${parseInt(j) + 1},0)`; 
                         if (inventoryList[j].notes === null || ((inventoryList[j].notes) == "NULL")) {
                             data[10] = "";
                         } else {
@@ -291,6 +297,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[15] = 0;
                         data[16] = 0;
                         data[17] = inventoryList[j].inventoryId;
+                        data[18] = inventoryList[j].multiplier; 
                         inventoryDataArr[j] = data;
                     }
                     var regionList = this.props.items.regionList;
@@ -308,9 +315,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[4] = adjustmentType; 
                         data[5] = ""; 
                         data[6] = ""; 
-                        data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";; 
-                        data[8] = `=ROUND(F${parseInt(0) + 1}*H${parseInt(0) + 1},0)`; 
-                        data[9] = `=ROUND(G${parseInt(0) + 1}*H${parseInt(0) + 1},0)`; 
+                        data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
+                        data[8] = `=ROUND(F${parseInt(0) + 1}*S${parseInt(0) + 1},0)`; 
+                        data[9] = `=ROUND(G${parseInt(0) + 1}*S${parseInt(0) + 1},0)`; 
                         data[10] = "";
                         data[11] = true;
                         if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -323,6 +330,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[15] = 1;
                         data[16] = 0;
                         data[17] = 0;
+                        data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; 
                         inventoryDataArr[0] = data;
                     }
                     this.setState({
@@ -332,14 +340,14 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data: inventoryDataArr,
                         columnDrag: false,
                         columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.props.items.generalProgramJson.cutOffDate!=undefined && this.props.items.generalProgramJson.cutOffDate!=null && this.props.items.generalProgramJson.cutOffDate!=""?moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD"):moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'autocomplete', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
                             { title: i18n.t('static.supplyPlan.inventoryType'), type: 'autocomplete', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
                             { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120, autoCasting: false },
                             { title: actualVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120, autoCasting: false },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##0.0000', decimal: '.', width: 90, readOnly: true },
+                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 100, readOnly: true },
                             { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##.00', decimal: '.', width: 120, readOnly: true, autoCasting: false },
                             { title: actualVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##.00', decimal: '.', width: 120, readOnly: true, autoCasting: false },
                             { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
@@ -368,6 +376,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 type: 'text',
                                 readOnly: true, visible: false, autoCasting: false
                             },
+                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                         ],
                         pagination: paginationOption,
                         paginationOptions: paginationArray,
@@ -680,9 +689,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[4] = map.get("4"); 
         data[5] = ""; 
         data[6] = ""; 
-        data[7] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; 
-        data[8] = `=ROUND(F${parseInt(json.length) + 1}*H${parseInt(json.length) + 1},0)`; 
-        data[9] = `=ROUND(G${parseInt(json.length) + 1}*H${parseInt(json.length) + 1},0)`; 
+        data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
+        data[8] = `=ROUND(F${parseInt(json.length) + 1}*S${parseInt(json.length) + 1},0)`; 
+        data[9] = `=ROUND(G${parseInt(json.length) + 1}*S${parseInt(json.length) + 1},0)`;
         data[10] = "";
         data[11] = true;
         if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -695,6 +704,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[15] = 1;
         data[16] = 0;
         data[17] = 0;
+        data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; 
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -761,6 +771,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
         tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.dataentry.conversionFactorTooltip')
         if (this.props.items.inventoryType == 2) {
             tr.children[11].classList.add('AsteriskTheadtrTd');
         }
@@ -958,10 +970,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
         if (x == 3) {
             elInstance.setValueFromCoords(7, y, "", true);
+            elInstance.setValueFromCoords(18, y, "", true);
             var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
             if (valid == true) {
-                var multiplier = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[3].toString().split(";")[0])[0]).multiplier;
-                elInstance.setValueFromCoords(7, y, multiplier, true);
+                var rcpuForTable = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[3].toString().split(";")[0])[0]);
+                elInstance.setValueFromCoords(7, y, (rcpuForTable.conversionMethod==1?"*":"/")+rcpuForTable.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                elInstance.setValueFromCoords(18, y, rcpuForTable.multiplier, true);
             }
             if (valid == false) {
                 elInstance.setValueFromCoords(16, y, 1, true);
@@ -1525,7 +1539,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryDataList[parseInt(map.get("14"))].dataSource.label = (this.state.dataSourceList).filter(c => c.id == map.get("2"))[0].label
                             inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.id = map.get("3");
                             inventoryDataList[parseInt(map.get("14"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
-                            inventoryDataList[parseInt(map.get("14"))].multiplier = map.get("7");
+                            inventoryDataList[parseInt(map.get("14"))].multiplier = map.get("18");
                             inventoryDataList[parseInt(map.get("14"))].adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                             inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                             inventoryDataList[parseInt(map.get("14"))].notes = map.get("10");
@@ -1563,7 +1577,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     id: map.get("3"),
                                     label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
                                 },
-                                multiplier: map.get("7"),
+                                multiplier: map.get("18"),
                                 planningUnit: {
                                     id: planningUnitId,
                                     label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == planningUnitId)[0]).planningUnit.label

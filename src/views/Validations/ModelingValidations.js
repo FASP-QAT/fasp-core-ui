@@ -24,7 +24,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -434,7 +434,7 @@ class ModelingValidation extends Component {
             if (treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 5).length > 0) {
                 levelList.push(-2);
             }
-            var scenarioList = treeListFiltered.scenarioList;
+            var scenarioList = treeListFiltered.scenarioList.filter(c => c.active.toString() == "true");
             var scenarioId = "";
             var event = {
                 target: {
@@ -677,7 +677,7 @@ class ModelingValidation extends Component {
                             var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
                             var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).isBetween(moment(monthList[j]), moment(monthList[j]).add(12, "months"), null, '[)')) : [];
                             if (cvList.length > 0) {
-                                calculatedValueTotal += (checkIfPuNode == 5 ? cvList.reduce((accumulator, currentValue) => currentValue.calculatedMmdValue == "" ? accumulator : accumulator + currentValue.calculatedMmdValue, 0) : cvList.reduce((accumulator, currentValue) => currentValue.calculatedValue == "" ? accumulator : accumulator + currentValue.calculatedValue, 0));
+                                calculatedValueTotal += (checkIfPuNode == 5 ? cvList.reduce((accumulator, currentValue) => currentValue.calculatedMmdValue == "" ? accumulator : accumulator + Number(currentValue.calculatedMmdValue), 0) : cvList.reduce((accumulator, currentValue) => currentValue.calculatedValue == "" ? accumulator : accumulator + Number(currentValue.calculatedValue), 0));
                             } else {
                             }
                         }
@@ -693,7 +693,7 @@ class ModelingValidation extends Component {
                             var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
                             var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).isBetween(moment(monthList[j]), moment(monthList[j]).add(12, "months"), null, '[)')) : [];
                             if (cvList.length > 0) {
-                                calculatedValueTotal += checkIfPuNode == 5 ? cvList.reduce((accumulator, currentValue) => currentValue.calculatedMmdValue == "" ? accumulator : accumulator + currentValue.calculatedMmdValue, 0) : cvList.reduce((accumulator, currentValue) => currentValue.calculatedValue == "" ? accumulator : accumulator + currentValue.calculatedValue, 0);
+                                calculatedValueTotal += checkIfPuNode == 5 ? cvList.reduce((accumulator, currentValue) => currentValue.calculatedMmdValue == "" ? accumulator : accumulator + Number(currentValue.calculatedMmdValue), 0) : cvList.reduce((accumulator, currentValue) => currentValue.calculatedValue == "" ? accumulator : accumulator + Number(currentValue.calculatedValue), 0);
                             } else {
                             }
                         }
@@ -742,8 +742,8 @@ class ModelingValidation extends Component {
                         }
                         var val = ""
                         if (calculatedValueTotal != "") {
-                            console.log("calculatedValueTotal Test@123",calculatedValueTotal);
-                            console.log("Total Test@123",total);
+                            console.log("calculatedValueTotal Test@123", calculatedValueTotal);
+                            console.log("Total Test@123", total);
                             val = (Number(calculatedValueTotal) / Number(total)) * 100;
                         }
                         data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
@@ -1866,6 +1866,7 @@ class ModelingValidation extends Component {
                                                     <MultiSelect
                                                         name="nodeId"
                                                         id="nodeId"
+                                                        filterOptions={filterOptions}
                                                         options={this.state.nodeList && this.state.nodeList.length > 0 ? this.state.nodeList : []}
                                                         value={this.state.nodeVal}
                                                         onChange={(e) => { this.setNodeVal(e) }}
@@ -1905,7 +1906,7 @@ class ModelingValidation extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3 pickerRangeBox">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
-                                                <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
+                                                    <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
                                                 </Label>
                                                 {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
                                                     <div className="controls edit">

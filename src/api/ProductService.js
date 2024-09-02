@@ -16,5 +16,9 @@ class ProductService {
         return axios.get(`${API_URL}/api/productCategory/realmId/${realmId}/programId/${programId}`, {}
         );
     }
+    getProductCategoryListForErpLinking(realmCountryId){
+        return axios.get(`${API_URL}/api/erpLinking/productCategory/realmCountryId/${realmCountryId}`, {}
+        );
+    }
 }
 export default new ProductService();

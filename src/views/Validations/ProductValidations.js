@@ -1,3 +1,4 @@
+
 import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -469,9 +470,9 @@ class ProductValidation extends Component {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                         var sharePu;
                         // if (finalData[i].nodeDataMap.puNode.sharePlanningUnit != "true") {
-                            sharePu = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
+                        sharePu = parseFloat(finalData[i].nodeDataMap.puNode.puPerVisit).toFixed(8);
                         // } else {
-                            // sharePu = parseFloat(noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier).toFixed(8);
+                        // sharePu = parseFloat(noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier).toFixed(8);
                         // }
                         usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
@@ -663,7 +664,7 @@ class ProductValidation extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push({"versionId":newVList[v].versionId,"createdDate":newVList[v].createdDate})
+                versionList.push({ "versionId": newVList[v].versionId, "createdDate": newVList[v].createdDate })
             }
             var versionId = "";
             var event = {
@@ -811,12 +812,12 @@ class ProductValidation extends Component {
                                                     id: myResult[mr].programId,
                                                     name: getLabelText(programNameJson, this.state.lang),
                                                     code: myResult[mr].programCode,
-                                                    versionList: [{ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate }]
+                                                    versionList: [{ versionId: myResult[mr].version + "  (Local)", createdDate: programData.currentVersion.createdDate }]
                                                 }
                                                 datasetList.push(json)
                                             } else {
                                                 var existingVersionList = datasetList[index].versionList;
-                                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)",createdDate:programData.currentVersion.createdDate })
+                                                existingVersionList.push({ versionId: myResult[mr].version + "  (Local)", createdDate: programData.currentVersion.createdDate })
                                                 datasetList[index].versionList = existingVersionList
                                             }
                                         }
@@ -936,8 +937,8 @@ class ProductValidation extends Component {
             }
         }
         const unit = "pt";
-        const size = "A4"; 
-        const orientation = "landscape"; 
+        const size = "A4";
+        const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
@@ -1071,7 +1072,7 @@ class ProductValidation extends Component {
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                                                {item.code}
+                        {item.code}
                     </option>
                 )
             }, this);
@@ -1118,14 +1119,14 @@ class ProductValidation extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                                                <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                                                        <a className="pr-lg-0 pt-lg-3">
+                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                            <a className="pr-lg-0 pt-lg-3">
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined && this.state.localProgramId != "" ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
                                 <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.modelingValidation')}</a></span>
                             </a>
-                                                    </div>
+                        </div>
                         <div className="Card-header-reporticon pb-0">
                             <a className="pr-lg-0 pt-lg-2 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
@@ -1134,7 +1135,7 @@ class ProductValidation extends Component {
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
                         </div>
-                                            </div>
+                    </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <Form >
@@ -1224,7 +1225,7 @@ class ProductValidation extends Component {
                                                         onChange={(e) => { this.setCurrencyId(e); }}
                                                         value={this.state.currencyId}
                                                     >
-                                                                                                                {currencies}
+                                                        {currencies}
                                                     </Input>
                                                 </InputGroup>
                                             </div>
@@ -1233,13 +1234,13 @@ class ProductValidation extends Component {
                                 </div>
                             </Form>
                             <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                                                <div className="row">
+                                <div className="row">
                                     <div className="col-md-12 pl-0 pr-0">
-                                                                                <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: !this.state.loading ? "block" : "none" }}>
+                                        <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: !this.state.loading ? "block" : "none" }}>
                                         </div>
                                     </div>
                                 </div>
-                                                            </Col>
+                            </Col>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">
@@ -1250,7 +1251,7 @@ class ProductValidation extends Component {
                                 </div>
                             </div>
                         </div>
-                                            </CardBody>
+                    </CardBody>
                 </Card>
             </div >
         );

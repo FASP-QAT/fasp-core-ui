@@ -673,7 +673,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.consumptionDate <= myEndDate
                                                                                     && c.active.toString() == "true"
                                                                                     && c.region.id == regionList[r].regionId
-                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id);
+                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.consumptionQty!=0);
                                                                                 var index = problemActionList.findIndex(
                                                                                     c =>
                                                                                         c.region != null &&
@@ -833,6 +833,16 @@ export default class QatProblemActionNew extends Component {
                                                                                 if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
+                                                                            }
+                                                                        }else{
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }
                                                                         break;
@@ -1019,6 +1029,16 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
+                                                                        }else{
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+                                                                            if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                            }
                                                                         }
                                                                         break;
                                                                     case 25:
@@ -1111,7 +1131,8 @@ export default class QatProblemActionNew extends Component {
                                                         userId: programRequestList[pp].userId,
                                                         programId: programList[pp].generalData.programId,
                                                         programModified: programQPLDetailsGetRequest.result.programModified,
-                                                        readonly: programQPLDetailsGetRequest.result.readonly
+                                                        readonly: programQPLDetailsGetRequest.result.readonly,
+                                                        cutOffDate:programQPLDetailsGetRequest.result.cutOffDate
                                                     }
                                                     programRequestList[pp].programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp].generalData), SECRET_KEY)).toString();
                                                 } catch (err) {

@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from "../../Constants";
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from "../../Constants";
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 /**
@@ -20,7 +20,7 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
  * @param {*} programDataJson This is the program data json
  * @param {*} programRequest This is the request which will be used to save the data in local indexed db
  */
-export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJson, generalProgramJson, props, planningUnitId, programPlanningUnitList, regionList, programIdParam, programJsonForStoringTheResult, programDataJson, programRequest) {
+export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJson, generalProgramJson, props, planningUnitId, programPlanningUnitList, regionList, programIdParam, programJsonForStoringTheResult, programDataJson, programRequest, monthsInPastForAMC, monthsInFutureForAMC) {
     props.updateState("scenarioId", '');
     var curDate = moment(startDate).format("YYYY-MM-DD");
     var startDate1 = moment(startDate).format("YYYY-MM-DD");
@@ -32,7 +32,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
         if (props.state.planBasedOn == 1) {
             var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
             var compare = (curDate >= currentMonth);
-            var amc = jsonList.length>0?Number(jsonList[0].amc):"";
+            var amc = jsonList.length > 0 ? Number(jsonList[0].amc) : "";
             var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
@@ -167,8 +167,8 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     accountFlag: true,
                     active: true,
                     dataSource: {
-                        id: NONE_SELECTED_DATA_SOURCE_ID,
-                        label: (props.state.dataSourceListAll).filter(c => c.dataSourceId == NONE_SELECTED_DATA_SOURCE_ID)[0].label
+                        id: QAT_SUGGESTED_DATA_SOURCE_ID,
+                        label: (props.state.dataSourceListAll).filter(c => c.dataSourceId == QAT_SUGGESTED_DATA_SOURCE_ID)[0].label
                     },
                     erpFlag: false,
                     localProcurement: false,
@@ -348,6 +348,17 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     } else {
                         openingBalanceWps = 0;
                     }
+                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+                        var currentMonthSupplyPlan = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(createdDate).format("YYYY-MM-DD") && c.planningUnitId == planningUnitId);
+                        if(currentMonthSupplyPlan.length>0){
+                            openingBalance=currentMonthSupplyPlan[0].openingBalance;
+                            openingBalanceWps=currentMonthSupplyPlan[0].openingBalanceWps;
+                        }else{
+                            openingBalance=0;
+                            openingBalanceWps=0;
+                        }
+                    }    
                     var shipmentList = (programJson.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
                     var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
                     var shipmentTotalQty = 0;
@@ -560,7 +571,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             if (consumptionList[c].dayOfStockOut > 0) {
                                 var daysPerMonth = moment(startDate).daysInMonth();
                                 var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
-                                if(daysOfData>0){
+                                if (daysOfData > 0) {
                                     var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;
                                     trueDemandPerMonth += Math.round(trueDemandPerDay * daysPerMonth);
                                 }
@@ -892,7 +903,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     batchDetails = myArray;
                     var amcTotal = 0;
                     var totalMonths = 0;
-                    for (var ap = 1; ap <= programPlanningUnitList.monthsInPastForAmc; ap++) {
+                    for (var ap = 1; ap <= monthsInPastForAmc; ap++) {
                         var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
                         var actualConsumptionQtyAmc = 0;
                         var forecastedConsumptionQtyAmc = 0;
@@ -906,7 +917,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;
                                 var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
-                                actualConsumptionQtyAmc += daysOfDataPast>0?trueDemandPerMonth1:0;
+                                actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
@@ -930,7 +941,15 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             }
                         }
                     }
-                    for (var ap = 0; ap < programPlanningUnitList.monthsInFutureForAmc; ap++) {
+                    var monthsInPastForAmc = programPlanningUnitList.monthsInPastForAmc;
+                    if (monthsInPastForAMC != undefined) {
+                        monthsInPastForAmc = monthsInPastForAMC
+                    }
+                    var monthsInFutureForAmc = programPlanningUnitList.monthsInFutureForAmc;
+                    if (monthsInFutureForAMC != undefined) {
+                        monthsInFutureForAmc = monthsInFutureForAMC
+                    }
+                    for (var ap = 0; ap < monthsInFutureForAmc; ap++) {
                         var amcDate = moment(startDate).add(ap, 'months').startOf('month').format("YYYY-MM-DD");
                         var actualConsumptionQtyAmc = 0;
                         var forecastedConsumptionQtyAmc = 0;
@@ -944,7 +963,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
                                 var trueDemandPerDayPast = Math.round(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;
                                 var trueDemandPerMonth1 = Math.round(trueDemandPerDayPast * daysPerMonthPast);
-                                actualConsumptionQtyAmc += daysOfDataPast>0?trueDemandPerMonth1:0;
+                                actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
@@ -974,6 +993,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     } else {
                         amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
                     }
+                    // var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                    // if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
+                    //     amc=null;
+                    // }
                     var maxForMonths = 0;
                     var realm = generalProgramJson.realmCountry.realm;
                     var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
@@ -1137,7 +1160,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
         putRequest.onerror = function (event) {
         }.bind(this);
         putRequest.onsuccess = function (event) {
-            calculateSupplyPlan(programIdParam, planningUnitId, "whatIfProgramData", "whatIf", props, [], startDate1)
+            calculateSupplyPlan(programIdParam, planningUnitId, "whatIfProgramData", "whatIf", props, [], startDate1,'',false,false,monthsInPastForAmc,monthsInFutureForAmc)
         }.bind(this)
     }.bind(this)
 }

@@ -30,11 +30,11 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 var count = 0;
                 for (var k = 0; k < responseData.fits.length; k++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual != '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0, ci: null })
+                    output.push({ month: count, actual: inputData[k] != undefined && inputData[k].actual != undefined && inputData[k].actual != null && inputData[k].actual !== '' ? inputData[k].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] > 0 ? responseData.fits[k] : 0, ci: null })
                 }
                 for (var j = 0; j < responseData.forecast.length; j++) {
                     count += 1;
-                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0, ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
+                    output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual !== '' ? inputData[count - 1].actual : null, forecast: responseData.forecast[j] == 'NA' ? null : responseData.forecast[j] > 0 ? responseData.forecast[j] : 0, ci: responseData.ci[j] > 0 ? responseData.ci[j] : 0 })
                 }
                 if (page == "DataEntry") {
                     var arimaData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
@@ -58,7 +58,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 props.updateState("loading", false);
                 props.updateState("dataChanged", true);
                 if (error.response.status == 500) {
-                    props.updateState("noDataMessage", i18n.t('static.extrapolation.error'));
+                    props.updateState("noDataMessage1", i18n.t('static.extrapolation.error'));
                 } else {
                     props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
                 }

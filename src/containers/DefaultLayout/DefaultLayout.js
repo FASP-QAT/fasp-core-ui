@@ -40,6 +40,9 @@ const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationTy
 const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
 const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard/ApplicationDashboard.js'));
 const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
+const AddFunderType = React.lazy(() => import('../../views/FunderType/AddFunderTypeComponent'));
+const ListFunderType = React.lazy(() => import('../../views/FunderType/ListFunderTypeComponent'));
+const EditFunderType = React.lazy(() => import('../../views/FunderType/EditFunderTypeComponent'));
 const AddFundingSource = React.lazy(() => import('../../views/FundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('../../views/FundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('../../views/FundingSource/EditFundingSourceComponent'));
@@ -196,8 +199,8 @@ const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.UpdateversionSettings.UpdateversionSettings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
-  { path: '/dataset/exportDataset', name: 'static.common.exportDataset', component: ExportDataset },
-  { path: '/dataset/importDataset', name: 'static.common.importDataset', component: ImportDataset },
+  { path: '/dataset/exportDataset', name: 'static.dashboard.exportprogram', component: ExportDataset },
+  { path: '/dataset/importDataset', name: 'static.dashboard.importprogram', component: ImportDataset },
   { path: '/dataset/loadDeleteDataSet/:message', name: 'static.common.loadDeleteLocalVersion', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
@@ -266,6 +269,10 @@ const routes = [
   { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationType.organisationType', component: EditOrganisationType },
+  { path: '/funderType/addFunderType', name: 'static.breadcrum.add', entityname: 'static.funderTypeHead.funderType', component: AddFunderType },
+  { path: '/funderType/listFunderType', exact: true, name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
+  { path: '/funderType/listFunderType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
+  { path: '/funderType/editFunderType/:fundingSourceTypeId', name: 'static.breadcrum.edit', entityname: 'static.funderTypeHead.funderType', component: EditFunderType },
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
@@ -300,7 +307,9 @@ const routes = [
   { path: '/realmCountry/realmCountry/:realmId', exact: true, name: 'static.dashboard.realmcountry', component: RealmCountry },
   { path: '/program/addIntegration/:programId', exact: true, name: 'static.integration.programIntegration', component: AddProgramIntegration },
   { path: '/program/addManualIntegration', exact: true, name: 'static.integration.manualProgramIntegration', component: ManualJsonTrigger },
-  { path: '/programProduct/addCountrySpecificPrice/:programPlanningUnitId/:programId', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/1/:colour/:message', name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice/:planningUnitId/:programId', name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
+  { path: '/programProduct/addCountrySpecificPrice', exact: true, name: 'static.countrySpecificPrices.countrySpecificPrices', component: AddCountrySpecificPrice },
   { path: '/program/mapProcurementAgent/:programId', exact: true, name: 'static.integration.programIntegration', component: MapProcurementAgent },
   { path: '/changePassword', exact: true, name: 'static.dashboard.changepassword', component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -1142,6 +1151,17 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
+                            name: i18n.t('static.funderTypeHead.funderType'),
+                            icon: 'fa fa-bank',
+                            url: '/funderType/listFunderType',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
                             name: i18n.t('static.fundingSourceHead.fundingSource'),
                             icon: 'fa fa-bank',
                             url: '/fundingSource/listFundingSource',
@@ -1627,6 +1647,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-cubes',
                             attributes: {
                               hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') && this.state.activeTab == 2) ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.countrySpecificPrices.countrySpecificPrices'),
+                            url: '/programProduct/addCountrySpecificPrice',
+                            icon: 'fa fa-cubes',
+                            attributes: {
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
