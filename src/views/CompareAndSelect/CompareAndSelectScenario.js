@@ -49,6 +49,46 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
+const filterDataByFiscalYear = (data, startingMonth) => {
+    const fiscalData = {};
+    const yearWiseData = {};
+
+    data.forEach(row => {
+        const year = parseInt(moment(row[0]).format("YYYY"));
+        const month = parseInt(moment(row[0]).format("M"));
+        // Determine the fiscal year
+        console.log("row.slice(2)", row)
+
+        let fiscalYear;
+        if (month >= startingMonth) {
+            fiscalYear = `${year}-${year + 1}`;
+        } else {
+            fiscalYear = `${year - 1}-${year}`;
+        }
+        if (yearWiseData[fiscalYear]) {
+            yearWiseData[fiscalYear] += 1;
+        } else {
+            yearWiseData[fiscalYear] = 1;
+        }
+        if (!fiscalData[fiscalYear]) {
+            fiscalData[fiscalYear] = Array(row.length).fill(0);
+        }
+        // Add the row data to the corresponding fiscal year
+        for (let i = 1; i < row.length; i++) {
+            const value = parseFloat(row[i]) || 0; // Convert to float and handle empty strings
+            fiscalData[fiscalYear][i] += value;
+        }
+    });
+    console.log("row.slice(1)", fiscalData)
+
+    for (const year in yearWiseData) {
+        fiscalData[year].push(yearWiseData[year]);
+    }
+
+    return fiscalData;
+}
+
+
 const calculateSums = (data) => {
     const yearSums = {};
     const yearWiseData = {};
@@ -72,7 +112,6 @@ const calculateSums = (data) => {
             yearSums[year][i] += value;
         }
     });
-    // Calculate the total of all columns for each year
     for (const year in yearWiseData) {
         //     const total = yearSums[year].reduce((sum, val) => sum + val, 0);
         yearSums[year].push(yearWiseData[year]);
@@ -298,7 +337,8 @@ class CompareAndSelectScenario extends Component {
             const year = date.split("-")[0]; // Extract the year from the date string
             return dataArr.includes(year);
         });
-        this.setState({ yearArray: dataArr, calendarMonthList: filteredDates }, () => {
+        var rangeValue1 = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+        this.setState({ yearArray: dataArr, calendarMonthList: filteredDates, singleValue2: rangeValue1 }, () => {
             this.setMonth1List()
         })
     }
@@ -648,9 +688,8 @@ class CompareAndSelectScenario extends Component {
                 dataArr1.push(data1)
             }
             if (this.state.xAxisDisplayBy != 1) {
-                var originalData = calculateSums(dataArr1);
+                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, this.state.singleValue2.from.month) : calculateSums(dataArr1);
                 // Convert the object to an array
-                console.log("originalData", dataArr1)
                 const transformedData = Object.keys(originalData).map((year, index) => ({
                     [index]: [parseInt(year), ...originalData[year]]
                 }));
