@@ -2741,7 +2741,7 @@ class usageTemplate extends Component {
                                                     <CardBody>
                                                         <div className="d-md-flex">
                                                             <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{ display: 'flex' }}>
-                                                                <legend class="w-auto" style={{ fontSize: '14px' }}>Interval</legend>
+                                                                <legend class="w-auto text-blackD" style={{ fontSize: '14px' }}>Interval</legend>
                                                                 <FormGroup className="pr-lg-2 mt-md-1 pt-lg-2 mb-md-0">
                                                                     <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
                                                                 </FormGroup>
@@ -2787,7 +2787,7 @@ class usageTemplate extends Component {
                                                                 <span>=</span>
                                                             </FormGroup>
                                                             <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{ display: 'flex' }}>
-                                                                <legend class="w-auto" style={{ fontSize: '14px' }}>Frequency</legend>
+                                                                <legend class="w-auto text-blackD" style={{ fontSize: '14px' }}>Frequency</legend>
                                                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                                                                                                                                                                             <div className="controls SelectGo">
                                                                         <Input type="number"

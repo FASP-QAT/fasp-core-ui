@@ -257,7 +257,7 @@ body {
   min-height: 23px;
   text-align: center;
   white-space: pre;
-  color: #e5edf5!important;
+  color: #e5edf5;
 }
 .form-control:disabled, .form-control[readonly] {
   // background-color: #212631;
@@ -1343,6 +1343,9 @@ a {
 .text-blackD{
   color:#e4e5e6;
 }
+.text-blackDBg{
+  background:#e4e5e6;
+}
 .sidebar.module2 .nav-link:hover {
   color: #BA0c2f!important;
   background: #e4e5e6;
@@ -1357,6 +1360,18 @@ a {
   color: #20a8d8;
   text-decoration: none;
   background-color: transparent;
+}
+.jcalendar-update {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 5px;
+  width: 100%;
+  color: #212721;
+}
+.month-picker > .rmp-container .rmp-popup.light .rmp-pad li.active, .month-picker > .rmp-container .rmp-popup.light .rmp-pad li.active:hover {
+  background-color: #e4e5e6;
+  color: #212721;
 }
 // .month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
 //   background-color: #d3d3d3;

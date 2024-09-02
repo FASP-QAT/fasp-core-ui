@@ -2394,7 +2394,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, this);
 
       const { isDarkMode } = this.state;
-const colourArray = isDarkMode ? darkModeColors : lightModeColors;
+// const colourArray = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
 const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
@@ -2469,11 +2469,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
     }
     let bar = {}
     var datasetListForGraph = [];
-    const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#fff1f1"]
-  
-  const lightModeColors = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-  
-    // var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+    var colourArray = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
     if (this.state.showDetailTable) {
       var elInstance = this.state.dataEl;
       if (elInstance != undefined) {
@@ -2699,7 +2695,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                     <div>
                                     </div>
                                   </div>
-                                  <b>{i18n.t('static.dataentry.graphNotes')}</b>
+                                  <b className="text-blackD">{i18n.t('static.dataentry.graphNotes')}</b>
                                 </div>
                               }
                             </div>
