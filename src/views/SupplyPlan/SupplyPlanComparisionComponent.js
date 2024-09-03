@@ -2844,7 +2844,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         )
                                         )
                                     }
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -2863,7 +2863,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr>
                                         <td className="BorderNoneSupplyPlan" colSpan="15"></td>
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -2875,7 +2875,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                         }
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
@@ -2889,7 +2889,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                         }
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                         {
                                             this.state.closingBalanceArray.map((item, count) => {
