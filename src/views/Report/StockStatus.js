@@ -275,6 +275,10 @@ class StockStatus extends Component {
           var planningUnitLabel = reportingUnitList.map(ele => ele.label).toString();
           csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + programLabel) + '"')
           csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + planningUnitLabel).replaceAll(' ', '%20') + '"');
+          csvRow.push('"' + (((item.data[0].planBasedOn==1?i18n.t('static.supplyPlan.minStockMos'):i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].planBasedOn==1?item.data[0].minStockMos:item.data.minStockQty)).replaceAll(' ', '%20') + '"');
+          if(item.data[0].planBasedOn==1){
+            csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].maxStockMos)).replaceAll(' ', '%20') + '"');
+          }
         }
         csvRow.push("")
         const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
@@ -287,7 +291,7 @@ class StockStatus extends Component {
         i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
         i18n.t('static.report.amc').replaceAll(' ', '%20'),
-        item.data.length > 0 && item.data[0].planBasedOn == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
+        item.data.length > 0 && (this.state.isAggregate.toString() == "false" ?item.planBasedOn:item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
         ])];
         A = headers
@@ -313,7 +317,7 @@ class StockStatus extends Component {
                 : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ?item.planBasedOn:ele.planBasedOn) == 1 ? roundN(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false"?ele.maxStock:ele.maxStockQty)), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
         }
@@ -468,7 +472,7 @@ class StockStatus extends Component {
                     : " | " + item1.orderNo) +
                 (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
-            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ?item.planBasedOn:ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC(ele.maxStockQty, 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
+            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ?item.planBasedOn:ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false"?ele.maxStock:ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
         { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
