@@ -275,13 +275,13 @@ class StockStatus extends Component {
           var planningUnitLabel = reportingUnitList.map(ele => ele.label).toString();
           csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + programLabel) + '"')
           csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ' : ' + planningUnitLabel).replaceAll(' ', '%20') + '"');
-          csvRow.push('"' + (((item.data[0].planBasedOn==1?i18n.t('static.supplyPlan.minStockMos'):i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].planBasedOn==1?item.data[0].minStockMos:item.data.minStockQty)).replaceAll(' ', '%20') + '"');
-          if(item.data[0].planBasedOn==1){
+          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].planBasedOn == 1 ? item.data[0].minStockMos : item.data.minStockQty)).replaceAll(' ', '%20') + '"');
+          if (item.data[0].planBasedOn == 1) {
             csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].maxStockMos)).replaceAll(' ', '%20') + '"');
           }
         }
         csvRow.push("")
-        const headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
+        var headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
         i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
         i18n.t('static.report.actual').replaceAll(' ', '%20'),
@@ -291,33 +291,75 @@ class StockStatus extends Component {
         i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
         i18n.t('static.report.amc').replaceAll(' ', '%20'),
-        item.data.length > 0 && (this.state.isAggregate.toString() == "false" ?item.planBasedOn:item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
+        item.data.length > 0 && (this.state.isAggregate.toString() == "false" ? item.planBasedOn : item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
         i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
         ])];
+        if (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) {
+          headers = [addDoubleQuoteToRowContent([i18n.t('static.common.month').replaceAll(' ', '%20'),
+          i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
+          i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
+          i18n.t('static.report.actual').replaceAll(' ', '%20'),
+          ("Consensus").replaceAll(' ', '%20'),
+          i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
+          (i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus').replaceAll(' ', '%20') + " | " + i18n.t('static.report.procurementAgentName') + " | " + i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')),
+          i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
+          i18n.t('static.supplyplan.exipredStock').replaceAll(' ', '%20'),
+          i18n.t('static.supplyPlan.endingBalance').replaceAll(' ', '%20'),
+          i18n.t('static.report.amc').replaceAll(' ', '%20'),
+          item.data.length > 0 && (this.state.isAggregate.toString() == "false" ? item.planBasedOn : item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos').replaceAll(' ', '%20') : i18n.t('static.supplyPlan.maxQty').replaceAll(' ', '%20'),
+          i18n.t('static.supplyPlan.unmetDemandStr').replaceAll(' ', '%20')
+          ])]
+        }
         A = headers
-        item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
-        (ele.shipmentInfo.map(item1 => {
-          return (
-            item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code +
-            (item1.orderNo == null &&
-              item1.primeLineNo == null &&
-              item1.roNo == null &&
-              item1.roPrimeLineNo == null
-              ? " | N/A"
-              : (item1.roNo == null && item1.roPrimeLineNo == null
-                ? ""
-                : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-              (item1.orderNo == null && item1.primeLineNo == null
-                ? ""
-                : item1.orderNo == null
+        if (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) {
+          item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.finalConsumptionQty == null ? '' : ele.finalConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
+          (ele.shipmentInfo.map(item1 => {
+            return (
+              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code +
+              (item1.orderNo == null &&
+                item1.primeLineNo == null &&
+                item1.roNo == null &&
+                item1.roPrimeLineNo == null
+                ? " | N/A"
+                : (item1.roNo == null && item1.roPrimeLineNo == null
                   ? ""
-                  : " | " + item1.orderNo) +
-              (item1.primeLineNo == null
-                ? ""
-                : "-" + item1.primeLineNo))
-          )
-        }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ?item.planBasedOn:ele.planBasedOn) == 1 ? roundN(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false"?ele.maxStock:ele.maxStockQty)), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+                  : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                (item1.orderNo == null && item1.primeLineNo == null
+                  ? ""
+                  : item1.orderNo == null
+                    ? ""
+                    : " | " + item1.orderNo) +
+                (item1.primeLineNo == null
+                  ? ""
+                  : "-" + item1.primeLineNo))
+            )
+          }).join(' \n')).replaceAll(' ', '%20')
+            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundN(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+        } else {
+          item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), ele.openingBalance, ele.forecastedConsumptionQty == null ? '' : ele.forecastedConsumptionQty, ele.actualConsumptionQty == null ? '' : ele.actualConsumptionQty, ele.shipmentQty == null ? '' : ele.shipmentQty,
+          (ele.shipmentInfo.map(item1 => {
+            return (
+              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code +
+              (item1.orderNo == null &&
+                item1.primeLineNo == null &&
+                item1.roNo == null &&
+                item1.roPrimeLineNo == null
+                ? " | N/A"
+                : (item1.roNo == null && item1.roPrimeLineNo == null
+                  ? ""
+                  : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                (item1.orderNo == null && item1.primeLineNo == null
+                  ? ""
+                  : item1.orderNo == null
+                    ? ""
+                    : " | " + item1.orderNo) +
+                (item1.primeLineNo == null
+                  ? ""
+                  : "-" + item1.primeLineNo))
+            )
+          }).join(' \n')).replaceAll(' ', '%20')
+            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundN(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+        }
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
         }
@@ -439,11 +481,11 @@ class StockStatus extends Component {
           doc.text((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')) + ' : ' + planningUnitLabel, doc.internal.pageSize.width / 10, 90, {
             align: 'left'
           })
-          doc.text((item.data[0].planBasedOn==1?i18n.t('static.supplyPlan.minStockMos'):i18n.t('static.product.minQuantity')) + ' : ' + (item.data[0].planBasedOn==1?formatter(item.data[0].minStockMos,0):formatter(item.data.minStockQty,0)), doc.internal.pageSize.width / 10, 100, {
+          doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ' : ' + (item.data[0].planBasedOn == 1 ? formatter(item.data[0].minStockMos, 0) : formatter(item.data.minStockQty, 0)), doc.internal.pageSize.width / 10, 100, {
             align: 'left'
           })
-          if(item.data[0].planBasedOn==1){
-            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + formatter(item.data[0].maxStockMos,0), doc.internal.pageSize.width / 10, 110, {
+          if (item.data[0].planBasedOn == 1) {
+            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ' : ' + formatter(item.data[0].maxStockMos, 0), doc.internal.pageSize.width / 10, 110, {
               align: 'left'
             })
           }
@@ -453,26 +495,50 @@ class StockStatus extends Component {
         doc.addImage(canvasImg1, 'png', 50, (this.state.isAggregate.toString() == "false" ? 160 : 120), 750, 300, "a" + count, 'CANVAS')
         count++
         var height = doc.internal.pageSize.height;
-        let otherdata =
-          item.data.map(ele => [dateFormatter(ele.dt), formatter(ele.openingBalance, 0), formatter(ele.forecastedConsumptionQty, 0), formatter(ele.actualConsumptionQty, 0), formatter(ele.shipmentQty, 0),
-          ele.shipmentInfo.map(item1 => {
-            return (
-              item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
-                item1.primeLineNo == null &&
-                item1.roNo == null &&
-                item1.roPrimeLineNo == null
-                ? " | N/A"
-                : (item1.roNo == null && item1.roPrimeLineNo == null
-                  ? ""
-                  : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
-                (item1.orderNo == null && item1.primeLineNo == null
-                  ? ""
-                  : item1.orderNo == null
+        let otherdata;
+        if (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) {
+          otherdata =
+            item.data.map(ele => [dateFormatter(ele.dt), formatter(ele.openingBalance, 0), formatter(ele.forecastedConsumptionQty, 0), formatter(ele.actualConsumptionQty, 0),formatter(ele.finalConsumptionQty, 0), formatter(ele.shipmentQty, 0),
+            ele.shipmentInfo.map(item1 => {
+              return (
+                item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
+                  item1.primeLineNo == null &&
+                  item1.roNo == null &&
+                  item1.roPrimeLineNo == null
+                  ? " | N/A"
+                  : (item1.roNo == null && item1.roPrimeLineNo == null
                     ? ""
-                    : " | " + item1.orderNo) +
-                (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
-          }).join(' \n')
-            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ?item.planBasedOn:ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false"?ele.maxStock:ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
+                    : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                  (item1.orderNo == null && item1.primeLineNo == null
+                    ? ""
+                    : item1.orderNo == null
+                      ? ""
+                      : " | " + item1.orderNo) +
+                  (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
+            }).join(' \n')
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
+        } else {
+          otherdata =
+            item.data.map(ele => [dateFormatter(ele.dt), formatter(ele.openingBalance, 0), formatter(ele.forecastedConsumptionQty, 0), formatter(ele.actualConsumptionQty, 0), formatter(ele.shipmentQty, 0),
+            ele.shipmentInfo.map(item1 => {
+              return (
+                item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
+                  item1.primeLineNo == null &&
+                  item1.roNo == null &&
+                  item1.roPrimeLineNo == null
+                  ? " | N/A"
+                  : (item1.roNo == null && item1.roPrimeLineNo == null
+                    ? ""
+                    : " | " + item1.roNo + "-" + item1.roPrimeLineNo) +
+                  (item1.orderNo == null && item1.primeLineNo == null
+                    ? ""
+                    : item1.orderNo == null
+                      ? ""
+                      : " | " + item1.orderNo) +
+                  (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
+            }).join(' \n')
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
+        }
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
         { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
@@ -489,9 +555,31 @@ class StockStatus extends Component {
           i18n.t('static.supplyplan.exipredStock'),
           i18n.t('static.supplyPlan.endingBalance'),
           i18n.t('static.report.amc'),
-          (this.state.isAggregate.toString() == "false" ?item.planBasedOn:item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
+          (this.state.isAggregate.toString() == "false" ? item.planBasedOn : item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
           i18n.t('static.supplyPlan.unmetDemandStr'),
         ]];
+        if (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) {
+          header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
+          { content: i18n.t("static.report.stock"), colSpan: 1 },
+          { content: i18n.t("static.supplyPlan.consumption"), colSpan: 3 },
+          { content: i18n.t("static.shipment.shipment"), colSpan: 2 },
+          { content: i18n.t("static.report.stock"), colSpan: 6 }
+          ],
+          [
+            i18n.t('static.supplyPlan.openingBalance'),
+            i18n.t('static.report.forecasted'),
+            i18n.t('static.report.actual'),
+            "Consensus",
+            i18n.t('static.supplyPlan.qty'),
+            (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
+            i18n.t('static.supplyPlan.adj'),
+            i18n.t('static.supplyplan.exipredStock'),
+            i18n.t('static.supplyPlan.endingBalance'),
+            i18n.t('static.report.amc'),
+            (this.state.isAggregate.toString() == "false" ? item.planBasedOn : item.data[0].planBasedOn) == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty'),
+            i18n.t('static.supplyPlan.unmetDemandStr'),
+          ]];
+        }
         let content = {
           margin: { top: 80, bottom: 70 },
           startY: height,
@@ -864,8 +952,8 @@ class StockStatus extends Component {
             },
             {
               type: "line",
-              yAxisID: (this.state.isAggregate.toString()=="false"?plannningUnitItem.planBasedOn:filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
-              label: (this.state.isAggregate.toString()=="false"?plannningUnitItem.planBasedOn:filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
+              yAxisID: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
+              label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
               backgroundColor: 'rgba(255,193,8,0.2)',
               borderColor: '#59cacc',
               borderStyle: 'dotted',
@@ -881,12 +969,12 @@ class StockStatus extends Component {
               pointRadius: 0,
               yValueFormatString: "$#,##0",
               lineTension: 0,
-              data: this.state.isAggregate.toString() == "true"?(filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1?item.minStockMos:item.minStockQty)))):(filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1?item.minMos:item.minStock))))
+              data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? item.minStockMos : item.minStockQty)))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.minMos : item.minStock))))
             }
             , {
               type: "line",
-              yAxisID: (this.state.isAggregate.toString()=="false"?plannningUnitItem.planBasedOn:filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
-              label: (this.state.isAggregate.toString()=="false"?plannningUnitItem.planBasedOn:filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
+              yAxisID: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
+              label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
               backgroundColor: 'rgba(0,0,0,0)',
               borderColor: '#59cacc',
               borderStyle: 'dotted',
@@ -902,10 +990,10 @@ class StockStatus extends Component {
               pointRadius: 0,
               showInLegend: true,
               yValueFormatString: "$#,##0",
-              data: this.state.isAggregate.toString() == "true"?(filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? item.maxStockMos:item.maxStock)))):(filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.maxMos: item.maxStock))))
+              data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? item.maxStockMos : item.maxStock)))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.maxMos : item.maxStock))))
             }
           ];
-          if((this.state.isAggregate.toString()=="false"?plannningUnitItem.planBasedOn:filteredPlanningUnitData[0].planBasedOn)==1){
+          if ((this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1) {
             datasets.push({
               type: "line",
               yAxisID: 'B',
@@ -1630,15 +1718,15 @@ class StockStatus extends Component {
    * @param {object} value - The new range value selected by the user.
    */
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value }, () => { 
-      if(this.state.planningUnitId.length>0 || this.state.realmCountryPlanningUnitId.length>0){
-      this.fetchData()
-      }else{
+    this.setState({ rangeValue: value }, () => {
+      if (this.state.planningUnitId.length > 0 || this.state.realmCountryPlanningUnitId.length > 0) {
+        this.fetchData()
+      } else {
         this.setState({
           stockStatusList: []
         })
       }
-     })
+    })
   }
   /**
    * Handles the click event on the range picker box.
@@ -2361,8 +2449,8 @@ class StockStatus extends Component {
                                     <b>{i18n.t("static.supplyPlan.maxStockMos")}</b>   : {this.state.stockStatusList[0].maxStockMos}
                                   </span>
                                 </li>
-                              </> : 
-                              <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li></>}
+                              </> :
+                                <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li></>}
                             </ul>
                           </FormGroup>
                         }
