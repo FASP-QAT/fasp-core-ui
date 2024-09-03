@@ -5430,7 +5430,7 @@ export default class TreeTable extends Component {
             <>
                 <TabPane tabId="1" style={{ paddingBottom: "50px" }}>
                     <i className="text-danger">{i18n.t('static.treeTable.tabNotes')}</i><br />
-                    <i>{i18n.t('static.treeTable.rightClickNotes')}</i>
+                    <i className='text-blackD'>{i18n.t('static.treeTable.rightClickNotes')}</i>
                     <div className="TreeTable">
                         <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>

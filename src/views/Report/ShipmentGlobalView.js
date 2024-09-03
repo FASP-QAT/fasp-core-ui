@@ -32,15 +32,15 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
-const backgroundColor = [
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-]
+// const backgroundColor = [
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+// ]
 /**
  * Component for Shipment Global View Report.
  */
@@ -1379,8 +1379,28 @@ observer.observe(document.documentElement, {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+
+        const lightModeColors = [
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        ]
+
+        const darkModeColors = [
+            '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+        ]
         const { isDarkMode } = this.state;
-// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
 
         const options = {
@@ -1714,8 +1734,9 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
             }
             displayObject.push(holdArray);
         }
+        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
         var bar1 = []
-        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
+        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor1[index] }))
         bar1 = {
             labels: [...new Set(this.state.dateSplitList.map(ele => (dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet

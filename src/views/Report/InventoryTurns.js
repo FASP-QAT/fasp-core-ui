@@ -1335,7 +1335,7 @@ export default class InventoryTurns extends Component {
                                             <FormGroup className="col-md-12 mt-2 " style={{ display: this.state.display }}>
                                                 <ul className="legendcommitversion list-group">
                                                     <li><span className="legendcolor" style={{ backgroundColor: "#BA0C2F" }}></span> <span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months12')}</span></li>
-                                                    <li><span className="legendcolor" style={{ backgroundColor: "#000000" }}></span> <span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months13')}</span></li>
+                                                    <li><span className="legendcolor text-blackDBg"></span> <span className="legendcommitversionText">{i18n.t('static.inventoryTurns.months13')}</span></li>
                                                 </ul>
                                             </FormGroup>
                                         </div>

@@ -773,9 +773,9 @@ observer.observe(document.documentElement, {
   render() {
 
     const { isDarkMode } = this.state;
-// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-// const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     const options = {
       title: {
@@ -806,12 +806,24 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
               }
               return x1 + x2;
             }
-          }
+          },
+          gridLines: {
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor 
+        }
         }],
         xAxes: [{
           ticks: {
             fontColor:fontColor
-          }
+          },
+          gridLines: {
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor 
+        }
         }]
       },
       annotation: {
@@ -873,7 +885,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
-    const backgroundColor = [
+    const lightModeColors = [
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
       '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
@@ -882,6 +894,16 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     ]
+    const darkModeColors = [
+      '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+      '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+      '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
+    ]
+    const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
     let consumptionSummerydata = [];
     var mainData = this.state.consumptions;
@@ -904,7 +926,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     }
     const bar = {
       labels: [...new Set(this.state.consumptions.map(ele => (dateFormatterLanguage(ele.consumptionDateString1))))],
-      datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
+      datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor1[index] })),
     };
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
