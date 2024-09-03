@@ -6282,7 +6282,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             )
                                             )
                                         }
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -6301,7 +6301,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         <tr>
                                             <td className="BorderNoneSupplyPlan" colSpan="15"></td>
                                         </tr>
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -6313,7 +6313,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
@@ -6327,7 +6327,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                             {
                                                 this.state.closingBalanceArray.map((item, count) => {
@@ -6457,7 +6457,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" useLocalData={1} />}
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="">
-                                    <div id="shipmentsDetailsTable" />
+                                    <div id="shipmentsDetailsTable" className='ModalTabletextClr' />
                                 </div>
                                 {this.refs.shipmentChild != undefined && this.refs.shipmentChild.state.originalShipmentIdForPopup !== "" && <><br /><strong>{this.refs.shipmentChild != undefined && this.refs.shipmentChild.state.originalShipmentIdForPopup !== "" ? "For Shipment Id " + this.refs.shipmentChild.state.originalShipmentIdForPopup : ""}</strong></>}
                                 <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
