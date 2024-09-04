@@ -2255,6 +2255,7 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
+                    backgroundColor: colors[1],
                     borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
