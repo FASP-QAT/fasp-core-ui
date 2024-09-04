@@ -1573,7 +1573,8 @@ class StockStatus extends Component {
       errorValues: [],
       regionListFiltered: [],
       show: false,
-      loading: false
+      loading: false,
+      stockStatusList:[]
     }, () => {
       if (viewById == 2) {
         document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
