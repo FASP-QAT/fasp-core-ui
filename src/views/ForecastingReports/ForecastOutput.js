@@ -41,7 +41,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -572,7 +572,7 @@ class ForecastOutput extends Component {
             let propertyName = this.state.monthArrayList.map(item1 => (
                 ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? ((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == 'NAN' || (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == null || Number.isNaN((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) ? '' : (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")) : ''
             ));
-            propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1.replace(',', '')).toFixed(2))
+            propertyName = propertyName.map(ele1 => ele1 === '' ? '' : formatter(Number(ele1.replaceAll(',', '')).toFixed(2)))
             A = [];
             A.push(
                 ((getLabelText(ele.objUnit.label, this.state.lang))),
@@ -588,7 +588,7 @@ class ForecastOutput extends Component {
             let propertyName = this.state.monthArrayList.map(item1 => (
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
-            propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1.replace(',', '')).toFixed(2))
+            propertyName = propertyName.map(ele1 => ele1 === '' ? '' : formatter(Number(ele1.replaceAll(',', '')).toFixed(2)))
             A.push(
                 ((i18n.t('static.supplyPlan.total') + ' ' + this.state.equivalencyUnitLabel)),
                 ''
@@ -600,7 +600,7 @@ class ForecastOutput extends Component {
             let propertyName = this.state.monthArrayList.map(item1 => (
                 ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
-            propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1.replace(',', '')).toFixed(2))
+            propertyName = propertyName.map(ele1 => ele1 === '' ? '' : formatter(Number(ele1.replaceAll(',', '')).toFixed(2)))
             A = [];
             A.push(
                 ((getLabelText(ele.objUnit.label, this.state.lang))),
@@ -616,7 +616,7 @@ class ForecastOutput extends Component {
             let propertyName = this.state.monthArrayList.map(item1 => (
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? (this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
-            propertyName = propertyName.map(ele1 => ele1 == '' ? '' : Number(ele1.replace(',', '')).toFixed(2))
+            propertyName = propertyName.map(ele1 => ele1 === '' ? '' : formatter(Number(ele1.replaceAll(',', '')).toFixed(2)))
             A.push(
                 ((i18n.t('static.supplyPlan.total') + ' ' + this.state.equivalencyUnitLabel)),
                 ''
