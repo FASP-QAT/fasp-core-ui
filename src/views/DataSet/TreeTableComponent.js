@@ -2594,6 +2594,7 @@ export default class TreeTable extends Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
+            columnDrag: false,
             filters: true,
             license: JEXCEL_PRO_KEY,
             onload: this.loadedTab1,
@@ -3159,9 +3160,14 @@ export default class TreeTable extends Component {
             treeArray[count] = data;
             count++;
         }
-
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        jexcel.destroy(document.getElementById("tableDiv"), true);
+        try {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+        } catch (err) { }
         var data = treeArray;
         var options = {
             data: data,
@@ -3370,6 +3376,7 @@ export default class TreeTable extends Component {
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
+            columnDrag: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
@@ -5429,8 +5436,7 @@ export default class TreeTable extends Component {
         return (
             <>
                 <TabPane tabId="1" style={{ paddingBottom: "50px" }}>
-                    <i className="text-danger">{i18n.t('static.treeTable.tabNotes')}</i><br />
-                    <i className='text-blackD'>{i18n.t('static.treeTable.rightClickNotes')}</i>
+                    <i>{i18n.t('static.treeTable.rightClickNotes')}</i>
                     <div className="TreeTable">
                         <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
@@ -5443,7 +5449,7 @@ export default class TreeTable extends Component {
                     </div>}
                 </TabPane>
                 <TabPane tabId="2" style={{ paddingBottom: "50px" }}>
-                    <i className="text-danger">{i18n.t('static.treeTable.tabNotes')}</i>
+                    <i>{i18n.t('static.treeTable.rightClickNotes')}</i>
                     <div className="TreeTable">
                         <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
@@ -5730,7 +5736,11 @@ export default class TreeTable extends Component {
         this.setState({
             items
         }, () => {
-            this.buildTab1Jexcel();
+            if (this.state.activeTab1[0] === '1') {
+                this.buildTab1Jexcel();
+            } else {
+                this.buildTab2Jexcel();
+            }
         })
     }
     /**
@@ -5918,6 +5928,11 @@ export default class TreeTable extends Component {
                                                             </Input>
                                                         </InputGroup>
                                                     </FormGroup>
+                                                    {/* <FormGroup className="col-md-3 pl-lg-0"> */}
+                                                        {/* <Label htmlFor="languageId"> */}
+                                                        {/* </Label> */}
+                                                        <i style={{"marginTop":"28px"}}>{i18n.t('static.consumption.forcast')}: {this.state.forecastPeriod}</i>
+                                                    {/* </FormGroup> */}
                                                 </Row>
                                             </div>
                                         </CardBody>
