@@ -988,8 +988,10 @@ export default class SupplyPlanComponent extends React.Component {
                 total+=Number(item.qty);
                 dataArray.push(data);
             }
+            try{
             this.el = jexcel(document.getElementById("inventoryActualBatchInfoTable"), '');
             jexcel.destroy(document.getElementById("inventoryActualBatchInfoTable"), true);
+            }catch(err){}
             var data = dataArray;
             var options = {
                 data: data,
@@ -1296,7 +1298,9 @@ export default class SupplyPlanComponent extends React.Component {
             cont = true;
         }
         if (cont == true) {
+            try{
             jexcel.destroy(document.getElementById("inventoryActualBatchInfoTable"), true);
+            }catch(err){}
             this.setState({
                 actualInventoryChanged:false,
                 actualInventoryEl:"",
@@ -4540,7 +4544,9 @@ export default class SupplyPlanComponent extends React.Component {
         }
         if (cont == true) {
             if(this.state.actualInventoryEl!=undefined && this.state.actualInventoryEl!=""){
+                try{
                 jexcel.destroy(document.getElementById("inventoryActualBatchInfoTable"), true);
+                }catch(err){}
             }
             this.setState({ loading: true, actualInventoryChanged:false, inventoryStartDateClicked: moment(endDate).startOf('month').format("YYYY-MM-DD"), actualInventoryEl:"", ledgerForBatch:[],actualInventoryBatchTotalNotMatching:"" })
             var elInstance = this.state.inventoryBatchInfoTableEl;
