@@ -18,6 +18,8 @@ import {
     Modal,
     ModalBody,
     ModalHeader,
+    Popover,
+    PopoverBody,
     Table
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -114,7 +116,7 @@ class CompareAndSelectScenario extends Component {
             monthArrayList: [],
             planningUnitId: "",
             scenarioList: [],
-            selectedTreeScenarioId: 0,
+            selectedTreeScenarioId: [],
             actualConsumptionList: [],
             showAllData: false,
             consumptionDataForTree: [],
@@ -381,7 +383,19 @@ class CompareAndSelectScenario extends Component {
             }
             if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined) {
             }
-            var selectedTreeScenarioId = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != null && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId).length > 0 ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId && c.tree.treeId == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeId)[0].id : 0 : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0;
+            var selectedTreeScenarioId = [];
+            if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined) {
+                if (selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario.length > 0) {
+                    var treeAndScenario = selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].treeAndScenario;
+                    for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                        if (treeScenarioList.filter(c => c.scenario.id == treeAndScenario[tas].scenarioId && c.tree.treeId == treeAndScenario[tas].treeId).length > 0) {
+                            selectedTreeScenarioId.push((treeScenarioList.filter(c => c.scenario.id == treeAndScenario[tas].scenarioId && c.tree.treeId == treeAndScenario[tas].treeId)[0].id).toString());
+                        }
+                    }
+                } else if ((selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId) != undefined) {
+                    selectedTreeScenarioId.push((selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId).toString());
+                }
+            }
             var forecastNotes = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes : "" : "";
             var readonlyList = treeScenarioList.filter(c => c.readonly).sort(function (a, b) {
                 a = (a.type == "T" ? getLabelText(a.tree.label, this.state.lang) + " - " + getLabelText(a.scenario.label, this.state.lang) : getLabelText(a.scenario.extrapolationMethod.label, this.state.lang)).toLowerCase();
@@ -456,6 +470,8 @@ class CompareAndSelectScenario extends Component {
                     }
                 }
             }
+            columns1.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length>1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+            calendarTableCol.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length>1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
             // calendarTableCol.push({ title: i18n.t('static.supplyPlan.total'), type: 'numeric', mask: '#,##.00' });
             calendarTableCol.push({ title: i18n.t("static.compareAndSelect.noOfMonths"), type: "numeric", width: 100 })
             var data = [];
@@ -563,6 +579,8 @@ class CompareAndSelectScenario extends Component {
                 data[0] = monthArrayListWithoutFormat[m];
                 var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                 data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+                var total = 0;
+                var count = 0;
                 if (actualFilter.length > 0) {
                     actualConsumptionListForMonth.push({ year: moment(actualFilter[0].month).format("YYYY"), value: Number(Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) });
                 }
@@ -570,32 +588,62 @@ class CompareAndSelectScenario extends Component {
                     if (treeScenarioList[tsl].type == "T") {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                         data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                        if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
+                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2)) : Number(0)
+                            if (scenarioFilter.length > 0) {
+                                count += 1;
+                            }
+                        }
                         consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
                         collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null })
                     } else {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                         data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                        if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
+                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2)) : Number(0);
+                            if (scenarioFilter.length > 0) {
+                                count += 1;
+                            }
+                        }
                         consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
                         collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null })
                     }
                 }
+                data[tsl + 2] = count > 0 ? Number(total).toFixed(2) : "";
+                consumptionDataForTree.push({ id: "-1", value: count > 0 ? Number(total).toFixed(2) : "", month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") })
+                collapsedExpandArr.push({ id: "-1", year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: count > 0 ? Number(total).toFixed(2) : "" })
                 dataArr.push(data)
             }
             var monthArrayListWithoutFormat = this.state.calendarMonthList;
             for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
                 data1 = [];
                 data1[0] = monthArrayListWithoutFormat[m];
+                var total = 0;
+                var count = 0;
                 for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                     if (treeScenarioList[tsl].checked) {
                         if (treeScenarioList[tsl].type == "T") {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                             data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                            if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
+                                total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2)) : Number(0);
+                            }
+                            if (scenarioFilter.length > 0) {
+                                count += 1;
+                            }
                         } else {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                             data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                            if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
+                                total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier)).toFixed(2) : Number(0);
+                            }
+                            if (scenarioFilter.length > 0) {
+                                count += 1;
+                            }
                         }
                     }
                 }
+                data1[tsl] = count > 0 ? Number(total).toFixed(2) : "";
                 dataArr1.push(data1)
             }
             if (this.state.xAxisDisplayBy != 1) {
@@ -705,12 +753,18 @@ class CompareAndSelectScenario extends Component {
                 let treeScenarioList1 = this.state.treeScenarioList;
                 let dataArray = [];
                 let count = 0;
+                var total = 0;
+                var count1 = 0;
                 for (var j = 0; j < treeScenarioList1.length; j++) {
                     data = [];
-                    data[0] = this.state.selectedTreeScenarioId == treeScenarioList1[j].id ? true : false
+                    if (this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString())) {
+                        count1 += 1;
+                        total += Number(Number(totalArray[j]).toFixed(2))
+                    }
+                    data[0] = this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString()) ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
-                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))} ${treeScenarioList1[j].readonly ? '<i class="fa fa-exclamation-triangle"></i>' : ''}`
+                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
                     data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
                     data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
                     data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
@@ -719,8 +773,19 @@ class CompareAndSelectScenario extends Component {
                     dataArray.push(data)
                     count++;
                 }
+                // data=[];
+                // data[0] ="";
+                // data[1] = "";
+                // data[2] ="";
+                // data[3] = "Total Aggregated Trees";
+                // data[4] = "1234";
+                // data[5]="";
+                // data[6] ="";
+                // data[7] ="";
+                // data[8] ="";
+                // dataArray.push(data);
                 let columns = [];
-                columns.push({ title: i18n.t('static.common.select'), type: 'radio', width: 50 });
+                columns.push({ title: i18n.t('static.common.select'), type: 'checkbox', width: 50 });
                 columns.push({ title: i18n.t('static.common.display?'), type: 'checkbox', width: 50 });
                 columns.push({ title: i18n.t('static.equivalancyUnit.type'), type: 'text', readOnly: true, width: 50 });
                 columns.push({ title: i18n.t('static.consumption.forcast'), type: 'html', readOnly: true, width: 150 });
@@ -763,7 +828,6 @@ class CompareAndSelectScenario extends Component {
                 };
                 var calendarDataEl = jexcel(document.getElementById("calendarTable"), calendarOptions);
                 this.el = calendarDataEl;
-
                 var data = dataArray;
                 var options = {
                     data: data,
@@ -772,6 +836,19 @@ class CompareAndSelectScenario extends Component {
                     columns: columns,
                     onload: this.loadedTable1,
                     onchange: this.changeTable1,
+                    footers: [
+                        [
+                            '',
+                            '',
+                            '',
+                            i18n.t("static.compareAndSelect.totalAggregated"),
+                            count1>0?formatter(Number(total).toFixed(2)):"",
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]
+                    ],
                     pagination: false,
                     search: false,
                     columnSorting: true,
@@ -852,7 +929,6 @@ class CompareAndSelectScenario extends Component {
             // var pu = localStorage.getItem("sesDatasetPlanningUnitId")
             // var trElement1 = document.querySelector('.planingUnitId-' + pu);
             // trElement1.classList.add('compareAndSelectPU');
-            console.log('Element not found');
         }
 
         var cont = false;
@@ -968,7 +1044,7 @@ class CompareAndSelectScenario extends Component {
         this.state.finalData.map(ele =>
             A.push(addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
-            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            this.state.selectedTreeScenarioId.includes(ele.id.toString()) ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
             !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
             ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
             ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
@@ -1209,7 +1285,7 @@ class CompareAndSelectScenario extends Component {
         this.state.finalData.map(ele =>
             dataArr3.push([ele.checked == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'), ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
             ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
-            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            this.state.selectedTreeScenarioId.includes(ele.id.toString()) ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
             formatter(ele.totalForecast, 0),
             ele.forecastError != i18n.t('static.supplyPlanFormula.na') ? ele.forecastError != "" ? formatter(ele.forecastError, 0) : "" : ele.forecastError,
             ele.noOfMonths.toString(),
@@ -1492,7 +1568,7 @@ class CompareAndSelectScenario extends Component {
                     cell.classList.add('readonlyForecast');
                     cell.classList.add('readonly');
                 }
-            } else if (this.state.selectedTreeScenarioId == rowData[8]) {
+            } else if (this.state.selectedTreeScenarioId.includes(rowData[8].toString())) {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                     cell.classList.add('selectedForecast');
@@ -1525,9 +1601,9 @@ class CompareAndSelectScenario extends Component {
      * @param {any} value - The new value of the changed cell.
      */
     changeTable1 = function (instance, cell, x, y, value) {
-        this.setState({
-            loading: true
-        })
+        // this.setState({
+        //     loading: true
+        // })
         var elInstance = instance;
         // elInstance.setColumnGroup(0, this.state.yearArray.length)
 
@@ -1536,18 +1612,118 @@ class CompareAndSelectScenario extends Component {
             var index = this.state.treeScenarioList.findIndex(c => c.id == elInstance.getRowData(y)[8]);
             treeScenarioList[index].checked = !treeScenarioList[index].checked;
             this.setState({
-                treeScenarioList: treeScenarioList
+                treeScenarioList: treeScenarioList,
+                loading: true
             }, () => {
                 this.buildJexcel()
             })
         }
         if (x == 0) {
+            if (value.toString() == "true") {
+                var selectedTreeScenarioId = this.state.selectedTreeScenarioId;
+                selectedTreeScenarioId.push(elInstance.getRowData(y)[8].toString());
+                if (selectedTreeScenarioId.length > 1) {
+                    var checkIfLatestIsConsumption = this.state.treeScenarioList.filter(c => c.id == elInstance.getRowData(y)[8].toString())[0].type;
+                    if (checkIfLatestIsConsumption == "C") {
+                        selectedTreeScenarioId = selectedTreeScenarioId.filter(c => c == elInstance.getRowData(y)[8].toString());
+                    } else {
+                        var treeAndScenarioList = this.state.treeScenarioList.filter(c => selectedTreeScenarioId.includes(c.id.toString()) && c.type == "T");
+                        selectedTreeScenarioId = [];
+                        treeAndScenarioList.map(item => {
+                            selectedTreeScenarioId.push(item.id.toString());
+                        });
+                    }
+                }
+            } else {
+                var selectedTreeScenarioId = this.state.selectedTreeScenarioId;
+                selectedTreeScenarioId = selectedTreeScenarioId.filter(c => c != elInstance.getRowData(y)[8].toString());
+            }
+            var json = instance.getJson(null, false);
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            var total=0;
+            var count=0;
+            for (var j = 0; j < json.length; j++) {
+                var rowData = elInstance.getRowData(j);
+                var treeScenarioFilter=this.state.treeScenarioList.filter(c=>c.id==elInstance.getRowData(j)[8].toString() && selectedTreeScenarioId.includes(c.id.toString()));
+                if(treeScenarioFilter.length>0){
+                    count+=1;
+                    total+=Number(rowData[4].toString().replaceAll(",",""));
+                }
+                instance.setFooter(
+                    [
+                        [
+                            '',
+                            '',
+                            '',
+                            i18n.t("static.compareAndSelect.totalAggregated"),
+                            count>0?formatter(Number(total).toFixed(2)):"",
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]
+                    ]
+                )
+                if (j != y) {
+                    instance.setValueFromCoords(x, j, (selectedTreeScenarioId.includes(elInstance.getRowData(j)[8].toString()) ? true : false), true);
+                }
+                var rowData = elInstance.getRowData(j);
+                if (this.state.treeScenarioList[j].readonly) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        try{
+                            cell.classList.remove('notSelectedForecast');     
+                        }catch(err){}
+                        try{
+                            cell.classList.remove('selectedForecast');     
+                        }catch(err){}
+                        cell.classList.add('readonlyForecast');
+                        cell.classList.add('readonly');
+                    }
+                } else if (selectedTreeScenarioId.includes(rowData[8].toString())) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        try{
+                            cell.classList.remove('notSelectedForecast');    
+                        }catch(err){}
+                        cell.classList.add('selectedForecast');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
+                        try{
+                            cell.classList.remove('selectedForecast');    
+                        }catch(err){}
+                        cell.classList.add('notSelectedForecast');
+                    }
+                }
+                if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
+                    var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                    try{
+                        cell.classList.remove('notLowestError');    
+                    }catch(err){}
+                    cell.classList.add('lowestError');
+                } else {
+                    var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                    try{
+                        cell.classList.remove('lowestError');    
+                    }catch(err){}
+                    cell.classList.add('notLowestError');
+                }
+                if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
+                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                    try{
+                        cell.classList.remove(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? this.state.finalData[j].compareToConsumptionForecastClass:"compareAndSelectRed");
+                    }catch(err){}
+                    cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? "compareAndSelectRed" : this.state.finalData[j].compareToConsumptionForecastClass);
+                }
+            }
             this.setState({
                 dataChangedFlag: 1,
                 changed: true,
-                selectedTreeScenarioId: elInstance.getRowData(y)[8]
+                selectedTreeScenarioId: selectedTreeScenarioId
             }, () => {
-                this.buildJexcel();
+                // this.buildJexcel();
             })
         }
     }
@@ -1593,11 +1769,15 @@ class CompareAndSelectScenario extends Component {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('jexcelBoldPurpleCell');
                 }
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelBoldPurpleCell');
             } else {
                 for (var c = 2; c <= tList.length + 1; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('jexcelPurpleCell');
                 }
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelPurpleCell');
             }
         }
     }
@@ -1632,11 +1812,15 @@ class CompareAndSelectScenario extends Component {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('jexcelBoldPurpleCell');
                 }
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelBoldPurpleCell');
             } else {
                 for (var c = 2; c <= tList.length + 1; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('jexcelPurpleCell');
                 }
+                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelPurpleCell');
             }
         }
     }
@@ -1656,10 +1840,13 @@ class CompareAndSelectScenario extends Component {
                 var obj = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == puList[p].planningUnit.id && c.consumptionExtrapolationId == map.consumptionExtrapolationId)[0];
                 selectedForecastString = obj != undefined ? getLabelText(obj.extrapolationMethod.label, this.state.lang) : "";
                 planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
-            } else if (map != undefined && map.scenarioId > 0 && map.treeId > 0) {
-                var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && map.treeId == c.treeId)[0];
-                var s = t != undefined ? t.scenarioList.filter(s => s.id == map.scenarioId)[0] : undefined;
-                selectedForecastString = t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : ""
+            } else if (map != undefined && map.treeAndScenario != undefined && map.treeAndScenario.length > 0) {
+                var treeAndScenario = map.treeAndScenario;
+                for (var tas = 0; tas < treeAndScenario.length; tas++) {
+                    var t = datasetJson.treeList.filter(c => c.active.toString() == "true" && treeAndScenario[tas].treeId == c.treeId)[0];
+                    var s = t != undefined ? t.scenarioList.filter(s => s.id == treeAndScenario[tas].scenarioId)[0] : undefined;
+                    selectedForecastString = selectedForecastString.concat(t != undefined && s != undefined ? getLabelText(t.label, this.state.lang) + " - " + getLabelText(s.label, this.state.lang) : "");
+                }
                 planningUnitListForTable.push({ planningUnit: puList[p].planningUnit, selectedForecast: selectedForecastString })
             } else {
                 selectedForecastString = ""
@@ -1857,6 +2044,7 @@ class CompareAndSelectScenario extends Component {
             });
             localStorage.setItem("sesDatasetRegionId", event.target.value);
             var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
+            // }
             var regionId = event.target.value;
             this.setState({
                 regionId: event.target.value,
@@ -1878,7 +2066,7 @@ class CompareAndSelectScenario extends Component {
             loading: true
         })
         this.setState({
-            selectedTreeScenarioId: id,
+            // selectedTreeScenarioId: id,
             loading: false
         }, () => {
             this.buildJexcel();
@@ -1920,17 +2108,39 @@ class CompareAndSelectScenario extends Component {
      */
     submitScenario() {
         this.setState({ dataChangedFlag: 0, loading: true })
-        var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
-        var treeId = this.state.selectedTreeScenarioId.toString().split("~")[0];
-        if (scenarioId == undefined) {
-            scenarioId = null;
-            treeId = null;
-        }
+        var selectedTreeScenarioId = this.state.selectedTreeScenarioId;
+        var treeAndScenario = [];
         var consumptionExtrapolationId = "";
-        if (!this.state.selectedTreeScenarioId.toString().includes("~")) {
-            consumptionExtrapolationId = this.state.selectedTreeScenarioId
+        if (selectedTreeScenarioId.length > 1) {
+            for (var tas = 0; tas < selectedTreeScenarioId.length; tas++) {
+                treeAndScenario.push({
+                    "treeId": selectedTreeScenarioId[tas].toString().split("~")[0],
+                    "scenarioId": selectedTreeScenarioId[tas].toString().split("~")[1]
+                })
+            }
+        } else if (selectedTreeScenarioId.length == 1) {
+            var scenarioId = this.state.selectedTreeScenarioId[0].toString().split("~")[1];
+            if (scenarioId == undefined) {
+                treeAndScenario = []
+            } else {
+                treeAndScenario.push({
+                    "treeId": this.state.selectedTreeScenarioId[0].toString().split("~")[0],
+                    "scenarioId": this.state.selectedTreeScenarioId[0].toString().split("~")[1]
+                })
+            }
+            var consumptionExtrapolationId = "";
+            if (!this.state.selectedTreeScenarioId[0].toString().includes("~")) {
+                consumptionExtrapolationId = this.state.selectedTreeScenarioId[0]
+            }
         }
-        var totalIndex = this.state.treeScenarioList.findIndex(c => c.id == this.state.selectedTreeScenarioId);
+        let total = 0;
+        this.state.treeScenarioList.forEach((c, index) => {
+            if (this.state.selectedTreeScenarioId.includes(c.id.toString())) {
+                total += Number(this.state.totalArray[index]);
+            } else {
+                total += 0;
+            }
+        });
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1954,7 +2164,7 @@ class CompareAndSelectScenario extends Component {
                 var planningUnitList1 = planningUnitList;
                 var index = planningUnitList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.active.toString() == "true");
                 var pu = planningUnitList1[index];
-                pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "treeId": treeId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[totalIndex], notes: this.state.forecastNotes };
+                pu.selectedForecastMap[this.state.regionId] = { treeAndScenario: treeAndScenario, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": total, notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
                 var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
@@ -2233,6 +2443,7 @@ class CompareAndSelectScenario extends Component {
             }
         }
         let bar = {}
+        let i = 0;
         if (this.state.showAllData) {
             var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
             var datasetsArr = [];
@@ -2268,6 +2479,7 @@ class CompareAndSelectScenario extends Component {
                 }
             )
             this.state.treeScenarioList.filter(c => c.checked).map((item, idx) => {
+                i = idx;
                 var collapsedExpandArray = [];
                 if (this.state.xAxisDisplayBy != 1) {
                     var collapsedExpandArray = this.state.collapsedExpandArr.filter(ar => ar.id == item.id);
@@ -2298,7 +2510,7 @@ class CompareAndSelectScenario extends Component {
                             fontColor: 'transparent',
                         },
                         lineTension: 0.1,
-                        borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
+                        borderWidth: (this.state.selectedTreeScenarioId.includes(item.id.toString()) && this.state.selectedTreeScenarioId.length==1) ? 5 : 3,
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
@@ -2308,6 +2520,44 @@ class CompareAndSelectScenario extends Component {
                     }
                 )
             })
+            if (this.state.selectedTreeScenarioId.length>1) {
+                var collapsedExpandArray = this.state.collapsedExpandArr.filter(ar => ar.id == -1);
+                if (collapsedExpandArray.length > 0) {
+                    collapsedExpandArray = collapsedExpandArray.map(i => ({ year: i.year, actual: i.actual }));
+                    var consolidatedData = collapsedExpandArray.reduce((acc, current) => {
+                        const { year, actual } = current;
+                        if (!acc[year]) {
+                            acc[year] = { year, totalActual: 0 };
+                        }
+                        acc[year].totalActual += Number(actual);
+                        return acc;
+                    }, {});
+
+                    // Convert the result to an array
+                    collapsedExpandArray = Object.values(consolidatedData);
+                }
+                datasetsArr.push(
+                    {
+                        label: i18n.t("static.compareAndSelect.totalAggregated"),
+                        type: 'line',
+                        stack: i + 2,
+                        backgroundColor: 'transparent',
+                        borderColor: "#BA0C2F",
+                        ticks: {
+                            fontSize: 2,
+                            fontColor: 'transparent',
+                        },
+                        lineTension: 0.1,
+                        borderWidth: 5,
+                        pointStyle: 'line',
+                        pointRadius: 3,
+                        showInLegend: true,
+                        data: this.state.xAxisDisplayBy == 1 ?
+                            this.state.consumptionDataForTree.filter(c => c.id == -1).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))) :
+                            collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(2) : null))
+                    }
+                )
+            }
             // bar = {
             //     labels: monthArrayList,
             //     datasets: datasetsArr
@@ -2501,15 +2751,17 @@ class CompareAndSelectScenario extends Component {
                                         <div className={this.state.showHidePU ? "col-md-9" : "col-md-12"} style={{ display: this.state.loading ? "none" : "block" }}>
                                             {this.state.showAllData &&
                                                 <>
-                                                    <ul style={{ marginLeft: '-2.5rem' }}><b className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
+                                                    <ul style={{ marginLeft: '-2.5rem' }}><span className='DarkThColr' style={{ color: this.state.treeScenarioList.filter(c => this.state.selectedTreeScenarioId.includes(c.id.toString())).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOneOrMore') + " "}<b>{getLabelText(this.state.planningUnitLabel, this.state.lang)}</b>{" "}{i18n.t('static.compareAndSelect.andRegion')}{" "}<b>{this.state.regionName}</b></span><br /></ul>
                                                     <ul className="legendcommitversion">
                                                         <li><span className="readonlylegend legendcolor"></span><span className="legendcommitversionText">{i18n.t('static.compareAndSelect.missingData')} </span></li>
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                                     </ul><br />
+                                                    <ul style={{ marginLeft: '-2.5rem', marginTop: '-7px' }}><span className='DarkThColr'><b>{i18n.t("static.versionSettings.note")+": "}</b>{i18n.t('static.compareAndSelect.topNote')}</span><br /></ul>
                                                     <div className="RemoveStriped removeOddColor">
                                                         <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                                     </div>
+                                                    {/* <span><b>Total Forecast Qty</b> : 1234</span> */}
                                                     <br></br>
                                                     <FormGroup className="col-md-12">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
@@ -2784,6 +3036,7 @@ class CompareAndSelectScenario extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <b>{i18n.t('static.compareAndSelect.note')}</b>
                                                                 <div className="col-md-12">
                                                                     <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}

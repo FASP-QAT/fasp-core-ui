@@ -294,10 +294,10 @@ export default class CompareVersionTableCompareVersion extends Component {
                 var puFiltered1 = pu1.filter(c => c.region.id == regionSet[k]);
                 data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) + " | " + pu[0].planningUnit.id : getLabelText(pu1[0].planningUnit.label) + " | " + pu1[0].planningUnit.id;
                 data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
-                data[2] = puFiltered.length > 0 ? getLabelText(puFiltered[0].selectedForecast) : ""
+                data[2] = puFiltered.length > 0 ? (getLabelText(puFiltered[0].selectedForecast)!=null?getLabelText(puFiltered[0].selectedForecast).replaceAll(",",";\r"):getLabelText(puFiltered[0].selectedForecast)) : ""
                 data[3] = puFiltered.length > 0 ? puFiltered[0].totalForecast !== "" && puFiltered[0].totalForecast != null ? Number(puFiltered[0].totalForecast).toFixed(2) : "" : "";
                 data[4] = puFiltered.length > 0 ? (puFiltered[0].notes != null && puFiltered[0].notes != '' ? puFiltered[0].notes.label_en : '') : ""
-                data[5] = puFiltered1.length > 0 ? getLabelText(puFiltered1[0].selectedForecast) : ""
+                data[5] = puFiltered1.length > 0 ? (getLabelText(puFiltered1[0].selectedForecast)!=null?getLabelText(puFiltered1[0].selectedForecast).replaceAll(",",";\r"):getLabelText(puFiltered1[0].selectedForecast)) : ""
                 data[6] = puFiltered1.length > 0 ? puFiltered1[0].totalForecast !== "" && puFiltered1[0].totalForecast != null ? Number(puFiltered1[0].totalForecast).toFixed(2) : "" : "";
                 data[7] = puFiltered1.length > 0 ? (puFiltered1[0].notes != null && puFiltered1[0].notes != '' ? puFiltered1[0].notes.label_en : '') : ""
                 data[8] = ""
