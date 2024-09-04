@@ -992,10 +992,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
         }
         if (isWithinLast6Months) {
-            defaultForecastStartYear = "";
-            defaultForecastStartMonth = "";
-            defaultForecastStopYear = "";
-            defaultForecastStopMonth = "";
+            defaultForecastStartYear = formattedDate.getFullYear();
+            defaultForecastStartMonth = formattedDate.getMonth() + 1;
+            // defaultForecastStopYear = "";
+            // defaultForecastStopMonth = "";
             updatedForecastStartYear = formattedDate.getFullYear();
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
         }
@@ -1021,6 +1021,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartYear = forecastStartDate.getFullYear();
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
+
         this.setState({
             toggleDoNotImport:false,
             versionId: event.target.value,
