@@ -1373,6 +1373,7 @@ observer.observe(document.documentElement, {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
+            fontColor:fontColor
         }
         const { rangeValue } = this.state
         const makeText = m => {
@@ -1402,6 +1403,7 @@ observer.observe(document.documentElement, {
         const { isDarkMode } = this.state;
 const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
         const options = {
             title: {
@@ -1415,8 +1417,14 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -1426,6 +1434,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
                         fontColor:fontColor,
@@ -1441,7 +1450,13 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }
                 ],
             },
@@ -1488,8 +1503,14 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -1499,6 +1520,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
                         fontColor:fontColor,
@@ -1514,7 +1536,13 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }],
             },
             tooltips: {
@@ -1560,8 +1588,14 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -1569,8 +1603,15 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                         labelString: this.state.puUnit.label.label_en,
                         fontColor:fontColor
                     },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                 }],
             },
             tooltips: {
@@ -1600,17 +1641,30 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                 }],
             },
             tooltips: {
@@ -1633,27 +1687,32 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentFundingSourceType'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor,
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1666,7 +1725,13 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }],
             },
             tooltips: {
@@ -1696,7 +1761,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor,
                 }
             }
         }
