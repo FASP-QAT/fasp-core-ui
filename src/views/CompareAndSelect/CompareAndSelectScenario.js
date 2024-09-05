@@ -3104,7 +3104,7 @@ class CompareAndSelectScenario extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <b className='text-blackD'>{i18n.t('static.compareAndSelect.note')}</b>
+                                                                <b>{i18n.t('static.compareAndSelect.note')}</b>
                                                                 <div className="col-md-12">
                                                                     <button className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
                                                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
