@@ -4183,9 +4183,11 @@ h6 {
 .ReportSearchMarginTop {
   margin-top: -51px;
 }
-.ReportSearchMarginTopSPVR{
+
+.ReportSearchMarginTopSPVR {
   margin-top: -42px;
 }
+
 .shipmentconsumptionSearchMarginTop {
   margin-top: -51px;
 
@@ -10938,14 +10940,16 @@ legend.scheduler-border {
   padding: 0px 0px 0px 3px;
 }
 
-.mapPlanningUnitpaginationD .jss_pagination_dropdown{
+.mapPlanningUnitpaginationD .jss_pagination_dropdown {
   position: absolute;
-    bottom: 5px;
-    left: 0;
+  bottom: 5px;
+  left: 0;
 }
-.mapPlanningUnitpaginationD .jss_pagination>div{
-  margin-left: 51px!important;
+
+.mapPlanningUnitpaginationD .jss_pagination>div {
+  margin-left: 51px !important;
 }
+
 .momJexcelPagination.jss_pagination_dropdown {
   margin-left: 4px;
   margin-right: 4px;
@@ -10953,10 +10957,41 @@ legend.scheduler-border {
   bottom: 7px;
   left: 0;
 }
+
 .momJexcelPagination.jss_pagination>div {
-  padding-left: 56px!important;
+  padding-left: 56px !important;
 }
+
 .compareAndSelectCollapsecol .jss>tbody>tr>td {
   white-space: pre !important;
   text-align: center !important;
+}
+
+.compareAndSelectPlanningUnitTable .table thead tr th {
+  position: sticky;
+  top: -1px;
+  padding: 6px 10px 5px 10px !important;
+  background: #fff;
+}
+
+.fixTableHeadCompareandselect {
+  max-height: calc(100vh - 300px) !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.compareAndSelectPlanningUnitTableTdWidth {
+  overflow: hidden !important;
+  min-width: 162px !important;
+  word-wrap: break-word !important;
+  z-index: 1;
+}
+
+.compareAndSelectPU {
+  background-color: #e5e5e5 !important;
+}
+
+.jss>tfoot>tr>td:not(:nth-child(2)) {
+  border-left: 0px solid #ccc !important;
+  font-weight: bold;
 }
