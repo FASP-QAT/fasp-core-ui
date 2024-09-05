@@ -1,52 +1,30 @@
 import React, { Component } from 'react';
-import { OrgDiagram } from 'basicprimitivesreact';
 import "jspdf-autotable";
-import cleanUp from '../../assets/img/calculator.png';
 import AggregationNode from '../../assets/img/Aggregation-icon.png';
-import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
-import { DropTarget, DragSource } from 'react-dnd';
+import { LCA, Tree, Colors, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
 import i18n from '../../i18n.js'
-import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { Formik } from 'formik';
 import * as Yup from 'yup'
-import { Row, Col, Card, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, InputGroup } from 'reactstrap';
-import Provider from '../../Samples/Provider.js'
+import { Row, Col, Card, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, Input, InputGroup } from 'reactstrap';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent.js';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText.js';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_DATE_FORMAT_WITHOUT_DATE, DECIMAL_NO_REGEX_8_DECIMALS } from '../../Constants.js'
+import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, DECIMAL_NO_REGEX_8_DECIMALS, TITLE_FONT, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions.js";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png';
 import CryptoJS from 'crypto-js'
-import { MultiSelect } from 'react-multi-select-component';
-import Draggable from 'react-draggable';
-import { Bar } from 'react-chartjs-2';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { grey } from '@material-ui/core/colors';
-import docicon from '../../assets/img/doc.png'
-import { saveAs } from "file-saver";
-import { convertInchesToTwip, Document, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from './ModelingDataCalculation2.js';
-import TreeExtrapolationComponent from './TreeExtrapolationComponent.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import classNames from 'classnames';
-import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
-import PDFDocument from 'pdfkit-nodejs-webpack';
-import blobStream from 'blob-stream';
-import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit.js';
-import Size from 'basicprimitives/src/graphics/structs/Size.js';
 import { Prompt } from 'react-router';
-import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
 import showguidanceBuildTreeEn from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesEn.html'
 import showguidanceBuildTreeFr from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesFr.html'
 import showguidanceBuildTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeBuildTreesSp.html'
@@ -59,7 +37,10 @@ import showguidanceModelingTransferEn from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferFr.html'
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
-import PlanningUnitService from '../../api/PlanningUnitService.js';
+import { LOGO } from '../../CommonComponent/Logo';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { addDoubleQuoteToRowContent, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -2487,7 +2468,39 @@ export default class TreeTable extends Component {
             data[10] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
             data[11] = items[i].id;
             data[12] = "";
-
+            var nodeType = "";
+            if (items[i].payload.nodeType.id == 2) {
+                nodeType = i18n.t("static.modelingValidation.number")
+            } else if (items[i].payload.nodeType.id == 3) {
+                nodeType = i18n.t("static.ManageTree.Percentage")
+            } else if (items[i].payload.nodeType.id == 1) {
+                nodeType = i18n.t("static.ManageTree.Aggregation")
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += i18n.t('static.ManageTree.Extrapolation')
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += "Scale Up"
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += "Scale Down"
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += i18n.t('static.ManageTree.Transfer')
+            }
+            data[13] = nodeType;
             treeArray[count] = data;
             count++;
         }
@@ -2495,71 +2508,76 @@ export default class TreeTable extends Component {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var data = treeArray;
+        var columns = [
+            {
+                title: 'Node Id',
+                type: 'hidden'
+            },
+            {
+                title: i18n.t('static.tree.parent'),
+                type: 'text',
+                width: '120'
+            },
+            {
+                title: i18n.t('static.ManageTree.NodeType'),
+                type: 'html',
+                width: '100'
+            },
+            {
+                title: i18n.t('static.tree.nodeTitle'),
+                type: 'text',
+                width: '120'
+            },
+            {
+                title: i18n.t('static.tree.nodeUnit'),
+                source: this.state.nodeUnitListForDropdown,
+                type: 'dropdown',
+            },
+            {
+                title: i18n.t('static.supplyPlan.startMonth'),
+                options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                type: 'calendar'
+            },
+            {
+                title: i18n.t('static.treeTable.numberOrPercentage'),
+                type: 'text',
+            },
+            {
+                title: i18n.t('static.tree.parentValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
+                mask: '#,##0.0000', decimal: '.',
+                type: 'numeric',
+            },
+            {
+                title: i18n.t('static.tree.nodeValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
+                mask: '#,##0.0000', decimal: '.',
+                type: 'numeric',
+            },
+            {
+                title: i18n.t('static.common.notes'),
+                type: 'text',
+            },
+            {
+                title: 'Node Type',
+                type: 'hidden',
+            },
+            {
+                title: 'Node Id',
+                type: 'hidden',
+            },
+            {
+                title: 'Is Changed',
+                type: 'hidden',
+            },
+            {
+                title: 'Node Type',
+                type: 'hidden',
+            }
+        ];
         var options = {
             data: data,
             columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                {
-                    title: 'Node Id',
-                    type: 'hidden'
-                },
-                {
-                    title: i18n.t('static.tree.parent'),
-                    type: 'text',
-                    width: '120'
-                },
-                {
-                    title: i18n.t('static.ManageTree.NodeType'),
-                    type: 'html',
-                    width: '100'
-                },
-                {
-                    title: i18n.t('static.tree.nodeTitle'),
-                    type: 'text',
-                    width: '120'
-                },
-                {
-                    title: i18n.t('static.tree.nodeUnit'),
-                    source: this.state.nodeUnitListForDropdown,
-                    type: 'dropdown',
-                },
-                {
-                    title: i18n.t('static.supplyPlan.startMonth'),
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
-                    type: 'calendar'
-                },
-                {
-                    title: i18n.t('static.treeTable.numberOrPercentage'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.tree.parentValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
-                    mask: '#,##0.0000', decimal: '.',
-                    type: 'numeric',
-                },
-                {
-                    title: i18n.t('static.tree.nodeValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
-                    mask: '#,##0.0000', decimal: '.',
-                    type: 'numeric',
-                },
-                {
-                    title: i18n.t('static.common.notes'),
-                    type: 'text',
-                },
-                {
-                    title: 'Node Type',
-                    type: 'hidden',
-                },
-                {
-                    title: 'Node Id',
-                    type: 'hidden',
-                },
-                {
-                    title: 'Is Changed',
-                    type: 'hidden',
-                }
-            ],
+            columns: columns,
             editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -2660,6 +2678,7 @@ export default class TreeTable extends Component {
         this.setState({
             treeTabl1El: treeTabl1El,
             loading: false,
+            columns: columns
         })
     }
     updateTab1Data() {
@@ -3157,7 +3176,56 @@ export default class TreeTable extends Component {
             data[36] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
             data[37] = items[i].id;
             data[38] = "";
-
+            var nodeType = "";
+            if (items[i].payload.nodeType.id == 2) {
+                nodeType = i18n.t("static.modelingValidation.number")
+            } else if (items[i].payload.nodeType.id == 3) {
+                nodeType = i18n.t("static.ManageTree.Percentage")
+            } else if (items[i].payload.nodeType.id == 1) {
+                nodeType = i18n.t("static.ManageTree.Aggregation")
+            } else if (items[i].payload.nodeType.id == 4) {
+                nodeType = i18n.t("static.dashboard.forecastingunit")
+            } else if (items[i].payload.nodeType.id == 5) {
+                nodeType = i18n.t("static.dashboard.planningunitheader")
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += i18n.t('static.ManageTree.Extrapolation')
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += "Scale Up"
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += "Scale Down"
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true) {
+                if (nodeType != "") {
+                    nodeType += " ";
+                }
+                nodeType += i18n.t('static.ManageTree.Transfer')
+            }
+            if ((items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4)) {
+                if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                    if (nodeType != "") {
+                        nodeType += " ";
+                    }
+                    nodeType += "C"
+                } else {
+                    if (nodeType != "") {
+                        nodeType += " ";
+                    }
+                    nodeType += "D"
+                }
+            }
+            data[39] = nodeType;
             treeArray[count] = data;
             count++;
         }
@@ -3170,201 +3238,206 @@ export default class TreeTable extends Component {
             jexcel.destroy(document.getElementById("tableDiv2"), true);
         } catch (err) { }
         var data = treeArray;
+        var columns = [
+            { // A
+                title: 'Node Id',
+                type: 'hidden',
+            },
+            { // b
+                title: i18n.t('static.tree.parent'),
+                type: 'text',
+                width: '120'
+            },
+            { //c
+                title: i18n.t('static.ManageTree.NodeType'),
+                type: 'html',
+                width: '100'
+            },
+            { //d
+                title: i18n.t('static.tree.nodeTitle'),
+                type: 'text',
+                width: '120'
+            },
+            {//e
+                title: i18n.t('static.supplyPlan.startMonth'),
+                options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                type: 'calendar'
+            },
+            {//f
+                title: i18n.t('static.tree.percentageOfParent'),
+                mask: '#,##0.00%', decimal: '.',
+                type: 'numeric',
+            },
+            {//g
+                title: i18n.t('static.tree.parentValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
+                mask: '#,##0.0000', decimal: '.',
+                type: 'numeric',
+            },
+            {//h
+                title: i18n.t('static.tree.nodeValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
+                mask: '#,##0.0000', decimal: '.',
+                type: 'numeric',
+            },
+            {//n
+                title: 'Tracer Category',
+                source: this.state.tracerCategoryListForDropdown,
+                type: 'dropdown',
+            },
+            {//i
+                title: 'Forecasting Unit',
+                source: this.state.forecastingUnitListForDropdown,
+                type: 'dropdown',
+            },
+            {//j
+                title: 'Planning Unit',
+                source: this.state.planningUnitListForDropdown,
+                type: 'dropdown',
+                filter: this.filterPlanningUnit
+            },
+            {//k
+                title: 'Conversion Factor',
+                mask: '#,##0.00', decimal: '.',
+                type: 'numeric',
+            },
+            {//l
+                title: '# PU / Interval / Patient (Reference)',
+                decimal: '.',
+                type: 'numeric',
+            },
+            {//m
+                title: '# PU / Interval / Patient',
+                decimal: '.',
+                type: 'numeric',
+            },
+            {//o
+                title: 'Type Of Use',
+                source: this.state.usageTypeListForDropdown,
+                type: 'dropdown',
+            },
+            {//p
+                title: 'One Time Dispensing',
+                source: this.state.booleanForDropdown,
+                type: 'dropdown',
+            },
+            {//p
+                title: 'Lag in months',
+                mask: '#,##0.00', decimal: '.',
+                type: 'numeric',
+            },
+            {//q
+                title: 'Every',
+                mask: '#,##0.00', decimal: '.',
+                type: 'numeric',
+            },
+            {//r
+                title: 'Unit',
+                source: this.state.nodeUnitListForDropdown,
+                type: 'dropdown',
+            },
+            {//s
+                title: 'Requires',
+                mask: '#,##0.00', decimal: '.',
+                type: 'numeric',
+            },
+            {//t
+                title: 'Forecasting Units Unit',
+                source: this.state.unitListForDropdown,
+                type: 'dropdown',
+            },
+            {//w
+                title: 'Single Use',
+                source: this.state.booleanForDropdown,
+                type: 'dropdown',
+            },
+            {//u
+                title: 'Every',
+                mask: '#,##0.00', decimal: '.',
+                type: 'numeric',
+            },
+            {//v
+                title: 'Usage Period',
+                source: this.state.usagePeriodListForDropdown,
+                type: 'dropdown',
+            },
+            {//x
+                title: 'For',
+                mask: '#,##0.00', decimal: '.',
+                type: 'numeric',
+            },
+            {//y
+                title: 'Period',
+                source: this.state.usagePeriodListForDropdown,
+                type: 'dropdown',
+            },
+            {//z
+                title: '# of FU required for period',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//aa
+                title: '# Of Months In Period',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//ab
+                title: '# of FU / month / Patient',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//ac
+                title: '# of FU / Unit/ Time',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//ad
+                title: '# of FU required for period per Unit',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//ae
+                title: '# of FU / month / Unit',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//af
+                title: '# of PU / month / Unit',
+                mask: '#,##0.00', decimal: '.',
+                type: 'hidden',
+            },
+            {//ag
+                title: i18n.t('static.common.notes'),
+                type: 'text',
+            },
+            {//ah
+                title: 'Node Type',
+                type: 'hidden',
+            },
+            {//ai
+                title: 'Node Id',
+                type: 'hidden',
+            },
+            {//aj
+                title: 'AA',
+                type: 'hidden',
+            },
+            {//ak
+                title: 'AB',
+                type: 'hidden',
+            },
+            {//al
+                title: 'Is Changed',
+                type: 'hidden',
+            },
+            {//al
+                title: 'Node Type',
+                type: 'hidden',
+            }
+        ]
         var options = {
             data: data,
             columnDrag: false,
             colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                { // A
-                    title: 'Node Id',
-                    type: 'hidden',
-                },
-                { // b
-                    title: i18n.t('static.tree.parent'),
-                    type: 'text',
-                    width: '120'
-                },
-                { //c
-                    title: i18n.t('static.ManageTree.NodeType'),
-                    type: 'html',
-                    width: '100'
-                },
-                { //d
-                    title: i18n.t('static.tree.nodeTitle'),
-                    type: 'text',
-                    width: '120'
-                },
-                {//e
-                    title: i18n.t('static.supplyPlan.startMonth'),
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
-                    type: 'calendar'
-                },
-                {//f
-                    title: i18n.t('static.tree.percentageOfParent'),
-                    mask: '#,##0.00%', decimal: '.',
-                    type: 'numeric',
-                },
-                {//g
-                    title: i18n.t('static.tree.parentValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
-                    mask: '#,##0.0000', decimal: '.',
-                    type: 'numeric',
-                },
-                {//h
-                    title: i18n.t('static.tree.nodeValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
-                    mask: '#,##0.0000', decimal: '.',
-                    type: 'numeric',
-                },
-                {//n
-                    title: 'Tracer Category',
-                    source: this.state.tracerCategoryListForDropdown,
-                    type: 'dropdown',
-                },
-                {//i
-                    title: 'Forecasting Unit',
-                    source: this.state.forecastingUnitListForDropdown,
-                    type: 'dropdown',
-                },
-                {//j
-                    title: 'Planning Unit',
-                    source: this.state.planningUnitListForDropdown,
-                    type: 'dropdown',
-                    filter: this.filterPlanningUnit
-                },
-                {//k
-                    title: 'Conversion Factor',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'numeric',
-                },
-                {//l
-                    title: '# PU / Interval / Patient (Reference)',
-                    decimal: '.',
-                    type: 'numeric',
-                },
-                {//m
-                    title: '# PU / Interval / Patient',
-                    decimal: '.',
-                    type: 'numeric',
-                },
-                {//o
-                    title: 'Type Of Use',
-                    source: this.state.usageTypeListForDropdown,
-                    type: 'dropdown',
-                },
-                {//p
-                    title: 'One Time Dispensing',
-                    source: this.state.booleanForDropdown,
-                    type: 'dropdown',
-                },
-                {//p
-                    title: 'Lag in months',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'numeric',
-                },
-                {//q
-                    title: 'Every',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'numeric',
-                },
-                {//r
-                    title: 'Unit',
-                    source: this.state.nodeUnitListForDropdown,
-                    type: 'dropdown',
-                },
-                {//s
-                    title: 'Requires',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'numeric',
-                },
-                {//t
-                    title: 'Forecasting Units Unit',
-                    source: this.state.unitListForDropdown,
-                    type: 'dropdown',
-                },
-                {//w
-                    title: 'Single Use',
-                    source: this.state.booleanForDropdown,
-                    type: 'dropdown',
-                },
-                {//u
-                    title: 'Every',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'numeric',
-                },
-                {//v
-                    title: 'Usage Period',
-                    source: this.state.usagePeriodListForDropdown,
-                    type: 'dropdown',
-                },
-                {//x
-                    title: 'For',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'numeric',
-                },
-                {//y
-                    title: 'Period',
-                    source: this.state.usagePeriodListForDropdown,
-                    type: 'dropdown',
-                },
-                {//z
-                    title: '# of FU required for period',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//aa
-                    title: '# Of Months In Period',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//ab
-                    title: '# of FU / month / Patient',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//ac
-                    title: '# of FU / Unit/ Time',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//ad
-                    title: '# of FU required for period per Unit',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//ae
-                    title: '# of FU / month / Unit',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//af
-                    title: '# of PU / month / Unit',
-                    mask: '#,##0.00', decimal: '.',
-                    type: 'hidden',
-                },
-                {//ag
-                    title: i18n.t('static.common.notes'),
-                    type: 'text',
-                },
-                {//ah
-                    title: 'Node Type',
-                    type: 'hidden',
-                },
-                {//ai
-                    title: 'Node Id',
-                    type: 'hidden',
-                },
-                {//aj
-                    title: 'AA',
-                    type: 'hidden',
-                },
-                {//ak
-                    title: 'AB',
-                    type: 'hidden',
-                },
-                {//al
-                    title: 'Is Changed',
-                    type: 'hidden',
-                }
-            ],
+            columns: columns,
             editable: true,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
@@ -3524,6 +3597,7 @@ export default class TreeTable extends Component {
         this.setState({
             treeTabl2El: treeTabl2El,
             loading: false,
+            columns: columns
         })
     }
     /**
@@ -5756,276 +5830,216 @@ export default class TreeTable extends Component {
             }
         })
     }
-    // /**
-    //  * This function is used to export the data in PDF format
-    //  */
-    // exportPDF() {
-    //     const addFooters = doc => {
-    //         const pageCount = doc.internal.getNumberOfPages()
-    //         doc.setFont('helvetica', 'bold')
-    //         doc.setFontSize(6)
-    //         for (var i = 1; i <= pageCount; i++) {
-    //             doc.setPage(i)
-    //             doc.setPage(i)
-    //             doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-    //                 align: 'center'
-    //             })
-    //             doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-    //                 align: 'center'
-    //             })
-    //         }
-    //     }
-    //     const addHeaders = doc => {
-    //         const pageCount = doc.internal.getNumberOfPages()
-    //         for (var i = 1; i <= pageCount; i++) {
-    //             doc.setFontSize(12)
-    //             doc.setFont('helvetica', 'bold')
-    //             doc.setPage(i)
-    //             doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-    //             doc.setFontSize(8)
-    //             doc.setFont('helvetica', 'normal')
-    //             doc.setTextColor("#002f6c");
-    //             doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
-    //                 align: 'right'
-    //             })
-    //             doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
-    //                 align: 'right'
-    //             })
-    //             doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
-    //                 align: 'right'
-    //             })
-    //             doc.text(document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 50, {
-    //                 align: 'right'
-    //             })
-    //             doc.setFontSize(TITLE_FONT)
-    //             doc.setTextColor("#002f6c");
-    //             doc.text(i18n.t('static.common.treeTable'), doc.internal.pageSize.width / 2, 50, {
-    //                 align: 'center'
-    //             })
-    //             if (i == 1) {
-    //                 doc.setFont('helvetica', 'normal')
-    //                 doc.setFontSize(8)
-    //                 doc.text(document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 90, {
-    //                     align: 'right'
-    //                 })
-    //             }
-    //         }
-    //     }
-    //     const unit = "pt";
-    //     const size = "A4";
-    //     const orientation = "landscape";
-    //     const marginLeft = 10;
-    //     const doc = new jsPDF(orientation, unit, size, true);
-    //     doc.setFontSize(8);
-    //     doc.setFont('helvetica', 'normal')
-    //     doc.setTextColor("#002f6c");
-    //     var y = 110;
-    //     planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-    //     y = y + 10;
-    //     for (var i = 0; i < planningText.length; i++) {
-    //         if (y > doc.internal.pageSize.height - 100) {
-    //             doc.addPage();
-    //             y = 80;
-    //         }
-    //         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-    //         y = y + 10;
-    //     }
-    //     planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-    //     y = y + 10;
-    //     for (var i = 0; i < planningText.length; i++) {
-    //         if (y > doc.internal.pageSize.height - 100) {
-    //             doc.addPage();
-    //             y = 80;
-    //         }
-    //         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-    //         y = y + 10;
-    //     }
-    //     planningText = doc.splitTextToSize(i18n.t('static.tree.displayDate')+"("+i18n.t('static.consumption.forcast')+":"+ this.state.forecastPeriod+")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY"), doc.internal.pageSize.width * 3 / 4);
-    //     y = y + 10;
-    //     for (var i = 0; i < planningText.length; i++) {
-    //         if (y > doc.internal.pageSize.height - 100) {
-    //             doc.addPage();
-    //             y = 80;
-    //         }
-    //         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-    //         y = y + 10;
-    //     }
-    //     doc.text("Aggregation/Number/Percentage Node", doc.internal.pageSize.width - 40, 60, {
-    //         align: 'center'
-    //     })
-    //     var columns = [i18n.t('static.tree.parent'),i18n.t('static.ManageTree.NodeType'),i18n.t('static.tree.nodeTitle'),i18n.t('static.tree.nodeUnit'),i18n.t('static.supplyPlan.startMonth')];
-    //     var dataArr = [];
-    //     var dataArr1 = [];
-    //     this.state.dataEl.getJson(null, false).map(ele => {
-    //         dataArr = [];
-    //         this.state.columns.map((item, idx) => {
-    //             if (item.type != 'hidden') {
-    //                 if (item.type == 'numeric') {
-    //                     if (item.mask != undefined && item.mask.toString().includes("%")) {
-    //                         dataArr.push(this.formatter(ele[idx]) + " %");
-    //                     } else {
-    //                         dataArr.push(this.formatter(ele[idx]));
-    //                     }
-    //                 } else if (item.type == 'calendar') {
-    //                     if (this.state.xAxisDisplayBy == 1)
-    //                         dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
-    //                     else
-    //                         dataArr.push(moment(ele[idx]).format("YYYY"));
-    //                 } else {
-    //                     dataArr.push(ele[idx]);
-    //                 }
-    //             }
-    //         })
-    //         dataArr1.push(dataArr);
-    //     })
-    //     const data = dataArr1;
-    //     doc.addPage()
-    //     let content = {
-    //         margin: { top: 80, bottom: 50 },
-    //         startY: startYtable,
-    //         head: [columns],
-    //         body: data,
-    //         styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
-    //     };
-    //     doc.autoTable(content);
-    //     if (this.state.xAxisDisplayBy > 1) {
-    //         var columns2 = [];
-    //         this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { columns2.push(item.title) });
-    //         var dataArr = [];
-    //         var dataArr1 = [];
-    //         this.state.dataEl2.getJson(null, false).map(ele => {
-    //             dataArr = [];
-    //             this.state.columns2.map((item, idx) => {
-    //                 if (item.type != 'hidden') {
-    //                     if (item.type == 'numeric') {
-    //                         if (item.mask != undefined && item.mask.toString().includes("%")) {
-    //                             dataArr.push(this.formatter(ele[idx]) + " %");
-    //                         } else {
-    //                             dataArr.push(this.formatter(ele[idx]));
-    //                         }
-    //                     } else if (item.type == 'calendar') {
-    //                         dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
-    //                     } else {
-    //                         dataArr.push(ele[idx]);
-    //                     }
-    //                 }
-    //             })
-    //             dataArr1.push(dataArr);
-    //         })
-    //         const data2 = dataArr1;
-    //         let content2 = {
-    //             margin: { top: 80, bottom: 50 },
-    //             startY: 40 + doc.autoTable.previous.finalY,
-    //             head: [columns2],
-    //             body: data2,
-    //             styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" }
-    //         };
-    //         doc.autoTable(content2);
-    //     }
-    //     addHeaders(doc)
-    //     addFooters(doc)
-    //     doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
-    // }
-    // /**
-    //  * This function is used to export the data in CSV format
-    //  */
-    // exportCSV() {
-    //     var csvRow = [];
-    //     csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (this.state.datasetData.programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit1') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     this.state.nodeLabelArr.map(ele =>
-    //         csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20').replaceAll('#', '%23') + '"'))
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.modelingValidation.xAxisDisplay') + ' : ' + document.getElementById("xAxisDisplayBy").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     let rVFrom = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.from) : this.state.rangeValue.from.year;
-    //     let rVTo = this.state.xAxisDisplayBy == 1 ? this.makeText(this.state.rangeValue.to) : this.state.rangeValue.to.year;
-    //     csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + rVFrom + ' ~ ' + rVTo).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.modelingValidation.yAxisDisplay') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-    //     csvRow.push('')
-    //     csvRow.push('')
-    //     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
-    //     csvRow.push('')
-    //     const headers = [];
-    //     this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
-    //     var A = [this.addDoubleQuoteToRowContent(headers)];
-    //     var B = []
-    //     this.state.dataEl.getJson(null, false).map(ele => {
-    //         B = [];
-    //         this.state.columns.map((item, idx) => {
-    //             if (item.type != 'hidden') {
-    //                 if (item.mask != undefined && item.mask.toString().includes("%")) {
-    //                     B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                 } else if (item.type == 'calendar') {
-    //                     if (this.state.xAxisDisplayBy == 1)
-    //                         B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                     else
-    //                         B.push(moment(ele[idx]).format("YYYY").toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                 } else {
-    //                     B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                 }
-    //             }
-    //         })
-    //         A.push(this.addDoubleQuoteToRowContent(B));
-    //     })
-    //     for (var i = 0; i < A.length; i++) {
-    //         csvRow.push(A[i].join(","))
-    //     }
-    //     csvRow.push('')
-    //     if (this.state.xAxisDisplayBy > 1) {
-    //         const headers2 = [];
-    //         this.state.columns2.filter(c => c.type != 'hidden').map((item, idx) => { headers2[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
-    //         var A = [this.addDoubleQuoteToRowContent(headers2)];
-    //         var B = []
-    //         this.state.dataEl2.getJson(null, false).map(ele => {
-    //             B = [];
-    //             this.state.columns2.map((item, idx) => {
-    //                 if (item.type != 'hidden') {
-    //                     if (item.mask != undefined && item.mask.toString().includes("%")) {
-    //                         B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                     } else if (item.type == 'calendar') {
-    //                         if (this.state.xAxisDisplayBy == 1)
-    //                             B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                         else
-    //                             B.push(moment(ele[idx]).format("YYYY").toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                     } else {
-    //                         B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
-    //                     }
-    //                 }
-    //             })
-    //             A.push(this.addDoubleQuoteToRowContent(B));
-    //         })
-    //         for (var i = 0; i < A.length; i++) {
-    //             csvRow.push(A[i].join(","))
-    //         }
-    //     }
-    //     var csvString = csvRow.join("%0A")
-    //     var a = document.createElement("a")
-    //     a.href = 'data:attachment/csv,' + csvString
-    //     a.target = "_Blank"
-    //     a.download = this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
-    //     document.body.appendChild(a)
-    //     a.click()
-    // }
+    /**
+     * This function is used to export the data in PDF format
+     */
+    exportPDF() {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                    align: 'right'
+                })
+                doc.text(document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 50, {
+                    align: 'right'
+                })
+                doc.setFontSize(TITLE_FONT)
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.common.treeTable') + " - Aggregation/Number/Percentage Node", doc.internal.pageSize.width / 2, 50, {
+                    align: 'center'
+                })
+            }
+        }
+        const unit = "pt";
+        const size = "A4";
+        const orientation = "landscape";
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+        var y = 60;
+        var planningText = "";
+        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.tree.displayDate') + "(" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY"), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var columns = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        var dataArr = [];
+        var dataArr1 = [];
+        var json = "";
+        if (this.state.activeTab1[0] === '1') {
+            json = this.state.treeTabl1El.getJson(null, true);
+        } else {
+            json = this.state.treeTabl2El.getJson(null, true);
+        }
+        json.map(ele => {
+            dataArr = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    if (item.type == 'numeric') {
+                        if (item.mask != undefined && item.mask.toString().includes("%")) {
+                            dataArr.push(formatter(ele[idx]) + " %");
+                        } else {
+                            dataArr.push(formatter(ele[idx]));
+                        }
+                    } else if (item.type == 'calendar') {
+                        if (ele[idx] != "") {
+                            dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                        } else {
+                            dataArr.push("");
+                        }
+                    } else if (item.type == 'html') {
+                        if (this.state.activeTab1[0] === '1') {
+                            dataArr.push(ele[13]);
+                        }else{
+                            dataArr.push(ele[39]);
+                        }
+                    } else {
+                        dataArr.push(ele[idx]);
+                    }
+                }
+            })
+            dataArr1.push(dataArr);
+        })
+        const data = dataArr1;
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: y,
+            head: [columns],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" },
+            horizontalPageBreak: true,
+            horizontalPageBreakRepeat: 0,
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save((document.getElementById("datasetId").selectedOptions[0].text) + "-" + i18n.t('static.common.treeTable') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
+    }
+    /**
+     * This function is used to export the data in CSV format
+     */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.tree.displayDate') + "(" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY")).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        const headers = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
+        var A = [addDoubleQuoteToRowContent(headers)];
+        var B = []
+        var json = "";
+        if (this.state.activeTab1[0] === '1') {
+            json = this.state.treeTabl1El.getJson(null, true);
+        } else {
+            json = this.state.treeTabl2El.getJson(null, true);
+        }
+        json.map(ele => {
+            B = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    if (item.mask != undefined && item.mask.toString().includes("%")) {
+                        B.push((ele[idx] + (" %")).toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                    } else if (item.type == 'calendar') {
+                        if (ele[idx] != "") {
+                            B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                        }else{
+                            B.push("")
+                        }
+                    } else if (item.type == 'html') {
+                        if (this.state.activeTab1[0] === '1') {
+                            B.push(ele[13].toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                        }else{
+                            B.push(ele[39].toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                        }
+                    } else {
+                        B.push(ele[idx].toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                    }
+                }
+            })
+            A.push(addDoubleQuoteToRowContent(B));
+        })
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        csvRow.push('')
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = (document.getElementById("datasetId").selectedOptions[0].text) + "-" + i18n.t('static.common.treeTable') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
     /**
      * Renders the create tree screen.
      * @returns {JSX.Element} - Create Tree screen.
