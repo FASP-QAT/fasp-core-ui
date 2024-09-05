@@ -24,7 +24,6 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
-import ProgramService from '../../api/ProgramService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -32,10 +31,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
-import RealmCountryService from '../../api/RealmCountryService.js';
-import PlanningUnitService from '../../api/PlanningUnitService.js';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -498,7 +494,7 @@ class StockStatus extends Component {
         let otherdata;
         if (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) {
           otherdata =
-            item.data.map(ele => [dateFormatter(ele.dt), formatter(ele.openingBalance, 0), formatter(ele.forecastedConsumptionQty, 0), formatter(ele.actualConsumptionQty, 0),formatter(ele.finalConsumptionQty, 0), formatter(ele.shipmentQty, 0),
+            item.data.map(ele => [dateFormatter(ele.dt), formatter(ele.openingBalance, 0), formatter(ele.forecastedConsumptionQty, 0), formatter(ele.actualConsumptionQty, 0), formatter(ele.finalConsumptionQty, 0), formatter(ele.shipmentQty, 0),
             ele.shipmentInfo.map(item1 => {
               return (
                 item1.shipmentQty + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
@@ -1013,14 +1009,17 @@ class StockStatus extends Component {
             })
           }
           var graphLabel = "";
+          var height = 400;
           if (this.state.isAggregate.toString() == "true") {
             var reportingUnitList = this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport;
             graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
             var count = 0;
-            var colourArray = ["#002f6c", "#49A4A1", "#0067B9", "#A7C6ED", "#20a8d8", "#212721", "#d1e3f5", "#4dbd74", "#f86c6b"]
+            var programCount = 0;
+            var colourArray = ["#002F6C","#A7C6ED","#49A4A1","#BA0C2F","#651D32","#212721","#118B70","#6C6463","#F48521","#f0bc52"]
             this.state.programId.map((e, i) => {
               count += 1;
               reportingUnitList.map((r, j) => {
+                programCount += 1;
                 var viewBy = this.state.viewById;
                 var planningUnitId = "";
                 if (viewBy == 1) {
@@ -1030,7 +1029,7 @@ class StockStatus extends Component {
                   planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
                 }
                 count += 1;
-                if (count > 9) {
+                if (count > 10) {
                   count = 0;
                 }
                 datasets.push({
@@ -1128,6 +1127,10 @@ class StockStatus extends Component {
               })
             });
           }
+          if (programCount > 10) {
+            programCount = programCount - 10;
+            height = 400 + (30 * programCount);
+          }
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
             datasets: datasets,
@@ -1135,7 +1138,7 @@ class StockStatus extends Component {
           var chartOptions = {
             title: {
               display: true,
-              text: graphLabel
+              text: entityname1
             },
             scales: {
               yAxes: [{
@@ -1270,6 +1273,7 @@ class StockStatus extends Component {
             data: filteredData,
             bar: bar,
             chartOptions: chartOptions,
+            height: height,
             inList: invList,
             coList: conList,
             shList: shipList,
@@ -1573,7 +1577,8 @@ class StockStatus extends Component {
       errorValues: [],
       regionListFiltered: [],
       show: false,
-      loading: false
+      loading: false,
+      stockStatusList: []
     }, () => {
       if (viewById == 2) {
         document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
@@ -1628,6 +1633,9 @@ class StockStatus extends Component {
     })
   }
   fetchData() {
+    this.setState({
+      loading:true
+    })
     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
     let inputjson = {
       "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
@@ -1661,7 +1669,8 @@ class StockStatus extends Component {
         planningUnitLabel: "",//document.getElementById("planningUnitId").selectedOptions[0].text,
         inList: inventoryList,
         coList: consumptionList,
-        shList: shipmentList
+        shList: shipmentList,
+        loading:false
       })
     }).catch(
       error => {
@@ -1775,7 +1784,7 @@ class StockStatus extends Component {
     const options = {
       title: {
         display: true,
-        text: reportingUnitList != undefined && reportingUnitList.length > 0 ? graphLabel : entityname1
+        text: entityname1
       },
       scales: {
         yAxes: [{
@@ -1894,7 +1903,7 @@ class StockStatus extends Component {
     const options1 = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v")) + " - " + this.state.planningUnitLabel : entityname1
+        text: entityname1
       },
       scales: {
         yAxes: [{
@@ -1983,7 +1992,7 @@ class StockStatus extends Component {
         }
       }
     }
-
+    let height = 400;
     let datasets = [
       {
         label: i18n.t('static.supplyplan.exipredStock'),
@@ -2173,10 +2182,12 @@ class StockStatus extends Component {
         });
       } else {
         var count = 0;
-        var colourArray = ["#002f6c", "#49A4A1", "#0067B9", "#A7C6ED", "#20a8d8", "#212721", "#d1e3f5", "#4dbd74", "#f86c6b"]
+        var programCount = 0;
+        var colourArray = ["#002F6C","#A7C6ED","#49A4A1","#BA0C2F","#651D32","#212721","#118B70","#6C6463","#F48521","#f0bc52"]
         this.state.programId.map((e, i) => {
           count += 1;
           reportingUnitList.map((r, j) => {
+            programCount += 1;
             var viewBy = this.state.viewById;
             var planningUnitId = "";
             if (viewBy == 1) {
@@ -2186,7 +2197,7 @@ class StockStatus extends Component {
               planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
             }
             count += 1;
-            if (count > 9) {
+            if (count > 10) {
               count = 0;
             }
             datasets.push({
@@ -2210,6 +2221,10 @@ class StockStatus extends Component {
           })
         })
       }
+    }
+    if (programCount > 10) {
+      programCount = programCount - 10;
+      height = 400 + (30 * programCount);
     }
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
       datasets.push({
@@ -2455,18 +2470,18 @@ class StockStatus extends Component {
                           </FormGroup>
                         }
                         <div className="col-md-12">
-                          <div className="chart-wrapper chart-graph-report">
+                          <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
                           </div>
                           <div id="bars_div" style={{ display: "none" }}>
                             {this.state.isAggregate.toString() == "true" && this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                             {this.state.isAggregate.toString() == "false" && this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                              return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.planBasedOn == 2 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                           </div>
                         </div>
