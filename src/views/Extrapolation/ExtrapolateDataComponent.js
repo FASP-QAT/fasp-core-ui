@@ -5021,6 +5021,41 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             <div className="col-md-12">
                                                 <div className='row'>
                                                     <FormGroup className="col-md-6">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
+                                                        <div className="controls edit" style={{ backgroundColor: this.state.isDisabled ? "#e5edf5" : "#fff" }}>
+                                                            <Picker
+                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                ref={this.pickRange1}
+                                                                value={rangeValue1}
+                                                                lang={pickerLang}
+                                                                key={JSON.stringify(rangeValue1)}
+                                                                onDismiss={this.handleRangeDissmis1}
+                                                            >
+                                                                <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this.state.isDisabled ? "" : this._handleClickRangeBox1} />
+                                                            </Picker>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <div className="tab-ml-1 ml-lg-5" style={{ marginTop: '9px' }}>
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="checkbox"
+                                                                id="seasonality"
+                                                                name="seasonality"
+                                                                // disabled={this.state.isDisabled}
+                                                                checked={this.state.seasonality}
+                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                            </Label>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                                <div className='row'>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}<span className="red Reqasterisk">*</span></Label>
                                                         <div className="controls">
                                                             <MultiSelect
@@ -5046,24 +5081,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
                                                                 labelledBy={i18n.t('static.common.regiontext')}
                                                             />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <div className="tab-ml-1 ml-lg-5" style={{ marginTop: '9px' }}>
-                                                            <Input
-                                                                className="form-check-input checkboxMargin"
-                                                                type="checkbox"
-                                                                id="seasonality"
-                                                                name="seasonality"
-                                                                // disabled={this.state.isDisabled}
-                                                                checked={this.state.seasonality}
-                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
-                                                            </Label>
                                                         </div>
                                                     </FormGroup>
                                                 </div>
