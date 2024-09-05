@@ -188,11 +188,13 @@ export default class ExtrapolateDataComponent extends React.Component {
             forecastProgramList: [],
             planningUnitId: -1,
             planningUnitList: [],
+            planningUnitMultiList: [],
             versionId: -1,
             versions: [],
             show: false,
             regionId: -1,
             regionList: [],
+            regionMultiList: [],
             monthArray: [],
             actualConsumptionList: [],
             inputDataFilter: [],
@@ -334,6 +336,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
         this.pickRange1 = React.createRef();
+        this.pickRange2 = React.createRef();
+        this._handleClickRangeBox2 = this._handleClickRangeBox2.bind(this)
+        this.handleRangeDissmiss2 = this.handleRangeDissmiss2.bind(this);
         this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
         this.changeNotes = this.changeNotes.bind(this);
         this.setButtonFlag = this.setButtonFlag.bind(this);
@@ -634,6 +639,50 @@ export default class ExtrapolateDataComponent extends React.Component {
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
                     arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                })
+            }, 0)
+        })
+    }
+    /**
+     * Handles the click event on the range picker box for bulk extrapolation.
+     * Shows the range picker component.
+     * @param {object} value - The value object containing date range value.
+     */
+    handleRangeDissmiss2(value) {
+        this.setState({ rangeValue1: value }, () => {
+            // this.getDateDifference()
+            var regionList = this.state.regionList;
+            var listOfPlanningUnits = this.state.planningUnitList;
+            setTimeout(() => {
+                var puObj = []
+                var regionObj = []
+                for (let pu = 0; pu < listOfPlanningUnits.length; pu++) {
+                    for (let i = 0; i < regionList.length; i++) {
+                        var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].planningUnit.id && c.region.id == regionList[i].regionId);
+                        var test = (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3)
+                            || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3)
+                            || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3)
+                            || (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24)
+                            || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2))
+                        if (test) {
+                            regionObj.push(regionList[i])
+                            puObj.push(listOfPlanningUnits[pu])
+                        }
+                    }
+                }
+                // Filter out duplicates by id
+                regionObj = Array.from(new Map(regionObj.map(r => [r.id, r])).values());
+                var regionValues = regionObj != null && regionObj.map((item, i) => {
+                    return ({ label: getLabelText(item.label, this.state.lang), value: item.regionId })
+                }, this);
+                var planningUnitValues = puObj != null && puObj.map((item, i) => {
+                    return ({ label: getLabelText(item.planningUnit.label, this.state.lang), value: item.planningUnit.id })
+                }, this);
+                this.setState({
+                    planningUnitMultiList: puObj,
+                    regionMultiList: regionObj,
+                    planningUnitValues: planningUnitValues,
+                    regionValues: regionValues
                 })
             }, 0)
         })
@@ -2195,6 +2244,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 }, () => {
                     this.getDateDifference()
                     this.buildActualJxl();
+                    this.handleRangeDissmiss2(rangeValue2)
                 })
             } else {
                 var startDate1 = "";
@@ -2231,7 +2281,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
                         arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
                     }, () => {
-                        this.getDateDifference()
+                        this.getDateDifference();
+                        this.handleRangeDissmiss2({ from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } })
                     })
                 } else {
                     startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2264,6 +2315,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         arimaDisabled: true
                     }, () => {
                         this.getDateDifference()
+                        this.handleRangeDissmiss2({ from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } })
                     })
                 }
             }
@@ -2458,7 +2510,6 @@ export default class ExtrapolateDataComponent extends React.Component {
             syncedExtrapolationsPercentage: 0
         }, () => {
             var programData = this.state.datasetJson;
-            // console.log("startBulkExtrapolation start===>", this.state.startBulkExtrapolation)
             if (listOfPlanningUnits.length > 0) {
                 var datasetJson = programData;
                 for (let pu = 0; pu < listOfPlanningUnits.length; pu++) {
@@ -2557,8 +2608,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                     totalExtrapolatedCount: count,
                     estimatedTime: count * 3
                 }, () => {
-                    console.log("count", count)
-
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
                     if (count == 0) {
                         this.setState({
@@ -2584,10 +2633,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var jsonDataMovingAvg = this.state.jsonDataMovingAvg;
         jsonDataMovingAvg.push(data);
         var countR = this.state.syncedExtrapolations
+        let totalExtrapolatedCount = this.state.totalExtrapolatedCount;
+        let percentage = 0;
+        if (totalExtrapolatedCount > 0) {
+            percentage = Math.floor(((countR + 1) / totalExtrapolatedCount) * 100);
+        } else {
+            // Handle the case where totalExtrapolatedCount is 0
+            percentage = 0; // or any fallback value you deem appropriate
+        }
         this.setState({
             jsonDataMovingAvg: jsonDataMovingAvg,
             syncedExtrapolations: countR + 1,
-            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
+            syncedExtrapolationsPercentage: percentage
         }, () => {
             localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
@@ -2608,10 +2665,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var jsonDataSemiAverage = this.state.jsonDataSemiAverage;
         jsonDataSemiAverage.push(data);
         var countR = this.state.syncedExtrapolations
+        let totalExtrapolatedCount = this.state.totalExtrapolatedCount;
+        let percentage = 0;
+        if (totalExtrapolatedCount > 0) {
+            percentage = Math.floor(((countR + 1) / totalExtrapolatedCount) * 100);
+        } else {
+            // Handle the case where totalExtrapolatedCount is 0
+            percentage = 0; // or any fallback value you deem appropriate
+        }
         this.setState({
             jsonDataSemiAverage: jsonDataSemiAverage,
             syncedExtrapolations: countR + 1,
-            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
+            syncedExtrapolationsPercentage: percentage
         }, () => {
             localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
@@ -2632,10 +2697,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var jsonDataLinearRegression = this.state.jsonDataLinearRegression;
         jsonDataLinearRegression.push(data);
         var countR = this.state.syncedExtrapolations
+        let totalExtrapolatedCount = this.state.totalExtrapolatedCount;
+        let percentage = 0;
+        if (totalExtrapolatedCount > 0) {
+            percentage = Math.floor(((countR + 1) / totalExtrapolatedCount) * 100);
+        } else {
+            // Handle the case where totalExtrapolatedCount is 0
+            percentage = 0; // or any fallback value you deem appropriate
+        }
         this.setState({
             jsonDataLinearRegression: jsonDataLinearRegression,
             syncedExtrapolations: countR + 1,
-            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
+            syncedExtrapolationsPercentage: percentage
         }, () => {
             localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
@@ -2656,10 +2729,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var jsonDataTes = this.state.jsonDataTes;
         jsonDataTes.push(data);
         var countR = this.state.syncedExtrapolations
+        let totalExtrapolatedCount = this.state.totalExtrapolatedCount;
+        let percentage = 0;
+        if (totalExtrapolatedCount > 0) {
+            percentage = Math.floor(((countR + 1) / totalExtrapolatedCount) * 100);
+        } else {
+            // Handle the case where totalExtrapolatedCount is 0
+            percentage = 0; // or any fallback value you deem appropriate
+        }
         this.setState({
             jsonDataTes: jsonDataTes,
             syncedExtrapolations: countR + 1,
-            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
+            syncedExtrapolationsPercentage: percentage
         }, () => {
             localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
@@ -2680,10 +2761,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var jsonDataArima = this.state.jsonDataArima;
         jsonDataArima.push(data);
         var countR = this.state.syncedExtrapolations
+        let totalExtrapolatedCount = this.state.totalExtrapolatedCount;
+        let percentage = 0;
+        if (totalExtrapolatedCount > 0) {
+            percentage = Math.floor(((countR + 1) / totalExtrapolatedCount) * 100);
+        } else {
+            // Handle the case where totalExtrapolatedCount is 0
+            percentage = 0; // or any fallback value you deem appropriate
+        }
         this.setState({
             jsonDataArima: jsonDataArima,
             syncedExtrapolations: countR + 1,
-            syncedExtrapolationsPercentage: Math.floor(((countR + 1) / this.state.totalExtrapolatedCount) * 100)
+            syncedExtrapolationsPercentage: percentage
         }, () => {
             localStorage.setItem("lastFocus", new Date())
             if (this.state.jsonDataMovingAvg.length
@@ -2700,13 +2789,11 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Saves extrapolation data in indexed DB for Bulk Extrapolation
      */
     saveForecastConsumptionBulkExtrapolation() {
-        // console.log("saveForecastConsumptionBulkExtrapolation====>")
         this.setState({
             startBulkExtrapolation: false,
             dataChanged: false,
             loading: true
         }, () => {
-            // console.log("startBulkExtrapolation end===>", this.state.startBulkExtrapolation)
             var db1;
             var storeOS;
             getDatabase();
@@ -2878,7 +2965,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 if (jsonDataArimaFilter.length > 0) {
                                     var jsonDataArima = jsonDataArimaFilter[0].data;
                                     for (var i = 0; i < jsonDataArima.length; i++) {
-                                        console.log("jsonDataArima[i].forecast", jsonDataArima[i].forecast)
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                     }
                                     consumptionExtrapolationList.push(
@@ -3693,8 +3779,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </option>
             )
         }, this);
-        let planningUnitMultiList = planningUnitList.length > 0
-            && planningUnitList.map((item, i) => {
+        const { planningUnitMultiList } = this.state;
+        let planningUnitMultiLists = planningUnitMultiList.length > 0
+            && planningUnitMultiList.map((item, i) => {
                 return ({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id })
             }, this);
         const { regionList } = this.state;
@@ -3705,8 +3792,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </option>
             )
         }, this);
-        let regionMultiList = regionList.length > 0
-            && regionList.map((item, i) => {
+        const { regionMultiList } = this.state;
+        let regionMultiLists = regionMultiList.length > 0
+            && regionMultiList.map((item, i) => {
                 return ({ value: item.regionId, label: getLabelText(item.label, this.state.lang) })
             }, this);
 
@@ -5022,16 +5110,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <div className='row'>
                                                     <FormGroup className="col-md-6">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
-                                                        <div className="controls edit" style={{ backgroundColor: this.state.isDisabled ? "#e5edf5" : "#fff" }}>
+                                                        <div className="controls edit">
                                                             <Picker
                                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                ref={this.pickRange1}
+                                                                ref={this.pickRange2}
                                                                 value={rangeValue1}
                                                                 lang={pickerLang}
                                                                 key={JSON.stringify(rangeValue1)}
-                                                                onDismiss={this.handleRangeDissmis1}
+                                                                onDismiss={this.handleRangeDissmiss2}
                                                             >
-                                                                <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this.state.isDisabled ? "" : this._handleClickRangeBox1} />
+                                                                <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this._handleClickRangeBox2} />
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
@@ -5064,7 +5152,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 bsSize="sm"
                                                                 value={this.state.planningUnitValues}
                                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
+                                                                options={planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : []}
                                                                 labelledBy={i18n.t('static.mt.selectPlanninfUnit')}
                                                             />
                                                         </div>
@@ -5078,7 +5166,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 bsSize="sm"
                                                                 value={this.state.regionValues}
                                                                 onChange={(e) => { this.handleRegionChange(e) }}
-                                                                options={regionMultiList && regionMultiList.length > 0 ? regionMultiList : []}
+                                                                options={regionMultiLists && regionMultiLists.length > 0 ? regionMultiLists : []}
                                                                 labelledBy={i18n.t('static.common.regiontext')}
                                                             />
                                                         </div>
@@ -5248,5 +5336,13 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     _handleClickRangeBox1(e) {
         this.pickRange1.current.show()
+    }
+    /**
+     * Handles the click event on the range picker box.
+     * Shows the range picker component.
+     * @param {object} e - The event object containing information about the click event.
+     */
+    _handleClickRangeBox2(e) {
+        this.pickRange2.current.show()
     }
 }
