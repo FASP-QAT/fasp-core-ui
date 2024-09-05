@@ -142,3 +142,4 @@ export const MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS=76;
 export const INTERPOLATE_DATA_SOURCE_ID=4;
 export const ENCRYPTION_EXPORT_PASSWORD="dgwsgdjwgyo3kjledhqwuigdwui";
 export const DRAFT_VERSION_TYPE = 1;
+export const DECIMAL_NO_REGEX_8_DECIMALS = /^\d+(\.\d{1,8})?$/

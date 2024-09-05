@@ -3364,5 +3364,10 @@
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
     "static.pipeline.pipelineConvertorLinux": "Linux.",
-    "static.common.treeTable":"Tree Table"
+    "static.common.treeTable":"Tree Table",
+    "static.common.in":"in",
+    "static.treeTable.numberOrPercentage":"Number Node Value / Percentage of Parent",
+    "static.treeTable.numberOrPercentageTooltip":"Enter the value or percentage of parent at the time of the Start Month. If this value changes over time, update in the Add/Edit Node, Modeling/Transfer tab.",
+    "static.treeTable.parentValueTooltip":"Value is calculated based on the Display Date. To change the Parent Value, edit the Parent Node directly.",
+    "static.treeTable.nodeValueTooltip":"Value is calculated based on the Display Date. "
 }
