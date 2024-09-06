@@ -5116,7 +5116,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 setFieldTouched
                             }) => (
                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
-                                    <ModalHeader toggle={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : 3, false))} className="ModalHead modal-info-Headher">
+                                    <ModalHeader toggle={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : 3), false)} className="ModalHead modal-info-Headher">
                                         <strong className="TextWhite">{
                                             this.state.bulkExtrapolation ? i18n.t('static.extrapolation.bulkExtrapolation') : (this.state.optimizeTESAndARIMA ? i18n.t('static.extrapolation.optimizeTES&ARIMA') : i18n.t('static.extrapolation.missingTES&ARIMA'))
                                         }</strong>
@@ -5125,7 +5125,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <ModalBody className="ModalBodyPadding">
                                             <div className="col-md-12">
                                                 <div className='row'>
-                                                    <FormGroup className="col-md-6">
+                                                    <FormGroup className="col-md-7">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -5140,8 +5140,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <div className="tab-ml-1 ml-lg-5" style={{ marginTop: '9px' }}>
+                                                    <FormGroup className="col-md-2">
+                                                        <div style={{ marginTop: '28px' }}>
+                                                            <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <div className="tab-ml-1 ml-lg-5" style={{ marginTop: '28px' }}>
                                                             <Input
                                                                 className="form-check-input checkboxMargin"
                                                                 type="checkbox"
