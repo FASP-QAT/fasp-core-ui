@@ -1770,14 +1770,22 @@ class StockStatus extends Component {
         return { value: item.programId, label: item.programCode }
       }, this);
 
-    const { planningUnitList } = this.state;
-    let puList = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
+    const { planningUnitList, lang } = this.state;
+    let puList = planningUnitList.length > 0 && planningUnitList.sort(function (a, b) {
+      a = getLabelText(a.label, lang).toLowerCase();
+      b = getLabelText(b.label, lang).toLowerCase();
+      return a < b ? -1 : a > b ? 1 : 0;
+    }).map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
     }, this);
 
     const { realmCountryPlanningUnitList } = this.state;
-    let rcpuList = realmCountryPlanningUnitList.length > 0 && realmCountryPlanningUnitList.map((item, i) => {
-      return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
+    let rcpuList = realmCountryPlanningUnitList.length > 0 && realmCountryPlanningUnitList.sort(function (a, b) {
+      a = getLabelText(a.label, lang).toLowerCase();
+      b = getLabelText(b.label, lang).toLowerCase();
+      return a < b ? -1 : a > b ? 1 : 0;
+    }).map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang) })
     }, this);
     var reportingUnitList = (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId);
     var graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
@@ -2549,7 +2557,7 @@ class StockStatus extends Component {
                             </td> <td>
                               {formatter(this.state.stockStatusList[idx].actualConsumptionQty, 0)}
                             </td>
-                            {this.state.programId.length > 1 && <td>
+                            {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <td>
                               {formatter(this.state.stockStatusList[idx].finalConsumptionQty, 0)}
                             </td>}
                             <td>
