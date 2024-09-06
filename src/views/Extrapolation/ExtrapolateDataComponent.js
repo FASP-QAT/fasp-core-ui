@@ -354,6 +354,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     seasonalityCheckbox(event) {
         this.setState({
             seasonality: event.target.checked ? 1 : 0
+        }, () => {
+            this.handleRangeDissmiss2(this.state.rangeValue1)
         });
     }
     /**
@@ -650,20 +652,27 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     handleRangeDissmiss2(value) {
         this.setState({ rangeValue1: value }, () => {
-            // this.getDateDifference()
+            this.getDateDifference()
             var regionList = this.state.regionList;
             var listOfPlanningUnits = this.state.planningUnitList;
+            var test = false;
             setTimeout(() => {
                 var puObj = []
                 var regionObj = []
                 for (let pu = 0; pu < listOfPlanningUnits.length; pu++) {
                     for (let i = 0; i < regionList.length; i++) {
                         var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].planningUnit.id && c.region.id == regionList[i].regionId);
-                        var test = (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3)
-                            || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3)
-                            || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3)
-                            || (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24)
-                            || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2))
+                        // var actualConsumptionListForPlanningUnitAndRegion = consumptionDataActual.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDateFromRangeValue1).format("YYYY-MM"));
+                        if (this.state.optimizeTESAndARIMA) {
+                            test = (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24) //tes
+                                || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) //arima
+                        } else {
+                            test = (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3) //movingAvg
+                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3) //semiAvg
+                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3) //linearRegression
+                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24) //tes
+                                || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) //arima
+                        }
                         if (test) {
                             regionObj.push(regionList[i])
                             puObj.push(listOfPlanningUnits[pu])
@@ -2038,7 +2047,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var extrapolationNotes = null;
-            if (consumptionExtrapolationList.length > 1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+            if (consumptionExtrapolationList.length > 0 && actualConsumptionListForPlanningUnitAndRegion.length > 0) {
                 this.setState({ loading: true })
                 var startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                 var minStartDate = startDate1;
@@ -2244,7 +2253,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 }, () => {
                     this.getDateDifference()
                     this.buildActualJxl();
-                    this.handleRangeDissmiss2(rangeValue2)
                 })
             } else {
                 var startDate1 = "";
@@ -2282,7 +2290,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                         arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
                     }, () => {
                         this.getDateDifference();
-                        this.handleRangeDissmiss2({ from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } })
                     })
                 } else {
                     startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
@@ -2315,7 +2322,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                         arimaDisabled: true
                     }, () => {
                         this.getDateDifference()
-                        this.handleRangeDissmiss2({ from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } })
                     })
                 }
             }
@@ -2507,7 +2513,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             jsonDataTes: [],
             jsonDataArima: [],
             syncedExtrapolations: 0,
-            syncedExtrapolationsPercentage: 0
+            syncedExtrapolationsPercentage: 0,
+            optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false
         }, () => {
             var programData = this.state.datasetJson;
             if (listOfPlanningUnits.length > 0) {
@@ -2520,8 +2527,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                     for (let i = 0; i < regionList.length; i++) {
                         var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[i].value);
                         if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
-                            let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-                            let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                            // let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                            // let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                            var rangeValue2 = this.state.rangeValue1;
+                            var minDate = rangeValue2.from.year + '-' + rangeValue2.from.month + '-01';
+                            var maxDate = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
+
                             let curDate = minDate;
                             var inputDataMovingAvg = [];
                             var inputDataSemiAverage = [];
@@ -2543,7 +2554,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                             const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
                             //2 and 3 - Optimise TES and ARIMA, 5 - Extrapolate ARIMA & TES using default parameters
                             if (id == 2 || id == 3 || id == 5) {
-                                this.setState({ optimizeTESAndARIMAExtrapolation: id == 2 || id == 3 ? true : false })
                                 if (id == 2) {
                                     if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
                                         count++;
@@ -2568,7 +2578,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 }
 
                             } else {//Extrapolate all methods using default parameters
-                                this.setState({ optimizeTESAndARIMAExtrapolation: false })
                                 if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
                                     count++;
                                     calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
@@ -2838,9 +2847,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 var datasetJson = this.state.datasetJson;
-                                var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value);
-                                var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-                                var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                                // var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value);
+                                // var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                                // var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
+                                var rangeValue2 = this.state.rangeValue1;
+                                var minDate = rangeValue2.from.year + '-' + rangeValue2.from.month + '-01';
+                                var maxDate = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
                                 var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                                 if (jsonDataSemiAvgFilter.length > 0) {
                                     var jsonSemi = jsonDataSemiAvgFilter[0].data;
@@ -2932,7 +2944,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 if (jsonDataTesFilter.length > 0) {
                                     var jsonDataTes = jsonDataTesFilter[0].data;
                                     for (var i = 0; i < jsonDataTes.length; i++) {
-                                        data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? (jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
+                                        data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? Number(jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
                                     }
                                     consumptionExtrapolationList.push(
                                         {
@@ -2965,7 +2977,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 if (jsonDataArimaFilter.length > 0) {
                                     var jsonDataArima = jsonDataArimaFilter[0].data;
                                     for (var i = 0; i < jsonDataArima.length; i++) {
-                                        data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? (jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
+                                        data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? Number(jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                     }
                                     consumptionExtrapolationList.push(
                                         {
@@ -3496,8 +3508,10 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
     * Toggles the state value of  'bulkExtrapolation','optimizeTESAndARIMA','missingTESAndARIMA' between true and false based on modalView.
     * If 'bulkExtrapolation' or 'optimizeTESAndARIMA' or 'missingTESAndARIMA' is currently true, it will be set to false, and vice versa based on modalView.
+    * @param {*} modalView - value to view modal based on modalView value
+    * @param {*} flag - flag to check whether handle range pus needs to be done ot not
     */
-    setModalValues(modalView) {
+    setModalValues(modalView, flag) {
         if (modalView == 1) {
             this.setState({
                 bulkExtrapolation: !this.state.bulkExtrapolation,
@@ -3510,6 +3524,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({
                 missingTESAndARIMA: !this.state.missingTESAndARIMA
             })
+        }
+        if (flag) {
+            this.handleRangeDissmiss2(this.state.rangeValue1)
         }
     }
     /**
@@ -4191,17 +4208,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <div className="card-header-actions">
                                 {this.state.forecastProgramId &&
                                     <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
+                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
                                     </a>
                                 }
                                 {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' &&
                                     <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
+                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
                                     </a>
                                 }
                                 {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
                                     <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3) }}><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
+                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
                                     </a>
                                 }
                                 <a className="card-header-action">
@@ -5099,7 +5116,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 setFieldTouched
                             }) => (
                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='levelForm' autocomplete="off">
-                                    <ModalHeader toggle={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : 3))} className="ModalHead modal-info-Headher">
+                                    <ModalHeader toggle={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : 3, false))} className="ModalHead modal-info-Headher">
                                         <strong className="TextWhite">{
                                             this.state.bulkExtrapolation ? i18n.t('static.extrapolation.bulkExtrapolation') : (this.state.optimizeTESAndARIMA ? i18n.t('static.extrapolation.optimizeTES&ARIMA') : i18n.t('static.extrapolation.missingTES&ARIMA'))
                                         }</strong>
@@ -5197,7 +5214,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </div>
                                         }
 
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""), false)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </ModalFooter>
                                 </Form>
                             )} />
