@@ -4888,7 +4888,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 </div>
                                                 <div id="scenariosFields2" className="col-md-12" style={{ display: 'none' }}>
                                                     <div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
-                                                        <span><b>{i18n.t('static.scenarioPlanning.currentShipmentSettings')}</b></span>
+                                                        <span className='text-blackD'><b>{i18n.t('static.scenarioPlanning.currentShipmentSettings')}</b></span>
                                                     </div>
                                                     <div className="row col-md-12">
                                                         <FormGroup className="col-md-3">
@@ -4935,7 +4935,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         </FormGroup>
                                                     </div>
                                                     <div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
-                                                        <span><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
+                                                        <span className='text-blackD'><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
                                                     </div>
                                                     <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
@@ -5370,7 +5370,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                     {
                                                         this.state.closingBalanceArray.map((item1, count) => {
-                                                            return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                            return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                         })
                                                     }
                                                 </tr>
