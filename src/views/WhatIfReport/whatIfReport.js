@@ -4802,7 +4802,7 @@ export default class WhatIfReportComponent extends React.Component {
     tabPane() {
         const darkModeColors = [
             '#d4bbff',  
-            '#fff1f1',   
+            '#49494a',   
         ];
         
         const lightModeColors = [

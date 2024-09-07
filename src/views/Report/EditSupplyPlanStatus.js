@@ -2714,7 +2714,7 @@ observer.observe(document.documentElement, {
         }
         const darkModeColors = [
             '#d4bbff', 
-            '#fff1f1' ,   
+            '#49494a' ,   
         ];
         
         const lightModeColors = [
@@ -3258,15 +3258,15 @@ observer.observe(document.documentElement, {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
                                                                     if (item1.consumptionType == 1) {
                                                                         if (item1.consumptionQty != null) {
-                                                                            return (<td align="right" className="hoverTd textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                                         } else {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
+                                                                            return (<td align="right" className="hoverTd  textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
                                                                         }
                                                                     } else {
                                                                         if (item1.consumptionQty != null) {
-                                                                            return (<td align="right" className="hoverTd textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
                                                                         } else {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
+                                                                            return (<td align="right" className="hoverTd textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
                                                                         }
                                                                     }
                                                                 })

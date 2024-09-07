@@ -1329,7 +1329,7 @@ class SupplyPlanVersionAndReview extends Component {
                                 </div>
                             </Form>
                         </div>
-                        <span>{i18n.t("static.spvr.rightClickNote")}</span>
+                        <span className="text-blackD">{i18n.t("static.spvr.rightClickNote")}</span>
                         <div className="ReportSearchMarginTopSPVR consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable TableWidth100">
                             </div>

@@ -1831,6 +1831,7 @@ observer.observe(document.documentElement, {
      * @returns {JSX.Element} - Shipment Global Demand View report table.
      */
     render() {
+                
         const { isDarkMode } = this.state;
 // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -2065,9 +2066,28 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         };
         
         // const { isDarkMode } = this.state;
-// const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+// const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
 // const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
 // const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+// const darkModeColors = [
+//                     '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+//                     '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+//                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//                     '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+//                     '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+//                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//                     '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+//                 ]
+//                 const lightModeColors = [
+//                    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//                     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//                     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//                     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//                     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//                 ]
+        
         const chartDataForPie = {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
@@ -2081,24 +2101,6 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
                     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
                 ],
-                // darkModeColors : [
-                //     '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
-                //     '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
-                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                //     '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
-                //     '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
-                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                //     '#d4bbff', '#BA0C2F', '#fff1f1', '#0067B9', '#A7C6ED',
-                // ],
-                // lightModeColors : [
-                //    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-                // ],
                 
         
                 legend: {
