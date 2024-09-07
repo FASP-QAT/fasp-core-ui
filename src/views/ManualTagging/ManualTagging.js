@@ -5242,7 +5242,7 @@ export default class ManualTagging extends Component {
                                                                 {this.state.comboBoxError && this.state.table1Loader ? <span className='red12'>{i18n.t('static.common.erpComboboxError')}</span> : ""}
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-6 pl-0">
+                                                        <FormGroup className="col-md-6 pl-0 DarkModeCombo">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
                                                             <div className="controls "
                                                             >
@@ -5292,8 +5292,8 @@ export default class ManualTagging extends Component {
                                         </div><br />
                                     </ModalBody>
                                     <ModalFooter>
-                                        <b><h3 className="float-right">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
-                                        {this.state.displayTotalQty && <b><h3 className="float-right">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
+                                        <b><h3 className="float-right text-blackD">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
+                                        {this.state.displayTotalQty && <b><h3 className="float-right text-blackD">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
                                         {this.state.displaySubmitButton
                                             && (this.state.active4 || this.state.originalQty > 0)
                                             && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}

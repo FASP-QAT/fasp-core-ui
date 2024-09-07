@@ -1876,9 +1876,9 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     },
                     gridLines: {
                         display: false,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor,
                         lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }],
                 yAxes: [{

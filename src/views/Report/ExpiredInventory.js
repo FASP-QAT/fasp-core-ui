@@ -1286,7 +1286,7 @@ export default class ExpiredInventory extends Component {
                                 </Col>
                             </div>
                         </div>
-                        {this.state.outPutList.length > 0 && <span style={{ textAlign: 'left' }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
+                        {this.state.outPutList.length > 0 && <span className='text-blackD' style={{ textAlign: 'left' }}><b>{i18n.t("static.expiryReport.batchInfoNote")}</b></span>}
                         <div className="consumptionDataEntryTable ProgramListSearchAlignment">
                             <div id="tableDiv" className={document.getElementById("versionId") != null && document.getElementById("versionId").value.includes('Local') ? "jexcelremoveReadonlybackground RowClickableExpiredInventory" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
@@ -1309,9 +1309,9 @@ export default class ExpiredInventory extends Component {
                     </ModalHeader>
                     <ModalBody>
                         <>
-                            {this.state.ledgerForBatch.length > 0 ? i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo : ""}
+                           <span className='text-blackD'> {this.state.ledgerForBatch.length > 0 ? i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo : ""}
                             <br></br>
-                            {i18n.t("static.batchLedger.note")}
+                            {i18n.t("static.batchLedger.note")}</span>
                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                 <thead>
                                     <tr>
