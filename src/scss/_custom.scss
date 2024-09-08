@@ -71,6 +71,23 @@ body {
     background-color: #212631;
     border: 1px solid #323a49;
 
+.Select.is-focused>.Select-control{
+  background: #212631!important;
+}
+.form-control.is-valid {
+  color: #e4e5e6;
+}
+.form-control{
+  background-color: #212631;
+  color: #e4e5e6;
+}
+.Login-component .input-group > .form-control{
+  background-color: transparent;
+  color: #e4e5e6;
+}
+@media (min-width: 992px) {
+  .module2.sidebar .nav > .nav-dropdown > .nav-dropdown-items {
+      background: #212631 !important;
   }
 
   .btn-transparent {
@@ -1594,6 +1611,283 @@ body {
 }
 .modal-body ul img {
   filter: invert(1) brightness(2);
+}
+.ShowGuidanceHeading {
+  color: #20a8d8;
+  font-weight: 600;
+  font-size: 19px;
+}
+.table .table-borderedproblemListDashboar tr td:first-child{
+  color:#e4e5e6;
+}
+.showdatabtn {
+  margin-top: 10px;
+}
+.fixTableHead1 {
+  max-height: calc(100vh - 100px) !important;
+  overflow-x: auto;
+  border-top: 1px solid #4d515a;
+}
+.infoIconStockStatus::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+  position: relative;
+  width: 3px;
+  height: 100%;
+  top: 0px;
+  left: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #e4e5e6;
+}
+.chart-graph-report {
+  height: 400px;
+  margin-bottom: 15px;
+}
+#hideLegendDiv{
+  color: #e4e5e6;
+}
+.Firstcolum1 {
+  width: 120px;
+  left: 0!important;
+  z-index: 3;
+}
+
+.Firstcolum {
+  width: 120px;
+  left: 0;
+  z-index: 2;
+  /* width: 100px; */
+  /* min-width: 100px; */
+  /* max-width: 100px; */
+}
+.sticky-col {
+  position: sticky;
+  position: -webkit-sticky;
+}
+.Secondcolum {
+  width: 150px;
+  left: 51px;
+  z-index: 3;
+  min-width: 150px;
+  max-width: 150px;
+}
+.Thirdcolum {
+  left: 200px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+.fourthcolum {
+  left: 399px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+.card-header {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: #323a49;
+  border-bottom: 1px solid #4d515a;
+  color: #e4e5e6;
+}
+.progress {
+  display: flex;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0.65625rem;
+  background-color: #323a49;
+  border-radius: 0.25rem;
+}
+
+.Select-menu-outer {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  background-color: #4d515a!important;
+  border: 1px solid #212631;
+  border-top-color: #212631;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  margin-top: -1px;
+  max-height: 200px;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  z-index: 1;
+  -webkit-overflow-scrolling: touch;
+}
+.Select-menu {
+  max-height: 198px;
+  overflow-y: auto;
+}
+.Select-option {
+  box-sizing: border-box;
+  background-color: #2a303d!important;
+  color: #e4e5e6;
+  cursor: pointer;
+  display: block;
+  padding: 8px 10px;
+}
+.Select-option:last-child {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.Select-option.is-selected {
+  background-color:#2a303d!important;
+  /* Fallback color for IE 8 */
+  background-color: rgba(0, 126, 255, 0.04);
+  color: #e4e5e6;
+}
+.Select-option.is-focused {
+  background-color: #212631!important;
+  /* Fallback color for IE 8 */
+  background-color: rgba(0, 126, 255, 0.08);
+  color: #e4e5e6;
+}
+.Select-option.is-disabled {
+  color: #cccccc;
+  cursor: default;
+}
+.TextCont h3 {
+  color: #e4e5e6 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.list-group-item-help {
+  margin-bottom: 14px !important;
+  border: none !important;
+  padding: 0.75rem 1.25rem !important;
+  cursor: pointer;
+  color: #e4e5e6 !important;
+  background-color: #f0f3f5;
+  font-size: 14px !important;
+  font-weight: 700;
+}
+a {
+  // color: #205493;
+  color: #20a8d8;
+  text-decoration: none;
+  background-color: transparent;
+  // text-decoration: underline;
+}
+.a_textLink {
+  // color: #205493;
+  color: #20a8d8;
+}
+.hoverTd:hover {
+  background-color: #4d515a;
+  color: #000 !important;
+  cursor: pointer;
+}
+.WhiteText{
+  color: #e4e5e6;
+}
+.compareAndSelectPU {
+  background-color: #e5e5e5 !important;
+  color: #000;
+}
+.close {
+  float: right;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #e4e5e6;
+  text-shadow: 0 1px 0 #e4e5e6;
+  opacity: .5;
+}
+.ImgInvert{
+  filter: invert(1);
+}
+.form-control:focus {
+  color: #e4e5e6;
+}
+.placeholder.TreeTemplateHeight svg path {
+  stroke: #e4e5e6 !important;
+}
+.month-picker > .rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
+  background-color: #d3d3d3;
+  color: #444;
+}
+.month-picker > .rmp-container .rmp-popup .rmp-pad> div label {
+  display: block;
+  font-size: 1.4rem;
+  text-align: center;
+  line-height: 3.4rem;
+  color: #e4e5e6 !important;
+}
+.CleanUpSize {
+  width: 16px;
+  height: 16px;
+  filter: invert(1) brightness(2);
+}
+.redColor {
+  color: #BA0C2F!important;
+}
+.greenColor {
+  color: #86cd99 !important;
+}
+
+.InnerBgImg{
+  background-image: url(/src/assets/img/bg-image/bg-login1.jpg);
+}
+.Iconinvert{
+  filter: invert(1) brightness(2);
+}
+.SettingIcon .btn {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  filter: invert(1) brightness(2);
+}
+.DarkColorOK.jss_filters_apply {
+  padding: 6px;
+  margin-top: 6px;
+  width: 100px;
+  float: right;
+  color: #000;
+}
+.consumptionDataEntryTable .jss_content {
+  max-height: calc(100vh - 262px) !important;
+  /* overflow: scroll !important; */
+}
+.Login-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: auto;
+  padding: 0px !important;
+  word-wrap: break-word;
+  background-color: #2a303dd4 !important;
+  background-clip: border-box;
+  border: none !important;
+  border-radius: 0.25rem;
+}
+.login-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e4e5e6!important;
+}
+.Loginicon {
+  color: #e4e5e6;
+}
+.DarkMode button.btn-primary {
+  color: #fff;
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
 }
 .ShowGuidanceHeading {
   color: #20a8d8;

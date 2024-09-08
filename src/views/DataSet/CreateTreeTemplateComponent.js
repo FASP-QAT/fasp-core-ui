@@ -12408,7 +12408,26 @@ export default class CreateTreeTemplate extends Component {
                                 </a>
                                 <a className="pr-lg-0 pt-lg-0 float-right">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                        onClick={() => this.exportPDF()}
+                                        onClick={() => {
+                                            var curTheme = localStorage.getItem("theme");
+                                            if(curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if(curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
                                     {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id == 1 || this.state.treeTemplate.flatList[0].payload.nodeType.id == 2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span> : <span className='WhiteText'><i>{"Create a tree first, then add this template to a node."}</i></span>}

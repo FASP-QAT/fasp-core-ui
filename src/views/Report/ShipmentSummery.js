@@ -3056,7 +3056,25 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     style={{ height: "25px", width: "25px", cursor: "pointer" }}
                     src={pdfIcon}
                     title="Export PDF"
-                    onClick={() => this.exportPDF()}
+                    onClick={() => {
+                      var curTheme = localStorage.getItem("theme");
+                      if(curTheme == "dark") {
+                          this.setState({
+                              isDarkMode: false
+                          }, () => {
+                              setTimeout(() => {
+                                  this.exportPDF();
+                                  if(curTheme == "dark") {
+                                      this.setState({
+                                          isDarkMode: true
+                                      })
+                                  }
+                              }, 0)
+                          })
+                      } else {
+                          this.exportPDF();
+                      }
+                  }}                  
                   />
                 </a>
                 <img

@@ -13493,7 +13493,26 @@ export default class BuildTree extends Component {
                                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
                                                                 {this.state.selectedScenario > 0 && <a style={{ marginRight: '7px' }} href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={() => this.recalculate(0, 2)}><i className="fa fa-refresh"></i></a>}
                                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                                                    onClick={() => this.exportPDF()}
+                                                                    onClick={() => {
+                                                                        var curTheme = localStorage.getItem("theme");
+                                                                        if(curTheme == "dark") {
+                                                                            this.setState({
+                                                                                isDarkMode: false
+                                                                            }, () => {
+                                                                                setTimeout(() => {
+                                                                                    this.exportPDF();
+                                                                                    if(curTheme == "dark") {
+                                                                                        this.setState({
+                                                                                            isDarkMode: true
+                                                                                        })
+                                                                                    }
+                                                                                }, 0)
+                                                                            })
+                                                                        } else {
+                                                                            this.exportPDF();
+                                                                        }
+                                                                    }}
+                                                                    
                                                                 />}
                                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />}
                                                             </FormGroup>
