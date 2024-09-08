@@ -311,7 +311,7 @@ select>.Select-control .Select-value,
   color: #e4e5e6;
 }
 .Login-component .input-group > .form-control{
-  background-color: #2a303d;
+  background-color: transparent;
   color: #e4e5e6;
 }
 @media (min-width: 992px) {
@@ -1222,7 +1222,7 @@ a {
   margin: auto;
   padding: 0px !important;
   word-wrap: break-word;
-  background-color: #2a303d !important;
+  background-color: #2a303dd4 !important;
   background-clip: border-box;
   border: none !important;
   border-radius: 0.25rem;

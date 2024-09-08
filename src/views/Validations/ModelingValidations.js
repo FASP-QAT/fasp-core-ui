@@ -1535,7 +1535,7 @@ class ModelingValidation extends Component {
             entries: " ",
         });
         const lightModeColors = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-        const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#EEE4B1", "#F48521", "#49A4A1", "#fff1f1"]
+        const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#EEE4B1", "#F48521", "#49A4A1", "#49494a"]
       
         const { isDarkMode } = this.state;
         const colourArray = isDarkMode ? darkModeColors : lightModeColors;
@@ -1786,7 +1786,26 @@ class ModelingValidation extends Component {
                     <div className="card-header-actions pr-lg-3">
                         {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer', float: 'right', marginTop: '3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         <a className="card-header-action" style={{ float: 'right' }}>
-                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
+                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />}
                         </a>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">

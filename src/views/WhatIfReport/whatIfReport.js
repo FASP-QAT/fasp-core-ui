@@ -4227,7 +4227,7 @@ export default class WhatIfReportComponent extends React.Component {
     tabPane() {
         const darkModeColors = [
             '#d4bbff',  
-            '#fff1f1',   
+            '#49494a',   
         ];
         
         const lightModeColors = [
@@ -5059,7 +5059,26 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="animated fadeIn ">
                                 <Row className="float-right">
                                     <div className="col-md-12">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                     </div>
                                 </Row>
