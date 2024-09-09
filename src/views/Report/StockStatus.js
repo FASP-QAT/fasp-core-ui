@@ -474,9 +474,6 @@ class StockStatus extends Component {
           doc.text((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')) + ' : ' + planningUnitLabel, doc.internal.pageSize.width / 10, 90, {
             align: 'left'
           })
-          doc.text((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')) + ' : ' + planningUnitLabel, doc.internal.pageSize.width / 10, 90, {
-            align: 'left'
-          })
           doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ' : ' + (item.data[0].planBasedOn == 1 ? formatter(item.data[0].minStockMos, 0) : formatter(item.data.minStockQty, 0)), doc.internal.pageSize.width / 10, 100, {
             align: 'left'
           })
@@ -584,7 +581,7 @@ class StockStatus extends Component {
           styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
           headStyles: { fillColor: "#e5edf5", textColor: "#000", fontStyle: "normal" },
           columnStyles: {
-            5: { cellWidth: 156.89 },
+            6: { cellWidth: 156.89 },
           },
           didParseCell: function (data) {
             if (data.column.index === 8 && data.row.section != "head") {
@@ -2710,7 +2707,7 @@ class StockStatus extends Component {
                 </>
               </ModalBody>
               <ModalFooter>
-                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.exportData(this.state.type)} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>
+                {(this.state.viewById == 1 ? this.state.planningUnitIdExport.length > 0 : this.state.realmCountryPlanningUnitIdExport.length > 0) && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.exportData(this.state.type)} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>}
               </ModalFooter>
             </Modal>
           </CardBody>
