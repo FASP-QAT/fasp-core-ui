@@ -476,6 +476,7 @@ export default class BranchTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            isDarkMode:false,
             isValidError: '',
             isTemplateChanged: false,
             percentForOneMonth: '',
@@ -4998,6 +4999,21 @@ export default class BranchTemplate extends Component {
     }
 
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         // console.log("my business functions---", AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE'));
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
@@ -6789,10 +6805,25 @@ export default class BranchTemplate extends Component {
     }
 
     tabPane1() {
+        const darkModeColors = [
+            '#d4bbff', // Color 1 
+            '#ba4e00'    
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+            '#651D32'
+        ];
+        const { isDarkMode } = this.state;
+// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
         var chartOptions = {
             title: {
                 display: true,
-                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -6801,12 +6832,12 @@ export default class BranchTemplate extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            fontColor: 'black'
+                            fontColor:fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             // stepSize: 1000000
                             callback: function (value) {
                                 var cell1 = value
@@ -6823,7 +6854,9 @@ export default class BranchTemplate extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 1,
+                            color: gridLineColor,
+    zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                         // scaleSteps : 100000
@@ -6831,10 +6864,12 @@ export default class BranchTemplate extends Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+    zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -6875,7 +6910,7 @@ export default class BranchTemplate extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -6891,7 +6926,7 @@ export default class BranchTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -6921,7 +6956,8 @@ export default class BranchTemplate extends Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -6938,12 +6974,12 @@ export default class BranchTemplate extends Component {
                                 // : ""
                                 : "",
                             // labelString: "",
-                            fontColor: 'black'
+                            fontColor:fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             // stepSize: 100000,
                             callback: function (value) {
                                 var cell1 = value
@@ -6960,7 +6996,9 @@ export default class BranchTemplate extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 1,
+                            color: gridLineColor,
+    zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                         // scaleSteps : 100000
@@ -6970,12 +7008,12 @@ export default class BranchTemplate extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: "% of " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
-                            fontColor: 'black'
+                            fontColor:fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value + " %";
                                 return cell1;
@@ -6985,17 +7023,21 @@ export default class BranchTemplate extends Component {
                             max: 100
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+    zeroLineColor: gridLineColor 
                         },
                         position: 'right',
                     }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+    zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -7036,7 +7078,7 @@ export default class BranchTemplate extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -7054,7 +7096,7 @@ export default class BranchTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -9490,7 +9532,26 @@ export default class BranchTemplate extends Component {
                                 </a>
                                 <a className="pr-lg-0 pt-lg-0 float-right">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                        onClick={() => this.exportPDF()}
+                                        onClick={() => {
+                                            var curTheme = localStorage.getItem("theme");
+                                            if(curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if(curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
                                 </a>
