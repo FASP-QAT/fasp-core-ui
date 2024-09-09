@@ -47,43 +47,48 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-const filterDataByFiscalYear = (data, startingMonth) => {
-    const fiscalData = {};
+const filterDataByFiscalYear = (data, fiscalStartMonth) => {
+    // fiscalStartMonth is 6 because July is the 7th month, so zero-indexed it is 6
+    const result = {};
     const yearWiseData = {};
 
-    data.forEach(row => {
-        const year = parseInt(moment(row[0]).format("YYYY"));
-        const month = parseInt(moment(row[0]).format("M"));
-        // Determine the fiscal year
-        console.log("row.slice(2)", row)
+    data.forEach(item => {
+        const date = new Date(item[0]);
+        let fiscalYearStart;
+        let fiscalYearEnd;
 
-        let fiscalYear;
-        if (month >= startingMonth) {
-            fiscalYear = `${year}-${year + 1}`;
+        const year = date.getFullYear();
+        const month = date.getMonth(); // 0 = Jan, 11 = Dec
+
+        if (month >= (fiscalStartMonth - 1)) {
+            fiscalYearStart = year;
+            fiscalYearEnd = year + 1;
         } else {
-            fiscalYear = `${year - 1}-${year}`;
+            fiscalYearStart = year - 1;
+            fiscalYearEnd = year;
         }
-        if (yearWiseData[fiscalYear]) {
-            yearWiseData[fiscalYear] += 1;
+
+        const fiscalYearKey = `${fiscalYearEnd}`;
+        if (yearWiseData[fiscalYearKey]) {
+            yearWiseData[fiscalYearKey] += 1;
         } else {
-            yearWiseData[fiscalYear] = 1;
+            yearWiseData[fiscalYearKey] = 1;
         }
-        if (!fiscalData[fiscalYear]) {
-            fiscalData[fiscalYear] = Array(row.length).fill(0);
+        // Aggregate values based on the fiscal year
+        if (!result[fiscalYearKey]) {
+            result[fiscalYearKey] = new Array(item.length).fill(0);
         }
-        // Add the row data to the corresponding fiscal year
-        for (let i = 1; i < row.length; i++) {
-            const value = parseFloat(row[i]) || 0; // Convert to float and handle empty strings
-            fiscalData[fiscalYear][i] += value;
+
+        for (let i = 1; i < item.length; i++) {
+            const value = parseFloat(item[i]) || 0; // Convert to float and handle empty strings
+            result[fiscalYearKey][i] += value;
         }
+        // result[fiscalYearKey] += item.value;
     });
-    console.log("row.slice(1)", fiscalData)
-
-    for (const year in yearWiseData) {
-        fiscalData[year].push(yearWiseData[year]);
+    for (const year in result) {
+        result[year].push(yearWiseData[year]);
     }
-
-    return fiscalData;
+    return result;
 }
 
 
@@ -301,12 +306,19 @@ class CompareAndSelectScenario extends Component {
         var rangeValue = this.state.singleValue2;
         let startDate;
         let stopDate;
-        if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
-            startDate = rangeValue.from.year - 1 + '-' + rangeValue.from.month + '-01';
-            stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        } else if (this.state.xAxisDisplayBy > 8) {
-            startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-            stopDate = rangeValue.to.year + 1 + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        var displayBy = this.state.xAxisDisplayBy;
+        if (displayBy > 2 && displayBy < 9) {
+            // startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            // stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            // startDate = moment(this.state.forecastStartDate).format("YYYY") + "-" + ((Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12) + "-01";
+            // stopDate = moment(this.state.forecastStopDate).format("YYYY") + "-" + ((Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12) + "-01"
+            startDate = rangeValue.from.year < moment(this.state.forecastStartDate).format("YYYY") ? moment(this.state.forecastStartDate).format("YYYY-MM-DD") : (rangeValue.from.year + '-' + rangeValue.from.month + '-01');
+            stopDate = moment(this.state.forecastStopDate).format("YYYY-MM-DD");
+        } else if (displayBy > 8) {
+            // startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            // stopDate = rangeValue.to.year + 1 + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            startDate = rangeValue.from.year < moment(this.state.forecastStartDate).format("YYYY") ? moment(this.state.forecastStartDate).format("YYYY-MM-DD") : (rangeValue.from.year + '-' + rangeValue.from.month + '-01');
+            stopDate = moment(this.state.forecastStopDate).add(1, "year").format("YYYY-MM-DD");
         } else {
             startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
@@ -319,23 +331,14 @@ class CompareAndSelectScenario extends Component {
         }
         var dataArr = [];
         var data = "";
-        if (this.state.xAxisDisplayBy != 1) {
-            let mL = this.state.xAxisDisplayBy == 9 ? monthList.length - 12 : monthList.length;
+        if (displayBy != 1) {
+            let mL = displayBy == 9 ? monthList.length - 12 : monthList.length;
             for (var j = 0; j < mL; j += 12) {
-                if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
-                    data = moment(monthList[j]).add(12, "months").format("YYYY");
-                } else {
-                    data = moment(monthList[j]).format("YYYY");
-                }
+                data = moment(monthList[j]).format("YYYY");
                 dataArr.push(data);
             }
         }
-        const filteredDates = this.state.monthList.filter(date => {
-            const year = date.split("-")[0]; // Extract the year from the date string
-            return dataArr.includes(year);
-        });
-        var rangeValue1 = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
-        this.setState({ yearArray: dataArr, calendarMonthList: filteredDates, singleValue2: rangeValue1 }, () => {
+        this.setState({ yearArray: dataArr, calendarMonthList: monthList }, () => {
             this.setMonth1List()
         })
     }
@@ -639,7 +642,10 @@ class CompareAndSelectScenario extends Component {
                 dataArr1.push(data1)
             }
             if (this.state.xAxisDisplayBy != 1) {
-                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, this.state.singleValue2.from.month) : calculateSums(dataArr1);
+                var displayBy = this.state.xAxisDisplayBy;
+                var fiscalStartMonth = (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12
+                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, fiscalStartMonth) : calculateSums(dataArr1);
+
                 // Convert the object to an array
                 const transformedData = Object.keys(originalData).map((year, index) => ({
                     [index]: [parseInt(year), ...originalData[year]]
@@ -2111,15 +2117,12 @@ class CompareAndSelectScenario extends Component {
                 }
             }
         }
-        console.log("val", val)
         this.setState({
             xAxisDisplayBy: displayBy,
             singleValue2: val,
             loading: false
         }, () => {
             this.getData();
-            // this.buildJexcel();
-            // this.expandCompressFuntion();
         })
     }
 
