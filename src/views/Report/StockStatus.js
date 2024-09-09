@@ -1785,11 +1785,11 @@ class StockStatus extends Component {
       return ({ label: getLabelText(item.label, this.state.lang) })
     }, this);
     var reportingUnitList = (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId);
-    var graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
+    var graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
     const options = {
       title: {
-        display: true,
-        text: entityname1
+        display: this.state.yaxisEquUnit==-1 && this.state.programId.length==1?true:false,
+        text: graphLabel
       },
       scales: {
         yAxes: [{
@@ -1907,8 +1907,8 @@ class StockStatus extends Component {
     }
     const options1 = {
       title: {
-        display: true,
-        text: entityname1
+        display: this.state.yaxisEquUnit==-1 && this.state.programId.length==1?true:false,
+        text: graphLabel
       },
       scales: {
         yAxes: [{
@@ -2474,7 +2474,10 @@ class StockStatus extends Component {
                             </ul>
                           </FormGroup>
                         }
-                        <div className="col-md-12">
+                        <div className="col-md-12 text-center">
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>=1 && <span align="center">{entityname1}</span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>=1 && <span id="programIdsLabels" align="center">{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.map(ele => ele.label).toString()):""}</span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>=1 && <span id="planningUnitIdsLabels" align="center">{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).toString()):""}</span>}
                           <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
@@ -2524,16 +2527,16 @@ class StockStatus extends Component {
                         <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th>
                       </tr>
                       <tr>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}</th>
-                        <th className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')} </th>
-                        {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th className="text-center" style={{ width: "200px" }}> Consensus </th>}
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.qty')}</th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.openingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.openingBalanceTooltipMultiProgram')):i18n('static.stockStatus.openingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.forecastedTooltipSingleProgram'):i18n.t('static.stockStatus.forecastedTooltipMultiProgram')):i18n('static.stockStatus.forecastedTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.actualTooltipSingleProgram'):i18n.t('static.stockStatus.actualTooltipMultiProgram')):i18n('static.stockStatus.actualTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>
+                        {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.consensusTooltipSingleProgram'):i18n.t('static.stockStatus.consensusTooltipMultiProgram')):i18n('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> Consensus<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>}
+                        <th className="text-center" title={this.state.yaxisEquUnit!=-1?i18n.t('static.stockStatus.shipmentQtyTooltipEU'):''} style={{ width: "200px" }}>{i18n.t('static.report.qty')}{this.state.yaxisEquUnit!=-1 && <i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i>}</th>
                         <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}</th>
-                        <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}</th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.adjustmentQtyTooltipSingleProgram'):i18n.t('static.stockStatus.adjustmentQtyTooltipMultiProgram')):i18n('static.stockStatus.adjustmentQtyTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.expiredStockTooltipSingleProgram'):i18n.t('static.stockStatus.expiredStockTooltipMultiProgram')):i18n('static.stockStatus.expiredStockTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.endingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.endingBalanceTooltipMultiProgram')):i18n('static.stockStatus.endingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.amcTooltipSingleProgram'):i18n.t('static.stockStatus.amcTooltipMultiProgram')):i18n('static.stockStatus.amcTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
                         <th className="text-center" style={{ width: "200px" }}>{this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
                       </tr>
@@ -2707,7 +2710,7 @@ class StockStatus extends Component {
                 </>
               </ModalBody>
               <ModalFooter>
-                {(this.state.viewById == 1 ? this.state.planningUnitIdExport.length > 0 : this.state.realmCountryPlanningUnitIdExport.length > 0) && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.exportData(this.state.type)} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>}
+                {(this.state.viewById == 1 ? this.state.planningUnitIdExport.length > 0 : this.state.realmCountryPlanningUnitIdExport.length > 0) && (!(this.state.yaxisEquUnit == -1 && this.state.isAggregate.toString() == "true" && (this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport).length>1)) && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.exportData(this.state.type)} ><i className="fa fa-check"></i>{i18n.t("static.common.submit")}</Button>}
               </ModalFooter>
             </Modal>
           </CardBody>
