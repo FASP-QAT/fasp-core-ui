@@ -1015,10 +1015,10 @@ class StockStatus extends Component {
             graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
             var count = 0;
             var programCount = 0;
-            var colourArray = ["#002F6C","#A7C6ED","#49A4A1","#BA0C2F","#651D32","#212721","#118B70","#6C6463","#F48521","#f0bc52"]
+            var colourArray = ["#002F6C","#BA0C2F","#118B70","#F48521","#A7C6ED","#651D32","#6C6463","#f0bc52","#49A4A1","#212721"]
             this.state.programId.map((e, i) => {
-              count += 1;
               reportingUnitList.map((r, j) => {
+                count += 1;
                 programCount += 1;
                 var viewBy = this.state.viewById;
                 var planningUnitId = "";
@@ -2191,10 +2191,10 @@ class StockStatus extends Component {
       } else {
         var count = 0;
         var programCount = 0;
-        var colourArray = ["#002F6C","#A7C6ED","#49A4A1","#BA0C2F","#651D32","#212721","#118B70","#6C6463","#F48521","#f0bc52"]
+        var colourArray = ["#002F6C","#BA0C2F","#118B70","#F48521","#A7C6ED","#651D32","#6C6463","#f0bc52","#49A4A1","#212721"]
         this.state.programId.map((e, i) => {
-          count += 1;
           reportingUnitList.map((r, j) => {
+            count += 1;
             programCount += 1;
             var viewBy = this.state.viewById;
             var planningUnitId = "";
