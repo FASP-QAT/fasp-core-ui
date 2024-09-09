@@ -1122,6 +1122,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == "inventory") {
                                     props.updateState("color", 'green');
                                     props.updateState("inventoryChangedFlag", 0);
+                                    console.log("props.inventoryPage Test@123",props.inventoryPage);
                                     if (props.inventoryPage != "inventoryDataEntry") {
                                         if (props.items== undefined || props.items.inventoryType == 1) {
                                             props.updateState("message", i18n.t('static.message.inventorySaved'));
@@ -1148,6 +1149,22 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     if (props.inventoryPage == "whatIf") {
                                         props.updateState("programModified", 1);
                                     }
+                                    props.updateState("loading", false);
+                                    props.hideFirstComponent();
+                                } else if (page == "actualInventory") {
+                                    props.updateState("color", 'green');
+                                    props.updateState("inventoryChangedFlag", 0);
+                                    if (props.inventoryPage != "inventoryDataEntry") {
+                                        if (props.items== undefined || props.items.inventoryType == 1) {
+                                            props.updateState("message", i18n.t('static.message.inventorySaved'));
+                                        } else {
+                                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                                        }
+                                    }
+                                    props.updateState("batchInfoInInventoryPopUp", []);
+                                    props.updateState("actualInventoryChanged", false);
+                                    props.updateState("actualInventoryBatchTotalNotMatching", "");
+                                    props.updateState("ledgerForBatch", []);
                                     props.updateState("loading", false);
                                     props.hideFirstComponent();
                                 } else if (page == "shipment") {

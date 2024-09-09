@@ -3456,6 +3456,7 @@
     "static.stockStatus.endingBalanceTooltipEU":"Sum of selected programs’ & planning units’ ending balances each month after converting to EU. Bolded if all programs have an actual inventory count in the current month",
     "static.stockStatus.amcTooltipSingleProgram":"Dynamic value based on user-entered number of months past & future in the Update PU screen",
     "static.stockStatus.amcTooltipMultiProgram":"Sum of the individually calculated AMC values for selected programs each month",
-    "static.stockStatus.amcTooltipEU":"Sum of the individually calculated AMC values for selected programs & planning units each month after converting to EU"
-    
+    "static.stockStatus.amcTooltipEU":"Sum of the individually calculated AMC values for selected programs & planning units each month after converting to EU",
+    "static.supplyPlan.actualInventoryNote1":"Click white cells to see data entry rows. Click on the `Final Inventory` row to edit batch details.",
+    "static.supplyPlan.actualInventoryNote2":"Right click to add/remove a batch, or to see the batch ledger for that batch"
 }
