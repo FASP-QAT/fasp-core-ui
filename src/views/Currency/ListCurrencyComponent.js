@@ -103,7 +103,7 @@ export default class CurrencyListComponent extends Component {
                                 },
                                 {
                                     title: i18n.t('static.currency.conversionrateusd'),
-                                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                                    type: 'numeric', mask: '#,##.0000', decimal: '.',
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
