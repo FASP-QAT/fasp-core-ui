@@ -2555,6 +2555,7 @@ export default class TreeTable extends Component {
             {
                 title: i18n.t('static.common.notes'),
                 type: 'text',
+                width:200
             },
             {
                 title: 'Node Type',
@@ -3407,6 +3408,7 @@ export default class TreeTable extends Component {
             {//ag
                 title: i18n.t('static.common.notes'),
                 type: 'text',
+                width:200
             },
             {//ah
                 title: 'Node Type',
