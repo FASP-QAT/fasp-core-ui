@@ -41,8 +41,11 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 if (page == "DataEntry") {
                     var arimaData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                     props.updateArimaData(arimaData);
-                } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
+                } else if (page == "importFromQATSP") {
                     var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
+                    props.updateArimaData(arimaData);
+                } else if (page == "bulkExtrapolation") {
+                    var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId, "p": responseData.var1, "d": responseData.var2, "q": responseData.var3 }
                     props.updateArimaData(arimaData);
                 } else {
                     props.updateState("arimaData", output);
