@@ -2423,7 +2423,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <>
                                         <h6 className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
                                         <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight"></div><br/>
-                                        <span>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>
+                                        {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <span>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
                                         {this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                         {this.state.actualInventoryChanged && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                         {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
