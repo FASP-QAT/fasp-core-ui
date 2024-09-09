@@ -41,8 +41,11 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 if (page == "DataEntry") {
                     var tesData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                     props.updateTESData(tesData);
-                } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
+                } else if (page == "importFromQATSP") {
                     var tesData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
+                    props.updateTESData(tesData);
+                } else if (page == "bulkExtrapolation") {
+                    var tesData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId, "alpha": responseData.var1, "beta": responseData.var2, "gamma": responseData.var3 }
                     props.updateTESData(tesData);
                 } else {
                     props.updateState("tesData", output);

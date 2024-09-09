@@ -2989,9 +2989,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             "jsonProperties": {
                                                 confidenceLevel: this.state.confidenceLevelId,
                                                 seasonality: this.state.noOfMonthsForASeason,
-                                                alpha: this.state.alpha,
-                                                beta: this.state.beta,
-                                                gamma: this.state.gamma,
+                                                alpha: jsonDataTesFilter[0].alpha,
+                                                beta: jsonDataTesFilter[0].beta,
+                                                gamma: jsonDataTesFilter[0].gamma,
                                                 startDate: moment(minDate).format("YYYY-MM-DD"),
                                                 stopDate: moment(maxDate).format("YYYY-MM-DD")
                                             },
@@ -3022,9 +3022,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             "jsonProperties": {
                                                 confidenceLevel: this.state.confidenceLevelIdArima,
                                                 seasonality: this.state.seasonality,
-                                                p: this.state.p,
-                                                d: this.state.d,
-                                                q: this.state.q,
+                                                p: jsonDataArimaFilter[0].p,
+                                                d: jsonDataArimaFilter[0].d,
+                                                q: jsonDataArimaFilter[0].q,
                                                 startDate: moment(minDate).format("YYYY-MM-DD"),
                                                 stopDate: moment(maxDate).format("YYYY-MM-DD")
                                             },
