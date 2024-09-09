@@ -2094,13 +2094,13 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
                 backgroundColor: [
-                    '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+                    '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
                     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                    '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+                    '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
                     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
                     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                    '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+                    '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
                 ],
                 
         

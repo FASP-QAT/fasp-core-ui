@@ -1769,7 +1769,7 @@ observer.observe(document.documentElement, {
   render() {
     const darkModeColors = [
       '#d4bbff', 
-      '#49494a' ,   
+      '#757575' ,   
   ];
   
   const lightModeColors = [

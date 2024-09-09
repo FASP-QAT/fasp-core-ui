@@ -1392,13 +1392,13 @@ observer.observe(document.documentElement, {
         ]
 
         const darkModeColors = [
-            '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
             '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
             '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
             '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
             '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
         ]
         const { isDarkMode } = this.state;
 const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;

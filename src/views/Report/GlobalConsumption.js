@@ -895,13 +895,13 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     ]
     const darkModeColors = [
-      '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
       '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-      '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
       '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-      '#d4bbff', '#BA0C2F', '#49494a', '#0067B9', '#A7C6ED',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
     ]
     const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];

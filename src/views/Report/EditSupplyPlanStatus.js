@@ -2714,7 +2714,7 @@ observer.observe(document.documentElement, {
         }
         const darkModeColors = [
             '#d4bbff', 
-            '#49494a' ,   
+            '#757575' ,   
         ];
         
         const lightModeColors = [
