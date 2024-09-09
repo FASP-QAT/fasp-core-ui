@@ -7407,7 +7407,8 @@ export default class BuildTree extends Component {
                     oldId: itemConfig.id,
                     newId: nodeId,
                     oldSortOrder: itemConfig.sortOrder,
-                    newSortOrder: child.sortOrder
+                    newSortOrder: child.sortOrder,
+                    newLevel: child.level
                 }
                 childListArr.push(json);
             } else {
@@ -7418,7 +7419,7 @@ export default class BuildTree extends Component {
                 child.id = nodeId;
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
-                child.level = child.parent.level+1;
+                child.level = parentNode.newLevel+1;
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == parentNode.newId) : items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7427,7 +7428,8 @@ export default class BuildTree extends Component {
                     oldId: oldId,
                     newId: nodeId,
                     oldSortOrder: oldSortOrder,
-                    newSortOrder: child.sortOrder
+                    newSortOrder: child.sortOrder,
+                    newLevel: child.level
                 }
                 childListArr.push(json);
             }
