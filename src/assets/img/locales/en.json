@@ -3371,5 +3371,8 @@
     "static.treeTable.parentValueTooltip":"Value is calculated based on the Display Date. To change the Parent Value, edit the Parent Node directly.",
     "static.treeTable.nodeValueTooltip":"Value is calculated based on the Display Date. ",
     "static.tree.numberNodeValue":"Number Node Value",
-    "static.tree.percentageNodeValue":"Percentage Node Value"
+    "static.tree.percentageNodeValue":"Percentage Node Value",
+    "static.tree.editIn":"Edit in",
+    "static.treeTable.updateNotes":"Note: Calculated values in gray cells only recalculate after clicking `Update.`",
+    "static.treeTable.rightClickNotes":"Right click on any row and click `Open this node for editing` to open that specific node in separate QAT window"
 }

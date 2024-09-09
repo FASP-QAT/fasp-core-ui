@@ -2192,9 +2192,6 @@ export default class TreeTable extends Component {
         this.checkValidationTab1();
         this.el = this.state.treeTabl1El;
         this.el.setValueFromCoords(12, y, 1, true);
-        if (x == 6 && this.el.getValueFromCoords(10, y) != 2) {
-            this.el.setValueFromCoords(8, y, this.el.getValueFromCoords(6, y).toString().replaceAll(",", "").replaceAll("%", "") * (this.el.getValueFromCoords(7, y) / 100), true);
-        }
         this.setState({
             isTabDataChanged: true
         })
@@ -2212,9 +2209,9 @@ export default class TreeTable extends Component {
             let tempMonth = new Date(value);
             this.el.setValueFromCoords(4, y, tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01", true);
         }
-        if (x == 5) {
-            this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y) * (value / 100), true);
-        }
+        // if (x == 5) {
+        //     this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y) * (value / 100), true);
+        // }
         if (x == 9) {
             var childNodes = this.state.items.filter(ele => ele.parent == nodeId);
             var jsonLength = parseInt(json.length);
@@ -2478,25 +2475,25 @@ export default class TreeTable extends Component {
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
                 nodeType += i18n.t('static.ManageTree.Extrapolation')
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
-                nodeType += "Scale Up"
+                nodeType += "Increase"
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
-                nodeType += "Scale Down"
+                nodeType += "Decrease"
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
                 nodeType += i18n.t('static.ManageTree.Transfer')
             }
@@ -3191,37 +3188,37 @@ export default class TreeTable extends Component {
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
                 nodeType += i18n.t('static.ManageTree.Extrapolation')
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
-                nodeType += "Scale Up"
+                nodeType += "Increase"
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
-                nodeType += "Scale Down"
+                nodeType += "Decrease"
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true) {
                 if (nodeType != "") {
-                    nodeType += " ";
+                    nodeType += ", ";
                 }
                 nodeType += i18n.t('static.ManageTree.Transfer')
             }
             if ((items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4)) {
                 if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
                     if (nodeType != "") {
-                        nodeType += " ";
+                        nodeType += ", ";
                     }
                     nodeType += "C"
                 } else {
                     if (nodeType != "") {
-                        nodeType += " ";
+                        nodeType += ", ";
                     }
                     nodeType += "D"
                 }
@@ -5513,7 +5510,6 @@ export default class TreeTable extends Component {
         return (
             <>
                 <TabPane tabId="1" style={{ paddingBottom: "50px" }}>
-                    <i>{i18n.t('static.treeTable.rightClickNotes')}</i>
                     <div className="TreeTable">
                         <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
@@ -5526,7 +5522,6 @@ export default class TreeTable extends Component {
                     </div>}
                 </TabPane>
                 <TabPane tabId="2" style={{ paddingBottom: "50px" }}>
-                    <i>{i18n.t('static.treeTable.rightClickNotes')}</i>
                     <div className="TreeTable">
                         <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
@@ -5890,7 +5885,7 @@ export default class TreeTable extends Component {
         doc.setTextColor("#002f6c");
         var y = 60;
         var planningText = "";
-        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
@@ -5900,7 +5895,7 @@ export default class TreeTable extends Component {
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-        planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
@@ -5910,7 +5905,7 @@ export default class TreeTable extends Component {
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-        planningText = doc.splitTextToSize(i18n.t('static.tree.displayDate') + "(" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY"), doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize(i18n.t('static.tree.displayDate') + " (" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY"), doc.internal.pageSize.width * 3 / 4);
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
@@ -5953,7 +5948,7 @@ export default class TreeTable extends Component {
                             dataArr.push(ele[39]);
                         }
                     } else {
-                        dataArr.push(ele[idx]);
+                        dataArr.push(ele[idx].toString().replaceAll(/&amp;/g, '&'));
                     }
                 }
             })
@@ -5979,21 +5974,13 @@ export default class TreeTable extends Component {
      */
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate')+" " + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime')+" " + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.tree.displayDate') + "(" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY")).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('"' + (i18n.t('static.tree.displayDate') + " (" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY")).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
@@ -6024,7 +6011,7 @@ export default class TreeTable extends Component {
                             B.push(ele[39].toString().replaceAll(',', '').replaceAll(' ', '%20'));
                         }
                     } else {
-                        B.push(ele[idx].toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                        B.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(',', '').replaceAll(' ', '%20'));
                     }
                 }
             })
@@ -6170,7 +6157,7 @@ export default class TreeTable extends Component {
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{i18n.t('static.listTree.manageTreeTreeList')}</small></span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> {i18n.t('static.tree.or')} <a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a></span>
                             </div>
                         </div>
                         <div className="row pt-lg-0 pr-lg-4">
@@ -6260,6 +6247,8 @@ export default class TreeTable extends Component {
                                             </div>
                                         </CardBody>
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
+                                            <i>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`}>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}{i18n.t('static.treeTable.rightClickNotes')}</i><br/><br/>
+                                            <i>{i18n.t('static.treeTable.updateNotes')}</i><br/><br/>
                                             <Row>
                                                 <Col xs="12" md="12" className="mb-4">
                                                     <Nav tabs>
