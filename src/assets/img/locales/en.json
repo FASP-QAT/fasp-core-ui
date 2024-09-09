@@ -3355,5 +3355,7 @@
     "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)",
     "static.supplyPlan.projectedQuantity":"Projected Quantity",
     "static.supplyPlan.actualQuantity":"Actual Quantity",
-    "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available"
+    "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available",
+    "static.supplyPlan.actualInventoryNote1":"Click white cells to see data entry rows. Click on the `Final Inventory` row to edit batch details.",
+    "static.supplyPlan.actualInventoryNote2":"Right click to add/remove a batch, or to see the batch ledger for that batch"
 }

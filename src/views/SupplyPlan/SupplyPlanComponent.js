@@ -153,7 +153,7 @@ export default class SupplyPlanComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             batchInfoInInventoryPopUp: [],
-            actualInventoryEditable:false,
+            actualInventoryEditable:0,
             ledgerForBatch: [],
             showBatchSaveButton: false,
             programQPLDetails: [],
@@ -902,7 +902,6 @@ export default class SupplyPlanComponent extends React.Component {
         doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
     }
     toggleInventoryActualBatchInfo(batchInfoList,isActual,count){
-        console.log("batchInfoList Test@123",batchInfoList);
         var cont = false;
         if (this.state.actualInventoryChanged) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -925,7 +924,7 @@ export default class SupplyPlanComponent extends React.Component {
             var editable=isActual;
         var programJson = this.state.programJson;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        var batchInfoListForProgram = programJson.batchInfoList;
+        var batchInfoListForProgram = programJson.batchInfoList.filter(c=>moment(c.createdDate).format("YYYY-MM")<=moment(this.state.monthsArray[count].startDate).format("YYYY-MM"));
         var batchList = [];
         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.accountFlag.toString() == "true");
         var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
@@ -1218,7 +1217,6 @@ export default class SupplyPlanComponent extends React.Component {
                         batchList: batchDetailsList
                     })
                     generalProgramJson.batchInventoryList = batchInventortListFilter;
-                    console.log("generalProgramJson Test@123",generalProgramJson);
                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;
                     var putRequest = programTransaction.put(programRequest.result);
@@ -1232,7 +1230,7 @@ export default class SupplyPlanComponent extends React.Component {
                         })
                         var objectStore = "";
                         objectStore = 'programData';
-                        calculateSupplyPlan(programId, planningUnitId, objectStore, "inventory", this, [], moment(this.state.actualInventoryDate).startOf('month').format("YYYY-MM-DD"));
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "actualInventory", this, [], moment(this.state.actualInventoryDate).startOf('month').format("YYYY-MM-DD"));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1248,9 +1246,11 @@ export default class SupplyPlanComponent extends React.Component {
             if (validation == false) {
                 valid = false;
             }
-            if(tempJson.filter(c=>c[0]==json[j][0]).length>0){
+            var tmpIndex=tempJson.findIndex(c=>c[0]==json[j][0]);
+            if(tmpIndex>=0){
                 valid = false;
                 inValid("A", j, i18n.t('static.supplyPlan.duplicateBatchNumber'), this.state.actualInventoryEl);
+                inValid("A", tmpIndex, i18n.t('static.supplyPlan.duplicateBatchNumber'), this.state.actualInventoryEl);
             }
             tempJson.push(json[j]);
             total+=Number(this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true).toString().replaceAll(",",""));
@@ -1267,6 +1267,7 @@ export default class SupplyPlanComponent extends React.Component {
             }
         }
         if(total!=this.state.actualInventoryBatchTotal){
+            valid=false;
             this.setState({
                 actualInventoryBatchTotalNotMatching:i18n.t("static.supplyPlan.batchNumberMissing")
             },()=>{
@@ -2368,7 +2369,8 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                     </tbody>
-                                </Table>
+                                </Table><br/>
+                                <span>{i18n.t('static.supplyPlan.actualInventoryNote1')}</span>
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                                 <div className=" mt-3">
                                     <div id="adjustmentsTable" className=" " />
@@ -2386,10 +2388,11 @@ export default class SupplyPlanComponent extends React.Component {
                                 {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                     <>
                                         <h6 className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
-                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight"></div><br/>
+                                        <span>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>
                                         {this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                         {this.state.actualInventoryChanged && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                        {this.state.actualInventoryEditable && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                        {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                     </>
                                 }
                                 {this.state.ledgerForBatch.length > 0 &&
