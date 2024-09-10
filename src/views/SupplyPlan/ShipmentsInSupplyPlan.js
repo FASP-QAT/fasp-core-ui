@@ -332,7 +332,6 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             fsRequest.onsuccess = function (event) {
                                 var fsResult = [];
                                 fsResult = fsRequest.result;
-                                console.log("fsResult Test@123",fsResult)
                                 for (var k = 0; k < fsResult.length; k++) {
                                     if (fsResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && [...new Set(fsResult[k].programList.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId))) {
                                         var fsJson = {

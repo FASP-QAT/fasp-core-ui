@@ -752,7 +752,6 @@ export default class SyncMasterData extends Component {
                                             this.fetchData(1, programList[i].id);
                                         }
                                     }).catch(error => {
-                                        console.log("In catch Test@123",error)
                                         this.fetchData(1, 1);
                                         if (error.message === "Network Error") {
                                         } else {

@@ -531,7 +531,6 @@ export default class EditForecastingUnitComponent extends Component {
                     </option>
                 )
             }, this);
-        console.log("this.state.forecastingUnit.genericLabel.label_en Test@123",this.state.forecastingUnit.genericLabel.label_en)    
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />

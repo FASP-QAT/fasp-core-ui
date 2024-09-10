@@ -545,7 +545,6 @@ observer.observe(document.documentElement, {
      * @param {Object} e - Event data containing planning unit information.
      */
     setPlanningUnit(e) {
-        console.log(" 1 Test@123", e)
         if (this.state.yaxisEquUnit > 0) {
             var forecastErrorThreshold = 0;
             var showForecastThresholdLegend = false;
@@ -568,7 +567,6 @@ observer.observe(document.documentElement, {
                 this.fetchData();
             })
         } else {
-            console.log("2 Test@123", e.target.value)
             if (e.target.value != -1) {
                 var forecastErrorThreshold = this.state.planningUnits.filter(c => c.planningUnit.id == e.target.value)[0].forecastErrorThreshold;
                 this.setState({

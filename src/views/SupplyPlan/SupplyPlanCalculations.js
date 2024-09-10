@@ -1082,7 +1082,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         } catch (err) {
-                            console.log("Err Test@123",err)
                             props.fetchData(1, programId)
                         }
                         programDataJson.planningUnitDataList = planningUnitDataList;
@@ -1122,7 +1121,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 } else if (page == "inventory") {
                                     props.updateState("color", 'green');
                                     props.updateState("inventoryChangedFlag", 0);
-                                    console.log("props.inventoryPage Test@123",props.inventoryPage);
                                     if (props.inventoryPage != "inventoryDataEntry") {
                                         if (props.items== undefined || props.items.inventoryType == 1) {
                                             props.updateState("message", i18n.t('static.message.inventorySaved'));
@@ -1161,6 +1159,9 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
                                         }
                                     }
+                                    props.updateState("programJson", programJsonForStoringTheResult);
+                                    props.updateState("planningUnitDataList", planningUnitDataList);
+                                    props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                     props.updateState("batchInfoInInventoryPopUp", []);
                                     props.updateState("actualInventoryChanged", false);
                                     props.updateState("actualInventoryBatchTotalNotMatching", "");

@@ -331,10 +331,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                             fsRequest.onsuccess = function (event) {
                                 var fsResult = [];
                                 fsResult = fsRequest.result;
-                                console.log("fsResult Test@123",fsResult)
                                 for (var k = 0; k < fsResult.length; k++) {
-                                    console.log("fsResult Test@123",fsResult[k]);
-                                    console.log("fsResult Test@123",fsResult[k].programList);
                                     if (fsResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && [...new Set(fsResult[k].programList.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId))) {
                                         var fsJson = {
                                             name: fsResult[k].fundingSourceCode,
