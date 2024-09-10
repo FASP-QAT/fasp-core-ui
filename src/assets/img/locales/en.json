@@ -3371,5 +3371,12 @@
     "static.treeTable.parentValueTooltip":"Value is calculated based on the Display Date. To change the Parent Value, edit the Parent Node directly.",
     "static.treeTable.nodeValueTooltip":"Value is calculated based on the Display Date. ",
     "static.tree.numberNodeValue":"Number Node Value",
-    "static.tree.percentageNodeValue":"Percentage Node Value"
+    "static.tree.percentageNodeValue":"Percentage Node Value",
+    "static.treeTable.conversionFactor":"Conversion Factor",
+    "static.treeTable.PUReference":"# PU / Interval / Patient (Reference)",
+    "static.treeTable.PUInterval":"# PU / Interval / Patient",
+    "static.treeTable.oneTimeDispensing":"One Time Dispensing",
+    "static.treeTable.period":"Period",
+    "static.treeTable.tab1":"Aggregation/Number/Percentage Node",
+    "static.treeTable.tab2":"FU/PU Node"
 }
