@@ -2552,7 +2552,7 @@ export default class TreeTable extends Component {
             {
                 title: i18n.t('static.common.notes'),
                 type: 'text',
-                width:200
+                width: 200
             },
             {
                 title: 'Node Type',
@@ -3277,63 +3277,63 @@ export default class TreeTable extends Component {
                 type: 'numeric',
             },
             {//n
-                title: 'Tracer Category',
+                title: i18n.t('static.tracercategory.tracercategory'),
                 source: this.state.tracerCategoryListForDropdown,
                 type: 'dropdown',
             },
             {//i
-                title: 'Forecasting Unit',
+                title: i18n.t('static.ManageTree.ForecastingUnit'),
                 source: this.state.forecastingUnitListForDropdown,
                 type: 'dropdown',
             },
             {//j
-                title: 'Planning Unit',
+                title: i18n.t('static.dashboard.planningunitheader'),
                 source: this.state.planningUnitListForDropdown,
                 type: 'dropdown',
                 filter: this.filterPlanningUnit
             },
             {//k
-                title: 'Conversion Factor',
+                title: i18n.t('static.treeTable.conversionFactor'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//l
-                title: '# PU / Interval / Patient (Reference)',
+                title: i18n.t('static.treeTable.PUReference'),
                 decimal: '.',
                 type: 'numeric',
             },
             {//m
-                title: '# PU / Interval / Patient',
+                title: i18n.t('static.treeTable.PUInterval'),
                 decimal: '.',
                 type: 'numeric',
             },
             {//o
-                title: 'Type Of Use',
+                title: i18n.t('static.common.typeofuse'),
                 source: this.state.usageTypeListForDropdown,
                 type: 'dropdown',
             },
             {//p
-                title: 'One Time Dispensing',
+                title: i18n.t('static.treeTable.oneTimeDispensing'),
                 source: this.state.booleanForDropdown,
                 type: 'dropdown',
             },
             {//p
-                title: 'Lag in months',
+                title: i18n.t('static.usageTemplate.lagInMonth'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//q
-                title: 'Every',
+                title: i18n.t('static.usageTemplate.every'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//r
-                title: 'Unit',
+                title: i18n.t('static.dashboard.unit'),
                 source: this.state.nodeUnitListForDropdown,
                 type: 'dropdown',
             },
             {//s
-                title: 'Requires',
+                title: i18n.t('static.tree.requires'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
@@ -3343,27 +3343,27 @@ export default class TreeTable extends Component {
                 type: 'dropdown',
             },
             {//w
-                title: 'Single Use',
+                title: i18n.t('static.tree.singleUse'),
                 source: this.state.booleanForDropdown,
                 type: 'dropdown',
             },
             {//u
-                title: 'Every',
+                title: i18n.t('static.usageTemplate.every'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//v
-                title: 'Usage Period',
+                title: i18n.t('static.usagePeriod.usagePeriod'),
                 source: this.state.usagePeriodListForDropdown,
                 type: 'dropdown',
             },
             {//x
-                title: 'For',
+                title: i18n.t('static.tree.for'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//y
-                title: 'Period',
+                title: i18n.t('static.treeTable.period'),
                 source: this.state.usagePeriodListForDropdown,
                 type: 'dropdown',
             },
@@ -3405,7 +3405,7 @@ export default class TreeTable extends Component {
             {//ag
                 title: i18n.t('static.common.notes'),
                 type: 'text',
-                width:200
+                width: 200
             },
             {//ah
                 title: 'Node Type',
@@ -5870,9 +5870,15 @@ export default class TreeTable extends Component {
                 })
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.common.treeTable') + " - Aggregation/Number/Percentage Node", doc.internal.pageSize.width / 2, 50, {
-                    align: 'center'
-                })
+                if (this.state.activeTab1[0] === '1') {
+                    doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab1'), doc.internal.pageSize.width / 2, 50, {
+                        align: 'center'
+                    })
+                }else{
+                    doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab2'), doc.internal.pageSize.width / 2, 50, {
+                        align: 'center'
+                    })
+                }
             }
         }
         const unit = "pt";
@@ -5905,7 +5911,7 @@ export default class TreeTable extends Component {
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
         }
-        planningText = doc.splitTextToSize(i18n.t('static.tree.displayDate') + " (" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY"), doc.internal.pageSize.width * 3 / 4);
+        planningText = doc.splitTextToSize(i18n.t('static.tree.displayDate') + " (" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ': ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY"), doc.internal.pageSize.width * 3 / 4);
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
@@ -5944,7 +5950,7 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             dataArr.push(ele[13]);
-                        }else{
+                        } else {
                             dataArr.push(ele[39]);
                         }
                     } else {
@@ -5974,13 +5980,13 @@ export default class TreeTable extends Component {
      */
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate')+" " + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime')+" " + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.common.treeName') + ': ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        csvRow.push('"' + (i18n.t('static.tree.displayDate') + " (" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ' : ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY")).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.tree.displayDate') + " (" + i18n.t('static.consumption.forcast') + ":" + this.state.forecastPeriod + ")" + ': ' + moment((this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("MMM YYYY")).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         const headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
@@ -6001,13 +6007,13 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'calendar') {
                         if (ele[idx] != "") {
                             B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', '').replaceAll(' ', '%20'));
-                        }else{
+                        } else {
                             B.push("")
                         }
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             B.push(ele[13].toString().replaceAll(',', '').replaceAll(' ', '%20'));
-                        }else{
+                        } else {
                             B.push(ele[39].toString().replaceAll(',', '').replaceAll(' ', '%20'));
                         }
                     } else {
@@ -6266,8 +6272,8 @@ export default class TreeTable extends Component {
                                             </div>
                                         </CardBody>
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
-                                            <i>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`}>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}{i18n.t('static.treeTable.rightClickNotes')}</i><br/><br/>
-                                            <i>{i18n.t('static.treeTable.updateNotes')}</i><br/><br/>
+                                            <i>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`}>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
+                                            <i>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
                                             <Row>
                                                 <Col xs="12" md="12" className="mb-4">
                                                     <Nav tabs>
@@ -6276,7 +6282,7 @@ export default class TreeTable extends Component {
                                                                 active={this.state.activeTab1[0] === '1'}
                                                                 onClick={() => { this.toggleModal(0, '1'); }}
                                                             >
-                                                                Aggregation/Number/Percentage Node
+                                                                {i18n.t('static.treeTable.tab1')}
                                                             </NavLink>
                                                         </NavItem>
                                                         <NavItem>
@@ -6284,7 +6290,7 @@ export default class TreeTable extends Component {
                                                                 active={this.state.activeTab1[0] === '2'}
                                                                 onClick={() => { this.toggleModal(0, '2'); }}
                                                             >
-                                                                FU/PU Node
+                                                                {i18n.t('static.treeTable.tab2')}
                                                             </NavLink>
                                                         </NavItem>
                                                     </Nav>

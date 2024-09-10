@@ -3423,7 +3423,6 @@
     "static.supplyPlan.actualQuantity":"Actual Quantity",
     "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available",
     "static.extrapolation.estimateTime": "Estimated time for extrapolation in seconds : ",
-    "static.treeTable.rightClickNotes": "Right click on any row and click 'Open this node for editing' to open that specific node in a separate QAT window",
     "static.common.treeTable":"Tree Table",
     "static.common.in":"in",
     "static.treeTable.numberOrPercentage":"Number / Percentage Node Value",
@@ -3460,5 +3459,13 @@
     "static.supplyPlan.actualInventoryNote1":"Click white cells to see data entry rows. Click on the `Final Inventory` row to edit batch details.",
     "static.supplyPlan.actualInventoryNote2":"Right click to add/remove a batch, or to see the batch ledger for that batch",
     "static.tree.editIn":"Edit in",
-    "static.treeTable.updateNotes":"Note: Calculated values in gray cells only recalculate after clicking `Update.`"
+    "static.treeTable.updateNotes":"Note: Calculated values in gray cells only recalculate after clicking `Update`.",
+    "static.treeTable.rightClickNotes":"right click on any row and click `Open this node for editing` to open that specific node in a separate QAT window",
+    "static.treeTable.conversionFactor":"Conversion Factor",
+    "static.treeTable.PUReference":"# PU / Interval / Patient (Reference)",
+    "static.treeTable.PUInterval":"# PU / Interval / Patient",
+    "static.treeTable.oneTimeDispensing":"One Time Dispensing",
+    "static.treeTable.period":"Period",
+    "static.treeTable.tab1":"Aggregation/Number/Percentage Node",
+    "static.treeTable.tab2":"FU/PU Node"
 }
