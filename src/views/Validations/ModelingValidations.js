@@ -742,8 +742,6 @@ class ModelingValidation extends Component {
                         }
                         var val = ""
                         if (calculatedValueTotal != "") {
-                            console.log("calculatedValueTotal Test@123", calculatedValueTotal);
-                            console.log("Total Test@123", total);
                             val = (Number(calculatedValueTotal) / Number(total)) * 100;
                         }
                         data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
