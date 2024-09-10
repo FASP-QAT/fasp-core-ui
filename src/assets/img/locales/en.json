@@ -3374,5 +3374,12 @@
     "static.tree.percentageNodeValue":"Percentage Node Value",
     "static.tree.editIn":"Edit in",
     "static.treeTable.updateNotes":"Note: Calculated values in gray cells only recalculate after clicking `Update.`",
-    "static.treeTable.rightClickNotes":"Right click on any row and click `Open this node for editing` to open that specific node in separate QAT window"
+    "static.treeTable.rightClickNotes":"Right click on any row and click `Open this node for editing` to open that specific node in separate QAT window",
+    "static.treeTable.conversionFactor":"Conversion Factor",
+    "static.treeTable.PUReference":"# PU / Interval / Patient (Reference)",
+    "static.treeTable.PUInterval":"# PU / Interval / Patient",
+    "static.treeTable.oneTimeDispensing":"One Time Dispensing",
+    "static.treeTable.period":"Period",
+    "static.treeTable.tab1":"Aggregation/Number/Percentage Node",
+    "static.treeTable.tab2":"FU/PU Node"
 }

@@ -3277,63 +3277,63 @@ export default class TreeTable extends Component {
                 type: 'numeric',
             },
             {//n
-                title: 'Tracer Category',
+                title: i18n.t('static.tracercategory.tracercategory'),
                 source: this.state.tracerCategoryListForDropdown,
                 type: 'dropdown',
             },
             {//i
-                title: 'Forecasting Unit',
+                title: i18n.t('static.ManageTree.ForecastingUnit'),
                 source: this.state.forecastingUnitListForDropdown,
                 type: 'dropdown',
             },
             {//j
-                title: 'Planning Unit',
+                title: i18n.t('static.dashboard.planningunitheader'),
                 source: this.state.planningUnitListForDropdown,
                 type: 'dropdown',
                 filter: this.filterPlanningUnit
             },
             {//k
-                title: 'Conversion Factor',
+                title: i18n.t('static.treeTable.conversionFactor'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//l
-                title: '# PU / Interval / Patient (Reference)',
+                title: i18n.t('static.treeTable.PUReference'),
                 decimal: '.',
                 type: 'numeric',
             },
             {//m
-                title: '# PU / Interval / Patient',
+                title: i18n.t('static.treeTable.PUInterval'),
                 decimal: '.',
                 type: 'numeric',
             },
             {//o
-                title: 'Type Of Use',
+                title: i18n.t('static.common.typeofuse'),
                 source: this.state.usageTypeListForDropdown,
                 type: 'dropdown',
             },
             {//p
-                title: 'One Time Dispensing',
+                title: i18n.t('static.treeTable.oneTimeDispensing'),
                 source: this.state.booleanForDropdown,
                 type: 'dropdown',
             },
             {//p
-                title: 'Lag in months',
+                title: i18n.t('static.usageTemplate.lagInMonth'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//q
-                title: 'Every',
+                title: i18n.t('static.usageTemplate.every'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//r
-                title: 'Unit',
+                title: i18n.t('static.dashboard.unit'),
                 source: this.state.nodeUnitListForDropdown,
                 type: 'dropdown',
             },
             {//s
-                title: 'Requires',
+                title: i18n.t('static.tree.requires'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
@@ -3343,27 +3343,27 @@ export default class TreeTable extends Component {
                 type: 'dropdown',
             },
             {//w
-                title: 'Single Use',
+                title: i18n.t('static.tree.singleUse'),
                 source: this.state.booleanForDropdown,
                 type: 'dropdown',
             },
             {//u
-                title: 'Every',
+                title: i18n.t('static.usageTemplate.every'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//v
-                title: 'Usage Period',
+                title: i18n.t('static.usagePeriod.usagePeriod'),
                 source: this.state.usagePeriodListForDropdown,
                 type: 'dropdown',
             },
             {//x
-                title: 'For',
+                title: i18n.t('static.tree.for'),
                 mask: '#,##0.00', decimal: '.',
                 type: 'numeric',
             },
             {//y
-                title: 'Period',
+                title: i18n.t('static.treeTable.period'),
                 source: this.state.usagePeriodListForDropdown,
                 type: 'dropdown',
             },
@@ -6257,7 +6257,7 @@ export default class TreeTable extends Component {
                                                                 active={this.state.activeTab1[0] === '1'}
                                                                 onClick={() => { this.toggleModal(0, '1'); }}
                                                             >
-                                                                Aggregation/Number/Percentage Node
+                                                                {i18n.t('static.treeTable.tab1')}
                                                             </NavLink>
                                                         </NavItem>
                                                         <NavItem>
@@ -6265,7 +6265,7 @@ export default class TreeTable extends Component {
                                                                 active={this.state.activeTab1[0] === '2'}
                                                                 onClick={() => { this.toggleModal(0, '2'); }}
                                                             >
-                                                                FU/PU Node
+                                                                {i18n.t('static.treeTable.tab2')}
                                                             </NavLink>
                                                         </NavItem>
                                                     </Nav>
