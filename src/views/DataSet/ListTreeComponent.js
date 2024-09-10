@@ -2504,7 +2504,7 @@ export default class ListTreeComponent extends Component {
                                 }.bind(this)
                             });
                             items.push({
-                                title: "Tree Table",
+                                title: i18n.t('static.common.treeTable'),
                                 onclick: function () {
                                     var treeId = this.state.treeEl.getValueFromCoords(0, y);
                                     var programId = this.state.treeEl.getValueFromCoords(8, y);
