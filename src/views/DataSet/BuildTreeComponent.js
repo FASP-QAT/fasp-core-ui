@@ -3269,6 +3269,22 @@ export default class BuildTree extends Component {
             selectedScenario: scenarioId,
             selectedScenarioLabel: selectedText,
         }, () => {
+            try {
+                if(localStorage.getItem("openNodeId")) {
+                    let tempData = {
+                        context: '',
+                        parentItem: ''
+                    };
+                    tempData.context = this.state.items.filter(t => t.id == localStorage.getItem("openNodeId"))[0];
+                    tempData.parentItem = this.state.items.filter(t => t.id == tempData.context.parent)[0];
+                    localStorage.removeItem("openNodeId");
+                    setTimeout(() => {
+                        this.onCursoChanged("", tempData);
+                    }, 2000)
+                }
+            } catch(e) {
+                localStorage.removeItem("openNodeId");
+            }
             this.handleAMonthDissmis3(this.state.singleValue2, 0);
         });
     }
@@ -4255,7 +4271,7 @@ export default class BuildTree extends Component {
             data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),4)`
             data[12] = this.state.currentScenario.manualChangesEffectFuture;
             data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false" ? tempNConvertToMonth * tempFuNode.usageFrequency * tempFuNode.noOfForecastingUnitsPerPerson : this.state.noFURequired)) : 1;
-            data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
+            data[14] = Math.floor(j / monthsPerVisit);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
                 var calculatedValueFromCurMonth = grandParentMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
@@ -4271,7 +4287,7 @@ export default class BuildTree extends Component {
                 if (Math.floor(j / monthsPerVisit) == 0) {
                     dataValue = (patients / monthsPerVisit) + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 } else {
-                    dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
+                    dataValue = (dataArray[j - monthsPerVisit][14]) + (j == 0 ? parseFloat(calculatedValueForCurMonth) - parseFloat(patients) : parseFloat(calculatedValueForCurMonth) - parseFloat(calculatedValueForPrevMonth))
                 }
                 data[15] = j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth;
                 data[16] = dataValue;
@@ -10569,7 +10585,7 @@ export default class BuildTree extends Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==3?i18n.t('static.tree.percentageNodeValue'):i18n.t('static.tree.percentageOfParent'))}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <InputGroup>
                                                         <Input type="number"
                                                             id="percentageOfParent"
@@ -10612,7 +10628,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
-                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==2?i18n.t('static.tree.numberNodeValue'):i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id >= 4) &&
                                                         <Label htmlFor="currencyId"> {this.state.currentScenario.dataValue} % of {i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} {this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     <Input type="text"
@@ -13338,7 +13354,8 @@ export default class BuildTree extends Component {
                                                     )} />
                                         </div>
                                         <div className="row ml-lg-1 pb-lg-2">
-                                            <FormGroup className="col-md-2" >
+                                            <b>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
+                                            <FormGroup className="col-md-2"  style={{ marginLeft: '2%' }}>
                                                 <div className="check inline  pl-lg-1 pt-lg-0">
                                                     <div>
                                                         <Input
