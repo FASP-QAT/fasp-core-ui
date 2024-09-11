@@ -294,7 +294,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
    * Exports the data to a PDF file.
    */
   exportPDF = () => {
-    var len = 130;
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
       doc.setFont("helvetica", "bold");
@@ -331,7 +330,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         doc.text(
           i18n.t("static.report.stockStatusAccrossPlanningUnitGlobalView"),
           doc.internal.pageSize.width / 2,
-          30,
+          60,
           {
             align: "center",
           }
@@ -360,6 +359,31 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
               align: "left",
             }
           );
+          /*
+          var planningText = doc.splitTextToSize(
+            i18n.t("static.dashboard.country") +
+            " : " +
+            this.state.countryLabels.join(" , "),
+            (doc.internal.pageSize.width * 3) / 4
+          );
+          doc.text(doc.internal.pageSize.width / 8, 130, planningText);
+          var len = 140 + planningText.length * 10;
+          planningText = doc.splitTextToSize(
+            i18n.t("static.program.program") +
+            " : " +
+            this.state.programLabels.join("; "),
+            (doc.internal.pageSize.width * 3) / 4
+          );
+          doc.text(doc.internal.pageSize.width / 8, 150, planningText);
+          var len = len + 10 + planningText.length * 10;
+          var planningText = doc.splitTextToSize(
+            i18n.t("static.tracercategory.tracercategory") +
+            " : " +
+            this.state.tracerCategoryLabels.join("; "),
+            (doc.internal.pageSize.width * 3) / 4
+          );
+          doc.text(doc.internal.pageSize.width / 8, len, planningText);
+          */
         }
       }
     };
@@ -452,7 +476,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[0].text),
       doc.internal.pageSize.width / 8 + 20,
-      y + 10,
+      y+10,
       {
         align: "left",
       }
@@ -461,7 +485,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[1].text),
       doc.internal.pageSize.width / 8 + 120,
-      y + 10,
+      y+10,
       {
         align: "left",
       }
@@ -470,7 +494,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[2].text),
       doc.internal.pageSize.width / 8 + 220,
-      y + 10,
+      y+10,
       {
         align: "left",
       }
@@ -479,7 +503,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[3].text),
       doc.internal.pageSize.width / 8 + 320,
-      y + 10,
+      y+10,
       {
         align: "left",
       }
@@ -488,7 +512,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[4].text),
       doc.internal.pageSize.width / 8 + 420,
-      y + 10,
+      y+10,
       {
         align: "left",
       }
@@ -571,40 +595,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     //   150 +
     //   this.state.countryValues.length * 2 +
     //   this.state.tracerCategoryLabels.length * 3;
-    var planningText = doc.splitTextToSize(
-      i18n.t("static.dashboard.country") +
-      " : " +
-      this.state.countryLabels.join(" , "),
-      (doc.internal.pageSize.width * 3) / 4
-    );
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor("#002f6c");
-    doc.text(doc.internal.pageSize.width / 8, len, planningText);
-    len = len + 10 + planningText.length * 10;
-    planningText = doc.splitTextToSize(
-      i18n.t("static.program.program") +
-      " : " +
-      this.state.programLabels.join("; "),
-      (doc.internal.pageSize.width * 3) / 4
-    );
-    doc.text(doc.internal.pageSize.width / 8, len, planningText);
-    len = len + 10 + planningText.length * 10;
-    var planningText = doc.splitTextToSize(
-      i18n.t("static.tracercategory.tracercategory") +
-      " : " +
-      this.state.tracerCategoryLabels.join("; "),
-      (doc.internal.pageSize.width * 3) / 4
-    );
-    var addHeight = 0;
-    if (len > doc.internal.pageSize.height - 100) {
-      doc.addPage();
-      len = 130;
-    } else {
-      addHeight = this.state.countryValues.length * 2 + this.state.programLabels.length * 2
-    }
-    doc.text(doc.internal.pageSize.width / 8, len, planningText);
-    var startY = 150 + addHeight + this.state.tracerCategoryLabels.length * 3;
+
+    let startY = y + 10;
 
     let content = {
       margin: { top: 80, bottom: 50 },
@@ -1358,10 +1350,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               : []
                           }
                           disabled={this.state.loading}
-                          overrideStrings={{
-                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                            selectSomeItems: i18n.t('static.common.select')
-                          }}
                         />
                         {!!this.props.error && this.props.touched && (
                           <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
@@ -1390,10 +1378,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             : []
                         }
                         disabled={this.state.loading}
-                        overrideStrings={{
-                          allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                          selectSomeItems: i18n.t('static.common.select')
-                        }}
                       />
                       {!!this.props.error && this.props.touched && (
                         <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
@@ -1430,10 +1414,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               }, this)
                               : []
                           }
-                          overrideStrings={{
-                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                            selectSomeItems: i18n.t('static.common.select')
-                          }}
                         />
                       </div>
                     </FormGroup>
@@ -1528,7 +1508,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               <thead>
                                 <tr>
                                   <th
-                                    className="text-center Firstcolum1SSAPUGV"
+                                    className="text-center Firstcolum1"
+                                    style={{ width: "27%" }}
                                   >
                                     {i18n.t("static.planningunit.planningunit")}
                                   </th>
@@ -1571,7 +1552,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                               <td></td>
                                             ) : (
                                               <td
-                                                className="text-center darkModeclrblack"
+                                                className="text-center"
                                                 style={this.cellstyleWithData(
                                                   item.programData.filter(
                                                     (c) =>
