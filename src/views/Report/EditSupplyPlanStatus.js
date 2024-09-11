@@ -1050,7 +1050,9 @@ class EditSupplyPlanStatus extends Component {
                                 id: c.realmCountryPlanningUnitId,
                                 multiplier: c.multiplier,
                                 active: c.active,
-                                label: c.label
+                                label: c.label,
+                                conversionNumber:c.conversionNumber,
+                                conversionMethod:c.conversionMethod
                             })
                         })
                         this.setState({
@@ -1178,7 +1180,9 @@ class EditSupplyPlanStatus extends Component {
                                 id: c.realmCountryPlanningUnitId,
                                 multiplier: c.multiplier,
                                 active: c.active,
-                                label: c.label
+                                label: c.label,
+                                conversionNumber:c.conversionNumber,
+                                conversionMethod:c.conversionMethod
                             })
                         })
                         this.setState({
