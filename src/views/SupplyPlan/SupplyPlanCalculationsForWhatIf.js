@@ -163,6 +163,11 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 var curUser = AuthenticationService.getLoggedInUserId();
                 var username = AuthenticationService.getLoggedInUsername();
                 var rcpu = props.state.realmCountryPlanningUnitListAll.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitId)[0];
+                var shipmentBudgetList=generalProgramJson.shipmentBudgetList;
+                if(shipmentBudgetList==undefined){
+                    shipmentBudgetList=[];
+                }
+                var tempShipmentId=planningUnitId.toString().concat(shipmentList.length);
                 var shipmentJson = {
                     accountFlag: true,
                     active: true,
@@ -219,6 +224,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     expectedDeliveryDate: curDate,
                     receivedDate: null,
                     index: shipmentList.length,
+                    tempShipmentId:tempShipmentId,
                     batchInfoList: [],
                     orderNo: "",
                     createdBy: {
@@ -233,6 +239,14 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     lastModifiedDate: curDate1,
                     isAddedViaScenario: true
                 }
+                shipmentBudgetList.push({
+                    shipmentId:0,
+                    tempShipmentId:tempShipmentId,
+                    shipmentAmt:Number(productCost)+Number(freightCost),
+                    budgetId:props.state.budgetIdSingle == "undefined" || props.state.budgetIdSingle == undefined || props.state.budgetIdSingle == "" ? '' : b.budgetId,
+                    currencyId:c.currencyId,
+                    conversionRateToUsd:c.conversionRateToUsd
+                })
                 var expectedDeliveryDate = moment(curDate).format("YYYY-MM-DD");
                 var createdDate = expectedDeliveryDate;
                 var programId = (programIdParam).split("_")[0];
@@ -266,6 +280,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 programJson.batchInfoList = batchInfoList;
                 shipmentList.push(shipmentJson);
                 programJson.shipmentList = shipmentList;
+                generalProgramJson.shipmentBudgetList=shipmentBudgetList;
                 var coreBatchDetails = programJson.batchInfoList;
                 var supplyPlanData = programJson.supplyPlan;
                 if (supplyPlanData == undefined) {

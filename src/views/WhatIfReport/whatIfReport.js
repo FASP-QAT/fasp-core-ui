@@ -996,6 +996,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (actionList == undefined) {
                                     actionList = []
                                 }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
+                                }
                                 var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                                 if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -1009,6 +1013,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         index = shipmentUnFundedList[i].index;
                                     }
                                     shipmentList[index].active = false;
+                                    shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
@@ -1021,6 +1026,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 1) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                                 let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
@@ -1115,6 +1121,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (actionList == undefined) {
                                     actionList = []
                                 }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
+                                }
                                 var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                                 if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -1173,6 +1183,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             var curUser = AuthenticationService.getLoggedInUserId();
                                             shipmentList[index].lastModifiedBy.userId = curUser;
                                             shipmentList[index].lastModifiedDate = curDate;
+                                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                         }
                                     } else {
                                         var index = 0;
@@ -1186,6 +1197,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var curUser = AuthenticationService.getLoggedInUserId();
                                         shipmentList[index].lastModifiedBy.userId = curUser;
                                         shipmentList[index].lastModifiedDate = curDate;
+                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     }
                                 }
                                 actionList.push({
@@ -1195,11 +1207,16 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 5) {
                                 var shipmentList = programJson.shipmentList;
                                 var actionList = generalProgramJson.actionList;
                                 if (actionList == undefined) {
                                     actionList = []
+                                }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
                                 }
                                 var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
@@ -1260,6 +1277,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var curUser = AuthenticationService.getLoggedInUserId();
                                         shipmentList[index].lastModifiedBy.userId = curUser;
                                         shipmentList[index].lastModifiedDate = curDate;
+                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     }
                                 }
                                 actionList.push({
@@ -1269,11 +1287,16 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 6) {
                                 var shipmentList = programJson.shipmentList;
                                 var actionList = generalProgramJson.actionList;
                                 if (actionList == undefined) {
                                     actionList = []
+                                }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
                                 }
                                 var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
@@ -1329,6 +1352,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             index = shipmentUnFundedList[i].index;
                                         }
                                         shipmentList[index].accountFlag = 0;
+                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     }
                                 }
                                 actionList.push({
@@ -1338,6 +1362,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 7) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                                 let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
@@ -1356,6 +1381,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (actionList == undefined) {
                                     actionList = []
                                 }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
+                                }
                                 var procurementAgentIds = [...new Set(rows[r].procurementAgents.map(ele => ele.value))];
                                 var fundingSourceIds = [...new Set(rows[r].fundingSources.map(ele => ele.value))];
                                 var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id) && fundingSourceIds.includes(c.fundingSource.id));
@@ -1372,6 +1401,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
                                     shipmentList[index].lastModifiedDate = curDate;
+                                    shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                 }
                                 actionList.push({
                                     planningUnitId: planningUnitId,
@@ -1380,6 +1410,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (this.state.scenarioId == 9) {
                                 var rangeValue = rows[r].rangeValue;
                                 let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
@@ -1644,6 +1675,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1658,6 +1693,7 @@ export default class WhatIfReportComponent extends React.Component {
                             var curUser = AuthenticationService.getLoggedInUserId();
                             shipmentList[index].lastModifiedBy.userId = curUser;
                             shipmentList[index].lastModifiedDate = curDate;
+                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                         }
                         actionList.push({
                             planningUnitId: planningUnitId,
@@ -1666,6 +1702,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -1905,6 +1942,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1960,6 +2001,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
                                     shipmentList[index].lastModifiedDate = curDate;
+                                    shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                 }
                             } else {
                                 var index = 0;
@@ -1973,6 +2015,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 shipmentList[index].lastModifiedBy.userId = curUser;
                                 shipmentList[index].lastModifiedDate = curDate;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                             }
                         }
                         actionList.push({
@@ -1982,6 +2025,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2034,6 +2078,10 @@ export default class WhatIfReportComponent extends React.Component {
                         var actionList = generalProgramJson.actionList;
                         if (actionList == undefined) {
                             actionList = []
+                        }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
                         }
                         var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
@@ -2090,6 +2138,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 shipmentList[index].lastModifiedBy.userId = curUser;
                                 shipmentList[index].lastModifiedDate = curDate;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                             }
                         }
                         actionList.push({
@@ -2099,6 +2148,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2152,6 +2202,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -2203,6 +2257,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     index = shipmentUnFundedList[i].index;
                                 }
                                 shipmentList[index].accountFlag = 0;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                             }
                         }
                         actionList.push({
@@ -2212,6 +2267,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2268,6 +2324,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => Number(ele.value)))];
                         var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => Number(ele.value)))];
                         var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(Number(c.procurementAgent.id)) && fundingSourceIds.includes(Number(c.fundingSource.id)));
@@ -2284,6 +2344,7 @@ export default class WhatIfReportComponent extends React.Component {
                             var curUser = AuthenticationService.getLoggedInUserId();
                             shipmentList[index].lastModifiedBy.userId = curUser;
                             shipmentList[index].lastModifiedDate = curDate;
+                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                         }
                         actionList.push({
                             planningUnitId: planningUnitId,
@@ -2292,6 +2353,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {

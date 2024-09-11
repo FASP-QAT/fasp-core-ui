@@ -3384,10 +3384,6 @@
     "static.tree.changePerPoints": "Change (% points)",
     "static.errorPage.validUserComment": "Enter Description",
     "static.import.doNoImportCheckbox":"Do not import all unmapped planning units",
-    "static.shipment.budgetWarning1":"The budget",
-    "static.shipment.budgetWarning2":") will be over budget by $",
-    "static.shipment.budgetWarning3":"if you submit.",
-    "static.shipment.budgetWarning4":"Do you want to continue?",
     "static.momper.tooltip1":"Calculated change is determined by the modeling table above",
     "static.momper.tooltip2":"= (Previous Month's %) + (Calculated Change +/- %)",
     "static.momper.tooltip3":"% over or under the average value. Enter a positive % for an increased value in this month or a negative value for a decreased value",
@@ -3467,5 +3463,9 @@
     "static.treeTable.oneTimeDispensing":"One Time Dispensing",
     "static.treeTable.period":"Period",
     "static.treeTable.tab1":"Aggregation/Number/Percentage Node",
-    "static.treeTable.tab2":"FU/PU Node"
+    "static.treeTable.tab2":"FU/PU Node",
+    "static.shipment.budgetWarning1":"The budget",
+    "static.shipment.budgetWarning2":") will go over budget by $",
+    "static.shipment.budgetWarning3":"if you submit.",
+    "static.shipment.budgetWarning4":"Do you want to continue?"
 }

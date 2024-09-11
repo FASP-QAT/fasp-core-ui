@@ -1563,6 +1563,10 @@ export default class ShipmentDetails extends React.Component {
                                     var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                                     var generalProgramJson = JSON.parse(generalProgramData);
                                     var actionList = generalProgramJson.actionList;
+                                    var shipmentBudgetList=generalProgramJson.shipmentBudgetList;
+                                    if(shipmentBudgetList==undefined){
+                                        shipmentBudgetList=[];
+                                    }
                                     var realmTransaction = db1.transaction(['realm'], 'readwrite');
                                     var realmOs = realmTransaction.objectStore('realm');
                                     var realmRequest = realmOs.get(generalProgramJson.realmCountry.realm.realmId);
@@ -1736,6 +1740,7 @@ export default class ShipmentDetails extends React.Component {
                                                         },
                                                         shipmentQty: suggestedOrd
                                                     }]
+                                                    var tempShipmentId=planningUnitsIds[pu].value.toString().concat(shipmentDataList.length);
                                                     shipmentDataList.push({
                                                         accountFlag: true,
                                                         active: true,
@@ -1792,7 +1797,7 @@ export default class ShipmentDetails extends React.Component {
                                                         expectedDeliveryDate: moment(month).format("YYYY-MM-DD"),
                                                         receivedDate: null,
                                                         index: shipmentDataList.length,
-                                                        tempShipmentId: planningUnitsIds[pu].value.toString().concat(shipmentDataList.length),
+                                                        tempShipmentId: tempShipmentId,
                                                         batchInfoList: batchInfo,
                                                         orderNo: "",
                                                         createdBy: {
@@ -1807,6 +1812,14 @@ export default class ShipmentDetails extends React.Component {
                                                         lastModifiedDate: curDate,
                                                         parentLinkedShipmentId: null,
                                                         tempParentLinkedShipmentId: null
+                                                    })
+                                                    shipmentBudgetList.push({
+                                                        shipmentId:0,
+                                                        tempShipmentId:tempShipmentId,
+                                                        shipmentAmt:Number(Number(pricePerUnit) * Number(suggestedOrd)) * (Number(Number(generalProgramJson.seaFreightPerc) / 100))+Number((Number(pricePerUnit) * Number(suggestedOrd)).toFixed(2)),
+                                                        budgetId:this.state.budgetId != "" ? this.state.budgetId : "",
+                                                        currencyId:c.currencyId,
+                                                        conversionRateToUsd:c.conversionRateToUsd
                                                     })
                                                     showPlanningUnitAndQtyList.push({
                                                         planningUnitLabel: getLabelText(programPlanningUnit.planningUnit.label, this.state.lang),
@@ -1842,6 +1855,7 @@ export default class ShipmentDetails extends React.Component {
                                             showPlanningUnitAndQtyList: showPlanningUnitAndQtyList
                                         })
                                         generalProgramJson.actionList = actionList;
+                                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                                         programRequest.result.programData.planningUnitDataList = planningUnitDataList;
                                         programRequest.result.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString();
                                         var transaction1 = db1.transaction(['programData'], 'readwrite');
