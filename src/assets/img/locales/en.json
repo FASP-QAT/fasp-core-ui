@@ -3375,5 +3375,9 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.shipment.budgetWarning1":"The budget",
+    "static.shipment.budgetWarning2":") will go over budget by $",
+    "static.shipment.budgetWarning3":"if you submit.",
+    "static.shipment.budgetWarning4":"Do you want to continue?"
 }
