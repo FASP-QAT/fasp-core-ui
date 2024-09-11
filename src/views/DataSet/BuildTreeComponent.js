@@ -537,6 +537,7 @@ export default class BuildTree extends Component {
             popoverOpenYearsOfTarget: false,
             popoverOpenNodeValue: false,
             popoverOpenSenariotree: false,
+            popoverOpenSenariotree2: false,
             popoverOpenNodeType: false,
             popoverOpenNodeTitle: false,
             popoverNodeUnit: false,
@@ -844,6 +845,7 @@ export default class BuildTree extends Component {
         this.toggleNodeType = this.toggleNodeType.bind(this);
         this.toggleNodeTitle = this.toggleNodeTitle.bind(this);
         this.toggleSenariotree = this.toggleSenariotree.bind(this);
+        this.toggleSenariotree2 = this.toggleSenariotree2.bind(this);
         this.toggleOneTimeDispensing = this.toggleOneTimeDispensing.bind(this);
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -3543,6 +3545,15 @@ export default class BuildTree extends Component {
             popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
         });
     }
+    /**
+     * Toggle info popup
+     */
+    toggleSenariotree2() {
+        this.setState({
+            popoverOpenSenariotree2: !this.state.popoverOpenSenariotree2,
+        });
+    }
+
     /**
      * Toggle info popup
      */
@@ -10415,13 +10426,13 @@ export default class BuildTree extends Component {
                                     {(this.state.currentItemConfig.context.payload.nodeType.id != 5) &&
                                         <>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover1" trigger="hover" toggle={this.toggleSenariotree}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenSenariotree2} target="pop" trigger="hover" toggle={this.toggleSenariotree2}>
                                                     <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <div className="row">
                                                 <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleSenariotree} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="scenarioTxt">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="pop" onClick={this.toggleSenariotree2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <Input type="text"
                                                         name="scenarioTxt"
                                                         bsSize="sm"
@@ -13828,10 +13839,10 @@ export default class BuildTree extends Component {
                     <strong>{i18n.t('static.tree.Add/EditNode')}</strong>
                     {<div className="HeaderNodeText"> {
                         <>
-                            <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover1" trigger="hover" toggle={this.toggleSenariotree}>
+                            <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover401" trigger="hover" toggle={this.toggleSenariotree}>
                                 <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
                             </Popover>
-                            <span htmlFor="currencyId">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleSenariotree} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <span htmlFor="Popover401">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover401" onClick={this.toggleSenariotree} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
                             <b className="supplyplanformulas ScalingheadTitle">{this.state.selectedScenarioLabel}</b>
                         </>
                     }</div>}
