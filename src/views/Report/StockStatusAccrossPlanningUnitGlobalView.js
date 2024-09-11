@@ -269,6 +269,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
    * Exports the data to a PDF file.
    */
   exportPDF = () => {
+    var len = 130;
     const addFooters = (doc) => {
       const pageCount = doc.internal.getNumberOfPages();
       doc.setFont("helvetica", "bold");
@@ -305,7 +306,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         doc.text(
           i18n.t("static.report.stockStatusAccrossPlanningUnitGlobalView"),
           doc.internal.pageSize.width / 2,
-          60,
+          30,
           {
             align: "center",
           }
@@ -334,29 +335,6 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
               align: "left",
             }
           );
-          var planningText = doc.splitTextToSize(
-            i18n.t("static.dashboard.country") +
-            " : " +
-            this.state.countryLabels.join(" , "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, 130, planningText);
-          var len = 140 + planningText.length * 10;
-          planningText = doc.splitTextToSize(
-            i18n.t("static.program.program") +
-            " : " +
-            this.state.programLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, 150, planningText);
-          var len = len + 10 + planningText.length * 10;
-          var planningText = doc.splitTextToSize(
-            i18n.t("static.tracercategory.tracercategory") +
-            " : " +
-            this.state.tracerCategoryLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, len, planningText);
         }
       }
     };
@@ -385,20 +363,51 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           elt.planningUnit.id,
           getLabelText(elt.planningUnit.label, this.state.lang),
           getLabelText(p.program.label, this.state.lang),
-          formatter(round(p.amc),0),
-          formatter(round(p.finalClosingBalance),0),
+          formatter(round(p.amc), 0),
+          formatter(round(p.finalClosingBalance), 0),
           p.mos != null
-            ? formatter(roundN(p.mos),0)
+            ? formatter(roundN(p.mos), 0)
             : i18n.t("static.supplyPlanFormula.na"),
           p.minMos,
           p.maxMos,
         ])
       )
     );
-    var startY =
-      150 +
-      this.state.countryValues.length * 2 +
-      this.state.tracerCategoryLabels.length * 3;
+
+    var planningText = doc.splitTextToSize(
+      i18n.t("static.dashboard.country") +
+      " : " +
+      this.state.countryLabels.join(" , "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor("#002f6c");
+    doc.text(doc.internal.pageSize.width / 8, len, planningText);
+    len = len + 10 + planningText.length * 10;
+    planningText = doc.splitTextToSize(
+      i18n.t("static.program.program") +
+      " : " +
+      this.state.programLabels.join("; "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    doc.text(doc.internal.pageSize.width / 8, len, planningText);
+    len = len + 10 + planningText.length * 10;
+    var planningText = doc.splitTextToSize(
+      i18n.t("static.tracercategory.tracercategory") +
+      " : " +
+      this.state.tracerCategoryLabels.join("; "),
+      (doc.internal.pageSize.width * 3) / 4
+    );
+    var addHeight = 0;
+    if (len > doc.internal.pageSize.height - 100) {
+      doc.addPage();
+      len = 130;
+    } else {
+      addHeight = this.state.countryValues.length * 2 + this.state.programLabels.length * 2
+    }
+    doc.text(doc.internal.pageSize.width / 8, len, planningText);
+    var startY = 150 + addHeight + this.state.tracerCategoryLabels.length * 3;
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startY,
