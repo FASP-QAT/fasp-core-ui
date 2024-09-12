@@ -2440,7 +2440,7 @@ export default class syncPage extends Component {
                                                   },
                                                   {
                                                     title: i18n.t('static.commit.local'),
-                                                    colspan: '7',
+                                                    colspan: '8',
                                                   },
                                                   {
                                                     title: i18n.t('static.commit.server'),
