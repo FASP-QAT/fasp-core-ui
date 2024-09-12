@@ -474,7 +474,7 @@ class ListUserComponent extends Component {
             data[2] = userList[j].username;
             data[3] = userList[j].orgAndCountry;
             data[4] = userList[j].emailId;
-            data[5] = userList[j].roleList.map(a => a.roleId).toString().trim().replaceAll(',', ';');
+            data[5] = userList[j].roleList.map(a => getLabelText(a.label,this.state.lang)).toString().trim().replaceAll(',', ';');
             data[6] = userList[j].faildAttempts;
             data[7] = (userList[j].lastLoginDate ? moment(userList[j].lastLoginDate).format("YYYY-MM-DD") : null)
             data[8] = userList[j].lastModifiedBy.username;
@@ -514,9 +514,7 @@ class ListUserComponent extends Component {
                 },
                 {
                     title: i18n.t('static.dashboard.role'),
-                    type: 'autocomplete',
-                    source: this.state.roleListJexcel,
-                    multiple: true,
+                    type: 'text'
                 },
                 {
                     title: i18n.t('static.user.failedAttempts'),
