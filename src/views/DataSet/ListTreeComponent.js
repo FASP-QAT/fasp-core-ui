@@ -2503,6 +2503,16 @@ export default class ListTreeComponent extends Component {
                                     });
                                 }.bind(this)
                             });
+                            items.push({
+                                title: i18n.t('static.common.treeTable'),
+                                onclick: function () {
+                                    var treeId = this.state.treeEl.getValueFromCoords(0, y);
+                                    var programId = this.state.treeEl.getValueFromCoords(8, y);
+                                    this.props.history.push({
+                                        pathname: `/dataSet/treeTable/tree/${treeId}/${programId}`,
+                                    });
+                                }.bind(this)
+                            });
                         }
                     }
                     return items;
