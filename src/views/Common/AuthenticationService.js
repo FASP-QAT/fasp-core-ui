@@ -1203,6 +1203,15 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/dataSet/treeTable/tree/:treeId/:programId":
+                    case "/dataSet/treeTable/tree/:treeId/:programId/:scenarioId":
+                    case "/dataSet/treeTable/":
+                    case "/dataSet/treeTable/treeServer/:treeId/:programId/:isLocal":
+                    case "/dataSet/treeTable/template/:templateId":
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/createTreeTemplate/:templateId":
                         if (bfunction.includes("ROLE_BF_EDIT_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_ADD_TREE_TEMPLATE") || bfunction.includes("ROLE_BF_VIEW_TREE_TEMPLATES")) {
                             return true;
