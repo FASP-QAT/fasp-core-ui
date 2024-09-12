@@ -119,7 +119,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
-      maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
+      // maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
+      maxDate: '',
       planningUnitTotalList: [],
       dataEnteredInTableExSpan: 0,
       confidenceLevelId: 0.85,
@@ -1594,14 +1595,22 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * Calls getDatasetList function on component mount
    */
   componentDidMount() {
+    //to restrict calender max date to current Date - 36 months
+    let currDate = Date.now();
+    let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
+    let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
     let hasRole = false;
     AuthenticationService.getLoggedInUserRole().map(c => {
       if (c.roleId == 'ROLE_FORECAST_VIEWER') {
         hasRole = true;
       }
     });
-    this.setState({ onlyDownloadedProgram: !hasRole })
-    // Detect initial theme
+    this.setState({ 
+      onlyDownloadedProgram: !hasRole,
+      maxDate: maxDateTmp
+     });
+
+     // Detect initial theme
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     this.setState({ isDarkMode });
 
@@ -1615,7 +1624,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         attributes: true,
         attributeFilter: ['data-theme'],
     });
-
     hideSecondComponent();
     if(localStorage.getItem('sessionType') === 'Online'){
     ForecastingUnitService.getForecastingUnitListAll().then(response => {
@@ -3429,7 +3437,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                   ref={this.pickAMonth2}
                                   years={{ min: this.state.minDate, max: this.state.maxDate }}
                                   value={this.state.singleValue2}
-                                  key={JSON.stringify(this.state.singleValue2)}
+                                  // key={JSON.stringify(this.state.singleValue2)}
+                                  key={JSON.stringify(this.state.maxDate) + "-" + JSON.stringify(this.state.singleValue2)}
                                   lang={pickerLang}
                                   onDismiss={this.handleAMonthDissmis2}
                                 >
