@@ -38,6 +38,8 @@ let initialValues = {
     shippedToArrivedByLandLeadTime: '',
     arrivedToDeliveredLeadTime: '',
     healthAreaId: [],
+    procurementAgents: [],
+    fundingSources: [],
     programNotes: '',
     regionId: [],
     programCode1: ''
@@ -102,6 +104,10 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
+        procurementAgents: Yup.string()
+            .required(i18n.t('static.procurementAgent.selectProcurementAgent')),        
+        fundingSources: Yup.string()
+            .required(i18n.t('static.budget.fundingtext')),                
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
         programCode1: Yup.string()
@@ -193,7 +199,9 @@ export default class EditProgram extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
-                healthAreaArray: []
+                healthAreaArray: [],
+                procurementAgents:[],
+                fundingSources:[]
             },
             regionId: '',
             healthAreaId: '',
@@ -202,6 +210,8 @@ export default class EditProgram extends Component {
             realmCountryList: [],
             organisationList: [],
             healthAreaList: [],
+            fundingSourceList:[],
+            procurementAgentList:[],
             programManagerList: [],
             regionList: [],
             message: '',
@@ -218,6 +228,8 @@ export default class EditProgram extends Component {
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
+        this.updateFieldDataProcurementAgent = this.updateFieldDataProcurementAgent.bind(this);
+        this.updateFieldDataFundingSource = this.updateFieldDataFundingSource.bind(this);
     }
     /**
      * Updates the message state with the provided message.
@@ -259,6 +271,7 @@ export default class EditProgram extends Component {
                 organisationCode: organisationCode,
                 realmCountryCode: realmCountryCode
             })
+            console.log('this.state.program.regionArray',this.state.program.regionArray);
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.programId)
                 .then(response => {
                     if (response.status == 200) {
@@ -503,6 +516,53 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
+                DropdownService.getProcurementAgentDropdownList()
+            .then(response => {
+                if (response.status == 200) {
+                    var json = response.data;
+                    var paList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        paList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    var listArray = paList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        procurementAgentList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+
+            DropdownService.getFundingSourceDropdownList()
+            .then(response => {
+                if (response.status == 200) {
+                    var json = response.data;
+                    var fsList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        fsList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    var listArray = fsList;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.label.toUpperCase(); 
+                        var itemLabelB = b.label.toUpperCase(); 
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        fundingSourceList: listArray
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -595,6 +655,32 @@ export default class EditProgram extends Component {
             healthAreaIdArray[i] = healthAreaId[i].value;
         }
         program.healthAreaArray = healthAreaIdArray;
+        this.setState({ program: program });
+    }
+    /**
+     * Handles the change event for  procurment agents.
+     * @param {Array} event - An array containing the selected procurement agent IDs.
+     */    
+    updateFieldDataProcurementAgent(value) {
+        let { program } = this.state;
+        var paArray = [];
+        for (var i = 0; i < value.length; i++) {
+            paArray[i] = value[i].value;
+        }
+        program.procurementAgents = paArray;
+        this.setState({ program: program });
+    }
+    /**
+     * Handles the change event for funding sources.
+     * @param {Array} event - An array containing the selected funding source Ids.
+     */    
+    updateFieldDataFundingSource(value) {
+        let { program } = this.state;
+        var fsArray = [];
+        for (var i = 0; i < value.length; i++) {
+            fsArray[i] = value[i].value;
+        }
+        program.fundingSources = fsArray;
         this.setState({ program: program });
     }
     /**
@@ -702,6 +788,8 @@ export default class EditProgram extends Component {
                                     shippedToArrivedByRoadLeadTime: this.state.program.shippedToArrivedByRoadLeadTime,
                                     arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                                     healthAreaId: this.state.program.healthAreaArray,
+                                    procurementAgents:this.state.program.procurementAgents,
+                                    fundingSources:this.state.program.fundingSources,
                                     healthAreaArray: this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
@@ -921,6 +1009,48 @@ export default class EditProgram extends Component {
                                                         id="healthAreaId"
                                                     />
                                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
+                                                    <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.procurementAgents },
+                                                            { 'is-invalid': (touched.procurementAgents && !!errors.procurementAgents || this.state.program.procurementAgents.length == 0) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("procurementAgents", e);
+                                                            this.updateFieldDataProcurementAgent(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("procurementAgents", true)}
+                                                        multi
+                                                        options={this.state.procurementAgentList}
+                                                        value={this.state.program.procurementAgents}
+                                                    />
+                                                    <FormFeedback>{errors.procurementAgents}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
+                                                    <Label htmlFor="select">{i18n.t('static.budget.fundingsource')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Select
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.fundingSources },
+                                                            { 'is-invalid': (touched.fundingSources && !!errors.fundingSources || this.state.program.fundingSources.length == 0) }
+                                                        )}
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("fundingSources", e);
+                                                            this.updateFieldDataFundingSource(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("fundingSources", true)}
+                                                        multi
+                                                        options={this.state.fundingSourceList}
+                                                        value={this.state.program.fundingSources}
+                                                        name="fundingSources"
+                                                        id="fundingSources"
+                                                    />
+                                                    <FormFeedback className="red">{errors.fundingSources}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6">
                                                     <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>

@@ -40,6 +40,9 @@ const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationTy
 const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
 const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard/ApplicationDashboard.js'));
 const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
+const AddFunderType = React.lazy(() => import('../../views/FunderType/AddFunderTypeComponent'));
+const ListFunderType = React.lazy(() => import('../../views/FunderType/ListFunderTypeComponent'));
+const EditFunderType = React.lazy(() => import('../../views/FunderType/EditFunderTypeComponent'));
 const AddFundingSource = React.lazy(() => import('../../views/FundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('../../views/FundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('../../views/FundingSource/EditFundingSourceComponent'));
@@ -119,6 +122,7 @@ const ListProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit
 const AddProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/AddProcurementUnit'))
 const EditProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/EditProcurementUnit'))
 const AddProcurementAgentPlanningUnit = React.lazy(() => import('../../views/ProcurementAgentPlanningUnit/AddProcurementAgentPlanningUnit'));
+const MapProcurementAgentForecastingUnit = React.lazy(() => import('../../views/ProcurementAgent/MapProcurementAgentForecastingUnit'));
 const AddProcurementAgentProcurementUnit = React.lazy(() => import('../../views/ProcurementAgentProcurementUnit/AddProcurementAgentProcurementUnit'));
 const PlanningUnitCountryList = React.lazy(() => import('../../views/RealmCountry/RealmCountryPlanningUnitList'));
 const PlanningUnitCapacity = React.lazy(() => import('../../views/PlanningUnitCapacity/PlanningUnitCapacity'));
@@ -175,6 +179,7 @@ const ProductValidation = React.lazy(() => import('../../views/Validations/Produ
 const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAndSelect/CompareAndSelectScenario'))
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
+const TreeTable = React.lazy(() => import('../../views/DataSet/TreeTableComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
@@ -215,6 +220,8 @@ const routes = [
   { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/treeTable/', exact: true, name: 'static.common.treeTable', component: TreeTable },
+  { path: '/dataSet/treeTable/tree/:treeId/:programId', exact: true, name: 'static.common.treeTable', component: TreeTable },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
@@ -249,6 +256,7 @@ const routes = [
   { path: '/programProduct/addProgramProduct', exact: true, name: 'static.Update.PlanningUnits', component: AddProgramProduct },
   { path: '/programProduct/addProgramProduct/:programId/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
+  { path: '/procurementAgent/mapProcurementAgentForecastingUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentForecastingUnit', component: MapProcurementAgentForecastingUnit },
   { path: '/procurementAgent/addProcurementAgentProcurementUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentProcurementUnit', component: AddProcurementAgentProcurementUnit },
   { path: '/budget/addBudget', name: 'static.breadcrum.add', entityname: 'static.dashboard.budget', component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.budget', component: ListBudgetComponent },
@@ -266,6 +274,10 @@ const routes = [
   { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/editOrganisationType/:organisationTypeId', name: 'static.breadcrum.edit', entityname: 'static.organisationType.organisationType', component: EditOrganisationType },
+  { path: '/funderType/addFunderType', name: 'static.breadcrum.add', entityname: 'static.funderTypeHead.funderType', component: AddFunderType },
+  { path: '/funderType/listFunderType', exact: true, name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
+  { path: '/funderType/listFunderType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.funderTypeHead.funderType', component: ListFunderType },
+  { path: '/funderType/editFunderType/:fundingSourceTypeId', name: 'static.breadcrum.edit', entityname: 'static.funderTypeHead.funderType', component: EditFunderType },
   { path: '/fundingSource/addFundingSource', name: 'static.breadcrum.add', entityname: 'static.fundingSourceHead.fundingSource', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.fundingSourceHead.fundingSource', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource/:fundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.fundingSourceHead.fundingSource', component: EditFundingSource },
@@ -1138,6 +1150,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-table',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE') && this.state.activeTab == 2 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.funderTypeHead.funderType'),
+                            icon: 'fa fa-bank',
+                            url: '/funderType/listFunderType',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }

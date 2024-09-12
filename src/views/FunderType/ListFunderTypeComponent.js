@@ -3,10 +3,10 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import { Search } from 'react-bootstrap-table2-toolkit';
-import { Button, Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
+import { Card, CardBody, Col, FormGroup, Input, InputGroup, Label } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
@@ -14,37 +14,28 @@ import RealmService from "../../api/RealmService";
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 // Localized entity name
-const entityname = i18n.t('static.procurementagent.procurementagent')
+const entityname = i18n.t('static.funderTypeHead.funderType')
 /**
- * Component for listing Procurement Agent details.
+ * Component for list of procurement agent type details.
  */
-class ListProcurementAgentComponent extends Component {
+class ListFunderTypeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             realms: [],
-            procurementAgentList: [],
+            fundingSourceTypeList: [],
             message: '',
-            selProcurementAgent: [],
+            selFundingSourceType: [],
             lang: localStorage.getItem('lang'),
-            loading: true
+            // loading: true
+            loading: false
         }
         this.filterData = this.filterData.bind(this);
-        this.addNewProcurementAgent = this.addNewProcurementAgent.bind(this);
-        this.addPlanningUnitMapping = this.addPlanningUnitMapping.bind(this);
-        this.addProcurementUnitMapping = this.addProcurementUnitMapping.bind(this);
-        this.hideFirstComponent = this.hideFirstComponent.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.addNewFunderType = this.addNewFunderType.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
-    }
-    /**
-     * Hides the message in div1 after 30 seconds.
-     */
-    hideFirstComponent() {
-        this.timeout = setTimeout(function () {
-            document.getElementById('div1').style.display = 'none';
-        }, 30000);
     }
     /**
      * Clears the timeout when the component is unmounted.
@@ -53,92 +44,65 @@ class ListProcurementAgentComponent extends Component {
         clearTimeout(this.timeout);
     }
     /**
-     * Hides the message in div2 after 30 seconds.
+     * Redirects to the add procurement agent type screen.
      */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
+    addNewFunderType() {
+        this.props.history.push("/funderType/addFunderType");
     }
     /**
-     * Redirect to Procurement Agent & Planning Unit mapping screen
-     * @param {*} event 
-     * @param {*} cell 
-     */
-    addPlanningUnitMapping(event, cell) {
-        event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
-            this.props.history.push({
-                pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
-            });
-        }
-    }
-    /**
-     * Redirect to Procurement Agent & Procurement Unit mapping screen
-     * @param {*} event 
-     * @param {*} cell 
-     */
-    addProcurementUnitMapping(event, cell) {
-        event.stopPropagation();
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
-            this.props.history.push({
-                pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
-            });
-        }
-    }
-    /**
-     * Redirects to the Add Procurement Agent screen
-     */
-    addNewProcurementAgent() {
-        this.props.history.push("/procurementAgent/addProcurementAgent");
-    }
-    /**
-     * Filters the Procurement Agent list according to the realmId & builds the jexcel.
+     * Function to filter procurement agent types based on realm Id
      */
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selProcurementAgent = this.state.procurementAgentList.filter(c => c.realm.id == realmId)
+            const selFundingSourceType = this.state.fundingSourceTypeList.filter(c => c.realm.id == realmId)
             this.setState({
-                selProcurementAgent
+                selFundingSourceType
             }, () => {
                 this.buildJExcel();
             });
         } else {
             this.setState({
-                selProcurementAgent: this.state.procurementAgentList
+                selFundingSourceType: this.state.fundingSourceTypeList
             }, () => {
                 this.buildJExcel();
             });
         }
     }
     /**
-     * Builds the jexcel component to display the Procurement Agent list.
+     * Builds the jexcel component to display procurement agent type list.
      */
     buildJExcel() {
-        let procurementAgentList = this.state.selProcurementAgent;
-        let procurementAgentArray = [];
+        let fundingSourceTypeList = this.state.selFundingSourceType;
+        let fundingSourceTypeArray = [];
         let count = 0;
-        for (var j = 0; j < procurementAgentList.length; j++) {
+        for (var j = 0; j < fundingSourceTypeList.length; j++) {
             data = [];
-            data[0] = procurementAgentList[j].procurementAgentId
-            data[1] = getLabelText(procurementAgentList[j].realm.label, this.state.lang)
-            data[2] = procurementAgentList[j].procurementAgentType.code;
-            data[3] = getLabelText(procurementAgentList[j].label, this.state.lang)
-            data[4] = procurementAgentList[j].procurementAgentCode;
-            data[5] = procurementAgentList[j].colorHtmlCode;
-            data[6] = procurementAgentList[j].submittedToApprovedLeadTime;
-            data[7] = procurementAgentList[j].approvedToShippedLeadTime;
-            data[8] = (procurementAgentList[j].localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
-            data[9] = procurementAgentList[j].lastModifiedBy.username;
-            data[10] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[11] = procurementAgentList[j].active;
-            procurementAgentArray[count] = data;
+            data[0] = fundingSourceTypeList[j].fundingSourceTypeId
+            data[1] = getLabelText(fundingSourceTypeList[j].realm.label, this.state.lang)
+            data[2] = getLabelText(fundingSourceTypeList[j].label, this.state.lang)
+            data[3] = fundingSourceTypeList[j].fundingSourceTypeCode;
+            data[4] = fundingSourceTypeList[j].lastModifiedBy.username;
+            data[5] = (fundingSourceTypeList[j].lastModifiedDate ? moment(fundingSourceTypeList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
+            data[6] = fundingSourceTypeList[j].active;
+            fundingSourceTypeArray[count] = data;
             count++;
         }
+
+        //temp
+        // data = [];
+        // data[0] = 1
+        // data[1] = 'realm'
+        // data[2] = 'type name';
+        // data[3] = 'display name';
+        // data[4] = 'username';
+        // data[5] = '12-Jul-23';
+        // data[6] = true;
+        // procurementAgentTypeArray[0] = data;
+
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var data = procurementAgentArray;
+        var data = fundingSourceTypeArray;
         var options = {
             data: data,
             columnDrag: false,
@@ -146,7 +110,7 @@ class ListProcurementAgentComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'procurementAgentId',
+                    title: 'fundingSourceTypeId',
                     type: 'hidden',
                 },
                 {
@@ -154,32 +118,12 @@ class ListProcurementAgentComponent extends Component {
                     type: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN') ? 'text' : 'hidden'),
                 },
                 {
-                    title: i18n.t('static.procurementagenttype.procurementagenttypecode'),
+                    title: i18n.t('static.funderType.funderTypeName'),
                     type: 'text',
                 },
                 {
-                    title: i18n.t('static.procurementagent.procurementagentname'),
+                    title: i18n.t('static.funderType.funderTypeCode'),
                     type: 'text',
-                },
-                {
-                    title: i18n.t('static.procurementagent.procurementagentcode'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.procurementagent.procurementAgentColorCode'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
-                },
-                {
-                    title: i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
-                },
-                {
-                    title: i18n.t('static.procurementAgent.localProcurementAgent'),
-                    type: 'hidden',
                 },
                 {
                     title: i18n.t('static.common.lastModifiedBy'),
@@ -195,12 +139,12 @@ class ListProcurementAgentComponent extends Component {
                     title: i18n.t('static.common.status'),
                     source: [
                         { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.dataentry.inactive') }
+                        { id: false, name: i18n.t('static.common.disabled') }
                     ]
                 },
             ],
             editable: false,
-            onload: this.loaded,
+            onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -218,40 +162,6 @@ class ListProcurementAgentComponent extends Component {
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT')) {
-                            items.push({
-                                title: i18n.t('static.program.mapPlanningUnit'),
-                                onclick: function () {
-                                    this.props.history.push({
-                                        pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${this.el.getValueFromCoords(0, y)}`,
-                                    });
-                                }.bind(this)
-                            });
-                        }
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_FORECASTING_UNIT')) {
-                            items.push({
-                                title: i18n.t('static.program.mapForecastingUnit'),
-                                onclick: function () {
-                                    this.props.history.push({
-                                        pathname: `/procurementAgent/mapProcurementAgentForecastingUnit/${this.el.getValueFromCoords(0, y)}`,
-                                    });
-                                }.bind(this)
-                            });
-                        }
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_UNIT')) {
-                            items.push({
-                                title: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
-                                onclick: function () {
-                                    this.props.history.push({
-                                        pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${this.el.getValueFromCoords(0, y)}`,
-                                    });
-                                }.bind(this)
-                            });
-                        }
-                    }
-                }
                 return items;
             }.bind(this)
         };
@@ -262,43 +172,27 @@ class ListProcurementAgentComponent extends Component {
         })
     }
     /**
-     * Redirects to the edit procurement agent screen on row click with procurementAgentId for editing.
-     * @param {*} instance - This is the DOM Element where sheet is created
-     * @param {*} cell - This is the object of the DOM element
-     * @param {*} x - Row Number
-     * @param {*} y - Column Number
-     * @param {*} value - Cell Value
-     * @param {Event} e - The selected event.
+     * Redirects to the edit procurement agent type screen on row click.
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+                console.log('inside else in selected fun.');
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
+                    // console.log('created path: '+`/funderType/editFunderType/${this.el.getValueFromCoords(0, x)}`);
                     this.props.history.push({
-                        pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
+                        pathname: `/funderType/editFunderType/${this.el.getValueFromCoords(0, x)}`,
                     });
                 }
             }
         }
     }.bind(this);
     /**
-     * This function is used to format the table like add asterisk or info to the table headers or change color of cell text.
-     * @param {*} instance - This is the DOM Element where sheet is created
-     * @param {*} cell - This is the object of the DOM element
-     * @param {*} x - Row Number
-     * @param {*} y - Column Number
-     * @param {*} value - Cell Value
-     */
-    loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
-    }
-    /**
-     * Fetches Realm list and Procurement Agent list from the server and builds the jexcel component on component mount.
+     * Reterives realm and procurement agent type list on component mount
      */
     componentDidMount() {
-        this.hideFirstComponent();
-        //Fetch all realm list
+        hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -316,7 +210,7 @@ class ListProcurementAgentComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -359,13 +253,12 @@ class ListProcurementAgentComponent extends Component {
                     }
                 }
             );
-        //Fetch all Procurement Agent list
-        ProcurementAgentService.getProcurementAgentListAll()
+            FundingSourceService.getFundingSourceTypeListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        procurementAgentList: response.data,
-                        selProcurementAgent: response.data,
+                        fundingSourceTypeList: response.data,
+                        selFundingSourceType: response.data,
                     },
                         () => {
                             this.buildJExcel();
@@ -375,7 +268,7 @@ class ListProcurementAgentComponent extends Component {
                         message: response.data.messageCode, loading: false
                     },
                         () => {
-                            this.hideSecondComponent();
+                            hideSecondComponent();
                         })
                 }
             })
@@ -418,10 +311,12 @@ class ListProcurementAgentComponent extends Component {
                     }
                 }
             );
+
+            // this.buildJExcel();
     }
     /**
-     * Renders the Procurement Agent list.
-     * @returns {JSX.Element} - Procurement Agent list.
+     * Renders the procurement agent type list.
+     * @returns {JSX.Element} - Procurement agent type list.
      */
     render() {
         jexcel.setDictionary({
@@ -466,7 +361,7 @@ class ListProcurementAgentComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selProcurementAgent.length
+                text: 'All', value: this.state.selFundingSourceType.length
             }]
         }
         return (
@@ -478,7 +373,7 @@ class ListProcurementAgentComponent extends Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROCUREMENT_AGENT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FUNDING_SOURCE') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewFunderType}><i className="fa fa-plus-square"></i></a>}
                             </div>
                         </div>
                     </div>
@@ -504,9 +399,7 @@ class ListProcurementAgentComponent extends Component {
                                 </FormGroup>
                             </Col>
                         }
-                        <div className='consumptionDataEntryTable'>
-                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -523,4 +416,4 @@ class ListProcurementAgentComponent extends Component {
         );
     }
 }
-export default ListProcurementAgentComponent;
+export default ListFunderTypeComponent;

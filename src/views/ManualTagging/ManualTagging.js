@@ -15,7 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionForErp, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { filterOptions, generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, BATCH_PREFIX, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, NONE_SELECTED_DATA_SOURCE_ID, PROGRAM_TYPE_SUPPLY_PLAN, PSM_PROCUREMENT_AGENT_ID, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, SHIPMENT_MODIFIED, STRING_TO_DATE_FORMAT, TBD_FUNDING_SOURCE, USD_CURRENCY_ID } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService.js';
@@ -1037,8 +1037,13 @@ export default class ManualTagging extends Component {
                     .then(response => {
                         if (response.status == 200) {
                             var listArray = response.data.map(ele => ele.realmCountry);
+                            var lang=this.state.lang;
                             this.setState({
-                                countryList: response.data
+                                countryList: response.data.sort(function (a, b) {
+                                    a = getLabelText(a.realmCountry.label,lang).toLowerCase();
+                                    b = getLabelText(b.realmCountry.label,lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                  })
                             }, () => {
                                 if (this.state.countryList.length == 1) {
                                     var event = {
@@ -2021,7 +2026,7 @@ export default class ManualTagging extends Component {
      */
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 ? this.state.localProgramList[0].programId : this.state.programId1.split("_")[0]) : document.getElementById("programId").value);
+        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 && this.state.localProgramList.length>0 ? this.state.localProgramList[0].programId : this.state.programId1!=undefined?this.state.programId1.toString().split("_")[0]:"") : document.getElementById("programId").value);
         var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         var linkedRoNoAndRoPrimeLineNo = [];
@@ -4499,7 +4504,7 @@ export default class ManualTagging extends Component {
             )
         }, this);
         const { fundingSourceList } = this.state;
-        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
+        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId1))).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {item.fundingSourceCode}
@@ -4763,6 +4768,7 @@ export default class ManualTagging extends Component {
                                                         value={this.state.productCategoryValues}
                                                         onChange={(e) => { this.handleProductCategoryChange(e) }}
                                                         options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
+                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -4816,6 +4822,7 @@ export default class ManualTagging extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>}
@@ -4831,6 +4838,7 @@ export default class ManualTagging extends Component {
                                                     onChange={(e) => { this.filterData(e) }}
                                                     options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                                     labelledBy={i18n.t('static.common.select')}
+                                                    filterOptions={filterOptions}
                                                 />
                                             </div>
                                         </FormGroup>}

@@ -1909,7 +1909,7 @@ export default class ListTreeComponent extends Component {
                                     f = 1;
                                 }
                             }
-                            if(this.state.onlyDownloadedProgram) {
+                            if(this.state.onlyDownloadedProgram && proList.filter(c=>c.id==programData.id).length==0) {
                                 proList.push(programData)
                             } else {
                                 if (f == 0) {
@@ -2500,6 +2500,16 @@ export default class ListTreeComponent extends Component {
                                                 this.getRegionList(this.state.datasetIdModal);
                                             })
                                         }
+                                    });
+                                }.bind(this)
+                            });
+                            items.push({
+                                title: i18n.t('static.common.treeTable'),
+                                onclick: function () {
+                                    var treeId = this.state.treeEl.getValueFromCoords(0, y);
+                                    var programId = this.state.treeEl.getValueFromCoords(8, y);
+                                    this.props.history.push({
+                                        pathname: `/dataSet/treeTable/tree/${treeId}/${programId}`,
                                     });
                                 }.bind(this)
                             });

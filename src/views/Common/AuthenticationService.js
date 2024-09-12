@@ -488,6 +488,22 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/funderType/addFunderType":
+                        if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
+                    case "/funderType/listFunderType":
+                    case "/funderType/listFunderType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
+                    case "/funderType/editFunderType/:fundingSourceTypeId":
+                        if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
+                            return true;
+                        }
+                        break;
                     case "/fundingSource/addFundingSource":
                         if (bfunction.includes("ROLE_BF_ADD_FUNDING_SOURCE")) {
                             return true;
@@ -497,7 +513,7 @@ class AuthenticationService {
                         if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
                             return true;
                         }
-                        break;
+                        break;                    
                     case "/fundingSource/listFundingSource":
                     case "/fundingSource/listFundingSource/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
@@ -802,6 +818,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/procurementAgent/mapProcurementAgentForecastingUnit/:procurementAgentId":
+                        if (bfunction.includes("ROLE_BF_MAP_FORECASTING_UNIT")) {
+                            return true;
+                        }
+                        break;                        
                     case "/programProduct/addProgramProduct":
                     case "/programProduct/addProgramProduct/:programId/:color/:message":
                         if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
@@ -1178,6 +1199,15 @@ class AuthenticationService {
                     case "/dataSet/buildTree/":
                     case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
                     case "/dataSet/buildTree/template/:templateId":
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataSet/treeTable/tree/:treeId/:programId":
+                    case "/dataSet/treeTable/tree/:treeId/:programId/:scenarioId":
+                    case "/dataSet/treeTable/":
+                    case "/dataSet/treeTable/treeServer/:treeId/:programId/:isLocal":
+                    case "/dataSet/treeTable/template/:templateId":
                         if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
                             return true;
                         }

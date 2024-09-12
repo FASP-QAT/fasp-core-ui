@@ -4,121 +4,98 @@ import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup,
 import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js';
-import CurrencyService from '../../api/CurrencyService.js';
+import ProcurementAgentService from "../../api/ProcurementAgentService";
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import FundingSourceService from '../../api/FundingSourceService.js';
 // Localized entity name
-const entityname = i18n.t('static.currency.currencyMaster');
-// Initial values for form fields
-let initialValues = {
-    currencyCode: '',
-    label: '',
-    conversionRate: '',
-    isSync: true
-}
+const entityname = i18n.t('static.funderTypeHead.funderType');
 /**
- * Defines the validation schema for currency details.
- * @param {*} values - Form values.
+ * Defines the validation schema for procurement agent type details.
+ * @param {Object} values - Form values.
  * @returns {Yup.ObjectSchema} - Validation schema.
  */
 const validationSchema = function (values) {
     return Yup.object().shape({
-        currencyCode: Yup.string()
+        fundingSourceTypeCode: Yup.string()
             .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
-            .required(i18n.t('static.currency.currencycodetext')),
-        label: Yup.string()
+            .required(i18n.t('static.funderType.funderTypeCodeText')),
+        fundingSourceTypeName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.currency.currencytext')),
-        // conversionRate: Yup.string()
-        //     .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
-        //     .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
-
-        conversionRate: Yup.string()
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
-            .when('isSync', {
-                is: false, // when isSync is false
-                then: Yup.string().required(i18n.t('static.currency.conversionrateNumber')), // conversionRate is required
-                otherwise: Yup.string().notRequired() // conversionRate is not required when isSync is true
-            })
-
+            .required(i18n.t('static.funderType.funderTypeNameText')),
     })
 }
 /**
- * Component for editing currency details.
+ * Component for editing procurement agent type details.
  */
-export default class UpdateCurrencyComponent extends Component {
+class EditFunderTypeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: {
-                currencyCode: '',
+            realms: [],
+            fundingSourceType: {
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
                 label: {
                     label_en: '',
                     label_sp: '',
                     label_pr: '',
-                    label_fr: ''
+                    label_fr: '',
                 },
-                conversionRateToUsd: '',
-                isSync: 'true'
+                fundingSourceTypeCode: '',
             },
             message: '',
             lang: localStorage.getItem('lang'),
-            loading: true
+            // loading: true
+            loading: false
         }
-        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
-        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     /**
-     * Hides the message in div2 after 30 seconds.
-     */
-    hideSecondComponent() {
-        setTimeout(function () {
-            document.getElementById('div2').style.display = 'none';
-        }, 30000);
-    }
-    /**
-     * Handles data change in the currency form.
+     * Handles data change in the form.
      * @param {Event} event - The change event.
      */
     dataChange(event) {
-        let { currency } = this.state
-        if (event.target.name === "currencyCode") {
-            this.state.currency.currencyCode = event.target.value.toUpperCase();
+        let { fundingSourceType } = this.state;
+        if (event.target.name == "fundingSourceTypeCode") {
+            fundingSourceType.fundingSourceTypeCode = event.target.value;
         }
-        if (event.target.name === "label") {
-            this.state.currency.label.label_en = event.target.value
+        if (event.target.name == "fundingSourceTypeName") {
+            fundingSourceType.label.label_en = event.target.value;
         }
-        else if (event.target.name === "conversionRate") {
-            this.state.currency.conversionRateToUsd = event.target.value
-        } else if (event.target.name === "isSync") {
-            this.state.currency.isSync = event.target.id === "active2" ? false : true;
+        if (event.target.name == "active") {
+            fundingSourceType.active = event.target.id === "active2" ? false : true;
         }
-        this.setState(
-            {
-                currency
-            }
-        )
+        this.setState({
+            fundingSourceType
+        },
+            () => { });
     };
     /**
-     * Fetches currency details on component mount.
+     * Fetches procurement agent type details on component mount.
      */
     componentDidMount() {
-        //Fetch currency details by currencyId
-        CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
+        FundingSourceService.getFundingSourceTypeById(this.props.match.params.fundingSourceTypeId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    currency: response.data, loading: false
+                    fundingSourceType: response.data, loading: false
                 });
-            }
-            else {
+            } else {
                 this.setState({
                     message: response.data.messageCode, loading: false
                 },
                     () => {
-                        this.hideSecondComponent();
+                        hideSecondComponent();
                     })
             }
         }).catch(
@@ -162,24 +139,8 @@ export default class UpdateCurrencyComponent extends Component {
         );
     }
     /**
-     * Capitalizes the first letter of the currency name.
-     * @param {string} str - The currency name.
-     */
-    Capitalize(str) {
-        if (str != null && str != "") {
-            let { currency } = this.state
-            currency.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-        }
-    }
-    /**
-     * Redirects to the list currency screen when cancel button is clicked.
-     */
-    cancelClicked() {
-        this.props.history.push(`/currency/listCurrency/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
-    }
-    /**
-     * Renders the currency details form.
-     * @returns {JSX.Element} - currency details form.
+     * Renders the procurement agent type details form.
+     * @returns {JSX.Element} - Procurement agent type details form.
      */
     render() {
         return (
@@ -191,28 +152,26 @@ export default class UpdateCurrencyComponent extends Component {
                         <Card>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{
-                                    currencyCode: this.state.currency.currencyCode,
-                                    currencySymbol: this.state.currency.currencySymbol,
-                                    label: getLabelText(this.state.currency.label, this.state.lang),
-                                    conversionRate: this.state.currency.conversionRateToUsd,
-                                    isSync: this.state.currency.isSync
-                                }}
+                                initialValues={
+                                    {
+                                        fundingSourceTypeCode: this.state.fundingSourceType.fundingSourceTypeCode,
+                                        fundingSourceTypeName: this.state.fundingSourceType.label.label_en,
+                                    }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
                                         loading: true
                                     })
-                                    CurrencyService.editCurrency(this.state.currency)
+                                    FundingSourceService.updateFundingSourceType(this.state.fundingSourceType)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/currency/listCurrency/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/funderType/listFunderType/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode, loading: false
                                                 },
                                                     () => {
-                                                        this.hideSecondComponent();
+                                                        hideSecondComponent();
                                                     })
                                             }
                                         }).catch(
@@ -267,68 +226,66 @@ export default class UpdateCurrencyComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                        <Form onSubmit={handleSubmit} noValidate name='currencyForm' autocomplete="off">
+                                        <Form onSubmit={handleSubmit} noValidate name='fundingSourceTypeForm' autocomplete="off">
                                             <CardBody className="pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 <FormGroup>
-                                                    <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input type="text"
-                                                        name="label"
-                                                        id="label"
+                                                    <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input
+                                                        type="text"
+                                                        name="realmId"
+                                                        id="realmId"
                                                         bsSize="sm"
-                                                        valid={!errors.label}
-                                                        invalid={touched.label && !!errors.label || !!errors.label}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                        onBlur={handleBlur}
-                                                        value={this.state.currency.label.label_en}
-                                                        required />
-                                                    <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                        readOnly={true}
+                                                        value={getLabelText(this.state.fundingSourceType.realm.label, this.state.lang)}
+                                                    >
+                                                    </Input>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label for="fundingSourceTypeName">{i18n.t('static.funderType.funderTypeName')}<span className="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
-                                                        name="currencyCode"
-                                                        id="currencyCode"
                                                         bsSize="sm"
-                                                        valid={!errors.currencyCode}
-                                                        invalid={touched.currencyCode && !!errors.currencyCode || !!errors.currencyCode}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                        name="fundingSourceTypeName"
+                                                        id="fundingSourceTypeName"
+                                                        valid={!errors.fundingSourceTypeName}
+                                                        invalid={(touched.fundingSourceTypeName && !!errors.fundingSourceTypeName) || !!errors.fundingSourceTypeName}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
-                                                        value={this.state.currency.currencyCode}
+                                                        maxLength={255}
                                                         required
-                                                        maxLength={4}
+                                                        value={getLabelText(this.state.fundingSourceType.label, this.state.lang)}
                                                     />
-                                                    <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
+                                                    <FormFeedback className="red">{errors.fundingSourceTypeName}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label for="fundingSourceTypeCode">{i18n.t('static.funderType.funderTypeCode')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
-                                                        name="conversionRate"
-                                                        id="conversionRate"
                                                         bsSize="sm"
-                                                        valid={!errors.conversionRate}
-                                                        invalid={touched.conversionRate && !!errors.conversionRate || !!errors.conversionRate}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                        onBlur={handleBlur}
-                                                        value={this.state.currency.conversionRateToUsd}
-                                                        required />
-                                                    <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
+                                                        name="fundingSourceTypeCode"
+                                                        id="fundingSourceTypeCode"
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        valid={!errors.fundingSourceTypeCode}
+                                                        invalid={(touched.fundingSourceTypeCode && !!errors.fundingSourceTypeCode) || !!errors.fundingSourceTypeCode}
+                                                        maxLength={10}
+                                                        value={this.state.fundingSourceType.fundingSourceTypeCode}
+                                                    />
+                                                    <FormFeedback className="red">{errors.fundingSourceTypeCode}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="isSync">{i18n.t('static.common.issync')}  </Label>
+                                                    <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                     <FormGroup check inline>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"
                                                             id="active1"
-                                                            name="isSync"
+                                                            name="active"
                                                             value={true}
-                                                            checked={this.state.currency.isSync === true}
+                                                            checked={this.state.fundingSourceType.active === true}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         />
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio1">
-                                                            {i18n.t('static.program.yes')}
+                                                            {i18n.t('static.common.active')}
                                                         </Label>
                                                     </FormGroup>
                                                     <FormGroup check inline>
@@ -336,15 +293,15 @@ export default class UpdateCurrencyComponent extends Component {
                                                             className="form-check-input"
                                                             type="radio"
                                                             id="active2"
-                                                            name="isSync"
+                                                            name="active"
                                                             value={false}
-                                                            checked={this.state.currency.isSync === false}
+                                                            checked={this.state.fundingSourceType.active === false}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         />
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2">
-                                                            {i18n.t('static.program.no')}
+                                                            {i18n.t('static.common.disabled')}
                                                         </Label>
                                                     </FormGroup>
                                                 </FormGroup>
@@ -360,9 +317,9 @@ export default class UpdateCurrencyComponent extends Component {
                                             </div>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
@@ -375,13 +332,18 @@ export default class UpdateCurrencyComponent extends Component {
         );
     }
     /**
-     * Resets the currency details form when reset button is clicked. Also fetches the currency details.
+     * Redirects to the list procurement agent type screen when cancel button is clicked.
+     */
+    cancelClicked() {
+        this.props.history.push(`/funderType/listFunderType/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+    /**
+     * Resets the procurement agent type details when reset button is clicked.
      */
     resetClicked() {
-        //Fetch currency details by currencyId
-        CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
+        FundingSourceService.getFundingSourceTypeById(this.props.match.params.fundingSourceTypeId).then(response => {
             this.setState({
-                currency: response.data
+                fundingSourceType: response.data, loading: false
             });
         }).catch(
             error => {
@@ -424,3 +386,4 @@ export default class UpdateCurrencyComponent extends Component {
         );
     }
 }
+export default EditFunderTypeComponent;

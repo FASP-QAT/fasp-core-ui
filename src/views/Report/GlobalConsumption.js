@@ -29,7 +29,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -750,21 +750,6 @@ class GlobalConsumption extends Component {
    */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
   /**
-   * Filters the options based on the provided filter string and sort the options.
-   * @param {Array} options - The array of options to filter.
-   * @param {string} filter - The filter string to apply.
-   * @returns {Array} - The filtered array of options.
-   */
-  filterOptions = async (options, filter) => {
-    if (filter) {
-      return options.filter((i) =>
-        i.label.toLowerCase().includes(filter.toLowerCase())
-      );
-    } else {
-      return options;
-    }
-  };
-  /**
    * Renders the Global Consumption report table.
    * @returns {JSX.Element} - Global Consumption report table.
    */
@@ -875,7 +860,7 @@ class GlobalConsumption extends Component {
                           value={this.state.countryValues}
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
-                          filterOptions={this.filterOptions}
+                          filterOptions={filterOptions}
                           disabled={this.state.loading}
                         />
                         {!!this.props.error &&
@@ -894,7 +879,7 @@ class GlobalConsumption extends Component {
                         value={this.state.programValues}
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
-                        filterOptions={this.filterOptions}
+                        filterOptions={filterOptions}
                         disabled={this.state.loading}
                       />
                       {!!this.props.error &&
@@ -913,7 +898,7 @@ class GlobalConsumption extends Component {
                           value={this.state.planningUnitValues}
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                          filterOptions={this.filterOptions}
+                          filterOptions={filterOptions}
                           disabled={this.state.loading}
                         />
                       </div>

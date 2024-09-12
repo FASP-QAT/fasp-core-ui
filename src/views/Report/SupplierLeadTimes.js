@@ -26,7 +26,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions';
 /**
  * Component for Supplier Lead Times Report.
@@ -1253,6 +1253,7 @@ class SupplierLeadTimes extends Component {
                                             name="planningUnitId"
                                             id="planningUnitId"
                                             bsSize="md"
+                                            filterOptions={filterOptions}
                                             value={this.state.planningUnitValues}
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
@@ -1267,6 +1268,7 @@ class SupplierLeadTimes extends Component {
                                             name="procurementAgentId"
                                             id="procurementAgentId"
                                             bsSize="md"
+                                            filterOptions={filterOptions}
                                             value={this.state.procurementAgenttValues}
                                             onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                             options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
