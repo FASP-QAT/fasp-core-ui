@@ -3004,7 +3004,7 @@
     "static.language.languageCode": "Language display name",
     "static.listTree.missingPlanningUnits": "Planning Units that are missing, inactive or unchecked for Tree Forecast in current program: (To see full list of current Planning Units, see",
     "static.dataentry.downloadTemplate": "Download template",
-    "static.compareAndSelect.forecastErrorMonths": "Forecast (Months)",
+    "static.compareAndSelect.forecastErrorMonths": "Forecast Error (# Months used)",
     "static.quantimed.planningUnitNotFoundText": "Planning Unit Not Found",
     "static.loadDelDataset.programWithSameVersion": "Program with same version already exist do you want to override data.",
     "static.translation.labelCode": "Label code",
