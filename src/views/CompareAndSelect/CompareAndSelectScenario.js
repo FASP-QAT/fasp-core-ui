@@ -669,25 +669,12 @@ class CompareAndSelectScenario extends Component {
                         if (treeScenarioList[tsl].type == "T") {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                             data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
-                            if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
-                                total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2)) : Number(0);
-                            }
-                            if (scenarioFilter.length > 0) {
-                                count += 1;
-                            }
                         } else {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                             data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
-                            if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
-                                total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier)).toFixed(2) : Number(0);
-                            }
-                            if (scenarioFilter.length > 0) {
-                                count += 1;
-                            }
                         }
                     }
                 }
-                data1[tsl] = count > 0 ? Number(total).toFixed(2) : "";
                 dataArr1.push(data1)
             }
             if (this.state.xAxisDisplayBy != 1) {
