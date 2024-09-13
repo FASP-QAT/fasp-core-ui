@@ -6272,7 +6272,7 @@ export default class TreeTable extends Component {
                                             </div>
                                         </CardBody>
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
-                                            <i>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`}>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
+                                            <i>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
                                             <i>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
                                             <Row>
                                                 <Col xs="12" md="12" className="mb-4">
