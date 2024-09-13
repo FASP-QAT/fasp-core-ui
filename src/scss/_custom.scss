@@ -262,9 +262,12 @@ body {
 .form-control:disabled, .form-control[readonly] {
   // background-color: #212631;
   // opacity: 1;
-  background-color: #e5edf5;
+  // background-color: #e5edf5;
+  //   opacity: 1;
+  //   color: #000!important;
+  background-color: #373c46;
     opacity: 1;
-    color: #000!important;
+    color: #e5edf5 !important;
 }
 .titleColorModule2 {
   color: #e4e5e6 !important;
@@ -318,6 +321,9 @@ select>.Select-control .Select-value,
   .module2.sidebar .nav > .nav-dropdown > .nav-dropdown-items {
       background: #212631 !important;
   }
+  .module1.sidebar .nav > .nav-dropdown > .nav-dropdown-items {
+    background: #212631 !important;
+}
 }
 .form-check-inline .form-check-input {
   margin-top: -8px;
@@ -1403,6 +1409,12 @@ a {
 .supplyplan-Thead {
   background-color: #e4e5e6 !important;
   color: #20a8d8 !important;
+}
+.datdEntryRow .regionBold {
+  font-weight: bold;
+  background: #757575 !important;
+  color: #fff !important;
+  border: none !important;
 }
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
@@ -8618,17 +8630,17 @@ label.arrow_label:before {
 
 .consumptionDataEntryTable .jexcel_content {
   max-height: calc(100vh - 262px) !important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
 }
 
 .inventoryDataEntryTable .jexcel_content {
   max-height: calc(100vh - 230px) !important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
 }
 
 .shipmentDataEntryTable .jexcel_content {
   max-height: calc(100vh - 213px) !important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
 }
 
 .consumptionDataEntryTable .jss_content {
@@ -8638,12 +8650,12 @@ label.arrow_label:before {
 
 .inventoryDataEntryTable .jss_content {
   max-height: calc(100vh - 230px) !important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
 }
 
 .shipmentDataEntryTable .jss_content {
   max-height: calc(100vh - 213px) !important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
 }
 
 .jexcel>tbody>tr>td.readonly>input[type="checkbox"],
@@ -12451,7 +12463,7 @@ label.arrow_label:before {
 
 .shipmentDataEntryTable .jss_content {
   max-height: calc(100vh - 213px) !important;
-  overflow: scroll !important;
+  // overflow: scroll !important;
 }
 
 .jss {
