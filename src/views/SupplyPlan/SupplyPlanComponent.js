@@ -183,7 +183,8 @@ export default class SupplyPlanComponent extends React.Component {
             viewById: 1,
             planningUnitNotes: "",
             actualInventoryChanged:false,
-            actualInventoryBatchTotalNotMatching:""
+            actualInventoryBatchTotalNotMatching:"",
+            planningUnit: "",
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
