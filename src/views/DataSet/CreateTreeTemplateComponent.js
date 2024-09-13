@@ -2855,8 +2855,11 @@ export default class CreateTreeTemplate extends Component {
      * Updates the current item's calculated data value based on the percentage of the parent value.
      * 
      * @param {string} month - The month for which to calculate the parent value from MOM data.
+     * @param {boolean} increaseScalingMonth - Increase the scaling month value by 1
+     * 
      */
-    calculateParentValueFromMOM(month) {
+    calculateParentValueFromMOM(month, increaseScalingMonth) {
+        console.log("inside ===> 1")
         var parentValue = 0;
         var currentItemConfig = this.state.currentItemConfig;
         if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
@@ -2878,7 +2881,7 @@ export default class CreateTreeTemplate extends Component {
             var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[0][0].dataValue;
             currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
         }
-        this.setState({ parentValue, currentItemConfig }, () => {
+        this.setState({ parentValue, currentItemConfig, scalingMonth: increaseScalingMonth ? parseInt(month) + 1 : this.state.scalingMonth }, () => {
         });
     }
     /**
@@ -3993,7 +3996,7 @@ export default class CreateTreeTemplate extends Component {
             showCalculatorFields: false,
         }, () => {
             document.getElementById("nodeValue").value = map1.get("9");
-            this.calculateParentValueFromMOM(map1.get("8"))
+            this.calculateParentValueFromMOM(map1.get("8"), false)
         }
         );
     }
@@ -5248,6 +5251,9 @@ export default class CreateTreeTemplate extends Component {
      * Builds Jexcel table for modeling data
      */
     buildModelingJexcel() {
+        console.log("inside ===> 2")
+
+        console.log("====>", this.state.scalingMonth)
         var scalingList = this.state.scalingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
         var dataArray = [];
@@ -5340,7 +5346,9 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.setState({ scalingTotal });
-        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+            jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        }
         var data = dataArray;
         var options = {
             data: data,
@@ -8182,7 +8190,7 @@ export default class CreateTreeTemplate extends Component {
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[0][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
             this.setState({ currentItemConfig }, () => {
-                this.calculateParentValueFromMOM(currentItemConfig.context.payload.nodeDataMap[0][0].monthNo);
+                this.calculateParentValueFromMOM(currentItemConfig.context.payload.nodeDataMap[0][0].monthNo, false);
             })
         }
         if (this.state.addNodeFlag) {
@@ -8209,6 +8217,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             if (tab == 2) {
+                this.setState({ scalingMonth: parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 });
                 if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                     var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                     var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
@@ -8241,7 +8250,6 @@ export default class CreateTreeTemplate extends Component {
                             this.buildModelingJexcel();
                     })
                 }
-                this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
             }
         });
     }
@@ -8493,7 +8501,7 @@ export default class CreateTreeTemplate extends Component {
             var parentValue;
             var parentValue1;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value.toString();
-            this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo);
+            this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo, false);
         }
         if (event.target.name === "nodeValue") {
             var value = (event.target.value).replaceAll(",", "");
@@ -8565,7 +8573,9 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "monthNo") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo = event.target.value;
-            this.calculateParentValueFromMOM(event.target.value);
+            this.calculateParentValueFromMOM(event.target.value, true);
+            this.buildModelingJexcel();
+
         }
         if (event.target.name === "usageFrequencyCon" || event.target.name === "usageFrequencyDis") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = (event.target.value).replaceAll(",", "");
@@ -9077,7 +9087,7 @@ export default class CreateTreeTemplate extends Component {
                 const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.level != 0) {
-                    this.calculateParentValueFromMOM(data.context.payload.nodeDataMap[0][0].monthNo);
+                    this.calculateParentValueFromMOM(data.context.payload.nodeDataMap[0][0].monthNo, false);
                 }
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId(1, 0);
@@ -11703,7 +11713,7 @@ export default class CreateTreeTemplate extends Component {
     handleAMonthDissmis1 = (value) => {
         let month = value.year + '-' + value.month + '-01';
         this.setState({ singleValue2: value, }, () => {
-            this.calculateParentValueFromMOM(month);
+            this.calculateParentValueFromMOM(month, false);
         })
     }
     /**
@@ -12299,7 +12309,7 @@ export default class CreateTreeTemplate extends Component {
                                             orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
                                         }, () => {
                                             this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
-                                            this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo);
+                                            this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo, false);
                                         });
                                         if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
                                             this.getUsageTemplateList(0);
