@@ -393,6 +393,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                         }
                                                     } else {
                                                         myArray[index].stock = Number(myArray[index].stock) + Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier));
+                                                        myArray[index].adjustment = Number(myArray[index].adjustment) + Math.round(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier));
                                                     }
                                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
                                                     actualBatchQtyTotal += Math.round(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier));
@@ -842,7 +843,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             shipmentQty: myArray[ma].shipment,
                                             openingBalanceWps: myArray[ma].openingBalanceWps,
                                             unallocatedQtyWps: Number(myArray[ma].calculatedFEFOWps) + (myArray[ma].calculatedLEFOWps != undefined && myArray[ma].calculatedLEFOWps != "" && myArray[ma].calculatedLEFOWps != null ? myArray[ma].calculatedLEFOWps : 0),
-                                            shipmentQtyWps: myArray[ma].shipmentWps,
+                                            shipmentQtyWps: myArray[ma].shipmentWps
                                         }
                                         finalBatchDetails.push(finalBatch)
                                     }
@@ -1160,12 +1161,10 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         }
                                     }
                                     props.updateState("programJson", programJsonForStoringTheResult);
+                                    props.updateState("generalProgramJson", generalProgramJson);
                                     props.updateState("planningUnitDataList", planningUnitDataList);
                                     props.formSubmit(props.state.planningUnit, props.state.monthCount);
-                                    props.updateState("batchInfoInInventoryPopUp", []);
                                     props.updateState("actualInventoryChanged", false);
-                                    props.updateState("actualInventoryBatchTotalNotMatching", "");
-                                    props.updateState("ledgerForBatch", []);
                                     props.updateState("loading", false);
                                     props.hideFirstComponent();
                                 } else if (page == "shipment") {
