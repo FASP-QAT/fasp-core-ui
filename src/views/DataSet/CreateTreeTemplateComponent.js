@@ -527,6 +527,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth1 = React.createRef()
         this.pickAMonth6 = React.createRef()
         this.state = {
+            isDarkMode: false,
             isBranchTemplateModalOpen: false,
             branchTemplateList: [],
             isValidError: '',
@@ -7314,6 +7315,21 @@ export default class CreateTreeTemplate extends Component {
      * Reterives node type, usage template, procurement agent, forecast method, unit, usage period, usage type, tracer category, modeling type and tree template list on component mount
      */
     componentDidMount() {
+         // Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+    
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+    
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+    
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         this.procurementAgentList();
@@ -9469,10 +9485,22 @@ export default class CreateTreeTemplate extends Component {
      * @returns {JSX.Element} - Node details and modeling data.
      */
     tabPane1() {
+        const darkModeColors = [
+            '#d4bbff',   
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1    
+        ]; 
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var chartOptions = {
             title: {
                 display: true,
-                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -9481,12 +9509,12 @@ export default class CreateTreeTemplate extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -9501,17 +9529,21 @@ export default class CreateTreeTemplate extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'left',
                     }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -9540,7 +9572,7 @@ export default class CreateTreeTemplate extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: fontColor
                 }
             }
         }
@@ -9555,7 +9587,7 @@ export default class CreateTreeTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -9579,7 +9611,8 @@ export default class CreateTreeTemplate extends Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -9593,12 +9626,12 @@ export default class CreateTreeTemplate extends Component {
                                         : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                             : ""
                                 : "",
-                            fontColor: 'black'
+                                fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -9613,7 +9646,9 @@ export default class CreateTreeTemplate extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'left',
                     },
@@ -9622,12 +9657,12 @@ export default class CreateTreeTemplate extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: "% of " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.level != 0 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value + " %";
                                 return cell1;
@@ -9635,17 +9670,20 @@ export default class CreateTreeTemplate extends Component {
                             min: 0,
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor
                         },
                         position: 'right',
                     }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor,
                     }
                 }]
             },
@@ -9679,7 +9717,7 @@ export default class CreateTreeTemplate extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: fontColor
                 }
             }
         }
@@ -9693,7 +9731,7 @@ export default class CreateTreeTemplate extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: Colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -11117,7 +11155,7 @@ export default class CreateTreeTemplate extends Component {
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 ? "none" : "block" }}>
-                                    <span>{i18n.t('static.modelingTable.note')}</span>
+                                    <span className='DarkThColr'>{i18n.t('static.modelingTable.note')}</span>
                                     <div className="calculatorimg calculatorTable">
                                         <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                         </div>
@@ -11533,7 +11571,7 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
+                                <div className="pt-lg-2 pl-lg-0"><i className='text-blackD'>{i18n.t('static.tree.tableDisplays')} <b>{
                                     this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                         this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
                                             : this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.unit.id)[0].label, this.state.lang) : ""
@@ -12362,10 +12400,29 @@ export default class CreateTreeTemplate extends Component {
                                 </a>
                                 <a className="pr-lg-0 pt-lg-0 float-right">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                        onClick={() => this.exportPDF()}
+                                        onClick={() => {
+                                            var curTheme = localStorage.getItem("theme");
+                                            if(curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if(curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
-                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id == 1 || this.state.treeTemplate.flatList[0].payload.nodeType.id == 2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span> : <span><i>{"Create a tree first, then add this template to a node."}</i></span>}
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id == 1 || this.state.treeTemplate.flatList[0].payload.nodeType.id == 2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span> : <span className='WhiteText'><i>{"Create a tree first, then add this template to a node."}</i></span>}
                                 </a>
                             </div>
                         </div>

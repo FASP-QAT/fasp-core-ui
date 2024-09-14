@@ -768,7 +768,7 @@ class Program extends Component {
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
                             </CardFooter>
                         </Card>
-                        <span align="right">{i18n.t("static.loadProgram.loadProgramNotePart1")}{" '"}<a href="/#/report/supplyPlanVersionAndReview" target="_blank">{i18n.t('static.report.supplyplanversionandreviewReport')}</a>{"' "}{i18n.t('static.loadProgram.loadProgramNotePart2')}</span>
+                        <span align="right" className='DarkThColr'>{i18n.t("static.loadProgram.loadProgramNotePart1")}{" '"}<a href="/#/report/supplyPlanVersionAndReview" target="_blank">{i18n.t('static.report.supplyplanversionandreviewReport')}</a>{"' "}{i18n.t('static.loadProgram.loadProgramNotePart2')}</span>
                     </Col>
                 </Row>
             </div>

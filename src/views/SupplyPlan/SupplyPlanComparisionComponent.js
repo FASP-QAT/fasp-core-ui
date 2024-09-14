@@ -31,6 +31,7 @@ export default class SupplyPlanComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            isDarkMode:false,
             loading: true,
             monthsArray: [],
             programList: [],
@@ -77,6 +78,7 @@ export default class SupplyPlanComponent extends React.Component {
             jsonArrForGraph: [],
             display: 'none',
             lang: localStorage.getItem('lang'),
+            theme:localStorage.getItem('theme'),
             unmetDemand: [],
             expiredStock: [],
             versionId: "",
@@ -571,6 +573,21 @@ export default class SupplyPlanComponent extends React.Component {
      * This function is used to get list of programs that user has downloaded
      */
     componentDidMount() {
+        // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
+
         var fields = document.getElementsByClassName("totalShipments1");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -1021,7 +1038,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor1 = procurementAgent.colorHtmlCode;
+                                                paColor1 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -1056,7 +1073,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor2 = procurementAgent.colorHtmlCode;
+                                                paColor2 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -1091,7 +1108,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor3 = procurementAgent.colorHtmlCode;
+                                                paColor3 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -1126,7 +1143,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor4 = procurementAgent.colorHtmlCode;
+                                                paColor4 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -1161,7 +1178,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor5 = procurementAgent.colorHtmlCode;
+                                                paColor5 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -1890,10 +1907,22 @@ export default class SupplyPlanComponent extends React.Component {
      * @returns The supply plan data in tabular format
      */
     render() {
+        const darkModeColors = [
+            '#d4bbff',      
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1    
+        ];
+        const { isDarkMode } = this.state;
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartOptions1 = {
             title: {
                 display: true,
-                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.aru.label : entityname)
+                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.aru.label : entityname),
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -1901,18 +1930,21 @@ export default class SupplyPlanComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true,
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 },
@@ -1921,25 +1953,31 @@ export default class SupplyPlanComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'right',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -1972,14 +2010,15 @@ export default class SupplyPlanComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
         var chartOptions2 = {
             title: {
                 display: true,
-                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.aru.label : entityname)
+                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.aru.label : entityname),
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -1987,28 +2026,34 @@ export default class SupplyPlanComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2041,7 +2086,7 @@ export default class SupplyPlanComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -2102,12 +2147,12 @@ export default class SupplyPlanComponent extends React.Component {
                     label: i18n.t('static.supplyPlan.delivered'),
                     stack: 1,
                     yAxisID: 'A',
-                    backgroundColor: '#002f6c',
-                    borderColor: '#002f6c',
-                    pointBackgroundColor: '#002f6c',
-                    pointBorderColor: '#002f6c',
-                    pointHoverBackgroundColor: '#002f6c',
-                    pointHoverBorderColor: '#002f6c',
+                    backgroundColor: colors[0],
+                    borderColor: colors[0],
+                    pointBackgroundColor: colors[0],
+                    pointBorderColor: colors[0],
+                    pointHoverBackgroundColor: colors[0],
+                    pointHoverBorderColor: colors[0],
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -2260,7 +2305,26 @@ export default class SupplyPlanComponent extends React.Component {
                     <div id="supplyPlanTableId" style={{ display: 'block' }}>
                         <Row className="float-right">
                             <div className="col-md-12">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         </Row>
@@ -2290,10 +2354,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tbody>
                                         <tr bgcolor='#d9d9d9'>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
+                                            <td align="left" className="sticky-col first-col clone darkModeclrblack" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
-                                                    <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
+                                                    <td align="right" className='darkModeclrblack'>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                 ))
                                             }
                                         </tr>
@@ -2562,10 +2626,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr bgcolor='#d9d9d9'>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
+                                            <td align="left" className="sticky-col first-col clone darkModeclrblack" style={{ backgroundColor: '#d9d9d9' }}><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                             {
                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                 })
                                             }
                                         </tr>
@@ -2574,7 +2638,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                    <td align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
                                         </tr>}
@@ -2624,7 +2688,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-12 pt-1"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                    <div className="col-md-12 pt-1 DarkThColr"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                 </div>}
                         </div>
                     </div>
@@ -2821,7 +2885,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         )
                                         )
                                     }
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -2840,7 +2904,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr>
                                         <td className="BorderNoneSupplyPlan" colSpan="15"></td>
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -2852,7 +2916,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                         }
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
@@ -2866,7 +2930,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                         }
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                         {
                                             this.state.closingBalanceArray.map((item, count) => {

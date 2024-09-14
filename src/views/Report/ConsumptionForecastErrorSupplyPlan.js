@@ -44,6 +44,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         dt.setMonth(dt.getMonth() - 10);
 
         this.state = {
+            isDarkMode:false,
             lang: localStorage.getItem("lang"),
             consumptionUnitShowArr: [],
             programId: '',
@@ -149,6 +150,21 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
      * Calls the get programs function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         this.getPrograms();
     }
     /**
@@ -2308,8 +2324,20 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
             }, this);
 
+            const darkModeColors = [
+                '#d4bbff', // Color 1 
+            ];
+            
+            const lightModeColors = [
+                '#002F6C',  // Color 1
+            ];
+            
 
-
+            const { isDarkMode } = this.state;
+            const colors = isDarkMode ? darkModeColors : lightModeColors;
+            const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+            const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+            
         var chartOptions = {
             title: {
                 display: true,
@@ -2317,7 +2345,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId).length > 0 ?
                         this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
                     this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
-                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : '')
+                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : ''),
+                        fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -2326,12 +2355,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit'))),
-                            fontColor: 'black'
+                            fontColor:fontColor
                         },
                         stacked: true,//stacked
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -2346,7 +2375,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                     },
@@ -2355,12 +2386,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: "Forecast Error",
-                            fontColor: 'black'
+                            fontColor:fontColor,
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += ' %';
@@ -2369,7 +2400,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             // max: 100
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'right',
 
@@ -2377,10 +2410,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2416,14 +2451,14 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]     
 
         var elInstance = this.state.dataList;
         if (elInstance != undefined) {
@@ -2488,7 +2523,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 data: consumptionForecastValue,
                 stack: 3,
                 yAxisID: 'A',
-                backgroundColor: '#002F6C',
+                backgroundColor: colors[0],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2542,7 +2577,26 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         {this.state.dataList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
@@ -2834,9 +2888,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                         {this.state.show && this.state.dataList.length > 0 &&
                                             <div className="table-scroll">
                                                 <ul className="legendcommitversion">
-                                                    <li style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
-                                                    {this.state.showForecastThresholdLegend && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>}
-                                                    {!this.state.showForecastThresholdLegend && <li><span className="legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThresholdNote')}</i></span></li>}
+                                                    <li className='DarkThColr' style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
+                                                    {this.state.showForecastThresholdLegend && <li className='DarkThColr'><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>}
+                                                    {!this.state.showForecastThresholdLegend && <li className='DarkThColr'><span className="legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThresholdNote')}</i></span></li>}
                                                 </ul>
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
@@ -2934,9 +2988,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                                 let differenceRegionData = (differenceData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));
                                                                                 regionDifferenceTotal += (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 0 : isNaN(Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty)) ? 0 : Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty);
                                                                                 regionDifferenceTotalCount += (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 0 : 1;
-                                                                                return (<td style={{ color: (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 'black' : (((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'black' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? '' : (Number((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                                return (<td style={{ color: (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 'text-blackD' : (((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'text-blackD' : 'text-blackD') }}>
+                                                                                    <NumberFormat displayType={'text'} thousandSeparator={true} />{(differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? '' : (Number((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                             })}
-                                                                            <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'black' : 'black' }}>{regionDifferenceTotalCount > 0 ? (Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                            <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'text-blackD' : 'text-blackD' }}>{regionDifferenceTotalCount > 0 ? (Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                                         </tr>)
                                                                     })}
                                                                 </>)
@@ -2985,9 +3040,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalDifference += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : isNaN(Number(data[0].actualQty - data[0].forecastQty)) ? 0 : Number(data[0].actualQty - data[0].forecastQty);
                                                                     totalDifferenceCount += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : 1;
-                                                                    return (<td style={{ color: (data[0].actualQty === '' || data[0].actualQty == null) ? 'black' : (((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'black' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td style={{ color: (data[0].actualQty === '' || data[0].actualQty == null) ? 'text-blackD' : (((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'text-blackD' : 'text-blackD') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone text-left" style={{ color: (totalDifference / totalDifferenceCount) < 0 ? 'black' : 'black' }}>{totalDifferenceCount > 0 ? (Number(totalDifference / totalDifferenceCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ color: (totalDifference / totalDifferenceCount) < 0 ? 'text-blackD' : 'text-blackD' }}>{totalDifferenceCount > 0 ? (Number(totalDifference / totalDifferenceCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                             </tr>
                                                         </tbody>
                                                     </Table>

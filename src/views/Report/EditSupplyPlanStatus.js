@@ -153,6 +153,7 @@ class EditSupplyPlanStatus extends Component {
             jsonArrForGraph: [],
             display: 'none',
             lang: localStorage.getItem('lang'),
+            theme:localStorage.getItem('theme'),
             unmetDemand: [],
             expiredStock: [],
             versionId: "",
@@ -1669,7 +1670,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor1 = procurementAgent.colorHtmlCode;
+                                                paColor1 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -1704,7 +1705,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor2 = procurementAgent.colorHtmlCode;
+                                                paColor2 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -1739,7 +1740,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor3 = procurementAgent.colorHtmlCode;
+                                                paColor3 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -1774,7 +1775,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor4 = procurementAgent.colorHtmlCode;
+                                                paColor4 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -1809,7 +1810,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor5 = procurementAgent.colorHtmlCode;
+                                                paColor5 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -3171,7 +3172,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
-                                                                    <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
+                                                                    <td align="right" className='darkModeclrblack'>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                                 ))
                                                             }
                                                         </tr>
@@ -3443,7 +3444,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                                    return (<td align="right"  bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
@@ -4881,7 +4882,7 @@ class EditSupplyPlanStatus extends Component {
                                                 )
                                                 )
                                             }
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -4900,7 +4901,7 @@ class EditSupplyPlanStatus extends Component {
                                             <tr>
                                                 <td className="BorderNoneSupplyPlan" colSpan="15"></td>
                                             </tr>
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -4912,7 +4913,7 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             </tr>
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
@@ -4926,7 +4927,7 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             </tr>
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                                 {
                                                     this.state.closingBalanceArray.map((item, count) => {

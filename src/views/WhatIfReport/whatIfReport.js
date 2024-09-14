@@ -173,6 +173,7 @@ export default class WhatIfReportComponent extends React.Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
+            isDarkMode:false,
             loading: true,
             monthsArray: [],
             programList: [],
@@ -220,6 +221,7 @@ export default class WhatIfReportComponent extends React.Component {
             jsonArrForGraph: [],
             display: 'none',
             lang: localStorage.getItem('lang'),
+            theme:localStorage.getItem('theme'),
             unmetDemand: [],
             expiredStock: [],
             versionId: "",
@@ -2973,6 +2975,23 @@ export default class WhatIfReportComponent extends React.Component {
      * This function is used to get list of programs that user has downloaded
      */
     componentDidMount() {
+
+        // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
+
+
         var fields = document.getElementsByClassName("totalShipments");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -3602,7 +3621,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor1 = procurementAgent.colorHtmlCode;
+                                                                paColor1 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -3637,7 +3656,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor2 = procurementAgent.colorHtmlCode;
+                                                                paColor2 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -3672,7 +3691,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor3 = procurementAgent.colorHtmlCode;
+                                                                paColor3 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -3707,7 +3726,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor4 = procurementAgent.colorHtmlCode;
+                                                                paColor4 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -3745,7 +3764,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor5 = procurementAgent.colorHtmlCode;
+                                                                paColor5 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -4698,10 +4717,24 @@ export default class WhatIfReportComponent extends React.Component {
      * @returns The supply plan data in tabular format
      */
     tabPane() {
+        const darkModeColors = [
+            '#d4bbff',  
+            '#49494a',   
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+            '#cfcdc9',    
+        ];
+        const { isDarkMode } = this.state;
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : ""
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -4709,18 +4742,21 @@ export default class WhatIfReportComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 },
@@ -4729,25 +4765,31 @@ export default class WhatIfReportComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'right',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -4780,14 +4822,15 @@ export default class WhatIfReportComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : ""
+                text: this.state.planningUnit != "" && this.state.planningUnit != undefined && this.state.planningUnit != null ? (this.state.programSelect).label + " - " + this.state.planningUnit.label : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -4795,28 +4838,34 @@ export default class WhatIfReportComponent extends React.Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, 
+                        lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -4849,7 +4898,7 @@ export default class WhatIfReportComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -4910,12 +4959,12 @@ export default class WhatIfReportComponent extends React.Component {
                     label: i18n.t('static.supplyPlan.delivered'),
                     stack: 1,
                     yAxisID: 'A',
-                    backgroundColor: '#002f6c',
-                    borderColor: '#002f6c',
-                    pointBackgroundColor: '#002f6c',
-                    pointBorderColor: '#002f6c',
-                    pointHoverBackgroundColor: '#002f6c',
-                    pointHoverBorderColor: '#002f6c',
+                    backgroundColor: colors[0],
+                    borderColor: colors[0],
+                    pointBackgroundColor: colors[0],
+                    pointBorderColor: colors[0],
+                    pointHoverBackgroundColor: colors[0],
+                    pointHoverBorderColor: colors[0],
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -4971,6 +5020,7 @@ export default class WhatIfReportComponent extends React.Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
+                    backgroundColor: colors[1],
                     borderColor: '#cfcdc9',
                     borderStyle: 'dotted',
                     ticks: {
@@ -5375,7 +5425,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 </div>
                                                 <div id="scenariosFields2" className="col-md-12" style={{ display: 'none' }}>
                                                     <div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
-                                                        <span><b>{i18n.t('static.scenarioPlanning.currentShipmentSettings')}</b></span>
+                                                        <span className='text-blackD'><b>{i18n.t('static.scenarioPlanning.currentShipmentSettings')}</b></span>
                                                     </div>
                                                     <div className="row col-md-12">
                                                         <FormGroup className="col-md-3">
@@ -5424,7 +5474,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         </FormGroup>
                                                     </div>
                                                     <div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
-                                                        <span><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
+                                                        <span className='text-blackD'><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
                                                     </div>
                                                     <FormGroup className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
@@ -5502,7 +5552,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
-                        <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }}>{i18n.t('static.whatIf.scenarioList')}</span>
+                        <span onClick={() => this.toggleAccordionScenarioList()}>{this.state.showScenarioList ? <i className="fa fa-minus-square-o scenarioListIcon" ></i> : <i className="fa fa-plus-square-o scenarioListIcon" ></i>}</span>&nbsp;&nbsp;<span style={{ fontSize: '16px' }} className='DarkThColr'>{i18n.t('static.whatIf.scenarioList')}</span>
                         <Row className="pt-3 pb-3 scenarioListDiv" >
                             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                                 <Col md="12 pl-0" id="realmDiv">
@@ -5552,7 +5602,26 @@ export default class WhatIfReportComponent extends React.Component {
                             <div className="animated fadeIn ">
                                 <Row className="float-right">
                                     <div className="col-md-12">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                     </div>
                                 </Row>
@@ -5587,7 +5656,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                     {
                                                         this.state.openingBalanceArray.map(item1 => (
-                                                            <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
+                                                            <td align="right" className='darkModeclrblack'>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                         ))
                                                     }
                                                 </tr>
@@ -5863,7 +5932,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                     {
                                                         this.state.closingBalanceArray.map((item1, count) => {
-                                                            return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                            return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                         })
                                                     }
                                                 </tr>
@@ -5872,7 +5941,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                     {
                                                         this.state.monthsOfStockArray.map(item1 => (
-                                                            <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                            <td align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                         ))
                                                     }
                                                 </tr>}
@@ -5922,7 +5991,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col-md-12 pt-1 pb-3"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                            <div className="col-md-12 pt-1 pb-3 DarkThColr"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                         </div>
                                     }
                                 </div>
@@ -6121,7 +6190,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             )
                                             )
                                         }
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -6140,7 +6209,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         <tr>
                                             <td className="BorderNoneSupplyPlan" colSpan="15"></td>
                                         </tr>
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
@@ -6152,7 +6221,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
@@ -6166,7 +6235,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
-                                        <tr bgcolor='#d9d9d9'>
+                                        <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                             <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                             {
                                                 this.state.closingBalanceArray.map((item, count) => {
@@ -6296,7 +6365,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 {this.state.showShipments == 1 && <ShipmentsInSupplyPlanComponent ref="shipmentChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} hideFourthComponent={this.hideFourthComponent} hideFifthComponent={this.hideFifthComponent} shipmentPage="whatIf" useLocalData={1} />}
                                 <h6 className="red" id="div2">{this.state.noFundsBudgetError || this.state.shipmentBatchError || this.state.shipmentError}</h6>
                                 <div className="">
-                                    <div id="shipmentsDetailsTable" />
+                                    <div id="shipmentsDetailsTable" className='ModalTabletextClr' />
                                 </div>
                                 {this.refs.shipmentChild != undefined && this.refs.shipmentChild.state.originalShipmentIdForPopup !== "" && <><br /><strong>{this.refs.shipmentChild != undefined && this.refs.shipmentChild.state.originalShipmentIdForPopup !== "" ? "For Shipment Id " + this.refs.shipmentChild.state.originalShipmentIdForPopup : ""}</strong></>}
                                 <h6 className="red" id="div3">{this.state.qtyCalculatorValidationError}</h6>
@@ -6681,7 +6750,8 @@ export default class WhatIfReportComponent extends React.Component {
                                     </ul>
                                 </FormGroup>
                                 <Row>
-                                    <Col xs="12" md="12" className="mb-4  mt-3 loadProgramHeight">
+                                <Col xs="12" md="12" className="mb-4  mt-3">
+                                    {/* <Col xs="12" md="12" className="mb-4  mt-3 loadProgramHeight"> */}
                                         <Nav tabs>
                                             <NavItem>
                                                 <NavLink

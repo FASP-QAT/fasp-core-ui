@@ -52,8 +52,15 @@ class AddProcurementAgentComponent extends Component {
         super(props);
         this.state = {
             displayColorPicker: false,
+            displayColorPickerDarkMode: false,
             background: '#000000',
             color: {
+                r: '241',
+                g: '112',
+                b: '19',
+                a: '1',
+            },
+            colorDarkMode: {
                 r: '241',
                 g: '112',
                 b: '19',
@@ -100,10 +107,22 @@ class AddProcurementAgentComponent extends Component {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
     /**
+     * Handles click event on color code picker for dark mode. Toggle color picker according to displayColorPickerDarkMode value. 
+     */
+    handleClickDarkMode = () => {
+        this.setState({ displayColorPickerDarkMode: !this.state.displayColorPickerDarkMode })
+    };
+    /**
      * Close color picker.
      */
     handleClose = () => {
         this.setState({ displayColorPicker: false })
+    };
+    /**
+     * Close color picker for dark mode.
+     */
+    handleCloseDarkMode = () => {
+        this.setState({ displayColorPickerDarkMode: false })
     };
     /**
      * Handles color change in color picker.
@@ -116,6 +135,22 @@ class AddProcurementAgentComponent extends Component {
         this.setState({
             color: color.rgb,
             rgba,
+            procurementAgent
+        },
+            () => {
+            });
+    };
+    /**
+     * Handles color change in color picker for dark mode.
+     * @param {*} colorDarkMode - selected color for dark mode.
+     */
+    handleChangeColorDarkMode = (colorDarkMode) => {
+        let { procurementAgent } = this.state;
+        procurementAgent.colorHtmlDarkCode = colorDarkMode.hex.toUpperCase();
+        let rgbaDarkMode = 'rgba(' + colorDarkMode.rgb.r + "," + colorDarkMode.rgb.g + "," + colorDarkMode.rgb.b + "," + colorDarkMode.rgb.a + ')';
+        this.setState({
+            colorDarkMode: colorDarkMode.rgb,
+            rgbaDarkMode,
             procurementAgent
         },
             () => {
@@ -549,6 +584,12 @@ class AddProcurementAgentComponent extends Component {
                     borderRadius: '2px',
                     background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${this.state.color.b}, ${this.state.color.a})`,
                 },
+                colorDarkMode: {
+                    width: '100px',
+                    height: '17px',
+                    borderRadius: '2px',
+                    background: `rgba(${this.state.colorDarkMode.r}, ${this.state.colorDarkMode.g}, ${this.state.colorDarkMode.b}, ${this.state.colorDarkMode.a})`,
+                },
                 swatch: {
                     padding: '5px',
                     background: '#fff',
@@ -791,6 +832,18 @@ class AddProcurementAgentComponent extends Component {
                                                     {this.state.displayColorPicker ? <div style={styles.popover}>
                                                         <div style={styles.cover} onClick={this.handleClose} />
                                                         <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
+                                                    </div> : null}
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCodeDarkMode')}</Label>
+                                                    <div bsSize="sm">
+                                                        <div style={styles.swatch} onClick={this.handleClickDarkMode}>
+                                                            <div style={styles.colorDarkMode} />
+                                                        </div>
+                                                    </div>
+                                                    {this.state.displayColorPickerDarkMode ? <div style={styles.popover}>
+                                                        <div style={styles.cover} onClick={this.handleCloseDarkMode} />
+                                                        <SketchPicker color={this.state.colorDarkMode} onChange={this.handleChangeColorDarkMode} />
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
