@@ -37,6 +37,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { DashboardTop } from '../Dashboard/DashboardTop.js';
 /**
  * Component for showing the dashboard.
  */
@@ -376,6 +377,7 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
+    DashboardTop();
     if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
