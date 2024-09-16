@@ -4385,7 +4385,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </FormGroup>
                                             <FormGroup className="col-md-5">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
-                                                <div className="controls edit Blackcolortext" style={{ backgroundColor: this.state.isDisabled ? "#e5edf5" : "#fff" }}>
+                                                <div className="controls edit Blackcolortext" style={{ backgroundColor: this.state.isDisabled ? "#e5edf5" : "transparent" }}>
                                                     <Picker
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         ref={this.pickRange1}

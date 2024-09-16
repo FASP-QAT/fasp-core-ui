@@ -2405,7 +2405,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table><br/>
-                                <span>{i18n.t('static.supplyPlan.actualInventoryNote1')}</span>
+                                <span className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote1')}</span>
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                                 <div className=" mt-3">
                                     <div id="adjustmentsTable" className=" " />
@@ -2423,7 +2423,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                     <>
                                         <h6 className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
-                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight"></div><br/>
+                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight bachTotaltDM"></div><br/>
                                         {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <span>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
                                         {this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                         {this.state.actualInventoryChanged && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}

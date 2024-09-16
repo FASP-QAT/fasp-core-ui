@@ -3610,7 +3610,7 @@ observer.observe(document.documentElement, {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                    <div className="offset-4 col-md-8"> <span className='text-blackD'>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                 </div>}
                                         </div>
                                     </div>
