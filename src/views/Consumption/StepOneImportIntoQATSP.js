@@ -70,7 +70,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPeriod: '',
             selSource1: [],
             selectedForecastProgramDesc: '',
-            toggleDoNotImport: false
+            toggleDoNotImport: false,
+            isForecastOver: false,
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -565,7 +566,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var programIdSplit = programId != 0 ? programId.split("_")[0] : 0;
-        if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0 && (this.state.rangeValue.from.year != '' && this.state.rangeValue.from.month != '' && this.state.rangeValue.to.year != '' && this.state.rangeValue.to.month != '')) {
+        if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0 && (this.state.rangeValue.from.year != '' && this.state.rangeValue.from.month != '' && this.state.rangeValue.to.year != '' && this.state.rangeValue.to.month != '') && this.state.isForecastOver == false) {
             let selectedSupplyPlanProgram = this.state.programObj;
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
@@ -1005,6 +1006,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartYear = formattedDate.getFullYear();
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
         }
+        this.setState({isForecastOver: isForecastOver});//to show/hide next button
         if (isForecastOver) {
             //old
             // defaultForecastStartYear = "";
@@ -1472,7 +1474,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
-                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-3" style={{ "marginLeft": "20px", "marginTop": "36px" }}>
                             <Input
                                 className="form-check-input"
                                 type="checkbox"
@@ -1487,6 +1489,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 {i18n.t('static.import.doNoImportCheckbox')}
                             </Label>
                         </FormGroup>}
+                        <p class="col-md-12 red">{i18n.t('static.versionSettings.note')}: <i>Forecast consumption cannot be imported when forecast period is over.</i></p>
                     </div>
                 </div>
                 <div className="consumptionDataEntryTable" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0 || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="") ? "none" : "block" }} >
