@@ -2422,7 +2422,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 16) {
-            var valid = checkValidtion("text", "Q", y, rowData[16], elInstance);
+            var valid = checkValidtion("text", "Q", y, elInstance.getValueFromCoords(16, y, true), elInstance);
             elInstance.setValueFromCoords(17, y, "", true);
             if (valid == true) {
                 var budgetList = this.state.budgetListAll;
@@ -3693,7 +3693,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             if (map.get("42") != undefined && map.get("42") != "" && map.get("42") != 0) {
                 var sblIndex = shipmentBudgetList.findIndex(c => (map.get("2") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
                 if (sblIndex != -1) {
-                    if (map.get(0).toString() == "true" && map.get(4) == 8 && map.get("34").toString() == "true") {
+                    if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
                         var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         var freightCost = elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         shipmentBudgetList[sblIndex].shipmentAmt = Number(productCost) + Number(freightCost);
@@ -3705,7 +3705,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         shipmentBudgetList=shipmentBudgetList.filter((c,index)=>index!=sblIndex);
                     }
                 }else{
-                    if (map.get(0).toString() == "true" && map.get(4) == 8 && map.get("34").toString() == "true") {
+                    if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
                         var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         var freightCost = elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
@@ -3891,7 +3891,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     valid = false;
                 }
                 if (json[y][1].toString() == "false") {
-                    var validation = checkValidtion("text", "Q", y, rowData[16], elInstance);
+                    var validation = checkValidtion("text", "Q", y, elInstance.getValueFromCoords(16, y, true), elInstance);
                 } else {
                     var validation = true;
                 }
@@ -4248,7 +4248,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 if (map.get("42") != undefined && map.get("42") != "" && map.get("42") != 0) {
                                     var sblIndex = shipmentBudgetList.findIndex(c => (map.get("2") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
                                     if (sblIndex != -1) {
-                                        if (map.get(0).toString() == "true" && map.get(4) == 8 && map.get("34").toString() == "true") {
+                                        if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
                                             var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                             var freightCost = elInstance.getValue(`W${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                             shipmentBudgetList[sblIndex].shipmentAmt = Number(productCost) + Number(freightCost);
@@ -4260,7 +4260,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             shipmentBudgetList=shipmentBudgetList.filter((c,index)=>index!=sblIndex);
                                         }
                                     }else{
-                                        if (map.get(0).toString() == "true" && map.get(4) == 8 && map.get("34").toString() == "true") {
+                                        if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
                                             var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                             var freightCost = elInstance.getValue(`W${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                             var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
