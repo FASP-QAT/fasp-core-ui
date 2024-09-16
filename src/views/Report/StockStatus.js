@@ -933,6 +933,7 @@ class StockStatus extends Component {
               label: i18n.t('static.report.stock'),
               yAxisID: 'A',
               type: 'line',
+              stack:7,
               borderColor: '#cfcdc9',
               ticks: {
                 fontSize: 2,
@@ -1016,7 +1017,6 @@ class StockStatus extends Component {
             var colourArray = ["#002F6C","#BA0C2F","#118B70","#F48521","#A7C6ED","#651D32","#6C6463","#f0bc52","#49A4A1","#212721"]
             this.state.programId.map((e, i) => {
               reportingUnitList.map((r, j) => {
-                count += 1;
                 programCount += 1;
                 var viewBy = this.state.viewById;
                 var planningUnitId = "";
@@ -1026,7 +1026,6 @@ class StockStatus extends Component {
                   var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
                   planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
                 }
-                count += 1;
                 if (count > 10) {
                   count = 0;
                 }
@@ -1048,6 +1047,7 @@ class StockStatus extends Component {
                     return count
                   })
                 })
+                count += 1;
               })
             })
           } else {
@@ -1135,7 +1135,7 @@ class StockStatus extends Component {
           };
           var chartOptions = {
             title: {
-              display: true,
+              display: false,
               text: entityname1
             },
             scales: {
@@ -1149,7 +1149,7 @@ class StockStatus extends Component {
                   fontSize: "12",
                   fontColor: 'black'
                 },
-                stacked: true,
+                // stacked: true,
                 ticks: {
                   beginAtZero: true,
                   fontColor: 'black',
@@ -1207,7 +1207,7 @@ class StockStatus extends Component {
                   fontStyle: "normal",
                   fontSize: "12"
                 },
-                // stacked: true,
+                stacked: true,
                 ticks: {
                   fontColor: 'black',
                   fontStyle: "normal",
@@ -1812,7 +1812,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
       b = getLabelText(b.label, lang).toLowerCase();
       return a < b ? -1 : a > b ? 1 : 0;
     }).map((item, i) => {
-      return ({ label: getLabelText(item.label, this.state.lang) })
+      return ({ label: getLabelText(item.label, this.state.lang), value:item.id })
     }, this);
     var reportingUnitList = (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId);
     var graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
@@ -1986,6 +1986,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             fontStyle: "normal",
             fontSize: "12"
           },
+          stacked: true,
           ticks: {
             fontColor:fontColor,
             fontStyle: "normal",
@@ -2090,8 +2091,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         label: i18n.t('static.report.stock'),
         yAxisID: 'A',
         type: 'line',
-        backgroundColor: colors[1],
-                    borderColor: colors[1],
+        stack:7,
+        borderColor: '#cfcdc9',
         ticks: {
           fontSize: 2,
           fontColor: 'transparent',
@@ -2229,7 +2230,6 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var colourArray = ["#002F6C","#BA0C2F","#118B70","#F48521","#A7C6ED","#651D32","#6C6463","#f0bc52","#49A4A1","#212721"]
         this.state.programId.map((e, i) => {
           reportingUnitList.map((r, j) => {
-            count += 1;
             programCount += 1;
             var viewBy = this.state.viewById;
             var planningUnitId = "";
@@ -2239,7 +2239,6 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
               var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
               planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
             }
-            count += 1;
             if (count > 10) {
               count = 0;
             }
@@ -2261,6 +2260,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 return count
               })
             })
+            count += 1;
           })
         })
       }
@@ -2513,9 +2513,9 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                           </FormGroup>
                         }
                         <div className="col-md-12 text-center">
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>=1 && <span align="center" className='text-blackD'>{entityname1}</span>}<br/>
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>=1 && <span className='text-blackD' id="programIdsLabels" align="center">{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.map(ele => ele.label).toString()):""}</span>}<br/>
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>=1 && <span id="planningUnitIdsLabels" className='text-blackD' align="center">{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).toString()):""}</span>}
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.map(ele => ele.label).join(", ")):""}</span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")):""}</span>}
                           <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
@@ -2565,16 +2565,16 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         <th className="text-center" colSpan="6"> {i18n.t('static.report.stock')} </th>
                       </tr>
                       <tr>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.openingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.openingBalanceTooltipMultiProgram')):i18n('static.stockStatus.openingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.forecastedTooltipSingleProgram'):i18n.t('static.stockStatus.forecastedTooltipMultiProgram')):i18n('static.stockStatus.forecastedTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.actualTooltipSingleProgram'):i18n.t('static.stockStatus.actualTooltipMultiProgram')):i18n('static.stockStatus.actualTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>
-                        {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.consensusTooltipSingleProgram'):i18n.t('static.stockStatus.consensusTooltipMultiProgram')):i18n('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> Consensus<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>}
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.openingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.openingBalanceTooltipMultiProgram')):i18n.t('static.stockStatus.openingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.forecastedTooltipSingleProgram'):i18n.t('static.stockStatus.forecastedTooltipMultiProgram')):i18n.t('static.stockStatus.forecastedTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.actualTooltipSingleProgram'):i18n.t('static.stockStatus.actualTooltipMultiProgram')):i18n.t('static.stockStatus.actualTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>
+                        {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.consensusTooltipSingleProgram'):i18n.t('static.stockStatus.consensusTooltipMultiProgram')):i18n.t('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> Consensus<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>}
                         <th className="text-center" title={this.state.yaxisEquUnit!=-1?i18n.t('static.stockStatus.shipmentQtyTooltipEU'):''} style={{ width: "200px" }}>{i18n.t('static.report.qty')}{this.state.yaxisEquUnit!=-1 && <i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i>}</th>
                         <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.adjustmentQtyTooltipSingleProgram'):i18n.t('static.stockStatus.adjustmentQtyTooltipMultiProgram')):i18n('static.stockStatus.adjustmentQtyTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.expiredStockTooltipSingleProgram'):i18n.t('static.stockStatus.expiredStockTooltipMultiProgram')):i18n('static.stockStatus.expiredStockTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.endingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.endingBalanceTooltipMultiProgram')):i18n('static.stockStatus.endingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
-                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.amcTooltipSingleProgram'):i18n.t('static.stockStatus.amcTooltipMultiProgram')):i18n('static.stockStatus.amcTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.adjustmentQtyTooltipSingleProgram'):i18n.t('static.stockStatus.adjustmentQtyTooltipMultiProgram')):i18n.t('static.stockStatus.adjustmentQtyTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.expiredStockTooltipSingleProgram'):i18n.t('static.stockStatus.expiredStockTooltipMultiProgram')):i18n.t('static.stockStatus.expiredStockTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.endingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.endingBalanceTooltipMultiProgram')):i18n.t('static.stockStatus.endingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
+                        <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.amcTooltipSingleProgram'):i18n.t('static.stockStatus.amcTooltipMultiProgram')):i18n.t('static.stockStatus.amcTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.amc')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
                         <th className="text-center" style={{ width: "200px" }}>{this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.mos') : i18n.t('static.supplyPlan.maxQty')}</th>
                         <th className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.unmetDemandStr')}</th>
                       </tr>

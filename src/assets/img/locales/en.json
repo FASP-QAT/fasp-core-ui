@@ -3462,10 +3462,14 @@
     "static.stockStatus.amcTooltipSingleProgram": "Dynamic value based on user-entered number of months past & future in the Update PU screen",
     "static.stockStatus.amcTooltipMultiProgram": "Sum of the individually calculated AMC values for selected programs each month",
     "static.stockStatus.amcTooltipEU": "Sum of the individually calculated AMC values for selected programs & planning units each month after converting to EU",
-    "static.supplyPlan.actualInventoryNote1": "Click white cells to see data entry rows. Click on the `Final Inventory` row to edit batch details.",
-    "static.supplyPlan.actualInventoryNote2": "Right click to add/remove a batch, or to see the batch ledger for that batch",
     "static.shipment.budgetWarning1": "The budget",
     "static.shipment.budgetWarning2": ") will go over budget by $",
     "static.shipment.budgetWarning3": "if you submit.",
-    "static.shipment.budgetWarning4": "Do you want to continue?"
+    "static.shipment.budgetWarning4": "Do you want to continue?",
+    "static.supplyPlan.actualInventoryNote1":"Click white cells to see data entry rows. Click on the `Final Inventory` row to edit batch details.",
+    "static.supplyPlan.actualInventoryNote2":"Right click to add/remove a batch, or to see the batch ledger for that batch",
+    "static.supplyPlan.batchTotal":"Batch Total",
+    "static.supplyPlan.inventoryTotal":"Inventory Total",
+    "static.supplyPlan.batchQtyNotAvailable":"Batch Total does not match Inventory Total",
+    "static.supplyPlan.combinationNotAllowed":"You cannot have combination of FEFO and other batch details"
 }
