@@ -59,8 +59,8 @@ const filterDataByFiscalYear = (data, fiscalStartMonth) => {
         let fiscalYearStart;
         let fiscalYearEnd;
 
-        const year = date.getFullYear();
-        const month = date.getMonth(); // 0 = Jan, 11 = Dec
+        const year = parseInt(moment(date).format("YYYY"));
+        const month = parseInt(moment(date).format("MM")) - 1; // 0 = Jan, 11 = Dec
 
         if (month >= (fiscalStartMonth - 1)) {
             fiscalYearStart = year;
