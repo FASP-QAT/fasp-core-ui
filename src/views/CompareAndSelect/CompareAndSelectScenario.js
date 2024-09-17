@@ -2620,26 +2620,10 @@ class CompareAndSelectScenario extends Component {
                     datasets: datasetsArr
                 };
             } else {
-                if (this.state.xAxisDisplayBy > 2 && this.state.xAxisDisplayBy < 9) {
-                    let arr = [...new Set(this.state.monthList1.map(ele => moment(ele).add(12, 'months').format("YYYY")))];
-                    arr.pop();
-                    bar = {
-                        labels: arr,
-                        datasets: datasetsArr
-                    };
-                } else if (this.state.xAxisDisplayBy > 8) {
-                    let arr = [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY")))];
-                    arr.pop();
-                    bar = {
-                        labels: arr,
-                        datasets: datasetsArr
-                    };
-                } else {
-                    bar = {
-                        labels: [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY")))],
-                        datasets: datasetsArr
-                    };
-                }
+                bar = {
+                    labels: [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY")))],
+                    datasets: datasetsArr
+                };
             }
         }
         const { forecastingUnitList } = this.state;
