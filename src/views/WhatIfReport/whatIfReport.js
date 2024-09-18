@@ -282,7 +282,7 @@ export default class WhatIfReportComponent extends React.Component {
             activeTab: new Array(3).fill('1'),
             takeDataFrom: "programData",
             planningUnitNotes: "",
-            multiplier:1
+            multiplier: 1
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
@@ -1139,7 +1139,20 @@ export default class WhatIfReportComponent extends React.Component {
                                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                         if (shipmentUnFundedList[i].localProcurement) {
-                                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                            var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                            var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                    addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                        addLeadTimes = programPA[0].localProcurementLeadTime;
+                                                    }
+                                                }
+                                            }
                                             var leadTimesPerStatus = addLeadTimes / 5;
                                             arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                             shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1152,24 +1165,111 @@ export default class WhatIfReportComponent extends React.Component {
                                             if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                                 submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                             }
+                                            var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                    submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                        submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                                    }
+                                                }
+                                            }
                                             var approvedToShippedLeadTime = "";
                                             approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                             if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                                 approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                             }
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                    approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                        approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                                    }
+                                                }
+                                            }
                                             var shippedToArrivedLeadTime = ""
                                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                                if (programPriceList.length > 0) {
+                                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                    if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                    } else {
+                                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                        if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                            shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                        }
+                                                    }
+                                                }
                                             } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                                if (programPriceList.length > 0) {
+                                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                    if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                    } else {
+                                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                        if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                            shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                        }
+                                                    }
+                                                }
                                             } else {
                                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                                if (programPriceList.length > 0) {
+                                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                    if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                    } else {
+                                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                        if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                            shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                        }
+                                                    }
+                                                }
                                             }
-                                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                    arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                        arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                                    }
+                                                }
+                                            }
+                                            var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                                    addLeadTimes = programPAPU[0].plannedToSubmittedLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                        addLeadTimes = programPA[0].plannedToSubmittedLeadTime;
+                                                    }
+                                                }
+                                            }
+                                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                             shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                             approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                             submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         }
                                         if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                             var index = 0;
@@ -1233,7 +1333,20 @@ export default class WhatIfReportComponent extends React.Component {
                                     var receivedDate = shipmentUnFundedList[i].receivedDate;
                                     var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                     if (shipmentUnFundedList[i].localProcurement) {
-                                        var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                        var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                    addLeadTimes = programPA[0].localProcurementLeadTime;
+                                                }
+                                            }
+                                        }
                                         var leadTimesPerStatus = addLeadTimes / 5;
                                         arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1242,28 +1355,115 @@ export default class WhatIfReportComponent extends React.Component {
                                         plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     } else {
                                         var ppUnit = papuResult;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                         var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                         if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                             submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                        }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                    submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                                }
+                                            }
                                         }
                                         var approvedToShippedLeadTime = "";
                                         approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                         if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                             approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                         }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                    approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                                }
+                                            }
+                                        }
                                         var shippedToArrivedLeadTime = ""
                                         if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                    }
+                                                }
+                                            }
                                         }
-                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                    arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                                }
+                                            }
+                                        }
+                                        var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                                plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                    plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                                }
+                                            }
+                                        }
+                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                        plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     }
                                     if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                         var index = 0;
@@ -1312,7 +1512,20 @@ export default class WhatIfReportComponent extends React.Component {
                                     var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                                     var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                     if (shipmentUnFundedList[i].localProcurement) {
-                                        var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                        var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                    addLeadTimes = programPA[0].localProcurementLeadTime;
+                                                }
+                                            }
+                                        }
                                         var leadTimesPerStatus = addLeadTimes / 5;
                                         arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1321,28 +1534,115 @@ export default class WhatIfReportComponent extends React.Component {
                                         plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     } else {
                                         var ppUnit = papuResult;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                         var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                         if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                             submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                        }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                    submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                                }
+                                            }
                                         }
                                         var approvedToShippedLeadTime = "";
                                         approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                         if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                             approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                         }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                    approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                                }
+                                            }
+                                        }
                                         var shippedToArrivedLeadTime = ""
                                         if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                    }
+                                                }
+                                            }
                                         }
-                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                    arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                                }
+                                            }
+                                        }
+                                        var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                                plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                    plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                                }
+                                            }
+                                        }
+                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                        plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     }
                                     if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                         var index = 0;
@@ -1957,7 +2257,20 @@ export default class WhatIfReportComponent extends React.Component {
                                 var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
-                                    var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                    var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                            addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                addLeadTimes = programPA[0].localProcurementLeadTime;
+                                            }
+                                        }
+                                    }
                                     var leadTimesPerStatus = addLeadTimes / 5;
                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1966,28 +2279,115 @@ export default class WhatIfReportComponent extends React.Component {
                                     plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 } else {
                                     var ppUnit = papuResult;
+                                    var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                         submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                    }
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                            submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                            }
+                                        }
                                     }
                                     var approvedToShippedLeadTime = "";
                                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                         approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                     }
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                            approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                            }
+                                        }
+                                    }
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                }
+                                            }
+                                        }
                                     } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                }
+                                            }
+                                        }
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                }
+                                            }
+                                        }
                                     }
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                            arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                            }
+                                        }
+                                    }
+                                    var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                            plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                            }
+                                        }
+                                    }
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 }
                                 if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                     var index = 0;
@@ -2094,7 +2494,20 @@ export default class WhatIfReportComponent extends React.Component {
                             var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                             var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                             if (shipmentUnFundedList[i].localProcurement) {
-                                var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                        addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                            addLeadTimes = programPA[0].localProcurementLeadTime;
+                                        }
+                                    }
+                                }
                                 var leadTimesPerStatus = addLeadTimes / 5;
                                 arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2103,28 +2516,115 @@ export default class WhatIfReportComponent extends React.Component {
                                 plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 var ppUnit = papuResult;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                     submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                        submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                            submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                        }
+                                    }
                                 }
                                 var approvedToShippedLeadTime = "";
                                 approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                 if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                     approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                 }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                        approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                            approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                        }
+                                    }
+                                }
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                            }
+                                        }
+                                    }
                                 }
-                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                        arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                            arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                        }
+                                    }
+                                }
+                                var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                        plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                            plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                        }
+                                    }
+                                }
+                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                 var index = 0;
@@ -2217,7 +2717,20 @@ export default class WhatIfReportComponent extends React.Component {
                             var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                             var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                             if (shipmentUnFundedList[i].localProcurement) {
-                                var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                        addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                            addLeadTimes = programPA[0].localProcurementLeadTime;
+                                        }
+                                    }
+                                }
                                 var leadTimesPerStatus = addLeadTimes / 5;
                                 arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2226,28 +2739,115 @@ export default class WhatIfReportComponent extends React.Component {
                                 plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 var ppUnit = papuResult;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                     submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                        submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                            submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                        }
+                                    }
                                 }
                                 var approvedToShippedLeadTime = "";
                                 approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                 if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                     approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                 }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                        approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                            approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                        }
+                                    }
+                                }
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                            }
+                                        }
+                                    }
                                 }
-                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                        arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                            arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                        }
+                                    }
+                                }
+                                var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                        plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                            plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                        }
+                                    }
+                                }
+                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                 var index = 0;
@@ -3131,9 +3731,9 @@ export default class WhatIfReportComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            label: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             value: myResult[i].id,
                             programId: myResult[i].programId
                         }
@@ -3315,7 +3915,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         rcpuResult = rcpuRequest.result;
                                         var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                                         var startDate = this.state.startDate;
-                                        var monthDifference=this.state.monthCount;
+                                        var monthDifference = this.state.monthCount;
                                         if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
                                             startDate = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
                                             localStorage.setItem("sesStartDate", JSON.stringify(startDate));
@@ -3345,7 +3945,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             realmCountryPlanningUnitListAll: rcpuResult,
                                             minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
                                             startDate: startDate,
-                                            monthCount:monthDifference,
+                                            monthCount: monthDifference,
                                             planningUnitListForConsumption: planningUnitListForConsumption,
                                             loading: false
                                         }, () => {
@@ -3410,26 +4010,26 @@ export default class WhatIfReportComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-        if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+        if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
             setTimeout(function () {
-            document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="none";
-            });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="none";
-            })
+                document.getElementsByClassName("supplyplan-larrow")[0].style.display = "none";
+                [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                    item.style.display = "none";
+                });
+                [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                    item.style.display = "none";
+                })
             }, 500);
-            curDate=moment(cutOffDate);
-            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                currentDate=moment(cutOffDate);
+            curDate = moment(cutOffDate);
+            if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
+                currentDate = moment(cutOffDate);
             }
-        }else{
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="block";
+        } else {
+            [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                item.style.display = "block";
             });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="block";
+            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                item.style.display = "block";
             })
         }
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
@@ -6937,7 +7537,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=undefined && this.state.generalProgramJson.cutOffDate!=null && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
+                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson != undefined && this.state.generalProgramJson != null && this.state.generalProgramJson != "" && this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != '' ? ' (' + i18n.t('static.supplyPlan.start') + ' ' + moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY') + ')' : '')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>

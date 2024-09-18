@@ -926,7 +926,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     }else{
                                                                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                         if(programPA.length>0 && programPA[0].localProcurementLeadTime!==null){
-                                                                                            addLeadTimes=programPAPU[0].localProcurementLeadTime;
+                                                                                            addLeadTimes=programPA[0].localProcurementLeadTime;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -950,7 +950,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     }else{
                                                                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                         if(programPA.length>0 && programPA[0].submittedToApprovedLeadTime!==null){
-                                                                                            submittedToApprovedLeadTime=programPAPU[0].submittedToApprovedLeadTime;
+                                                                                            submittedToApprovedLeadTime=programPA[0].submittedToApprovedLeadTime;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -966,7 +966,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     }else{
                                                                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                         if(programPA.length>0 && programPA[0].approvedToShippedLeadTime!==null){
-                                                                                            approvedToShippedLeadTime=programPAPU[0].approvedToShippedLeadTime;
+                                                                                            approvedToShippedLeadTime=programPA[0].approvedToShippedLeadTime;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -980,7 +980,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                         }else{
                                                                                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                             if(programPA.length>0 && programPA[0].shippedToArrivedByAirLeadTime!==null){
-                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                                                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedByAirLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
@@ -993,7 +993,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                         }else{
                                                                                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                             if(programPA.length>0 && programPA[0].shippedToArrivedByRoadLeadTime!==null){
-                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                                                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedByRoadLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
@@ -1006,7 +1006,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                         }else{
                                                                                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                             if(programPA.length>0 && programPA[0].shippedToArrivedBySeaLeadTime!==null){
-                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                                                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedBySeaLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
@@ -1019,7 +1019,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     }else{
                                                                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                         if(programPA.length>0 && programPA[0].arrivedToDeliveredLeadTime!==null){
-                                                                                            arrivedToDeliveredLeadTime=programPAPU[0].arrivedToDeliveredLeadTime;
+                                                                                            arrivedToDeliveredLeadTime=programPA[0].arrivedToDeliveredLeadTime;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -1031,7 +1031,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     }else{
                                                                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                                                                         if(programPA.length>0 && programPA[0].plannedToSubmittedLeadTime!==null){
-                                                                                            plannedToSubmittedLeadTime=programPAPU[0].plannedToSubmittedLeadTime;
+                                                                                            plannedToSubmittedLeadTime=programPA[0].plannedToSubmittedLeadTime;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -1906,7 +1906,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].localProcurementLeadTime!==null){
-                                addLeadTimes=programPAPU[0].localProcurementLeadTime;
+                                addLeadTimes=programPA[0].localProcurementLeadTime;
                             }
                         }
                     }
@@ -1929,7 +1929,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].submittedToApprovedLeadTime!==null){
-                                submittedToApprovedLeadTime=programPAPU[0].submittedToApprovedLeadTime;
+                                submittedToApprovedLeadTime=programPA[0].submittedToApprovedLeadTime;
                             }
                         }
                     }
@@ -1945,7 +1945,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].approvedToShippedLeadTime!==null){
-                                approvedToShippedLeadTime=programPAPU[0].approvedToShippedLeadTime;
+                                approvedToShippedLeadTime=programPA[0].approvedToShippedLeadTime;
                             }
                         }
                     }
@@ -1959,7 +1959,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].shippedToArrivedByAirLeadTime!==null){
-                                    shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByAirLeadTime;
+                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedByAirLeadTime;
                                 }
                             }
                         }
@@ -1972,7 +1972,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].shippedToArrivedByRoadLeadTime!==null){
-                                    shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedByRoadLeadTime;
                                 }
                             }
                         }
@@ -1985,7 +1985,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].shippedToArrivedBySeaLeadTime!==null){
-                                    shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedBySeaLeadTime;
                                 }
                             }
                         }
@@ -1998,7 +1998,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].arrivedToDeliveredLeadTime!==null){
-                                arrivedToDeliveredLeadTime=programPAPU[0].arrivedToDeliveredLeadTime;
+                                arrivedToDeliveredLeadTime=programPA[0].arrivedToDeliveredLeadTime;
                             }
                         }
                     }
@@ -2010,7 +2010,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].plannedToSubmittedLeadTime!==null){
-                                plannedToSubmittedLeadTime=programPAPU[0].plannedToSubmittedLeadTime;
+                                plannedToSubmittedLeadTime=programPA[0].plannedToSubmittedLeadTime;
                             }
                         }
                     }
@@ -2365,7 +2365,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].seaFreightPerc!==null){
-                                    seaFreightPercentage=programPAPU[0].seaFreightPerc;
+                                    seaFreightPercentage=programPA[0].seaFreightPerc;
                                 }
                             }
                         }
@@ -2380,7 +2380,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].roadFreightPerc!==null){
-                                    roadFreightPercentage=programPAPU[0].roadFreightPerc;
+                                    roadFreightPercentage=programPA[0].roadFreightPerc;
                                 }
                             }
                         }
@@ -2395,7 +2395,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].airFreightPerc!==null){
-                                    airFreightPercentage=programPAPU[0].airFreightPerc;
+                                    airFreightPercentage=programPA[0].airFreightPerc;
                                 }
                             }
                         }
@@ -2467,7 +2467,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].seaFreightPerc!==null){
-                                    seaFreightPercentage=programPAPU[0].seaFreightPerc;
+                                    seaFreightPercentage=programPA[0].seaFreightPerc;
                                 }
                             }
                         }
@@ -2482,7 +2482,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].roadFreightPerc!==null){
-                                    roadFreightPercentage=programPAPU[0].roadFreightPerc;
+                                    roadFreightPercentage=programPA[0].roadFreightPerc;
                                 }
                             }
                         }
@@ -2497,7 +2497,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             }else{
                                 var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                 if(programPA.length>0 && programPA[0].airFreightPerc!==null){
-                                    airFreightPercentage=programPAPU[0].airFreightPerc;
+                                    airFreightPercentage=programPA[0].airFreightPerc;
                                 }
                             }
                         }
@@ -2529,7 +2529,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].seaFreightPerc!==null){
-                                seaFreightPercentage=programPAPU[0].seaFreightPerc;
+                                seaFreightPercentage=programPA[0].seaFreightPerc;
                             }
                         }
                     }
@@ -2544,7 +2544,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].roadFreightPerc!==null){
-                                roadFreightPercentage=programPAPU[0].roadFreightPerc;
+                                roadFreightPercentage=programPA[0].roadFreightPerc;
                             }
                         }
                     }
@@ -2559,7 +2559,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].airFreightPerc!==null){
-                                airFreightPercentage=programPAPU[0].airFreightPerc;
+                                airFreightPercentage=programPA[0].airFreightPerc;
                             }
                         }
                     }
@@ -2589,7 +2589,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].seaFreightPerc!==null){
-                                seaFreightPercentage=programPAPU[0].seaFreightPerc;
+                                seaFreightPercentage=programPA[0].seaFreightPerc;
                             }
                         }
                     }
@@ -2604,7 +2604,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].roadFreightPerc!==null){
-                                roadFreightPercentage=programPAPU[0].roadFreightPerc;
+                                roadFreightPercentage=programPA[0].roadFreightPerc;
                             }
                         }
                     }
@@ -2619,7 +2619,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].airFreightPerc!==null){
-                                airFreightPercentage=programPAPU[0].airFreightPerc;
+                                airFreightPercentage=programPA[0].airFreightPerc;
                             }
                         }
                     }
@@ -3140,7 +3140,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }else{
                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                         if(programPA.length>0 && programPA[0].localProcurementLeadTime!==null){
-                            addLeadTimes=programPAPU[0].localProcurementLeadTime;
+                            addLeadTimes=programPA[0].localProcurementLeadTime;
                         }
                     }
                 }
@@ -3158,7 +3158,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }else{
                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                         if(programPA.length>0 && programPA[0].submittedToApprovedLeadTime!==null){
-                            submittedToApprovedLeadTime=programPAPU[0].submittedToApprovedLeadTime;
+                            submittedToApprovedLeadTime=programPA[0].submittedToApprovedLeadTime;
                         }
                     }
                 }
@@ -3174,7 +3174,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }else{
                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                         if(programPA.length>0 && programPA[0].approvedToShippedLeadTime!==null){
-                            approvedToShippedLeadTime=programPAPU[0].approvedToShippedLeadTime;
+                            approvedToShippedLeadTime=programPA[0].approvedToShippedLeadTime;
                         }
                     }
                 }
@@ -3188,7 +3188,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].shippedToArrivedByAirLeadTime!==null){
-                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByAirLeadTime;
+                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedByAirLeadTime;
                             }
                         }
                     }
@@ -3201,7 +3201,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].shippedToArrivedByRoadLeadTime!==null){
-                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedByRoadLeadTime;
                             }
                         }
                     }
@@ -3214,7 +3214,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         }else{
                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                             if(programPA.length>0 && programPA[0].shippedToArrivedBySeaLeadTime!==null){
-                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedBySeaLeadTime;
                             }
                         }
                     }
@@ -3227,7 +3227,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }else{
                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                         if(programPA.length>0 && programPA[0].plannedToSubmittedLeadTime!==null){
-                            plannedToSubmittedLeadTime=programPAPU[0].plannedToSubmittedLeadTime;
+                            plannedToSubmittedLeadTime=programPA[0].plannedToSubmittedLeadTime;
                         }
                     }
                 }
@@ -3239,7 +3239,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }else{
                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                         if(programPA.length>0 && programPA[0].arrivedToDeliveredLeadTime!==null){
-                            arrivedToDeliveredLeadTime=programPAPU[0].arrivedToDeliveredLeadTime;
+                            arrivedToDeliveredLeadTime=programPA[0].arrivedToDeliveredLeadTime;
                         }
                     }
                 }
@@ -3340,7 +3340,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }else{
                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                         if(programPA.length>0 && programPA[0].localProcurementLeadTime!==null){
-                                            addLeadTimes=programPAPU[0].localProcurementLeadTime;
+                                            addLeadTimes=programPA[0].localProcurementLeadTime;
                                         }
                                     }
                                 }
@@ -3364,7 +3364,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }else{
                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                         if(programPA.length>0 && programPA[0].submittedToApprovedLeadTime!==null){
-                                            submittedToApprovedLeadTime=programPAPU[0].submittedToApprovedLeadTime;
+                                            submittedToApprovedLeadTime=programPA[0].submittedToApprovedLeadTime;
                                         }
                                     }
                                 }
@@ -3380,7 +3380,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }else{
                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                         if(programPA.length>0 && programPA[0].approvedToShippedLeadTime!==null){
-                                            approvedToShippedLeadTime=programPAPU[0].approvedToShippedLeadTime;
+                                            approvedToShippedLeadTime=programPA[0].approvedToShippedLeadTime;
                                         }
                                     }
                                 }
@@ -3394,7 +3394,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }else{
                                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                             if(programPA.length>0 && programPA[0].shippedToArrivedByAirLeadTime!==null){
-                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedByAirLeadTime;
                                             }
                                         }
                                     }
@@ -3407,7 +3407,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }else{
                                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                             if(programPA.length>0 && programPA[0].shippedToArrivedByRoadLeadTime!==null){
-                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedByRoadLeadTime;
                                             }
                                         }
                                     }
@@ -3420,7 +3420,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                         }else{
                                             var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                             if(programPA.length>0 && programPA[0].shippedToArrivedBySeaLeadTime!==null){
-                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                shippedToArrivedLeadTime=programPA[0].shippedToArrivedBySeaLeadTime;
                                             }
                                         }
                                     }
@@ -3433,7 +3433,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }else{
                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                         if(programPA.length>0 && programPA[0].arrivedToDeliveredLeadTime!==null){
-                                            arrivedToDeliveredLeadTime=programPAPU[0].arrivedToDeliveredLeadTime;
+                                            arrivedToDeliveredLeadTime=programPA[0].arrivedToDeliveredLeadTime;
                                         }
                                     }
                                 }
@@ -3445,7 +3445,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     }else{
                                         var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
                                         if(programPA.length>0 && programPA[0].plannedToSubmittedLeadTime!==null){
-                                            plannedToSubmittedLeadTime=programPAPU[0].plannedToSubmittedLeadTime;
+                                            plannedToSubmittedLeadTime=programPA[0].plannedToSubmittedLeadTime;
                                         }
                                     }
                                 }
