@@ -431,6 +431,7 @@ const routes = [
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/extrapolation/extrapolateData', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
   { path: '/extrapolation/extrapolateData/:planningUnitId', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
+  { path: '/extrapolation/extrapolateData/:color/:message', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
   { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'static.commitProgram.commitProgram' }), component: CommitTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
