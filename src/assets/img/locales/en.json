@@ -3361,5 +3361,6 @@
     "static.supplyPlan.batchTotal":"Batch Total",
     "static.supplyPlan.inventoryTotal":"Inventory Total",
     "static.supplyPlan.batchQtyNotAvailable":"Batch Total does not match Inventory Total",
-    "static.supplyPlan.combinationNotAllowed":"You cannot have combination of FEFO and other batch details"
+    "static.supplyPlan.combinationNotAllowed":"You cannot have combination of FEFO and other batch details",
+    "static.supplyPlan.qatAutocalculations":"QAT auto-calculation"
 }
