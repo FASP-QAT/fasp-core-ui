@@ -9,7 +9,7 @@
  * @param {*} treeId This is the tree Id to which this node belongs
  * @param {*} isTemplate This is flag used to check if the calculations has be done for template or for a tree
  */
-export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
+export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, calculateAggregationDownward, allNodeDataListMaster, calculatedNodeListMaster) {
     nodeId = -1;
     var datasetJson = {};
     if (!isTemplate) {
@@ -17,7 +17,8 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
     } else {
         datasetJson = dataset;
     }
-    var allNodeDataList = [];
+    var allNodeDataList = allNodeDataListMaster ? allNodeDataListMaster : [];
+    var calculatedNodeList = calculatedNodeListMaster ? calculatedNodeListMaster : [];
     var treeList = [];
     if (!isTemplate) {
         treeList = datasetJson.treeList;
@@ -47,12 +48,20 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
             flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
         }
         var transferToNodeList = [];
+        flatListUnsorted.filter(x => x.payload.nodeType.id == 6).map(t => {
+            t.payload.downwardAggregationList.map(x => {
+                if(flatList.filter(e => e.payload.nodeId == x.nodeId).length > 0) {
+                    flatList = flatList.concat(flatListUnsorted.filter(c => c.sortOrder.toString().startsWith(t.sortOrder.toString())))
+                }
+            });
+        })
+        flatList = [...new Set(flatList.map(ele => ele))];
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
-            if (payload.nodeType.id != 1) {
+            if (payload.nodeType.id != 1 && payload.nodeType.id != 6) {
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
-                if (scenarioId != -1) {
+                if (scenarioId != -1 && treeList[tl].treeId == treeId) {
                     if (!isTemplate) {
                         scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
                     } else {
@@ -87,7 +96,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
         var sortedFlatListId = [];
         var sortedFlatListNodeDataId = [];
         for (var ml = 0; ml <= maxLevel; ml++) {
-            var flatListForLevel = flatList.filter(c => c.level == ml && c.payload.nodeType.id != 1);
+            var flatListForLevel = flatList.filter(c => c.level == ml && c.payload.nodeType.id != 1 && c.payload.nodeType.id != 6);
             for (var fll = 0; fll < flatListForLevel.length; fll++) {
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var filterFlatListWhoseCalculationsAreRemaining = flatListForLevel.filter(c => !sortedFlatListId.includes(c.id));
@@ -113,10 +122,10 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
             }
         }
         var overallTransferList = [];
-        flatList = sortedFlatList.concat(flatList.filter(c => c.payload.nodeType.id == 1)).concat(flatList.filter(c => c.payload.nodeType.id != 1 && !sortedFlatListId.includes(c.id)));
+        flatList = sortedFlatList.concat(flatList.filter(c => c.payload.nodeType.id == 1 || c.payload.nodeType.id == 6)).concat(flatList.filter(c => c.payload.nodeType.id != 1 && c.payload.nodeType.id != 6 && !sortedFlatListId.includes(c.id)));
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
-            if (payload.nodeType.id != 1 && (payload.extrapolation == undefined || payload.extrapolation.toString() == "false")) {
+            if (payload.nodeType.id != 1 && payload.nodeType.id != 6 && (payload.extrapolation == undefined || payload.extrapolation.toString() == "false")) {
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (!isTemplate) {
@@ -645,17 +654,103 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                     nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                 }
-                if (nodeId == -1) {
+                // if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
                     payload.nodeDataMap = nodeDataMap;
                     flatListUnsorted[findIndex].payload = payload;
                     var findIndex1 = flatList.findIndex(c => c.id == flatList[fl].id);
                     flatList[findIndex1].payload = payload;
-                }
+                // }
             } else {
             }
         }
+        var aggregateDownwardNodeList = flatList.filter(c => c.payload.nodeType.id == 6);
         var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
+        for (var fl = 0; fl < aggregateDownwardNodeList.length; fl++) {
+            if(!calculateAggregationDownward || (calculateAggregationDownward && !calculatedNodeList.includes(aggregateDownwardNodeList[fl].id))) {
+                var payload = aggregateDownwardNodeList[fl].payload;
+                if (payload.nodeType.id == 6) {
+                    calculatedNodeList.push(aggregateDownwardNodeList[fl].id);
+                    var nodeDataMap = payload.nodeDataMap;
+                    var scenarioList = tree.scenarioList;
+                    if (scenarioId != -1) {
+                        if (!isTemplate) {
+                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                        } else {
+                            scenarioList = scenarioList.filter(c => c.id == scenarioId);
+                        }
+                    }
+                    for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                        var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
+                        var childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
+                        var monthList = [];
+                        childNodeFlatList.map(d => {
+                            if (d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList != undefined && d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList.length > 0) {
+                                monthList.push(d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList[0].month);
+                            } else {
+                                monthList.push((d.payload.nodeDataMap[scenarioList[ndm].id][0].monthNo));
+                            }
+                        })
+                        var minMonth = Math.min(...monthList);
+                        var curDate = minMonth;
+                        var nodeDataList = [];
+                        for (var i = curDate; i <= datasetJson.monthsInFuture; i++) {
+                            var aggregatedStartValue = 0;
+                            var aggregatedEndValue = 0;
+                            var aggregatedCalculatedValue = 0;
+                            var aggregatedDifference = 0;
+                            var aggregatedSeasonality = 0;
+                            var aggregatedManualChange = 0;
+                            if (i != 0) {
+                                for (var cnfl = 0; cnfl < childNodeFlatList.length; cnfl++) {
+                                    var childScenario = (childNodeFlatList[cnfl].payload.nodeDataMap[scenarioList[ndm].id]);
+                                    if (childScenario != undefined && childScenario.length > 0) {
+                                        var childNodeMomData = childScenario[0].nodeDataMomList;
+                                        var nodeDataListFilteredFilter = (childNodeMomData.filter(c => c.month == i));
+                                        if (nodeDataListFilteredFilter.length > 0) {
+                                            var nodeDataListFiltered = nodeDataListFilteredFilter[0];
+                                            aggregatedStartValue += Number(nodeDataListFiltered.startValue);
+                                            aggregatedEndValue += Number(nodeDataListFiltered.endValue);
+                                            aggregatedCalculatedValue += Number(nodeDataListFiltered.calculatedValue);
+                                            aggregatedDifference += Number(nodeDataListFiltered.difference);
+                                            aggregatedSeasonality += Number(nodeDataListFiltered.seasonalityPerc);
+                                            aggregatedManualChange += Number(nodeDataListFiltered.manualChange);
+                                        }
+                                    }
+                                }
+                                nodeDataList.push(
+                                    {
+                                        month: i,
+                                        startValue: aggregatedStartValue,
+                                        endValue: aggregatedEndValue,
+                                        calculatedValue: aggregatedCalculatedValue,
+                                        difference: aggregatedDifference,
+                                        seasonalityPerc: aggregatedSeasonality,
+                                        manualChange: aggregatedManualChange,
+                                        calculatedMmdValue: aggregatedCalculatedValue
+                                    }
+                                );
+                            }
+                        }
+                        allNodeDataList.push({
+                            nodeId: aggregateDownwardNodeList[fl].id,
+                            nodeDataMomList: nodeDataList
+                        })
+                        nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                        nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                    }
+                    // if (nodeId == -1) {
+                        var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateDownwardNodeList[fl].id);
+                        payload.nodeDataMap = nodeDataMap;
+                        flatListUnsorted[findIndex].payload = payload;
+                        var findIndex1 = flatList.findIndex(c => c.id == aggregateDownwardNodeList[fl].id);
+                        flatList[findIndex1].payload = payload;
+                    // }
+                }
+                calculateModelingDataForTreeTemplate(dataset, props, page, aggregateDownwardNodeList[fl].id, scenarioId, type, treeId, true, true, allNodeDataList, calculatedNodeList)
+            }
+        }
+        
         for (var fl = aggregateNodeList.length; fl > 0; fl--) {
             var payload = aggregateNodeList[fl - 1].payload;
             if (payload.nodeType.id == 1) {
@@ -727,13 +822,13 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                     nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                 }
-                if (nodeId == -1) {
+                // if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
                     payload.nodeDataMap = nodeDataMap;
                     flatListUnsorted[findIndex].payload = payload;
                     var findIndex1 = flatList.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
                     flatList[findIndex1].payload = payload;
-                }
+                // }
             }
         }
     }

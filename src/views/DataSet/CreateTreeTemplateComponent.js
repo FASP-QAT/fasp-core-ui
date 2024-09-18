@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { OrgDiagram } from 'basicprimitivesreact';
-import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness } from 'basicprimitives';
+import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, ConnectorAnnotationConfig, AnnotationType, LineType, Thickness, ConnectorShapeType, ConnectorPlacementType, HighlightPathAnnotationConfig } from 'basicprimitives';
 import { DropTarget, DragSource } from 'react-dnd';
 import i18n from '../../i18n'
 import { confirmAlert } from 'react-confirm-alert';
@@ -826,7 +826,9 @@ export default class CreateTreeTemplate extends Component {
             copyLoader: false,
             invalidNodeError: false,
             invalidNodeType: "",
-            invalidParentNodeType: ""
+            invalidParentNodeType: "",
+            downwardAggregationList: [],
+            multiselectError: false
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -959,6 +961,7 @@ export default class CreateTreeTemplate extends Component {
         this.resetCopyMoveModal = this.resetCopyMoveModal.bind(this);
         this.toggleTooltipNodeUnit = this.toggleTooltipNodeUnit.bind(this);
         this.setCopyModeling = this.setCopyModeling.bind(this);
+        this.downwardAggregationListChange = this.downwardAggregationListChange.bind(this);
     }
     /**
        * Hides the message in div3 after 30 seconds.
@@ -3223,6 +3226,24 @@ export default class CreateTreeTemplate extends Component {
                     this.buildMomJexcelPercent();
                 }
             });
+        }
+    }
+    downwardAggregationListChange(daList) {
+        this.setState({
+            isChanged: true
+        })
+        let { currentItemConfig } = this.state;
+        let tempList = [];
+        daList.map(x => tempList.push({
+            treeId: x.value.split("~")[0],
+            scenarioId: x.value.split("~")[1],
+            nodeId: x.value.split("~")[2]
+        }))
+        currentItemConfig.context.payload.downwardAggregationList = tempList;
+        if(tempList.length == 0) {
+            this.setState({
+                multiselectError: true
+            })
         }
     }
     /**
@@ -6061,6 +6082,18 @@ export default class CreateTreeTemplate extends Component {
     getNodeTypeFollowUpList(nodeTypeId) {
         var nodeType;
         var nodeTypeList = [];
+        var downwardAggregationList = [];
+        this.state.treeTemplate.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (t.level == (this.state.addNodeFlag ? this.state.currentItemConfig.context.level : this.state.currentItemConfig.context.level-1) ? downwardAggregationList.push({label: t.payload.label.label_en, value: this.state.treeTemplate.treeTemplateId+"~"+"0"+"~"+t.payload.nodeId}) : "" ))
+        // for(var i = 0; i < this.state.treeTemplate.length; i++) {
+        //     for(var j = 0; j < this.state.treeTemplate[i].scenarioList.length; j++) {
+        //         if(this.state.treeTemplate[i].scenarioList[j].active) {
+        //             tempDownwardAggregationList.filter(x => x.value.split("~")[0] == this.state.treeTemplate[i].treeId).map(x => downwardAggregationList.push({
+        //                 label: x.label.split("~")[0]+" > "+this.state.treeTemplate[i].scenarioList[j].label.label_en+" > "+x.label.split("~")[1],
+        //                 value: x.value.split("~")[0]+"~"+this.state.treeTemplate[i].scenarioList[j].id+"~"+x.value.split("~")[1]
+        //             }))
+        //         }
+        //     }
+        // }
         if (nodeTypeId != 0) {
             nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
             for (let i = 0; i < nodeType.allowedChildList.length; i++) {
@@ -6071,7 +6104,8 @@ export default class CreateTreeTemplate extends Component {
             nodeTypeList = this.state.nodeTypeList.filter(c => c.id != 5);
         }
         this.setState({
-            nodeTypeFollowUpList: nodeTypeList
+            nodeTypeFollowUpList: nodeTypeList,
+            downwardAggregationList: downwardAggregationList
         }, () => {
             if (nodeTypeList.length == 1) {
                 const currentItemConfig = this.state.currentItemConfig;
@@ -8092,6 +8126,15 @@ export default class CreateTreeTemplate extends Component {
                 numberNode: false,
                 aggregationNode: false
             });
+        } else if (nodeTypeId == 6) {
+            this.setState({
+                numberNode: false,
+                aggregationNode: false
+            }, () => {
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = 0;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode = null;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].puNode = null;
+            });
         } else if (nodeTypeId == 2) {
             this.setState({
                 numberNode: false,
@@ -8625,6 +8668,9 @@ export default class CreateTreeTemplate extends Component {
                 currentTargetChangeNumberEdit: false
             });
         }
+        if (event.target.name == "downwardAggregationAllowed") {
+            currentItemConfig.context.payload.downwardAggregationAllowed = event.target.checked;
+        }
         if (event.target.name != "treeNameForCreateTree" && event.target.name != "forecastMethodIdForCreateTree" && event.target.name != "notesForCreateTree" && event.target.name != "activeForCreateTree" && event.target.name != "datasetIdModalForCreateTree" && event.target.name != "treeTemplateId" && event.target.name != "monthId") {
             this.setState({ isChanged: true })
         }
@@ -9000,8 +9046,8 @@ export default class CreateTreeTemplate extends Component {
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
-                numberNode: (data.context.payload.nodeType.id == 1 || data.context.payload.nodeType.id == 2 ? false : true),
-                aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
+                numberNode: (data.context.payload.nodeType.id == 1 || data.context.payload.nodeType.id == 6 || data.context.payload.nodeType.id == 2 ? false : true),
+                aggregationNode: (data.context.payload.nodeType.id == 1 || data.context.payload.nodeType.id == 6 ? false : true),
                 scalingList: (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList != null ? (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList : [],
                 highlightItem: item.id,
                 cursorItem: item.id,
@@ -9893,7 +9939,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id < 4 ? 'block' : 'none' }}>
                                                     <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="select"
@@ -10010,6 +10056,32 @@ export default class CreateTreeTemplate extends Component {
                                                         value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue == 0 ? "0" : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue.toString())}
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6 pl-5 pt-4" style={{ display: (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) ? 'block' : 'none' }}>
+                                                    <Input
+                                                        className="form-check-input checkboxMargin"
+                                                        type="checkbox"
+                                                        id="downwardAggregationAllowed"
+                                                        name="downwardAggregationAllowed"
+                                                        checked={this.state.currentItemConfig.context.payload.downwardAggregationAllowed}
+                                                        onClick={(e) => { this.dataChange(e) }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="downwardAggregationAllowed" style={{ fontSize: '12px' }}>
+                                                        <b>{'Available to be aggregated'}</b>
+                                                    </Label>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 6 ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">Source Node</Label>
+                                                    <MultiSelect
+                                                        name="downwardAggregationList"
+                                                        id="downwardAggregationList"
+                                                        options={this.state.downwardAggregationList.length > 0 ? this.state.downwardAggregationList : []}
+                                                        value={this.state.currentItemConfig.context.payload.downwardAggregationList ? this.state.currentItemConfig.context.payload.downwardAggregationList.map(x => ({value: x.treeId + "~" + x.scenarioId + "~" + x.nodeId, label: this.state.downwardAggregationList.filter(t => t.value == (x.treeId + "~" + x.scenarioId + "~" + x.nodeId))[0].label})) : []}
+                                                        onChange={(e) => { this.downwardAggregationListChange(e) }}
+                                                        labelledBy={i18n.t('static.common.select')}
+                                                    />
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6">
                                                     <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
@@ -11999,8 +12071,48 @@ export default class CreateTreeTemplate extends Component {
                 }));
             }
         }
+        var newItems = this.state.items;       
+        for (var i = 0; i < newItems.length; i++) {
+            if(newItems[i].payload.downwardAggregationList) {
+                for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                    treeLevelItems.push(new ConnectorAnnotationConfig({
+                        annotationType: AnnotationType.Connector,
+                        fromItem: parseInt(newItems[i].id),
+                        toItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                        labelSize: { width: 80, height: 30 },
+                        connectorShapeType: ConnectorShapeType.OneWay,
+                        color: Colors.Green,
+                        offset: 0,
+                        lineWidth: 2,
+                        lineType: LineType.Dashed,
+                        connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
+                        selectItems: false
+                    }));
+                    treeLevelItems.push({
+                        annotationType: AnnotationType.HighlightPath,
+                        items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                        color: "#FFFFFF",
+                        lineWidth: 10,
+                        opacity: 1,
+                        showArrows: false
+                    })
+                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent).filter(x => x.id != parseInt(newItems[i].id));
+                    for(var k = 0; k < tempValidLines.length; k++) {
+                        treeLevelItems.push({
+                            annotationType: AnnotationType.HighlightPath,
+                            items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
+                            color: "#000000",
+                            lineWidth: 1,
+                            opacity: 1,
+                            showArrows: false
+                        })
+                    }
+                }
+            }
+        }
         const config = {
             ...this.state,
+            items: newItems,
             pageFitMode: PageFitMode.None,
             hasSelectorCheckbox: Enabled.False,
             hasButtons: Enabled.True,
@@ -12159,8 +12271,8 @@ export default class CreateTreeTemplate extends Component {
                                         usageTemplateId: '',
                                         usageText: "",
                                         level0: true,
-                                        numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
-                                        aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
+                                        numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 6 || itemConfig.payload.nodeType.id == 2 ? false : true),
+                                        aggregationNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 6 ? false : true),
                                         addNodeFlag: true,
                                         openAddNodeModal: true,
                                         modelingChangedOrAdded: false,
@@ -12411,6 +12523,8 @@ export default class CreateTreeTemplate extends Component {
                                                 parent: item.parent,
                                                 payload: {
                                                     collapsed: item.payload.collapsed,
+                                                    downwardAggregationAllowed: item.payload.downwardAggregationAllowed,
+                                                    downwardAggregationList: item.payload.downwardAggregationList,
                                                     nodeId: item.payload.nodeId,
                                                     nodeType: {
                                                         id: item.payload.nodeType.id
