@@ -12067,6 +12067,15 @@ export default class CreateTreeTemplate extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelBackgroundRender: ((data) => {
+                var {context, width, height } = data;
+                var { title, fillColor, opacity } = context;
+                return !opacity ? <div style={{
+                    background: "#212631"}}>
+                </div> : <div style={{
+                  background: "#212631"}}>
+                </div>
+            }),
             onLevelTitleRender: ((data) => {
                 var { context, width, height } = data;
                 var { title, titleColor } = context;
