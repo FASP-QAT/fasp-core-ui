@@ -307,7 +307,7 @@ class ApplicationDashboard extends Component {
             versionId: filteredGetRequestList[i].version,
             id: filteredGetRequestList[i].id,
             loading: false,
-            cutOffDate:filteredGetRequestList[i].cutOffDate!=undefined && filteredGetRequestList[i].cutOffDate!=null && filteredGetRequestList[i].cutOffDate!=""?filteredGetRequestList[i].cutOffDate:""
+            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
           });
         }
         this.setState({
@@ -942,7 +942,7 @@ class ApplicationDashboard extends Component {
                           </Dropdown>
                         </ButtonGroup>
                       </div>
-                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":"")}</div>
+                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : "")}</div>
                       <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
                       <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
                     </div>
@@ -1318,76 +1318,10 @@ class ApplicationDashboard extends Component {
             </div>
           </div>
         </div>
-
-        {/* <div className='col-xxl-6 col-xl-12'>
-          <div className='row row-cols-12'>
-            <div class="col pl-lg-0">
-              <div class="card custom-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-top">
-                    <div class="me-3">
-                      <span class="avatar avatar-md p-2 bg-primaryD">
-                        <i class="nav-icon fa fa-pencil"></i>
-                      </span>
-                    </div>
-                    <div class="flex-fill">
-                      <div class="d-flex mb-1 align-items-top justify-content-between">
-                        <h5 class="fw-semibold mb-0 lh-1">256</h5>
-
-                      </div>
-                      <p class="mb-0 fs-10 op-7 text-mutedDashboard fw-semibold">Data Qulity</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card custom-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-top">
-                    <div class="me-3">
-                      <span class="avatar avatar-md p-2 bg-primaryD">
-                        <i class="nav-icon fa fa-bar-chart"></i>
-                      </span>
-                    </div>
-                    <div class="flex-fill">
-                      <div class="d-flex mb-1 align-items-top justify-content-between">
-                        <h5 class="fw-semibold mb-0 lh-1">256</h5>
-
-                      </div>
-                      <p class="mb-0 fs-10 op-7 text-mutedDashboard fw-semibold">Supply Plan</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card custom-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-top">
-                    <div class="me-3">
-                      <span class="avatar avatar-md p-2 bg-primaryD">
-                        <i class="nav-icon fa fa-user-circle-o"></i>
-                      </span>
-                    </div>
-                    <div class="flex-fill">
-                      <div class="d-flex mb-1 align-items-top justify-content-between">
-                        <h5 class="fw-semibold mb-0 lh-1">256</h5>
-
-                      </div>
-                      <p class="mb-0 fs-10 op-7 text-mutedDashboard fw-semibold">Procurement Shedule</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div> */}
         <div className='row'>
           <div className='col-md-12'>
             <div className='row'>
-              <FormGroup className='col-md-4 FormGroupD'>
+              <FormGroup className='col-md-3 FormGroupD'>
                 <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
                 <Input
                   type="select"
@@ -1403,7 +1337,7 @@ class ApplicationDashboard extends Component {
                 </Input>
               </FormGroup>
 
-              <FormGroup className='col-md-4 pl-lg-0 FormGroupD'>
+              <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
                 <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
                 <Input
                   type="select"
@@ -1418,167 +1352,7 @@ class ApplicationDashboard extends Component {
                   <option value="3">Three</option>
                 </Input>
               </FormGroup>
-            </div>
-          </div>
-        </div>
-        <div className='row'>
-          <div class="col-xl-12">
-            <div className='row pl-lg-1 pr-lg-1'>
-              <div className='col-md-4'>
-                <div class="card custom-card">
-                  <div class="card-header  justify-content-between">
-                    <div class="card-title"> Stock Status </div>
-                  </div>
-                  <div class="card-body">
-                    <img src={barchartImg} style={{ width: '100%' }} />
-
-                  </div>
-
-                  <div class="card-header  justify-content-between">
-                    <div class="card-title"> Stocked out Planning Units (3) </div>
-                  </div>
-                  <div class="card-body pt-2 pb-0">
-
-                    <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
-                      <li class="success">
-                        <div class="d-flex align-items-center justify-content-between">
-                          <div className='text-mutedDashboard'>Product B </div>
-                          <div class="fs-12 text-mutedDashboard">4 months​</div>
-                        </div>
-                      </li>
-                      <li class="info">
-                        <div class="d-flex align-items-center justify-content-between">
-                          <div className='text-mutedDashboard'>Product A </div>
-                          <div class="fs-12 text-mutedDashboard">3 months​</div>
-                        </div>
-                      </li>
-                      <li class="warning">
-                        <div class="d-flex align-items-center justify-content-between">
-                          <div className='text-mutedDashboard'>Product C </div>
-                          <div class="fs-12 text-mutedDashboard">1 months​</div>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-3 pl-lg-4 pr-lg-4">
-                <div class="card custom-card">
-                  <div class="card-header  justify-content-between">
-                    <div class="card-title"> Forecast Error </div>
-                  </div>
-                  <div class="card-body px-0 py-0">
-                    <div class="table-responsive tableFixHeadDash" style={{ height: '309px' }}>
-                      <table class="table text-nowrap table-bordered">
-                        <thead>
-                          <tr>
-                            <th scope="col">PU</th>
-                            <th scope="col">Average %</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className='col-md-5'>
-                <div class="card custom-card">
-                  <div class="card-header  justify-content-between">
-                    <div class="card-title"> Data Quality (doesn't use date selector) </div>
-                  </div>
-                  <div class="card-body py-2">
-                    <div className='row'>
-                      <div class="container1">
-                        <span class="label-text" style={{ paddingLeft: '31px' }}>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                        <div class="pie-wrapper">
-                          <div class="arc" data-value="24"></div>
-                          <span class="score text-mutedDashboard">20 Missing</span>
-                        </div>
-                      </div>
-                      <div class="container1">
-                        <span class="label-text" style={{ paddingLeft: '54px' }}>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                        <div class="pie-wrapper">
-                          <div class="arc" data-value="24"></div>
-                          <span class="score text-mutedDashboard">20 Missing</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='row'>
-                      <div class="container1">
-                        <span class="label-text" style={{ paddingLeft: '39px' }}>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                        <div class="pie-wrapper">
-                          <div class="arc" data-value="24"></div>
-                          <span class="score text-mutedDashboard">20 Missing</span>
-                        </div>
-                      </div>
-                      <div class="container1">
-                        <span class="label-text" style={{ paddingLeft: '64px' }}>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                        <div class="pie-wrapper">
-                          <div class="arc" data-value="24"></div>
-                          <span class="score text-mutedDashboard">20 Missing</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div className='row px-0'>
-          <div className='col-md-12'>
-            <div className='row'>
-              <FormGroup className='col-md-4 pt-lg-2 FormGroupD'>
+              <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
                 <Label htmlFor="organisationTypeId">Display By<span class="red Reqasterisk">*</span></Label>
                 <Input
                   type="select"
@@ -1592,154 +1366,305 @@ class ApplicationDashboard extends Component {
                   <option value="2">Two</option>
                   <option value="3">Three</option>
                 </Input>
+                <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment $1.176,003.49</p></div>
               </FormGroup>
             </div>
-            <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment $1.176,003.49</p></div>
           </div>
         </div>
-
         <div className='row'>
-          <div class="col-xl-12 pl-lg-4 pr-lg-4">
-            <div class="card custom-card">
-              <div class="row">
-                <div class="col">
+          <div class="col-xl-12">
+            <div className='row pl-lg-1 pr-lg-1'>
+              <div className='col-md-6'>
+                <div className='row'>
+                  <div className='col-md-6'>
+                    <div class="card custom-card">
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title"> Stock Status </div>
+                      </div>
+                      <div class="card-body">
+                        <img src={barchartImg} style={{ width: '100%' }} />
 
-                  <div class="card-header  justify-content-between">
-                    <div class="card-title">Shipments </div>
+                      </div>
+
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title"> Stocked out Planning Units (3) </div>
+                      </div>
+                      <div class="card-body pt-2 pb-0">
+
+                        <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
+                          <li class="success">
+                            <div class="d-flex align-items-center justify-content-between">
+                              <div className='text-mutedDashboard'>Product B </div>
+                              <div class="fs-12 text-mutedDashboard">4 months​</div>
+                            </div>
+                          </li>
+                          <li class="info">
+                            <div class="d-flex align-items-center justify-content-between">
+                              <div className='text-mutedDashboard'>Product A </div>
+                              <div class="fs-12 text-mutedDashboard">3 months​</div>
+                            </div>
+                          </li>
+                          <li class="warning">
+                            <div class="d-flex align-items-center justify-content-between">
+                              <div className='text-mutedDashboard'>Product C </div>
+                              <div class="fs-12 text-mutedDashboard">1 months​</div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                  <div class="card-body">
-                    <div className='d-flex align-items-center justify-content-center'>
-                    <img src={piechartImg} width={'210px'} />
+                  <div class="col-md-6 pl-lg-6 pr-lg-6">
+                    <div class="card custom-card">
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title"> Forecast Error </div>
+                      </div>
+                      <div class="card-body px-0 py-0">
+                        <div class="table-responsive tableFixHeadDash" style={{ height: '309px' }}>
+                          <table class="table text-nowrap table-bordered">
+                            <thead>
+                              <tr>
+                                <th scope="col">PU</th>
+                                <th scope="col">Average %</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <div class="col">
-
-                  <div class="card-header  justify-content-between">
-                    <div class="card-title"># of Shipments with funding TBD </div>
+                <div className='row'>
+                  <div className='col-md-12'>
+                    <div class="card custom-card">
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title"> Data Quality (doesn't use date selector) </div>
+                      </div>
+                      <div class="card-body py-2">
+                        <div className='row'>
+                          <div class="container1">
+                            <span class="label-text" style={{ paddingLeft: '31px' }}>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                          <div class="container1">
+                            <span class="label-text" style={{ paddingLeft: '54px' }}>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className='row'>
+                          <div class="container1">
+                            <span class="label-text" style={{ paddingLeft: '39px' }}>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                          <div class="container1">
+                            <span class="label-text" style={{ paddingLeft: '64px' }}>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="card-body">
-                  <div class="table-responsive tableFixHeadDash" style={{ height: '186px' }}>
-                      <table class="table text-nowrap table-bordered">
-                        <thead>
-                          <tr>
-                            <th scope="col">PU</th>
-                            <th scope="col"># of Shipments</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>15</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>15</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>15</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>15</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>150%</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>15</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">TLD30​</td>
-                            <td>15</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                </div>
+              </div>
+              <div class="col-xl-6 pl-lg-6 pr-lg-6">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div className="card custom-card">
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title">Shipments </div>
+                      </div>
+                      <div class="card-body">
+                        <div className='d-flex align-items-center justify-content-center'>
+                          <img src={piechartImg} width={'210px'} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div className="card custom-card">
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title"># of Shipments with funding TBD </div>
+                      </div>
+                      <div class="card-body">
+                        <div class="table-responsive tableFixHeadDash" style={{ height: '186px' }}>
+                          <table class="table text-nowrap table-bordered">
+                            <thead>
+                              <tr>
+                                <th scope="col">PU</th>
+                                <th scope="col"># of Shipments</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>15</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>15</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>15</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>15</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>150%</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>15</td>
+                              </tr>
+                              <tr>
+                                <td scope="row">TLD30​</td>
+                                <td>15</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div className='col-md-12'>
+                    <div className='row'>
+                      <div class="col-md-12 pl-lg-4 pr-lg-4">
+                        <div class="card custom-card">
+                          <div class="card-header justify-content-between">
+                            <div class="card-title"> Expiries</div>
+                          </div>
+                          <div class="card-body pl-lg-0 pr-lg-0 pt-lg-2">
+                            <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
+                            <div class="table-responsive tableFixHeadDash" style={{ height: '186px' }}>
+                              <table class="table table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th style={{ width: '168px' }}>Planning Unit</th>
+                                    <th style={{ width: '100px' }}>Expired/Expiring Quantity</th>
+                                    <th scope="col">Batch Number</th>
+                                    <th scope="col">Auto Generated</th>
+                                    <th scope="col">Batch Start Date</th>
+                                    <th scope="col">Shelf Life (months)</th>
+                                    <th scope="col">Expiry Date</th>
+                                    <th scope="col">Total Cost</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td style={{ width: '168px' }}>(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
+                                    <td>50</td>
+                                    <td>QAT00257100000001240825AVG</td>
+                                    <td>Yes</td>
+                                    <td>05-Jun-24</td>
+                                    <td>10</td>
+                                    <td>01-Apr-25</td>
+                                    <td>29,750</td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
+                                    <td>50</td>
+                                    <td>QAT00257100000001240825AVG</td>
+                                    <td>Yes</td>
+                                    <td>05-Jun-24</td>
+                                    <td>10</td>
+                                    <td>01-Apr-25</td>
+                                    <td>29,750</td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
+                                    <td>50</td>
+                                    <td>QAT00257100000001240825AVG</td>
+                                    <td>Yes</td>
+                                    <td>05-Jun-24</td>
+                                    <td>10</td>
+                                    <td>01-Apr-25</td>
+                                    <td>29,750</td>
+                                  </tr>
+                                  <tr>
+                                    <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
+                                    <td>50</td>
+                                    <td>QAT00257100000001240825AVG</td>
+                                    <td>Yes</td>
+                                    <td>05-Jun-24</td>
+                                    <td>10</td>
+                                    <td>01-Apr-25</td>
+                                    <td>29,750</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className='row'>
-          <div className='col-md-12'>
-              <div className='row'>
-                
-              <div class="col-md-12 pl-lg-4 pr-lg-4">
-                <div class="card custom-card">
-                  <div class="card-header justify-content-between">
-                    <div class="card-title"> Expiries</div>
-                  </div>
-                  <div class="card-body pl-lg-0 pr-lg-0 pt-lg-2">
-                  <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
-                    <div class="table-responsive tableFixHeadDash" style={{ height: '186px' }}>
-                      <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th style={{width:'168px'}}>Planning Unit</th>
-                            <th style={{width:'100px'}}>Expired/Expiring Quantity</th>
-                            <th scope="col">Batch Number</th>
-                            <th scope="col">Auto Generated</th>
-                            <th scope="col">Batch Start Date</th>
-                            <th scope="col">Shelf Life (months)</th>
-                            <th scope="col">Expiry Date</th>
-                            <th scope="col">Total Cost</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td style={{width:'168px'}}>(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                            <td>50</td>
-                            <td>QAT00257100000001240825AVG</td>
-                            <td>Yes</td>
-                            <td>05-Jun-24</td>
-                            <td>10</td>
-                            <td>01-Apr-25</td>
-                            <td>29,750</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                            <td>50</td>
-                            <td>QAT00257100000001240825AVG</td>
-                            <td>Yes</td>
-                            <td>05-Jun-24</td>
-                            <td>10</td>
-                            <td>01-Apr-25</td>
-                            <td>29,750</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                            <td>50</td>
-                            <td>QAT00257100000001240825AVG</td>
-                            <td>Yes</td>
-                            <td>05-Jun-24</td>
-                            <td>10</td>
-                            <td>01-Apr-25</td>
-                            <td>29,750</td>
-                          </tr>
-                          <tr>
-                            <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                            <td>50</td>
-                            <td>QAT00257100000001240825AVG</td>
-                            <td>Yes</td>
-                            <td>05-Jun-24</td>
-                            <td>10</td>
-                            <td>01-Apr-25</td>
-                            <td>29,750</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              </div>
           </div>
         </div>
       </div >
