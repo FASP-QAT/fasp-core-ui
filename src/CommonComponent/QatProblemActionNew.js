@@ -512,35 +512,120 @@ export default class QatProblemActionNew extends Component {
                                                                                 var arrivedDate = filteredShipmentList[s].arrivedDate;
                                                                                 var expectedDeliveryDate = filteredShipmentList[s].expectedDeliveryDate;
                                                                                 if (filteredShipmentList[s].localProcurement) {
-                                                                                    var addLeadTimes = programPlanningUnitList.filter(c =>
+                                                                                    var ppu=programPlanningUnitList.filter(c =>
                                                                                         c.planningUnit.id == filteredShipmentList[s].planningUnit.id
                                                                                         && c.program.id == programList[pp].generalData.programId
-                                                                                    )[0].localProcurementLeadTime;
+                                                                                    );
+                                                                                    var programPriceList=ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programList[pp].generalData.programId && c.procurementAgent.id == filteredShipmentList[s].procurementAgent.id && c.active)
+                                                                                    var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                                                                    if(programPriceList.length>0){
+                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if(programPAPU.length>0 && programPAPU[0].localProcurementLeadTime!==null){
+                                                                                            addLeadTimes=programPAPU[0].localProcurementLeadTime;
+                                                                                        }else{
+                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                            if(programPA.length>0 && programPA[0].localProcurementLeadTime!==null){
+                                                                                                addLeadTimes=programPA[0].localProcurementLeadTime;
+                                                                                            }
+                                                                                        }
+                                                                                    }
                                                                                     var leadTimesPerStatus = addLeadTimes / 5;
                                                                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                     shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                     approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                     submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                 } else {
+                                                                                    var ppu=programPlanningUnitList.filter(c =>
+                                                                                        c.planningUnit.id == filteredShipmentList[s].planningUnit.id
+                                                                                        && c.program.id == programList[pp].generalData.programId
+                                                                                    );
+                                                                                    var programPriceList=ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programList[pp].generalData.programId && c.procurementAgent.id == filteredShipmentList[s].procurementAgent.id && c.active)
                                                                                     var ppUnit = papuResult;
                                                                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                                                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                                                                         submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
+                                                                                    }
+                                                                                    if(programPriceList.length>0){
+                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if(programPAPU.length>0 && programPAPU[0].submittedToApprovedLeadTime!==null){
+                                                                                            submittedToApprovedLeadTime=programPAPU[0].submittedToApprovedLeadTime;
+                                                                                        }else{
+                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                            if(programPA.length>0 && programPA[0].submittedToApprovedLeadTime!==null){
+                                                                                                submittedToApprovedLeadTime=programPA[0].submittedToApprovedLeadTime;
+                                                                                            }
+                                                                                        }
                                                                                     }
                                                                                     var approvedToShippedLeadTime = "";
                                                                                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                                                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                                                                         approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
                                                                                     }
+                                                                                    if(programPriceList.length>0){
+                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if(programPAPU.length>0 && programPAPU[0].approvedToShippedLeadTime!==null){
+                                                                                            approvedToShippedLeadTime=programPAPU[0].approvedToShippedLeadTime;
+                                                                                        }else{
+                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                            if(programPA.length>0 && programPA[0].approvedToShippedLeadTime!==null){
+                                                                                                approvedToShippedLeadTime=programPA[0].approvedToShippedLeadTime;
+                                                                                            }
+                                                                                        }
+                                                                                    }
                                                                                     var shippedToArrivedLeadTime = ""
                                                                                     if (filteredShipmentList[s].shipmentMode == "Air") {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
+                                                                                        if(programPriceList.length>0){
+                                                                                            var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                            if(programPAPU.length>0 && programPAPU[0].shippedToArrivedByAirLeadTime!==null){
+                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                                                            }else{
+                                                                                                var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                                if(programPA.length>0 && programPA[0].shippedToArrivedByAirLeadTime!==null){
+                                                                                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedByAirLeadTime;
+                                                                                                }
+                                                                                            }
+                                                                                        }
                                                                                     } else if (filteredShipmentList[s].shipmentMode == "Road") {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByRoadLeadTime);
+                                                                                        if(programPriceList.length>0){
+                                                                                            var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                            if(programPAPU.length>0 && programPAPU[0].shippedToArrivedByRoadLeadTime!==null){
+                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                                                            }else{
+                                                                                                var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                                if(programPA.length>0 && programPA[0].shippedToArrivedByRoadLeadTime!==null){
+                                                                                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedByRoadLeadTime;
+                                                                                                }
+                                                                                            }
+                                                                                        }
                                                                                     } else {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                                                                                        if(programPriceList.length>0){
+                                                                                            var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                            if(programPAPU.length>0 && programPAPU[0].shippedToArrivedBySeaLeadTime!==null){
+                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                                                            }else{
+                                                                                                var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                                if(programPA.length>0 && programPA[0].shippedToArrivedBySeaLeadTime!==null){
+                                                                                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedBySeaLeadTime;
+                                                                                                }
+                                                                                            }
+                                                                                        }
                                                                                     }
-                                                                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(programJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                                                                    var arrivedToDeliveredLeadTime=programJson.arrivedToDeliveredLeadTime;
+                                                                                    if(programPriceList.length>0){
+                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if(programPAPU.length>0 && programPAPU[0].arrivedToDeliveredLeadTime!==null){
+                                                                                            arrivedToDeliveredLeadTime=programPAPU[0].arrivedToDeliveredLeadTime;
+                                                                                        }else{
+                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
+                                                                                            if(programPA.length>0 && programPA[0].arrivedToDeliveredLeadTime!==null){
+                                                                                                arrivedToDeliveredLeadTime=programPA[0].arrivedToDeliveredLeadTime;
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                                     shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                                     approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                                                                     submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
