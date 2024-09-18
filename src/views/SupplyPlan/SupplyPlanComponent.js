@@ -175,7 +175,8 @@ export default class SupplyPlanComponent extends React.Component {
             batchQtyTotalForPopup: 0,
             multiplier: 1,
             viewById: 1,
-            planningUnitNotes: ""
+            planningUnitNotes: "",
+            planningUnit: "",
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
