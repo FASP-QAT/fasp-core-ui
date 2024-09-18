@@ -63,22 +63,28 @@ export default class SyncMasterData extends Component {
         AuthenticationService.setupAxiosInterceptors();
         document.getElementById("retryButtonDiv").style.display = "none";
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        UserService.getUserDetails(decryptedCurUser).then(response => {
-            var userObj=response.data;
-            var user=response.data.user;
-            user.fcProgramList=userObj.fcProgramList;
-            user.spProgramList=userObj.spProgramList;
-            var aclList=[]
-            user.userAclList.map(item=>{
-                var acl=item;
-                acl.businessFunctionList=userObj.aclRoleBfList[item.roleId]
-                acl.programList=userObj.spProgramList.concat(userObj.fcProgramList);
-                aclList.push(acl);
-            });
-            user.userAclList=aclList;
-            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data.user).toString(), `${SECRET_KEY}`));
-            // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","100"],'ROLE_BF_MANUAL_TAGGING'));
-            // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","2007"],'ROLE_BF_MANUAL_TAGGING'));
+        // UserService.getUserDetails(decryptedCurUser).then(response => {
+        //     var userObj=response.data;
+        //     var user=response.data.user;
+        //     user.fcProgramList=userObj.fcProgramList;
+        //     user.spProgramList=userObj.spProgramList;
+        //     var aclList=[]
+        //     user.userAclList.map(item=>{
+        //         var acl=item;
+        //         acl.businessFunctionList=userObj.aclRoleBfList[item.roleId]
+        //         acl.programList=userObj.spProgramList.concat(userObj.fcProgramList);
+        //         aclList.push(acl);
+        //     });
+        //     user.userAclList=aclList;
+        //     localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data.user).toString(), `${SECRET_KEY}`));
+        //     // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","100"],'ROLE_BF_MANUAL_TAGGING'));
+        //     // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","2007"],'ROLE_BF_MANUAL_TAGGING'));
+        //     setTimeout(function () {
+        //         this.syncMasters();
+        //     }.bind(this), 500)
+        // })
+        UserService.getUserByUserId(decryptedCurUser).then(response => {
+            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data).toString(), `${SECRET_KEY}`));
             setTimeout(function () {
                 this.syncMasters();
             }.bind(this), 500)
@@ -199,7 +205,7 @@ export default class SyncMasterData extends Component {
                 }
             }
             var lastSyncDate = date;
-            lastSyncDate = moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss")
+            lastSyncDate = moment(generalJson.currentVersion.createdDate).subtract(3, 'years').format("YYYY-MM-DD HH:mm:ss")
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
                 programId: programList[pl].programId,
@@ -238,12 +244,12 @@ export default class SyncMasterData extends Component {
                                             if (actionList == undefined) {
                                                 actionList = []
                                             }
-                                            if(generalJson.currentVersionNotes == undefined){
-                                                generalJson.currentVersionNotes=response.data.versionNotes;
+                                            if (generalJson.currentVersionNotes == undefined) {
+                                                generalJson.currentVersionNotes = response.data.versionNotes;
                                             }
                                             var problemReportList = generalJson.problemReportList;
                                             var shipArray = shipmentSyncResponse.data[response.data.programId].filter(c => c.shipmentActive == true && c.orderActive == true);
-                                            var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss") : date;
+                                            var minDateForPPLModify = this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(prog.id) ? moment(generalJson.currentVersion.createdDate).subtract(3, 'years').format("YYYY-MM-DD HH:mm:ss") : date;
                                             var pplModified = programPlanningUnitList.filter(c => moment(c.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") >= moment(minDateForPPLModify).format("YYYY-MM-DD HH:mm:ss") && c.program.id == response.data.programId);
                                             var rebuild = false;
                                             if (shipArray.length > 0 || pplModified.length > 0) {
@@ -590,18 +596,18 @@ export default class SyncMasterData extends Component {
                                                 // var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitDataList[ol].planningUnitId);
                                                 var programJson = {}
                                                 // if (planningUnitDataIndex != -1) {
-                                                    var planningUnitData = planningUnitDataList[ol];
-                                                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                    programJson = JSON.parse(programData);
+                                                var planningUnitData = planningUnitDataList[ol];
+                                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                programJson = JSON.parse(programData);
                                                 // } else {
-                                                    // programJson = {
-                                                        // consumptionList: [],
-                                                        // inventoryList: [],
-                                                        // shipmentList: [],
-                                                        // batchInfoList: [],
-                                                        // supplyPlan: []
-                                                    // }
+                                                // programJson = {
+                                                // consumptionList: [],
+                                                // inventoryList: [],
+                                                // shipmentList: [],
+                                                // batchInfoList: [],
+                                                // supplyPlan: []
+                                                // }
                                                 // }
                                                 var shipmentDataList = programJson.shipmentList;
                                                 var getPlannedShipments = shipmentDataList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS);
@@ -624,46 +630,46 @@ export default class SyncMasterData extends Component {
                                                     shipmentDataList[shipmentIndex].rate = Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2)
                                                     var productCost = Math.round(Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2) * shipmentDataList[shipmentIndex].shipmentQty)
                                                     shipmentDataList[shipmentIndex].productCost = productCost;
-                                                    if(getPlannedShipments[pss].autoGeneratedFreight!=undefined && getPlannedShipments[pss].autoGeneratedFreight.toString()!="false"){
+                                                    if (getPlannedShipments[pss].autoGeneratedFreight != undefined && getPlannedShipments[pss].autoGeneratedFreight.toString() != "false") {
                                                         var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalJson.programId && c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.active);
-                                                        var programFilter = programMasterList.filter(c=>c.programId==generalJson.programId);
+                                                        var programFilter = programMasterList.filter(c => c.programId == generalJson.programId);
                                                         var freightPercentage = 0;
                                                         if (shipmentDataList[shipmentIndex].shipmentMode == "Air") {
                                                             var freightPercentage = programFilter[0].airFreightPerc;
-                                                            if(programPriceList.length>0){
-                                                                var programPAPU=programPriceList.filter(c=>c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
-                                                                if(programPAPU.length>0 && programPAPU[0].airFreightPerc>0){
-                                                                    freightPercentage=programPAPU[0].airFreightPerc;
-                                                                }else{
-                                                                    var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                    if(programPA.length>0 && programPA[0].airFreightPerc){
-                                                                        freightPercentage=programPAPU[0].airFreightPerc;
+                                                            if (programPriceList.length > 0) {
+                                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
+                                                                if (programPAPU.length > 0 && programPAPU[0].airFreightPerc > 0) {
+                                                                    freightPercentage = programPAPU[0].airFreightPerc;
+                                                                } else {
+                                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                    if (programPA.length > 0 && programPA[0].airFreightPerc) {
+                                                                        freightPercentage = programPAPU[0].airFreightPerc;
                                                                     }
                                                                 }
                                                             }
                                                         } else if (shipmentDataList[shipmentIndex].shipmentMode == "Road") {
                                                             var freightPercentage = programFilter[0].roadFreightPerc;
-                                                            if(programPriceList.length>0){
-                                                                var programPAPU=programPriceList.filter(c=>c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
-                                                                if(programPAPU.length>0 && programPAPU[0].roadFreightPerc>0){
-                                                                    freightPercentage=programPAPU[0].roadFreightPerc;
-                                                                }else{
-                                                                    var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                    if(programPA.length>0 && programPA[0].roadFreightPerc){
-                                                                        freightPercentage=programPAPU[0].roadFreightPerc;
+                                                            if (programPriceList.length > 0) {
+                                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
+                                                                if (programPAPU.length > 0 && programPAPU[0].roadFreightPerc > 0) {
+                                                                    freightPercentage = programPAPU[0].roadFreightPerc;
+                                                                } else {
+                                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                    if (programPA.length > 0 && programPA[0].roadFreightPerc) {
+                                                                        freightPercentage = programPAPU[0].roadFreightPerc;
                                                                     }
                                                                 }
                                                             }
                                                         } else {
                                                             var freightPercentage = programFilter[0].seaFreightPerc;
-                                                            if(programPriceList.length>0){
-                                                                var programPAPU=programPriceList.filter(c=>c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
-                                                                if(programPAPU.length>0 && programPAPU[0].seaFreightPerc>0){
-                                                                    freightPercentage=programPAPU[0].seaFreightPerc;
-                                                                }else{
-                                                                    var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                    if(programPA.length>0 && programPA[0].seaFreightPerc){
-                                                                        freightPercentage=programPAPU[0].seaFreightPerc;
+                                                            if (programPriceList.length > 0) {
+                                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
+                                                                if (programPAPU.length > 0 && programPAPU[0].seaFreightPerc > 0) {
+                                                                    freightPercentage = programPAPU[0].seaFreightPerc;
+                                                                } else {
+                                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                    if (programPA.length > 0 && programPA[0].seaFreightPerc) {
+                                                                        freightPercentage = programPAPU[0].seaFreightPerc;
                                                                     }
                                                                 }
                                                             }
@@ -676,9 +682,9 @@ export default class SyncMasterData extends Component {
                                                 }
                                                 programJson.shipmentList = shipmentDataList;
                                                 // if (planningUnitDataIndex != -1) {
-                                                    planningUnitDataList[ol].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                planningUnitDataList[ol].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                                 // } else {
-                                                    // planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                                // planningUnitDataList.push({ planningUnitId: planningUnitList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                                 // }
                                             }
                                             if (pplModified.length > 0) {
@@ -766,7 +772,7 @@ export default class SyncMasterData extends Component {
                                             this.fetchData(1, programList[i].id);
                                         }
                                     }).catch(error => {
-                                        console.log("In catch Test@123",error)
+                                        console.log("In catch Test@123", error)
                                         this.fetchData(1, 1);
                                         if (error.message === "Network Error") {
                                         } else {
@@ -1519,7 +1525,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 this.setState({
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }, () => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }, () => {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     var fundingSourceTypeTransaction = db1.transaction(['fundingSourceType'], 'readwrite');
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     var fundingSourceTypeObjectStore = fundingSourceTypeTransaction.objectStore('fundingSourceType');
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     var json = (response.fundingSourceType);
