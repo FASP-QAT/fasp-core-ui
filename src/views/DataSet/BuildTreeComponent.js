@@ -12776,7 +12776,7 @@ export default class BuildTree extends Component {
                         showArrows: false
                     })
                     var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent).filter(x => x.id != parseInt(newItems[i].id));
-                    if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId){
+                    // if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId){
                         for(var k = 0; k < tempValidLines.length; k++) {
                             treeLevelItems.push({
                                 annotationType: AnnotationType.HighlightPath,
@@ -12787,7 +12787,7 @@ export default class BuildTree extends Component {
                                 showArrows: false
                             })
                         }
-                    }
+                    // }
                 }
             }
         }
