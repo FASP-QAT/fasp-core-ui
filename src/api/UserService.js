@@ -66,5 +66,9 @@ class UserService {
         return axios.post(`${API_URL}/api/user/module/${json}`, {}
         );
     }
+    getUserDetails() {
+        return axios.get(`${API_URL}/api/user/details`, {
+        });
+    }
 }
 export default new UserService()

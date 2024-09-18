@@ -63,8 +63,22 @@ export default class SyncMasterData extends Component {
         AuthenticationService.setupAxiosInterceptors();
         document.getElementById("retryButtonDiv").style.display = "none";
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        UserService.getUserByUserId(decryptedCurUser).then(response => {
-            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data).toString(), `${SECRET_KEY}`));
+        UserService.getUserDetails(decryptedCurUser).then(response => {
+            var userObj=response.data;
+            var user=response.data.user;
+            user.fcProgramList=userObj.fcProgramList;
+            user.spProgramList=userObj.spProgramList;
+            var aclList=[]
+            user.userAclList.map(item=>{
+                var acl=item;
+                acl.businessFunctionList=userObj.aclRoleBfList[item.roleId]
+                acl.programList=userObj.spProgramList.concat(userObj.fcProgramList);
+                aclList.push(acl);
+            });
+            user.userAclList=aclList;
+            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data.user).toString(), `${SECRET_KEY}`));
+            // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","100"],'ROLE_BF_MANUAL_TAGGING'));
+            // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","2007"],'ROLE_BF_MANUAL_TAGGING'));
             setTimeout(function () {
                 this.syncMasters();
             }.bind(this), 500)

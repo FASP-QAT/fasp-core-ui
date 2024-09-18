@@ -268,6 +268,33 @@ class AuthenticationService {
             return [];
         }
     }
+
+    checkUserACL(programIds,businessFunctionId){
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let userAclList = decryptedUser.userAclList;
+                var hasAccess=false;
+                userAclList.map(item=>{
+                    var programFilter=item.programList.filter(c=>programIds.includes(c.toString()));
+                    if(programFilter.length==[...new Set(programIds)].length){
+                        var hasBusinessFunction=item.businessFunctionList.filter(c=>c==businessFunctionId);
+                        if(hasBusinessFunction.length>0){
+                            hasAccess= true;
+                        }
+                    }
+                })
+                return hasAccess;
+            } catch (err) {
+                localStorage.setItem('curUser', '')
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+    }
     /**
      * Checks if the current user is authenticated to access a specific route.
      * @param {string} route - The route to be checked for authentication.
