@@ -2307,7 +2307,27 @@ body {
     color: #20a8d8;
     text-decoration: none;
     background-color: transparent;
-  }
+}
+.sidebar .nav-link {
+  display: block;
+  // padding: 0.75rem 1rem;
+  color: #e4e5e6;
+  text-decoration: none;
+  background: transparent;
+}
+.sidebar .nav-dropdown.open .nav-link {
+  color: #e4e5e6;
+  border-left: 0;
+}
+.sidebar.module1 .nav-link:hover {
+  color: #002f6c!important;
+  background: #e4e5e6;
+}
+.typing-en::before {
+  content: "Type at least 3 characters to search";
+  color: #212721;
+  font-style: italic;
+}
 
   .jcalendar-update {
     border: 1px solid #ccc;
