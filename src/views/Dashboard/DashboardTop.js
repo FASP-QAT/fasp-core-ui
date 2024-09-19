@@ -56,9 +56,9 @@ export function DashboardTop(props) {
                                     "countOfExpiredPU": 3,
                                     "countOfOpenProblem": item.openCount,
                                     "lastModifiedDate": "2023-07-13",
-                                    "commitDate": "2024-08-20",
-                                    "versionType": program[0].currentVersion.versionType,
-                                    "versionStatus": program[0].currentVersion.versionStatus
+                                    "commitDate": programJson.currentVersion.createdDate,
+                                    "versionType": programJson.currentVersion.versionType,
+                                    "versionStatus": programJson.currentVersion.versionStatus
                                 }
                                 console.log("dashboradTop Test@123",dashboradTop)
                                 dashboradTopList.push(dashboradTop);
