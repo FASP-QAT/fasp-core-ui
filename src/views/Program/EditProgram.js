@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {
-    Row, Card, CardBody, 
+    Row, Card, CardBody,
     Label, Input, FormGroup,
     CardFooter, Button, Col, FormFeedback, Form
 } from 'reactstrap';
@@ -105,9 +105,9 @@ const validationSchema = function (values) {
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         procurementAgents: Yup.string()
-            .required(i18n.t('static.procurementAgent.selectProcurementAgent')),        
+            .required(i18n.t('static.procurementAgent.selectProcurementAgent')),
         fundingSources: Yup.string()
-            .required(i18n.t('static.budget.fundingtext')),                
+            .required(i18n.t('static.budget.fundingtext')),
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
         programCode1: Yup.string()
@@ -200,8 +200,8 @@ export default class EditProgram extends Component {
                 programNotes: '',
                 regionArray: [],
                 healthAreaArray: [],
-                procurementAgents:[],
-                fundingSources:[]
+                procurementAgents: [],
+                fundingSources: []
             },
             regionId: '',
             healthAreaId: '',
@@ -210,8 +210,8 @@ export default class EditProgram extends Component {
             realmCountryList: [],
             organisationList: [],
             healthAreaList: [],
-            fundingSourceList:[],
-            procurementAgentList:[],
+            fundingSourceList: [],
+            procurementAgentList: [],
             programManagerList: [],
             regionList: [],
             message: '',
@@ -255,7 +255,7 @@ export default class EditProgram extends Component {
             var splitCode = programCode.split("-");
             var uniqueCode = splitCode[3];
             if (splitCode.length > 4) {
-                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3])+2, programCode.length);
+                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3]) + 2, programCode.length);
             }
             var realmCountryCode = splitCode[0];
             var healthAreaCode = splitCode[1];
@@ -271,14 +271,13 @@ export default class EditProgram extends Component {
                 organisationCode: organisationCode,
                 realmCountryCode: realmCountryCode
             })
-            console.log('this.state.program.regionArray',this.state.program.regionArray);
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.programId)
                 .then(response => {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.username.toUpperCase(); 
-                            var itemLabelB = b.username.toUpperCase(); 
+                            var itemLabelA = a.username.toUpperCase();
+                            var itemLabelB = b.username.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -340,8 +339,8 @@ export default class EditProgram extends Component {
                             regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                         }
                         regList.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); 
-                            var itemLabelB = b.label.toUpperCase(); 
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -396,8 +395,8 @@ export default class EditProgram extends Component {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -464,8 +463,8 @@ export default class EditProgram extends Component {
                         }
                         var listArray = haList;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); 
-                            var itemLabelB = b.label.toUpperCase(); 
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -516,53 +515,53 @@ export default class EditProgram extends Component {
                         }
                     }
                 );
-                DropdownService.getProcurementAgentDropdownList()
-            .then(response => {
-                if (response.status == 200) {
-                    var json = response.data;
-                    var paList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        paList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+            DropdownService.getProcurementAgentDropdownList()
+                .then(response => {
+                    if (response.status == 200) {
+                        var json = response.data;
+                        var paList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                        for (var i = 0; i < json.length; i++) {
+                            paList[i + 1] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                        }
+                        var listArray = paList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            procurementAgentList: listArray
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
                     }
-                    var listArray = paList;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); 
-                        var itemLabelB = b.label.toUpperCase(); 
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        procurementAgentList: listArray
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+                })
 
             DropdownService.getFundingSourceDropdownList()
-            .then(response => {
-                if (response.status == 200) {
-                    var json = response.data;
-                    var fsList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        fsList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                .then(response => {
+                    if (response.status == 200) {
+                        var json = response.data;
+                        var fsList = [{ value: "-1", label: i18n.t("static.common.all") }];
+                        for (var i = 0; i < json.length; i++) {
+                            fsList[i+1] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                        }
+                        var listArray = fsList;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            fundingSourceList: listArray
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
                     }
-                    var listArray = fsList;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.label.toUpperCase(); 
-                        var itemLabelB = b.label.toUpperCase(); 
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        fundingSourceList: listArray
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            })
+                })
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -660,28 +659,42 @@ export default class EditProgram extends Component {
     /**
      * Handles the change event for  procurment agents.
      * @param {Array} event - An array containing the selected procurement agent IDs.
-     */    
+     */
     updateFieldDataProcurementAgent(value) {
         let { program } = this.state;
-        var paArray = [];
-        for (var i = 0; i < value.length; i++) {
-            paArray[i] = value[i].value;
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
         }
-        program.procurementAgents = paArray;
-        this.setState({ program: program });
+
+        if (selectedArray.includes("-1")) {//when All option is selected
+            var idList = this.state.procurementAgentList.filter((c) => c.value != -1).map((c) => c.value);
+            program.procurementAgents = idList;
+            this.setState({ program: program });
+        } else {
+            program.procurementAgents = selectedArray;
+            this.setState({ program: program });
+        }        
     }
     /**
      * Handles the change event for funding sources.
      * @param {Array} event - An array containing the selected funding source Ids.
-     */    
+     */
     updateFieldDataFundingSource(value) {
         let { program } = this.state;
-        var fsArray = [];
-        for (var i = 0; i < value.length; i++) {
-            fsArray[i] = value[i].value;
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
         }
-        program.fundingSources = fsArray;
-        this.setState({ program: program });
+
+        if (selectedArray.includes("-1")) {//when All option is selected
+            var idList = this.state.fundingSourceList.filter((c) => c.value != -1).map((c) => c.value);
+            program.fundingSources = idList;
+            this.setState({ program: program });
+        } else {
+            program.fundingSources = selectedArray;
+            this.setState({ program: program });
+        }
     }
     /**
      * Handles data change in the form.
@@ -701,7 +714,7 @@ export default class EditProgram extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        }if (event.target.name == 'roadFreightPerc') {
+        } if (event.target.name == 'roadFreightPerc') {
             program.roadFreightPerc = event.target.value;
         }
         if (event.target.name == 'plannedToSubmittedLeadTime') {
@@ -737,7 +750,7 @@ export default class EditProgram extends Component {
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
         }
-        this.setState({ program }, () => {})
+        this.setState({ program }, () => { })
     }
     /**
      * Renders the edit program screen.
@@ -788,8 +801,8 @@ export default class EditProgram extends Component {
                                     shippedToArrivedByRoadLeadTime: this.state.program.shippedToArrivedByRoadLeadTime,
                                     arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                                     healthAreaId: this.state.program.healthAreaArray,
-                                    procurementAgents:this.state.program.procurementAgents,
-                                    fundingSources:this.state.program.fundingSources,
+                                    procurementAgents: this.state.program.procurementAgents,
+                                    fundingSources: this.state.program.fundingSources,
                                     healthAreaArray: this.state.program.healthAreaArray,
                                     programNotes: this.state.program.programNotes,
                                     regionArray: this.state.program.regionArray,
@@ -803,7 +816,7 @@ export default class EditProgram extends Component {
                                         loading: true
                                     })
                                     let pro = this.state.program;
-                                    pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
+                                    pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
                                     ProgramService.editProgram(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
