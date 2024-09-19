@@ -164,6 +164,21 @@ a {
 											<li>
 												<b> Tipo de nodo de previsión :</b> Seleccione discreto si este producto se usará por tiempo limitado y continuo 
 												si se usará indefinidamente.</li>
+												<li><b>¿Necesita calcular cantidades de uso de productos discretos?
+												</b>
+												QAT tiene la opción de calcular el uso de productos discretos en nodos de unidades de pronóstico en 
+												de dos maneras: anticipando la cantidad discreta consumida por paciente en el mes 1 
+												(elija "Calcular usando una dispensación única" = "Sí") o desagregando el 
+												cantidad discreta consumida por paciente por mes (elija "Calcular usando una dispensación única" = "No"). 
+												De forma predeterminada, QAT asumirá el método de distribución anticipada para calcular la unidad de pronóstico discreta. 
+												cantidades; sin embargo, los usuarios tienen la opción de elegir el método alternativo a través de una radio. 
+												botón. Este cálculo discreto alternativo podría ser útil para las Unidades de Planificación (PU) 
+												que tienen patrones de bajo consumo durante un período de tiempo. Por ejemplo, si una mujer embarazada 
+												Se requiere tomar un suplemento nutricional una vez al mes durante el embarazo. 
+												(nueve meses), QAT actualmente calcularía nueve suplementos en el mes 1 (distribución anticipada). 
+												Sin la distribución anticipada, QAT calcularía un suplemento en el mes 1, un suplemento en 
+												mes 2, un suplemento en el mes 3, y así sucesivamente.
+												</li>
 											<li><b> ¿Uso del producto retrasado o escalonado?</b> A veces, el consumo del producto se retrasa en relación a 
 												los otros niveles superiores del árbol. en lo pertinente <b> Unidad de previsión </b>nodo, utilice el <b>Retraso</b> campo para indicar este retraso.
 											<ul>
