@@ -79,7 +79,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     super(props);
     var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
     this.state = {
-      isDarkMode:false,
+      isDarkMode: false,
       datasetList: [],
       datasetId: "",
       showInPlanningUnit: false,
@@ -1605,128 +1605,31 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         hasRole = true;
       }
     });
-    this.setState({ 
+    this.setState({
       onlyDownloadedProgram: !hasRole,
       maxDate: maxDateTmp
-     });
+    });
 
-     // Detect initial theme
+    // Detect initial theme
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     this.setState({ isDarkMode });
 
     // Listening for theme changes
     const observer = new MutationObserver(() => {
-        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-        this.setState({ isDarkMode: updatedDarkMode });
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
     });
 
     observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-theme'],
+      attributes: true,
+      attributeFilter: ['data-theme'],
     });
     hideSecondComponent();
-    if(localStorage.getItem('sessionType') === 'Online'){
-    ForecastingUnitService.getForecastingUnitListAll().then(response => {
-      if (response.status == 200) {
-        this.setState({
-          fuResult: response.data,
-          loading: false
-        })
-      }
-    }).catch(
-      error => {
-        if (error.message === "Network Error") {
-          this.setState({
-            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-            loading: false
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`)
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`)
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false
-              });
-              break;
-            case 412:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false
-              });
-              break;
-            default:
-              this.setState({
-                message: 'static.unkownError',
-                loading: false
-              });
-              break;
-          }
-        }
-      }
-    );
-    }
-    if(localStorage.getItem('sessionType') === 'Online'){
-    PlanningUnitService.getAllPlanningUnitList().then(response => {
-      if (response.status == 200) {
-        this.setState({
-          puResult: response.data,
-          loading: false
-        })
-      }
-    }).catch(
-      error => {
-        if (error.message === "Network Error") {
-          this.setState({
-            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-            loading: false
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`)
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`)
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false
-              });
-              break;
-            case 412:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false
-              });
-              break;
-            default:
-              this.setState({
-                message: 'static.unkownError',
-                loading: false
-              });
-              break;
-          }
-        }
-      }
-    );
-      }
-    if(localStorage.getItem('sessionType') === 'Online'){
-    TracerCategoryService.getTracerCategoryListAll()
-      .then(response => {
+    if (localStorage.getItem('sessionType') === 'Online') {
+      ForecastingUnitService.getForecastingUnitListAll().then(response => {
         if (response.status == 200) {
           this.setState({
-            tcResult: response.data,
+            fuResult: response.data,
             loading: false
           })
         }
@@ -1767,8 +1670,56 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 break;
             }
           }
-      }
-    );
+        }
+      );
+    }
+    if (localStorage.getItem('sessionType') === 'Online') {
+      PlanningUnitService.getAllPlanningUnitList().then(response => {
+        if (response.status == 200) {
+          this.setState({
+            puResult: response.data,
+            loading: false
+          })
+        }
+      }).catch(
+        error => {
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
     }
     // this.getDatasetList();
     this.getPrograms()
@@ -2403,66 +2354,66 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
    * @param {*} programId - Forecast Program Id
    */
   consolidatedVersionList = (programId) => {
-      const { versions } = this.state
-      var verList;
-      if(this.state.onlyDownloadedProgram) {
-        verList = [];
-      } else {
-        verList = versions;
-      }
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['datasetData'], 'readwrite');
-          var program = transaction.objectStore('datasetData');
-          var getRequest = program.getAll();
-          getRequest.onerror = function (event) {
-          };
-          getRequest.onsuccess = function (event) {
-              var myResult = [];
-              myResult = getRequest.result;
-              var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-              var userId = userBytes.toString(CryptoJS.enc.Utf8);
-              for (var i = 0; i < myResult.length; i++) {
-                  if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                      var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                      var programData = databytes.toString(CryptoJS.enc.Utf8)
-                      var version = JSON.parse(programData).currentVersion
-                      version.versionId = `${version.versionId} (Local)`
-                      verList.push(version)
-                  }
-              }
-              let versionList = verList.filter(function (x, i, a) {
-                  return a.indexOf(x) === i;
-              })
-              versionList.reverse();
-              if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
-                  this.setState({
-                      versions: versionList,
-                      versionId: this.props.match.params.versionId + " (Local)",
-                  }, () => {
-                      this.getDatasetData();
-                  })
-              } else if (localStorage.getItem("sesVersionId") != '' && localStorage.getItem("sesVersionId") != undefined) {
-                  let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionId"));
-                  this.setState({
-                      versions: versionList,
-                      versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionId") : versionList[0].versionId),
-                  }, () => {
-                      this.getDatasetData();
-                  })
-              } else {
-                  this.setState({
-                      versions: versionList,
-                      versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
-                  }, () => {
-                      this.getDatasetData();
-                  })
-              }
-          }.bind(this);
-      }.bind(this)
+    const { versions } = this.state
+    var verList;
+    if (this.state.onlyDownloadedProgram) {
+      verList = [];
+    } else {
+      verList = versions;
+    }
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['datasetData'], 'readwrite');
+      var program = transaction.objectStore('datasetData');
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId && myResult[i].programId == programId) {
+            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+            var programData = databytes.toString(CryptoJS.enc.Utf8)
+            var version = JSON.parse(programData).currentVersion
+            version.versionId = `${version.versionId} (Local)`
+            verList.push(version)
+          }
+        }
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        })
+        versionList.reverse();
+        if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
+          this.setState({
+            versions: versionList,
+            versionId: this.props.match.params.versionId + " (Local)",
+          }, () => {
+            this.getDatasetData();
+          })
+        } else if (localStorage.getItem("sesVersionId") != '' && localStorage.getItem("sesVersionId") != undefined) {
+          let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesVersionId"));
+          this.setState({
+            versions: versionList,
+            versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesVersionId") : versionList[0].versionId),
+          }, () => {
+            this.getDatasetData();
+          })
+        } else {
+          this.setState({
+            versions: versionList,
+            versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
+          }, () => {
+            this.getDatasetData();
+          })
+        }
+      }.bind(this);
+    }.bind(this)
   }
   /**
    * Reterives forecast program list from indexed db that user has loaded
@@ -3205,28 +3156,28 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         )
       }, this);
 
-      const { isDarkMode } = this.state;
-// const colourArray = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+    const { isDarkMode } = this.state;
+    // const colourArray = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     var chartOptions = {
       title: {
         display: true,
         text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
-        fontColor:fontColor
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
-            fontColor:fontColor
+            fontColor: fontColor
           },
           stacked: true,
           ticks: {
             beginAtZero: true,
-            fontColor:fontColor,
+            fontColor: fontColor,
             callback: function (value) {
               return value.toLocaleString();
             }
@@ -3234,18 +3185,18 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
           gridLines: {
             drawBorder: true, lineWidth: 0,
             color: gridLineColor,
-    zeroLineColor: gridLineColor 
+            zeroLineColor: gridLineColor
           },
           position: 'left',
         }],
         xAxes: [{
           ticks: {
-            fontColor:fontColor,
+            fontColor: fontColor,
           },
           gridLines: {
             drawBorder: true, lineWidth: 0,
             color: gridLineColor,
-    zeroLineColor: gridLineColor 
+            zeroLineColor: gridLineColor
           },
         }]
       },
@@ -3275,7 +3226,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor:fontColor
+          fontColor: fontColor
         }
       }
     }
