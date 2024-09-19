@@ -66,8 +66,6 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, forecastEndDate) => {
             } else {
                 fiscalYearEnd = year;
             }
-            console.log("====>", month, "====", fiscalStartMonth, "====", year, "====", forecastEndYear)
-
             const fiscalYearKey = `${fiscalYearEnd}`;
             if (fiscalYearKey != "") {
                 if (yearWiseData[fiscalYearKey]) {
@@ -88,7 +86,6 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, forecastEndDate) => {
         }
         // result[fiscalYearKey] += item.value;
     });
-    console.log("result===>", result)
     for (const year in result) {
         result[year].push(yearWiseData[year]);
     }
@@ -96,27 +93,30 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, forecastEndDate) => {
 }
 
 
-const calculateSums = (data) => {
+const calculateSums = (data, forecastEndDate) => {
     const yearSums = {};
     const yearWiseData = {};
 
     data.forEach((row) => {
         const year = moment(row[0]).format("YYYY");
+        const forecastEndYear = parseInt(moment(forecastEndDate).format("YYYY"));
+        if (year <= forecastEndYear) {
 
-        // Ensure the year is present in the sums object
-        if (!yearSums[year]) {
-            yearSums[year] = new Array(row.length).fill(0);
-        }
-        if (yearWiseData[year]) {
-            yearWiseData[year] += 1;
-        } else {
-            yearWiseData[year] = 1;
-        }
+            // Ensure the year is present in the sums object
+            if (!yearSums[year]) {
+                yearSums[year] = new Array(row.length).fill(0);
+            }
+            if (yearWiseData[year]) {
+                yearWiseData[year] += 1;
+            } else {
+                yearWiseData[year] = 1;
+            }
 
-        // Start from the 2nd column (index 1) and sum each value
-        for (let i = 1; i < row.length; i++) {
-            const value = parseFloat(row[i]) || 0; // Convert to float and handle empty strings
-            yearSums[year][i] += value;
+            // Start from the 2nd column (index 1) and sum each value
+            for (let i = 1; i < row.length; i++) {
+                const value = parseFloat(row[i]) || 0; // Convert to float and handle empty strings
+                yearSums[year][i] += value;
+            }
         }
     });
     for (const year in yearWiseData) {
@@ -665,18 +665,32 @@ class CompareAndSelectScenario extends Component {
                         if (treeScenarioList[tsl].type == "T") {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                             data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                            if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
+                                total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2)) : Number(0);
+                            }
+                            if (scenarioFilter.length > 0) {
+                                count += 1;
+                            }
                         } else {
                             var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                             data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                            if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
+                                total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier)).toFixed(2) : Number(0);
+                            }
+                            if (scenarioFilter.length > 0) {
+                                count += 1;
+                            }
                         }
                     }
                 }
+                // data1[tsl] = count > 0 ? Number(total).toFixed(2) : "";
                 dataArr1.push(data1)
             }
             if (this.state.xAxisDisplayBy != 1) {
                 var displayBy = this.state.xAxisDisplayBy;
                 var fiscalStartMonth = (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12
-                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.forecastStopDate) : calculateSums(dataArr1);
+                var forecastStartMonth = parseInt(moment(this.state.forecastStartDate).format("MM"));
+                var originalData = this.state.xAxisDisplayBy > 2 && fiscalStartMonth != forecastStartMonth ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.forecastStopDate) : calculateSums(dataArr1, this.state.forecastStopDate);
 
                 // Convert the object to an array
                 const transformedData = Object.keys(originalData).map((year, index) => ({

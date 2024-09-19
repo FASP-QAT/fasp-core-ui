@@ -29,9 +29,19 @@ const validationSchema = function (values) {
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.currency.currencytext')),
+        // conversionRate: Yup.string()
+        //     .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+        //     .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
+
         conversionRate: Yup.string()
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
-            .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
+            // .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d*(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .when('isSync', {
+                is: false, // when isSync is false
+                then: Yup.string().required(i18n.t('static.currency.conversionrateNumber')), // conversionRate is required
+                otherwise: Yup.string().notRequired() // conversionRate is not required when isSync is true
+            })
+
     })
 }
 /**
@@ -291,7 +301,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                     <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span style={{ display: this.state.currency.isSync ? "none" : "inline-block"}} class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
                                                         name="conversionRate"
                                                         id="conversionRate"

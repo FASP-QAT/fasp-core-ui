@@ -1,14 +1,12 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 let m = 0;
 let c = 0;
-export function calculateSemiAverages(inputData, noOfProjectionMonths, props, page, regionId,planningUnitId) {
+export function calculateSemiAverages(inputData, noOfProjectionMonths, props, page, regionId, planningUnitId) {
     const data = inputData;
     const noOfMonthsForProjection = noOfProjectionMonths;
     let actualMonths = 0;
     for (let x = 0; x < data.length; x++) {
-        if (data[x].actual != null) {
-            actualMonths++;
-        }
+        actualMonths++;
     }
     initializeSemiAverage(data, actualMonths);
     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
@@ -23,7 +21,7 @@ export function calculateSemiAverages(inputData, noOfProjectionMonths, props, pa
     if (page == "DataEntry") {
         var semiAvgData = { "data": data, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
         props.updateSemiAveragesData(semiAvgData);
-    }else if (page == "importFromQATSP") {
+    } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
         var semiAvgData = { "data": data, "PlanningUnitId": planningUnitId, "regionId": regionId }
         props.updateSemiAveragesData(semiAvgData);
     } else {
@@ -38,19 +36,23 @@ function initializeSemiAverage(data, actualMonths) {
     let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
     let cnt = 0;
     for (let x = 1; x <= Math.floor(actualMonths / 2); x++) {
-        x1 += data[x - 1].month;
-        console.log("X1 ",x)
-        y1 += data[x - 1].actual;
-        cnt++;
+        if (data[x - 1].actual != null) {
+            x1 += data[x - 1].month;
+            console.log("X1 ", x)
+            y1 += data[x - 1].actual;
+            cnt++;
+        }
     }
     x1 = x1 / cnt;
     y1 = y1 / cnt;
     cnt = 0;
     for (let x = actualMonths % 2 === 0 ? Math.floor(actualMonths / 2) + 1 : Math.floor(actualMonths / 2) + 2; x <= actualMonths; x++) {
-        x2 += data[x - 1].month;
-        console.log("X2 ",x)
-        y2 += data[x - 1].actual;
-        cnt++;
+        if (data[x - 1].actual != null) {
+            x2 += data[x - 1].month;
+            console.log("X2 ", x)
+            y2 += data[x - 1].actual;
+            cnt++;
+        }
     }
     x2 = x2 / cnt;
     y2 = y2 / cnt;

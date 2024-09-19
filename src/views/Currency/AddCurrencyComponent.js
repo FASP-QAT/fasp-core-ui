@@ -28,9 +28,18 @@ const validationSchema = function (values) {
         label: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.currency.currencytext')),
+        // conversionRate: Yup.string()
+        //     .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+        //     .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
+
         conversionRate: Yup.string()
-            .matches(/^\d+(\.\d{1,2})?$/, i18n.t('static.currency.conversionrateNumberTwoDecimalPlaces'))
-            .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
+            // .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d*(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .when('isSync', {
+                is: false, // when isSync is false
+                then: Yup.string().required(i18n.t('static.currency.conversionrateNumber')), // conversionRate is required
+                otherwise: Yup.string().notRequired() // conversionRate is not required when isSync is true
+            })
     })
 }
 /**
@@ -111,7 +120,15 @@ export default class AddCurrencyComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <Formik
-                                initialValues={initialValues}
+                                // initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    currencyCode: this.state.currencyCode,
+                                    // currencySymbol: this.state.currency.currencySymbol,
+                                    label: this.state.label.label_en,
+                                    conversionRate: this.state.conversionRateToUsd,
+                                    isSync: this.state.isSync
+                                }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     this.setState({
@@ -190,7 +207,7 @@ export default class AddCurrencyComponent extends Component {
                                                         name="label"
                                                         id="label"
                                                         bsSize="sm"
-                                                        valid={!errors.label && this.state.label.label_en != ''}
+                                                        valid={!errors.label}
                                                         invalid={touched.label && !!errors.label}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                         onBlur={handleBlur}
@@ -215,12 +232,13 @@ export default class AddCurrencyComponent extends Component {
                                                     <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
-                                                    <Input type="number"
+                                                    <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span id="conversionRateRequiredSpan" style={{ display: this.state.isSync ? "none" : "inline-block"}} class="red Reqasterisk">*</span></Label>
+                                                    <Input type="text"
                                                         name="conversionRate"
                                                         id="conversionRate"
-                                                        valid={!errors.conversionRate && this.state.conversionRateToUsd != ''}
-                                                        invalid={touched.conversionRate && !!errors.conversionRate}
+                                                        // valid={!errors.conversionRate && this.state.conversionRateToUsd != ''}
+                                                        valid={!errors.conversionRate}
+                                                        invalid={touched.conversionRate && !!errors.conversionRate || !!errors.conversionRate}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                         onBlur={handleBlur}
                                                         value={this.state.conversionRateToUsd}
@@ -277,7 +295,8 @@ export default class AddCurrencyComponent extends Component {
                                                 <FormGroup>
                                                     <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button> */}
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>
