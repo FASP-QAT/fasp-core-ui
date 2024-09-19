@@ -157,6 +157,20 @@ a {
 											<ul style="font-size: 13px;">
 												<li><b> Forecasting Node-Type :</b> Select discrete if this product will be used for limited time, and continuous 
 													if it will be used indefinitely.</li>
+													<li><b>Need to calculate quantities of discrete product usage? </b>
+														QAT has the option to calculate discrete product usage in forecasting unit nodes in 
+														two ways: by frontloading the discrete quantity consumed per patient in month 1 
+														(choose "Calculate Using One Time Dispensing" = "Yes") or by disaggregating the 
+														discrete quantity consumed per patient by month (choose "Calculate Using One Time Dispensing" = "No"). 
+														By default, QAT will assume the frontloading method of calculating discrete forecasting unit 
+														quantities; however, users have the option to choose the alternative method via a radio 
+														button. This alternative discrete calculation could be useful for Planning Units (PUs) 
+														that have low consumption patterns over a period of time. For example, if a pregnant woman 
+														is required to take a nutritional supplement once/month for the duration of the pregnancy 
+														(nine months), QAT currently would calculate nine supplements in month 1 (frontloading). 
+														Without frontloading, QAT would calculate one supplement in month 1, one supplement in 
+														month 2, one supplement in month 3, and so forth. 
+													</li>
 												<li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher 
 													levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field 
 													to indicate this delay.
