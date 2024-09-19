@@ -1298,13 +1298,13 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 if (validation == false) {
                     valid = false;
                 }
-                var batchDetails=this.props.items.batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")));
-                if(batchDetails.length>0){
-                    if(batchDetails[0].qtyAvailable<Number(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""))){
-                        inValid("C", y, i18n.t('static.supplyPlan.qtyNotAvailable'), elInstance);
-                        valid=false;
-                    }
-                }
+                // var batchDetails=this.props.items.batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")));
+                // if(batchDetails.length>0){
+                //     if(batchDetails[0].qtyAvailable<Number(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""))){
+                //         inValid("C", y, i18n.t('static.supplyPlan.qtyNotAvailable'), elInstance);
+                //         valid=false;
+                //     }
+                // }
                 totalConsumptionBatchQty += Number(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             }
         }
