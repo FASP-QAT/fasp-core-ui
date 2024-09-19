@@ -971,7 +971,7 @@ export default class SupplyPlanComponent extends React.Component {
                         if (batchDetailsToPush.length > 0) {
                             batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
                             if (shipmentBatchListFiltered.length > 0 || consumptionBatchListFiltered.length > 0 || inventoryBatchListFiltered.length > 0) {
-                                batchDetailsToPush[0].checkQtyValidation = true;
+                                batchDetailsToPush[0].checkQtyValidation = false;
                             } else {
                                 batchDetailsToPush[0].checkQtyValidation = false;
                             }
@@ -1007,7 +1007,7 @@ export default class SupplyPlanComponent extends React.Component {
                         if (batchDetailsToPush.length > 0) {
                             batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
                             if (shipmentBatchListFiltered.length > 0 || consumptionBatchListFiltered.length > 0 || inventoryBatchListFiltered.length > 0) {
-                                batchDetailsToPush[0].checkQtyValidation = true;
+                                batchDetailsToPush[0].checkQtyValidation = false;
                             } else {
                                 batchDetailsToPush[0].checkQtyValidation = false;
                             }

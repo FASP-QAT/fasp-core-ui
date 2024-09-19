@@ -1242,13 +1242,13 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             positiveValidation("D", y, elInstance);
                         }
                     }
-                    var batchDetails=this.props.items.puData.filter(c => c.id == parseInt(this.state.inventoryEl.getRowData(parseInt(rowNumber))[0]))[0].batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")));
-                    if(batchDetails.length>0 && Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())<0){
-                        if(batchDetails[0].qtyAvailable<Number(0-Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))){
-                            inValid("D", y, i18n.t('static.supplyPlan.qtyNotAvailable'), elInstance);
-                            valid=false;
-                        }
-                    }
+                    // var batchDetails=this.props.items.puData.filter(c => c.id == parseInt(this.state.inventoryEl.getRowData(parseInt(rowNumber))[0]))[0].batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")));
+                    // if(batchDetails.length>0 && Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())<0){
+                    //     if(batchDetails[0].qtyAvailable<Number(0-Number(elInstance.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))){
+                    //         inValid("D", y, i18n.t('static.supplyPlan.qtyNotAvailable'), elInstance);
+                    //         valid=false;
+                    //     }
+                    // }
                 }
                 if (rowData[2] == 1) {
                     validation = checkValidtion("number", "E", y, elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
