@@ -1,5 +1,7 @@
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateLinearRegression(inputData, confidence, noOfProjectionMonths, props, isTreeExtrapolation, page, regionId, planningUnitId) {
+    console.log("inside linear reg")
+
     const tTable = [
         { "df": 1, "zValue": [4.16529977009041, 6.31375151467504, 12.7062047361747, 63.6567411628715, 127.321336468872, 636.619248768789] },
         { "df": 2, "zValue": [2.28193058772768, 2.91998558035373, 4.30265272974946, 9.92484320091829, 14.0890472755553, 31.5990545764454] },
@@ -115,19 +117,19 @@ export function calculateLinearRegression(inputData, confidence, noOfProjectionM
             let ciL = y - cLevel;
             let ciU = y + cLevel;
             ciString = " : " + ciL + " : " + ciU;
-            output.push({ month:(x + 1),actual:null, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:cLevel})
-        }else{
-            output.push({ month:(x + 1),actual:inputData[x].actual, forecast:y == 'NA' ? null : y > 0 ? y : 0,ci:null})
+            output.push({ month: (x + 1), actual: null, forecast: y == 'NA' ? null : y > 0 ? y : 0, ci: cLevel })
+        } else {
+            output.push({ month: (x + 1), actual: inputData[x].actual, forecast: y == 'NA' ? null : y > 0 ? y : 0, ci: null })
         }
     }
-        if (page == "DataEntry") {
-            var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
-            props.updateLinearRegressionData(linearRegressionData);
-        }else if (page == "importFromQATSP") {
-            var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
-            props.updateLinearRegressionData(linearRegressionData);
-        } else {
-            props.updateState("linearRegressionData", output);
-            calculateError(output, "linearRegressionError", props);
-        }   
+    if (page == "DataEntry") {
+        var linearRegressionData = { "data": output, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
+        props.updateLinearRegressionData(linearRegressionData);
+    } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
+        var linearRegressionData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
+        props.updateLinearRegressionData(linearRegressionData);
+    } else {
+        props.updateState("linearRegressionData", output);
+        calculateError(output, "linearRegressionError", props);
+    }
 }
