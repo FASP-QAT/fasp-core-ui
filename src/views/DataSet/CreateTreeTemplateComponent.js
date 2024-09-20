@@ -8604,6 +8604,8 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = event.target.value;
+            let usagePeriodJson = {usagePeriodId: 1 };//to fix error at the time of edit template
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod = usagePeriodJson;
             this.getUsageText();
         }
         if (event.target.name === "planningUnitIdFU") {
