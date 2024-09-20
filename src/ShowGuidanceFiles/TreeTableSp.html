@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Mostrar guía</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Mesa de árbol</h3>
+										
+										<p>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Type de nœud:</span></p>
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table  style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Type de nœud</th>
+														<th>Valeur</th>
+														<th>Dérivés potentiels</th>
+														<th>Fonctionnalité avancée</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Agrégation ∑</b></td>
+														<td>Somme des dérivés</td>
+														<td><b style="color: rgb(0, 47, 108);">∑</b> ou Nombre</td>
+														<td>-</td>
+													</tr>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Nombre #</b></td>
+														<td>Défini à ce nœud</td>
+														<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
+													</tr>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Pourcentage %</b></td>
+														<td>Défini comme un pourcentage du parent/source</td>
+														<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+													</tr>
+													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td>Défini comme un pourcentage de la source et des paramètres de l'unité de prévision</td>
+														<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+													</tr>
+													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Unité de planification <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td>Défini comme un pourcentage du parent/source et des paramètres de l'unité de planification</td>
+														<td>-</td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</p>
+									
+									<p style="font-size: 13px;">
+										<span style="font-size: 13px; font-weight: bold;">Uso de escenarios :</span>Los escenarios se utilizan para modelar diferentes valores 
+										para el mismo árbol.
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table  style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Fijo para todos los escenarios</th>
+														<th style="width: 230px;">Único para cada escenario</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Estructura de árbol</td>
+														<td>Valor de nodo</td>
+													</tr>
+													<tr>
+														<td>Título del nodo</td>
+														<td>Mes</td>
+													</tr>
+													<tr>
+														<td>Tipo de nodo</td>
+														<td>notas</td>
+													</tr>
+													<tr>
+														<td></td>
+														<td>Modelado/Transferencia/Extrapolación</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</p>
+												
+									<p style="font-size: 13px;">
+										<span classnames="UnderLineText" style="font-size: 13px;"><b>Consejos para casos de uso específicos:</b></span>
+										<ul style="font-size: 13px;">
+											<li>
+												<b> Tipo de nodo de previsión :</b> Seleccione discreto si este producto se usará por tiempo limitado y continuo 
+												si se usará indefinidamente.</li>
+											<li><b> ¿Uso del producto retrasado o escalonado?</b> A veces, el consumo del producto se retrasa en relación a 
+												los otros niveles superiores del árbol. en lo pertinente <b> Unidad de previsión </b>nodo, utilice el <b>Retraso</b> campo para indicar este retraso.
+											<ul>
+												<li>Por ejemplo, si el uso del producto comenzará 2 meses después de las fechas del 
+													nodo principal, ingrese 2 en este campo.  </li>
+												<li>Este campo también se puede usar cuando el producto cambia con el tiempo, por 
+													ejemplo, si las unidades de pronóstico A, B y C se usan en secesión durante dos 
+													meses a la vez, puede configurar su árbol con la Unidad de pronóstico A 
+													(discreta para 2 meses). , lag=0), Unidad de Pronóstico B (discreta por 2 meses, lag=2), 
+													Unidad de Pronóstico C (discreta por 2 meses, lag = 4).
+												</li>
+											</ul>
+										</li>
+										
+										</ul>
+									</p>
+								
+
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
