@@ -13880,7 +13880,7 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody className="ModalBodyPadding">
+                    <ModalBody className="ModalBodyPadding Darkmode">
                         <div dangerouslySetInnerHTML={{
                             __html: localStorage.getItem('lang') == 'en' ?
                                 showguidanceBuildTreeEn :
