@@ -3,7 +3,7 @@ import { OrgDiagram } from 'basicprimitivesreact';
 import "jspdf-autotable";
 import cleanUp from '../../assets/img/calculator.png';
 import AggregationNode from '../../assets/img/Aggregation-icon.png';
-import AggregationDown from '../../assets/img/aggregateDown.png';
+import AggregationDown from '../../assets/img/funnel.png';
 import AggregationAllowed from '../../assets/img/aggregateAllowed.png';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, ConnectorAnnotationConfig, AnnotationType, LineType, Thickness, ConnectorShapeType, ConnectorPlacementType, HighlightPathAnnotationConfig } from 'basicprimitives';
 import { DropTarget, DragSource } from 'react-dnd';
@@ -814,7 +814,9 @@ export default class BuildTree extends Component {
             invalidNodeType: "",
             invalidParentNodeType: "",
             downwardAggregationList: [],
-            multiselectError: false
+            multiselectError: false,
+            showConnections: true,
+            sourceNodeUsageList: []
         }
         this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
@@ -3118,7 +3120,7 @@ export default class BuildTree extends Component {
                     calculateAllScenario: false
                 })
                 if(isCopy) {
-                    calculateModelingData(dataSetObj, this, '', -1, -1, type, [this.state.treeId, this.state.copyModalTree].toString(), false, false, this.state.autoCalculate).then(() => {
+                    calculateModelingData(dataSetObj, this, '', -1, -1, type, [this.state.treeId, this.state.copyModalTree].toString(), false, false, this.state.autoCalculate, true).then(() => {
                         resolve();
                     });
                 } else {
@@ -3253,7 +3255,7 @@ export default class BuildTree extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId = scenarioId;
         for (let i = 0; i < items.length; i++) {
-            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 6 || items[i].payload.nodeType.id == 2) {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
@@ -3648,6 +3650,7 @@ export default class BuildTree extends Component {
                 }
                 this.setState({ items })
             }
+            try {
             if (parameterName == 'type' && (value == 0 || value == 1) && (!this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].hasOwnProperty("extrapolation") || this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true")) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
@@ -3669,6 +3672,7 @@ export default class BuildTree extends Component {
                     });
                 }
             }
+            } catch(e) {}
             if (parameterName == "nodeDataMomList") {
                 this.saveTreeData(false, false);
             }
@@ -7234,7 +7238,8 @@ export default class BuildTree extends Component {
         var nodeTypeList = [];
         var tempDownwardAggregationList = [];
         var downwardAggregationList = [];
-        this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (x.treeId != this.state.treeId ? (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId})) : (t.level == (this.state.addNodeFlag ? this.state.currentItemConfig.context.level : this.state.currentItemConfig.context.level - 1) ? tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}) : "" ))))
+        // this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (x.treeId != this.state.treeId ? (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId})) : (t.level == (this.state.addNodeFlag ? this.state.currentItemConfig.context.level : this.state.currentItemConfig.context.level - 1) ? tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}) : "" ))))
+        this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}))))
         for(var i = 0; i < this.state.treeData.length; i++) {
             for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
                 if(this.state.treeData[i].scenarioList[j].active) {
@@ -7256,6 +7261,8 @@ export default class BuildTree extends Component {
             nodeType = this.state.nodeTypeList.filter(c => c.id == 1)[0];
             nodeTypeList.push(nodeType);
             nodeType = this.state.nodeTypeList.filter(c => c.id == 2)[0];
+            nodeTypeList.push(nodeType);
+            nodeType = this.state.nodeTypeList.filter(c => c.id == 6)[0];
             nodeTypeList.push(nodeType);
         }
         this.setState({
@@ -8112,6 +8119,9 @@ export default class BuildTree extends Component {
             this.setState({ toggleArray: tempToggleArray })
         }
         this.setState({ items: updatedItems }, () => { this.saveTreeData(false, true) })
+    }
+    changeShowConnections(e) {
+        this.setState({ showConnections: e.target.checked })
     }
     /**
      * Gets the value of a node based on its type.
@@ -9629,7 +9639,10 @@ export default class BuildTree extends Component {
     onCursoChanged(event, data) {
         const { context: item } = data;
         if (item != null) {
+            var sourceNodeUsageList = [];
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId) ? sourceNodeUsageList.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""))
             this.setState({
+                sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
                 usageTemplateId: '',
                 sameLevelNodeList: [],
@@ -10264,7 +10277,7 @@ export default class BuildTree extends Component {
                         id: 'B',
                         scaleLabel: {
                             display: true,
-                            labelString: "% of " + (this.state.currentItemConfig.context.payload.nodeType.id > 2 ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
+                            labelString: "% of " + ((this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.payload.nodeType.id != 6) ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ""),
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -10705,6 +10718,12 @@ export default class BuildTree extends Component {
                                                         value={this.state.currentScenario.notes}
                                                     ></Input>
                                                 </FormGroup>
+                                                {this.state.currentItemConfig.context.payload.downwardAggregationAllowed && <div className="col-md-6">
+                                                    <b>Used by the following nodes:</b><br></br>
+                                                    {this.state.sourceNodeUsageList.map(sn => (<><u><a href={"/#/dataSet/buildTree/tree/" + sn.treeId + "/" + this.state.programId + "/" + "-1"} target="_blank">
+                                                        {sn.treeName+" > "+sn.scenarioName+" > "+sn.nodeName}
+                                                    </a></u><br></br></>))}
+                                                </div>}
                                             </div>
                                         </>}
                                     <div>
@@ -12552,6 +12571,8 @@ export default class BuildTree extends Component {
                     itemTitleColor = "#BA0C2F";
                 }
             }
+            var sourceNodeUsageListCount = [];
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""))
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
@@ -12585,8 +12606,8 @@ export default class BuildTree extends Component {
                                                         (itemConfig.payload.nodeType.id == 1 ?
                                                             <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : 
                                                                 (itemConfig.payload.nodeType.id == 6 ?
-                                                                    <i><img src={AggregationDown} className="AggregationNodeSize" /></i> : "")))))}</b>
-                                    {itemConfig.payload.downwardAggregationAllowed ? <i><img src={AggregationAllowed} className="AggregationNodeSize" /></i> : ""}
+                                                                    <>{itemConfig.payload.downwardAggregationList.length}<i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
+                                    {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
                                 </div>
                             </div>
                         </div>
@@ -12600,6 +12621,8 @@ export default class BuildTree extends Component {
         }
         const HighlightNode = ({ itemConfig }) => {
             let itemTitleColor = Colors.RoyalBlue;
+            var sourceNodeUsageListCount = [];
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""))
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{ height: "88px", width: "200px", zIndex: "1" }}>
                     <div className={itemConfig.payload.nodeType.id == 5
@@ -12629,8 +12652,8 @@ export default class BuildTree extends Component {
                                                     (itemConfig.payload.nodeType.id == 1 ?
                                                         <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : 
                                                             (itemConfig.payload.nodeType.id == 6 ?
-                                                                <i><img src={AggregationDown} className="AggregationNodeSize" /></i> : "")))))}</b>
-                                {itemConfig.payload.downwardAggregationAllowed ? <i><img src={AggregationAllowed} className="AggregationNodeSize" /></i> : ""}
+                                                                <>{itemConfig.payload.downwardAggregationList.length}<i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
+                                    {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
                             </div>
                         </div>
                     </div>
@@ -12748,21 +12771,21 @@ export default class BuildTree extends Component {
                 }));
             }
         }
-        var newItems = this.state.items;       
+        var newItems = this.state.items;   
         for (var i = 0; i < newItems.length; i++) {
             if(newItems[i].payload.downwardAggregationList) {
                 for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId){
+                    if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections){
                         treeLevelItems.push(new ConnectorAnnotationConfig({
                             annotationType: AnnotationType.Connector,
-                            fromItem: parseInt(newItems[i].id),
-                            toItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                            fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                            toItem: parseInt(newItems[i].id),
                             labelSize: { width: 80, height: 30 },
                             connectorShapeType: ConnectorShapeType.OneWay,
-                            color: Colors.Green,
+                            color: "#000000",
                             offset: 0,
-                            lineWidth: 2,
-                            lineType: LineType.Dashed,
+                            lineWidth: 1,
+                            lineType: LineType.Solid,
                             connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
                             selectItems: false
                         }));
@@ -12775,19 +12798,17 @@ export default class BuildTree extends Component {
                         opacity: 1,
                         showArrows: false
                     })
-                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent).filter(x => x.id != parseInt(newItems[i].id));
-                    // if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId){
-                        for(var k = 0; k < tempValidLines.length; k++) {
-                            treeLevelItems.push({
-                                annotationType: AnnotationType.HighlightPath,
-                                items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
-                                color: "#000000",
-                                lineWidth: 1,
-                                opacity: 1,
-                                showArrows: false
-                            })
-                        }
-                    // }
+                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
+                    for(var k = 0; k < tempValidLines.length; k++) {
+                        treeLevelItems.push({
+                            annotationType: AnnotationType.HighlightPath,
+                            items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
+                            color: "#000000",
+                            lineWidth: 1,
+                            opacity: 1,
+                            showArrows: false
+                        })
+                    }
                 }
             }
         }
@@ -13471,7 +13492,7 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3" style={{ marginLeft: '-2%' }}>
+                                            <FormGroup className="col-md-2" style={{ marginLeft: '-2%' }}>
                                                 <div className="check inline  pl-lg-0 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -13546,6 +13567,25 @@ export default class BuildTree extends Component {
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                             <b>{i18n.t('static.tree.collapseTree')}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-2" >
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="active10"
+                                                            name="active10"
+                                                            checked={this.state.showConnections}
+                                                            onClick={(e) => { this.changeShowConnections(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>Funnel node connections</b>
                                                         </Label>
                                                     </div>
                                                 </div>

@@ -14,7 +14,7 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION } from '../../Constants';
  * @param {*} listPage This is the flag to check if this calculation function is being called from list page
  * @param {*} autoCalculate This is the flag used to check if auto calculate is checked or not
  */
-export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage, autoCalculate, calculateAggregationDownward, allNodeDataListMaster, originalTreeId) {
+export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage, autoCalculate, calculateAggregationDownward, allNodeDataListMaster, originalTreeId, maxCount) {
     return new Promise((resolve, reject) => {
     var db1;
     getDatabase();
@@ -689,10 +689,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 }
 
                     var aggregateDownwardNodeList = flatList.filter(c => c.payload.nodeType.id == 6);
+                    var count = maxCount ? maxCount : 0; 
                     var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
                     for (var fl = 0; fl < aggregateDownwardNodeList.length; fl++) {
-                        if(!calculateAggregationDownward || (calculateAggregationDownward && aggregateDownwardNodeList[fl].id != nodeId && treeList[tl].treeId == treeId) || (calculateAggregationDownward && treeList[tl].treeId != treeId)) {
+                        if((!calculateAggregationDownward || (calculateAggregationDownward && aggregateDownwardNodeList[fl].id != nodeId && treeList[tl].treeId == treeId) || (calculateAggregationDownward && treeList[tl].treeId != treeId)) && count <= aggregateDownwardNodeList.length) {
                             var payload = aggregateDownwardNodeList[fl].payload;
+                            count++;
                             if (payload.nodeType.id == 6) {
                                 var nodeDataMap = payload.nodeDataMap;
                                 var scenarioList = tree.scenarioList;
@@ -775,7 +777,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var treeIndex = dataset.programData.treeList.findIndex(t => t.treeId == treeList[tl].treeId);
                             dataset.programData.treeList[treeIndex] = treeList[tl];
                             datasetJson = dataset.programData;
-                            await calculateModelingData(dataset, props, page, aggregateDownwardNodeList[fl].id, -1, type, treeId != -1 ? treeList[tl].treeId : treeId, isTemplate, listPage, autoCalculate, true, allNodeDataList, (calculateAggregationDownward ? originalTreeId : treeId))
+                            await calculateModelingData(dataset, props, page, aggregateDownwardNodeList[fl].id, -1, type, treeId != -1 ? treeList[tl].treeId : treeId, isTemplate, listPage, autoCalculate, true, allNodeDataList, (calculateAggregationDownward ? originalTreeId : treeId), count)
                         }
                     }
 
