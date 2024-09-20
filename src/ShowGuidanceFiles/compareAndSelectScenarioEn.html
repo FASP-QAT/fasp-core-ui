@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,71 +8,164 @@
 	<title>Show Guidance</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<style>
-		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
-		body{padding: 0;margin: 0;color: #272127;}
-	
-/* .table1 td, th {
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		/* .table1 td, th {
   border: 1px solid #c8ced3;
   text-align: left;
   padding: 8px;
   border-collapse: collapse!important;
   width: 100%;
 }*/
-.table1 td {
-  border: 1px solid #c8ced3!important;
-  padding: 6px;
-  font-size: 13px;
-}
-.table1 th {
-  border: 1px solid #c8ced3!important;
-  padding: 6px;
-  font-size: 13px;
-}
-.table1 {
-  /* width: 100%; */
-  border-collapse: collapse;
-}
-a {
-    color: #205493;
-    /* text-decoration: none; */
-    background-color: transparent;
-}
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 {
+			/* width: 100%; */
+			border-collapse: collapse;
+		}
+
+		a {
+			color: #205493;
+			/* text-decoration: none; */
+			background-color: transparent;
+		}
 	</style>
 </head>
+
 <body style="margin:0;padding:0;background:#e4e5e6;">
 	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 		<tr>
 			<td align="center" style="padding:0;">
-				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
-							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+							<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
-									
+
 									<td style="padding:0 0 10px 0;color:#153643;">
-										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Compare and Select</h3>
-										<p style="font-size: 13px;"><span style="font-size:13px;font-weight: bold;"><u>Purpose : </u> </span>Enable users to compare all the available forecasts (from tree and consumption methods), and select their final forecast. In this screen, users select their forecasts one planning unit and region at a time. For selecting forecasts across multiple planning units and regions, use the<a href="/#/forecastReport/forecastSummary" target="_blank" style="text-decoration: underline;"> Forecast Summary</a> screen.</p>
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Compare and Select
+										</h3>
+										<p style="font-size: 13px;"><span
+												style="font-size:13px;font-weight: bold;"><u>Purpose : </u>
+											</span>Enable users to compare all the available forecasts (from tree and
+											consumption methods), and select their final forecast. In this screen, users
+											select their forecasts one planning unit and region at a time. For selecting
+											forecasts across multiple planning units and regions, use the<a
+												href="/#/forecastReport/forecastSummary" target="_blank"
+												style="text-decoration: underline;"> Forecast Summary</a> screen.</p>
 										<p>
-											<p style="font-size: 13px; font-weight: bold;"><span class=""><u>Using this screen:</u></span></p>
-											<ol style="font-size: 13px;" type="1"><li>Check to make sure all expected forecasts appear in the Compare &amp; Select table. To add forecasts, navigate to the <a href="/#/dataset/listTree" target="_blank" style="text-decoration: underline;">Manage Tree</a> screen to build a tree forecast or the <a href="/#/Extrapolation/extrapolateData" target="_blank" style="text-decoration: underline;">Extrapolation</a> screen to build a consumption-based forecast. The <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  symbol denotes that there is no forecast quantity available; the entire row will be gray and non-editable as there is nothing to display or select.</li><li>Review available forecasts using the following information on the screen:<ul type="a"><li> <b>Forecast Error (%):</b> this error is calculated using the Weighted Absolute Percentage Error (WAPE) calculation. If the forecast error is highlighted in <span style="color: rgb(17, 139, 112);">green text</span>, this forecast has the lowest forecast error out of the available forecasts.Example WAPE calculation using the default 6-month time window:<img class="img-fluid" src="/ForecastError-Formula.png"><br>If 6 months of data is not available, QAT will utilize as many months as available and denote it in this column.</li><li> <b>Compare to Consumption Forecast:</b> QAT compares available Consumption Forecasts and Tree Forecasts. For any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest Consumption Forecast. The comparison will be highlighted in <span style="color: rgb(186, 12, 47);">red text</span> if it is outside of the threshold percentages set by the user in the <br>  <a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Version Settings</a> screen.Assuming reliable actual consumption data, this comparison helps users determine if their Tree Forecasts are realistic. </li><li> <b>Graph:</b> Visually compare the different forecasts. The selected forecast will appear <b>bolded.</b></li><li> <b>Tabular Data Table:</b> Compare the data between forecasts side-by-side by clicking the “Show Data” button below the graph. Any <b>bolded/<span style="color: rgb(128, 0, 128); font-style: italic;">bolded italicized purple</span></b> data fall within the forecast period. </li></ul></li><li>Select the final forecast in the Compare &amp; Select table. Repeat steps 1-3 for each planning unit and region. Once completed,continue forward to the <a href="/#/forecastReport/forecastOutput" target="_blank" style="text-decoration: underline;">Monthly Forecast</a> to verify all planning units together.</li></ol>
+										<p style="font-size: 13px; font-weight: bold;"><span class=""><u>Using this
+													screen:</u></span></p>
+										<ol style="font-size: 13px;" type="1">
+											<li>Check to make sure all expected forecasts appear in the Compare &amp;
+												Select table. To add forecasts, navigate to the <a
+													href="/#/dataset/listTree" target="_blank"
+													style="text-decoration: underline;">Manage Tree</a> screen to build
+												a tree forecast or the <a href="/#/Extrapolation/extrapolateData"
+													target="_blank"
+													style="text-decoration: underline;">Extrapolation</a> screen to
+												build a consumption-based forecast. The <i
+													class="fa fa-exclamation-triangle" aria-hidden="true"></i> symbol
+												denotes that there is no forecast quantity available; the entire row
+												will be gray and non-editable as there is nothing to display or select.
+											</li>
+											<li>Review available forecasts using the following information on the
+												screen:<ul type="a">
+													<li> <b>Forecast Error (%):</b> this error is calculated using the
+														Weighted Absolute Percentage Error (WAPE) calculation. If the
+														forecast error is highlighted in <span
+															style="color: rgb(17, 139, 112);">green text</span>, this
+														forecast has the lowest forecast error out of the available
+														forecasts.Example WAPE calculation using the default 6-month
+														time window:<img class="img-fluid formula-img-mr"
+															src="/ForecastError-Formula.png"><br>If 6 months of data is
+														not available, QAT will utilize as many months as available and
+														denote it in this column.</li>
+													<li> <b>Compare to Consumption Forecast:</b> QAT compares available
+														Consumption Forecasts and Tree Forecasts. For any Tree
+														Forecasts, QAT will flag the percentage above the highest or
+														below the lowest Consumption Forecast. The comparison will be
+														highlighted in <span style="color: rgb(186, 12, 47);">red
+															text</span> if it is outside of the threshold percentages
+														set by the user in the <br> <a href="/#/dataset/versionSettings"
+															target="_blank" style="text-decoration: underline;">Version
+															Settings</a> screen.Assuming reliable actual consumption
+														data, this comparison helps users determine if their Tree
+														Forecasts are realistic. </li>
+													<li> <b>Graph:</b> Visually compare the different forecasts. The
+														selected forecast will appear <b>bolded.</b></li>
+													<li> <b>Tabular Data Table:</b> Compare the data between forecasts
+														side-by-side by clicking the “Show Data” button below the graph.
+														Any <b>bolded/<span
+																style="color: rgb(128, 0, 128); font-style: italic;">bolded
+																italicized purple</span></b> data fall within the
+														forecast period. </li>
+												</ul>
+											</li>
+											<li>Select the final forecast in the Compare &amp; Select table. Repeat
+												steps 1-3 for each planning unit and region. Once completed,continue
+												forward to the <a href="/#/forecastReport/forecastOutput"
+													target="_blank" style="text-decoration: underline;">Monthly
+													Forecast</a> to verify all planning units together.</li>
+										</ol>
 										</p>
 
-                                        <p style="font-size: 13px;font-weight: bold;"><u>Tips on Using the Graph & Tabular Data :</u><ul style="font-size: 13px;"><li>By default, QAT will display all available forecasts by Planning Unit and any actuals entered or imported from QAT Supply Planning module; however, a user may deselect the “Display?” checkbox for any forecasts in the top table if they do not wish to view it in the graph.  </li><li>A user may view the graph in Forecasting Unit, Equivalency Unit, and for a specific period of time. If a user choses to “Show only Forecast Period,” the graph will display only the period of time the user chose as the forecast period in the <a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Version Settings</a> screen. </li></ul></p>
+										<p style="font-size: 13px;font-weight: bold;"><u>Tips on Using the Graph &
+												Tabular Data :</u>
+										<ul style="font-size: 13px;">
+											<li>By default, QAT will display all available forecasts by Planning Unit
+												and any actuals entered or imported from QAT Supply Planning module;
+												however, a user may deselect the “Display?” checkbox for any forecasts
+												in the top table if they do not wish to view it in the graph. </li>
+											<li>A user may view the graph in Forecasting Unit, Equivalency Unit, and for
+												a specific period of time. If a user choses to “Show only Forecast
+												Period,” the graph will display only the period of time the user chose
+												as the forecast period in the <a href="/#/dataset/versionSettings"
+													target="_blank" style="text-decoration: underline;">Version
+													Settings</a> screen. </li>
+										</ul>
+										</p>
 
-									</li>
-								</ol>
-							</p>
-				</td>
-				</tr>
-				
-		
+										</li>
+										</ol>
+										</p>
+									</td>
+								</tr>
+
+
 							</table>
 						</td>
 					</tr>
-					
+
 				</table>
 			</td>
 		</tr>
 	</table>
 </body>
+
 </html>
