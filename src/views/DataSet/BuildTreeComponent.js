@@ -12572,7 +12572,8 @@ export default class BuildTree extends Component {
                 }
             }
             var sourceNodeUsageListCount = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""))
+            if(this.state.dataSetObj.programData.treeList)
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
@@ -12622,7 +12623,8 @@ export default class BuildTree extends Component {
         const HighlightNode = ({ itemConfig }) => {
             let itemTitleColor = Colors.RoyalBlue;
             var sourceNodeUsageListCount = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""))
+            if(this.state.dataSetObj.programData.treeList)
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{ height: "88px", width: "200px", zIndex: "1" }}>
                     <div className={itemConfig.payload.nodeType.id == 5
