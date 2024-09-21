@@ -3403,5 +3403,18 @@
     "static.currency.conversionrateusd": "Conversion rate to 1 USD",
     "static.logout.confirmLogout": "Are you sure you want to log out?",
     "static.common.node": "Node",
-    "static.pipeline.pipelineConvertorLinux": "Linux."
+    "static.pipeline.pipelineConvertorLinux": "Linux.",
+    "static.supplyPlan.totalAdjustment": "Total Adjustment",
+    "static.supplyPlan.manualAdjustment":"Adjustment (manual)",
+    "static.supplyPlan.nationalAdjustment":"National Adjustment (auto)",
+    "static.supplyPlan.projectedQuantity":"Projected Quantity",
+    "static.supplyPlan.actualQuantity":"Actual Quantity",
+    "static.supplyPlan.qtyNotAvailable":"Batch Quantity Not available",
+    "static.supplyPlan.actualInventoryNote1":"Click white cells to see data entry rows. Click on the `Final Inventory` row to edit batch details.",
+    "static.supplyPlan.actualInventoryNote2":"Right click to add/remove a batch, or to see the batch ledger for that batch",
+    "static.supplyPlan.batchTotal":"Batch Total",
+    "static.supplyPlan.inventoryTotal":"Inventory Total",
+    "static.supplyPlan.batchQtyNotAvailable":"Batch Total does not match Inventory Total",
+    "static.supplyPlan.combinationNotAllowed":"You cannot have combination of FEFO and other batch details",
+    "static.supplyPlan.qatAutocalculations":"QAT auto-calculation"
 }

@@ -1252,7 +1252,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
+            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
         }
     }
     /**
@@ -1294,10 +1294,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 if (validation == false) {
                     valid = false;
                 }
-                validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
+                validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
                 if (validation == false) {
                     valid = false;
                 }
+                // var batchDetails=this.props.items.batchInfoList.filter(c => (c.batchNo == (elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getCell(`A${parseInt(y) + 1}`).innerText).split("~")[1]).format("YYYY-MM")));
+                // if(batchDetails.length>0){
+                //     if(batchDetails[0].qtyAvailable<Number(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""))){
+                //         inValid("C", y, i18n.t('static.supplyPlan.qtyNotAvailable'), elInstance);
+                //         valid=false;
+                //     }
+                // }
                 totalConsumptionBatchQty += Number(elInstance.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", ""));
             }
         }

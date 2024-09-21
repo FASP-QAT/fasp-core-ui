@@ -127,6 +127,8 @@ class EditSupplyPlanStatus extends Component {
             consumptionTotalMonthWise: [],
             consumptionChangedFlag: 0,
             inventoryTotalData: [],
+            adjustmentTotalData: [],
+            nationalAdjustmentTotalData: [],
             expectedBalTotalData: [],
             suggestedShipmentsTotalData: [],
             inventoryFilteredArray: [],
@@ -1338,6 +1340,22 @@ class EditSupplyPlanStatus extends Component {
         }
     }
     /**
+     * This function is used to toggle the accordian for the total adjustments
+     */
+    toggleAccordionTotalAdjustments() {
+        this.setState({
+            showTotalAdjustment: !this.state.showTotalAdjustment
+        })
+        var fields = document.getElementsByClassName("totalAdjustments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalAdjustment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+    /**
      * This function is called when the cancel button is clicked from expired stock popup
      */
     actionCanceledExpiredStock() {
@@ -1514,6 +1532,8 @@ class EditSupplyPlanStatus extends Component {
         var minStockMoS = [];
         var maxStockMoS = [];
         var inventoryTotalData = [];
+        var adjustmentTotalData = [];
+        var nationalAdjustmentTotalData = [];
         var suggestedShipmentsTotalData = [];
         var openingBalanceArray = [];
         var closingBalanceArray = [];
@@ -1887,7 +1907,6 @@ class EditSupplyPlanStatus extends Component {
                                 } else {
                                     onholdShipmentsTotalData.push("")
                                 }
-                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
                                 maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
@@ -2023,6 +2042,17 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
                                 var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
+                                var adjustmentCount=0;
+                                var adjustmentTotal=0;
+                                inventoryListForRegion.map(item=>{
+                                    if (item.adjustmentQty != undefined && item.adjustmentQty != null && item.adjustmentQty !== "") {
+                                        adjustmentCount+=1;
+                                        adjustmentTotal+=Number(Math.round(Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
+                                    }
+                                })
+                                adjustmentTotalData.push(adjustmentCount>0?Number(adjustmentTotal):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? Number(jsonList[0].nationalAdjustment) : "");
+                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?Number(adjustmentCount>0?Number(adjustmentTotal):0)+Number(jsonList[0].regionCountForStock > 0 ? Number(jsonList[0].nationalAdjustment) : 0):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -2081,7 +2111,7 @@ class EditSupplyPlanStatus extends Component {
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                 }
                                 consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
+                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0)-(jsonList[0].unmetDemand != "" && jsonList[0].unmetDemand!=null ? jsonList[0].unmetDemand : 0);
                                 if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                     totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                 }
@@ -2124,6 +2154,8 @@ class EditSupplyPlanStatus extends Component {
                                 plannedShipmentsTotalData.push("");
                                 onholdShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
+                                adjustmentTotalData.push("");
+                                nationalAdjustmentTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
                                 maxQtyArray.push(null)
@@ -2170,6 +2202,8 @@ class EditSupplyPlanStatus extends Component {
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
                             onholdShipmentsTotalData: onholdShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
+                            adjustmentTotalData:adjustmentTotalData,
+                            nationalAdjustmentTotalData:nationalAdjustmentTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
                             amcTotalData: amcTotalData,
@@ -2374,6 +2408,10 @@ class EditSupplyPlanStatus extends Component {
                     this.fetchData();
                     this.buildJExcel()
                     var fields = document.getElementsByClassName("totalShipments");
+                    for (var i = 0; i < fields.length; i++) {
+                        fields[i].style.display = "none";
+                    }
+                    var fields = document.getElementsByClassName("totalAdjustments");
                     for (var i = 0; i < fields.length; i++) {
                         fields[i].style.display = "none";
                     }
@@ -3409,18 +3447,46 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
-                                                            {
-                                                                this.state.inventoryTotalData.map((item1, count) => {
-                                                                    if (item1 != null) {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                                    } else {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                                    }
-                                                                })
-                                                            }
-                                                        </tr>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalAdjustments()}>
+                                                {this.state.showTotalAdjustment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.totalAdjustment')}</b></td>
+                                            {
+                                                this.state.inventoryTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualAdjustment')}</td>
+                                            {
+                                                this.state.adjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.nationalAdjustment')}</td>
+                                            {
+                                                this.state.nationalAdjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
@@ -4913,7 +4979,7 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             </tr>
                                             <tr bgcolor='#d9d9d9'>
-                                                <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                                <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                         if (count < 7) {
