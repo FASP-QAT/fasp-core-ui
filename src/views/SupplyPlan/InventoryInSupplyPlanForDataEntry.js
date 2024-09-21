@@ -50,8 +50,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var adjustmentType = this.props.items.inventoryType;
-                (instance).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},0)`, true);
-                (instance).setValueFromCoords(10, data[i].y, `=ROUND(H${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(9, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},8)`, true);
+                (instance).setValueFromCoords(10, data[i].y, `=ROUND(H${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},8)`, true);
                 (instance).setValueFromCoords(5, data[i].y, adjustmentType, true);
                 var index = (instance).getValue(`P${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
@@ -97,9 +97,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+            elInstance.setValueFromCoords(6, y, Math.round(Number(rowData[6])), true);
         } else if (x == 7 && !isNaN(rowData[7]) && rowData[7].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(7, y, parseFloat(rowData[7]), true);
+            elInstance.setValueFromCoords(7, y, Math.round(Number(rowData[7])), true);
         } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         } else if (x == 10 && !isNaN(rowData[10]) && rowData[10].toString().indexOf('.') != -1) {
@@ -281,8 +281,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[6] = Math.round(inventoryList[j].adjustmentQty); 
                             data[7] = Math.round(inventoryList[j].actualQty); 
                             data[8] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                            data[9] = `=ROUND(G${parseInt(j) + 1}*T${parseInt(j) + 1},0)`; 
-                            data[10] = `=ROUND(H${parseInt(j) + 1}*T${parseInt(j) + 1},0)`; 
+                            data[9] = `=ROUND(G${parseInt(j) + 1}*T${parseInt(j) + 1},8)`; 
+                            data[10] = `=ROUND(H${parseInt(j) + 1}*T${parseInt(j) + 1},8)`; 
                             if (inventoryList[j].notes === null || ((inventoryList[j].notes) == "NULL")) {
                                 data[11] = "";
                             } else {
@@ -322,8 +322,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[6] = ""; 
                             data[7] = ""; 
                             data[8] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
-                            data[9] = `=ROUND(F${parseInt(0) + 1}*T${parseInt(0) + 1},0)`; 
-                            data[10] = `=ROUND(G${parseInt(0) + 1}*T${parseInt(0) + 1},0)`; 
+                            data[9] = `=ROUND(F${parseInt(0) + 1}*T${parseInt(0) + 1},8)`; 
+                            data[10] = `=ROUND(G${parseInt(0) + 1}*T${parseInt(0) + 1},8)`; 
                             data[11] = "";
                             data[12] = true;
                             if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -700,8 +700,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[6] = ""; 
         data[7] = ""; 
         data[8] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
-        data[9] = `=ROUND(F${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},0)`; 
-        data[10] = `=ROUND(G${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},0)`;
+        data[9] = `=ROUND(F${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},8)`; 
+        data[10] = `=ROUND(G${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},8)`;
         data[11] = "";
         data[12] = true;
         if (this.props.inventoryPage != "inventoryDataEntry") {

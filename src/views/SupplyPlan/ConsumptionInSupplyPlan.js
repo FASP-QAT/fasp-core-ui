@@ -49,7 +49,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*Q${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(7, data[i].y, `=ROUND(F${parseInt(data[i].y) + 1}*Q${parseInt(data[i].y) + 1},8)`, true);
                 var index = (instance).getValue(`M${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(11, data[i].y, "", true);
@@ -113,7 +113,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 5 && !isNaN(rowData[5]) && rowData[5].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(5, y, parseFloat(rowData[5]), true);
+            elInstance.setValueFromCoords(5, y, Math.round(Number(rowData[5])), true);
         } else if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
         }
@@ -263,7 +263,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[4] = consumptionList[j].realmCountryPlanningUnit.id; 
                         data[5] = Math.round(consumptionList[j].consumptionRcpuQty); 
                         data[6] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                        data[7] = `=ROUND(F${parseInt(j) + 1}*Q${parseInt(j) + 1},0)`; 
+                        data[7] = `=ROUND(F${parseInt(j) + 1}*Q${parseInt(j) + 1},8)`; 
                         data[8] = consumptionList[j].dayOfStockOut;
                         if (consumptionList[j].notes === null || ((consumptionList[j].notes) == "NULL")) {
                             data[9] = "";
@@ -299,7 +299,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
                         data[5] = ""; 
                         data[6] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
-                        data[7] = `=ROUND(F${parseInt(0) + 1}*Q${parseInt(0) + 1},0)`; 
+                        data[7] = `=ROUND(F${parseInt(0) + 1}*Q${parseInt(0) + 1},8)`; 
                         data[8] = "";
                         data[9] = "";
                         data[10] = true;
@@ -700,7 +700,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[4] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
         data[5] = ""; 
         data[6] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
-        data[7] = `=ROUND(F${parseInt(json.length) + 1}*Q${parseInt(json.length) + 1},0)`; 
+        data[7] = `=ROUND(F${parseInt(json.length) + 1}*Q${parseInt(json.length) + 1},8)`; 
         data[8] = "";
         data[9] = "";
         data[10] = true;
@@ -1666,7 +1666,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             consumptionDataList[parseInt(map.get("12"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label;
                             consumptionDataList[parseInt(map.get("12"))].multiplier = map.get("16");
                             consumptionDataList[parseInt(map.get("12"))].consumptionRcpuQty = (elInstance.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
-                            consumptionDataList[parseInt(map.get("12"))].consumptionQty = (elInstance.getValue(`H${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
+                            consumptionDataList[parseInt(map.get("12"))].consumptionQty = Number(Number((elInstance.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll("\,", ""))*Number(map.get("16"))).toFixed(8);
                             consumptionDataList[parseInt(map.get("12"))].dayOfStockOut = (elInstance.getValue(`I${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
                             consumptionDataList[parseInt(map.get("12"))].notes = map.get("9");
                             consumptionDataList[parseInt(map.get("12"))].actualFlag = actualFlag;
@@ -1697,7 +1697,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 },
                                 consumptionDate: moment(map.get("0")).startOf('month').format("YYYY-MM-DD"),
                                 consumptionRcpuQty: elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
-                                consumptionQty: (elInstance.getValue(`H${parseInt(i) + 1}`, true)).toString().replaceAll("\,", ""),
+                                consumptionQty: Number(Number((elInstance.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll("\,", ""))*Number(map.get("16"))).toFixed(8),
                                 dayOfStockOut: elInstance.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
                                 active: map.get("10"),
                                 realmCountryPlanningUnit: {
