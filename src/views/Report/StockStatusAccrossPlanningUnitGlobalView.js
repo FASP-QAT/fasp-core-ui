@@ -1552,7 +1552,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                               <td></td>
                                             ) : (
                                               <td
-                                                className="text-center"
+                                                className="text-center darkModeclrblack"
                                                 style={this.cellstyleWithData(
                                                   item.programData.filter(
                                                     (c) =>
