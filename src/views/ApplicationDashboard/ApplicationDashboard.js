@@ -73,6 +73,7 @@ class ApplicationDashboard extends Component {
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
     this.checkNewerVersionsDataset = this.checkNewerVersionsDataset.bind(this);
     this.updateState = this.updateState.bind(this);
+    this.updateStateDashboard = this.updateStateDashboard.bind(this);
     this.getDataSetList = this.getDataSetList.bind(this);
     this.deleteProgram = this.deleteProgram.bind(this);
     this.deleteSupplyPlanProgram = this.deleteSupplyPlanProgram.bind(this);
@@ -377,7 +378,7 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    DashboardTop();
+    DashboardTop(this,false);
     if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
@@ -492,6 +493,16 @@ class ApplicationDashboard extends Component {
     this.setState({
       'programList': programList
     })
+  }
+  /**
+   * Update a specific key-value pair in the state's programList array.
+   * @param {string} key The key of the item in the programList array to update.
+   * @param {any} value The new value to set for the specified key.
+   */
+  updateStateDashboard(key, value) {
+    this.setState({
+      [key]: value
+  })
   }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
