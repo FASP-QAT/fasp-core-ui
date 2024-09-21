@@ -351,7 +351,7 @@ export async function filterOptions(options, filter){
  * @returns This function returns the rounded values in terms of ARU
  */
 export function roundARU(value, multiplier) {
-  if (multiplier != 1) {
+  // if (multiplier != 1) {
     if (value != null && value !== "") {
       var aruValue = Number(value) / Number(multiplier);
       if (Number(aruValue).toFixed(0) >= 100) {
@@ -366,7 +366,7 @@ export function roundARU(value, multiplier) {
     } else {
       return "";
     }
-  } else {
-    return value;
-  }
+  // } else {
+  //   return value;
+  // }
 }
