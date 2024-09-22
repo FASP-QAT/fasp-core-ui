@@ -2,6 +2,8 @@ import CryptoJS from 'crypto-js';
 import classNames from 'classnames';
 import moment from 'moment';
 import React, { Component } from 'react';
+import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
+import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
 import piechartImg from '../../assets/img/piegraph.png';
@@ -586,6 +588,200 @@ class ApplicationDashboard extends Component {
         </CarouselItem>
       );
     });
+
+    const stockStatusData = {
+      labels: ['Current Stock Status'],
+      datasets: [
+        {
+          label: 'Overstock',
+          data: [7],
+          backgroundColor: 'rgba(0, 51, 102, 0.8)', // Dark Blue
+        },
+        {
+          label: 'Adequate',
+          data: [67],
+          backgroundColor: 'rgba(0, 153, 51, 0.8)', // Green
+        },
+        {
+          label: 'Below Min',
+          data: [20],
+          backgroundColor: 'rgba(255, 204, 0, 0.8)', // Yellow
+        },
+        {
+          label: 'Stockout',
+          data: [6],
+          backgroundColor: 'rgba(204, 0, 0, 0.8)', // Red
+        }
+      ]
+    };
+
+    const stockStatusOptions = {
+      scales: {
+        xAxes: [{
+          stacked: true,
+          ticks: {
+            beginAtZero: true,
+            display: false // Hide the X-axis values
+          }
+        }],
+        yAxes: [{
+          stacked: true,
+          ticks: {
+            display: false // Hide the Y-axis values
+          },
+          gridLines: {
+            display: false // Remove grid lines
+          }
+        }]
+      },
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true // Use points for the legend icons
+        }
+      },
+      tooltips: {
+        enabled: true,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            const dataset = data.datasets[tooltipItem.datasetIndex];
+            const currentValue = dataset.data[tooltipItem.index];
+            const label = dataset.label;
+            return label + ': ' + currentValue + '%';
+          }
+        }
+      }
+    };
+
+    const shipmentsPieData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const shipmentsPieOptions = {
+    }
+
+    const forecastConsumptionData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const forecastConsumptionOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
+    const actualInventoryData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const actualInventoryOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
+    const actualConsumptionData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const actualConsumptionOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
+    const shipmentsData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const shipmentsOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
     return (
       <div className="animated fadeIn">
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
@@ -1374,23 +1570,20 @@ class ApplicationDashboard extends Component {
         <div className='row'>
           <div class="col-xl-12">
             <div className='row pl-lg-1 pr-lg-1'>
-              <div className='col-md-6'>
+              <div className='col-md-12'>
                 <div className='row'>
-                  <div className='col-md-6'>
-                    <div class="card custom-card">
+                  <div className='col-md-3'>
+                    <div className="card custom-card" style={{ height: '350px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Stock Status </div>
                       </div>
                       <div class="card-body">
-                        <img src={barchartImg} style={{ width: '100%' }} />
-
+                        <HorizontalBar data={stockStatusData} options={stockStatusOptions} />
                       </div>
-
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Stocked out Planning Units (3) </div>
                       </div>
                       <div class="card-body pt-2 pb-0">
-
                         <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
                           <li class="success">
                             <div class="d-flex align-items-center justify-content-between">
@@ -1414,8 +1607,8 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-6 pl-lg-6 pr-lg-6">
-                    <div class="card custom-card">
+                  <div className="col-md-3">
+                    <div className="card custom-card" style={{ height: '350px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Forecast Error </div>
                       </div>
@@ -1479,68 +1672,20 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className='row'>
-                  <div className='col-md-12'>
-                    <div class="card custom-card">
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title"> Data Quality (doesn't use date selector) </div>
-                      </div>
-                      <div class="card-body py-2">
-                        <div className='row'>
-                          <div class="container1">
-                            <span class="label-text" style={{ paddingLeft: '31px' }}>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <span class="score text-mutedDashboard">20 Missing</span>
-                            </div>
-                          </div>
-                          <div class="container1">
-                            <span class="label-text" style={{ paddingLeft: '54px' }}>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <span class="score text-mutedDashboard">20 Missing</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className='row'>
-                          <div class="container1">
-                            <span class="label-text" style={{ paddingLeft: '39px' }}>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <span class="score text-mutedDashboard">20 Missing</span>
-                            </div>
-                          </div>
-                          <div class="container1">
-                            <span class="label-text" style={{ paddingLeft: '64px' }}>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <span class="score text-mutedDashboard">20 Missing</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-6 pl-lg-6 pr-lg-6">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div className="card custom-card">
+                  <div className="col-md-3">
+                    <div className="card custom-card" style={{ height: '350px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title">Shipments </div>
                       </div>
                       <div class="card-body">
                         <div className='d-flex align-items-center justify-content-center'>
-                          <img src={piechartImg} width={'210px'} />
+                          <Pie data={shipmentsPieData} options={shipmentsPieOptions} />
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  <div class="col-md-6">
-                    <div className="card custom-card">
+                  <div className="col-md-3">
+                    <div className="card custom-card" style={{ height: '350px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"># of Shipments with funding TBD </div>
                       </div>
@@ -1589,11 +1734,56 @@ class ApplicationDashboard extends Component {
                     </div>
                   </div>
                 </div>
-                <div class="row">
-                  <div className='col-md-12'>
+                <div className='row'>
+                  <div className='col-md-6'>
+                    <div class="card custom-card" style={{ height: '360px' }}>
+                      <div class="card-header  justify-content-between">
+                        <div class="card-title"> Data Quality (doesn't use date selector) </div>
+                      </div>
+                      <div class="card-body py-2">
+                        <div className='row'>
+                          <div class="col-md-6 container1">
+                            <span class="label-text" style={{ paddingLeft: '31px' }}>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                          <div class="col-md-6 container1">
+                            <span class="label-text" style={{ paddingLeft: '54px' }}>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className='row'>
+                          <div class="col-md-6 container1">
+                            <span class="label-text" style={{ paddingLeft: '39px' }}>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                          <div class="col-md-6 container1">
+                            <span class="label-text" style={{ paddingLeft: '64px' }}>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <div class="pie-wrapper">
+                              <div class="arc" data-value="24"></div>
+                              <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
+                              <span class="score text-mutedDashboard">20 Missing</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='col-md-6'>
                     <div className='row'>
                       <div class="col-md-12 pl-lg-4 pr-lg-4">
-                        <div class="card custom-card">
+                        <div class="card custom-card" style={{ height: '360px' }}>
                           <div class="card-header justify-content-between">
                             <div class="card-title"> Expiries</div>
                           </div>
@@ -1605,11 +1795,7 @@ class ApplicationDashboard extends Component {
                                   <tr>
                                     <th style={{ width: '168px' }}>Planning Unit</th>
                                     <th style={{ width: '100px' }}>Expired/Expiring Quantity</th>
-                                    <th scope="col">Batch Number</th>
-                                    <th scope="col">Auto Generated</th>
-                                    <th scope="col">Batch Start Date</th>
-                                    <th scope="col">Shelf Life (months)</th>
-                                    <th scope="col">Expiry Date</th>
+                                    <th scope="col">Expiring MOS</th>
                                     <th scope="col">Total Cost</th>
                                   </tr>
                                 </thead>
@@ -1617,40 +1803,24 @@ class ApplicationDashboard extends Component {
                                   <tr>
                                     <td style={{ width: '168px' }}>(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
                                     <td>50</td>
-                                    <td>QAT00257100000001240825AVG</td>
-                                    <td>Yes</td>
-                                    <td>05-Jun-24</td>
-                                    <td>10</td>
                                     <td>01-Apr-25</td>
                                     <td>29,750</td>
                                   </tr>
                                   <tr>
                                     <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
                                     <td>50</td>
-                                    <td>QAT00257100000001240825AVG</td>
-                                    <td>Yes</td>
-                                    <td>05-Jun-24</td>
-                                    <td>10</td>
                                     <td>01-Apr-25</td>
                                     <td>29,750</td>
                                   </tr>
                                   <tr>
                                     <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
                                     <td>50</td>
-                                    <td>QAT00257100000001240825AVG</td>
-                                    <td>Yes</td>
-                                    <td>05-Jun-24</td>
-                                    <td>10</td>
                                     <td>01-Apr-25</td>
                                     <td>29,750</td>
                                   </tr>
                                   <tr>
                                     <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
                                     <td>50</td>
-                                    <td>QAT00257100000001240825AVG</td>
-                                    <td>Yes</td>
-                                    <td>05-Jun-24</td>
-                                    <td>10</td>
                                     <td>01-Apr-25</td>
                                     <td>29,750</td>
                                   </tr>
