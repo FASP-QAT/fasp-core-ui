@@ -9999,7 +9999,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==3?i18n.t('static.tree.percentageNodeValue'):i18n.t('static.tree.percentageOfParent'))}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <InputGroup>
                                                         <Input type="number"
                                                             id="percentageOfParent"
@@ -10041,7 +10041,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
-                                                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==2?i18n.t('static.tree.numberNodeValue'):i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id >= 4) &&
                                                         <Label htmlFor="currencyId"> {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue} % of {i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {i18n.t("static.ManageTree.Month")} {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo} {this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     <Input type="text"

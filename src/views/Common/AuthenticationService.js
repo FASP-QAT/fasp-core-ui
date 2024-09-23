@@ -113,11 +113,11 @@ class AuthenticationService {
      *                   If the user is not logged in or if the realm ID is not found, returns an empty string.
      */
     getRealmId() {
-        try{
+        try {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
             return decryptedUser.realm.realmId;
-        }catch{
+        } catch {
             return "";
         }
     }
@@ -145,7 +145,7 @@ class AuthenticationService {
         } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList","/report/problemList/:programId/:calculate/:color/:message","/report/problemList/:color/:message","/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate", "/ApplicationDashboard/:id", "/ApplicationDashboard", "/ApplicationDashboard/:color/:message", "/ApplicationDashboard/:id/:color/:message", "/planningUnitSetting/listPlanningUnitSetting", "/dataset/versionSettings", "/dataset/importDataset", "/dataset/exportDataset", "/dataentry/consumptionDataEntryAndAdjustment", "/dataentry/consumptionDataEntryAndAdjustment/:color/:message", "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId", "/extrapolation/extrapolateData","/extrapolation/extrapolateData/:planningUnitId", "/dataset/listTree", "/validation/modelingValidation", "/validation/productValidation", "/report/compareAndSelectScenario", "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId", "/forecastReport/forecastOutput", "/forecastReport/forecastOutput/:programId/:versionId", "/forecastReport/forecastSummary", "/forecastReport/forecastSummary/:programId/:versionId", "/report/compareVersion", "/dataSet/buildTree/tree/:treeId/:programId", "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId", "/dataSet/buildTree/", "/dataSet/buildTree/template/:templateId","/accessDenied"];
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/problemList/:programId/:calculate/:color/:message", "/report/problemList/:color/:message", "/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate", "/ApplicationDashboard/:id", "/ApplicationDashboard", "/ApplicationDashboard/:color/:message", "/ApplicationDashboard/:id/:color/:message", "/planningUnitSetting/listPlanningUnitSetting", "/dataset/versionSettings", "/dataset/importDataset", "/dataset/exportDataset", "/dataentry/consumptionDataEntryAndAdjustment", "/dataentry/consumptionDataEntryAndAdjustment/:color/:message", "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId", "/extrapolation/extrapolateData", "/extrapolation/extrapolateData/:planningUnitId", "/extrapolation/extrapolateData/:color/:message", "/dataset/listTree", "/validation/modelingValidation", "/validation/productValidation", "/report/compareAndSelectScenario", "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId", "/forecastReport/forecastOutput", "/forecastReport/forecastOutput/:programId/:versionId", "/forecastReport/forecastSummary", "/forecastReport/forecastSummary/:programId/:versionId", "/report/compareVersion", "/dataSet/buildTree/tree/:treeId/:programId", "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId", "/dataSet/buildTree/", "/dataSet/buildTree/template/:templateId", "/accessDenied"];
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
@@ -161,10 +161,10 @@ class AuthenticationService {
         let usernameStored = localStorage.getItem('username');
         if (usernameStored !== null && usernameStored !== "") {
             var originalText;
-            try{
+            try {
                 var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
                 originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
-            }catch{
+            } catch {
                 originalText = ""
             }
             if (originalText !== newUsername) {
@@ -213,19 +213,19 @@ class AuthenticationService {
     setupAxiosInterceptors() {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
             var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
-            var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());            
+            var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             let decryptedToken;
-            if(temp_time_token > 21000000){
+            if (temp_time_token > 21000000) {
                 axios.get(`${API_URL}/refresh`, {}).then(response => {
-                    var decoded = jwt_decode(response.data.token.toString().replaceAll("Bearer ",""));
-                    localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token.toString().replaceAll("Bearer ","")).toString(), `${SECRET_KEY}`));
+                    var decoded = jwt_decode(response.data.token.toString().replaceAll("Bearer ", ""));
+                    localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token.toString().replaceAll("Bearer ", "")).toString(), `${SECRET_KEY}`));
                     localStorage.setItem("tokenSetTime", new Date());
-                    decryptedToken = CryptoJS.AES.decrypt(response.data.token.toString().replaceAll("Bearer ",""), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                    decryptedToken = CryptoJS.AES.decrypt(response.data.token.toString().replaceAll("Bearer ", ""), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                 }).catch(error => {
-                    console.log("Error ",error);
+                    console.log("Error ", error);
                 })
-            }else{
+            } else {
                 decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             }
             let basicAuthHeader = 'Bearer ' + decryptedToken
@@ -277,7 +277,7 @@ class AuthenticationService {
     authenticatedRoute(route, url) {
         if (url == "") {
             localStorage.setItem("isOfflinePage", 0);
-            var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList","/report/problemList/:programId/:calculate/:color/:message","/report/problemList/:color/:message","/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate","/accessDenied"];
+            var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/problemList/:programId/:calculate/:color/:message", "/report/problemList/:color/:message", "/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate", "/accessDenied"];
             if (urlarr.includes(route)) {
                 localStorage.setItem("isOfflinePage", 1);
             }
@@ -818,6 +818,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/procurementAgent/mapProcurementAgentForecastingUnit/:procurementAgentId":
+                        if (bfunction.includes("ROLE_BF_MAP_FORECASTING_UNIT")) {
+                            return true;
+                        }
+                        break;                        
                     case "/programProduct/addProgramProduct":
                     case "/programProduct/addProgramProduct/:programId/:color/:message":
                         if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
@@ -1127,6 +1132,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/extrapolation/extrapolateData/:color/:message":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
                     case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
@@ -1194,6 +1204,15 @@ class AuthenticationService {
                     case "/dataSet/buildTree/":
                     case "/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal":
                     case "/dataSet/buildTree/template/:templateId":
+                        if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataSet/treeTable/tree/:treeId/:programId":
+                    case "/dataSet/treeTable/tree/:treeId/:programId/:scenarioId":
+                    case "/dataSet/treeTable/":
+                    case "/dataSet/treeTable/treeServer/:treeId/:programId/:isLocal":
+                    case "/dataSet/treeTable/template/:templateId":
                         if (bfunction.includes("ROLE_BF_ADD_TREE") || bfunction.includes("ROLE_BF_VIEW_TREE") || bfunction.includes("ROLE_BF_EDIT_TREE")) {
                             return true;
                         }
@@ -1318,9 +1337,9 @@ class AuthenticationService {
     clearUserDetails() {
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti","sesAutoCalculate", "sesRangeValueManualJson","sesLatestDataset","sesCountryIdSPVR","sesProgramIdSPVR","sesVersionTypeSPVR","sesVersionStatusSPVR","sesReportRangeSPVR"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti", "sesAutoCalculate", "sesRangeValueManualJson", "sesLatestDataset", "sesCountryIdSPVR", "sesProgramIdSPVR", "sesVersionTypeSPVR", "sesVersionStatusSPVR", "sesReportRangeSPVR"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti","sesAutoCalculate", "sesRangeValueManualJson","sesLatestDataset","sesCountryIdSPVR","sesProgramIdSPVR","sesVersionTypeSPVR","sesVersionStatusSPVR","sesReportRangeSPVR"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport", "sesShipmentType", "sesCountryId", "sesPlanningUnitIdMulti", "sesAutoCalculate", "sesRangeValueManualJson", "sesLatestDataset", "sesCountryIdSPVR", "sesProgramIdSPVR", "sesVersionTypeSPVR", "sesVersionStatusSPVR", "sesReportRangeSPVR"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1395,7 +1414,7 @@ class AuthenticationService {
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))
-        localStorage.setItem('sesAutoCalculate',true)
+        localStorage.setItem('sesAutoCalculate', true)
     }
     /**
      * Retrieves the icon or static label based on the specified value and the user's default language.

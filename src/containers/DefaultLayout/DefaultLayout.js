@@ -122,6 +122,7 @@ const ListProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit
 const AddProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/AddProcurementUnit'))
 const EditProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/EditProcurementUnit'))
 const AddProcurementAgentPlanningUnit = React.lazy(() => import('../../views/ProcurementAgentPlanningUnit/AddProcurementAgentPlanningUnit'));
+const MapProcurementAgentForecastingUnit = React.lazy(() => import('../../views/ProcurementAgent/MapProcurementAgentForecastingUnit'));
 const AddProcurementAgentProcurementUnit = React.lazy(() => import('../../views/ProcurementAgentProcurementUnit/AddProcurementAgentProcurementUnit'));
 const PlanningUnitCountryList = React.lazy(() => import('../../views/RealmCountry/RealmCountryPlanningUnitList'));
 const PlanningUnitCapacity = React.lazy(() => import('../../views/PlanningUnitCapacity/PlanningUnitCapacity'));
@@ -178,6 +179,7 @@ const ProductValidation = React.lazy(() => import('../../views/Validations/Produ
 const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAndSelect/CompareAndSelectScenario'))
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
+const TreeTable = React.lazy(() => import('../../views/DataSet/TreeTableComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
 const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
@@ -213,11 +215,13 @@ const routes = [
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:color/:message', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
-  { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
-  { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
-  { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.common.managetree', component: BuildTree },
-  { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
-  { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.ManageTree.BuildTree', component: BuildTree },
+  { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
+  { path: '/dataSet/treeTable/', exact: true, name: 'static.common.treeTable', component: TreeTable },
+  { path: '/dataSet/treeTable/tree/:treeId/:programId', exact: true, name: 'static.common.treeTable', component: TreeTable },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
   { path: '/shipment/shipmentDetails/:programId/:versionId/:planningUnitId', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList },
   { path: '/report/problemList/:color/:message', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.qatProblem', component: ProblemList },
@@ -252,6 +256,7 @@ const routes = [
   { path: '/programProduct/addProgramProduct', exact: true, name: 'static.Update.PlanningUnits', component: AddProgramProduct },
   { path: '/programProduct/addProgramProduct/:programId/:color/:message', name: 'static.Update.PlanningUnits', component: AddProgramProduct },
   { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentPlanningUnit', component: AddProcurementAgentPlanningUnit },
+  { path: '/procurementAgent/mapProcurementAgentForecastingUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentForecastingUnit', component: MapProcurementAgentForecastingUnit },
   { path: '/procurementAgent/addProcurementAgentProcurementUnit/:procurementAgentId', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementAgentProcurementUnit', component: AddProcurementAgentProcurementUnit },
   { path: '/budget/addBudget', name: 'static.breadcrum.add', entityname: 'static.dashboard.budget', component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.budget', component: ListBudgetComponent },
@@ -426,6 +431,7 @@ const routes = [
   { path: '/usageTemplate/listUsageTemplate', exact: true, name: 'static.breadcrum.list', entityname: 'static.usageTemplate.usageTemplate', component: UsageTemplateList },
   { path: '/extrapolation/extrapolateData', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
   { path: '/extrapolation/extrapolateData/:planningUnitId', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
+  { path: '/extrapolation/extrapolateData/:color/:message', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
   { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'static.commitProgram.commitProgram' }), component: CommitTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
