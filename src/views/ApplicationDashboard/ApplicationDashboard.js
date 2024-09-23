@@ -6,8 +6,10 @@ import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
-import piechartImg from '../../assets/img/piegraph.png';
-import barchartImg from '../../assets/img/bargraph1.png';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import {
   ButtonGroup,
   Card,
@@ -31,7 +33,7 @@ import {
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY } from '../../Constants.js';
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import DashboardService from "../../api/DashboardService";
 import ProgramService from "../../api/ProgramService";
 import imageHelp from '../../assets/img/help-icon.png';
@@ -79,6 +81,9 @@ class ApplicationDashboard extends Component {
     this.getDataSetList = this.getDataSetList.bind(this);
     this.deleteProgram = this.deleteProgram.bind(this);
     this.deleteSupplyPlanProgram = this.deleteSupplyPlanProgram.bind(this);
+    this.buildForecastErrorJexcel = this.buildForecastErrorJexcel.bind(this);
+    this.buildShipmentsTBDJexcel = this.buildShipmentsTBDJexcel.bind(this);
+    this.buildExpiriesJexcel = this.buildExpiriesJexcel.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -380,7 +385,56 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    DashboardTop(this,false);
+    DashboardTop(this, false);
+    Chart.plugins.register({
+      beforeDraw: function (chart) {
+        if (chart.config.type === 'doughnut') {
+          const width = chart.chart.width;
+          const height = chart.chart.height;
+          const ctx = chart.chart.ctx;
+
+          ctx.restore();
+          const fontSize = "1";
+          ctx.font = `bold ${fontSize}em Arial`;
+          ctx.textBaseline = "middle";
+
+          const text = "Center Text",
+            textX = Math.round((width - ctx.measureText(text).width) / 2),
+            textY = height / 1.5;
+
+          ctx.fillText(text, textX, textY);
+          ctx.save();
+        }
+      },
+      afterDatasetsDraw: function (chart) {
+        if (chart.config.type === 'horizontalBar') {
+          const ctx = chart.ctx;
+          chart.data.datasets.forEach(function (dataset, i) {
+            const meta = chart.getDatasetMeta(i);
+
+            meta.data.forEach(function (element, index) {
+              // Get the percentage value
+              const dataValue = dataset.data[index];
+              const percentageText = `${dataValue}%`;
+
+              // Calculate position for centered text
+              const position = element.tooltipPosition();
+              const barWidth = element._model.x - element._model.base; // Get the width of the bar
+              const centerX = element._model.base + barWidth / 2; // Center horizontally in the bar segment
+
+              // Set text style
+              ctx.fillStyle = 'white'; // Set text color
+              ctx.font = 'bold 12px Arial'; // Set font
+              ctx.textAlign = 'center'; // Horizontally align text to center
+              ctx.textBaseline = 'middle'; // Vertically align text to middle
+
+              // Draw the text at the center of each segment
+              ctx.fillText(percentageText, centerX, position.y);
+            });
+          });
+        }
+      }
+    });
     if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
@@ -440,6 +494,9 @@ class ApplicationDashboard extends Component {
           })
         })
     }
+    this.buildForecastErrorJexcel();
+    this.buildShipmentsTBDJexcel();
+    this.buildExpiriesJexcel();
     hideFirstComponent();
   }
   /**
@@ -504,7 +561,7 @@ class ApplicationDashboard extends Component {
   updateStateDashboard(key, value) {
     this.setState({
       [key]: value
-  })
+    })
   }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
@@ -525,6 +582,264 @@ class ApplicationDashboard extends Component {
     this.setState({
       popoverOpenMa: !this.state.popoverOpenMa,
     });
+  }
+
+  buildForecastErrorJexcel() {
+    var missingPUList = [
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+    ];
+    var dataArray = [];
+    let count = 0;
+    if (missingPUList.length > 0) {
+      for (var j = 0; j < missingPUList.length; j++) {
+        data = [];
+        data[0] = missingPUList[j].name
+        data[1] = missingPUList[j].percentage
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("forecastErrorJexcel"), '');
+    jexcel.destroy(document.getElementById("forecastErrorJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "PU",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Average %",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var forecastErrorJexcel = jexcel(document.getElementById("forecastErrorJexcel"), options);
+    this.el = forecastErrorJexcel;
+    this.setState({
+      forecastErrorJexcel
+    }
+    );
+  }
+
+  buildShipmentsTBDJexcel() {
+    var missingPUList = [
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+    ];
+    var dataArray = [];
+    let count = 0;
+    if (missingPUList.length > 0) {
+      for (var j = 0; j < missingPUList.length; j++) {
+        data = [];
+        data[0] = missingPUList[j].name
+        data[1] = missingPUList[j].percentage
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("shipmentsTBDJexcel"), '');
+    jexcel.destroy(document.getElementById("shipmentsTBDJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "PU",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "# of Shipments",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var shipmentsTBDJexcel = jexcel(document.getElementById("shipmentsTBDJexcel"), options);
+    this.el = shipmentsTBDJexcel;
+    this.setState({
+      shipmentsTBDJexcel
+    }
+    );
+  }
+
+  buildExpiriesJexcel() {
+    var missingPUList = [
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+    ];
+    var dataArray = [];
+    let count = 0;
+    if (missingPUList.length > 0) {
+      for (var j = 0; j < missingPUList.length; j++) {
+        data = [];
+        data[0] = missingPUList[j].name
+        data[1] = missingPUList[j].percentage
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("expiriesJexcel"), '');
+    jexcel.destroy(document.getElementById("expiriesJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "Planning Unit",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Expired/Expiring Quanitity",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Expiring MOS",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Total Cost",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var expiriesJexcel = jexcel(document.getElementById("expiriesJexcel"), options);
+    this.el = expiriesJexcel;
+    this.setState({
+      expiriesJexcel
+    }
+    );
   }
   /**
    * Displays a loading indicator while data is being loaded.
@@ -649,7 +964,8 @@ class ApplicationDashboard extends Component {
         display: true,
         position: 'bottom',
         labels: {
-          usePointStyle: true // Use points for the legend icons
+          pointStyle: 'rect',
+          boxWidth: 12
         }
       },
       tooltips: {
@@ -661,6 +977,15 @@ class ApplicationDashboard extends Component {
             const label = dataset.label;
             return label + ': ' + currentValue + '%';
           }
+        }
+      },
+      plugins: {
+        datalabels: {
+          display: true,
+          color: 'white',
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => `${value}%` // Display percentage values
         }
       }
     };
@@ -683,6 +1008,14 @@ class ApplicationDashboard extends Component {
       }]
     };
     const shipmentsPieOptions = {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          pointStyle: 'rect',
+          boxWidth: 12
+        }
+      },
     }
 
     const forecastConsumptionData = {
@@ -1584,7 +1917,7 @@ class ApplicationDashboard extends Component {
               <div className='col-md-12'>
                 <div className='row'>
                   <div className='col-md-3'>
-                    <div className="card custom-card" style={{ height: '350px' }}>
+                    <div className="card custom-card" style={{ height: '375px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Stock Status </div>
                       </div>
@@ -1619,72 +1952,18 @@ class ApplicationDashboard extends Component {
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="card custom-card" style={{ height: '350px' }}>
+                    <div className="card custom-card" style={{ height: '375px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Forecast Error </div>
                       </div>
-                      <div class="card-body px-0 py-0">
-                        <div class="table-responsive tableFixHeadDash" style={{ height: '309px' }}>
-                          <table class="table text-nowrap table-bordered">
-                            <thead>
-                              <tr>
-                                <th scope="col">PU</th>
-                                <th scope="col">Average %</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                            </tbody>
-                          </table>
+                      <div class="card-body px-0 py-0" style={{ overflowY: "auto" }}>
+                        <div id="forecastErrorJexcel">
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="card custom-card" style={{ height: '350px' }}>
+                    <div className="card custom-card" style={{ height: '375px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title">Shipments </div>
                       </div>
@@ -1696,50 +1975,12 @@ class ApplicationDashboard extends Component {
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="card custom-card" style={{ height: '350px' }}>
+                    <div className="card custom-card" style={{ height: '375px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"># of Shipments with funding TBD </div>
                       </div>
-                      <div class="card-body">
-                        <div class="table-responsive tableFixHeadDash" style={{ height: '186px' }}>
-                          <table class="table text-nowrap table-bordered">
-                            <thead>
-                              <tr>
-                                <th scope="col">PU</th>
-                                <th scope="col"># of Shipments</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>15</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>15</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>15</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>15</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>150%</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>15</td>
-                              </tr>
-                              <tr>
-                                <td scope="row">TLD30​</td>
-                                <td>15</td>
-                              </tr>
-                            </tbody>
-                          </table>
+                      <div class="card-body px-0 py-0" style={{ overflowY: "auto" }}>
+                        <div id="shipmentsTBDJexcel">
                         </div>
                       </div>
                     </div>
@@ -1747,44 +1988,40 @@ class ApplicationDashboard extends Component {
                 </div>
                 <div className='row'>
                   <div className='col-md-6'>
-                    <div class="card custom-card" style={{ height: '360px' }}>
+                    <div class="card custom-card" style={{ height: '375px' }}>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Data Quality (doesn't use date selector) </div>
                       </div>
                       <div class="card-body py-2">
                         <div className='row'>
                           <div class="col-md-6 container1">
-                            <span class="label-text" style={{ paddingLeft: '31px' }}>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <span class="label-text"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
-                              <span class="score text-mutedDashboard">20 Missing</span>
                             </div>
                           </div>
                           <div class="col-md-6 container1">
-                            <span class="label-text" style={{ paddingLeft: '54px' }}>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <span class="label-text"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
-                              <span class="score text-mutedDashboard">20 Missing</span>
                             </div>
                           </div>
                         </div>
                         <div className='row'>
                           <div class="col-md-6 container1">
-                            <span class="label-text" style={{ paddingLeft: '39px' }}>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <span class="label-text"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
-                              <span class="score text-mutedDashboard">20 Missing</span>
                             </div>
                           </div>
                           <div class="col-md-6 container1">
-                            <span class="label-text" style={{ paddingLeft: '64px' }}>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></span>
+                            <span class="label-text"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
-                              <span class="score text-mutedDashboard">20 Missing</span>
                             </div>
                           </div>
                         </div>
@@ -1794,49 +2031,13 @@ class ApplicationDashboard extends Component {
                   <div className='col-md-6'>
                     <div className='row'>
                       <div class="col-md-12 pl-lg-4 pr-lg-4">
-                        <div class="card custom-card" style={{ height: '360px' }}>
+                        <div class="card custom-card" style={{ height: '375px' }}>
                           <div class="card-header justify-content-between">
                             <div class="card-title"> Expiries</div>
                           </div>
-                          <div class="card-body pl-lg-0 pr-lg-0 pt-lg-2">
+                          <div class="card-body px-0 py-0" style={{ overflowY: "auto" }}>
                             <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
-                            <div class="table-responsive tableFixHeadDash" style={{ height: '186px' }}>
-                              <table class="table table-bordered">
-                                <thead>
-                                  <tr>
-                                    <th style={{ width: '168px' }}>Planning Unit</th>
-                                    <th style={{ width: '100px' }}>Expired/Expiring Quantity</th>
-                                    <th scope="col">Expiring MOS</th>
-                                    <th scope="col">Total Cost</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td style={{ width: '168px' }}>(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                                    <td>50</td>
-                                    <td>01-Apr-25</td>
-                                    <td>29,750</td>
-                                  </tr>
-                                  <tr>
-                                    <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                                    <td>50</td>
-                                    <td>01-Apr-25</td>
-                                    <td>29,750</td>
-                                  </tr>
-                                  <tr>
-                                    <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                                    <td>50</td>
-                                    <td>01-Apr-25</td>
-                                    <td>29,750</td>
-                                  </tr>
-                                  <tr>
-                                    <td scope="row">(COVID-19) 1 Year PM Contract [SC-731-PM-1Y], 1 Each​</td>
-                                    <td>50</td>
-                                    <td>01-Apr-25</td>
-                                    <td>29,750</td>
-                                  </tr>
-                                </tbody>
-                              </table>
+                            <div id="expiriesJexcel">
                             </div>
                           </div>
                         </div>
