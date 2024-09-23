@@ -31,11 +31,29 @@ const defaultProps = {
 
 const setDark = () => {
   localStorage.setItem("theme", "dark");
+  AuthenticationService.updateUserTheme(2);
+    if (localStorage.getItem("sessionType") === 'Online') {
+      AuthenticationService.setupAxiosInterceptors();
+      UserService.updateUserTheme(2)
+        .then(response => {
+        }).catch(
+          error => {
+          })
+    }
   document.documentElement.setAttribute("data-theme", "dark");
 };
 
 const setLight = () => {
   localStorage.setItem("theme", "light");
+  AuthenticationService.updateUserTheme(1);
+    if (localStorage.getItem("sessionType") === 'Online') {
+      AuthenticationService.setupAxiosInterceptors();
+      UserService.updateUserTheme(1)
+        .then(response => {
+        }).catch(
+          error => {
+          })
+    }
   document.documentElement.setAttribute("data-theme", "light");
 };
 
