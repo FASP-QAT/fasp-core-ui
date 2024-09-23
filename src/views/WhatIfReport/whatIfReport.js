@@ -6197,6 +6197,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     id="procurementAgentId"
                                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                                                     value={this.state.procurementAgents}
+                                                                    disabled={procurementAgentList.length > 0?false:true}
                                                                     onChange={(e) => { this.setProcurementAgents(e) }}
                                                                     labelledBy={i18n.t('static.common.select')}
                                                                 />
@@ -6212,12 +6213,18 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     filterOptions={filterOptions}
                                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                                     value={this.state.fundingSources}
+                                                                    disabled={fundingSourceList.length > 0?false:true}
                                                                     onChange={(e) => { this.setFundingSources(e) }}
                                                                     labelledBy={i18n.t('static.common.select')}
                                                                 />
                                                             </div>
                                                         </FormGroup>
                                                     </div>
+                                                    {procurementAgentList.length==0 && fundingSourceList.length==0 && 
+                                                    <><div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
+                                                    <span className='red'>{i18n.t('static.scenarioPlanning.noShipmentsInThatRange')}</span>
+                                                    </div><br/><br/></>
+                                                    }
                                                     <div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
                                                         <span className='text-blackD'><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
                                                     </div>
