@@ -9748,6 +9748,7 @@ export default class CreateTreeTemplate extends Component {
                             noOfPersons: "",
                             forecastingUnitPerPersonsFC: "",
                             repeatCount: "",
+                            repeatUsagePeriodId: "",
                             usageFrequencyCon: "",
                             usageFrequencyDis: "",
                             oneTimeUsage: "",
