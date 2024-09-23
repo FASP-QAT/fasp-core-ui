@@ -206,6 +206,20 @@ class AuthenticationService {
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
     }
+
+    /**
+     * Updates the user's theme preference in local storage.
+     * @param {string} languageCode - The theme code to set for the user.
+     */
+    updateUserTheme(themeId) {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+        decryptedUser.defaultThemeId = themeId;
+        localStorage.removeItem('user-' + decryptedCurUser);
+        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+        }
+    }
     /**
      * Sets up Axios interceptors to automatically add the Authorization header with the user's token for authenticated requests.
      * It also handles token refreshing if the token is expired.
