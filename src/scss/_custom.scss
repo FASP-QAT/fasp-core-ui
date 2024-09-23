@@ -231,7 +231,7 @@ body {
   border-color: #4d515a #4d515a #4d515a;
 }
 .nav-tabs .nav-link {
-  color: #e4e5e6!important;
+  color: #e4e5e6;
   // background-color: #212631;
   // border-color: #2a303d #2a303d #2a303d;
 }
@@ -1502,6 +1502,10 @@ a {
 .jexcelRedCell {
   color: #BA0C2F !important;
   font-weight: bolder;
+}
+a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
+  color: #e4e5e6;
+  text-decoration: none;
 }
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
