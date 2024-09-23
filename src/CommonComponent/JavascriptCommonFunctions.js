@@ -352,13 +352,14 @@ export async function filterOptions(options, filter){
  */
 export function roundARU(value, multiplier) {
   // if (multiplier != 1) {
+  if(value!=i18n.t('static.supplyPlan.notAllRegionsHaveActualStock')){
     if (value != null && value !== "") {
       var aruValue = Number(value) / Number(multiplier);
-      if (Number(aruValue).toFixed(0) >= 100) {
+      if (Math.abs(Number(aruValue).toFixed(0)) >= 100) {
         return Number(aruValue).toFixed(0);
-      } else if (Number(aruValue).toFixed(1) >= 10) {
+      } else if (Math.abs(Number(aruValue).toFixed(1)) >= 10) {
         return Number(aruValue).toFixed(1);
-      } else if (Number(aruValue).toFixed(2) >= 1) {
+      } else if (Math.abs(Number(aruValue).toFixed(2)) >= 1) {
         return Number(aruValue).toFixed(2);
       } else {
         return Number(aruValue).toFixed(3);
@@ -366,6 +367,9 @@ export function roundARU(value, multiplier) {
     } else {
       return "";
     }
+  }else{
+    return value;
+  }
   // } else {
   //   return value;
   // }

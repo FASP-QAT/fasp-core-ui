@@ -996,7 +996,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         for (var b = 0; b < batchDetails.length; b++) {
                             adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
                         }
-                        if (batchDetails.length > 0 && (Number(adjustmentBatchQty) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
+                        if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())!="" && (Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
                             inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                             valid = false;
                         } else {
@@ -1030,7 +1030,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 for (var b = 0; b < batchDetails.length; b++) {
                     adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
                 }
-                if (batchDetails.length > 0 && (Number(adjustmentBatchQty) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
+                if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())!="" && (Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -1216,7 +1216,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 this.props.updateState("inventoryBatchInfoNoStockError", i18n.t('static.consumption.missingBatch'));
                 this.props.hideThirdComponent();
                 valid = false;
-            } else if (adjustmentType == 2 && inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() != "" && (inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? totalAdjustments > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() : totalAdjustments < inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim())) {
+            } else if (adjustmentType == 2 && inventoryInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() != "" && (inventoryInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? totalAdjustments > inventoryInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() : totalAdjustments < inventoryInstance.getValue(`F${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim())) {
                 this.props.updateState("inventoryBatchInfoNoStockError", i18n.t('static.consumption.missingBatch'));
                 this.props.hideThirdComponent();
                 valid = false;

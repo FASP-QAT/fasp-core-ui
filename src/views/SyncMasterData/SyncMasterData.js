@@ -321,7 +321,7 @@ export default class SyncMasterData extends Component {
                                                                     realmCountryPlanningUnit: shipmentDataList[index].realmCountryPlanningUnit,
                                                                     procurementAgent: shipmentDataList[index].procurementAgent,
                                                                     productCost: Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price / shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty,
-                                                                    shipmentQty: Math.round(shipmentQty),
+                                                                    shipmentQty: (shipmentQty),
                                                                     shipmentRcpuQty: Math.round(shipmentARUQty),
                                                                     rate: Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price / shipmentDataList[index].realmCountryPlanningUnit).toFixed(6)),
                                                                     shipmentId: 0,
@@ -450,7 +450,7 @@ export default class SyncMasterData extends Component {
                                                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedBy.username = username;
                                                             linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                                             shipmentDataList[index].shipmentQty = Math.round(shipmentQty);
-                                                            shipmentDataList[index].shipmentRcpuQty = Math.round(shipmentARUQty);
+                                                            shipmentDataList[index].shipmentRcpuQty = (shipmentARUQty);
                                                             shipmentDataList[index].freightCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost;
                                                             shipmentDataList[index].productCost = Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price / shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty;
                                                             shipmentDataList[index].rate = Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price / shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6));

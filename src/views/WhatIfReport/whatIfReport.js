@@ -4594,12 +4594,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                 inventoryListForRegion.map(item=>{
                                                     if (item.adjustmentQty != undefined && item.adjustmentQty != null && item.adjustmentQty !== "") {
                                                         adjustmentCount+=1;
-                                                        adjustmentTotal+=Number(((item.adjustmentQty) * parseFloat(item.multiplier)))
+                                                        adjustmentTotal+=Number((Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
                                                     }
                                                 })
                                                 adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):"");
                                                 nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
-                                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.state.multiplier):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : 0):"");
+                                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
                                                 var consumptionTotalForRegion = 0;
                                                 var totalAdjustmentsQtyForRegion = 0;
                                                 var totalActualQtyForRegion = 0;
@@ -4614,13 +4614,13 @@ export default class WhatIfReportComponent extends React.Component {
                                                     for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                                         if (noOfActualEntries > 0) {
                                                             if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                                consumptionQtyForRegion += ((consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                                consumptionTotalForRegion += ((consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                                consumptionQtyForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                                consumptionTotalForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                             }
                                                             actualFlagForRegion = true;
                                                         } else {
-                                                            consumptionQtyForRegion += ((consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                            consumptionTotalForRegion += ((consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                            consumptionQtyForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                            consumptionTotalForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                                             actualFlagForRegion = false;
                                                         }
                                                     }
@@ -4636,8 +4636,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                     for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
                                                         if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty !== "") {
                                                             actualCount += 1;
-                                                            actualQtyForRegion += ((inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
-                                                            totalActualQtyForRegion += ((inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                            actualQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                            totalActualQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                             var index = regionsReportingActualInventory.findIndex(c => c == regionListFiltered[r].id);
                                                             if (index == -1) {
                                                                 regionsReportingActualInventory.push(regionListFiltered[r].id)
@@ -4645,8 +4645,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                         }
                                                         if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty !== "") {
                                                             adjustmentsCount += 1;
-                                                            adjustmentsQtyForRegion += ((inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
-                                                            totalAdjustmentsQtyForRegion += ((inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                            adjustmentsQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                                            totalAdjustmentsQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                                         }
                                                     }
                                                     if (actualCount == 0) {

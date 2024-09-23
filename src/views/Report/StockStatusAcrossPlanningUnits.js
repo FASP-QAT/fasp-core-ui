@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundARU, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -301,7 +301,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],1), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],1), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],1), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],0), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],1), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],1), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 200,
@@ -686,7 +686,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = dataStockStatus[j].planBasedOn;
             data[2] = data1;
-            data[3] = (dataStockStatus[j].stock);
+            data[3] = roundARU(dataStockStatus[j].stock,1);
             data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
             data[5] = (dataStockStatus[j].minMos);
             data[6] = (dataStockStatus[j].maxMos);
@@ -720,7 +720,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'numeric', mask: '#,##',
+                    type: 'numeric', mask: '#,##.000', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.mos'),

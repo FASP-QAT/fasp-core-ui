@@ -28,7 +28,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundARU, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
 const options = {
     title: {
         display: true,
@@ -795,10 +795,10 @@ class StockStatusOverTime extends Component {
                                                             }
                                                         }
                                                         if (count == 0) {
-                                                            consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
+                                                            consumptionQty += (Number((consumptionListForAMC[j].consumptionQty)));
                                                         } else {
                                                             if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                                consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
+                                                                consumptionQty += (Number((consumptionListForAMC[j].consumptionQty)));
                                                             }
                                                         }
                                                     }
@@ -821,10 +821,10 @@ class StockStatusOverTime extends Component {
                                                             }
                                                         }
                                                         if (count == 0) {
-                                                            consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
+                                                            consumptionQty += (Number((consumptionListForAMC[j].consumptionQty)));
                                                         } else {
                                                             if (consumptionListForAMC[j].actualFlag.toString() == 'true') {
-                                                                consumptionQty += Math.round(Number((consumptionListForAMC[j].consumptionQty)));
+                                                                consumptionQty += (Number((consumptionListForAMC[j].consumptionQty)));
                                                             }
                                                         }
                                                     }
@@ -986,7 +986,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
         var A = [addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), (i18n.t('static.report.mospast')).replaceAll(' ', '%20'), (i18n.t('static.report.mosfuture')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), i18n.t('static.report.mos')])]
-        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : roundARU(elt.stock,1), elt.consumptionQty == null ? '' : roundARU(elt.consumptionQty,1), elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1077,7 +1077,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.mospast'), i18n.t('static.report.mosfuture'), i18n.t('static.report.amc'), i18n.t('static.report.mos')]];
         const data = [];
         // this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), formatter(roundAMC(elt.amc),0), elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
-        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(roundARU(elt.stock,1),0), formatter(roundARU(elt.consumptionQty,1),0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1341,10 +1341,10 @@ class StockStatusOverTime extends Component {
                                                                 {getLabelText(item.planningUnit.label, this.state.lang)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.stock,0)}
+                                                                {formatter(roundARU(item.stock,1),0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.consumptionQty,0)}
+                                                                {formatter(roundARU(item.consumptionQty,1),0)}
                                                             </td>
                                                             <td>
                                                                 {formatter(item.mosPast,0)}

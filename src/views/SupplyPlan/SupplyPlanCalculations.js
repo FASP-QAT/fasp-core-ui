@@ -451,23 +451,23 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var regionList = regionListFiltered;
                                     for (var c = 0; c < consumptionList.length; c++) {
                                         if (consumptionList[c].actualFlag.toString() == "true") {
-                                            actualConsumptionQty += ((consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier));
+                                            actualConsumptionQty += (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier));
                                             if (consumptionList[c].dayOfStockOut > 0) {
                                                 var daysPerMonth = moment(startDate).daysInMonth();
                                                 var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
                                                 if (daysOfData > 0) {
-                                                    var trueDemandPerDay = ((consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;
+                                                    var trueDemandPerDay = (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)) / daysOfData;
                                                     trueDemandPerMonth += (trueDemandPerDay * daysPerMonth);
                                                 }
                                             } else {
-                                                trueDemandPerMonth += ((consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
+                                                trueDemandPerMonth += (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
                                             }
                                             var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                                             if (index == -1) {
                                                 regionsReportingActualConsumption.push(consumptionList[c].region.id);
                                             }
                                         } else {
-                                            forecastedConsumptionQty += ((consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
+                                            forecastedConsumptionQty += (Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier))
                                         }
                                     }
                                     noOfRegionsReportingActualConsumption = regionsReportingActualConsumption.length;
@@ -549,14 +549,14 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         if(inventoryListForRegionFilter.length==totalNoOfRegions){
                                             var stock=0;
                                             inventoryListForRegionFilter.map(item=>{
-                                                stock+=Number(item.actualQty)
+                                                stock+=Number(item.actualQty)*Number(item.multiplier)
                                             })
                                             var batchQty=0;
                                             var batchInfoList=batchInventoryListFilter[0].batchList;
                                             batchInfoList.map(item=>{
                                                 batchQty+=Number(item.qty)
                                             })
-                                            if(Number(stock)==Number(batchQty)){
+                                            if(Number(stock).toFixed(8)==Number(batchQty).toFixed(8)){
                                                 useInventoryCalculations=true;
                                             }
                                             batchInfoList.map(item=>{
@@ -866,7 +866,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (amcFilter[c].actualFlag.toString() == "true") {
                                                 var daysPerMonthPast = moment(amcDate).daysInMonth();
                                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
-                                                var trueDemandPerDayPast = ((amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;
+                                                var trueDemandPerDayPast = (Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;
                                                 var trueDemandPerMonth1 = (trueDemandPerDayPast * daysPerMonthPast);
                                                 actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
                                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
@@ -874,7 +874,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                                 }
                                             } else {
-                                                forecastedConsumptionQtyAmc += ((amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
+                                                forecastedConsumptionQtyAmc += (Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
                                             }
                                         }
                                         noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
@@ -904,7 +904,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                             if (amcFilter[c].actualFlag.toString() == "true") {
                                                 var daysPerMonthPast = moment(amcDate).daysInMonth();
                                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
-                                                var trueDemandPerDayPast = ((amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;
+                                                var trueDemandPerDayPast = (Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)) / daysOfDataPast;
                                                 var trueDemandPerMonth1 = (trueDemandPerDayPast * daysPerMonthPast);
                                                 actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
                                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
@@ -912,7 +912,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                                 }
                                             } else {
-                                                forecastedConsumptionQtyAmc += ((amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
+                                                forecastedConsumptionQtyAmc += (Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier));
                                             }
                                         }
                                         noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
