@@ -113,5 +113,8 @@ class ReportService {
         return axios.get(`${API_URL}/api/report/updateProgramInfo/programTypeId/${programTypeId}/realmCountryId/${realmCountryId}/active/${statusId}`, {}
         );
     }
+    getDropdownListByProgramIds(inputjson) {
+        return axios.post(`${API_URL}/api/report/stockStatusVertical/dropdowns`, inputjson, {});
+    }
 }
 export default new ReportService();
