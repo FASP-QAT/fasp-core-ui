@@ -566,7 +566,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         var programIdSplit = programId != 0 ? programId.split("_")[0] : 0;
-        if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0 && (this.state.rangeValue.from.year != '' && this.state.rangeValue.from.month != '' && this.state.rangeValue.to.year != '' && this.state.rangeValue.to.month != '') && this.state.isForecastOver == false) {
+        if (versionId != 0 && programIdSplit > 0 && forecastProgramId > 0 && (this.state.rangeValue.from.year != '' && this.state.rangeValue.from.month != '' && this.state.rangeValue.to.year != '' && this.state.rangeValue.to.month != '')) {
             let selectedSupplyPlanProgram = this.state.programObj;
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             if (selectedSupplyPlanProgram.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId) {
@@ -993,10 +993,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
         }
 
-        console.log('isForecastAlreadyStarted: ',isForecastAlreadyStarted);
-        console.log('isForecastOver: ',isForecastOver);
-        console.log('isWithinLast6Months: ',isWithinLast6Months);
-        console.log('isFutureForecast: ',isFutureForecast);
+        // console.log('isForecastAlreadyStarted: ',isForecastAlreadyStarted);
+        // console.log('isForecastOver: ',isForecastOver);
+        // console.log('isWithinLast6Months: ',isWithinLast6Months);
+        // console.log('isFutureForecast: ',isFutureForecast);
 
         if (isWithinLast6Months) {
             defaultForecastStartYear = formattedDate.getFullYear();
@@ -1007,6 +1007,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
         }
         this.setState({isForecastOver: isForecastOver});//to show/hide next button
+        this.props.updateStepOneData("isForecastOver", isForecastOver);
         if (isForecastOver) {
             //old
             // defaultForecastStartYear = "";
@@ -1031,11 +1032,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
 
-        console.log('at end');
-        console.log('defaultForecastStartYear: ',defaultForecastStartYear);
-        console.log('defaultForecastStartMonth: ',defaultForecastStartMonth);
-        console.log('defaultForecastStopYear: ',defaultForecastStopYear);
-        console.log('defaultForecastStopMonth: ',defaultForecastStopMonth);
+        // console.log('at end');
+        // console.log('defaultForecastStartYear: ',defaultForecastStartYear);
+        // console.log('defaultForecastStartMonth: ',defaultForecastStartMonth);
+        // console.log('defaultForecastStopYear: ',defaultForecastStopYear);
+        // console.log('defaultForecastStopMonth: ',defaultForecastStopMonth);
 
         this.setState({
             toggleDoNotImport:false,
@@ -1488,8 +1489,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                 {i18n.t('static.import.doNoImportCheckbox')}
                             </Label>
-                        </FormGroup>}
-                        <p class="col-md-12 red">{i18n.t('static.versionSettings.note')}: <i>Forecast consumption cannot be imported when forecast period is over.</i></p>
+                        </FormGroup>}                        
                     </div>
                 </div>
                 <div className="consumptionDataEntryTable" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0 || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="") ? "none" : "block" }} >
