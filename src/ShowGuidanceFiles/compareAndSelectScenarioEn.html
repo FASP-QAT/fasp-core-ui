@@ -82,18 +82,21 @@
 										<p style="font-size: 13px; font-weight: bold;"><span class=""><u>Using this
 													screen:</u></span></p>
 										<ol style="font-size: 13px;" type="1">
-											<li>Check to make sure all expected forecasts appear in the Compare &amp;
-												Select table. To add forecasts, navigate to the <a
-													href="/#/dataset/listTree" target="_blank"
-													style="text-decoration: underline;">Manage Tree</a> screen to build
-												a tree forecast or the <a href="/#/Extrapolation/extrapolateData"
+
+											<li>
+												Check to make sure all expected forecasts appear in the Compare & Select
+												table. To add forecasts, navigate to the <a href="/#/dataset/listTree"
+													target="_blank" style="text-decoration: underline;">Manage Tree</a>
+												screen to build a
+												tree forecast or the <a href="/#/Extrapolation/extrapolateData"
 													target="_blank"
 													style="text-decoration: underline;">Extrapolation</a> screen to
-												build a consumption-based forecast. The <i
-													class="fa fa-exclamation-triangle" aria-hidden="true"></i> symbol
-												denotes that there is no forecast quantity available; the entire row
-												will be gray and non-editable as there is nothing to display or select.
+												build a consumption-based
+												forecast. Any rows that appear gray and non-editable denotes that there
+												is no forecast quantity available as there is no data for that
+												particular forecast.
 											</li>
+
 											<li>Review available forecasts using the following information on the
 												screen:<ul type="a">
 													<li> <b>Forecast Error (%):</b> this error is calculated using the
@@ -127,12 +130,33 @@
 														forecast period. </li>
 												</ul>
 											</li>
-											<li>Select the final forecast in the Compare &amp; Select table. Repeat
-												steps 1-3 for each planning unit and region. Once completed,continue
-												forward to the <a href="/#/forecastReport/forecastOutput"
+											<li>Select the final forecast in the Compare & Select table. If there is a
+
+												<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> symbol
+												next to the Planning Unit, there is
+												no forecast selected.
+												If there is a <i class="fa fa-check-square" aria-hidden="true"></i>
+												symbol next to
+												the Planning Unit,
+												there is a forecast selected. Repeat steps 1-3 for each Planning Unit
+												and
+												Region until no more<i class="fa fa-exclamation-triangle"
+													aria-hidden="true"></i> symbols
+												remain. Once completed,
+												continue forward to the <a href="/#/forecastReport/forecastOutput"
 													target="_blank" style="text-decoration: underline;">Monthly
-													Forecast</a> to verify all planning units together.</li>
+													Forecast</a> to verify all planning units together.
+
+											</li>
+
 										</ol>
+										<p>Note: Users may select multiple tree forecasts as their final forecast, which
+											will aggregate the monthly forecast quantities; however, users cannot select
+											multiple consumption forecasts or a combination of consumption and tree
+											forecasts.
+
+
+										</p>
 										</p>
 
 										<p style="font-size: 13px;font-weight: bold;"><u>Tips on Using the Graph &
