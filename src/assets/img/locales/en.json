@@ -3475,5 +3475,6 @@
     "static.supplyPlan.qatAutocalculations":"QAT auto-calculation",
     "static.scenarioPlanning.noShipmentsInThatRange":"No shipments in that range. Proceed to selecting `Re-Planned Shipment settings`.",
     "static.supplyPlan.consumptionFEFO":"QAT Calculation (FEFO)",
-    "static.supplyPlan.adjustmentFEFO":"QAT Calculation (Best Case Scenario)"
+    "static.supplyPlan.adjustmentFEFO":"QAT Calculation (Best Case Scenario)",
+    "static.importIntoSupplyPlan.forecastRestrictionNotes": "Forecast consumption cannot be imported when forecast period is over."
 }
