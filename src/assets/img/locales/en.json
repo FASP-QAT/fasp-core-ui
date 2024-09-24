@@ -3473,5 +3473,7 @@
     "static.supplyPlan.batchQtyNotAvailable":"Batch Total does not match Inventory Total",
     "static.supplyPlan.combinationNotAllowed":"You cannot have combination of FEFO and other batch details",
     "static.supplyPlan.qatAutocalculations":"QAT auto-calculation",
-    "static.scenarioPlanning.noShipmentsInThatRange":"No shipments in that range. Proceed to selecting `Re-Planned Shipment settings`."
+    "static.scenarioPlanning.noShipmentsInThatRange":"No shipments in that range. Proceed to selecting `Re-Planned Shipment settings`.",
+    "static.supplyPlan.consumptionFEFO":"QAT Calculation (FEFO)",
+    "static.supplyPlan.adjustmentFEFO":"QAT Calculation (Best Case Scenario)"
 }
