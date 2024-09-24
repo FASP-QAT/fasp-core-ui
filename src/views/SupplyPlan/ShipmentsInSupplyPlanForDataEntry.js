@@ -3855,7 +3855,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             if (map.get("42") != undefined && map.get("42") != "" && map.get("42") != 0) {
                 var sblIndex = shipmentBudgetList.findIndex(c => (map.get("2") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
                 if (sblIndex != -1) {
-                    if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
+                    if (map.get("0").toString() == "true" && map.get("4") != 8 && map.get("34").toString() == "true") {
                         var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         var freightCost = elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         shipmentBudgetList[sblIndex].shipmentAmt = Number(productCost) + Number(freightCost);
@@ -3866,7 +3866,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                         shipmentBudgetList=shipmentBudgetList.filter((c,index)=>index!=sblIndex);
                     }
                 }else{
-                    if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
+                    if (map.get("0").toString() == "true" && map.get("4") != 8 && map.get("34").toString() == "true") {
                         var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         var freightCost = elInstance.getValue(`W${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                         var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
@@ -4420,7 +4420,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                         if (map.get("42") != undefined && map.get("42") != "" && map.get("42") != 0) {
                                             var sblIndex = shipmentBudgetList.findIndex(c => (map.get("2") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
                                             if (sblIndex != -1) {
-                                                if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
+                                                if (map.get("0").toString() == "true" && map.get("4") != 8 && map.get("34").toString() == "true") {
                                                     var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                                     var freightCost = elInstance.getValue(`W${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                                     shipmentBudgetList[sblIndex].shipmentAmt = Number(productCost) + Number(freightCost);
@@ -4432,7 +4432,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     shipmentBudgetList=shipmentBudgetList.filter((c,index)=>index!=sblIndex);
                                                 }
                                             }else{
-                                                if (map.get("0").toString() == "true" && map.get("4") == 8 && map.get("34").toString() == "true") {
+                                                if (map.get("0").toString() == "true" && map.get("4") != 8 && map.get("34").toString() == "true") {
                                                     var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                                     var freightCost = elInstance.getValue(`W${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                                     var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])

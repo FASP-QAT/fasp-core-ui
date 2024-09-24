@@ -712,6 +712,7 @@ export default class SyncMasterData extends Component {
                                                     }
                                                     var sblIndex = shipmentBudgetList.findIndex(c => (shipmentDataList[shipmentIndex].shipmentId == 0 ? (c.tempShipmentId == shipmentDataList[shipmentIndex].tempShipmentId) : (c.shipmentId == shipmentDataList[shipmentIndex].shipmentId)));
                                                     if (sblIndex == -1) {
+                                                        if(shipmentDataList[shipmentIndex].active.toString()=="true" && shipmentDataList[shipmentIndex].accountFlag.toString()=="true" && shipmentDataList[shipmentIndex].shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS){
                                                         shipmentBudgetList.push({
                                                             shipmentAmt: Number(shipmentDataList[shipmentIndex].productCost) + Number(shipmentDataList[shipmentIndex].freightCost),
                                                             budgetId: shipmentDataList[shipmentIndex].budget.id,
@@ -720,6 +721,7 @@ export default class SyncMasterData extends Component {
                                                             tempShipmentId:shipmentDataList[shipmentIndex].tempShipmentId,
                                                             currencyId:shipmentDataList[shipmentIndex].currency.currencyId
                                                         })
+                                                    }
                                                     }else{
                                                         shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentDataList[shipmentIndex].productCost) + Number(shipmentDataList[shipmentIndex].freightCost);
                                                         shipmentBudgetList[sblIndex].budgetId=shipmentDataList[shipmentIndex].budget.id;
