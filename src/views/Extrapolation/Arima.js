@@ -3,6 +3,7 @@ import ExtrapolationService from "../../api/ExtrapolationService";
 import i18n from "../../i18n";
 import { calculateError } from "./ErrorCalculations";
 export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality, page, regionId, planningUnitId) {
+    console.log("inside arima")
     var startYear = moment(minStartDate).format("YYYY");
     var startMonth = moment(minStartDate).format("M");
     var decimal = (startMonth - 1) / 12;
@@ -20,7 +21,8 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "q": Number(q),
         "n": Number(noOfProjectionMonths),
         "seasonality": seasonality,
-        "level": Number(confidenceLevel)
+        "level": Number(confidenceLevel),
+        "optimize": page == "bulkExtrapolation" ? props.state.optimizeTESAndARIMAExtrapolation : false
     }
     ExtrapolationService.arima(json)
         .then(response => {
@@ -42,6 +44,9 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 } else if (page == "importFromQATSP") {
                     var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId }
                     props.updateArimaData(arimaData);
+                } else if (page == "bulkExtrapolation") {
+                    var arimaData = { "data": output, "PlanningUnitId": planningUnitId, "regionId": regionId, "p": responseData.var1, "d": responseData.var2, "q": responseData.var3 }
+                    props.updateArimaData(arimaData);
                 } else {
                     props.updateState("arimaData", output);
                     calculateError(output, "arimaError", props)
@@ -51,7 +56,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
             if (page == "DataEntry") {
                 var arimaData = { "data": [], "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);
-            } else if (page == "importFromQATSP") {
+            } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
                 var arimaData = { "data": [], "PlanningUnitId": planningUnitId, "regionId": regionId }
                 props.updateArimaData(arimaData);
             } else {

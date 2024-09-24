@@ -1893,7 +1893,7 @@ export default class SupplyPlanComponent extends React.Component {
         const chartOptions1 = {
             title: {
                 display: true,
-                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.aru.label : entityname)
+                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label+ " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label+ " - " + this.props.items.aru.label : entityname)
             },
             scales: {
                 yAxes: [{
@@ -1979,7 +1979,7 @@ export default class SupplyPlanComponent extends React.Component {
         var chartOptions2 = {
             title: {
                 display: true,
-                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " (Local)" + " - " + this.props.items.aru.label : entityname)
+                text: this.props.items.viewById == 1 ? (this.props.items.planningUnit != "" && this.props.items.planningUnit != undefined && this.props.items.planningUnit != null ? (this.props.items.programSelect).label + " - " + this.props.items.planningUnit.label : entityname) : (this.props.items.aru != "" && this.props.items.aru != undefined && this.props.items.aru != null ? (this.props.items.programSelect).label + " - " + this.props.items.aru.label : entityname)
             },
             scales: {
                 yAxes: [{
