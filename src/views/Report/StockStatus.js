@@ -879,6 +879,14 @@ class StockStatus extends Component {
             var shipmentList = [];
             var responseData = response.data[0];
             let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+            console.log('this.state.rangeValue.from.year: ',this.state.rangeValue.from.year);
+            console.log('this.state.rangeValue.from.month: ',this.state.rangeValue.from.month);
+            console.log('startDate: ',startDate);
+            
+            console.log('sampleDate: ',new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+            console.log('manual sampleDate: ',new Date('2023' + '-' + '11' + '-01'));
+
+
             var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             filteredResponseData.map(c => {
               c.inventoryInfo.map(i => inventoryList.push(i))
