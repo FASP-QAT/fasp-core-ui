@@ -976,8 +976,10 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
+                        console.log("Error 1 Test@123",error)
                     });
                 }).catch(error => {
+                    console.log("Error 2 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1100,8 +1102,10 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
+                        console.log("Error 3 Test@123",error)
                     });
                 }).catch(error => {
+                    console.log("Error 4 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1295,13 +1299,27 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             })
-                                        }).catch(error => { });
-                                    }).catch(error => { });
-                                }).catch(error => { });
-                            }).catch(error => { });
-                        }).catch(error => { });
-                    }).catch(error => { });
-                }).catch(error => { });
+                                        }).catch(error => {
+                                            console.log("Error 5 Test@123",error)
+                                         });
+                                    }).catch(error => {
+                                        console.log("Error 6 Test@123",error)
+                                     });
+                                }).catch(error => { 
+                                    console.log("Error 7 Test@123",error)
+                                });
+                            }).catch(error => {
+                                console.log("Error 8 Test@123",error)
+                             });
+                        }).catch(error => {
+                            console.log("Error 9 Test@123",error)
+                         });
+                    }).catch(error => { 
+                        console.log("Error 10 Test@123",error)
+                    });
+                }).catch(error => { 
+                    console.log("Error 11 Test@123",error)
+                });
             }.bind(this)
         }.bind(this)
     }
@@ -2233,6 +2251,7 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
+                    console.log("Error 12 Test@123",error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2389,6 +2408,7 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
+                    console.log("Error 13 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -2433,6 +2453,7 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
+                    console.log("Error 14 Test@123",error)
                     this.setState({
                         statuses: [],
                     })
@@ -2490,6 +2511,7 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
+                    console.log("Error 15 Test@123",error)
                     this.setState({
                         statuses: [],
                     })
@@ -4232,6 +4254,7 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
+                    console.log("Error 16 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4335,6 +4358,7 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
+                    console.log("Error 17 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4468,6 +4492,7 @@ class EditSupplyPlanStatus extends Component {
 
             }).catch(
                 error => {
+                    console.log("Error 18 Test@123",error)
                     this.setState({
                         loadingForNotes: false
                     })
@@ -5295,7 +5320,9 @@ class EditSupplyPlanStatus extends Component {
                                                                 } else {
                                                                     try {
                                                                         document.getElementById("submitButton").disabled = false;
-                                                                    } catch (err) { }
+                                                                    } catch (err) { 
+                                                                        console.log("Error 19 Test@123",err)
+                                                                    }
                                                                     this.setState({
                                                                         submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                                         submitColor: "green",
@@ -5314,6 +5341,7 @@ class EditSupplyPlanStatus extends Component {
                                                             })
                                                             .catch(
                                                                 error => {
+                                                                    console.log("Error 20 Test@123",error)
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
                                                                             // message: 'static.unkownError',
@@ -5366,6 +5394,9 @@ class EditSupplyPlanStatus extends Component {
                                                                 }
                                                             );
                                                     } else {
+                                                        this.setState({
+                                                            loading:false
+                                                        })
                                                         document.getElementById("submitButton").disabled = false;
                                                         alert("To approve a supply plan – Reviewed must all be checked.");
                                                     }
@@ -5397,6 +5428,7 @@ class EditSupplyPlanStatus extends Component {
                                         })
                                         .catch(
                                             error => {
+                                                console.log("Error 21 Test@123",error)
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         // message: 'static.unkownError',
