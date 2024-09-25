@@ -2745,7 +2745,7 @@ observer.observe(document.documentElement, {
         
         const lightModeColors = [
             '#002F6C',  // Color 1 
-            '#212721',   
+            '#cfcdc9',   
         ];
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
