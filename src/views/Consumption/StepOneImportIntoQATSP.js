@@ -992,12 +992,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 isFutureForecast = false;
             }
         }
-
-        // console.log('isForecastAlreadyStarted: ',isForecastAlreadyStarted);
-        // console.log('isForecastOver: ',isForecastOver);
-        // console.log('isWithinLast6Months: ',isWithinLast6Months);
-        // console.log('isFutureForecast: ',isFutureForecast);
-
         if (isWithinLast6Months) {
             defaultForecastStartYear = formattedDate.getFullYear();
             defaultForecastStartMonth = formattedDate.getMonth() + 1;
@@ -1031,12 +1025,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartYear = forecastStartDate.getFullYear();
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
-
-        // console.log('at end');
-        // console.log('defaultForecastStartYear: ',defaultForecastStartYear);
-        // console.log('defaultForecastStartMonth: ',defaultForecastStartMonth);
-        // console.log('defaultForecastStopYear: ',defaultForecastStopYear);
-        // console.log('defaultForecastStopMonth: ',defaultForecastStopMonth);
 
         this.setState({
             toggleDoNotImport:false,

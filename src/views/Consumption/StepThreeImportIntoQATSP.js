@@ -387,7 +387,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
      * Handles various error scenarios, such as network errors and authentication failures.
      */
     filterData() {
-        console.log("s3 isForecastOver:", this.props.items.isForecastOver);        
         document.getElementById("stepThreeImportBtn").disabled = this.props.items.isForecastOver;
 
         var realmId = AuthenticationService.getRealmId();
