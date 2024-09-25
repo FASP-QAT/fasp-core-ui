@@ -229,7 +229,7 @@ class StockStatus extends Component {
                 : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 && ele.expiredStock != null ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 && ele.unmetDemand != null  ? ele.unmetDemand : ''])));
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
         }
@@ -1626,7 +1626,8 @@ class StockStatus extends Component {
           });
           sortedPlanningUnitData.map(plannningUnitItem => {
             var planningUnitItemFilter = response.data.filter(c => c[0].planningUnit.id == plannningUnitItem.value)[0];
-            let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+            // let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+            let startDateForFilter = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
             var filteredPlanningUnitData = planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
             var bar = {
               labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
@@ -1939,7 +1940,8 @@ class StockStatus extends Component {
               }
             }
             var data = planningUnitItemFilter;
-            let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+            // let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
+            let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
             var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
             var planningUnit = planningUnitItemFilter[0].planningUnit
             var conList = [];
