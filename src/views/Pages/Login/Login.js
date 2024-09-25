@@ -349,6 +349,8 @@ class Login extends Component {
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
+                                document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
+                                localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 localStorage.setItem("lastFocus", new Date());
@@ -408,6 +410,8 @@ class Login extends Component {
                                   localStorage.setItem('sessionType', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
+                                  localStorage.setItem('theme', user.defaultThemeId==1?'light':'dark');
+                                  document.documentElement.setAttribute("data-theme", user.defaultThemeId==1?'light':'dark');
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   localStorage.setItem("lastFocus", new Date());

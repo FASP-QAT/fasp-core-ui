@@ -32,15 +32,15 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
-const backgroundColor = [
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-]
+// const backgroundColor = [
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+// ]
 /**
  * Component for Shipment Global View Report.
  */
@@ -930,7 +930,7 @@ observer.observe(document.documentElement, {
                         var val = [];
                         var table1Body = [];
                         table1Headers = Object.keys(response.data.countrySplitList[0].amount);
-                        table1Headers.unshift("Country");
+                        table1Headers.unshift(i18n.t('static.dashboard.country'));
                         for (var item = 0; item < response.data.countrySplitList.length; item++) {
                             let obj = {
                                 country: response.data.countrySplitList[item].country,
@@ -1373,15 +1373,37 @@ observer.observe(document.documentElement, {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
+            fontColor:fontColor
         }
         const { rangeValue } = this.state
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+
+        const lightModeColors = [
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        ]
+
+        const darkModeColors = [
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+        ]
         const { isDarkMode } = this.state;
-// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
         const options = {
             title: {
@@ -1395,8 +1417,14 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -1406,6 +1434,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
                         fontColor:fontColor,
@@ -1421,7 +1450,13 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }
                 ],
             },
@@ -1468,8 +1503,14 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -1479,6 +1520,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
                         fontColor:fontColor,
@@ -1494,7 +1536,13 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }],
             },
             tooltips: {
@@ -1540,8 +1588,14 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -1549,8 +1603,15 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                         labelString: this.state.puUnit.label.label_en,
                         fontColor:fontColor
                     },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                 }],
             },
             tooltips: {
@@ -1580,17 +1641,30 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                     stacked: true,
                     fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                 }],
             },
             tooltips: {
@@ -1613,27 +1687,32 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentFundingSourceType'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor,
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1646,7 +1725,13 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }],
             },
             tooltips: {
@@ -1676,7 +1761,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor,
                 }
             }
         }
@@ -1714,8 +1799,9 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
             }
             displayObject.push(holdArray);
         }
+        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
         var bar1 = []
-        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
+        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor1[index] }))
         bar1 = {
             labels: [...new Set(this.state.dateSplitList.map(ele => (dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
@@ -1730,7 +1816,26 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                         {(this.state.shipmentList.length > 0 || this.state.dateSplitList.length > 0 || this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                     {(this.state.shipmentList.length > 0 || this.state.countrySplitList.length > 0) &&
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                     }

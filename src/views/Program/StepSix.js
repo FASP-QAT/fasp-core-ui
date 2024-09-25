@@ -151,9 +151,9 @@ export default class StepSix extends Component {
             .then(response => {
                 if (response.status == 200) {
                     var json = response.data;
-                    var paList = [];
+                    var paList = [{ value: "-1", label: i18n.t("static.common.all") }];
                     for (var i = 0; i < json.length; i++) {
-                        paList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                        paList[i + 1] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
                     }
                     var listArray = paList;
                     listArray.sort((a, b) => {
@@ -164,6 +164,7 @@ export default class StepSix extends Component {
                     this.setState({
                         procurementAgentList: listArray
                     })
+                    this.props.updateStepOneData("procurementAgentList", listArray);//for dropdown usage
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -175,9 +176,9 @@ export default class StepSix extends Component {
             .then(response => {
                 if (response.status == 200) {
                     var json = response.data;
-                    var fsList = [];
+                    var fsList = [{ value: "-1", label: i18n.t("static.common.all") }];
                     for (var i = 0; i < json.length; i++) {
-                        fsList[i] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                        fsList[i + 1] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
                     }
                     var listArray = fsList;
                     listArray.sort((a, b) => {
@@ -188,6 +189,7 @@ export default class StepSix extends Component {
                     this.setState({
                         fundingSourceList: listArray
                     })
+                    this.props.updateStepOneData("fundingSourceList", listArray);//for dropdown usage
                 } else {
                     this.setState({
                         message: response.data.messageCode

@@ -3344,7 +3344,7 @@ export default class CommitTreeComponent extends React.Component {
                                         <Nav tabs>
                                             <NavItem>
                                                 <NavLink
-                                                    style={{ background: this.state.conflictsCountVersionSettings > 0 ? "yellow" : "" }}
+                                                    style={{ background: this.state.conflictsCountVersionSettings > 0 ? "yellow" : "",color: this.state.conflictsCountVersionSettings > 0 ? "black" : "" }}
                                                     active={this.state.activeTab[0] === '1'}
                                                     onClick={() => { this.toggle(0, '1'); }}
                                                 >
@@ -3353,7 +3353,7 @@ export default class CommitTreeComponent extends React.Component {
                                             </NavItem>
                                             <NavItem>
                                                 <NavLink
-                                                    style={{ background: this.state.conflictsCountPlanningUnits > 0 ? "yellow" : "" }}
+                                                    style={{ background: this.state.conflictsCountPlanningUnits > 0 ? "yellow" : "",color: this.state.conflictsCountPlanningUnits > 0 ? "black" : "" }}
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
@@ -3362,7 +3362,7 @@ export default class CommitTreeComponent extends React.Component {
                                             </NavItem>
                                             <NavItem>
                                                 <NavLink
-                                                    style={{ background: this.state.conflictsCountConsumption > 0 ? "yellow" : "" }}
+                                                    style={{ background: this.state.conflictsCountConsumption > 0 ? "yellow" : "",color: this.state.conflictsCountConsumption > 0 ? "black" : "", }}
                                                     active={this.state.activeTab[0] === '3'}
                                                     onClick={() => { this.toggle(0, '3'); }}
                                                 >
@@ -3371,7 +3371,7 @@ export default class CommitTreeComponent extends React.Component {
                                             </NavItem>
                                             <NavItem>
                                                 <NavLink
-                                                    style={{ background: this.state.conflictsCountTree > 0 ? "yellow" : "" }}
+                                                    style={{ background: this.state.conflictsCountTree > 0 ? "yellow" : "",color: this.state.conflictsCountTree > 0 ? "black" : "", }}
                                                     active={this.state.activeTab[0] === '4'}
                                                     onClick={() => { this.toggle(0, '4'); }}
                                                 >
@@ -3380,7 +3380,7 @@ export default class CommitTreeComponent extends React.Component {
                                             </NavItem>
                                             <NavItem>
                                                 <NavLink
-                                                    style={{ background: this.state.conflictsCountSelectedForecast > 0 ? "yellow" : "" }}
+                                                    style={{ background: this.state.conflictsCountSelectedForecast > 0 ? "yellow" : "",color: this.state.conflictsCountSelectedForecast > 0 ? "black" : "" }}
                                                     active={this.state.activeTab[0] === '5'}
                                                     onClick={() => { this.toggle(0, '5'); }}
                                                 >

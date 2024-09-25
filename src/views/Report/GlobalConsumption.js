@@ -122,7 +122,7 @@ class GlobalConsumption extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
-      isDarkMode:false,
+      isDarkMode: false,
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -292,7 +292,7 @@ class GlobalConsumption extends Component {
     }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(elt.planningUnitQty,0)]);
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(elt.planningUnitQty, 0)]);
     doc.addPage()
     startYtable = 80
     let content = {
@@ -724,19 +724,19 @@ class GlobalConsumption extends Component {
    */
   componentDidMount() {
     // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
 
 
     this.getCountrys();
@@ -773,27 +773,27 @@ observer.observe(document.documentElement, {
   render() {
 
     const { isDarkMode } = this.state;
-// const colors = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-// const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+    const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     const options = {
       title: {
         display: true,
         text: i18n.t('static.dashboard.globalconsumption'),
-        fontColor:fontColor
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
-            fontColor:fontColor
+            fontColor: fontColor
           },
           stacked: true,
           ticks: {
             beginAtZero: true,
-            fontColor:fontColor,
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -806,11 +806,23 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
               }
               return x1 + x2;
             }
+          },
+          gridLines: {
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor
           }
         }],
         xAxes: [{
           ticks: {
-            fontColor:fontColor
+            fontColor: fontColor
+          },
+          gridLines: {
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor
           }
         }]
       },
@@ -849,7 +861,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor:fontColor
+          fontColor: fontColor
         }
       }
     }
@@ -873,7 +885,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
-    const backgroundColor = [
+    const lightModeColors = [
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
       '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
@@ -882,6 +894,16 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     ]
+    const darkModeColors = [
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+      '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+      '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+    ]
+    const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
     let consumptionSummerydata = [];
     var mainData = this.state.consumptions;
@@ -904,7 +926,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     }
     const bar = {
       labels: [...new Set(this.state.consumptions.map(ele => (dateFormatterLanguage(ele.consumptionDateString1))))],
-      datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
+      datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor1[index] })),
     };
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -925,26 +947,26 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
+                  var curTheme = localStorage.getItem("theme");
+                  if (curTheme == "dark") {
                     this.setState({
-                        isDarkMode: true
+                      isDarkMode: false
+                    }, () => {
+                      setTimeout(() => {
+                        this.exportPDF();
+                        if (curTheme == "dark") {
+                          this.setState({
+                            isDarkMode: true
+                          })
+                        }
+                      }, 0)
                     })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
+                  } else {
+                    this.exportPDF();
+                  }
+                }}
 
- />
+                />
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               </a>
             </div>}
@@ -1101,7 +1123,7 @@ const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
                                       {this.state.consumptions[idx].consumptionDateString}
                                     </td>
                                     <td >
-                                      {formatter(this.state.consumptions[idx].planningUnitQty,0)}
+                                      {formatter(this.state.consumptions[idx].planningUnitQty, 0)}
                                     </td>
                                   </tr>)
                               }

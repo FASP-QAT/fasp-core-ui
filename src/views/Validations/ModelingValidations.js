@@ -743,8 +743,6 @@ class ModelingValidation extends Component {
                         }
                         var val = ""
                         if (calculatedValueTotal != "") {
-                            console.log("calculatedValueTotal Test@123", calculatedValueTotal);
-                            console.log("Total Test@123", total);
                             val = (Number(calculatedValueTotal) / Number(total)) * 100;
                         }
                         data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
@@ -1535,7 +1533,7 @@ class ModelingValidation extends Component {
             entries: " ",
         });
         const lightModeColors = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-        const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#EEE4B1", "#F48521", "#49A4A1", "#49494a"]
+        const darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#ba4e00", "#EEE4B1", "#F48521", "#49A4A1", "#757575"]
       
         const { isDarkMode } = this.state;
         const colourArray = isDarkMode ? darkModeColors : lightModeColors;

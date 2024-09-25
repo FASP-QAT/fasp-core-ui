@@ -194,6 +194,8 @@ export default class WhatIfReportComponent extends React.Component {
             consumptionTotalMonthWise: [],
             consumptionChangedFlag: 0,
             inventoryTotalData: [],
+            adjustmentTotalData: [],
+            nationalAdjustmentTotalData: [],
             expectedBalTotalData: [],
             suggestedShipmentsTotalData: [],
             inventoryFilteredArray: [],
@@ -280,7 +282,7 @@ export default class WhatIfReportComponent extends React.Component {
             activeTab: new Array(3).fill('1'),
             takeDataFrom: "programData",
             planningUnitNotes: "",
-            multiplier:1
+            multiplier: 1
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
@@ -303,6 +305,7 @@ export default class WhatIfReportComponent extends React.Component {
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
         this.shipmentsDetailsClicked = this.shipmentsDetailsClicked.bind(this);
         this.toggleAccordionTotalShipments = this.toggleAccordionTotalShipments.bind(this);
+        this.toggleAccordionTotalAdjustments = this.toggleAccordionTotalAdjustments.bind(this);
         this.addRow = this.addRow.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.tabPane = this.tabPane.bind(this);
@@ -993,6 +996,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (actionList == undefined) {
                                     actionList = []
                                 }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
+                                }
                                 var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                                 if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -1006,6 +1013,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         index = shipmentUnFundedList[i].index;
                                     }
                                     shipmentList[index].active = false;
+                                    shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
@@ -1018,6 +1026,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 1) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                                 let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
@@ -1112,6 +1121,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (actionList == undefined) {
                                     actionList = []
                                 }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
+                                }
                                 var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                                 if (moment(minDate).format("YYYY-MM-DD") < moment(minimumDate).format("YYYY-MM-DD")) {
@@ -1126,7 +1139,20 @@ export default class WhatIfReportComponent extends React.Component {
                                         var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                         if (shipmentUnFundedList[i].localProcurement) {
-                                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                            var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                            var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                    addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                        addLeadTimes = programPA[0].localProcurementLeadTime;
+                                                    }
+                                                }
+                                            }
                                             var leadTimesPerStatus = addLeadTimes / 5;
                                             arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                             shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1139,24 +1165,111 @@ export default class WhatIfReportComponent extends React.Component {
                                             if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                                 submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
                                             }
+                                            var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                    submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                        submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                                    }
+                                                }
+                                            }
                                             var approvedToShippedLeadTime = "";
                                             approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                             if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                                 approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                             }
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                    approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                        approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                                    }
+                                                }
+                                            }
                                             var shippedToArrivedLeadTime = ""
                                             if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                                if (programPriceList.length > 0) {
+                                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                    if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                    } else {
+                                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                        if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                            shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                        }
+                                                    }
+                                                }
                                             } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                                if (programPriceList.length > 0) {
+                                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                    if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                    } else {
+                                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                        if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                            shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                        }
+                                                    }
+                                                }
                                             } else {
                                                 shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                                if (programPriceList.length > 0) {
+                                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                    if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                    } else {
+                                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                        if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                            shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                        }
+                                                    }
+                                                }
                                             }
-                                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                    arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                        arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                                    }
+                                                }
+                                            }
+                                            var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                                    addLeadTimes = programPAPU[0].plannedToSubmittedLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                        addLeadTimes = programPA[0].plannedToSubmittedLeadTime;
+                                                    }
+                                                }
+                                            }
+                                            arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                             shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                             approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                             submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                            plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                            plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         }
                                         if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                             var index = 0;
@@ -1170,6 +1283,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             var curUser = AuthenticationService.getLoggedInUserId();
                                             shipmentList[index].lastModifiedBy.userId = curUser;
                                             shipmentList[index].lastModifiedDate = curDate;
+                                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                         }
                                     } else {
                                         var index = 0;
@@ -1183,6 +1297,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var curUser = AuthenticationService.getLoggedInUserId();
                                         shipmentList[index].lastModifiedBy.userId = curUser;
                                         shipmentList[index].lastModifiedDate = curDate;
+                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     }
                                 }
                                 actionList.push({
@@ -1192,11 +1307,16 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 5) {
                                 var shipmentList = programJson.shipmentList;
                                 var actionList = generalProgramJson.actionList;
                                 if (actionList == undefined) {
                                     actionList = []
+                                }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
                                 }
                                 var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
@@ -1213,7 +1333,20 @@ export default class WhatIfReportComponent extends React.Component {
                                     var receivedDate = shipmentUnFundedList[i].receivedDate;
                                     var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                     if (shipmentUnFundedList[i].localProcurement) {
-                                        var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                        var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                    addLeadTimes = programPA[0].localProcurementLeadTime;
+                                                }
+                                            }
+                                        }
                                         var leadTimesPerStatus = addLeadTimes / 5;
                                         arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1222,28 +1355,115 @@ export default class WhatIfReportComponent extends React.Component {
                                         plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     } else {
                                         var ppUnit = papuResult;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                         var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                         if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                             submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                        }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                    submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                                }
+                                            }
                                         }
                                         var approvedToShippedLeadTime = "";
                                         approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                         if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                             approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                         }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                    approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                                }
+                                            }
+                                        }
                                         var shippedToArrivedLeadTime = ""
                                         if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                    }
+                                                }
+                                            }
                                         }
-                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                    arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                                }
+                                            }
+                                        }
+                                        var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                                plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                    plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                                }
+                                            }
+                                        }
+                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                        plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     }
                                     if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                         var index = 0;
@@ -1257,6 +1477,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         var curUser = AuthenticationService.getLoggedInUserId();
                                         shipmentList[index].lastModifiedBy.userId = curUser;
                                         shipmentList[index].lastModifiedDate = curDate;
+                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     }
                                 }
                                 actionList.push({
@@ -1266,11 +1487,16 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 6) {
                                 var shipmentList = programJson.shipmentList;
                                 var actionList = generalProgramJson.actionList;
                                 if (actionList == undefined) {
                                     actionList = []
+                                }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
                                 }
                                 var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                                 var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
@@ -1286,7 +1512,20 @@ export default class WhatIfReportComponent extends React.Component {
                                     var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                                     var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                     if (shipmentUnFundedList[i].localProcurement) {
-                                        var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                        var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                    addLeadTimes = programPA[0].localProcurementLeadTime;
+                                                }
+                                            }
+                                        }
                                         var leadTimesPerStatus = addLeadTimes / 5;
                                         arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1295,28 +1534,115 @@ export default class WhatIfReportComponent extends React.Component {
                                         plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     } else {
                                         var ppUnit = papuResult;
+                                        var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                         var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                         if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                             submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                        }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                    submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                                }
+                                            }
                                         }
                                         var approvedToShippedLeadTime = "";
                                         approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                         if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                             approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                         }
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                    approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                                }
+                                            }
+                                        }
                                         var shippedToArrivedLeadTime = ""
                                         if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                    }
+                                                }
+                                            }
                                         } else {
                                             shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                            var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                            if (programPriceList.length > 0) {
+                                                var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                                if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                } else {
+                                                    var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                    if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                        shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                    }
+                                                }
+                                            }
                                         }
-                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                    arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                                }
+                                            }
+                                        }
+                                        var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                                plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                    plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                                }
+                                            }
+                                        }
+                                        arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                         submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                        plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                        plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     }
                                     if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                         var index = 0;
@@ -1326,6 +1652,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             index = shipmentUnFundedList[i].index;
                                         }
                                         shipmentList[index].accountFlag = 0;
+                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                     }
                                 }
                                 actionList.push({
@@ -1335,6 +1662,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 7) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                                 let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
@@ -1353,6 +1681,10 @@ export default class WhatIfReportComponent extends React.Component {
                                 if (actionList == undefined) {
                                     actionList = []
                                 }
+                                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                if (shipmentBudgetList == undefined) {
+                                    shipmentBudgetList = []
+                                }
                                 var procurementAgentIds = [...new Set(rows[r].procurementAgents.map(ele => ele.value))];
                                 var fundingSourceIds = [...new Set(rows[r].fundingSources.map(ele => ele.value))];
                                 var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(c.procurementAgent.id) && fundingSourceIds.includes(c.fundingSource.id));
@@ -1369,6 +1701,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
                                     shipmentList[index].lastModifiedDate = curDate;
+                                    shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                 }
                                 actionList.push({
                                     planningUnitId: planningUnitId,
@@ -1377,6 +1710,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (this.state.scenarioId == 9) {
                                 var rangeValue = rows[r].rangeValue;
                                 let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
@@ -1641,6 +1975,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => c.fundingSource.id == "" || c.fundingSource.id == TBD_FUNDING_SOURCE && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1655,6 +1993,7 @@ export default class WhatIfReportComponent extends React.Component {
                             var curUser = AuthenticationService.getLoggedInUserId();
                             shipmentList[index].lastModifiedBy.userId = curUser;
                             shipmentList[index].lastModifiedDate = curDate;
+                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                         }
                         actionList.push({
                             planningUnitId: planningUnitId,
@@ -1663,6 +2002,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -1902,6 +2242,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -1913,7 +2257,20 @@ export default class WhatIfReportComponent extends React.Component {
                                 var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
-                                    var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                    var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                            addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                addLeadTimes = programPA[0].localProcurementLeadTime;
+                                            }
+                                        }
+                                    }
                                     var leadTimesPerStatus = addLeadTimes / 5;
                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1922,28 +2279,115 @@ export default class WhatIfReportComponent extends React.Component {
                                     plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 } else {
                                     var ppUnit = papuResult;
+                                    var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                         submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                    }
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                            submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                            }
+                                        }
                                     }
                                     var approvedToShippedLeadTime = "";
                                     approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                         approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                     }
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                            approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                            }
+                                        }
+                                    }
                                     var shippedToArrivedLeadTime = ""
                                     if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                                }
+                                            }
+                                        }
                                     } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                                }
+                                            }
+                                        }
                                     } else {
                                         shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                        var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                        if (programPriceList.length > 0) {
+                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                            } else {
+                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                                }
+                                            }
+                                        }
                                     }
-                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                            arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                            }
+                                        }
+                                    }
+                                    var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                            plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                                plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                            }
+                                        }
+                                    }
+                                    arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                     submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                    plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                    plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 }
                                 if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                     var index = 0;
@@ -1957,6 +2401,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     var curUser = AuthenticationService.getLoggedInUserId();
                                     shipmentList[index].lastModifiedBy.userId = curUser;
                                     shipmentList[index].lastModifiedDate = curDate;
+                                    shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                                 }
                             } else {
                                 var index = 0;
@@ -1970,6 +2415,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 shipmentList[index].lastModifiedBy.userId = curUser;
                                 shipmentList[index].lastModifiedDate = curDate;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                             }
                         }
                         actionList.push({
@@ -1979,6 +2425,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2032,6 +2479,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -2043,7 +2494,20 @@ export default class WhatIfReportComponent extends React.Component {
                             var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                             var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                             if (shipmentUnFundedList[i].localProcurement) {
-                                var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                        addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                            addLeadTimes = programPA[0].localProcurementLeadTime;
+                                        }
+                                    }
+                                }
                                 var leadTimesPerStatus = addLeadTimes / 5;
                                 arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2052,28 +2516,115 @@ export default class WhatIfReportComponent extends React.Component {
                                 plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 var ppUnit = papuResult;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                     submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                        submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                            submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                        }
+                                    }
                                 }
                                 var approvedToShippedLeadTime = "";
                                 approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                 if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                     approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                 }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                        approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                            approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                        }
+                                    }
+                                }
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                            }
+                                        }
+                                    }
                                 }
-                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                        arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                            arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                        }
+                                    }
+                                }
+                                var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                        plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                            plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                        }
+                                    }
+                                }
+                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             if (moment(approvedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                 var index = 0;
@@ -2087,6 +2638,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var curUser = AuthenticationService.getLoggedInUserId();
                                 shipmentList[index].lastModifiedBy.userId = curUser;
                                 shipmentList[index].lastModifiedDate = curDate;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                             }
                         }
                         actionList.push({
@@ -2096,6 +2648,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2149,6 +2702,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var shipmentUnFundedList = shipmentList.filter(c => (c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS));
                         var minDate = moment.min(shipmentUnFundedList.map(d => moment(d.expectedDeliveryDate)))
                         for (var i = 0; i < shipmentUnFundedList.length; i++) {
@@ -2160,7 +2717,20 @@ export default class WhatIfReportComponent extends React.Component {
                             var arrivedDate = shipmentUnFundedList[i].arrivedDate;
                             var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                             if (shipmentUnFundedList[i].localProcurement) {
-                                var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
+                                var addLeadTimes = ppu[0].localProcurementLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                        addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                            addLeadTimes = programPA[0].localProcurementLeadTime;
+                                        }
+                                    }
+                                }
                                 var leadTimesPerStatus = addLeadTimes / 5;
                                 arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -2169,28 +2739,115 @@ export default class WhatIfReportComponent extends React.Component {
                                 plannedDate = moment(submittedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             } else {
                                 var ppUnit = papuResult;
+                                var ppu = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
                                 var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                 if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                     submittedToApprovedLeadTime = generalProgramJson.submittedToApprovedLeadTime;
+                                }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                        submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                            submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
+                                        }
+                                    }
                                 }
                                 var approvedToShippedLeadTime = "";
                                 approvedToShippedLeadTime = ppUnit.approvedToShippedLeadTime;
                                 if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                     approvedToShippedLeadTime = generalProgramJson.approvedToShippedLeadTime;
                                 }
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                        approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                            approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
+                                        }
+                                    }
+                                }
                                 var shippedToArrivedLeadTime = ""
                                 if (shipmentUnFundedList[i].shipmentMode == "Air") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByAirLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else if (shipmentUnFundedList[i].shipmentMode == "Road") {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedByRoadLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
+                                            }
+                                        }
+                                    }
                                 } else {
                                     shippedToArrivedLeadTime = parseFloat(generalProgramJson.shippedToArrivedBySeaLeadTime);
+                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                    if (programPriceList.length > 0) {
+                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                        if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                            shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                        } else {
+                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                            if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
+                                            }
+                                        }
+                                    }
                                 }
-                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(generalProgramJson.arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                var arrivedToDeliveredLeadTime = generalProgramJson.arrivedToDeliveredLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                        arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                            arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
+                                        }
+                                    }
+                                }
+                                var plannedToSubmittedLeadTime = generalProgramJson.plannedToSubmittedLeadTime;
+                                var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.procurementAgent.id == shipmentUnFundedList[i].procurementAgent.id && c.active)
+                                if (programPriceList.length > 0) {
+                                    var programPAPU = programPriceList.filter(c => c.planningUnit.id == shipmentUnFundedList[i].planningUnit.id);
+                                    if (programPAPU.length > 0 && programPAPU[0].plannedToSubmittedLeadTime !== null) {
+                                        plannedToSubmittedLeadTime = programPAPU[0].plannedToSubmittedLeadTime;
+                                    } else {
+                                        var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                        if (programPA.length > 0 && programPA[0].plannedToSubmittedLeadTime !== null) {
+                                            plannedToSubmittedLeadTime = programPA[0].plannedToSubmittedLeadTime;
+                                        }
+                                    }
+                                }
+                                arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(arrivedToDeliveredLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 shippedDate = moment(arrivedDate).subtract(parseFloat(shippedToArrivedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 approvedDate = moment(shippedDate).subtract(parseFloat(approvedToShippedLeadTime * 30), 'days').format("YYYY-MM-DD");
                                 submittedDate = moment(approvedDate).subtract(parseFloat(submittedToApprovedLeadTime * 30), 'days').format("YYYY-MM-DD");
-                                plannedDate = moment(submittedDate).subtract(parseFloat(generalProgramJson.plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
+                                plannedDate = moment(submittedDate).subtract(parseFloat(plannedToSubmittedLeadTime * 30), 'days').format("YYYY-MM-DD");
                             }
                             if (moment(submittedDate).format("YYYY-MM-DD") < moment(Date.now()).format("YYYY-MM-DD")) {
                                 var index = 0;
@@ -2200,6 +2857,7 @@ export default class WhatIfReportComponent extends React.Component {
                                     index = shipmentUnFundedList[i].index;
                                 }
                                 shipmentList[index].accountFlag = 0;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                             }
                         }
                         actionList.push({
@@ -2209,6 +2867,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2265,6 +2924,10 @@ export default class WhatIfReportComponent extends React.Component {
                         if (actionList == undefined) {
                             actionList = []
                         }
+                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                        if (shipmentBudgetList == undefined) {
+                            shipmentBudgetList = []
+                        }
                         var procurementAgentIds = [...new Set(this.state.procurementAgents.map(ele => Number(ele.value)))];
                         var fundingSourceIds = [...new Set(this.state.fundingSources.map(ele => Number(ele.value)))];
                         var shipmentUnFundedList = shipmentList.filter(c => c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS && c.planningUnit.id == planningUnitId && moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && procurementAgentIds.includes(Number(c.procurementAgent.id)) && fundingSourceIds.includes(Number(c.fundingSource.id)));
@@ -2281,6 +2944,7 @@ export default class WhatIfReportComponent extends React.Component {
                             var curUser = AuthenticationService.getLoggedInUserId();
                             shipmentList[index].lastModifiedBy.userId = curUser;
                             shipmentList[index].lastModifiedDate = curDate;
+                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[index].shipmentId>0?(shipmentList[index].shipmentId!=c.shipmentId):(shipmentList[index].tempShipmentId!=c.tempShipmentId)))
                         }
                         actionList.push({
                             planningUnitId: planningUnitId,
@@ -2289,6 +2953,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2579,6 +3244,22 @@ export default class WhatIfReportComponent extends React.Component {
         }
     }
     /**
+     * This function is used to toggle the accordian for the total adjustments
+     */
+    toggleAccordionTotalAdjustments() {
+        this.setState({
+            showTotalAdjustment: !this.state.showTotalAdjustment
+        })
+        var fields = document.getElementsByClassName("totalAdjustments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalAdjustment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+    /**
      * This function is used to add double quotes to the scenario row content
      * @param {*} arr Content of scenario row
      * @returns Returns the row with quotes
@@ -2660,7 +3341,9 @@ export default class WhatIfReportComponent extends React.Component {
         var orderedShipmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.submitted')).replaceAll(' ', '%20') + "\""], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
         var onholdShipmentArr = [...["\"" + ("   " + i18n.t('static.report.hold')).replaceAll(' ', '%20') + "\""], ...this.state.onholdShipmentsTotalData.map(item => item.qty)]
         var plannedShipmentArr = [...["\"" + ("   " + i18n.t('static.report.planned')).replaceAll(' ', '%20') + "\""], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
-        var inventoryArr = [...["\"" + (i18n.t('static.supplyPlan.adjustments')).replaceAll(' ', '%20') + "\""], ...this.state.inventoryTotalData]
+        var inventoryArr = [...["\'" + ("+/-" + i18n.t('static.supplyPlan.totalAdjustment')).replaceAll(' ', '%20') + "\'"], ...this.state.inventoryTotalData]
+        var manualAdjustmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.manualAdjustment')).replaceAll(' ', '%20') + "\""], ...this.state.adjustmentTotalData]
+        var nationalAdjustmentArr = [...["\"" + ("   " + i18n.t('static.supplyPlan.nationalAdjustment')).replaceAll(' ', '%20') + "\""], ...this.state.nationalAdjustmentTotalData]
         var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock')).replaceAll(' ', '%20') + "\""], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...["\"" + (i18n.t('static.supplyPlan.endingBalance')).replaceAll(' ', '%20') + "\""], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...["\"" + (i18n.t('static.supplyPlan.monthsOfStock')).replaceAll(' ', '%20') + "\""], ... this.state.monthsOfStockArray]
@@ -2677,6 +3360,8 @@ export default class WhatIfReportComponent extends React.Component {
         A.push(onholdShipmentArr)
         A.push(plannedShipmentArr)
         A.push(inventoryArr)
+        A.push(manualAdjustmentArr)
+        A.push(nationalAdjustmentArr)
         A.push(expiredStockArr)
         A.push(closingBalanceArr)
         A.push(this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? c : i18n.t("static.supplyPlanFormula.na"))) : maxQtyArr.map(c => c != null ? c : ""))
@@ -2829,7 +3514,9 @@ export default class WhatIfReportComponent extends React.Component {
         var orderedShipmentArr = [...[("   " + i18n.t('static.supplyPlan.submitted'))], ...this.state.orderedShipmentsTotalData.map(item => item.qty)]
         var onholdShipmentArr = [...[("   " + i18n.t('static.report.hold'))], ...this.state.onholdShipmentsTotalData.map(item => item.qty)]
         var plannedShipmentArr = [...[("   " + i18n.t('static.report.planned'))], ...this.state.plannedShipmentsTotalData.map(item => item.qty)]
-        var inventoryArr = [...[(i18n.t('static.supplyPlan.adjustments'))], ...this.state.inventoryTotalData]
+        var inventoryArr = [...[("+/-" + i18n.t('static.supplyPlan.totalAdjustment'))], ...this.state.inventoryTotalData]
+        var manualAdjustmentArr = [...[("   " + i18n.t('static.supplyPlan.manualAdjustment'))], ...this.state.adjustmentTotalData]
+        var nationalAdjustmentArr = [...[("   " + i18n.t('static.supplyPlan.nationalAdjustment'))], ...this.state.nationalAdjustmentTotalData]
         var expiredStockArr = [...[(i18n.t('static.supplyplan.exipredStock'))], ...this.state.expiredStockArr.map(item => item.qty)]
         var closingBalanceArr = [...[(i18n.t('static.supplyPlan.endingBalance'))], ...this.state.closingBalanceArray.map(item => item.balance)]
         var monthsOfStockArr = [...[(i18n.t('static.supplyPlan.monthsOfStock'))], ... this.state.monthsOfStockArray]
@@ -2838,7 +3525,7 @@ export default class WhatIfReportComponent extends React.Component {
         var unmetDemandArr = [...[(i18n.t('static.supplyPlan.unmetDemandStr'))], ...this.state.unmetDemand]
         const data = [openningArr.map(c => this.formatter(c)), consumptionArr.map((c, item) => item != 0 ? this.formatter(c.consumptionQty) : c), shipmentArr.map(c => this.formatter(c)), suggestedArr.map(c => this.formatter(c)),
         deliveredShipmentArr.map(c => this.formatter(c)), shippedShipmentArr.map(c => this.formatter(c)), orderedShipmentArr.map(c => this.formatter(c)), onholdShipmentArr.map(c => this.formatter(c)), plannedShipmentArr.map(c => this.formatter(c)),
-        inventoryArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na'))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : '')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
+        inventoryArr.map(c => this.formatter(c)),manualAdjustmentArr.map(c => this.formatter(c)),nationalAdjustmentArr.map(c => this.formatter(c)), expiredStockArr.map(c => this.formatter(c)), closingBalanceArr.map(c => this.formatter(c)), this.state.planBasedOn == 1 ? (monthsOfStockArr.map(c => c != null ? this.formatterDouble(c) : i18n.t('static.supplyPlanFormula.na'))) : (maxQtyArr.map(c => c != null ? this.formatter(c) : '')), amcgArr.map(c => this.formatter(c)), unmetDemandArr.map(c => this.formatter(c))];
         let content = {
             margin: { top: 80, bottom: 70 },
             startY: height,
@@ -2996,6 +3683,10 @@ export default class WhatIfReportComponent extends React.Component {
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
         }
+        var fields = document.getElementsByClassName("totalAdjustments");
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].style.display = "none";
+        }
         fields = document.getElementsByClassName("manualShipments");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -3040,9 +3731,9 @@ export default class WhatIfReportComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            label: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             value: myResult[i].id,
                             programId: myResult[i].programId
                         }
@@ -3224,7 +3915,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         rcpuResult = rcpuRequest.result;
                                         var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                                         var startDate = this.state.startDate;
-                                        var monthDifference=this.state.monthCount;
+                                        var monthDifference = this.state.monthCount;
                                         if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
                                             startDate = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
                                             localStorage.setItem("sesStartDate", JSON.stringify(startDate));
@@ -3254,7 +3945,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             realmCountryPlanningUnitListAll: rcpuResult,
                                             minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
                                             startDate: startDate,
-                                            monthCount:monthDifference,
+                                            monthCount: monthDifference,
                                             planningUnitListForConsumption: planningUnitListForConsumption,
                                             loading: false
                                         }, () => {
@@ -3319,26 +4010,26 @@ export default class WhatIfReportComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-        if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+        if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
             setTimeout(function () {
-            document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="none";
-            });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="none";
-            })
+                document.getElementsByClassName("supplyplan-larrow")[0].style.display = "none";
+                [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                    item.style.display = "none";
+                });
+                [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                    item.style.display = "none";
+                })
             }, 500);
-            curDate=moment(cutOffDate);
-            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                currentDate=moment(cutOffDate);
+            curDate = moment(cutOffDate);
+            if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
+                currentDate = moment(cutOffDate);
             }
-        }else{
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="block";
+        } else {
+            [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                item.style.display = "block";
             });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="block";
+            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                item.style.display = "block";
             })
         }
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
@@ -3394,6 +4085,8 @@ export default class WhatIfReportComponent extends React.Component {
         var minStockMoS = [];
         var maxStockMoS = [];
         var inventoryTotalData = [];
+        var adjustmentTotalData = [];
+        var nationalAdjustmentTotalData = [];
         var suggestedShipmentsTotalData = [];
         var openingBalanceArray = [];
         var closingBalanceArray = [];
@@ -3842,7 +4535,6 @@ export default class WhatIfReportComponent extends React.Component {
                                                 } else {
                                                     onholdShipmentsTotalData.push("")
                                                 }
-                                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
                                                 maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
@@ -3978,6 +4670,17 @@ export default class WhatIfReportComponent extends React.Component {
                                                 }
                                                 var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == this.state.planningUnitId && c.active == true);
                                                 var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == this.state.planningUnitId && c.active == true);
+                                                var adjustmentCount=0;
+                                                var adjustmentTotal=0;
+                                                inventoryListForRegion.map(item=>{
+                                                    if (item.adjustmentQty != undefined && item.adjustmentQty != null && item.adjustmentQty !== "") {
+                                                        adjustmentCount+=1;
+                                                        adjustmentTotal+=Number(Math.round(Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
+                                                    }
+                                                })
+                                                adjustmentTotalData.push(adjustmentCount>0?Number(adjustmentTotal):"");
+                                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? Number(jsonList[0].nationalAdjustment) : "");
+                                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?Number(adjustmentCount>0?Number(adjustmentTotal):0)+Number(jsonList[0].regionCountForStock > 0 ? Number(jsonList[0].nationalAdjustment) : 0):"");
                                                 var consumptionTotalForRegion = 0;
                                                 var totalAdjustmentsQtyForRegion = 0;
                                                 var totalActualQtyForRegion = 0;
@@ -4036,7 +4739,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                                 }
                                                 consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
+                                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0)-(jsonList[0].unmetDemand != "" && jsonList[0].unmetDemand!=null ? jsonList[0].unmetDemand : 0);
                                                 if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                                     totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                                 }
@@ -4079,6 +4782,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 plannedShipmentsTotalData.push("");
                                                 onholdShipmentsTotalData.push("");
                                                 inventoryTotalData.push("");
+                                                adjustmentTotalData.push("");
+                                                nationalAdjustmentTotalData.push("");
                                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                                 monthsOfStockArray.push(null)
                                                 maxQtyArray.push(null)
@@ -4125,6 +4830,8 @@ export default class WhatIfReportComponent extends React.Component {
                                             plannedShipmentsTotalData: plannedShipmentsTotalData,
                                             onholdShipmentsTotalData: onholdShipmentsTotalData,
                                             inventoryTotalData: inventoryTotalData,
+                                            adjustmentTotalData:adjustmentTotalData,
+                                            nationalAdjustmentTotalData:nationalAdjustmentTotalData,
                                             monthsOfStockArray: monthsOfStockArray,
                                             maxQtyArray: maxQtyArray,
                                             amcTotalData: amcTotalData,
@@ -4479,13 +5186,32 @@ export default class WhatIfReportComponent extends React.Component {
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
             var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+            var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
+            var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(inventory => inventory.batchInfoList);
+            var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
             for (var sl = 0; sl < shipmentList.length; sl++) {
                 var bdl = shipmentList[sl].batchInfoList;
                 for (var bd = 0; bd < bdl.length; bd++) {
                     var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                     if (index == -1) {
+                        var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var shipmentTotal=0;
+                        var consumptionTotal=0;
+                        var inventoryTotal=0;
+                        shipmentBatchListFiltered.map(item=>{
+                            shipmentTotal+=Number(item.shipmentQty);
+                        })
+                        consumptionBatchListFiltered.map(item=>{
+                            consumptionTotal+=Number(item.consumptionQty);
+                        })
+                        inventoryBatchListFiltered.map(item=>{
+                            inventoryTotal+=Number(item.adjustmentQty)
+                        })
                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                         if (batchDetailsToPush.length > 0) {
+                            batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
                             batchList.push(batchDetailsToPush[0]);
                         }
                     }
@@ -4546,13 +5272,32 @@ export default class WhatIfReportComponent extends React.Component {
             var batchInfoList = programJson.batchInfoList;
             var batchList = [];
             var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
+            var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(consumption => consumption.batchInfoList);
+            var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==planningUnitId).flatMap(inventory => inventory.batchInfoList);
+            var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
             for (var sl = 0; sl < shipmentList.length; sl++) {
                 var bdl = shipmentList[sl].batchInfoList;
                 for (var bd = 0; bd < bdl.length; bd++) {
                     var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                     if (index == -1) {
+                        var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        var shipmentTotal=0;
+                        var consumptionTotal=0;
+                        var inventoryTotal=0;
+                        shipmentBatchListFiltered.map(item=>{
+                            shipmentTotal+=Number(item.shipmentQty);
+                        })
+                        consumptionBatchListFiltered.map(item=>{
+                            consumptionTotal+=Number(item.consumptionQty);
+                        })
+                        inventoryBatchListFiltered.map(item=>{
+                            inventoryTotal+=Number(item.adjustmentQty)
+                        })
                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                         if (batchDetailsToPush.length > 0) {
+                            batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
                             batchList.push(batchDetailsToPush[0]);
                         }
                     }
@@ -4719,7 +5464,7 @@ export default class WhatIfReportComponent extends React.Component {
     tabPane() {
         const darkModeColors = [
             '#d4bbff',  
-            '#49494a',   
+            '#757575',   
         ];
         
         const lightModeColors = [
@@ -5021,7 +5766,7 @@ export default class WhatIfReportComponent extends React.Component {
                     type: 'line',
                     yAxisID: 'A',
                     backgroundColor: colors[1],
-                    borderColor: '#cfcdc9',
+                    borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -5452,6 +6197,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     id="procurementAgentId"
                                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                                                     value={this.state.procurementAgents}
+                                                                    disabled={procurementAgentList.length > 0?false:true}
                                                                     onChange={(e) => { this.setProcurementAgents(e) }}
                                                                     labelledBy={i18n.t('static.common.select')}
                                                                 />
@@ -5467,12 +6213,18 @@ export default class WhatIfReportComponent extends React.Component {
                                                                     filterOptions={filterOptions}
                                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                                     value={this.state.fundingSources}
+                                                                    disabled={fundingSourceList.length > 0?false:true}
                                                                     onChange={(e) => { this.setFundingSources(e) }}
                                                                     labelledBy={i18n.t('static.common.select')}
                                                                 />
                                                             </div>
                                                         </FormGroup>
                                                     </div>
+                                                    {procurementAgentList.length==0 && fundingSourceList.length==0 && 
+                                                    <><div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
+                                                    <span className='red'>{i18n.t('static.scenarioPlanning.noShipmentsInThatRange')}</span>
+                                                    </div><br/><br/></>
+                                                    }
                                                     <div className="row col-md-12" style={{ marginLeft: "0.5px" }}>
                                                         <span className='text-blackD'><b>{i18n.t('static.scenarioPlanning.replannedShipmentSettings')}</b></span>
                                                     </div>
@@ -5667,7 +6419,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                         this.state.consumptionTotalData.map((item1, count) => {
                                                             if (item1.consumptionType == 1) {
                                                                 if (item1.consumptionQty != null) {
-                                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                    return (<td align="right" className="hoverTd lightModeclrblack" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                                 } else {
                                                                     return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
                                                                 }
@@ -5898,18 +6650,46 @@ export default class WhatIfReportComponent extends React.Component {
                                                     }
                                                 </tr>
                                                 <tr>
-                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                    <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
-                                                    {
-                                                        this.state.inventoryTotalData.map((item1, count) => {
-                                                            if (item1 != null) {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                            } else {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                            }
-                                                        })
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalAdjustments()}>
+                                                {this.state.showTotalAdjustment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.totalAdjustment')}</b></td>
+                                            {
+                                                this.state.inventoryTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
                                                     }
-                                                </tr>
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualAdjustment')}</td>
+                                            {
+                                                this.state.adjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.nationalAdjustment')}</td>
+                                            {
+                                                this.state.nationalAdjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
                                                 <tr>
                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                     <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
@@ -6222,7 +7002,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr bgcolor='#d9d9d9' className='text-blackDModal'>
-                                            <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                            <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                             {
                                                 this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                     if (count < 7) {
@@ -6266,7 +7046,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     <tr>
                                                         <td>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                        <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                        <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
                                                         <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>
                                                     </tr>
@@ -6439,7 +7219,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 <tr>
                                                     <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                     <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                    <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                    <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                     <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
                                                     <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                                 </tr>
@@ -6485,14 +7265,14 @@ export default class WhatIfReportComponent extends React.Component {
                                                             <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
                                                             <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
                                                             <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
-                                                            {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                            {((item.stockQty != null && Number(item.stockQty) > 0)  || (item.actualInventoryBatch)) ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
                                                         </tr>
                                                     ))
                                                 }
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
+                                                    <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")+" ("+moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("MMM-YY")+")"}</b></td>
                                                     <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
                                                 </tr>
                                             </tfoot>
@@ -6552,8 +7332,32 @@ export default class WhatIfReportComponent extends React.Component {
                 allBatchLedger.push(batchInfo);
             }));
         var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+        let finalLedger = [];
+        let start = moment(createdDate).format("YYYY-MM");
+        let end = moment(expiryDate).format("YYYY-MM");
+        let months = new Set(ledgerForBatch.map(e => e.transDate));
+        var batchInventortList=this.state.generalProgramJson.batchInventoryList;
+        if(batchInventortList==undefined){
+            batchInventortList=[]
+        }
+        while (moment(start).format("YYYY-MM") <= moment(end).format("YYYY-MM")) {
+            let month = moment(start).startOf('month').format("YYYY-MM-DD");
+            var ledgerData;
+            if (months.has(month)) {
+                var ledgerData=ledgerForBatch.find(e => e.transDate === month);
+                ledgerData.actualInventoryBatch=batchInventortList.filter(c=>moment(c.inventoryDate).format("YYYY-MM")==moment(month).format("YYYY-MM")).flatMap(c=>c.batchList).length>0?true:false;
+                var projectedBalance=Number(ledgerData.openingBalance)-Number(ledgerData.consumptionQty)+Number(ledgerData.adjustmentQty)+Number(ledgerData.shipmentQty)-Number(ledgerData.unallocatedQty);
+                if(projectedBalance!=Number(ledgerData.qty)){
+                    ledgerData.unallocatedQty=Number(ledgerData.unallocatedQty)-Number((Number(ledgerData.qty)-Number(projectedBalance)))
+                }
+            } else {
+                ledgerData = { transDate: month, openingBalance: 0, consumptionQty: null, adjustmentQty: null, shipmentQty: null, unallocatedQty: null, qty: 0, stockQty: 0, actualInventoryBatch: false, expiryDate:expiryDate, expiredQty:0 }
+            }
+            finalLedger.push(ledgerData);
+            start = moment(start).add(1, 'month').format('YYYY-MM')
+        }
         this.setState({
-            ledgerForBatch: ledgerForBatch,
+            ledgerForBatch: finalLedger,
             loading: false
         })
     }
@@ -6764,7 +7568,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=undefined && this.state.generalProgramJson.cutOffDate!=null && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
+                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson != undefined && this.state.generalProgramJson != null && this.state.generalProgramJson != "" && this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != '' ? ' (' + i18n.t('static.supplyPlan.start') + ' ' + moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY') + ')' : '')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>

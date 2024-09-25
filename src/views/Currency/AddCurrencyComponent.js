@@ -33,7 +33,8 @@ const validationSchema = function (values) {
         //     .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
 
         conversionRate: Yup.string()
-            .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            // .matches(/^\d+(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
+            .matches(/^\d*(\.\d{1,4})?$/, i18n.t('static.currency.conversionrateNumberDecimalPlaces'))
             .when('isSync', {
                 is: false, // when isSync is false
                 then: Yup.string().required(i18n.t('static.currency.conversionrateNumber')), // conversionRate is required
@@ -231,7 +232,7 @@ export default class AddCurrencyComponent extends Component {
                                                     <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span id="conversionRateRequiredSpan" style={{ display: this.state.isSync ? "none" : "inline-block"}} class="red Reqasterisk">*</span></Label>
                                                     <Input type="text"
                                                         name="conversionRate"
                                                         id="conversionRate"
