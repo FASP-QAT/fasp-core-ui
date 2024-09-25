@@ -4376,6 +4376,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var b = this.state.budgetList.filter(c => c.id == map.get("17"))[0];
                                 var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0]);
                                 var fs = this.state.fundingSourceList.filter(c => c.id == map.get("16"))[0];
+                                var tempShipmentId=map.get("3").toString().concat(shipmentDataList.length);
                                 var shipmentJson = {
                                     accountFlag: map.get("0"),
                                     active: map.get("34"),
