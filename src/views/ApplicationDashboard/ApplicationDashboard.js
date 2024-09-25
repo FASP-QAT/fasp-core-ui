@@ -28,6 +28,7 @@ import {
   FormGroup,
   Label,
   Popover,
+  Table,
   PopoverBody
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -50,6 +51,7 @@ class ApplicationDashboard extends Component {
     super(props);
     this.toggle = this.toggle.bind(this);
     this.state = {
+      isDarkMode:false,
       popoverOpenMa: false,
       id: this.props.match.params.id,
       dropdownOpen: false,
@@ -498,6 +500,24 @@ class ApplicationDashboard extends Component {
     this.buildShipmentsTBDJexcel();
     this.buildExpiriesJexcel();
     hideFirstComponent();
+
+    // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
+
+
   }
   /**
    * Callback function invoked when an animation is about to start exiting.
@@ -850,6 +870,13 @@ class ApplicationDashboard extends Component {
    * @returns {JSX.Element} - Application Dashboard.
    */
   render() {
+
+const { isDarkMode } = this.state;
+// const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#fff';
+
+
     const checkOnline = localStorage.getItem('sessionType');
     let defaultModuleId;
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
@@ -956,7 +983,11 @@ class ApplicationDashboard extends Component {
             display: false // Hide the Y-axis values
           },
           gridLines: {
-            display: false // Remove grid lines
+            display: false, // Remove grid lines
+            color: gridLineColor,
+                    drawBorder: true,
+                    lineWidth: 0,
+                    zeroLineColor: gridLineColor 
           }
         }]
       },
@@ -965,7 +996,8 @@ class ApplicationDashboard extends Component {
         position: 'bottom',
         labels: {
           pointStyle: 'rect',
-          boxWidth: 12
+          boxWidth: 12,
+          fontColor:fontColor,
         }
       },
       tooltips: {
@@ -1013,7 +1045,8 @@ class ApplicationDashboard extends Component {
         position: 'bottom',
         labels: {
           pointStyle: 'rect',
-          boxWidth: 12
+          boxWidth: 12,
+          fontColor:fontColor,
         }
       },
     }
@@ -1122,7 +1155,11 @@ class ApplicationDashboard extends Component {
       cutout: '50%', // Doughnut hole size
       responsive: true,
       legend: {
-        display: false // Hide the legend
+        display: false ,// Hide the legend
+        color: gridLineColor, 
+                drawBorder: true,
+                lineWidth: 0,
+                zeroLineColor: gridLineColor 
       }
     }
 
@@ -1565,8 +1602,8 @@ class ApplicationDashboard extends Component {
             <div class="col-xl-12 pl-lg-0 pr-lg-0">
               <div class="card custom-card">
                 <div class="card-body px-0 py-0">
-                  <div class="table-responsive tableFixHeadDash">
-                    <table class="table text-nowrap table-bordered">
+                  <div class="table-responsive fixTableHead tableFixHeadDash">
+                  <Table className="table-striped table-bordered text-center">
                       <thead>
                         <th scope="col">Program</th>
                         <th scope="col"># of active planning units</th>
@@ -1851,7 +1888,7 @@ class ApplicationDashboard extends Component {
                         </tr>
 
                       </tbody>
-                    </table>
+                    </Table>
                   </div>
                 </div>
               </div>
@@ -1956,8 +1993,8 @@ class ApplicationDashboard extends Component {
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Forecast Error </div>
                       </div>
-                      <div class="card-body px-0 py-0" style={{ overflowY: "auto" }}>
-                        <div id="forecastErrorJexcel">
+                      <div class="card-body px-0 py-0">
+                        <div id="forecastErrorJexcel" className='DashboardreadonlyBg consumptionDataEntryTable'>
                         </div>
                       </div>
                     </div>
@@ -1979,8 +2016,8 @@ class ApplicationDashboard extends Component {
                       <div class="card-header  justify-content-between">
                         <div class="card-title"># of Shipments with funding TBD </div>
                       </div>
-                      <div class="card-body px-0 py-0" style={{ overflowY: "auto" }}>
-                        <div id="shipmentsTBDJexcel">
+                      <div class="card-body px-0 py-0">
+                        <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg consumptionDataEntryTable'>
                         </div>
                       </div>
                     </div>
@@ -1993,32 +2030,32 @@ class ApplicationDashboard extends Component {
                         <div class="card-title"> Data Quality (doesn't use date selector) </div>
                       </div>
                       <div class="card-body py-2">
-                        <div className='row'>
+                        <div className='row pt-lg-4'>
                           <div class="col-md-6 container1">
-                            <span class="label-text"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
+                            <p class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
                             </div>
                           </div>
                           <div class="col-md-6 container1">
-                            <span class="label-text"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
+                            <p class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
                             </div>
                           </div>
                         </div>
-                        <div className='row'>
+                        <div className='row pt-lg-4'>
                           <div class="col-md-6 container1">
-                            <span class="label-text"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
+                            <p class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
                             </div>
                           </div>
                           <div class="col-md-6 container1">
-                            <span class="label-text"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></span>
+                            <p class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
                             <div class="pie-wrapper">
                               <div class="arc" data-value="24"></div>
                               <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
@@ -2035,9 +2072,9 @@ class ApplicationDashboard extends Component {
                           <div class="card-header justify-content-between">
                             <div class="card-title"> Expiries</div>
                           </div>
-                          <div class="card-body px-0 py-0" style={{ overflowY: "auto" }}>
+                          <div class="card-body px-0 py-0">
                             <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
-                            <div id="expiriesJexcel">
+                            <div id="expiriesJexcel" className='DashboardreadonlyBg consumptionDataEntryTable'>
                             </div>
                           </div>
                         </div>
