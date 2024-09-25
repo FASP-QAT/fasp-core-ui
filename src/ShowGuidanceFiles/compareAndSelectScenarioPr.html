@@ -59,7 +59,8 @@
 	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 		<tr>
 			<td align="center" style="padding:0;">
-				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
 							<table role="presentation"
@@ -70,7 +71,15 @@
 										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Comparar e
 											selecionar</h3>
 										<p>
-											<p style="font-size: 13px;"><p style="font-size: 13px;"><span style="font-weight:bold ;"><u>Usando esta tela :</u></span></p><ol type="1" style="font-size: 13px;"><li>Verifique se todas as previsões esperadas aparecem na tabela Comparar e selecionar. Para adicionar previsões, navegue até o <a href="/#/dataset/listTree" target="_blank" style="text-decoration: underline;">Gerenciar árvore</a> tela para construir uma previsão de árvore ou o <a href="/#/Extrapolation/extrapolateData" target="_blank" style="text-decoration: underline;">Extrapolação</a> tela para construir uma previsão baseada no consumo. o <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  símbolo indica que não há quantidade prevista disponível; a linha inteira ficará cinza e não editável, pois não há nada para exibir ou selecionar.</li><li>Revise as previsões disponíveis usando as seguintes informações na tela:<ul type="a"><li> <b>Erro de previsão (%):</b> esse erro é calculado usando o cálculo do Erro de Porcentagem Absoluta Ponderada (WAPE). Se o erro de previsão estiver destacado em <span style="color: rgb(17, 139, 112);">texto verde</span>, esta previsão tem o menor erro de previsão entre as previsões disponíveis. Exemplo de cálculo WAPE usando a janela de tempo padrão de 6 meses:<img class="img-fluid formula-img-mr" src="/ForecastError-Formula.png"><br>Se 6 meses de dados não estiverem disponíveis, o QAT utilizará quantos meses estiverem disponíveis e os indicará nesta coluna.</li><li> <b>Comparar com a previsão de consumo:</b> QAT compara Previsões de Consumo e Previsões de Árvore disponíveis. Para qualquer Previsão de Árvore, o QAT sinalizará a porcentagem acima da Previsão de Consumo mais alta ou abaixo da Previsão de Consumo mais baixa. A comparação será destacada em <span style="color: rgb(186, 12, 47);">texto vermelho</span> se estiver fora das porcentagens de limite definidas pelo usuário no <br>  <a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Configuración de versión</a> Assumindo dados confiáveis de consumo real, esta comparação ajuda os usuários a determinar se suas Previsões de Árvore são realistas. </li><li> <b>Gráfico:</b> Compare visualmente as diferentes previsões. A previsão selecionada aparecerá <b>negrito.</b></li><li> <b>Tabela de dados tabulares:</b> Compare os dados entre as previsões lado a lado clicando no botão Mostrar dados abaixo do gráfico. Algum <b>negrito/<span style="color: rgb(128, 0, 128); font-style: italic;">roxo em itálico em negrito</span></b> os dados estão dentro do período de previsão. </li></ul></li><li>Selecione a previsão final na tabela Comparar e Selecionar. Repita as etapas 1 a 3 para cada unidade de planejamento e região. Uma vez concluído, continue em frente para o <a href="/#/forecastReport/forecastOutput" target="_blank" style="text-decoration: underline;">Previsão Mensal</a> para verificar todas as unidades de planejamento juntas.</li></ol>
+										<p style="font-size: 13px;"><span><u style="font-weight:bold ;">Objetivo
+													:</u></span> Permitir que os usuários comparem todas as previsões
+											disponíveis (da árvore e
+											métodos de consumo) e selecione sua previsão final. Nesta tela, os usuários
+											selecione suas previsões, uma unidade de planejamento e região de cada vez.
+											Para selecionar
+											previsões em diversas unidades de planejamento e regiões, use o<a
+												href="/#/forecastReport/forecastSummary" target="_blank"
+												style="text-decoration: underline;"> Resumo da previsão</a>.</p>
 										</p>
 										<p>
 										<p style="font-size: 13px;">
