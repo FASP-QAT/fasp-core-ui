@@ -98,6 +98,8 @@ export default class ProgramOnboarding extends Component {
             realmCountryCode: '',
             organisationCode: '',
             healthAreaCode: '',
+            procurementAgentList: [],
+            fundingSourceList: []
         }
         this.dataChange = this.dataChange.bind(this);
         this.getDependentLists = this.getDependentLists.bind(this);
@@ -124,6 +126,7 @@ export default class ProgramOnboarding extends Component {
         this.generateCountryCode = this.generateCountryCode.bind(this);
         this.generateOrganisationCode = this.generateOrganisationCode.bind(this);
         this.generateHealthAreaCode = this.generateHealthAreaCode.bind(this);
+        this.updateStepOneData = this.updateStepOneData.bind(this);
     }
      /**
      * Sets up the initial display state for the steps.
@@ -640,12 +643,26 @@ export default class ProgramOnboarding extends Component {
      */    
     updateFieldDataProcurementAgent(value) {
         let { program } = this.state;
-        var paArray = [];
-        for (var i = 0; i < value.length; i++) {
-            paArray[i] = value[i].value;
+        // var paArray = [];
+        // for (var i = 0; i < value.length; i++) {
+        //     paArray[i] = value[i].value;
+        // }
+        // program.procurementAgents = paArray;
+        // this.setState({ program: program });
+
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
         }
-        program.procurementAgents = paArray;
-        this.setState({ program: program });
+
+        if (selectedArray.includes("-1")) {//when All option is selected
+            var idList = this.state.procurementAgentList.filter((c) => c.value != -1).map((c) => c.value);
+            program.procurementAgents = idList;
+            this.setState({ program: program });
+        } else {
+            program.procurementAgents = selectedArray;
+            this.setState({ program: program });
+        }
     }
     /**
      * Handles the change event for funding sources.
@@ -653,12 +670,39 @@ export default class ProgramOnboarding extends Component {
      */    
     updateFieldDataFundingSource(value) {
         let { program } = this.state;
-        var fsArray = [];
-        for (var i = 0; i < value.length; i++) {
-            fsArray[i] = value[i].value;
+        // var fsArray = [];
+        // for (var i = 0; i < value.length; i++) {
+        //     fsArray[i] = value[i].value;
+        // }
+        // program.fundingSources = fsArray;
+        // this.setState({ program: program });
+
+        var selectedArray = [];
+        for (var p = 0; p < value.length; p++) {
+            selectedArray.push(value[p].value);
         }
-        program.fundingSources = fsArray;
-        this.setState({ program: program });
+
+        if (selectedArray.includes("-1")) {//when All option is selected
+            var idList = this.state.fundingSourceList.filter((c) => c.value != -1).map((c) => c.value);
+            program.fundingSources = idList;
+            this.setState({ program: program });
+        } else {
+            program.fundingSources = selectedArray;
+            this.setState({ program: program });
+        }
+    }
+
+    /**
+     * Updates the state with the provided key-value pair.
+     * @param {String} key The key of the state to be updated.
+     * @param {any} value The value to be assigned to the specified key in the state.
+     */
+    updateStepOneData(key, value) {
+        this.setState({
+            [key]: value
+        },
+            () => {
+            })
     }
     /**
      * Renders the program onboarding screen.
@@ -771,7 +815,7 @@ export default class ProgramOnboarding extends Component {
                                         <StepFive ref='regionChild' finishedStepFive={this.finishedStepFive} previousToStepFour={this.previousToStepFour} updateFieldData={this.updateFieldData} items={this.state}></StepFive>
                                     </div>
                                     <div id="stepSix">
-                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state} updateFieldDataProcurementAgent={this.updateFieldDataProcurementAgent} updateFieldDataFundingSource={this.updateFieldDataFundingSource}></StepSix>
+                                        <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state} updateFieldDataProcurementAgent={this.updateFieldDataProcurementAgent} updateFieldDataFundingSource={this.updateFieldDataFundingSource} updateStepOneData={this.updateStepOneData}></StepSix>
                                     </div>
                                     <div id="stepSeven">
                                         <MapPlanningUnits ref="child" message={i18n.t(this.state.message)} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>

@@ -42,15 +42,15 @@ a {
 	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 		<tr>
 			<td align="center" style="padding:0;">
-				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
 							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
 									
 									<td style="padding:0 0 10px 0;color:#153643;">
-										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Adicionar/editar nó - dados do nó</h3>
-										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo :</span> Ativar permite que o usuário especifique o tipo de nó</p>
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Mesa de árvore</h3>
+								
 										<p style="font-size: 13px;">
 											<p style="font-size: 13px; font-weight: bold;"><span class="">Tipo de nó:</span></p>
 											<div class="pl-lg-4 pr-lg-4 table1">
@@ -98,34 +98,6 @@ a {
 												</table>
 											</div>
 										</p>
-										
-										<p style="font-size: 13px;">
-											<span style="font-size: 13px; font-weight: bold;">Mudanças ao longo do tempo</span><br>Embora a estrutura da árvore permaneça constante ao 
-											longo do tempo, as porcentagens e os valores dos nós podem mudar ao longo do tempo. 
-											As três funcionalidades abaixo estão disponíveis em cada nó e permitem que o usuário 
-											controle como os nós mudam ao longo do tempo:
-											<ul style="font-size: 13px;">
-												<li><b>Guia Modelagem/Transferência</b> </li>
-												<ul style="font-size: 13px;">
-													<li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modelagem:</b> Permite que o usuário especifique a taxa exata de mudança</li>
-													<li><b><i class="fa fa-link"></i> Transferir:</b> Permite que os usuários vinculem dois nós - de modo que a diminuição do nó de origem 
-														esteja vinculada ao aumento do nó de destino. </li>
-													</ul>
-													<li><b>Aba Extrapolação</b> (somente nós de número)</li>
-													<ul>
-														<li><b><i class="fa fa-line-chart"></i> Extrapolação:</b> Permite que os usuários usem dados históricos para extrapolar 
-															alterações futuras. , Habilite este recurso marcando a caixa "Extrapolação". Observe que 
-															se você fizer isso - a guia Modelagem/Transferência ficará oculta, pois só é possível usar 
-															uma de cada vez. Quaisquer dados inseridos anteriormente na guia Modelagem/Transferência 
-															serão apagados.</li>
-														</ul>
-													</ul>
-													<p>Se nenhuma mudança ao longo do tempo for desejada, simplesmente não use as 
-														guias "Modelagem/Transferência" e "Extrapolação", e o valor do nó será igual ao valor 
-														inserido ou calculado na guia "Dados do nó".
-													</p>
-												</p>
-
 												<p style="font-size: 13px;">
 													<span style="font-size: 13px; font-weight: bold;">Usando cenários :</span>Cenários são usados para modelar valores diferentes para a mesma árvore.
 													<div class="pl-lg-4 pr-lg-4 table1">
@@ -163,22 +135,6 @@ a {
 													<ul style="font-size: 13px;">
 														<li><b> Tipo de nó de previsão :</b> Selecione discreto se este produto for usado por tempo limitado e contínuo se 
 															for usado indefinidamente.</li>
-															<li><b>Precisa calcular quantidades de uso discreto de produtos?
-															</b>
-															QAT tem a opção de calcular o uso discreto do produto em nós de unidades de previsão em 
-															duas maneiras: antecipando a quantidade discreta consumida por paciente no mês 1 
-															(escolha "Calcular Usando Dispensação Única" = "Sim") ou desagregando o 
-															quantidade discreta consumida por paciente por mês (escolha "Calcular usando distribuição única" = "Não"). 
-															Por padrão, o QAT assumirá o método de antecipação para calcular a unidade de previsão discreta 
-															quantidades; no entanto, os usuários têm a opção de escolher o método alternativo por meio de um rádio 
-															botão. Este cálculo discreto alternativo pode ser útil para Unidades de Planejamento (PUs) 
-															que apresentam padrões de baixo consumo durante um período de tempo. Por exemplo, se uma mulher grávida 
-															é obrigado a tomar um suplemento nutricional uma vez por mês durante a gravidez 
-															(nove meses), o QAT atualmente calcularia nove suplementos no mês 1 (fornecimento prévio). 
-															Sem o fornecimento prévio, o QAT calcularia um suplemento no mês 1, um suplemento no 
-															mês 2, um suplemento no mês 3 e assim por diante.
-
-															</li>
 														<li><b> Uso do produto atrasado ou faseado?</b> Às vezes, o consumo do produto é atrasado em relação aos demais 
 															níveis superiores da árvore. No relevante <b> Unidade de previsão </b>nó, use o <b>Atraso</b> campo para indicar este atraso.
 														<ul>
@@ -190,19 +146,13 @@ a {
 																(discreta por 2 meses , lag=0), Unidade de previsão B (discreta para 2 meses, lag=2), 
 																Unidade de previsão C (discreta para 2 meses, lag = 4).
 															</li>
+															<li><b>Repetindo Usos de Previsão?</b> Se vários nós da Unidade de previsão compartilharem 
+																as mesmas configurações, considere usar o <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Modelo de uso </a>tela para salvar seus usos comuns e,
+																 em seguida, usando o campo Copiar do modelo para preencher os campos nos nós da unidade 
+																 de previsão. </li>
 														</ul>
 													</li>
-													<li><b> Padrões de consumo de vários meses?</b> Com que frequência o produto é realmente 
-														consumido? é mensal ou a cada três meses? O consumo pode ser definido em diferentes níveis, 
-														dependendo de sua cadeia de suprimentos. No <b>Nó da Unidade de Planejamento</b>, use o <b>Intervalo de consumo</b> campo para 
-														indicar. Por exemplo, se o usuário final usa um produto diariamente, mas só pega ou 
-														compra o produto a cada 2 meses, insira 2 no campo Intervalo de consumo para contabilizar 
-														um padrão de consumo de vários meses. Observe que isso está disponível apenas para nós 
-														Contínuos, pois o produto é considerado “consumido” no início do período de uso.</li>
-													<li><b>Repetindo Usos de Previsão?</b> Se vários nós da Unidade de previsão compartilharem 
-														as mesmas configurações, considere usar o <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Modelo de uso </a>tela para salvar seus usos comuns e,
-														 em seguida, usando o campo Copiar do modelo para preencher os campos nos nós da unidade 
-														 de previsão. </li>
+													
 														</ul>
 													</p>
 

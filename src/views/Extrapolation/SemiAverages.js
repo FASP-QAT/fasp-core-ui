@@ -21,7 +21,7 @@ export function calculateSemiAverages(inputData, noOfProjectionMonths, props, pa
     if (page == "DataEntry") {
         var semiAvgData = { "data": data, "PlanningUnitId": props.state.selectedConsumptionUnitId, "regionId": regionId }
         props.updateSemiAveragesData(semiAvgData);
-    } else if (page == "importFromQATSP") {
+    } else if (page == "importFromQATSP" || page == "bulkExtrapolation") {
         var semiAvgData = { "data": data, "PlanningUnitId": planningUnitId, "regionId": regionId }
         props.updateSemiAveragesData(semiAvgData);
     } else {

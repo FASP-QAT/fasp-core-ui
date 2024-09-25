@@ -49,9 +49,8 @@ a {
 								<tr>
 									
 									<td style="padding:0 0 10px 0;color:#153643;">
-										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Administrar árbol - Construir árboles</h3>
-										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo</span> Permita que los usuarios administren y construyan árboles de pronóstico y escenarios, para cualquier pronóstico que no 
-											sea de consumo (demográfico, morbilidad, servicios, etc.). Tenga en cuenta que hay más orientación disponible después de hacer clic en cualquier nodo específico.</p>
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Mesa de árbol</h3>
+										
 										<p>
 											<p style="font-size: 13px; font-weight: bold;"><span class="">Type de nœud:</span></p>
 										<div class="pl-lg-4 pr-lg-4 table1">
@@ -80,13 +79,13 @@ a {
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Pourcentage %</b></td>
 														<td>Défini comme un pourcentage du parent/source</td>
-														<td>% or <b style=" color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 													</tr>
 													<tr>
 														<td style="background:#002f6c;color: #fff;"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td>Défini comme un pourcentage de la source et des paramètres de l'unité de prévision</td>
-														<td><b style=" color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td><b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 													</tr>
 													<tr>
@@ -99,32 +98,7 @@ a {
 											</table>
 										</div>
 									</p>
-									<p style="font-size: 13px;">
-										<span style="font-size: 13px; font-weight: bold;">Cambios a lo largo del tiempo</span><br>Si bien la estructura de árbol se mantiene constante a lo largo del tiempo, los porcentajes y 
-										valores de los nodos pueden cambiar con el tiempo. Las tres funcionalidades a continuación 
-										están disponibles en cada nodo y permiten al usuario controlar cómo cambian los nodos 
-										con el tiempo:
-										<ul style="font-size: 13px;">
-											<li><b>Ficha Modelado/Transferencia</b> </li>
-											<ul>
-												<li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modelado:</b> Permite al usuario especificar la tasa exacta de cambio</li>
-												<li><b><i class="fa fa-link"></i> Transferir:</b> Permite a los usuarios vincular dos nodos, por lo que la disminución del nodo de origen está vinculada 
-													al aumento del nodo de destino. </li>
-											</ul>
-											<li><b>Ficha Extrapolación</b> (solo nodos numéricos)</li>
-											<ul>
-												<li><b><i class="fa fa-line-chart"></i> Extrapolación:</b> Permite a los usuarios utilizar datos históricos para extrapolar 
-													cambios futuros. , Habilite esta función marcando la casilla "Extrapolación". 
-													Tenga en cuenta que si lo hace, la pestaña Modelado/Transferencia se ocultará ya que 
-													solo es posible usar una a la vez. Se borrarán todos los datos ingresados previamente 
-													en la pestaña Modelado/Transferencia.</li>
-												</ul>
-											</ul>
-											<p style="font-size: 13px;">Si no desea ningún cambio a lo largo del tiempo, simplemente no utilice las pestañas 
-												"Modelado/Transferencia" y "Extrapolación", y el valor del nodo será igual al valor 
-												ingresado o calculado en la pestaña "Datos del nodo".
-											</p>
-									</p>
+									
 									<p style="font-size: 13px;">
 										<span style="font-size: 13px; font-weight: bold;">Uso de escenarios :</span>Los escenarios se utilizan para modelar diferentes valores 
 										para el mismo árbol.
@@ -164,21 +138,6 @@ a {
 											<li>
 												<b> Tipo de nodo de previsión :</b> Seleccione discreto si este producto se usará por tiempo limitado y continuo 
 												si se usará indefinidamente.</li>
-												<li><b>¿Necesita calcular cantidades de uso de productos discretos?
-												</b>
-												QAT tiene la opción de calcular el uso de productos discretos en nodos de unidades de pronóstico en 
-												de dos maneras: anticipando la cantidad discreta consumida por paciente en el mes 1 
-												(elija "Calcular usando una dispensación única" = "Sí") o desagregando el 
-												cantidad discreta consumida por paciente por mes (elija "Calcular usando una dispensación única" = "No"). 
-												De forma predeterminada, QAT asumirá el método de distribución anticipada para calcular la unidad de pronóstico discreta. 
-												cantidades; sin embargo, los usuarios tienen la opción de elegir el método alternativo a través de una radio. 
-												botón. Este cálculo discreto alternativo podría ser útil para las Unidades de Planificación (PU) 
-												que tienen patrones de bajo consumo durante un período de tiempo. Por ejemplo, si una mujer embarazada 
-												Se requiere tomar un suplemento nutricional una vez al mes durante el embarazo. 
-												(nueve meses), QAT actualmente calcularía nueve suplementos en el mes 1 (distribución anticipada). 
-												Sin la distribución anticipada, QAT calcularía un suplemento en el mes 1, un suplemento en 
-												mes 2, un suplemento en el mes 3, y así sucesivamente.
-												</li>
 											<li><b> ¿Uso del producto retrasado o escalonado?</b> A veces, el consumo del producto se retrasa en relación a 
 												los otros niveles superiores del árbol. en lo pertinente <b> Unidad de previsión </b>nodo, utilice el <b>Retraso</b> campo para indicar este retraso.
 											<ul>
@@ -190,18 +149,12 @@ a {
 													(discreta para 2 meses). , lag=0), Unidad de Pronóstico B (discreta por 2 meses, lag=2), 
 													Unidad de Pronóstico C (discreta por 2 meses, lag = 4).
 												</li>
+												<li><b>¿Usos de pronóstico repetidos?</b> Si varios nodos de Unidad de pronóstico 
+													comparten la misma configuración, considere usar el <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Plantilla de uso </a>pantalla para guardar sus usos comunes y luego usar el campo Copiar de plantilla para completar 
+													los campos en los nodos de la unidad de pronóstico. </li>
 											</ul>
 										</li>
-										<li><b> ¿Patrones de consumo de varios meses?</b> ¿Con qué frecuencia se consume realmente el producto? es mensual o 
-											cada tres meses? El consumo se puede definir en diferentes niveles dependiendo de su 
-											cadena de suministro. En el <b>Nodo de unidad de planificación</b>, utilizar el <b>Intervalo de consumo</b> campo a indicar. Por ejemplo, 
-											si el usuario final usa un producto a diario, pero solo recoge o compra el producto 
-											cada 2 meses, ingrese 2 en el campo Intervalo de consumo para dar cuenta de un patrón 
-											de consumo de varios meses. Tenga en cuenta que esto solo está disponible para los nodos 
-											continuos, ya que se supone que el producto se consume al comienzo del período de uso.</li>
-										<li><b>¿Usos de pronóstico repetidos?</b> Si varios nodos de Unidad de pronóstico 
-											comparten la misma configuración, considere usar el <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Plantilla de uso </a>pantalla para guardar sus usos comunes y luego usar el campo Copiar de plantilla para completar 
-											los campos en los nodos de la unidad de pronóstico. </li>
+										
 										</ul>
 									</p>
 								

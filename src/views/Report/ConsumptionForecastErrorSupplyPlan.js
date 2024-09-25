@@ -545,7 +545,6 @@ observer.observe(document.documentElement, {
      * @param {Object} e - Event data containing planning unit information.
      */
     setPlanningUnit(e) {
-        console.log(" 1 Test@123", e)
         if (this.state.yaxisEquUnit > 0) {
             var forecastErrorThreshold = 0;
             var showForecastThresholdLegend = false;
@@ -568,7 +567,6 @@ observer.observe(document.documentElement, {
                 this.fetchData();
             })
         } else {
-            console.log("2 Test@123", e.target.value)
             if (e.target.value != -1) {
                 var forecastErrorThreshold = this.state.planningUnits.filter(c => c.planningUnit.id == e.target.value)[0].forecastErrorThreshold;
                 this.setState({
@@ -1709,7 +1707,7 @@ observer.observe(document.documentElement, {
             csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + "No").replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.timeWindow') + ': ' + (document.getElementById("timeWindow").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         if (document.getElementById("yaxisEquUnit").value > 0) {
-            csvRow.push('"' + ("Y-axis in equivalency unit" + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         }
         csvRow.push('');
         var columns = [];
@@ -1988,7 +1986,7 @@ observer.observe(document.documentElement, {
                         align: 'left'
                     })
                     if (document.getElementById("yaxisEquUnit").value > 0) {
-                        doc.text("Y-axis in equivalency unit" + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y + 20), {
+                        doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y + 20), {
                             align: 'left'
                         })
                     }
@@ -2683,6 +2681,8 @@ observer.observe(document.documentElement, {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                         filterOptions={filterOptions}
                                                     />
                                                 </div>
@@ -2706,7 +2706,7 @@ observer.observe(document.documentElement, {
 
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                                <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2847,29 +2847,10 @@ observer.observe(document.documentElement, {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Show consumption adjusted for stock out?
+                                                        {i18n.t('static.forecastMonthlyErrorReport.showConsumption')}
                                                     </Label>
                                                 </div>
                                             </FormGroup>
-
-                                            {/* <FormGroup className="col-md-3">
-                                                <div className="tab-ml-1" style={{ marginTop: '30px' }}>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="yaxisEquUnitCb"
-                                                        name="yaxisEquUnitCb"
-                                                        // checked={true}
-                                                        // checked={this.state.yaxisEquUnit}
-                                                        onClick={(e) => { this.yaxisEquUnitCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Y-axis in equivalency unit?
-                                                    </Label>
-                                                </div>
-                                            </FormGroup> */}
                                         </div>
                                     </div>
                                 </Form>

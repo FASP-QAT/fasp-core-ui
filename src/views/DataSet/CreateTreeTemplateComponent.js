@@ -8584,6 +8584,8 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = event.target.value;
+            let usagePeriodJson = {usagePeriodId: 1 };//to fix error at the time of edit template
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod = usagePeriodJson;
             this.getUsageText();
         }
         if (event.target.name === "planningUnitIdFU") {
@@ -9786,6 +9788,7 @@ export default class CreateTreeTemplate extends Component {
                             noOfPersons: "",
                             forecastingUnitPerPersonsFC: "",
                             repeatCount: "",
+                            repeatUsagePeriodId: "",
                             usageFrequencyCon: "",
                             usageFrequencyDis: "",
                             oneTimeUsage: "",
@@ -12047,6 +12050,15 @@ export default class CreateTreeTemplate extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelBackgroundRender: ((data) => {
+                var {context, width, height } = data;
+                var { title, fillColor, opacity } = context;
+                return !opacity ? <div style={{
+                    background: "#212631"}}>
+                </div> : <div style={{
+                  background: "#212631"}}>
+                </div>
+            }),
             onLevelTitleRender: ((data) => {
                 var { context, width, height } = data;
                 var { title, titleColor } = context;
