@@ -1994,7 +1994,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                         <div class="card-title"> Forecast Error </div>
                       </div>
                       <div class="card-body px-0 py-0">
-                        <div id="forecastErrorJexcel" className='DashboardreadonlyBg consumptionDataEntryTable'>
+                        <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable'>
                         </div>
                       </div>
                     </div>
@@ -2017,7 +2017,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                         <div class="card-title"># of Shipments with funding TBD </div>
                       </div>
                       <div class="card-body px-0 py-0">
-                        <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg consumptionDataEntryTable'>
+                        <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable1'>
                         </div>
                       </div>
                     </div>
@@ -2074,7 +2074,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                           </div>
                           <div class="card-body px-0 py-0">
                             <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
-                            <div id="expiriesJexcel" className='DashboardreadonlyBg consumptionDataEntryTable'>
+                            <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
                             </div>
                           </div>
                         </div>
