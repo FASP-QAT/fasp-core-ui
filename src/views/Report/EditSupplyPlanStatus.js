@@ -703,8 +703,8 @@ class EditSupplyPlanStatus extends Component {
             });
             this.formSubmit(monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
-            var roleList = AuthenticationService.getLoggedInUserRole();
-            if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+            // var roleList = AuthenticationService.getLoggedInUserRole();
+            if (AuthenticationService.checkUserACLBasedOnRoleId(this.state.programId.toString.split("_")[0].map(c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
             } else {
                 var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                 this.setState({
@@ -929,8 +929,8 @@ class EditSupplyPlanStatus extends Component {
                                 multiplier: c.multiplier,
                                 active: c.active,
                                 label: c.label,
-                                conversionNumber:c.conversionNumber,
-                                conversionMethod:c.conversionMethod
+                                conversionNumber: c.conversionNumber,
+                                conversionMethod: c.conversionMethod
                             })
                         })
                         this.setState({
@@ -1047,8 +1047,8 @@ class EditSupplyPlanStatus extends Component {
                                 multiplier: c.multiplier,
                                 active: c.active,
                                 label: c.label,
-                                conversionNumber:c.conversionNumber,
-                                conversionMethod:c.conversionMethod
+                                conversionNumber: c.conversionNumber,
+                                conversionMethod: c.conversionMethod
                             })
                         })
                         this.setState({
@@ -1177,8 +1177,8 @@ class EditSupplyPlanStatus extends Component {
                                 multiplier: c.multiplier,
                                 active: c.active,
                                 label: c.label,
-                                conversionNumber:c.conversionNumber,
-                                conversionMethod:c.conversionMethod
+                                conversionNumber: c.conversionNumber,
+                                conversionMethod: c.conversionMethod
                             })
                         })
                         this.setState({
@@ -2337,12 +2337,13 @@ class EditSupplyPlanStatus extends Component {
                     }
                     regionList[i] = regionJson
                 }
-                var hasRole = false;
-                AuthenticationService.getLoggedInUserRole().map(c => {
-                    if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
-                        hasRole = true;
-                    }
-                });
+                let hasRole = AuthenticationService.checkUserACLBasedOnRoleId(program.programId.map(c.toString()), "ROLE_SUPPLY_PLAN_REVIEWER");
+
+                // AuthenticationService.getLoggedInUserRole().map(c => {
+                //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                //         hasRole = true;
+                //     }
+                // });
                 var programQPLDetails = [];
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -2356,7 +2357,7 @@ class EditSupplyPlanStatus extends Component {
                     addressedCount: 0,
                     programModified: 0,
                     readonly: 0,
-                    cutOffDate:""
+                    cutOffDate: ""
                 })
                 this.setState({
                     program,
@@ -3575,7 +3576,7 @@ class EditSupplyPlanStatus extends Component {
                             </FormGroup>
                         </div>
                     </Col>
-                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM') &&
+                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_ADD_PROBLEM') &&
                         <div className="col-md-12 card-header-action">
                             <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                         </div>
@@ -5513,8 +5514,8 @@ class EditSupplyPlanStatus extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
-                                                {(this.state.editable || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
+                                                {(this.state.editable || AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="submit" size="md" color="success" id="submitButton" className="float-left mr-1"><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                {(this.state.editable || AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_ADD_PROBLEM')) && (this.state.problemReportChanged == 1 || this.state.remainingDataChanged == 1) && <Button type="button" size="md" color="warning" className="float-left mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i>{i18n.t('static.common.reset')}</Button>}
                                                 <Button type="button" size="md" color="danger" className="float-left mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 &nbsp;
                                             </FormGroup>

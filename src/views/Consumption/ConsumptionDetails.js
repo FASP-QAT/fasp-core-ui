@@ -339,9 +339,9 @@ export default class ConsumptionDetails extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            label: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -480,8 +480,8 @@ export default class ConsumptionDetails extends React.Component {
                             var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                             var rangeValue = this.state.rangeValue;
                             if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                                rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                                var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                                rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                                 localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                             }
                             this.setState({
@@ -589,8 +589,8 @@ export default class ConsumptionDetails extends React.Component {
                 document.getElementById("consumptionTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
-                    var roleList = AuthenticationService.getLoggedInUserRole();
-                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly) {
+                    // var roleList = AuthenticationService.getLoggedInUserRole();
+                    if (AuthenticationService.checkUserACLBasedOnRoleId(programId.split("_")[0].map(c.toString()), 'ROLE_GUEST_USER') || (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly) {
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }

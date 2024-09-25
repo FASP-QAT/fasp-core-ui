@@ -344,7 +344,7 @@ class ListBudgetComponent extends Component {
       if ((x == 0 && value != 0) || (y == 0)) {
       } else {
         if (this.state.selBudget.length != 0) {
-          if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
+          if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(1, x).map(c.toString()), 'ROLE_BF_EDIT_BUDGET')) {
             this.props.history.push({
               pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
             });
@@ -582,7 +582,7 @@ class ListBudgetComponent extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.filter(c=>this.state.programId==0 || this.state.programId==-1?1==1:[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId))).map((item, i) => {
+    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.filter(c => this.state.programId == 0 || this.state.programId == -1 ? 1 == 1 : [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId))).map((item, i) => {
       return (
         <option key={i} value={item.fundingSourceId}>
           {getLabelText(item.label, this.state.lang)}
@@ -634,7 +634,7 @@ class ListBudgetComponent extends Component {
             <span className="pl-0">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.checkUserACL(this.state.programs.map(c => c.id.toString()), 'ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>
@@ -699,7 +699,7 @@ class ListBudgetComponent extends Component {
               </div>
             </Col>
             <div className='consumptionDataEntryTable'>
-              <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+              <div id="tableDiv" className={AuthenticationService.checkUserACL(this.state.programs.map(c => c.id.toString()), 'ROLE_BF_EDIT_BUDGET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
               </div>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>

@@ -1351,7 +1351,7 @@ class ForecastSummary extends Component {
                                                 }
                                             }
                                         },
-                                        editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY') ? true : false,
+                                        editable: AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_LIST_FORECAST_SUMMARY') ? true : false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.worksheets[0];

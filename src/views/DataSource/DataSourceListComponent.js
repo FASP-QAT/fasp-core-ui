@@ -49,11 +49,11 @@ export default class DataSourceListComponent extends Component {
         let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
         let programId = document.getElementById("programId").value;
         let realmId = 0;
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+        if (AuthenticationService.checkUserACL(programId.map(c.toString()), 'ROLE_BF_SHOW_REALM_COLUMN')) {
             realmId = document.getElementById("realmId").value;
         }
         if (realmId != 0 && dataSourceTypeId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && (c.program == null || c.program.id == programId || c.program.id==0))
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && (c.program == null || c.program.id == programId || c.program.id == 0))
             this.setState({
                 selSource
             },
@@ -65,13 +65,13 @@ export default class DataSourceListComponent extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (realmId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && (c.program == null || c.program.id == programId || c.program.id==0))
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && (c.program == null || c.program.id == programId || c.program.id == 0))
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id==0) && c.dataSourceType.id == dataSourceTypeId)
+            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id == 0) && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
@@ -89,7 +89,7 @@ export default class DataSourceListComponent extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id==0))
+            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id == 0))
             this.setState({
                 selSource
             },
@@ -427,7 +427,7 @@ export default class DataSourceListComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
+                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(0, x).map(c.toString()), 'ROLE_BF_EDIT_DATA_SOURCE')) {
                     this.props.history.push({
                         pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     });

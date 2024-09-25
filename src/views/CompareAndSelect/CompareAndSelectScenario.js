@@ -510,8 +510,8 @@ class CompareAndSelectScenario extends Component {
                     }
                 }
             }
-            columns1.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length>1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
-            calendarTableCol.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length>1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+            columns1.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length > 1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+            calendarTableCol.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length > 1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
             // calendarTableCol.push({ title: i18n.t('static.supplyPlan.total'), type: 'numeric', mask: '#,##.00' });
             calendarTableCol.push({ title: i18n.t("static.compareAndSelect.noOfMonths"), type: "numeric", width: 100 })
             var data = [];
@@ -881,7 +881,7 @@ class CompareAndSelectScenario extends Component {
                             '',
                             '',
                             i18n.t("static.compareAndSelect.totalAggregated"),
-                            count1>0?formatter(Number(total).toFixed(2)):"",
+                            count1 > 0 ? formatter(Number(total).toFixed(2)) : "",
                             '',
                             '',
                             '',
@@ -903,7 +903,7 @@ class CompareAndSelectScenario extends Component {
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
-                    editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? true : false
+                    editable: AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_COMPARE_AND_SELECT') ? true : false
                 };
                 var languageEl = jexcel(document.getElementById("table1"), options);
                 this.el = languageEl;
@@ -1679,14 +1679,14 @@ class CompareAndSelectScenario extends Component {
             }
             var json = instance.getJson(null, false);
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-            var total=0;
-            var count=0;
+            var total = 0;
+            var count = 0;
             for (var j = 0; j < json.length; j++) {
                 var rowData = elInstance.getRowData(j);
-                var treeScenarioFilter=this.state.treeScenarioList.filter(c=>c.id==elInstance.getRowData(j)[8].toString() && selectedTreeScenarioId.includes(c.id.toString()));
-                if(treeScenarioFilter.length>0){
-                    count+=1;
-                    total+=Number(rowData[4].toString().replaceAll(",",""));
+                var treeScenarioFilter = this.state.treeScenarioList.filter(c => c.id == elInstance.getRowData(j)[8].toString() && selectedTreeScenarioId.includes(c.id.toString()));
+                if (treeScenarioFilter.length > 0) {
+                    count += 1;
+                    total += Number(rowData[4].toString().replaceAll(",", ""));
                 }
                 instance.setFooter(
                     [
@@ -1695,7 +1695,7 @@ class CompareAndSelectScenario extends Component {
                             '',
                             '',
                             i18n.t("static.compareAndSelect.totalAggregated"),
-                            count>0?formatter(Number(total).toFixed(2)):"",
+                            count > 0 ? formatter(Number(total).toFixed(2)) : "",
                             '',
                             '',
                             '',
@@ -1710,50 +1710,50 @@ class CompareAndSelectScenario extends Component {
                 if (this.state.treeScenarioList[j].readonly) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                        try{
-                            cell.classList.remove('notSelectedForecast');     
-                        }catch(err){}
-                        try{
-                            cell.classList.remove('selectedForecast');     
-                        }catch(err){}
+                        try {
+                            cell.classList.remove('notSelectedForecast');
+                        } catch (err) { }
+                        try {
+                            cell.classList.remove('selectedForecast');
+                        } catch (err) { }
                         cell.classList.add('readonlyForecast');
                         cell.classList.add('readonly');
                     }
                 } else if (selectedTreeScenarioId.includes(rowData[8].toString())) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                        try{
-                            cell.classList.remove('notSelectedForecast');    
-                        }catch(err){}
+                        try {
+                            cell.classList.remove('notSelectedForecast');
+                        } catch (err) { }
                         cell.classList.add('selectedForecast');
                     }
                 } else {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
-                        try{
-                            cell.classList.remove('selectedForecast');    
-                        }catch(err){}
+                        try {
+                            cell.classList.remove('selectedForecast');
+                        } catch (err) { }
                         cell.classList.add('notSelectedForecast');
                     }
                 }
                 if (Math.min(...this.state.actualDiff.filter((c, index) => this.state.useForLowestError[index])) == this.state.actualDiff[j] && this.state.useForLowestError[j]) {
                     var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                    try{
-                        cell.classList.remove('notLowestError');    
-                    }catch(err){}
+                    try {
+                        cell.classList.remove('notLowestError');
+                    } catch (err) { }
                     cell.classList.add('lowestError');
                 } else {
                     var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                    try{
-                        cell.classList.remove('lowestError');    
-                    }catch(err){}
+                    try {
+                        cell.classList.remove('lowestError');
+                    } catch (err) { }
                     cell.classList.add('notLowestError');
                 }
                 if (this.state.finalData[j].compareToConsumptionForecastClass != "") {
                     var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                    try{
-                        cell.classList.remove(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? this.state.finalData[j].compareToConsumptionForecastClass:"compareAndSelectRed");
-                    }catch(err){}
+                    try {
+                        cell.classList.remove(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? this.state.finalData[j].compareToConsumptionForecastClass : "compareAndSelectRed");
+                    } catch (err) { }
                     cell.classList.add(this.state.finalData[j].compareToConsumptionForecastClass == "red" ? "compareAndSelectRed" : this.state.finalData[j].compareToConsumptionForecastClass);
                 }
             }
@@ -2551,7 +2551,7 @@ class CompareAndSelectScenario extends Component {
                             fontColor: 'transparent',
                         },
                         lineTension: 0.1,
-                        borderWidth: (this.state.selectedTreeScenarioId.includes(item.id.toString()) && this.state.selectedTreeScenarioId.length==1) ? 5 : 3,
+                        borderWidth: (this.state.selectedTreeScenarioId.includes(item.id.toString()) && this.state.selectedTreeScenarioId.length == 1) ? 5 : 3,
                         pointStyle: 'line',
                         pointRadius: 3,
                         showInLegend: true,
@@ -2561,7 +2561,7 @@ class CompareAndSelectScenario extends Component {
                     }
                 )
             })
-            if (this.state.selectedTreeScenarioId.length>1) {
+            if (this.state.selectedTreeScenarioId.length > 1) {
                 var collapsedExpandArray = this.state.collapsedExpandArr.filter(ar => ar.id == -1);
                 if (collapsedExpandArray.length > 0) {
                     collapsedExpandArray = collapsedExpandArray.map(i => ({ year: i.year, actual: i.actual }));
@@ -2798,7 +2798,7 @@ class CompareAndSelectScenario extends Component {
                                                         <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
                                                         <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                                     </ul><br />
-                                                    <ul style={{ marginLeft: '-2.5rem', marginTop: '-7px' }}><span className='DarkThColr'><b>{i18n.t("static.versionSettings.note")+": "}</b>{i18n.t('static.compareAndSelect.topNote')}</span><br /></ul>
+                                                    <ul style={{ marginLeft: '-2.5rem', marginTop: '-7px' }}><span className='DarkThColr'><b>{i18n.t("static.versionSettings.note") + ": "}</b>{i18n.t('static.compareAndSelect.topNote')}</span><br /></ul>
                                                     <div className="RemoveStriped removeOddColor">
                                                         <div id="table1" className="compareAndSelect TableWidth100 compareAndSelectCollapsecol"></div>
                                                     </div>
@@ -2814,7 +2814,7 @@ class CompareAndSelectScenario extends Component {
                                                                     id="forecastNotes"
                                                                     value={this.state.forecastNotes}
                                                                     onChange={(e) => { this.setForecastNotes(e); }}
-                                                                    readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
+                                                                    readOnly={AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_COMPARE_AND_SELECT') ? false : true}
                                                                     bsSize="sm"
                                                                 >
                                                                 </Input>
@@ -3120,7 +3120,7 @@ class CompareAndSelectScenario extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>

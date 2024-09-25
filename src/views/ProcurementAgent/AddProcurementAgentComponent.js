@@ -862,7 +862,7 @@ class AddProcurementAgentComponent extends Component {
      */
     resetClicked() {
         let { procurementAgent } = this.state;
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+        if (AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_SHOW_REALM_COLUMN')) {
             procurementAgent.realm.id = ''
         }
         procurementAgent.procurementAgentCode = ''

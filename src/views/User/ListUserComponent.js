@@ -9,7 +9,7 @@ import {
     Col,
     FormGroup, Input, InputGroup,
     Label,
-    
+
     Nav, NavItem, NavLink,
     TabContent, TabPane
 } from 'reactstrap';
@@ -248,8 +248,8 @@ class ListUserComponent extends Component {
                                     }
                                     var listArray = roleList;
                                     listArray.sort((a, b) => {
-                                        var itemLabelA = a.label.toUpperCase(); 
-                                        var itemLabelB = b.label.toUpperCase(); 
+                                        var itemLabelA = a.label.toUpperCase();
+                                        var itemLabelB = b.label.toUpperCase();
                                         return itemLabelA > itemLabelB ? 1 : -1;
                                     });
                                     this.setState({
@@ -384,17 +384,17 @@ class ListUserComponent extends Component {
         return (
             <>
                 <TabPane tabId="1" className='pb-lg-0'>
-                                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                                                <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                     </CardBody>
-                                                        </TabPane>
+                </TabPane>
                 <TabPane tabId="2" className='pb-lg-0'>
-                                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                                                <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                     </CardBody>
-                                                        </TabPane>
+                </TabPane>
             </>
         );
     }
@@ -608,7 +608,7 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId', 
+                    title: 'userId',
                     type: 'hidden',
                 },
                 {
@@ -699,7 +699,7 @@ class ListUserComponent extends Component {
                 <h5 className={this.state.color} id="div3">{this.state.message}</h5>
                 <Card>
                     <div className="Card-header-addicon">
-                                                <div className="card-header-actions">
+                        <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
                             </div>
@@ -722,7 +722,7 @@ class ListUserComponent extends Component {
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {realmList}
                                             </Input>
-                                                                                    </InputGroup>
+                                        </InputGroup>
                                     </div>
                                 </FormGroup>
                             </Col>

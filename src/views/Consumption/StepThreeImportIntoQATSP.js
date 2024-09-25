@@ -273,12 +273,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
                                                 && c.actualFlag.toString() == "false" && c.multiplier == 1);
-                                            var indexWithoutMultiplier1=consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
-                                            && c.region.id == finalImportQATDataFilter[i].v11
-                                            && c.actualFlag.toString() == "false");
-                                            var remainingConsumptionRecords=consumptionDataList.filter((c,index1) => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
-                                            && c.region.id == finalImportQATDataFilter[i].v11
-                                            && c.actualFlag.toString() == "false" && index1!=index && index1!=indexWithoutMultiplier1);
+                                            var indexWithoutMultiplier1 = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
+                                                && c.region.id == finalImportQATDataFilter[i].v11
+                                                && c.actualFlag.toString() == "false");
+                                            var remainingConsumptionRecords = consumptionDataList.filter((c, index1) => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
+                                                && c.region.id == finalImportQATDataFilter[i].v11
+                                                && c.actualFlag.toString() == "false" && index1 != index && index1 != indexWithoutMultiplier1);
                                             if (index != -1) {
                                                 consumptionDataList[index].consumptionQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[index].consumptionRcpuQty = finalImportQATDataFilter[i].v7;
@@ -286,17 +286,17 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 consumptionDataList[index].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[index].lastModifiedDate = curDate;
                                                 consumptionDataList[index].notes = "Imported on " + moment(curDate).format("DD-MMM-YYYY") + " by " + curUserName + " from " + finalImportQATDataFilter[i].v17;
-                                            }else if(indexWithoutMultiplier1!=-1){
+                                            } else if (indexWithoutMultiplier1 != -1) {
                                                 consumptionDataList[indexWithoutMultiplier1].consumptionQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[indexWithoutMultiplier1].consumptionRcpuQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[indexWithoutMultiplier1].dataSource.id = QAT_DATASOURCE_ID;
                                                 consumptionDataList[indexWithoutMultiplier1].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[indexWithoutMultiplier1].lastModifiedDate = curDate;
                                                 consumptionDataList[indexWithoutMultiplier1].notes = "Imported on " + moment(curDate).format("DD-MMM-YYYY") + " by " + curUserName + " from " + finalImportQATDataFilter[i].v17;
-                                                consumptionDataList[indexWithoutMultiplier1].realmCountryPlanningUnit= {
+                                                consumptionDataList[indexWithoutMultiplier1].realmCountryPlanningUnit = {
                                                     id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATDataFilter[i].v10 && c.multiplier == 1)[0].realmCountryPlanningUnitId,
                                                 };
-                                                consumptionDataList[indexWithoutMultiplier1].multiplier= 1;
+                                                consumptionDataList[indexWithoutMultiplier1].multiplier = 1;
                                             } else {
                                                 var consumptionJson = {
                                                     consumptionId: 0,
@@ -332,9 +332,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 }
                                                 consumptionDataList.push(consumptionJson);
                                             }
-                                            remainingConsumptionRecords.map(c=>{
-                                                c.notes="De-activated due to forecast import on "+ moment(curDate).format("DD-MMM-YYYY");
-                                                c.active=false;
+                                            remainingConsumptionRecords.map(c => {
+                                                c.notes = "De-activated due to forecast import on " + moment(curDate).format("DD-MMM-YYYY");
+                                                c.active = false;
                                             })
                                         }
                                         programJson.consumptionList = consumptionDataList;
@@ -469,9 +469,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         var diff = this.monthDiff(new Date(primaryConsumptionData[i].monthlyForecastData[j].month), new Date());
                                         var isOldDate = diff < (realm.forecastConsumptionMonthsInPast + 1);
                                         var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId);
-                                        var totalConsumption=0;
-                                        checkConsumptionData.map(item=>{
-                                            totalConsumption+=Number(item.consumptionQty)
+                                        var totalConsumption = 0;
+                                        checkConsumptionData.map(item => {
+                                            totalConsumption += Number(item.consumptionQty)
                                         })
                                         rem = rem + Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) % 1;
                                         let temp_consumptionQty = Math.floor(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)
@@ -497,7 +497,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             v15: regionFilter[0].forecastPercentage,// % of forecast
                                             v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                             v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                            v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
+                                            v18: AuthenticationService.checkUserACL(this.props.items.forecastProgramId.map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
                                         });
                                     }
                                 }

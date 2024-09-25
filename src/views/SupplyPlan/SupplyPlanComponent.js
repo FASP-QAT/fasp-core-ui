@@ -2449,9 +2449,9 @@ export default class SupplyPlanComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            label: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             value: myResult[i].id,
                             programId: myResult[i].programId
                         }
@@ -2659,7 +2659,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 }
                                                 var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                                                 var startDate = this.state.startDate;
-                                                var monthDifference=this.state.monthCount;
+                                                var monthDifference = this.state.monthCount;
                                                 if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
                                                     startDate = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
                                                     localStorage.setItem("sesStartDate", JSON.stringify(startDate));
@@ -2669,7 +2669,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                     var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
                                                     monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
-                                                }        
+                                                }
                                                 this.setState({
                                                     planningUnitList: proList.sort(function (a, b) {
                                                         a = a.label.toLowerCase();
@@ -2709,7 +2709,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     realmCountryPlanningUnitListAll: rcpuResult,
                                                     minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
                                                     startDate: startDate,
-                                                    monthCount:monthDifference,
+                                                    monthCount: monthDifference,
                                                     planningUnitListForConsumption: planningUnitListForConsumption,
                                                     loading: false
                                                 }, () => {
@@ -2778,29 +2778,29 @@ export default class SupplyPlanComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-        if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+        if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
             setTimeout(function () {
-            document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="none";
-            });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="none";
-            })
+                document.getElementsByClassName("supplyplan-larrow")[0].style.display = "none";
+                [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                    item.style.display = "none";
+                });
+                [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                    item.style.display = "none";
+                })
             }, 500);
-            curDate=moment(cutOffDate);
-            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                currentDate=moment(cutOffDate);
+            curDate = moment(cutOffDate);
+            if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
+                currentDate = moment(cutOffDate);
             }
-        }else{
+        } else {
             setTimeout(function () {
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="block";
-            });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="block";
-            })
-        }, 500);
+                [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                    item.style.display = "block";
+                });
+                [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                    item.style.display = "block";
+                })
+            }, 500);
         }
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
         localStorage.setItem("sesStartDate", JSON.stringify({ year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) }));
@@ -3609,8 +3609,8 @@ export default class SupplyPlanComponent extends React.Component {
                     this.formSubmit(this.state.planningUnit, monthCountConsumption);
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
-                var roleList = AuthenticationService.getLoggedInUserRole();
-                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                // var roleList = AuthenticationService.getLoggedInUserRole();
+                if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).map(c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                     this.setState({
@@ -4237,7 +4237,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     </div>
                                                 </FormGroup>
                                                 {/* <FormGroup className="col-md-4" style={{ "marginTop": "-20px" }}> */}
-                                                    {/* <FormGroup check inline className='pl-lg-0' style={{ "paddingLeft": "0px" }}>
+                                                {/* <FormGroup check inline className='pl-lg-0' style={{ "paddingLeft": "0px" }}>
                                                         <Input
                                                             style={{ "marginLeft": "0px" }}
                                                             type="radio"
@@ -4273,10 +4273,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                             {i18n.t('static.planningunit.countrysku')}
                                                         </Label>
                                                     </FormGroup> */}
-                                                    {/* <FormGroup id="planningUnitDiv" className='pt-lg-1 col-md-4'> */}
-                                                    <FormGroup id="planningUnitDiv" className='col-md-4'>
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
-                                                        <div className="controls ">
+                                                {/* <FormGroup id="planningUnitDiv" className='pt-lg-1 col-md-4'> */}
+                                                <FormGroup id="planningUnitDiv" className='col-md-4'>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.supplyPlan.qatProduct')}</Label>
+                                                    <div className="controls ">
                                                         <Select
                                                             name="planningUnit"
                                                             id="planningUnit"
@@ -4285,12 +4285,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
                                                         />
-                                                        </div>
-                                                    </FormGroup>
-                                                    {/* <FormGroup id="aruDiv" style={{ display: 'none' }} className='pt-lg-1'> */}
-                                                        {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.countrysku')}</Label> */}
-                                                        {/* <div className="controls "> */}
-                                                        {/* <Select
+                                                    </div>
+                                                </FormGroup>
+                                                {/* <FormGroup id="aruDiv" style={{ display: 'none' }} className='pt-lg-1'> */}
+                                                {/* <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.countrysku')}</Label> */}
+                                                {/* <div className="controls "> */}
+                                                {/* <Select
                                                             name="aru"
                                                             id="aru"
                                                             bsSize="sm"
@@ -4298,8 +4298,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                             value={this.state.aru}
                                                             onChange={(e) => { this.updateFieldDataARU(e); }}
                                                         /> */}
-                                                        {/* </div> */}
-                                                    {/* </FormGroup> */}
+                                                {/* </div> */}
+                                                {/* </FormGroup> */}
                                                 {/* </FormGroup> */}
                                                 <input type="hidden" id="planningUnitId" name="planningUnitId" value={this.state.planningUnitId} />
                                                 <input type="hidden" id="programId" name="programId" value={this.state.programId} />
@@ -4373,7 +4373,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=undefined && this.state.generalProgramJson.cutOffDate!=null && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
+                                                    {i18n.t('static.supplyPlan.supplyPlanForV')}{this.state.versionId}{(this.state.generalProgramJson != undefined && this.state.generalProgramJson != null && this.state.generalProgramJson != "" && this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != '' ? ' (' + i18n.t('static.supplyPlan.start') + ' ' + moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY') + ')' : '')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>

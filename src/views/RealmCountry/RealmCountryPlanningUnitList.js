@@ -213,7 +213,7 @@ export default class RealmCountryPlanningUnitList extends Component {
           .getValue(`G${parseInt(i) + 1}`, true)
           .toString()
           .replaceAll(",", "");
-        var map1 = new Map(Object.entries(tableJson[i]));        
+        var map1 = new Map(Object.entries(tableJson[i]));
         var oldValue = map1.get("11");
         if (value != oldValue && map1.get("9") > 0) {
           isMultiplierChanged = 1;
@@ -388,15 +388,15 @@ export default class RealmCountryPlanningUnitList extends Component {
       var value = this.el.getValueFromCoords(10, y);
       if (parseInt(value) == 1) {
         valid = checkValidation(this.el);
-        if(!valid){
+        if (!valid) {
           this.setState({
-                  message: i18n.t('static.supplyPlan.validationFailed'),
-                  color: 'red'
-              },
-              () => {
-                  hideSecondComponent();
-              })
-      }
+            message: i18n.t('static.supplyPlan.validationFailed'),
+            color: 'red'
+          },
+            () => {
+              hideSecondComponent();
+            })
+        }
         var value = this.el
           .getValue(`G${parseInt(y) + 1}`, true)
           .toString()
@@ -417,7 +417,7 @@ export default class RealmCountryPlanningUnitList extends Component {
   changed = function (instance, cell, x, y, value) {
 
     changed(instance, cell, x, y, value)
-    
+
     //Active
     if (x != 10) {
       this.el.setValueFromCoords(10, y, 1, true);
@@ -1242,7 +1242,7 @@ export default class RealmCountryPlanningUnitList extends Component {
           </CardBody>
           {this.state.allowAdd && (
             <CardFooter>
-              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
+              {AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()),
                 "ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"
               ) && (
                   <FormGroup>

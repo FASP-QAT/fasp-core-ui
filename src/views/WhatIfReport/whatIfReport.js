@@ -278,7 +278,7 @@ export default class WhatIfReportComponent extends React.Component {
             activeTab: new Array(3).fill('1'),
             takeDataFrom: "programData",
             planningUnitNotes: "",
-            multiplier:1
+            multiplier: 1
         }
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
@@ -3021,9 +3021,9 @@ export default class WhatIfReportComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            label: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             value: myResult[i].id,
                             programId: myResult[i].programId
                         }
@@ -3205,7 +3205,7 @@ export default class WhatIfReportComponent extends React.Component {
                                         rcpuResult = rcpuRequest.result;
                                         var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                                         var startDate = this.state.startDate;
-                                        var monthDifference=this.state.monthCount;
+                                        var monthDifference = this.state.monthCount;
                                         if (moment(this.state.startDate.year + "-" + (this.state.startDate.month <= 9 ? "0" + this.state.startDate.month : this.state.startDate.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
                                             startDate = { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) };
                                             localStorage.setItem("sesStartDate", JSON.stringify(startDate));
@@ -3235,7 +3235,7 @@ export default class WhatIfReportComponent extends React.Component {
                                             realmCountryPlanningUnitListAll: rcpuResult,
                                             minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
                                             startDate: startDate,
-                                            monthCount:monthDifference,
+                                            monthCount: monthDifference,
                                             planningUnitListForConsumption: planningUnitListForConsumption,
                                             loading: false
                                         }, () => {
@@ -3300,26 +3300,26 @@ export default class WhatIfReportComponent extends React.Component {
         var month = [];
         var curDate = currentDate.subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months');
         var cutOffDate = this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != "" ? this.state.generalProgramJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-        if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
+        if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
             setTimeout(function () {
-            document.getElementsByClassName("supplyplan-larrow")[0].style.display="none";
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="none";
-            });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="none";
-            })
+                document.getElementsByClassName("supplyplan-larrow")[0].style.display = "none";
+                [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                    item.style.display = "none";
+                });
+                [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                    item.style.display = "none";
+                })
             }, 500);
-            curDate=moment(cutOffDate);
-            if(moment(curDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                currentDate=moment(cutOffDate);
+            curDate = moment(cutOffDate);
+            if (moment(curDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
+                currentDate = moment(cutOffDate);
             }
-        }else{
-            [...document.getElementsByClassName("supplyplan-larrow")].map(item=>{
-                item.style.display="block";
+        } else {
+            [...document.getElementsByClassName("supplyplan-larrow")].map(item => {
+                item.style.display = "block";
             });
-            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item=>{
-                item.style.display="block";
+            [...document.getElementsByClassName("supplyplan-larrow-dataentry")].map(item => {
+                item.style.display = "block";
             })
         }
         this.setState({ startDate: { year: parseInt(moment(curDate).format('YYYY')), month: parseInt(moment(curDate).format('M')) } })
@@ -4206,8 +4206,8 @@ export default class WhatIfReportComponent extends React.Component {
                     this.formSubmit(this.state.planningUnit, monthCountConsumption);
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
-                var roleList = AuthenticationService.getLoggedInUserRole();
-                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                // var roleList = AuthenticationService.getLoggedInUserRole();
+                if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).map(c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                     this.setState({
@@ -6694,7 +6694,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                     active={this.state.activeTab[0] === '2'}
                                                     onClick={() => { this.toggle(0, '2'); }}
                                                 >
-                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson!=undefined && this.state.generalProgramJson!=null && this.state.generalProgramJson!="" && this.state.generalProgramJson.cutOffDate!=undefined && this.state.generalProgramJson.cutOffDate!=null && this.state.generalProgramJson.cutOffDate!=''?' ('+i18n.t('static.supplyPlan.start')+' '+moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY')+')':'')}
+                                                    {i18n.t('static.scenarioPlanning.tab2')}{this.state.versionId}{(this.state.generalProgramJson != undefined && this.state.generalProgramJson != null && this.state.generalProgramJson != "" && this.state.generalProgramJson.cutOffDate != undefined && this.state.generalProgramJson.cutOffDate != null && this.state.generalProgramJson.cutOffDate != '' ? ' (' + i18n.t('static.supplyPlan.start') + ' ' + moment(this.state.generalProgramJson.cutOffDate).format('MMM YYYY') + ')' : '')}
                                                 </NavLink>
                                             </NavItem>
                                         </Nav>
@@ -6800,8 +6800,8 @@ export default class WhatIfReportComponent extends React.Component {
             else {
                 shipmentList = [];
             }
-            var roleList = AuthenticationService.getLoggedInUserRole();
-            if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+            // var roleList = AuthenticationService.getLoggedInUserRole();
+            if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).map(c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 if (document.getElementById("addRowId") != null) {
                     document.getElementById("addRowId").style.display = "none"
                 }

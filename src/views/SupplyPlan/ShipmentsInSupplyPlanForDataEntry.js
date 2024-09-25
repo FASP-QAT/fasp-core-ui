@@ -476,8 +476,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                             if (this.props.shipmentPage == "shipmentDataEntry" && (this.props.items.shipmentTypeIds.length == 1 && (this.props.items.shipmentTypeIds).includes(2))) {
                                                 shipmentEditable = false;
                                             }
-                                            var roleList = AuthenticationService.getLoggedInUserRole();
-                                            if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
+                                            // var roleList = AuthenticationService.getLoggedInUserRole();
+                                            var programId = (document.getElementById("programId").value).split("_")[0];
+
+                                            if (AuthenticationService.checkUserACLBasedOnRoleId(programId.map(c.toString()), 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                                                 shipmentEditable = false;
                                             }
                                             var paginationOption = false;

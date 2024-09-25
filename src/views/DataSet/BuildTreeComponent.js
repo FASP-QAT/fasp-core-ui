@@ -2738,7 +2738,7 @@ export default class BuildTree extends Component {
         let copyModalParentLevelList = [];
         let tempCopyModalParentLevelList = [];
         let copyModalParentNodeList = [];
-        let allowedNodeTypeList = []; 
+        let allowedNodeTypeList = [];
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
         if (event.target.name === "copyMove") {
             val = event.target.id === "copyMoveTrue" ? 1 : 2;
@@ -2746,31 +2746,31 @@ export default class BuildTree extends Component {
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
-        if(tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
+        if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             copyModalParentLevelList = [];
-            for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+            for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
                 copyModalParentLevelList.push({
-                    label: {label_en: "Level " + i},
+                    label: { label_en: "Level " + i },
                     levelNo: i
                 })
             }
-        } else if(tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
+        } else if (tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
             copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
-        if(this.state.copyModalNode.payload.nodeType.id == 5) {
+        if (this.state.copyModalNode.payload.nodeType.id == 5) {
             let allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
             let invalidLevel = [];
-            for(let i = 0; i < copyModalParentLevelList.length; i++) {
+            for (let i = 0; i < copyModalParentLevelList.length; i++) {
                 let tempCopyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevelList[i].levelNo).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
-                if(tempCopyModalParentNodeList.length == 0) {
+                if (tempCopyModalParentNodeList.length == 0) {
                     invalidLevel.push(copyModalParentLevelList[i])
                 }
             }
             copyModalParentLevelList = copyModalParentLevelList.filter(x => !invalidLevel.includes(x))
         }
-        if(val == 1) {
-            if(this.state.copyModalNode.level != 0){
-                copyModalParentLevel = this.state.copyModalNode.level-1;
+        if (val == 1) {
+            if (this.state.copyModalNode.level != 0) {
+                copyModalParentLevel = this.state.copyModalNode.level - 1;
                 copyModalParentNodeList = this.state.curTreeObj.tree.flatList.filter(m => m.level == copyModalParentLevel);
                 copyModalParentNode = this.state.copyModalNode.parent;
             } else {
@@ -2778,11 +2778,11 @@ export default class BuildTree extends Component {
                 copyModalParentNodeList = [];
                 copyModalParentNode = "";
             }
-        } else if(val == 2) {
-            if(copyModalParentLevelList.length == 1) {
+        } else if (val == 2) {
+            if (copyModalParentLevelList.length == 1) {
                 copyModalParentLevel = copyModalParentLevelList[0].levelNo;
                 copyModalParentNodeList = this.state.curTreeObj.tree.flatList.filter(m => m.level == copyModalParentLevel);
-                if(copyModalParentNodeList.length == 1) {
+                if (copyModalParentNodeList.length == 1) {
                     copyModalParentNode = copyModalParentNodeList[0].id;
                 } else {
                     copyModalParentNode = "";
@@ -2813,7 +2813,7 @@ export default class BuildTree extends Component {
         let copyModalParentLevelList = [];
         let tempCopyModalParentLevelList = [];
         let copyModalParentNodeList = [];
-        let allowedNodeTypeList = []; 
+        let allowedNodeTypeList = [];
         let invalidNodeError = false;
         let invalidNodeType = "";
         let invalidParentNodeType = "";
@@ -2821,46 +2821,46 @@ export default class BuildTree extends Component {
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
-        if(tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
+        if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             copyModalParentLevelList = [];
-            for(var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+            for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
                 copyModalParentLevelList.push({
-                    label: {label_en: "Level " + i},
+                    label: { label_en: "Level " + i },
                     levelNo: i
                 })
             }
-        } else if(tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
+        } else if (tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
             copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
-        if(this.state.copyModalNode.payload.nodeType.id == 5) {
+        if (this.state.copyModalNode.payload.nodeType.id == 5) {
             let allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
             let invalidLevel = [];
-            for(let i = 0; i < copyModalParentLevelList.length; i++) {
+            for (let i = 0; i < copyModalParentLevelList.length; i++) {
                 let tempCopyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevelList[i].levelNo).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
-                if(tempCopyModalParentNodeList.length == 0) {
+                if (tempCopyModalParentNodeList.length == 0) {
                     invalidLevel.push(copyModalParentLevelList[i])
                 }
             }
             copyModalParentLevelList = copyModalParentLevelList.filter(x => !invalidLevel.includes(x))
         }
-        if(this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
-            copyModalParentLevel = this.state.copyModalNode.level-1;
-            if(this.state.copyModalNode.payload.nodeType.id == 5) {
+        if (this.state.copyModalData == 1 && copyModalTree == this.state.treeId) {
+            copyModalParentLevel = this.state.copyModalNode.level - 1;
+            if (this.state.copyModalNode.payload.nodeType.id == 5) {
                 copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel).filter(x => allowedNodeTypeList.includes(x.payload.nodeType.id));
             } else {
                 copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
             }
             copyModalParentNode = this.state.copyModalNode.parent;
-        } else if(this.state.copyModalData == 2 || copyModalTree != this.state.treeId) {
-            if(copyModalParentLevelList.length == 1) {
+        } else if (this.state.copyModalData == 2 || copyModalTree != this.state.treeId) {
+            if (copyModalParentLevelList.length == 1) {
                 copyModalParentLevel = copyModalParentLevelList[0].levelNo;
                 copyModalParentNodeList = copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(m => m.level == copyModalParentLevel);
-                if(copyModalParentNodeList.length == 1) {
+                if (copyModalParentNodeList.length == 1) {
                     copyModalParentNode = copyModalParentNodeList[0].id;
                     let allowedNodeTypeList = [];
                     allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
                     let tempParentNode = copyModalParentNodeList.filter(x => x.id == copyModalParentNode)[0].payload.nodeType.id;
-                    if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+                    if (allowedNodeTypeList.includes(parseInt(tempParentNode))) {
                         invalidNodeError = false;
                     } else {
                         invalidNodeError = true;
@@ -2886,7 +2886,7 @@ export default class BuildTree extends Component {
             invalidNodeError: invalidNodeError,
             invalidNodeType: invalidNodeType,
             invalidParentNodeType: invalidParentNodeType
-        },() => {
+        }, () => {
             validationSchemaCopyMove();
         })
     }
@@ -2902,17 +2902,17 @@ export default class BuildTree extends Component {
         } else {
             copyModalParentNodeList = this.state.copyModalTreeList.filter(x => x.treeId == this.state.copyModalTree)[0].tree.flatList.filter(m => m.level == e.target.value);
         }
-        if(this.state.copyModalData == 2){
-            if(this.state.copyModalTree == this.state.treeId) {
+        if (this.state.copyModalData == 2) {
+            if (this.state.copyModalTree == this.state.treeId) {
                 copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
                 copyModalParentNodeList = copyModalParentNodeList.filter(x => !x.sortOrder.startsWith(this.state.copyModalNode.sortOrder))
             }
         }
-        if(copyModalParentNodeList.length == 1) {
+        if (copyModalParentNodeList.length == 1) {
             let allowedNodeTypeList = [];
             allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
             let tempParentNode = copyModalParentNodeList.filter(x => x.id == copyModalParentNodeList[0].id)[0].payload.nodeType.id;
-            if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+            if (allowedNodeTypeList.includes(parseInt(tempParentNode))) {
                 invalidNodeError = false;
             } else {
                 invalidNodeError = true;
@@ -2936,7 +2936,7 @@ export default class BuildTree extends Component {
         let invalidParentNodeType = "";
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
         let tempParentNode = this.state.copyModalParentNodeList.filter(x => x.id == e.target.value)[0].payload.nodeType.id;
-        if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+        if (allowedNodeTypeList.includes(parseInt(tempParentNode))) {
             invalidNodeError = false;
         } else {
             invalidNodeError = true;
@@ -3085,7 +3085,7 @@ export default class BuildTree extends Component {
         return new Promise((resolve, reject) => {
             let curTreeObj;
             var items;
-            if(isCopy) {
+            if (isCopy) {
                 curTreeObj = this.state.treeData.filter(x => x.treeId == this.state.copyModalTree)[0];
                 items = curTreeObj.tree.flatList;
             } else {
@@ -3096,7 +3096,7 @@ export default class BuildTree extends Component {
             let { dataSetObj } = this.state;
             var programData = dataSetObj.programData;
             programData.treeList = treeData;
-            if(!isCopy) {
+            if (!isCopy) {
                 if (this.state.selectedScenario !== "") {
                     curTreeObj.tree.flatList = items;
                 }
@@ -3114,7 +3114,7 @@ export default class BuildTree extends Component {
                 this.setState({
                     calculateAllScenario: false
                 })
-                if(isCopy) {
+                if (isCopy) {
                     calculateModelingData(dataSetObj, this, '', -1, -1, type, [this.state.treeId, this.state.copyModalTree].toString(), false, false, this.state.autoCalculate).then(() => {
                         resolve();
                     });
@@ -3270,7 +3270,7 @@ export default class BuildTree extends Component {
             selectedScenarioLabel: selectedText,
         }, () => {
             try {
-                if(localStorage.getItem("openNodeId")) {
+                if (localStorage.getItem("openNodeId")) {
                     let tempData = {
                         context: '',
                         parentItem: ''
@@ -3282,7 +3282,7 @@ export default class BuildTree extends Component {
                         this.onCursoChanged("", tempData);
                     }, 2000)
                 }
-            } catch(e) {
+            } catch (e) {
                 localStorage.removeItem("openNodeId");
             }
             this.handleAMonthDissmis3(this.state.singleValue2, 0);
@@ -4250,18 +4250,18 @@ export default class BuildTree extends Component {
             var tempNConvertToMonth = tempFuNode && tempFuNode.usagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth : 1;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false") {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
-                var tempNoOfMonths=Number(tempMonth)-Math.floor(Number(tempMonth));
+                var tempNoOfMonths = Number(tempMonth) - Math.floor(Number(tempMonth));
                 tempCalculatedValue = 0;
-                var f=momListParent.filter(c => c.month > moment(momList[j].month).subtract(Math.ceil(tempMonth), 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD"));
-                f.map((item,index) => {
-                    if(f.length>1 && (index!=f.length-1)){
+                var f = momListParent.filter(c => c.month > moment(momList[j].month).subtract(Math.ceil(tempMonth), 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD"));
+                f.map((item, index) => {
+                    if (f.length > 1 && (index != f.length - 1)) {
                         tempCalculatedValue += item.calculatedValue;
-                    }else if(f.length==1 || tempNoOfMonths==0){
+                    } else if (f.length == 1 || tempNoOfMonths == 0) {
                         tempCalculatedValue += item.calculatedValue;
                     }
                 })
-                if(f.length>=2){
-                    tempCalculatedValue += tempNoOfMonths*f[f.length-1].calculatedValue;
+                if (f.length >= 2) {
+                    tempCalculatedValue += tempNoOfMonths * f[f.length - 1].calculatedValue;
                 }
             }
             data[7] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -4362,7 +4362,7 @@ export default class BuildTree extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
-                    readOnly: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') ? false : true,
+                    readOnly: AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') ? false : true,
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
@@ -5919,7 +5919,7 @@ export default class BuildTree extends Component {
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-            if (y == 8 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
+            if (y == 8 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -7404,7 +7404,7 @@ export default class BuildTree extends Component {
                 child.parent = this.state.copyModalParentNode;
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
-                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level+1;
+                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == this.state.copyModalParentNode) : items.filter(c => c.parent == this.state.copyModalParentNode);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7424,7 +7424,7 @@ export default class BuildTree extends Component {
                 child.id = nodeId;
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
-                child.level = child.parent.level+1;
+                child.level = child.parent.level + 1;
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == parentNode.newId) : items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7439,14 +7439,14 @@ export default class BuildTree extends Component {
             }
             if (scenarioList.length > 0) {
                 for (let i = 0; i < scenarioList.length; i++) {
-                    if(scenarioList[i].id == this.state.selectedScenario){
+                    if (scenarioList[i].id == this.state.selectedScenario) {
                         childListBasedOnScenarion.push({
                             oldId: (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId,
                             newId: maxNodeDataId
                         });
                         (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
                         maxNodeDataId++;
-                        if(this.state.copyModalTree != this.state.treeId) {
+                        if (this.state.copyModalTree != this.state.treeId) {
                             var tempData = child.payload.nodeDataMap[scenarioList[i].id];
                             delete child.payload.nodeDataMap[scenarioList[i].id];
                             for (let j = 0; j < scenarioListNew.length; j++) {
@@ -7464,22 +7464,22 @@ export default class BuildTree extends Component {
                 for (let i = 0; i < scenarioListNew.length; i++) {
                     let invalidTransfer = [];
                     var nodeDataModelingList = (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList //.filter(x => (x.transferNodeDataId == "" || x.transferNodeDataId == null) && this.state.copyModeling);
-                    if(!this.state.copyModeling) {
+                    if (!this.state.copyModeling) {
                         nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null && x.transferNodeDataId != "null"));
                     }
                     if (nodeDataModelingList.length > 0) {
                         nodeDataModelingList.map((item1, c) => {
                             var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
-                            if(newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "null" && item1.transferNodeDataId != "") {
+                            if (newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "null" && item1.transferNodeDataId != "") {
                                 invalidTransfer.push(item1.nodeDataModelingId);
                             }
-                            try{
+                            try {
                                 item1.transferNodeDataId = newTransferId[0].newId;
                             } catch {
                             }
                         })
                     }
-                    (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList = nodeDataModelingList.filter(x => !invalidTransfer.includes(x.nodeDataModelingId)); 
+                    (updatedFlatList[indexItems].payload.nodeDataMap[scenarioListNew[i].id])[0].nodeDataModelingList = nodeDataModelingList.filter(x => !invalidTransfer.includes(x.nodeDataModelingId));
                 }
             }
         })
@@ -7492,13 +7492,13 @@ export default class BuildTree extends Component {
             cursorItem: nodeId
         }, () => {
             this.calculateMOMData(0, 2, true).then(() => {
-                if(this.state.copyModalData == 2) {
+                if (this.state.copyModalData == 2) {
                     this.onRemoveButtonClick(itemConfig).then(() => {
                         this.setState({
                             copyLoader: false,
                             copyModal: false,
                         }, () => {
-                            if(this.state.copyModalTree != this.state.treeId){
+                            if (this.state.copyModalTree != this.state.treeId) {
                                 // this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
                                 // window.location.reload(); 
                                 this.setState({
@@ -7518,7 +7518,7 @@ export default class BuildTree extends Component {
                         copyLoader: false,
                         copyModal: false,
                     }, () => {
-                        if(this.state.copyModalTree != this.state.treeId){
+                        if (this.state.copyModalTree != this.state.treeId) {
                             // this.props.history.push("/dataSet/buildTree/tree/" + this.state.copyModalTree + "/" + this.state.programId + "/" + "-1");
                             // window.location.reload(); 
                             this.setState({
@@ -9892,7 +9892,7 @@ export default class BuildTree extends Component {
             },
             onpaste: function (instance, data) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].x == 1){
+                    if (data[i].x == 1) {
                         (instance).setValueFromCoords(1, data[i].y, Math.round(data[i].value), true);
                     }
                 }
@@ -10585,7 +10585,7 @@ export default class BuildTree extends Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==3?i18n.t('static.tree.percentageNodeValue'):i18n.t('static.tree.percentageOfParent'))}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id == 3 ? i18n.t('static.tree.percentageNodeValue') : i18n.t('static.tree.percentageOfParent'))}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <InputGroup>
                                                         <Input type="number"
                                                             id="percentageOfParent"
@@ -10628,7 +10628,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
-                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==2?i18n.t('static.tree.numberNodeValue'):i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id == 2 ? i18n.t('static.tree.numberNodeValue') : i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id >= 4) &&
                                                         <Label htmlFor="currencyId"> {this.state.currentScenario.dataValue} % of {i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} {this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     <Input type="text"
@@ -11675,7 +11675,7 @@ export default class BuildTree extends Component {
                                                 })
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -11737,8 +11737,8 @@ export default class BuildTree extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
-                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                         </div>
                         {this.state.showCalculatorFields &&
@@ -12060,7 +12060,7 @@ export default class BuildTree extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -12159,7 +12159,7 @@ export default class BuildTree extends Component {
                                             })
                                         }
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -12484,16 +12484,16 @@ export default class BuildTree extends Component {
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
             var illegalNode = false;
             var itemConfigParent = this.state.curTreeObj.tree.flatList.filter(x => x.id == itemConfig.parent);
-            var allowedNodeTypeList = []; 
-            if(itemConfigParent.length > 0) {
+            var allowedNodeTypeList = [];
+            if (itemConfigParent.length > 0) {
                 allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(itemConfig.payload.nodeType.id))).map(x => x.id);
-                if(allowedNodeTypeList.includes(parseInt(itemConfigParent[0].payload.nodeType.id))){
+                if (allowedNodeTypeList.includes(parseInt(itemConfigParent[0].payload.nodeType.id))) {
                     illegalNode = false;
                 } else {
                     illegalNode = true;
                 }
             }
-            
+
             const opacity = isDragging ? 0.4 : 1
             let itemTitleColor = Colors.RoyalBlue;
             if (isOver) {
@@ -12766,29 +12766,29 @@ export default class BuildTree extends Component {
                 },
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
-                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
-                                    <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            this.setState({
-                                                copyModal: true,
-                                                copyModalData: "",
-                                                copyModalTree: "",
-                                                copyModalParentLevel: "",
-                                                copyModalParentNode: "",
-                                                copyModalTreeList: [],
-                                                copyModalParentLevelList: [],
-                                                copyModalParentNodeList: [],
-                                                copyModalNode: JSON.parse(JSON.stringify(itemConfig))
-                                            })
-                                            // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
-                                        }}>
-                                        <i class="fa fa-paste" aria-hidden="true"></i>
-                                    </button>
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    this.setState({
+                                        copyModal: true,
+                                        copyModalData: "",
+                                        copyModalTree: "",
+                                        copyModalParentLevel: "",
+                                        copyModalParentNode: "",
+                                        copyModalTreeList: [],
+                                        copyModalParentLevelList: [],
+                                        copyModalParentNodeList: [],
+                                        copyModalNode: JSON.parse(JSON.stringify(itemConfig))
+                                    })
+                                    // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                }}>
+                                <i class="fa fa-paste" aria-hidden="true"></i>
+                            </button>
                         }
                         {itemConfig.parent != null &&
                             <>
-                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                {!this.state.hideActionButtons && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -12810,7 +12810,7 @@ export default class BuildTree extends Component {
                                         <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                     </button>}
                             </>}
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -12819,7 +12819,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-sitemap" aria-hidden="true"></i>
                             </button>
                         }
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     this.setState({
@@ -13022,7 +13022,7 @@ export default class BuildTree extends Component {
                                 }}>
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') &&
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') &&
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     var items = this.state.items;
@@ -13177,7 +13177,7 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {scenarios}
                                                             </Input>
-                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                                            {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                                                 <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                     <InputGroupText className='SettingIcon'>
                                                                         <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
@@ -13347,7 +13347,7 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
-                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
@@ -13355,7 +13355,7 @@ export default class BuildTree extends Component {
                                         </div>
                                         <div className="row ml-lg-1 pb-lg-2">
                                             <b>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
-                                            <FormGroup className="col-md-2"  style={{ marginLeft: '2%' }}>
+                                            <FormGroup className="col-md-2" style={{ marginLeft: '2%' }}>
                                                 <div className="check inline  pl-lg-1 pt-lg-0">
                                                     <div>
                                                         <Input
@@ -14139,7 +14139,7 @@ export default class BuildTree extends Component {
                             setFieldTouched
                         }) => (
                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='copyModalForm' autocomplete="off">
-                                <ModalHeader toggle={() => this.setState({copyModal: false})} className="modalHeader">
+                                <ModalHeader toggle={() => this.setState({ copyModal: false })} className="modalHeader">
                                     <strong>{i18n.t('static.tree.moveCopy')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
@@ -14185,7 +14185,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <FormGroup>
                                             <Label className="form-check-label">
-                                                <b>Node name:</b> {this.state.copyModalNode.payload.label.label_en} 
+                                                <b>Node name:</b> {this.state.copyModalNode.payload.label.label_en}
                                             </Label>
                                         </FormGroup>
                                         <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
@@ -14281,7 +14281,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
-                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : "PU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : "PU")}</p>
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>", this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : "PU").replace("<parentNodeType>", this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : "PU")}</p>
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>
@@ -14300,7 +14300,7 @@ export default class BuildTree extends Component {
                                         <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
                                     <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.resetCopyMoveModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.setState({copyModal: false})}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.setState({ copyModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </Form>
                         )} />

@@ -199,7 +199,7 @@ export default class AddDataSource extends Component {
     if (this.state.realm.id != 0) {
       DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
         .then((response) => {
-          var listArray = response.data.filter(c=>c.active==true);
+          var listArray = response.data.filter(c => c.active == true);
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
               a.label,
@@ -692,7 +692,7 @@ export default class AddDataSource extends Component {
     this.state.label.label_en = "";
     this.state.dataSourceType.id = "";
     if (
-      AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
+      AuthenticationService.checkUserACL(this.state.programId.map(c => c.id.toString()),
         "ROLE_BF_SHOW_REALM_COLUMN"
       )
     ) {
