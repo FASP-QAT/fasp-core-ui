@@ -79,6 +79,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     super(props);
     var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
     this.state = {
+      isDarkMode:false,
       datasetList: [],
       datasetId: "",
       showInPlanningUnit: false,
@@ -1592,14 +1593,35 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   /**
    * Calls getDatasetList function on component mount
    */
-  componentDidMount() {
+  componentDidMount() {//to restrict calender max date to current Date - 36 months
+    let currDate = Date.now();
+    let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
+    let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
     let hasRole = false;
     AuthenticationService.getLoggedInUserRole().map(c => {
       if (c.roleId == 'ROLE_FORECAST_VIEWER') {
         hasRole = true;
       }
     });
-    this.setState({ onlyDownloadedProgram: !hasRole })
+    this.setState({
+      onlyDownloadedProgram: !hasRole,
+      maxDate: maxDateTmp
+    });
+
+    // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
     hideSecondComponent();
     if (localStorage.getItem('sessionType') === 'Online') {
       ForecastingUnitService.getForecastingUnitListAll().then(response => {
@@ -1696,55 +1718,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
       );
-    }
-    if (localStorage.getItem('sessionType') === 'Online') {
-      TracerCategoryService.getTracerCategoryListAll()
-        .then(response => {
-          if (response.status == 200) {
-            this.setState({
-              tcResult: response.data,
-              loading: false
-            })
-          }
-        }).catch(
-          error => {
-            if (error.message === "Network Error") {
-              this.setState({
-                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                loading: false
-              });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 401:
-                  this.props.history.push(`/login/static.message.sessionExpired`)
-                  break;
-                case 403:
-                  this.props.history.push(`/accessDenied`)
-                  break;
-                case 500:
-                case 404:
-                case 406:
-                  this.setState({
-                    message: error.response.data.messageCode,
-                    loading: false
-                  });
-                  break;
-                case 412:
-                  this.setState({
-                    message: error.response.data.messageCode,
-                    loading: false
-                  });
-                  break;
-                default:
-                  this.setState({
-                    message: 'static.unkownError',
-                    loading: false
-                  });
-                  break;
-              }
-            }
-          }
-        );
     }
     // this.getDatasetList();
     this.getPrograms()
@@ -3180,37 +3153,48 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </option>
         )
       }, this);
+
+      const { isDarkMode } = this.state;
+// const colourArray = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
     var chartOptions = {
       title: {
         display: true,
-        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : ""
+        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
+        fontColor:fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
-            fontColor: 'black'
+            fontColor:fontColor
           },
           stacked: true,
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor:fontColor,
             callback: function (value) {
               return value.toLocaleString();
             }
           },
           gridLines: {
-            drawBorder: true, lineWidth: 0
+            drawBorder: true, lineWidth: 0,
+            color: gridLineColor,
+    zeroLineColor: gridLineColor 
           },
           position: 'left',
         }],
         xAxes: [{
           ticks: {
-            fontColor: 'black'
+            fontColor:fontColor,
           },
           gridLines: {
-            drawBorder: true, lineWidth: 0
+            drawBorder: true, lineWidth: 0,
+            color: gridLineColor,
+    zeroLineColor: gridLineColor 
           },
         }]
       },
@@ -3240,13 +3224,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor:fontColor
         }
       }
     }
     let bar = {}
     var datasetListForGraph = [];
-    var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+    var colourArray = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
     if (this.state.showDetailTable) {
       var elInstance = this.state.dataEl;
       if (elInstance != undefined) {
@@ -3508,7 +3492,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     <div>
                                     </div>
                                   </div>
-                                  <b>{i18n.t('static.dataentry.graphNotes')}</b>
+                                  <b className="text-blackD">{i18n.t('static.dataentry.graphNotes')}</b>
                                 </div>
                               }
                             </div>

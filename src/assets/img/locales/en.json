@@ -3423,5 +3423,6 @@
     "static.supplyPlan.combinationNotAllowed":"You cannot have combination of QAT auto-calculation and other batch details",
     "static.supplyPlan.qatAutocalculations":"QAT auto-calculation",
     "static.supplyPlan.consumptionFEFO":"QAT Calculation (FEFO)",
-    "static.supplyPlan.adjustmentFEFO":"QAT Calculation (Best Case Scenario)"
+    "static.supplyPlan.adjustmentFEFO":"QAT Calculation (Best Case Scenario)",
+    "static.procurementagent.procurementAgentColorCodeDarkMode":"Color Code Dark Mode"
 }

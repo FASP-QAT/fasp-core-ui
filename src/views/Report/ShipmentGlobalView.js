@@ -52,6 +52,7 @@ class ShipmentGlobalView extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
+            isDarkMode:false,
             labels: ['GF', 'Govt', 'Local', 'PSM'],
             datasets: [{
                 data: [13824000, 26849952, 0, 5615266],
@@ -544,6 +545,21 @@ class ShipmentGlobalView extends Component {
      * Calls the get countrys function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         this.getCountrys();
         document.getElementById("procurementAgentDiv").style.display = "none";
         document.getElementById("procurementAgentTypeDiv").style.display = "none";
@@ -1363,16 +1379,21 @@ class ShipmentGlobalView extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+        const { isDarkMode } = this.state;
+// const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+
         const options = {
             title: {
                 display: true,
                 text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
                         display: false
                     },
@@ -1381,13 +1402,13 @@ class ShipmentGlobalView extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1431,7 +1452,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1439,12 +1460,13 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentfundingSource'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
                         display: false
                     },
@@ -1453,13 +1475,13 @@ class ShipmentGlobalView extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1502,7 +1524,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1510,12 +1532,13 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgent'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
                         display: false
                     },
@@ -1524,7 +1547,7 @@ class ShipmentGlobalView extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
@@ -1541,7 +1564,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1549,12 +1572,13 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgentType'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
                         display: false
                     },
@@ -1580,7 +1604,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
