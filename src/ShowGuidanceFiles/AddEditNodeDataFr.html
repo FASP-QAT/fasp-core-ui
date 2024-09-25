@@ -158,6 +158,21 @@ a {
 											<ul style="font-size: 13px;">
 												<li><b> Forecasting Node-Type :</b> Select discrete if this product will be used for limited time, and continuous 
 													if it will be used indefinitely.</li>
+
+													<li><b>Besoin de calculer les quantités d'utilisation de produits discrets ? </b>
+														QAT a la possibilité de calculer l'utilisation discrète des produits dans les nœuds d'unité de prévision dans 
+														de deux manières : en préalimentant la quantité discrète consommée par patient au cours du mois 1 
+														(choisissez "Calculer en utilisant une distribution unique" = "Oui") ou en désagrégeant les 
+														quantité discrète consommée par patient et par mois (choisissez « Calculer en utilisant une distribution unique » = « Non »). 
+														Par défaut, QAT utilisera la méthode de chargement anticipé pour calculer l'unité de prévision discrète. 
+														quantités; cependant, les utilisateurs ont la possibilité de choisir la méthode alternative via une radio 
+														bouton. Ce calcul discret alternatif pourrait être utile pour les unités de planification (PU) 
+														qui ont de faibles habitudes de consommation sur une période donnée. Par exemple, si une femme enceinte 
+														il est nécessaire de prendre un complément nutritionnel une fois/mois pendant toute la durée de la grossesse 
+														(neuf mois), QAT calculerait actuellement neuf suppléments au cours du premier mois (frontloading). 
+														Sans préalimentation, QAT calculerait un supplément au mois 1, un supplément au mois 
+														le mois 2, un supplément le mois 3, et ainsi de suite.
+													</li>
 												<li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher 
 													levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field 
 													to indicate this delay.
