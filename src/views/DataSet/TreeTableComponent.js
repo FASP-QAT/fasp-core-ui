@@ -37,6 +37,10 @@ import showguidanceModelingTransferEn from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferFr.html'
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
+import showguidanceTreeTableEn from '../../../src/ShowGuidanceFiles/TreeTableEn.html'
+import showguidanceTreeTableFr from '../../../src/ShowGuidanceFiles/TreeTableFr.html'
+import showguidanceTreeTablePr from '../../../src/ShowGuidanceFiles/TreeTablePr.html'
+import showguidanceTreeTableSp from '../../../src/ShowGuidanceFiles/TreeTableSp.html'
 import { LOGO } from '../../CommonComponent/Logo';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -433,6 +437,7 @@ export default class TreeTable extends Component {
             isTreeDataChanged: false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
+            showGuidanceTreeTable: false,
             showGuidanceModelingTransfer: false,
             showGuidanceModelingTransfer: false,
             showGuidanceNodeData: false,
@@ -5441,6 +5446,15 @@ export default class TreeTable extends Component {
         const { items } = this.state;
         this.setState(this.getDeletedItems(items, [id]));
     }
+
+    /**
+     * Toggle show guidance popup
+     */
+    toggleShowGuidanceTreeTable() {
+        this.setState({
+            showGuidanceTreeTable: !this.state.showGuidanceTreeTable
+        })
+    }
     /**
      * Retrieves updated item list with specified items removed and cursor parent item.
      * @param {Array} items - Array of tree items.
@@ -6169,7 +6183,7 @@ export default class TreeTable extends Component {
                         <div className="row pt-lg-0 pr-lg-4">
                             <div className="col-md-12">
                                 <a style={{ float: 'right' }}>
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidanceTreeTable() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                                 </a>
                             </div>
                         </div>
@@ -6300,6 +6314,25 @@ export default class TreeTable extends Component {
                             </div>
                         </CardBody>
                     </Card></Col></Row>
+                    <Modal isOpen={this.state.showGuidanceTreeTable}
+                className={'modal-lg ' + this.props.className} >
+                <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                </ModalHeader>
+                <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={{
+                            __html: localStorage.getItem('lang') == 'en' ?
+                            showguidanceTreeTableEn :
+                                localStorage.getItem('lang') == 'fr' ?
+                                showguidanceTreeTableFr :
+                                    localStorage.getItem('lang') == 'sp' ?
+                                    showguidanceTreeTableSp :
+                                    showguidanceTreeTablePr
+                        }} />
+                    </ModalBody>
+                </div>
+            </Modal>
             <Modal isOpen={this.state.showGuidanceModelingTransfer}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
