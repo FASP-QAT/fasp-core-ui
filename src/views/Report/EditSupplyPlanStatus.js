@@ -127,6 +127,8 @@ class EditSupplyPlanStatus extends Component {
             consumptionTotalMonthWise: [],
             consumptionChangedFlag: 0,
             inventoryTotalData: [],
+            adjustmentTotalData: [],
+            nationalAdjustmentTotalData: [],
             expectedBalTotalData: [],
             suggestedShipmentsTotalData: [],
             inventoryFilteredArray: [],
@@ -1356,6 +1358,22 @@ class EditSupplyPlanStatus extends Component {
         }
     }
     /**
+     * This function is used to toggle the accordian for the total adjustments
+     */
+    toggleAccordionTotalAdjustments() {
+        this.setState({
+            showTotalAdjustment: !this.state.showTotalAdjustment
+        })
+        var fields = document.getElementsByClassName("totalAdjustments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalAdjustment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+    /**
      * This function is called when the cancel button is clicked from expired stock popup
      */
     actionCanceledExpiredStock() {
@@ -1532,6 +1550,8 @@ class EditSupplyPlanStatus extends Component {
         var minStockMoS = [];
         var maxStockMoS = [];
         var inventoryTotalData = [];
+        var adjustmentTotalData = [];
+        var nationalAdjustmentTotalData = [];
         var suggestedShipmentsTotalData = [];
         var openingBalanceArray = [];
         var closingBalanceArray = [];
@@ -1905,7 +1925,6 @@ class EditSupplyPlanStatus extends Component {
                                 } else {
                                     onholdShipmentsTotalData.push("")
                                 }
-                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
                                 totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
                                 maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
@@ -2041,6 +2060,17 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
                                 var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
+                                var adjustmentCount=0;
+                                var adjustmentTotal=0;
+                                inventoryListForRegion.map(item=>{
+                                    if (item.adjustmentQty != undefined && item.adjustmentQty != null && item.adjustmentQty !== "") {
+                                        adjustmentCount+=1;
+                                        adjustmentTotal+=Number(Math.round(Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
+                                    }
+                                })
+                                adjustmentTotalData.push(adjustmentCount>0?Number(adjustmentTotal):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? Number(jsonList[0].nationalAdjustment) : "");
+                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?Number(adjustmentCount>0?Number(adjustmentTotal):0)+Number(jsonList[0].regionCountForStock > 0 ? Number(jsonList[0].nationalAdjustment) : 0):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -2099,7 +2129,7 @@ class EditSupplyPlanStatus extends Component {
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                 }
                                 consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
+                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0)-(jsonList[0].unmetDemand != "" && jsonList[0].unmetDemand!=null ? jsonList[0].unmetDemand : 0);
                                 if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                     totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                 }
@@ -2142,6 +2172,8 @@ class EditSupplyPlanStatus extends Component {
                                 plannedShipmentsTotalData.push("");
                                 onholdShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
+                                adjustmentTotalData.push("");
+                                nationalAdjustmentTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
                                 maxQtyArray.push(null)
@@ -2188,6 +2220,8 @@ class EditSupplyPlanStatus extends Component {
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
                             onholdShipmentsTotalData: onholdShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
+                            adjustmentTotalData:adjustmentTotalData,
+                            nationalAdjustmentTotalData:nationalAdjustmentTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
                             amcTotalData: amcTotalData,
@@ -2393,6 +2427,10 @@ class EditSupplyPlanStatus extends Component {
                     this.fetchData();
                     this.buildJExcel()
                     var fields = document.getElementsByClassName("totalShipments");
+                    for (var i = 0; i < fields.length; i++) {
+                        fields[i].style.display = "none";
+                    }
+                    var fields = document.getElementsByClassName("totalAdjustments");
                     for (var i = 0; i < fields.length; i++) {
                         fields[i].style.display = "none";
                     }
@@ -3431,18 +3469,46 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
-                                                            {
-                                                                this.state.inventoryTotalData.map((item1, count) => {
-                                                                    if (item1 != null) {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                                    } else {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                                    }
-                                                                })
-                                                            }
-                                                        </tr>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalAdjustments()}>
+                                                {this.state.showTotalAdjustment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.totalAdjustment')}</b></td>
+                                            {
+                                                this.state.inventoryTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualAdjustment')}</td>
+                                            {
+                                                this.state.adjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.nationalAdjustment')}</td>
+                                            {
+                                                this.state.nationalAdjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
@@ -4938,7 +5004,7 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             </tr>
                                             <tr bgcolor='#d9d9d9'>
-                                                <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                                <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                         if (count < 7) {
@@ -4982,7 +5048,7 @@ class EditSupplyPlanStatus extends Component {
                                                         <tr>
                                                             <td>{item.batchNo}</td>
                                                             <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                            <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                            <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                             <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
                                                             <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>
                                                         </tr>
@@ -5150,7 +5216,7 @@ class EditSupplyPlanStatus extends Component {
                                                     <tr>
                                                         <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                        <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                        <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
                                                         <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
                                                     </tr>
@@ -5196,14 +5262,14 @@ class EditSupplyPlanStatus extends Component {
                                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
                                                                 <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
                                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
-                                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                                {((item.stockQty != null && Number(item.stockQty) > 0)  || (item.actualInventoryBatch)) ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
                                                             </tr>
                                                         ))
                                                     }
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
+                                                        <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")+" ("+moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("MMM-YY")+")"}</b></td>
                                                         <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
                                                     </tr>
                                                 </tfoot>
@@ -5598,8 +5664,32 @@ class EditSupplyPlanStatus extends Component {
                 allBatchLedger.push(batchInfo);
             }));
         var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+        let finalLedger = [];
+        let start = moment(createdDate).format("YYYY-MM");
+        let end = moment(expiryDate).format("YYYY-MM");
+        let months = new Set(ledgerForBatch.map(e => e.transDate));
+        var batchInventortList=this.state.generalProgramJson.batchInventoryList;
+        if(batchInventortList==undefined){
+            batchInventortList=[]
+        }
+        while (moment(start).format("YYYY-MM") <= moment(end).format("YYYY-MM")) {
+            let month = moment(start).startOf('month').format("YYYY-MM-DD");
+            var ledgerData;
+            if (months.has(month)) {
+                var ledgerData=ledgerForBatch.find(e => e.transDate === month);
+                ledgerData.actualInventoryBatch=batchInventortList.filter(c=>moment(c.inventoryDate).format("YYYY-MM")==moment(month).format("YYYY-MM")).flatMap(c=>c.batchList).length>0?true:false;
+                var projectedBalance=Number(ledgerData.openingBalance)-Number(ledgerData.consumptionQty)+Number(ledgerData.adjustmentQty)+Number(ledgerData.shipmentQty)-Number(ledgerData.unallocatedQty);
+                if(projectedBalance!=Number(ledgerData.qty)){
+                    ledgerData.unallocatedQty=Number(ledgerData.unallocatedQty)-Number((Number(ledgerData.qty)-Number(projectedBalance)))
+                }
+            } else {
+                ledgerData = { transDate: month, openingBalance: 0, consumptionQty: null, adjustmentQty: null, shipmentQty: null, unallocatedQty: null, qty: 0, stockQty: 0, actualInventoryBatch: false, expiryDate:expiryDate, expiredQty:0 }
+            }
+            finalLedger.push(ledgerData);
+            start = moment(start).add(1, 'month').format('YYYY-MM')
+        }
         this.setState({
-            ledgerForBatch: ledgerForBatch,
+            ledgerForBatch: finalLedger,
             loading: false
         })
     }
