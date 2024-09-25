@@ -5394,6 +5394,9 @@ class EditSupplyPlanStatus extends Component {
                                                                 }
                                                             );
                                                     } else {
+                                                        this.setState({
+                                                            loading:false
+                                                        })
                                                         document.getElementById("submitButton").disabled = false;
                                                         alert("To approve a supply plan – Reviewed must all be checked.");
                                                     }
