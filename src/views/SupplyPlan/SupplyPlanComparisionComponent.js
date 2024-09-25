@@ -1953,11 +1953,13 @@ export default class SupplyPlanComponent extends React.Component {
      */
     render() {
         const darkModeColors = [
-            '#d4bbff',      
+            '#d4bbff',  
+            '#757575' ,       
         ];
         
         const lightModeColors = [
-            '#002F6C',  // Color 1    
+            '#002F6C',
+            '#212721',      
         ];
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -2253,7 +2255,8 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
-                    borderColor: '#cfcdc9',
+                    backgroundColor: colors[1],
+                    borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -2413,7 +2416,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.consumptionTotalData.map((item1, count) => {
                                                     if (item1.consumptionType == 1) {
                                                         if (item1.consumptionQty != null) {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                            return (<td align="right" className="hoverTd lightModeclrblack" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                         } else {
                                                             return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
                                                         }
@@ -3002,7 +3005,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             })
                                         }
                                     </tr>
-                                    <tr bgcolor='#d9d9d9'  className='text-blackDModal'>
+                                    <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                         <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                         {
                                             this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {

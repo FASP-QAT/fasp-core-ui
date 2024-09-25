@@ -14,7 +14,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast, filterOptions, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { contrast, hideSecondComponent, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
@@ -97,6 +97,7 @@ class EditSupplyPlanStatus extends Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
+            isDarkMode:false,
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
@@ -2374,6 +2375,21 @@ class EditSupplyPlanStatus extends Component {
      * This function is used to get planning unit, program data, problem criticaliy list
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         this.setState({
             loading: true
         })
@@ -2722,11 +2738,24 @@ class EditSupplyPlanStatus extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
+        const darkModeColors = [
+            '#d4bbff', 
+            '#757575' ,   
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1 
+            '#212721',   
+        ];
+        const { isDarkMode } = this.state;
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname,
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -2734,18 +2763,20 @@ class EditSupplyPlanStatus extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 },
@@ -2754,25 +2785,29 @@ class EditSupplyPlanStatus extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     position: 'right',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2805,14 +2840,15 @@ class EditSupplyPlanStatus extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname,
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -2820,28 +2856,32 @@ class EditSupplyPlanStatus extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2874,7 +2914,7 @@ class EditSupplyPlanStatus extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -2954,12 +2994,12 @@ class EditSupplyPlanStatus extends Component {
                     label: i18n.t('static.supplyPlan.delivered'),
                     stack: 1,
                     yAxisID: 'A',
-                    backgroundColor: '#002f6c',
-                    borderColor: '#002f6c',
-                    pointBackgroundColor: '#002f6c',
-                    pointBorderColor: '#002f6c',
-                    pointHoverBackgroundColor: '#002f6c',
-                    pointHoverBorderColor: '#002f6c',
+                    backgroundColor: colors[0],
+                    borderColor: colors[0],
+                    pointBackgroundColor: colors[0],
+                    pointBorderColor: colors[0],
+                    pointHoverBackgroundColor: colors[0],
+                    pointHoverBorderColor: colors[0],
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -3015,7 +3055,8 @@ class EditSupplyPlanStatus extends Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
-                    borderColor: '#cfcdc9',
+                    backgroundColor: colors[1],
+                    borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -3245,13 +3286,13 @@ class EditSupplyPlanStatus extends Component {
                                                                         if (item1.consumptionQty != null) {
                                                                             return (<td align="right" className="hoverTd lightModeclrblack" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                                         } else {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
+                                                                            return (<td align="right" className="hoverTd  textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
                                                                         }
                                                                     } else {
                                                                         if (item1.consumptionQty != null) {
                                                                             return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
                                                                         } else {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
+                                                                            return (<td align="right" className="hoverTd textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
                                                                         }
                                                                     }
                                                                 })
@@ -3532,7 +3573,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right"  bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
@@ -3541,7 +3582,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                                    <td align="right" className='text-blackDModal' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>}
@@ -3591,7 +3632,7 @@ class EditSupplyPlanStatus extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                    <div className="offset-4 col-md-8"> <span className='text-blackD'>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                 </div>}
                                         </div>
                                     </div>
@@ -4479,87 +4520,86 @@ class EditSupplyPlanStatus extends Component {
             loadingForNotes: true
         })
         ProgramService.getNotesHistory(programId)
-            .then(response => {
-                var data = response.data;
-                const listArray = [];
-                const grouped = data.reduce((acc, item) => {
-                    acc[item.versionId] = acc[item.versionId] || [];
-                    acc[item.versionId].push(item);
-                    return acc;
-                }, {});
-
-                Object.values(grouped).forEach(entries => {
-                    const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
-                    if (pendingEntries.length) {
-                        listArray.push(pendingEntries[0]);
-                        if (pendingEntries.length > 1) {
-                            listArray.push(pendingEntries[pendingEntries.length - 1]);
-                        }
+        .then(response => {
+            var data = response.data;
+            const listArray = [];
+            const grouped = data.reduce((acc, item) => {
+                acc[item.versionId] = acc[item.versionId] || [];
+                acc[item.versionId].push(item);
+                return acc;
+            }, {});
+        
+            Object.values(grouped).forEach(entries => {
+                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                if (pendingEntries.length) {
+                    listArray.push(pendingEntries[0]);
+                    if (pendingEntries.length > 1) {
+                        listArray.push(pendingEntries[pendingEntries.length - 1]);
                     }
-                    listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
-                });
-                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                    jexcel.destroy(document.getElementById("notesTransTable"), true);
                 }
-                var json = [];
-                for (var sb = listArray.length - 1; sb >= 0; sb--) {
-                    var data = [];
-                    data[0] = listArray[sb].versionId;
-                    data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-                    data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                    data[3] = listArray[sb].notes;
-                    data[4] = listArray[sb].lastModifiedBy.username;
-                    data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
-                    json.push(data);
-                }
-                var options = {
-                    data: json,
-                    columnDrag: false,
-                    columns: [
-                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                        { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
-                        { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
-                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                        {
-                            title: i18n.t("static.common.lastModifiedBy"),
-                            type: "text",
-                        },
-                        {
-                            title: i18n.t("static.common.lastModifiedDate"),
-                            type: "calendar",
-                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                        },
-                    ],
-                    editable: false,
-                    onload: function (instance, cell) {
-                        jExcelLoadedFunction(instance, 1);
-                    }.bind(this),
-                    pagination: localStorage.getItem("sesRecordCount"),
-                    search: true,
-                    columnSorting: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    // onselection: this.selected,
-                    oneditionend: this.onedit,
-                    copyCompatibility: true,
-                    allowExport: false,
-                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                    position: "top",
-                    filters: true,
-                    license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
-                        return false;
-                    }.bind(this),
-                };
-                var elVar = jexcel(document.getElementById("notesTransTable"), options);
-                this.el = elVar;
-                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
-
-            }).catch(
-                error => {
-                    console.log("Error 18 Test@123",error)
+                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+            });
+            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                jexcel.destroy(document.getElementById("notesTransTable"), true);
+            }
+            var json=[];
+            for (var sb = listArray.length-1; sb >= 0; sb--) {
+                var data = [];
+                data[0] = listArray[sb].versionId; 
+                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                data[3] = listArray[sb].notes;
+                data[4] = listArray[sb].lastModifiedBy.username;
+                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");                
+                json.push(data);
+            }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                {
+                    title: i18n.t("static.common.lastModifiedBy"),
+                    type: "text",
+                  },
+                  {
+                    title: i18n.t("static.common.lastModifiedDate"),
+                    type: "calendar",
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                  },
+            ],
+            editable: false,
+            onload: function (instance, cell) {
+                jExcelLoadedFunction(instance,1);
+            }.bind(this),
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: "top",
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
+            
+        }).catch(
+            error => {
                     this.setState({
                         loadingForNotes: false
                     })
@@ -5563,7 +5603,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Col md="12 pl-0">
                                                     <div className="row">
                                                         <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"(" + i18n.t('static.problemContext.viewTrans') + ")"}</small></span>
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
                                                             <Input
                                                                 type="textarea"
                                                                 maxLength={65535}

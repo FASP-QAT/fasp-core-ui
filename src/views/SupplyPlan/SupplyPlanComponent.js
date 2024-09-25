@@ -34,7 +34,7 @@ import {
 import * as Yup from 'yup';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast, filterOptions, roundAMC, roundARU } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, roundAMC, roundARU, filterOptions } from "../../CommonComponent/JavascriptCommonFunctions";
 import { generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -182,9 +182,9 @@ export default class SupplyPlanComponent extends React.Component {
             multiplier: 1,
             viewById: 1,
             planningUnitNotes: "",
-            planningUnit: "",
             actualInventoryChanged:false,
-            actualInventoryBatchTotalNotMatching:""
+            actualInventoryBatchTotalNotMatching:"",
+            planningUnit: "",
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -1428,11 +1428,13 @@ export default class SupplyPlanComponent extends React.Component {
             }, this);
 
             const darkModeColors = [
-                '#d4bbff',      
+                '#d4bbff', 
+                '#757575' ,   
             ];
             
             const lightModeColors = [
-                '#002F6C',  // Color 1    
+                '#002F6C',  // Color 1 
+                '#212721',   
             ];
             const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -1729,7 +1731,8 @@ export default class SupplyPlanComponent extends React.Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
-                    borderColor: '#cfcdc9',
+                    backgroundColor: colors[1],
+                    borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -2485,7 +2488,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </tbody>
                                 </Table><br/>
-                                <span>{i18n.t('static.supplyPlan.actualInventoryNote1')}</span>
+                                <span className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote1')}</span>
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlan" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                                 <div className=" mt-3">
                                     <div id="adjustmentsTable" className=" " />
@@ -2495,16 +2498,16 @@ export default class SupplyPlanComponent extends React.Component {
                                     <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
                                 </div>
                                 <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                                    <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                                    <span className='text-blackD'>{i18n.t("static.dataEntry.missingBatchNote")}</span>
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
                                 {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                     <>
-                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight"></div><br/>
+                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight bachTotaltDM"></div><br/>
                                         <h6 style={{"textAlign":"right"}} className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
-                                        {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <span>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
+                                        {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <span  className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
                                         {this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                         {this.state.actualInventoryChanged && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                         {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl!="" && this.state.actualInventoryEl!=undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
@@ -4985,6 +4988,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             options={this.state.programList}
                                                             value={this.state.programSelect}
                                                             onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -5036,6 +5040,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             options={this.state.planningUnitList}
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                         </div>
                                                     </FormGroup>
