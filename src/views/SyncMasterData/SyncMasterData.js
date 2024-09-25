@@ -11,7 +11,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import i18next from 'i18next';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, PLANNED_SHIPMENT_STATUS } from '../../Constants.js'
+import { SECRET_KEY, TOTAL_NO_OF_MASTERS_IN_SYNC, INDEXED_DB_VERSION, INDEXED_DB_NAME, SHIPMENT_MODIFIED, DELIVERED_SHIPMENT_STATUS, BATCH_PREFIX, PLANNED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
@@ -88,7 +88,7 @@ export default class SyncMasterData extends Component {
                                 <strong>{i18n.t('static.masterDataSync.masterDataSync')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <div className="text-center">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
+                                <div className="text-center DarkThColr">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
                                 <Progress value={this.state.syncedMasters} max={this.state.totalMasters} />
                             </CardBody>
                             <CardFooter id="retryButtonDiv">
@@ -224,6 +224,10 @@ export default class SyncMasterData extends Component {
                                             if (actionList == undefined) {
                                                 actionList = []
                                             }
+                                            var shipmentBudgetList = generalJson.shipmentBudgetList;
+                                            if (shipmentBudgetList == undefined) {
+                                                shipmentBudgetList = []
+                                            }
                                             if(generalJson.currentVersionNotes == undefined){
                                                 generalJson.currentVersionNotes=response.data.versionNotes;
                                             }
@@ -309,6 +313,7 @@ export default class SyncMasterData extends Component {
                                                                         shipmentQty: Number(item.erpQty) * Number(linkedShipmentsListBasedOnRoNoAndRoPrimeLineNo[0].conversionFactor)
                                                                     })
                                                                 })
+                                                                var tempShipmentId=ppuObject.planningUnit.id.toString().concat(shipmentDataList.length);
                                                                 shipmentDataList.push({
                                                                     accountFlag: true,
                                                                     active: true,
@@ -354,11 +359,21 @@ export default class SyncMasterData extends Component {
                                                                         username: username
                                                                     },
                                                                     lastModifiedDate: curDate,
-                                                                    tempShipmentId: ppuObject.planningUnit.id.toString().concat(shipmentDataList.length),
+                                                                    tempShipmentId: tempShipmentId,
                                                                     tempParentShipmentId: shipmentDataList[index].tempParentShipmentId,
                                                                     parentLinkedShipmentId: null,
                                                                     tempParentLinkedShipmentId: null
                                                                 })
+                                                                if (shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].qatEquivalentShipmentStatus.id != CANCELLED_SHIPMENT_STATUS) {
+                                                                    shipmentBudgetList.push({
+                                                                        shipmentAmt: Number(Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price / shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty) + Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost),
+                                                                        budgetId: shipmentDataList[index].budget.id,
+                                                                        conversionRateToUsd: shipmentDataList[index].currency.conversionRateToUsd,
+                                                                        shipmentId: 0,
+                                                                        tempShipmentId: tempShipmentId,
+                                                                        currencyId: shipmentDataList[index].currency.currencyId
+                                                                    })
+                                                                }
                                                                 if (moment(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                                                     minDate = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].expectedDeliveryDate;
                                                                 }
@@ -464,6 +479,12 @@ export default class SyncMasterData extends Component {
                                                             shipmentDataList[index].lastModifiedBy.userId = curUser;
                                                             shipmentDataList[index].lastModifiedBy.username = username;
                                                             shipmentDataList[index].lastModifiedDate = curDate;
+                                                            var sblIndex = shipmentBudgetList.findIndex(c => (shipmentDataList[index].shipmentId == 0 ? (c.tempShipmentId == shipmentDataList[index].tempShipmentId) : (c.shipmentId == shipmentDataList[index].shipmentId)));
+                                                            if (sblIndex != -1) {
+                                                                var productCost = Number(shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].price / shipmentDataList[index].realmCountryPlanningUnit.multiplier).toFixed(6) * shipmentQty;
+                                                                var freightCost = shipArrayBasedOnRoNoRoPrimeLineNoAndKnShipmentNo[0].shippingCost;
+                                                                shipmentBudgetList[sblIndex].shipmentAmt = Number(productCost) + Number(freightCost);
+                                                            }
                                                             if (moment(shipmentDataList[index].expectedDeliveryDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")) {
                                                                 minDate = shipmentDataList[index].expectedDeliveryDate;
                                                             }
@@ -508,6 +529,7 @@ export default class SyncMasterData extends Component {
                                                         }
                                                         var shipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsList[linkedShipmentsListIndex].childShipmentId > 0 ? c.shipmentId == linkedShipmentsList[linkedShipmentsListIndex].childShipmentId : c.tempShipmentId == linkedShipmentsList[linkedShipmentsListIndex].tempChildShipmentId);
                                                         shipmentDataList[shipmentIndex].active = false;
+                                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentDataList[shipmentIndex].shipmentId>0?(c.shipmentId!=shipmentDataList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentDataList[shipmentIndex].tempShipmentId)));
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
                                                         shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
@@ -524,6 +546,22 @@ export default class SyncMasterData extends Component {
                                                             shipmentDataList[parentShipmentIndex].lastModifiedBy.userId = curUser;
                                                             shipmentDataList[parentShipmentIndex].lastModifiedBy.username = username;
                                                             shipmentDataList[parentShipmentIndex].lastModifiedDate = curDate;
+                                                            var sblIndex = shipmentBudgetList.findIndex(c => (shipmentDataList[parentShipmentIndex].shipmentId == 0 ? (c.tempShipmentId == shipmentDataList[parentShipmentIndex].tempShipmentId) : (c.shipmentId == shipmentDataList[parentShipmentIndex].shipmentId)));
+                                                            if (sblIndex == -1) {
+                                                                shipmentBudgetList.push({
+                                                                    shipmentAmt: Number(shipmentDataList[parentShipmentIndex].productCost) + Number(shipmentDataList[parentShipmentIndex].freightCost),
+                                                                    budgetId: shipmentDataList[parentShipmentIndex].budget.id,
+                                                                    conversionRateToUsd: shipmentDataList[parentShipmentIndex].currency.conversionRateToUsd,
+                                                                    shipmentId:shipmentDataList[parentShipmentIndex].shipmentId,
+                                                                    tempShipmentId:shipmentDataList[parentShipmentIndex].tempShipmentId,
+                                                                    currencyId:shipmentDataList[parentShipmentIndex].currency.currencyId
+                                                                })
+                                                            }else{
+                                                                shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentDataList[parentShipmentIndex].productCost) + Number(shipmentDataList[parentShipmentIndex].freightCost);
+                                                                shipmentBudgetList[sblIndex].budgetId=shipmentDataList[parentShipmentIndex].budget.id;
+                                                                shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentDataList[parentShipmentIndex].currency.conversionRateToUsd;
+                                                                shipmentBudgetList[sblIndex].currencyId=shipmentDataList[parentShipmentIndex].currency.currencyId;
+                                                            }
                                                             if (moment(minDate).format("YYYY-MM-DD") > moment(shipmentDataList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD")) {
                                                                 minDate = moment(shipmentDataList[parentShipmentIndex].expectedDeliveryDate).format("YYYY-MM-DD");
                                                             }
@@ -534,6 +572,22 @@ export default class SyncMasterData extends Component {
                                                             for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
                                                                 var parentShipmentIndex1 = shipmentDataList.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
                                                                 shipmentDataList[parentShipmentIndex1].active = true;
+                                                                var sblIndex = shipmentBudgetList.findIndex(c => (shipmentDataList[parentShipmentIndex1].shipmentId == 0 ? (c.tempShipmentId == shipmentDataList[parentShipmentIndex1].tempShipmentId) : (c.shipmentId == shipmentDataList[parentShipmentIndex1].shipmentId)));
+                                                                if (sblIndex == -1) {
+                                                                    shipmentBudgetList.push({
+                                                                        shipmentAmt: Number(shipmentDataList[parentShipmentIndex1].productCost) + Number(shipmentDataList[parentShipmentIndex1].freightCost),
+                                                                        budgetId: shipmentDataList[parentShipmentIndex1].budget.id,
+                                                                        conversionRateToUsd: shipmentDataList[parentShipmentIndex1].currency.conversionRateToUsd,
+                                                                        shipmentId:shipmentDataList[parentShipmentIndex1].shipmentId,
+                                                                        tempShipmentId:shipmentDataList[parentShipmentIndex1].tempShipmentId,
+                                                                        currencyId:shipmentDataList[parentShipmentIndex1].currency.currencyId
+                                                                    })
+                                                                }else{
+                                                                    shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentDataList[parentShipmentIndex1].productCost) + Number(shipmentDataList[parentShipmentIndex1].freightCost);
+                                                                    shipmentBudgetList[sblIndex].budgetId=shipmentDataList[parentShipmentIndex1].budget.id;
+                                                                    shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentDataList[parentShipmentIndex1].currency.conversionRateToUsd;
+                                                                    shipmentBudgetList[sblIndex].currencyId=shipmentDataList[parentShipmentIndex1].currency.currencyId;
+                                                                }
                                                                 shipmentDataList[parentShipmentIndex1].erpFlag = false;
                                                                 shipmentDataList[parentShipmentIndex1].lastModifiedBy.userId = curUser;
                                                                 shipmentDataList[parentShipmentIndex1].lastModifiedBy.username = username;
@@ -656,6 +710,24 @@ export default class SyncMasterData extends Component {
                                                         }
                                                         shipmentDataList[shipmentIndex].freightCost = Number(Number(productCost) * (Number(Number(freightPercentage) / 100))).toFixed(2);
                                                     }
+                                                    var sblIndex = shipmentBudgetList.findIndex(c => (shipmentDataList[shipmentIndex].shipmentId == 0 ? (c.tempShipmentId == shipmentDataList[shipmentIndex].tempShipmentId) : (c.shipmentId == shipmentDataList[shipmentIndex].shipmentId)));
+                                                    if (sblIndex == -1) {
+                                                        if(shipmentDataList[shipmentIndex].active.toString()=="true" && shipmentDataList[shipmentIndex].accountFlag.toString()=="true" && shipmentDataList[shipmentIndex].shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS){
+                                                        shipmentBudgetList.push({
+                                                            shipmentAmt: Number(shipmentDataList[shipmentIndex].productCost) + Number(shipmentDataList[shipmentIndex].freightCost),
+                                                            budgetId: shipmentDataList[shipmentIndex].budget.id,
+                                                            conversionRateToUsd: shipmentDataList[shipmentIndex].currency.conversionRateToUsd,
+                                                            shipmentId:shipmentDataList[shipmentIndex].shipmentId,
+                                                            tempShipmentId:shipmentDataList[shipmentIndex].tempShipmentId,
+                                                            currencyId:shipmentDataList[shipmentIndex].currency.currencyId
+                                                        })
+                                                    }
+                                                    }else{
+                                                        shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentDataList[shipmentIndex].productCost) + Number(shipmentDataList[shipmentIndex].freightCost);
+                                                        shipmentBudgetList[sblIndex].budgetId=shipmentDataList[shipmentIndex].budget.id;
+                                                        shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentDataList[shipmentIndex].currency.conversionRateToUsd;
+                                                        shipmentBudgetList[sblIndex].currencyId=shipmentDataList[shipmentIndex].currency.currencyId;
+                                                    }
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
                                                     shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
@@ -701,6 +773,7 @@ export default class SyncMasterData extends Component {
                                                 })
                                             }
                                             generalJson.actionList = actionList;
+                                            generalJson.shipmentBudgetList = shipmentBudgetList;
                                             generalJson.shipmentLinkingList = linkedShipmentsList.concat(inactiveLinkedShipmentsList);
                                             generalJson.problemReportList = problemReportList;
                                             prgQPLDetails.openCount = (problemReportList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;

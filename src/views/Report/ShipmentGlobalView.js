@@ -32,15 +32,15 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
-const backgroundColor = [
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-    '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-    '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-    '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-]
+// const backgroundColor = [
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+//     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+//     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+//     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+// ]
 /**
  * Component for Shipment Global View Report.
  */
@@ -52,6 +52,7 @@ class ShipmentGlobalView extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
+            isDarkMode:false,
             labels: ['GF', 'Govt', 'Local', 'PSM'],
             datasets: [{
                 data: [13824000, 26849952, 0, 5615266],
@@ -544,6 +545,21 @@ class ShipmentGlobalView extends Component {
      * Calls the get countrys function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         this.getCountrys();
         document.getElementById("procurementAgentDiv").style.display = "none";
         document.getElementById("procurementAgentTypeDiv").style.display = "none";
@@ -914,7 +930,7 @@ class ShipmentGlobalView extends Component {
                         var val = [];
                         var table1Body = [];
                         table1Headers = Object.keys(response.data.countrySplitList[0].amount);
-                        table1Headers.unshift("Country");
+                        table1Headers.unshift(i18n.t('static.dashboard.country'));
                         for (var item = 0; item < response.data.countrySplitList.length; item++) {
                             let obj = {
                                 country: response.data.countrySplitList[item].country,
@@ -1357,37 +1373,71 @@ class ShipmentGlobalView extends Component {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
+            fontColor:fontColor
         }
         const { rangeValue } = this.state
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+
+        const lightModeColors = [
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        ]
+
+        const darkModeColors = [
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+        ]
+        const { isDarkMode } = this.state;
+const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
         const options = {
             title: {
                 display: true,
                 text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1400,7 +1450,13 @@ class ShipmentGlobalView extends Component {
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }
                 ],
             },
@@ -1431,7 +1487,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1439,27 +1495,35 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentfundingSource'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1472,7 +1536,13 @@ class ShipmentGlobalView extends Component {
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }],
             },
             tooltips: {
@@ -1502,7 +1572,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1510,24 +1580,38 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgent'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                 }],
             },
             tooltips: {
@@ -1541,7 +1625,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1549,24 +1633,38 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgentType'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
+                    ticks: {
+                        fontColor:fontColor,
+                    }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                 }],
             },
             tooltips: {
@@ -1580,7 +1678,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -1589,27 +1687,32 @@ class ShipmentGlobalView extends Component {
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentFundingSourceType'),
-                fontColor: 'black'
+                fontColor:fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
+                    fontColor:fontColor,
                     gridLines: {
-                        display: false
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor: 'black'
+                        fontColor:fontColor,
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
+                    fontColor:fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1622,7 +1725,13 @@ class ShipmentGlobalView extends Component {
                             }
                             return x1 + x2;
                         }
-                    }
+                    },
+                    gridLines: {
+                        display: true,
+                        lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
+                    },
                 }],
             },
             tooltips: {
@@ -1652,7 +1761,7 @@ class ShipmentGlobalView extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor,
                 }
             }
         }
@@ -1690,8 +1799,9 @@ class ShipmentGlobalView extends Component {
             }
             displayObject.push(holdArray);
         }
+        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
         var bar1 = []
-        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor[index] }))
+        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor1[index] }))
         bar1 = {
             labels: [...new Set(this.state.dateSplitList.map(ele => (dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
             datasets: dataSet
@@ -1706,7 +1816,26 @@ class ShipmentGlobalView extends Component {
                         {(this.state.shipmentList.length > 0 || this.state.dateSplitList.length > 0 || this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                     {(this.state.shipmentList.length > 0 || this.state.countrySplitList.length > 0) &&
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                     }

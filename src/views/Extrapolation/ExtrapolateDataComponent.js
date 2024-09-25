@@ -180,6 +180,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
         this.state = {
+            isDarkMode: false,
             popoverOpenConfidenceLevel: false,
             popoverOpenConfidenceLevel1: false,
             popoverOpenConfidenceLevel2: false,
@@ -373,6 +374,21 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         });
         this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
+        // Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+
         var isExtrapolation = localStorage.getItem("isExtrapolation")
         if (isExtrapolation == "true") {
             this.setState({
@@ -2506,8 +2522,10 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
      * Builds data for extrapolation and runs extrapolation methods
      * @param {Object} id defines which submit has been clicked on
+     * @param {Object} event contains the Extrapolated modal parameters 
      */
-    ExtrapolatedParameters(id) {
+    ExtrapolatedParameters(id, event) {
+        event.stopPropagation();
         var regionList = this.state.regionValues;
         var listOfPlanningUnits = this.state.planningUnitValues;
         var puObj = [];
@@ -2621,12 +2639,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (regionObj != "" && puObj != "") {
                     this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
                 }
+                console.log("count1", count)
+
                 this.setState({
                     count: count,
                     totalExtrapolatedCount: count,
                     estimatedTime: count * 3
                 }, () => {
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
+                    console.log("count3", count)
+
                     if (count == 0) {
                         this.setState({
                             startBulkExtrapolation: false,
@@ -3840,21 +3862,37 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </li>
             )
         }, this);
+        const darkModeColors = [
+            '#d4bbff', // Color 1 
+            '#ba4e00'
+        ];
+
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+            '#651D32'
+        ];
+
+
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const options = {
             title: {
                 display: true,
-                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text + " " + i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0] : ""
+                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text + " " + i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0] : "",
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.report.consupmtionqty'),
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -3866,17 +3904,23 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
                             }
                             return x1 + x2;
-                        }
+                        },
+
+                    },
+                    gridLines: {
+                        color: gridLineColor,
                     }
                 }],
                 xAxes: [
                     {
                         id: 'xAxis1',
                         gridLines: {
-                            color: "rgba(0, 0, 0, 0)",
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor,
+                            lineWidth: 0
                         },
                         ticks: {
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
@@ -3890,8 +3934,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         id: 'xAxis2',
                         gridLines: {
                             drawOnChartArea: false,
+
                         },
                         ticks: {
+                            fontColor: fontColor,
                             callback: function (label) {
                                 var xAxis2 = label
                                 xAxis2 += '';
@@ -3936,7 +3982,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: "black"
+                    fontColor: fontColor
                 }
             }
         }
@@ -3961,7 +4007,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             lineTension: 0,
             label: i18n.t('static.extrapolation.adjustedActuals'),
             backgroundColor: 'transparent',
-            borderColor: '#002F6C',
+            borderColor: colors[0], // Use the first color in the array
+            // borderColor: '#002F6C',
             ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',
@@ -4137,7 +4184,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t("static.extrapolation.arimaLower"),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: colors[1],
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -4156,7 +4203,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: colors[1],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -4173,7 +4220,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t("static.extrapolation.arimaUpper"),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: colors[1],
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -4338,7 +4385,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </FormGroup>
                                             <FormGroup className="col-md-5">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
-                                                <div className="controls edit" style={{ backgroundColor: this.state.isDisabled ? "#e5edf5" : "#fff" }}>
+                                                <div className="controls edit Blackcolortext" style={{ backgroundColor: this.state.isDisabled ? "#e5edf5" : "transparent" }}>
                                                     <Picker
                                                         years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                         ref={this.pickRange1}
@@ -4911,7 +4958,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     {this.state.showData &&
                                                         <div className="">
                                                             <div className="">
-                                                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
+                                                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset',border:'1px solid #4d515a' }}>
                                                                     <thead>
                                                                         <tr>
                                                                             <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
@@ -4937,91 +4984,91 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         <tr>
                                                                             <td>{i18n.t('static.extrapolation.rmse')}</td>
                                                                             {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse !== "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.movingAvgError.rmse ? "#86cd99" : ""}>{this.state.movingAvgError.rmse !== "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse !== "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.semiAvgError.rmse ? "#86cd99" : ""}>{this.state.semiAvgError.rmse !== "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse !== "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.linearRegressionError.rmse ? "#86cd99" : ""}>{this.state.linearRegressionError.rmse !== "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.smoothingId && this.state.tesData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse !== "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.tesError.rmse ? "#86cd99" : ""}>{this.state.tesError.rmse !== "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.arimaId && this.state.arimaData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.arimaError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.arimaError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rmse !== "" ? this.state.arimaError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minRmse === this.state.arimaError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse === this.state.arimaError.rmse ? "#86cd99" : ""}>{this.state.arimaError.rmse !== "" ? this.state.arimaError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                         </tr>
                                                                         <tr>
                                                                             <td>{i18n.t('static.extrapolation.mape')}</td>
                                                                             {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape !== "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.movingAvgError.mape ? "#86cd99" : ""}>{this.state.movingAvgError.mape !== "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape !== "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.semiAvgError.mape ? "#86cd99" : ""}>{this.state.semiAvgError.mape !== "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape !== "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.linearRegressionError.mape ? "#86cd99" : ""}>{this.state.linearRegressionError.mape !== "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.smoothingId && this.state.tesData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape !== "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.tesError.mape ? "#86cd99" : ""}>{this.state.tesError.mape !== "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.arimaId && this.state.arimaData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.arimaError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.arimaError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.mape !== "" ? this.state.arimaError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMape === this.state.arimaError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape === this.state.arimaError.mape ? "#86cd99" : ""}>{this.state.arimaError.mape !== "" ? this.state.arimaError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                         </tr>
                                                                         <tr>
                                                                             <td>{i18n.t('static.extrapolation.mse')}</td>
                                                                             {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse !== "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.movingAvgError.mse ? "#86cd99" : ""}>{this.state.movingAvgError.mse !== "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse !== "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.semiAvgError.mse ? "#86cd99" : ""}>{this.state.semiAvgError.mse !== "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse !== "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.linearRegressionError.mse ? "#86cd99" : ""}>{this.state.linearRegressionError.mse !== "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.smoothingId && this.state.tesData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse !== "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.tesError.mse ? "#86cd99" : ""}>{this.state.tesError.mse !== "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.arimaId && this.state.arimaData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.arimaError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.arimaError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.mse !== "" ? this.state.arimaError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minMse === this.state.arimaError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse === this.state.arimaError.mse ? "#86cd99" : ""}>{this.state.arimaError.mse !== "" ? this.state.arimaError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                         </tr>
                                                                         <tr>
                                                                             <td>{i18n.t('static.extrapolation.wape')}</td>
                                                                             {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape !== "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.movingAvgError.wape ? "#86cd99" : ""}>{this.state.movingAvgError.wape !== "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape !== "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.semiAvgError.wape ? "#86cd99" : ""}>{this.state.semiAvgError.wape !== "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape !== "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.linearRegressionError.wape ? "#86cd99" : ""}>{this.state.linearRegressionError.wape !== "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.smoothingId && this.state.tesData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape !== "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.tesError.wape ? "#86cd99" : ""}>{this.state.tesError.wape !== "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.arimaId && this.state.arimaData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.arimaError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.arimaError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.wape !== "" ? this.state.arimaError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.minWape === this.state.arimaError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape === this.state.arimaError.wape ? "#86cd99" : ""}>{this.state.arimaError.wape !== "" ? this.state.arimaError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                         </tr>
                                                                         <tr>
                                                                             <td>{i18n.t('static.extrapolation.rSquare')}</td>
                                                                             {this.state.movingAvgId && this.state.movingAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd !== "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.movingAvgError.rSqd ? "#86cd99" : ""}>{this.state.movingAvgError.rSqd !== "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.semiAvgId && this.state.semiAvgData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd !== "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.semiAvgError.rSqd ? "#86cd99" : ""}>{this.state.semiAvgError.rSqd !== "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.linearRegressionId && this.state.linearRegressionData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd !== "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.linearRegressionError.rSqd ? "#86cd99" : ""}>{this.state.linearRegressionError.rSqd !== "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.smoothingId && this.state.tesData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd !== "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.tesError.rSqd ? "#86cd99" : ""}>{this.state.tesError.rSqd !== "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                             {this.state.arimaId && this.state.arimaData.length > 0 &&
-                                                                                <td style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.arimaError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rSqd !== "" ? this.state.arimaError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                                <td className='text-blackD' style={{ textAlign: "right", "fontWeight": this.state.maxRsqd === this.state.arimaError.rSqd ? "bold" : "normal" }} bgcolor={this.state.maxRsqd === this.state.arimaError.rSqd ? "#86cd99" : ""}>{this.state.arimaError.rSqd !== "" ? this.state.arimaError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                             }
                                                                         </tr>
                                                                     </tbody>
@@ -5032,7 +5079,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <div className="col-md-10 pt-4 pb-3">
                                                             {this.state.showData && <ul className="legendcommitversion">
                                                                 <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.common.forecastPeriod')}{" "}<b>{"("}{i18n.t('static.supplyPlan.forecastedConsumption')}{")"}</b></i></span></li>
-                                                                <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
+                                                                <li><span className="legendcolor text-blackDBg"></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                                             </ul>}
                                                         </div>
                                                         <div className="row  mt-lg-3 mb-lg-3">
@@ -5212,22 +5259,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <ModalFooter>
                                         {this.state.bulkExtrapolation && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(1)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(1, e)}><i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingDefaultParams')}</Button>
                                             </div>
                                         }
                                         {localStorage.getItem('sessionType') === 'Online' && (this.state.bulkExtrapolation || this.state.missingTESAndARIMA) && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(2)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(2, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateUsingOptimizedArimaAndTes')}</Button>
                                             </div>
                                         }
                                         {this.state.optimizeTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(3)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(3, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.optimizeTES&ARIMA')}</Button>
                                             </div>
                                         }
                                         {localStorage.getItem('sessionType') === 'Online' && this.state.missingTESAndARIMA && this.state.planningUnitValues != "" && this.state.regionValues != "" &&
                                             <div className="mr-0">
-                                                <Button size="md" color="success" className="submitBtn float-right" onClick={() => this.ExtrapolatedParameters(5)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
+                                                <Button size="md" color="success" className="submitBtn float-right" onClick={(e) => this.ExtrapolatedParameters(5, e)}> <i className="fa fa-check"></i> {i18n.t('static.extrapolation.extrapolateTES&ARIMAUsingDefaultParams')}</Button>
                                             </div>
                                         }
 

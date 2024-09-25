@@ -51,6 +51,7 @@ class StockStatus extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode:false,
       PlanningUnitDataForExport: [],
       loading: true,
       dropdownOpen: false,
@@ -1716,6 +1717,21 @@ class StockStatus extends Component {
    * Calls the get programs function on page load
    */
   componentDidMount() {
+    // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
     this.getPrograms();
   }
   /**
@@ -1751,6 +1767,20 @@ class StockStatus extends Component {
    * @returns {JSX.Element} - Stock Status report table.
    */
   render() {
+    const darkModeColors = [
+      '#d4bbff', 
+      '#757575' ,   
+  ];
+  
+  const lightModeColors = [
+      '#002F6C',  // Color 1 
+      '#cfcdc9',   
+  ];
+    const { isDarkMode } = this.state;
+const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
     const { equivalencyUnitList } = this.state;
     let equivalencyUnitList1 = equivalencyUnitList.length > 0
       && equivalencyUnitList.map((item, i) => {
@@ -1789,7 +1819,8 @@ class StockStatus extends Component {
     const options = {
       title: {
         display: this.state.yaxisEquUnit==-1 && this.state.programId.length==1?true:false,
-        text: graphLabel
+        text: graphLabel,
+        fontColor:fontColor
       },
       scales: {
         yAxes: [{
@@ -1800,11 +1831,11 @@ class StockStatus extends Component {
             labelString: i18n.t('static.shipment.qty'),
             display: true,
             fontSize: "12",
-            fontColor: 'black'
+            fontColor:fontColor
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor:fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -1818,8 +1849,9 @@ class StockStatus extends Component {
               return x1 + x2;
             }
           }, gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
+            lineWidth: 0,
+    color: gridLineColor,
+    zeroLineColor: gridLineColor 
           }
         }
           , {
@@ -1827,12 +1859,12 @@ class StockStatus extends Component {
           position: 'right',
           scaleLabel: {
             labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-            fontColor: 'black',
+            fontColor:fontColor,
             display: true,
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor:fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -1847,27 +1879,29 @@ class StockStatus extends Component {
             }
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
+            lineWidth: 0,
+    color: gridLineColor,
+    zeroLineColor: gridLineColor 
           }
         }],
         xAxes: [{
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
+            fontColor:fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           stacked: true,
           ticks: {
-            fontColor: 'black',
+            fontColor:fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
+            lineWidth: 0,
+            color: gridLineColor,
+            zeroLineColor: gridLineColor 
           }
         }]
       },
@@ -1901,14 +1935,15 @@ class StockStatus extends Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor:fontColor,
         }
       }
     }
     const options1 = {
       title: {
         display: this.state.yaxisEquUnit==-1 && this.state.programId.length==1?true:false,
-        text: graphLabel
+        text: graphLabel,
+        fontColor:fontColor
       },
       scales: {
         yAxes: [{
@@ -1919,11 +1954,11 @@ class StockStatus extends Component {
             labelString: i18n.t('static.shipment.qty'),
             display: true,
             fontSize: "12",
-            fontColor: 'black'
+            fontColor:fontColor
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor:fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -1937,8 +1972,9 @@ class StockStatus extends Component {
               return x1 + x2;
             }
           }, gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
+            lineWidth: 0,
+    color: gridLineColor,
+    zeroLineColor: gridLineColor 
           }
         }
         ],
@@ -1946,19 +1982,20 @@ class StockStatus extends Component {
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
+            fontColor:fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           stacked: true,
           ticks: {
-            fontColor: 'black',
+            fontColor:fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
-            lineWidth: 0
+            lineWidth: 0,
+    color: gridLineColor,
+    zeroLineColor: gridLineColor 
           }
         }]
       },
@@ -1994,7 +2031,7 @@ class StockStatus extends Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor:fontColor
         }
       }
     }
@@ -2119,12 +2156,12 @@ class StockStatus extends Component {
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
           stack: 1,
-          backgroundColor: '#002f6c',
-          borderColor: '#002f6c',
-          pointBackgroundColor: '#002f6c',
-          pointBorderColor: '#002f6c',
-          pointHoverBackgroundColor: '#002f6c',
-          pointHoverBorderColor: '#002f6c',
+          backgroundColor: colors[0],
+          borderColor: colors[0],
+          pointBackgroundColor: colors[0],
+          pointBorderColor: colors[0],
+          pointHoverBackgroundColor: colors[0],
+          pointHoverBorderColor: colors[0],
           data: this.state.stockStatusList.map((item, index) => {
             let count = 0;
             (item.shipmentInfo.map((ele, index) => {
@@ -2476,9 +2513,9 @@ class StockStatus extends Component {
                           </FormGroup>
                         }
                         <div className="col-md-12 text-center">
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span align="center"><b>{entityname1}</b></span>}<br/>
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="programIdsLabels" align="center">{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.map(ele => ele.label).join(", ")):""}</span>}<br/>
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="planningUnitIdsLabels" align="center">{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")):""}</span>}
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.map(ele => ele.label).join(", ")):""}</span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")):""}</span>}
                           <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}

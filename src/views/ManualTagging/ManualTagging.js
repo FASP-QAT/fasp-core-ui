@@ -1476,6 +1476,7 @@ export default class ManualTagging extends Component {
                     var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
                     var generalProgramJson = JSON.parse(generalProgramData);
                     var actionList = generalProgramJson.actionList;
+                    var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
                     var delinkList = generalProgramJson.delinkList;
                     var linkedShipmentsList = generalProgramJson.shipmentLinkingList == null ? [] : generalProgramJson.shipmentLinkingList;
                     if (actionList == undefined) {
@@ -1483,6 +1484,9 @@ export default class ManualTagging extends Component {
                     }
                     if (delinkList == undefined) {
                         delinkList = []
+                    }
+                    if (shipmentBudgetList == undefined) {
+                        shipmentBudgetList = []
                     }
                     for (var pu = 0; pu < setOfPlanningUnitIds.length; pu++) {
                         var planningUnitId = setOfPlanningUnitIds[pu];
@@ -1528,6 +1532,7 @@ export default class ManualTagging extends Component {
                                 }
                                 var shipmentIndex = shipmentList.findIndex(c => selectedShipment[ss][17].shipmentId > 0 ? c.shipmentId == selectedShipment[ss][17].shipmentId : c.tempShipmentId == selectedShipment[ss][17].tempShipmentId);
                                 shipmentList[shipmentIndex].active = false;
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex].tempShipmentId))
                                 shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
                                 shipmentList[shipmentIndex].lastModifiedBy.username = username;
                                 shipmentList[shipmentIndex].lastModifiedDate = curDate;
@@ -1540,6 +1545,22 @@ export default class ManualTagging extends Component {
                                 if (activateParentShipment) {
                                     var parentShipmentIndex = shipmentList.findIndex(c => linkedShipmentsListFilter[0].parentShipmentId > 0 ? c.shipmentId == linkedShipmentsListFilter[0].parentShipmentId : c.tempShipmentId == linkedShipmentsListFilter[0].tempParentShipmentId);
                                     shipmentList[parentShipmentIndex].active = true;
+                                    var sblIndex = shipmentBudgetList.findIndex(c => (shipmentList[parentShipmentIndex].shipmentId == 0 ? (c.tempShipmentId == shipmentList[parentShipmentIndex].tempShipmentId) : (c.shipmentId == shipmentList[parentShipmentIndex].shipmentId)));
+                                    if (sblIndex == -1) {
+                                        shipmentBudgetList.push({
+                                            shipmentAmt: Number(shipmentList[parentShipmentIndex].productCost) + Number(shipmentList[parentShipmentIndex].freightCost),
+                                            budgetId: shipmentList[parentShipmentIndex].budget.id,
+                                            conversionRateToUsd: shipmentList[parentShipmentIndex].currency.conversionRateToUsd,
+                                            shipmentId:shipmentList[parentShipmentIndex].shipmentId,
+                                            tempShipmentId:shipmentList[parentShipmentIndex].tempShipmentId,
+                                            currencyId:shipmentList[parentShipmentIndex].currency.currencyId
+                                        })
+                                    }else{
+                                        shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentList[parentShipmentIndex].productCost) + Number(shipmentList[parentShipmentIndex].freightCost);
+                                        shipmentBudgetList[sblIndex].budgetId=shipmentList[parentShipmentIndex].budget.id;
+                                        shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentList[parentShipmentIndex].currency.conversionRateToUsd;
+                                        shipmentBudgetList[sblIndex].currencyId=shipmentList[parentShipmentIndex].currency.currencyId;
+                                    }
                                     shipmentList[parentShipmentIndex].erpFlag = false;
                                     shipmentList[parentShipmentIndex].lastModifiedBy.userId = curUser;
                                     shipmentList[parentShipmentIndex].lastModifiedBy.username = username;
@@ -1554,6 +1575,22 @@ export default class ManualTagging extends Component {
                                     for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
                                         var parentShipmentIndex1 = shipmentList.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
                                         shipmentList[parentShipmentIndex1].active = true;
+                                        var sblIndex = shipmentBudgetList.findIndex(c => (shipmentList[parentShipmentIndex1].shipmentId == 0 ? (c.tempShipmentId == shipmentList[parentShipmentIndex1].tempShipmentId) : (c.shipmentId == shipmentList[parentShipmentIndex1].shipmentId)));
+                                        if (sblIndex == -1) {
+                                            shipmentBudgetList.push({
+                                                shipmentAmt: Number(shipmentList[parentShipmentIndex1].productCost) + Number(shipmentList[parentShipmentIndex1].freightCost),
+                                                budgetId: shipmentList[parentShipmentIndex1].budget.id,
+                                                conversionRateToUsd: shipmentList[parentShipmentIndex1].currency.conversionRateToUsd,
+                                                shipmentId:shipmentList[parentShipmentIndex1].shipmentId,
+                                                tempShipmentId:shipmentList[parentShipmentIndex1].tempShipmentId,
+                                                currencyId:shipmentList[parentShipmentIndex1].currency.currencyId
+                                            })
+                                        }else{
+                                            shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentList[parentShipmentIndex1].productCost) + Number(shipmentList[parentShipmentIndex1].freightCost);
+                                            shipmentBudgetList[sblIndex].budgetId=shipmentList[parentShipmentIndex1].budget.id;
+                                            shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentList[parentShipmentIndex1].currency.conversionRateToUsd;
+                                            shipmentBudgetList[sblIndex].currencyId=shipmentList[parentShipmentIndex1].currency.currencyId;
+                                        }
                                         shipmentList[parentShipmentIndex1].erpFlag = false;
                                         shipmentList[parentShipmentIndex1].lastModifiedBy.userId = curUser;
                                         shipmentList[parentShipmentIndex1].lastModifiedBy.username = username;
@@ -1614,6 +1651,7 @@ export default class ManualTagging extends Component {
                         }
                     }
                     generalProgramJson.actionList = actionList;
+                    generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                     generalProgramJson.delinkList = delinkList;
                     generalProgramJson.shipmentLinkingList = linkedShipmentsList;
                     programDataJson.planningUnitDataList = planningUnitDataList;
@@ -1732,6 +1770,10 @@ export default class ManualTagging extends Component {
                                         if (actionList == undefined) {
                                             actionList = []
                                         }
+                                        var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                                        if (shipmentBudgetList == undefined) {
+                                            shipmentBudgetList = []
+                                        }
                                         var shipmentList = programJson.shipmentList;
                                         var batchInfoList = programJson.batchInfoList;
                                         if (!this.state.active4) {
@@ -1740,12 +1782,14 @@ export default class ManualTagging extends Component {
                                             var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
                                             shipmentList[shipmentIndex].erpFlag = true;
                                             shipmentList[shipmentIndex].active = false;
+                                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex].tempShipmentId))
                                             var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
                                             for (var i = 1; i < this.state.finalShipmentId.length; i++) {
                                                 var shipmentId1 = this.state.active1 ? this.state.finalShipmentId[i].shipmentId : this.state.finalShipmentId[i].shipmentId;
                                                 var index1 = this.state.active1 ? this.state.finalShipmentId[i].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
                                                 var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
                                                 shipmentList[shipmentIndex1].erpFlag = true;
+                                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex1].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex1].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex1].tempShipmentId))
                                                 shipmentList[shipmentIndex1].active = false;
                                                 shipmentList[shipmentIndex1].parentLinkedShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
                                                 shipmentList[shipmentIndex1].tempParentLinkedShipmentId = this.state.finalShipmentId[0].tempShipmentId;
@@ -1798,6 +1842,7 @@ export default class ManualTagging extends Component {
                                                     if (this.state.active4 && uq == 0) {
                                                         var c = (cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0]);
                                                         var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
+                                                        var tempShipmentId=ppuObject.planningUnit.id.toString().concat(shipmentList.length);
                                                         shipmentList.push({
                                                             accountFlag: true,
                                                             active: false,
@@ -1862,7 +1907,7 @@ export default class ManualTagging extends Component {
                                                                 username: username
                                                             },
                                                             lastModifiedDate: curDate,
-                                                            tempShipmentId: ppuObject.planningUnit.id.toString().concat(shipmentList.length),
+                                                            tempShipmentId: tempShipmentId,
                                                             tempParentShipmentId: null,
                                                             parentLinkedShipmentId: null,
                                                             tempParentLinkedShipmentId: null
@@ -1903,6 +1948,7 @@ export default class ManualTagging extends Component {
                                                         lastModifiedDate: curDate,
                                                     })
                                                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
+                                                    var tempShipmentId=shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
                                                     shipmentList.push({
                                                         accountFlag: true,
                                                         active: true,
@@ -1952,10 +1998,18 @@ export default class ManualTagging extends Component {
                                                             username: username
                                                         },
                                                         lastModifiedDate: curDate,
-                                                        tempShipmentId: shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length),
+                                                        tempShipmentId: tempShipmentId,
                                                         tempParentShipmentId: shipmentList[shipmentIndex].shipmentId == 0 ? shipmentList[shipmentIndex].tempShipmentId : null,
                                                         parentLinkedShipmentId: null,
                                                         tempParentLinkedShipmentId: null
+                                                    })
+                                                    shipmentBudgetList.push({
+                                                        shipmentAmt: Number(Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty))+Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].shippingCost),
+                                                        budgetId: shipmentList[shipmentIndex].budget.id,
+                                                        conversionRateToUsd: shipmentList[shipmentIndex].currency.conversionRateToUsd,
+                                                        shipmentId:0,
+                                                        tempShipmentId:tempShipmentId,
+                                                        currencyId:shipmentList[shipmentIndex].currency.currencyId
                                                     })
                                                     for (var bi = 0; bi < batchInfo.length; bi++) {
                                                         var index = batchInfoList.findIndex(c => c.batchNo == batchInfo[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfo[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitId);
@@ -1991,6 +2045,7 @@ export default class ManualTagging extends Component {
                                             planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                         }
                                         generalProgramJson.actionList = actionList;
+                                        generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                                         generalProgramJson.shipmentLinkingList = linkedShipmentsList;
                                         programDataJson.planningUnitDataList = planningUnitDataList;
                                         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
@@ -4673,7 +4728,8 @@ export default class ManualTagging extends Component {
                     </div>
                     <CardBody className="pb-lg-5" >
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
-                            <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> <span style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
+                            <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> 
+                                <span className='DarkThColr' style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
                             <div className="col-md-12 pl-0">
                                 <Row>
                                     <FormGroup className="pl-3">
@@ -5100,7 +5156,7 @@ export default class ManualTagging extends Component {
                                                                 {this.state.comboBoxError && this.state.table1Loader ? <span className='red12'>{i18n.t('static.common.erpComboboxError')}</span> : ""}
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-6 pl-0">
+                                                        <FormGroup className="col-md-6 pl-0 DarkModeCombo">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.manualTagging.search')}</Label>
                                                             <div className="controls "
                                                             >
@@ -5150,8 +5206,8 @@ export default class ManualTagging extends Component {
                                         </div><br />
                                     </ModalBody>
                                     <ModalFooter>
-                                        <b><h3 className="float-right">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
-                                        {this.state.displayTotalQty && <b><h3 className="float-right">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
+                                        <b><h3 className="float-right text-blackD">{i18n.t('static.mt.originalQty')} : {this.state.active4 ? this.state.totalQuantity : this.addCommas(this.state.originalQty)}</h3></b>
+                                        {this.state.displayTotalQty && <b><h3 className="float-right text-blackD">{i18n.t('static.mt.totalQty')} : {this.state.totalQuantity}</h3></b>}
                                         {this.state.displaySubmitButton
                                             && (this.state.active4 || this.state.originalQty > 0)
                                             && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.link}> <i className="fa fa-check"></i>{(this.state.active2 ? i18n.t('static.common.update') : i18n.t('static.manualTagging.link'))}</Button>}
