@@ -70,7 +70,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPeriod: '',
             selSource1: [],
             selectedForecastProgramDesc: '',
-            toggleDoNotImport: false
+            toggleDoNotImport: false,
+            isForecastOver: false,
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -992,22 +993,25 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
         }
         if (isWithinLast6Months) {
-            defaultForecastStartYear = "";
-            defaultForecastStartMonth = "";
-            defaultForecastStopYear = "";
-            defaultForecastStopMonth = "";
+            defaultForecastStartYear = formattedDate.getFullYear();
+            defaultForecastStartMonth = formattedDate.getMonth() + 1;
+            // defaultForecastStopYear = "";
+            // defaultForecastStopMonth = "";
             updatedForecastStartYear = formattedDate.getFullYear();
             updatedForecastStartMonth = formattedDate.getMonth() + 1;
         }
+        this.setState({isForecastOver: isForecastOver});//to show/hide next button
+        this.props.updateStepOneData("isForecastOver", isForecastOver);
         if (isForecastOver) {
-            defaultForecastStartYear = "";
-            defaultForecastStartMonth = "";
-            defaultForecastStopYear = "";
-            defaultForecastStopMonth = "";
-            updatedForecastStartYear = "";
-            updatedForecastStartMonth = "";
-            updatedForecastStopYear = "";
-            updatedForecastStopMonth = "";
+            //old
+            // defaultForecastStartYear = "";
+            // defaultForecastStartMonth = "";
+            // defaultForecastStopYear = "";
+            // defaultForecastStopMonth = "";
+            // updatedForecastStartYear = "";
+            // updatedForecastStartMonth = "";
+            // updatedForecastStopYear = "";
+            // updatedForecastStopMonth = "";            
         }
         if (isForecastAlreadyStarted) {
             defaultForecastStartYear = forecastStartDate.getFullYear();
@@ -1021,6 +1025,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updatedForecastStartYear = forecastStartDate.getFullYear();
             updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
         }
+
         this.setState({
             toggleDoNotImport:false,
             versionId: event.target.value,
@@ -1458,7 +1463,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 </Picker>
                             </div>
                         </FormGroup>
-                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-2" style={{ "marginLeft": "20px", "marginTop": "47px" }}>
+                        {this.state.selSource != undefined && this.state.selSource.length != 0 &&  this.state.forecastProgramId!=0 && this.state.versionId!=0 && this.state.programId!=0 && this.state.forecastProgramId!="" && this.state.versionId!="" && this.state.programId!="" && <FormGroup className="col-md-3" style={{ "marginLeft": "20px", "marginTop": "36px" }}>
                             <Input
                                 className="form-check-input"
                                 type="checkbox"
@@ -1472,7 +1477,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                 {i18n.t('static.import.doNoImportCheckbox')}
                             </Label>
-                        </FormGroup>}
+                        </FormGroup>}                        
                     </div>
                 </div>
                 <div className="consumptionDataEntryTable" style={{ display: (this.props.items.loading || this.state.forecastProgramId==0 || this.state.versionId==0 || this.state.programId==0 || this.state.forecastProgramId=="" || this.state.versionId=="" || this.state.programId=="") ? "none" : "block" }} >

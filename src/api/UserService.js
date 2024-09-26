@@ -70,5 +70,9 @@ class UserService {
         return axios.get(`${API_URL}/api/user/details`, {
         });
     }
+    updateUserTheme(json) {
+        return axios.post(`${API_URL}/api/user/theme/${json}`, {}
+        );
+    }
 }
 export default new UserService()

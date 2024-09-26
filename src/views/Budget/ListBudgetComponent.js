@@ -631,7 +631,7 @@ class ListBudgetComponent extends Component {
         <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <div className="Card-header-addicon BudgetPlusIcon" style={{ marginTop: '13px' }}>
-            <span className="pl-0">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
+            <span className="pl-0 text-blackD">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
             <div className="card-header-actions">
               <div className="card-header-action">
                 {AuthenticationService.checkUserACL(this.state.programs.map(c => c.id.toString()), 'ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}

@@ -35,81 +35,81 @@ const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
 }
-const options = {
-  title: {
-    display: true,
-    text: i18n.t('static.dashboard.globalconsumption'),
-  },
-  scales: {
-    yAxes: [{
-      scaleLabel: {
-        display: true,
-        labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
-        fontColor: 'black'
-      },
-      stacked: true,
-      ticks: {
-        beginAtZero: true,
-        fontColor: 'black',
-        callback: function (value) {
-          var cell1 = value
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return x1 + x2;
-        }
-      }
-    }],
-    xAxes: [{
-      ticks: {
-        fontColor: 'black',
-      }
-    }]
-  },
-  annotation: {
-    annotations: [{
-      type: 'triangle',
-      drawTime: 'beforeDatasetsDraw',
-      scaleID: 'x-axis-0',
-      value: 'Mar-2020',
-      backgroundColor: 'rgba(0, 255, 0, 0.1)'
-    }],
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips,
-    callbacks: {
-      label: function (tooltipItem, data) {
-        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-        var cell1 = value
-        cell1 += '';
-        var x = cell1.split('.');
-        var x1 = x[0];
-        var x2 = x.length > 1 ? '.' + x[1] : '';
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-      }
-    }
-  },
-  maintainAspectRatio: false
-  ,
-  legend: {
-    display: true,
-    position: 'bottom',
-    labels: {
-      usePointStyle: true,
-      fontColor: 'black'
-    }
-  }
-}
+// const options = {
+//   title: {
+//     display: true,
+//     text: i18n.t('static.dashboard.globalconsumption'),
+//   },
+//   scales: {
+//     yAxes: [{
+//       scaleLabel: {
+//         display: true,
+//         labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
+//         fontColor: 'black'
+//       },
+//       stacked: true,
+//       ticks: {
+//         beginAtZero: true,
+//         fontColor: 'black',
+//         callback: function (value) {
+//           var cell1 = value
+//           cell1 += '';
+//           var x = cell1.split('.');
+//           var x1 = x[0];
+//           var x2 = x.length > 1 ? '.' + x[1] : '';
+//           var rgx = /(\d+)(\d{3})/;
+//           while (rgx.test(x1)) {
+//             x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//           }
+//           return x1 + x2;
+//         }
+//       }
+//     }],
+//     xAxes: [{
+//       ticks: {
+//         fontColor: 'black',
+//       }
+//     }]
+//   },
+//   annotation: {
+//     annotations: [{
+//       type: 'triangle',
+//       drawTime: 'beforeDatasetsDraw',
+//       scaleID: 'x-axis-0',
+//       value: 'Mar-2020',
+//       backgroundColor: 'rgba(0, 255, 0, 0.1)'
+//     }],
+//   },
+//   tooltips: {
+//     enabled: false,
+//     custom: CustomTooltips,
+//     callbacks: {
+//       label: function (tooltipItem, data) {
+//         let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+//         var cell1 = value
+//         cell1 += '';
+//         var x = cell1.split('.');
+//         var x1 = x[0];
+//         var x2 = x.length > 1 ? '.' + x[1] : '';
+//         var rgx = /(\d+)(\d{3})/;
+//         while (rgx.test(x1)) {
+//           x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//         }
+//         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+//       }
+//     }
+//   },
+//   maintainAspectRatio: false
+//   ,
+//   legend: {
+//     display: true,
+//     position: 'bottom',
+//     labels: {
+//       usePointStyle: true,
+//       fontColor: 'black'
+//     }
+//   }
+// }
 /**
  * Component for Global Consumption Report.
  */
@@ -122,6 +122,7 @@ class GlobalConsumption extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode: false,
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -291,7 +292,7 @@ class GlobalConsumption extends Component {
     }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(elt.planningUnitQty,0)]);
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(elt.planningUnitQty, 0)]);
     doc.addPage()
     startYtable = 80
     let content = {
@@ -722,6 +723,22 @@ class GlobalConsumption extends Component {
    * Calls the get countrys function on page load
    */
   componentDidMount() {
+    // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+
     this.getCountrys();
   }
   /**
@@ -754,6 +771,100 @@ class GlobalConsumption extends Component {
    * @returns {JSX.Element} - Global Consumption report table.
    */
   render() {
+
+    const { isDarkMode } = this.state;
+    const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
+    const options = {
+      title: {
+        display: true,
+        text: i18n.t('static.dashboard.globalconsumption'),
+        fontColor: fontColor
+      },
+      scales: {
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
+            fontColor: fontColor
+          },
+          stacked: true,
+          ticks: {
+            beginAtZero: true,
+            fontColor: fontColor,
+            callback: function (value) {
+              var cell1 = value
+              cell1 += '';
+              var x = cell1.split('.');
+              var x1 = x[0];
+              var x2 = x.length > 1 ? '.' + x[1] : '';
+              var rgx = /(\d+)(\d{3})/;
+              while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              }
+              return x1 + x2;
+            }
+          },
+          gridLines: {
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor
+          }
+        }],
+        xAxes: [{
+          ticks: {
+            fontColor: fontColor
+          },
+          gridLines: {
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor
+          }
+        }]
+      },
+      annotation: {
+        annotations: [{
+          type: 'triangle',
+          drawTime: 'beforeDatasetsDraw',
+          scaleID: 'x-axis-0',
+          value: 'Mar-2020',
+          backgroundColor: 'rgba(0, 255, 0, 0.1)'
+        }],
+      },
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+          }
+        }
+      },
+      maintainAspectRatio: false
+      ,
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          fontColor: fontColor
+        }
+      }
+    }
     const { planningUnits } = this.state;
     let planningUnitList = [];
     planningUnitList = planningUnits.length > 0
@@ -774,7 +885,7 @@ class GlobalConsumption extends Component {
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
-    const backgroundColor = [
+    const lightModeColors = [
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
       '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
@@ -783,6 +894,16 @@ class GlobalConsumption extends Component {
       '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
       '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
     ]
+    const darkModeColors = [
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+      '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+      '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+      '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+    ]
+    const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
     let localCountryList = [...new Set(this.state.consumptions.map(ele => (getLabelText(ele.realmCountry.label, this.state.lang))))];
     let consumptionSummerydata = [];
     var mainData = this.state.consumptions;
@@ -805,7 +926,7 @@ class GlobalConsumption extends Component {
     }
     const bar = {
       labels: [...new Set(this.state.consumptions.map(ele => (dateFormatterLanguage(ele.consumptionDateString1))))],
-      datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor[index] })),
+      datasets: consumptionSummerydata.map((item, index) => ({ stack: 1, label: localCountryList[index], data: item, backgroundColor: backgroundColor1[index] })),
     };
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -825,7 +946,27 @@ class GlobalConsumption extends Component {
           <div className="Card-header-reporticon">
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
-                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
+                  var curTheme = localStorage.getItem("theme");
+                  if (curTheme == "dark") {
+                    this.setState({
+                      isDarkMode: false
+                    }, () => {
+                      setTimeout(() => {
+                        this.exportPDF();
+                        if (curTheme == "dark") {
+                          this.setState({
+                            isDarkMode: true
+                          })
+                        }
+                      }, 0)
+                    })
+                  } else {
+                    this.exportPDF();
+                  }
+                }}
+
+                />
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               </a>
             </div>}
@@ -982,7 +1123,7 @@ class GlobalConsumption extends Component {
                                       {this.state.consumptions[idx].consumptionDateString}
                                     </td>
                                     <td >
-                                      {formatter(this.state.consumptions[idx].planningUnitQty,0)}
+                                      {formatter(this.state.consumptions[idx].planningUnitQty, 0)}
                                     </td>
                                   </tr>)
                               }

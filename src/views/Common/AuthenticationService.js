@@ -145,7 +145,7 @@ class AuthenticationService {
         } else if (!checkSite && sessionType === 'Online') {
             localStorage.setItem("sessionType", 'Offline')
         }
-        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/problemList/:programId/:calculate/:color/:message", "/report/problemList/:color/:message", "/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate", "/ApplicationDashboard/:id", "/ApplicationDashboard", "/ApplicationDashboard/:color/:message", "/ApplicationDashboard/:id/:color/:message", "/planningUnitSetting/listPlanningUnitSetting", "/dataset/versionSettings", "/dataset/importDataset", "/dataset/exportDataset", "/dataentry/consumptionDataEntryAndAdjustment", "/dataentry/consumptionDataEntryAndAdjustment/:color/:message", "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId", "/extrapolation/extrapolateData", "/extrapolation/extrapolateData/:planningUnitId", "/dataset/listTree", "/validation/modelingValidation", "/validation/productValidation", "/report/compareAndSelectScenario", "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId", "/forecastReport/forecastOutput", "/forecastReport/forecastOutput/:programId/:versionId", "/forecastReport/forecastSummary", "/forecastReport/forecastSummary/:programId/:versionId", "/report/compareVersion", "/dataSet/buildTree/tree/:treeId/:programId", "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId", "/dataSet/buildTree/", "/dataSet/buildTree/template/:templateId", "/accessDenied"];
+        var urlarr = ["/consumptionDetails", "/inventory/addInventory", "/inventory/addInventory/:programId/:versionId/:planningUnitId", "/shipment/shipmentDetails", "/shipment/shipmentDetails/:message", "/shipment/shipmentDetails/:programId/:versionId/:planningUnitId", "/program/importProgram", "/program/exportProgram", "/program/deleteLocalProgram", "/supplyPlan", "/supplyPlanFormulas", "/supplyPlan/:programId/:versionId/:planningUnitId", "/report/whatIf", "/report/stockStatus", "/report/problemList", "/report/problemList/:programId/:calculate/:color/:message", "/report/problemList/:color/:message", "/report/problemList/1/:programId/:calculate", "/report/productCatalog", "/report/stockStatusOverTime", "/report/stockStatusMatrix", "/report/stockStatusAcrossPlanningUnits", "/report/consumption", "/report/forecastOverTheTime", "/report/consumptionForecastErrorSupplyPlan", "/report/shipmentSummery", "/report/procurementAgentExport", "/report/annualShipmentCost", "/report/budgets", "/report/supplierLeadTimes", "/report/expiredInventory", "/report/costOfInventory", "/report/inventoryTurns", "/report/stockAdjustment", "/report/warehouseCapacity", "/supplyPlan/:programId/:planningUnitId/:expiryNo/:expiryDate", "/ApplicationDashboard/:id", "/ApplicationDashboard", "/ApplicationDashboard/:color/:message", "/ApplicationDashboard/:id/:color/:message", "/planningUnitSetting/listPlanningUnitSetting", "/dataset/versionSettings", "/dataset/importDataset", "/dataset/exportDataset", "/dataentry/consumptionDataEntryAndAdjustment", "/dataentry/consumptionDataEntryAndAdjustment/:color/:message", "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId", "/extrapolation/extrapolateData", "/extrapolation/extrapolateData/:planningUnitId", "/extrapolation/extrapolateData/:color/:message", "/dataset/listTree", "/validation/modelingValidation", "/validation/productValidation", "/report/compareAndSelectScenario", "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId", "/forecastReport/forecastOutput", "/forecastReport/forecastOutput/:programId/:versionId", "/forecastReport/forecastSummary", "/forecastReport/forecastSummary/:programId/:versionId", "/report/compareVersion", "/dataSet/buildTree/tree/:treeId/:programId", "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId", "/dataSet/buildTree/", "/dataSet/buildTree/template/:templateId", "/accessDenied"];
         if ((typeOfSession === 'Online' && checkSite) || (typeOfSession === 'Offline' && !checkSite) || (typeOfSession === 'Online' && !checkSite && urlarr.includes(url)) || (typeOfSession === 'Offline' && urlarr.includes(url))) {
             return true;
         } else {
@@ -205,6 +205,20 @@ class AuthenticationService {
         decryptedUser.language.languageCode = languageCode;
         localStorage.removeItem('user-' + decryptedCurUser);
         localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+    }
+
+    /**
+     * Updates the user's theme preference in local storage.
+     * @param {string} languageCode - The theme code to set for the user.
+     */
+    updateUserTheme(themeId) {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+        decryptedUser.defaultThemeId = themeId;
+        localStorage.removeItem('user-' + decryptedCurUser);
+        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+        }
     }
     /**
      * Sets up Axios interceptors to automatically add the Authorization header with the user's token for authenticated requests.
@@ -1194,6 +1208,11 @@ class AuthenticationService {
                         break;
                     case "/extrapolation/extrapolateData":
                     case "/extrapolation/extrapolateData/:planningUnitId":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/extrapolation/extrapolateData/:color/:message":
                         if (bfunction.includes("ROLE_BF_EXTRAPOLATION") || bfunction.includes("ROLE_BF_VIEW_EXTRAPOLATION")) {
                             return true;
                         }

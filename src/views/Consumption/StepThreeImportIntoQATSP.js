@@ -387,6 +387,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
      * Handles various error scenarios, such as network errors and authentication failures.
      */
     filterData() {
+        document.getElementById("stepThreeImportBtn").disabled = this.props.items.isForecastOver;
+
         var realmId = AuthenticationService.getRealmId();
         var db1;
         getDatabase();
@@ -868,7 +870,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                     </ul>
                 </div>
-                <p style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
+                <p className='DarkThColr' style={{ display: this.props.items.loading ? "none" : "block" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.notes')}</i></p>
                 <div className="consumptionDataEntryTable">
                     <div id="mapImport" style={{ display: this.props.items.loading ? "none" : "block" }}>
                     </div>
@@ -883,7 +885,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     </div>
                 </div>
                 <FormGroup>
-                    <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
+                    <Button color="success" size="md" className="float-right mr-1" id="stepThreeImportBtn" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
+                    <span class="red float-right " style={{marginTop: '7px', marginRight: '5px', display: this.props.items.isForecastOver ? "block" : "none"}}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.forecastRestrictionNotes')}</i></span>
                     &nbsp;
                     <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                     &nbsp;

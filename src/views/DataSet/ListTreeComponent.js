@@ -155,8 +155,8 @@ export default class ListTreeComponent extends Component {
         this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
     }
     /**
-     * Hides the message in div3 after 30 seconds.
-     */
+   * Hides the message in div3 after 30 seconds.
+   */
     hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
@@ -2546,12 +2546,12 @@ export default class ListTreeComponent extends Component {
      * Calls getPrograms,getTreeTemplateList,getForecastMethodList and procurementAgentList functions on component mount
      */
     componentDidMount() {
-        let hasRole = AuthenticationService.checkUserACLBasedOnRoleId(this.state.datasetId.toString.split("_")[0].map(c.toString()), "ROLE_FORECAST_VIEWER");
-        // AuthenticationService.getLoggedInUserRole().map(c => {
-        //     if (c.roleId == 'ROLE_FORECAST_VIEWER') {
-        //         hasRole = true;
-        //     }
-        // });
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
         this.setState({ onlyDownloadedProgram: !hasRole })
         hideFirstComponent();
         this.getPrograms();
@@ -2585,6 +2585,9 @@ export default class ListTreeComponent extends Component {
             })
         }
     }
+    /**
+     * Toggle modal for copy or delete tree
+     */
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -2664,7 +2667,7 @@ export default class ListTreeComponent extends Component {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
             } else {
-                if (AuthenticationService.checkUserACL(this.state.treeEl.getValueFromCoords(8, x).map(c.toString()), 'ROLE_BF_EDIT_TREE') || AuthenticationService.checkUserACL(this.state.treeEl.getValueFromCoords(8, x).map(c.toString()), 'ROLE_BF_VIEW_TREE')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE')) {
                     var treeId = this.state.treeEl.getValueFromCoords(0, x);
                     var programId = this.state.treeEl.getValueFromCoords(8, x);
                     var isLocal = this.state.treeEl.getValueFromCoords(13, x);
@@ -2807,6 +2810,7 @@ export default class ListTreeComponent extends Component {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
+            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         });
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
@@ -2877,7 +2881,7 @@ export default class ListTreeComponent extends Component {
                                 </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_ADD_TREE') && this.state.datasetId != 0 && this.state.versionId.toString().includes("(Local)") &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') && this.state.datasetId != 0 && this.state.versionId.toString().includes("(Local)") &&
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                                 <div className="controls SelectGo">
                                                     <InputGroup>
@@ -2960,7 +2964,7 @@ export default class ListTreeComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        {AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_DOWNLOAD_PROGARM') &&
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
                             <FormGroup className="col-md-3" style={{ marginTop: '45px' }}>
                                 <div className="tab-ml-1 ml-lg-3">
                                     <Input
@@ -2980,7 +2984,7 @@ export default class ListTreeComponent extends Component {
                             </FormGroup>
                         }
                         <div className="listtreetable consumptionDataEntryTable">
-                            <div id="tableDiv" className={checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -3218,7 +3222,7 @@ export default class ListTreeComponent extends Component {
                                                         {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
                                                         {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
                                                         {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
-                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong className='text-blackD'>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
                                                         &nbsp;
                                                     </FormGroup>
                                                 </div>

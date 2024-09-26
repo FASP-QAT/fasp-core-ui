@@ -436,8 +436,6 @@ class EditBudgetComponent extends Component {
             return '?'
         }
         const { fundingSources } = this.state;
-        console.log("fundingSources Test@123", fundingSources);
-        console.log("Selected Program Ids Test@123", selectedProgramIds)
         let fundingSourceList = fundingSources.length > 0 && fundingSources.filter(item => {
             // Check if the funding source is available in at least one of the selected programs
             return selectedProgramIds.some(programId =>

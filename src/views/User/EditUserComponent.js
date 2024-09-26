@@ -47,6 +47,7 @@ const entityname = i18n.t("static.user.user");
  * @param {*} values 
  * @returns 
  */
+
 const validationSchema = function (values) {
   return Yup.object().shape({
     username: Yup.string()
@@ -75,6 +76,7 @@ const validationSchema = function (values) {
       .required(i18n.t("static.user.org&CountryText")),
   });
 };
+
 /**
  * This component is used to display the user details in a form and allow user to edit the details
  */

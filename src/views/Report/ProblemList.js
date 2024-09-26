@@ -732,7 +732,7 @@ export default class ProblemList extends React.Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.problemType') + ' : ' + document.getElementById("problemTypeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.problemActionReport.problemCategory') + ' , ' + document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.problemActionReport.problemCategory') + ' : ' + document.getElementById("problemCategoryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -751,12 +751,12 @@ export default class ProblemList extends React.Component {
         var A = [this.addDoubleQuoteToRowContent(headers)];
         this.state.data.map(
             ele => A.push(this.addDoubleQuoteToRowContent([
-                getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20'),
+                getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 (ele.problemType.id == 1 ? getLabelText(ele.problemCategory.label, this.state.lang) : (ele.realmProblem.criticality.id == 1 ? this.state.problemCategoryList.filter(c => c.id == 4)[0].name : (ele.realmProblem.criticality.id == 2 ? this.state.problemCategoryList.filter(c => c.id == 5)[0].name : this.state.problemCategoryList.filter(c => c.id == 6)[0].name))).replaceAll(' ', '%20'),
-                getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20'),
-                getSuggestion(ele, this.state.lang).replaceAll(' ', '%20'),
+                getProblemDesc(ele, this.state.lang).replaceAll(' ', '%20').replaceAll('#', '%23'),
+                getSuggestion(ele, this.state.lang).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 getLabelText(ele.problemStatus.label, this.state.lang).replaceAll(' ', '%20'),
-                this.getNote(ele, this.state.lang) == null ? "" : this.getNote(ele, this.state.lang).replaceAll(' ', '%20'),
+                this.getNote(ele, this.state.lang) == null ? "" : this.getNote(ele, this.state.lang).replaceAll(' ', '%20').replaceAll('#', '%23'),
                 ele.reviewed == false ? i18n.t('static.program.no') : i18n.t('static.program.yes'),
                 ele.reviewNotes == null ? '' : (ele.reviewNotes).replaceAll(' ', '%20'),
                 (ele.reviewedDate == "" || ele.reviewedDate == null) ? '' : moment(ele.reviewedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`).replaceAll(' ', '%20'),
