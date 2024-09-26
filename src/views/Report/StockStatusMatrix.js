@@ -39,7 +39,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { addDoubleQuoteToRowContent, filterOptions, formatter, roundAMC, roundN, roundNMOS } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, formatterMOS, roundAMC, roundN, roundNMOS } from "../../CommonComponent/JavascriptCommonFunctions";
 const { RangePicker } = DatePicker;
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
@@ -1990,144 +1990,144 @@ export default class StockStatusMatrix extends React.Component {
       ele.planBasedOn == 1
         ? i18n.t("static.report.mos")
         : i18n.t("static.report.qty"),
-      formatter(ele.minMonthsOfStock, 1),
+      formatterMOS(ele.minMonthsOfStock, 1),
       ele.planBasedOn == 1
-        ? formatter(
+        ? formatterMOS(
           Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
           , 0)
-        : formatter(roundAMC(ele.maxStock), 0),
+        : formatterMOS(roundAMC(ele.maxStock), 0),
       ele.year,
       ele.planBasedOn == 1
         ? ele.jan != null
           ? isNaN(ele.jan)
             ? ""
-            : formatter(ele.jan, 1)
+            : formatterMOS(ele.jan, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.janStock != null
           ? isNaN(ele.janStock)
             ? ""
-            : formatter(ele.janStock, 1)
+            : formatterMOS(ele.janStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.feb != null
           ? isNaN(ele.feb)
             ? ""
-            : formatter(ele.feb, 1)
+            : formatterMOS(ele.feb, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.febStock != null
           ? isNaN(ele.febStock)
             ? ""
-            : formatter(ele.febStock, 1)
+            : formatterMOS(ele.febStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.mar != null
           ? isNaN(ele.mar)
             ? ""
-            : formatter(ele.mar, 1)
+            : formatterMOS(ele.mar, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.marStock != null
           ? isNaN(ele.marStock)
             ? ""
-            : formatter(ele.marStock, 1)
+            : formatterMOS(ele.marStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.apr != null
           ? isNaN(ele.apr)
             ? ""
-            : formatter(ele.apr, 1)
+            : formatterMOS(ele.apr, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.aprStock != null
           ? isNaN(ele.aprStock)
             ? ""
-            : formatter(ele.aprStock, 1)
+            : formatterMOS(ele.aprStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.may != null
           ? isNaN(ele.may)
             ? ""
-            : formatter(ele.may, 1)
+            : formatterMOS(ele.may, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.mayStock != null
           ? isNaN(ele.mayStock)
             ? ""
-            : formatter(ele.mayStock, 1)
+            : formatterMOS(ele.mayStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.jun != null
           ? isNaN(ele.jun)
             ? ""
-            : formatter(ele.jun, 1)
+            : formatterMOS(ele.jun, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.junStock != null
           ? isNaN(ele.junStock)
             ? ""
-            : formatter(ele.junStock, 1)
+            : formatterMOS(ele.junStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.jul != null
           ? isNaN(ele.jul)
             ? ""
-            : formatter(ele.jul, 1)
+            : formatterMOS(ele.jul, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.julStock != null
           ? isNaN(ele.julStock)
             ? ""
-            : formatter(ele.julStock, 1)
+            : formatterMOS(ele.julStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.aug != null
           ? isNaN(ele.aug)
             ? ""
-            : formatter(ele.aug, 1)
+            : formatterMOS(ele.aug, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.augStock != null
           ? isNaN(ele.augStock)
             ? ""
-            : formatter(ele.augStock, 1)
+            : formatterMOS(ele.augStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.sep != null
           ? isNaN(ele.sep)
             ? ""
-            : formatter(ele.sep, 1)
+            : formatterMOS(ele.sep, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.sepStock != null
           ? isNaN(ele.sepStock)
             ? ""
-            : formatter(ele.sepStock, 1)
+            : formatterMOS(ele.sepStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.oct != null
           ? isNaN(ele.oct)
             ? ""
-            : formatter(ele.oct, 1)
+            : formatterMOS(ele.oct, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.octStock != null
           ? isNaN(ele.octStock)
             ? ""
-            : formatter(ele.octStock, 1)
+            : formatterMOS(ele.octStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.nov != null
           ? isNaN(ele.nov)
             ? ""
-            : formatter(ele.nov, 1)
+            : formatterMOS(ele.nov, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.novStock != null
           ? isNaN(ele.novStock)
             ? ""
-            : formatter(ele.novStock, 1)
+            : formatterMOS(ele.novStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
       ele.planBasedOn == 1
         ? ele.dec != null
           ? isNaN(ele.dec)
             ? ""
-            : formatter(ele.dec, 1)
+            : formatterMOS(ele.dec, 1)
           : i18n.t("static.supplyPlanFormula.na")
         : ele.decStock != null
           ? isNaN(ele.decStock)
             ? ""
-            : formatter(ele.decStock, 1)
+            : formatterMOS(ele.decStock, 1)
           : i18n.t("static.supplyPlanFormula.na"),
     ]);
     const cellStyle = (
@@ -2735,15 +2735,15 @@ export default class StockStatusMatrix extends React.Component {
                                 : i18n.t("static.report.qty")}
                             </td>
                             <td className="text-center">
-                              {formatter(ele.minMonthsOfStock, 0)}
+                              {formatterMOS(ele.minMonthsOfStock, 0)}
                             </td>
                             <td className="text-center">
                               {ele.planBasedOn == 1
-                                ? formatter(
+                                ? formatterMOS(
                                   Number(ele.minMonthsOfStock) +
                                   Number(ele.reorderFrequency)
                                   , 0)
-                                : formatter(
+                                : formatterMOS(
                                   roundAMC(ele.maxStock)
                                   , 0)}
                             </td>
@@ -2762,12 +2762,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.jan)
                                   ? ""
                                   : ele.jan != null
-                                    ? formatter(ele.jan, 1)
+                                    ? formatterMOS(ele.jan, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.janStock)
                                   ? ""
                                   : ele.janStock != null
-                                    ? formatter(ele.janStock, 1)
+                                    ? formatterMOS(ele.janStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2785,12 +2785,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.feb)
                                   ? ""
                                   : ele.feb != null
-                                    ? formatter(ele.feb, 1)
+                                    ? formatterMOS(ele.feb, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.febStock)
                                   ? ""
                                   : ele.febStock != null
-                                    ? formatter(ele.febStock, 1)
+                                    ? formatterMOS(ele.febStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2808,12 +2808,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.mar)
                                   ? ""
                                   : ele.mar != null
-                                    ? formatter(ele.mar, 1)
+                                    ? formatterMOS(ele.mar, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.marStock)
                                   ? ""
                                   : ele.marStock != null
-                                    ? formatter(ele.marStock, 1)
+                                    ? formatterMOS(ele.marStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2831,12 +2831,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.apr)
                                   ? ""
                                   : ele.apr != null
-                                    ? formatter(ele.apr, 1)
+                                    ? formatterMOS(ele.apr, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.aprStock)
                                   ? ""
                                   : ele.aprStock != null
-                                    ? formatter(ele.aprStock, 1)
+                                    ? formatterMOS(ele.aprStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2854,12 +2854,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.may)
                                   ? ""
                                   : ele.may != null
-                                    ? formatter(ele.may, 1)
+                                    ? formatterMOS(ele.may, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.mayStock)
                                   ? ""
                                   : ele.mayStock != null
-                                    ? formatter(ele.mayStock, 1)
+                                    ? formatterMOS(ele.mayStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2877,12 +2877,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.jun)
                                   ? ""
                                   : ele.jun != null
-                                    ? formatter(ele.jun, 1)
+                                    ? formatterMOS(ele.jun, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.junStock)
                                   ? ""
                                   : ele.junStock != null
-                                    ? formatter(ele.junStock, 1)
+                                    ? formatterMOS(ele.junStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2900,12 +2900,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.jul)
                                   ? ""
                                   : ele.jul != null
-                                    ? formatter(ele.jul, 1)
+                                    ? formatterMOS(ele.jul, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.julStock)
                                   ? ""
                                   : ele.julStock != null
-                                    ? formatter(ele.julStock, 1)
+                                    ? formatterMOS(ele.julStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2923,12 +2923,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.aug)
                                   ? ""
                                   : ele.aug != null
-                                    ? formatter(ele.aug, 1)
+                                    ? formatterMOS(ele.aug, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.augStock)
                                   ? ""
                                   : ele.augStock != null
-                                    ? formatter(ele.augStock, 1)
+                                    ? formatterMOS(ele.augStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2946,12 +2946,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.sep)
                                   ? ""
                                   : ele.sep != null
-                                    ? formatter(ele.sep, 1)
+                                    ? formatterMOS(ele.sep, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.sepStock)
                                   ? ""
                                   : ele.sepStock != null
-                                    ? formatter(ele.sepStock, 1)
+                                    ? formatterMOS(ele.sepStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2969,12 +2969,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.oct)
                                   ? ""
                                   : ele.oct != null
-                                    ? formatter(ele.oct, 1)
+                                    ? formatterMOS(ele.oct, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.octStock)
                                   ? ""
                                   : ele.octStock != null
-                                    ? formatter(ele.octStock, 1)
+                                    ? formatterMOS(ele.octStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -2992,12 +2992,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.nov)
                                   ? ""
                                   : ele.nov != null
-                                    ? formatter(ele.nov, 1)
+                                    ? formatterMOS(ele.nov, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.novStock)
                                   ? ""
                                   : ele.novStock != null
-                                    ? formatter(ele.novStock, 1)
+                                    ? formatterMOS(ele.novStock, 1)
                                     : ""}
                             </td>
                             <td
@@ -3015,12 +3015,12 @@ export default class StockStatusMatrix extends React.Component {
                                 ? isNaN(ele.dec)
                                   ? ""
                                   : ele.dec != null
-                                    ? formatter(ele.dec, 1)
+                                    ? formatterMOS(ele.dec, 1)
                                     : i18n.t("static.supplyPlanFormula.na")
                                 : isNaN(ele.decStock)
                                   ? ""
                                   : ele.decStock != null
-                                    ? formatter(ele.decStock, 1)
+                                    ? formatterMOS(ele.decStock, 1)
                                     : ""}
                             </td>
                           </tr>
