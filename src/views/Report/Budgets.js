@@ -34,7 +34,7 @@ const pickerLang = {
 /**
  * Component for Expired Inventory Report.
  */
-class Budgets extends Component {  
+class Budgets extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
@@ -42,7 +42,7 @@ class Budgets extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
-            isDarkMode:false,
+            isDarkMode: false,
             budgetList: [],
             lang: localStorage.getItem('lang'),
             message: '',
@@ -71,8 +71,8 @@ class Budgets extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.buildJexcel = this.buildJexcel.bind(this);
     }
-    
-    
+
+
 
     /**
      * Handles the dismiss of the range picker component.
@@ -100,7 +100,7 @@ class Budgets extends Component {
         let programIds = this.state.programValues.map((ele) =>
             Number(ele.value)
         );
-                DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
+        DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
             .then(response => {
                 if (response.status == 200) {
                     var fundingSourceTypeValues = [];
@@ -119,7 +119,7 @@ class Budgets extends Component {
                         fundingSourceTypes: fundingSourceTypes, loading: false,
                         fundingSourceTypeValues: fundingSourceTypeValues,
                         fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
-                    },()=>{
+                    }, () => {
                         this.filterData();
                     })
                 } else {
@@ -218,9 +218,9 @@ class Budgets extends Component {
     getFundingSource = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let programIds = this.state.programValues.map((ele) =>
-            Number(ele.value)
-        );
-                DropdownService.getFundingSourceForProgramsDropdownList(programIds)
+                Number(ele.value)
+            );
+            DropdownService.getFundingSourceForProgramsDropdownList(programIds)
                 .then(response => {
                     var fundingSourceValues = [];
                     var fundingSources = response.data;
@@ -561,20 +561,19 @@ class Budgets extends Component {
     componentDidMount() {
         this.getPrograms();
         // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
-        
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
     }
     /**
      * Formats a numerical value into a string with thousands separators.
@@ -609,94 +608,94 @@ observer.observe(document.documentElement, {
     render() {
 
 
-const darkModeColors = [
-    '#d4bbff', // Color 1 
-];
+        const darkModeColors = [
+            '#d4bbff', // Color 1 
+        ];
 
-const lightModeColors = [
-    '#002F6C',  // Color 1
-];
-const { isDarkMode } = this.state;
-const colors = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+        ];
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
-const chartoptions =
-{
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.budget'),
-        fontColor:fontColor
-    },
-    scales: {
-        yAxes: [{
-            id: 'A',
-            position: 'left',
-            scaleLabel: {
+        const chartoptions =
+        {
+            title: {
                 display: true,
-                fontSize: "12",
-                fontColor:fontColor
+                text: i18n.t('static.dashboard.budget'),
+                fontColor: fontColor
             },
-            ticks: {
-                beginAtZero: true,
-                fontColor:fontColor
+            scales: {
+                yAxes: [{
+                    id: 'A',
+                    position: 'left',
+                    scaleLabel: {
+                        display: true,
+                        fontSize: "12",
+                        fontColor: fontColor
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        fontColor: fontColor
+                    },
+                    gridLines: {
+                        drawBorder: true,
+                        lineWidth: 1,
+                        color: gridLineColor
+                    },
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.supplyPlan.amountInUSD'),
+                        fontColor: fontColor,
+                        fontStyle: "normal",
+                        fontSize: "12"
+                    },
+                    ticks: {
+                        fontColor: fontColor,
+                        callback: function (value) {
+                            if (value != null) {
+                                return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                            }
+                        }
+                    },
+                    gridLines: {
+                        drawBorder: true,
+                        lineWidth: 1,
+                        color: gridLineColor
+                    },
+                }]
             },
-            gridLines: {
-                drawBorder: true, 
-                lineWidth: 1,
-                color: gridLineColor
-            },
-        }],
-        xAxes: [{
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.supplyPlan.amountInUSD'),
-                fontColor:fontColor,
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                fontColor:fontColor,
-                callback: function (value) {
-                    if (value != null) {
-                        return Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     }
                 }
             },
-            gridLines: {
-                drawBorder: true, 
-                lineWidth: 1,
-                color: gridLineColor
+            hover: {
+                mode: 'index',
+                intersect: false
             },
-        }]
-    },
-    tooltips: {
-        mode: 'index',
-        intersect: false,
-        enabled: false,
-        custom: CustomTooltips,
-        callbacks: {
-            label: function (tooltipItem, data) {
-                let label = data.labels[tooltipItem.index];
-                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + Math.floor(value).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            maintainAspectRatio: false,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: fontColor
+                }
             }
         }
-    },
-    hover: {
-        mode: 'index',
-        intersect: false
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor:fontColor
-        }
-    }
-}
         const { programs } = this.state;
         let programList = programs.length > 0
             && programs.map((item, i) => {

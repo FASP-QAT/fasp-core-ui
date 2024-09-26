@@ -37,7 +37,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, round, roundN } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, round, roundN, roundNMOS } from "../../CommonComponent/JavascriptCommonFunctions.js";
 const ref = React.createRef();
 const pickerLang = {
   months: [
@@ -245,7 +245,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           round(p.amc),
           round(p.finalClosingBalance),
           p.mos != null
-            ? roundN(p.mos)
+            ? roundNMOS(p.mos)
             : i18n.t("static.supplyPlanFormula.na"),
           p.minMos,
           p.maxMos,
@@ -271,20 +271,20 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
    * @returns {Object} - An object representing the cell's background color based on the MOS thresholds.
    */
   cellstyleWithData = (item) => {
-    if (item.mos != null && roundN(item.mos) == 0) {
+    if (item.mos != null && (item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color };
     } else if (
-      roundN(item.mos) != 0 &&
-      roundN(item.mos) != null &&
-      roundN(item.mos) < item.minMos
+      (item.mos) != 0 &&
+      (item.mos) != null &&
+      (item.mos) < item.minMos
     ) {
       return { backgroundColor: legendcolor[1].color };
     } else if (
-      roundN(item.mos) >= item.minMos &&
-      roundN(item.mos) <= item.maxMos
+      (item.mos) >= item.minMos &&
+      (item.mos) <= item.maxMos
     ) {
       return { backgroundColor: legendcolor[2].color };
-    } else if (roundN(item.mos) > item.maxMos) {
+    } else if ((item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color };
     } else if (item.mos == null) {
       return { backgroundColor: legendcolor[4].color };
@@ -561,7 +561,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         formatter(round(p.amc), 0),
         formatter(round(p.finalClosingBalance), 0),
         p.mos != null
-          ? formatter(roundN(p.mos), 0)
+          ? formatter(roundNMOS(p.mos), 0)
           : i18n.t("static.supplyPlanFormula.na"),
         p.minMos,
         p.maxMos,
@@ -1563,7 +1563,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                                 {item.programData.filter(
                                                   (c) => c.program.code == ele1
                                                 )[0].mos != null
-                                                  ? roundN(
+                                                  ? roundNMOS(
                                                     item.programData.filter(
                                                       (c) =>
                                                         c.program.code == ele1

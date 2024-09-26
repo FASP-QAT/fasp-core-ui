@@ -1594,8 +1594,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   /**
    * Calls getDatasetList function on component mount
    */
-  componentDidMount() {
-    //to restrict calender max date to current Date - 36 months
+  componentDidMount() {//to restrict calender max date to current Date - 36 months
     let currDate = Date.now();
     let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
     let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };

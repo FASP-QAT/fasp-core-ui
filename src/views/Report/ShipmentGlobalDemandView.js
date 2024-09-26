@@ -34,7 +34,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, makeText, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
  const pickerLang = {
      months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -2053,13 +2053,13 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
-                data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
+                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.orderedShipmentQty,1))),
                 backgroundColor: '#0067B9',
                 borderWidth: 0
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
-                data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
+                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.plannedShipmentQty,1))),
                 backgroundColor: '#A7C6ED',
                 borderWidth: 0,
             }

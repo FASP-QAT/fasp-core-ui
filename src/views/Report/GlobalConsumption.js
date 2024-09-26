@@ -29,7 +29,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText, roundARU, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -122,7 +122,7 @@ class GlobalConsumption extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
-      isDarkMode:false,
+      isDarkMode: false,
       dropdownOpen: false,
       radioSelected: 2,
       lang: localStorage.getItem('lang'),
@@ -181,7 +181,7 @@ class GlobalConsumption extends Component {
     var A = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
     re = this.state.consumptions
     for (var item = 0; item < re.length; item++) {
-      A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), re[item].planningUnitQty])])
+      A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -292,7 +292,7 @@ class GlobalConsumption extends Component {
     }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
     const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(elt.planningUnitQty,0)]);
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]);
     doc.addPage()
     startYtable = 80
     let content = {
@@ -477,7 +477,7 @@ class GlobalConsumption extends Component {
               let json = {
                 "realmCountry": countryConsumption[j].country,
                 "consumptionDate": tempConsumptionData[i].transDate,
-                "planningUnitQty": roundN2((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
+                "planningUnitQty": ((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
                 "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
@@ -724,19 +724,19 @@ class GlobalConsumption extends Component {
    */
   componentDidMount() {
     // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
 
 
     this.getCountrys();
@@ -773,27 +773,27 @@ observer.observe(document.documentElement, {
   render() {
 
     const { isDarkMode } = this.state;
-const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+    const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     const options = {
       title: {
         display: true,
         text: i18n.t('static.dashboard.globalconsumption'),
-        fontColor:fontColor
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
-            fontColor:fontColor
+            fontColor: fontColor
           },
           stacked: true,
           ticks: {
             beginAtZero: true,
-            fontColor:fontColor,
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -811,19 +811,19 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             color: gridLineColor,
             drawBorder: true,
             lineWidth: 0,
-            zeroLineColor: gridLineColor 
-        }
+            zeroLineColor: gridLineColor
+          }
         }],
         xAxes: [{
           ticks: {
-            fontColor:fontColor
+            fontColor: fontColor
           },
           gridLines: {
             color: gridLineColor,
             drawBorder: true,
             lineWidth: 0,
-            zeroLineColor: gridLineColor 
-        }
+            zeroLineColor: gridLineColor
+          }
         }]
       },
       annotation: {
@@ -861,7 +861,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor:fontColor
+          fontColor: fontColor
         }
       }
     }
@@ -947,26 +947,26 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
+                  var curTheme = localStorage.getItem("theme");
+                  if (curTheme == "dark") {
                     this.setState({
-                        isDarkMode: true
+                      isDarkMode: false
+                    }, () => {
+                      setTimeout(() => {
+                        this.exportPDF();
+                        if (curTheme == "dark") {
+                          this.setState({
+                            isDarkMode: true
+                          })
+                        }
+                      }, 0)
                     })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
+                  } else {
+                    this.exportPDF();
+                  }
+                }}
 
- />
+                />
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               </a>
             </div>}
@@ -1129,7 +1129,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                       {this.state.consumptions[idx].consumptionDateString}
                                     </td>
                                     <td >
-                                      {formatter(this.state.consumptions[idx].planningUnitQty,0)}
+                                      {formatter(roundARU(this.state.consumptions[idx].planningUnitQty,1), 0)}
                                     </td>
                                   </tr>)
                               }

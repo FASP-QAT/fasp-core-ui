@@ -201,6 +201,7 @@ export function makeText(m) {
  */
 export function roundAMC(amc) {
   if (amc != null) {
+    if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
     if (Number(amc).toFixed(0) >= 100) {
       return Number(amc).toFixed(0);
     } else if (Number(amc).toFixed(1) >= 10) {
@@ -210,6 +211,9 @@ export function roundAMC(amc) {
     } else {
       return Number(amc).toFixed(3);
     }
+  }else{
+    return Number(amc).toFixed(0);
+  }
   } else {
     return null;
   }
@@ -336,7 +340,7 @@ export function PercentageFormatter(num) {
    * @param {string} filter - The filter string to apply.
    * @returns {Array} - The filtered array of options.
    */
-export async function filterOptions(options, filter){
+export async function filterOptions(options, filter) {
   if (filter) {
     return options.filter((i) =>
       i.label.toLowerCase().includes(filter.toLowerCase())
@@ -351,22 +355,51 @@ export async function filterOptions(options, filter){
  * @returns This function returns the rounded values in terms of ARU
  */
 export function roundARU(value, multiplier) {
-  if (multiplier != 1) {
+  // if (multiplier != 1) {
+  if (value != i18n.t('static.supplyPlan.notAllRegionsHaveActualStock')) {
     if (value != null && value !== "") {
       var aruValue = Number(value) / Number(multiplier);
-      if (Number(aruValue).toFixed(0) >= 100) {
-        return Number(aruValue).toFixed(0);
-      } else if (Number(aruValue).toFixed(1) >= 10) {
-        return Number(aruValue).toFixed(1);
-      } else if (Number(aruValue).toFixed(2) >= 1) {
-        return Number(aruValue).toFixed(2);
+      if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
+        if (Math.abs(Number(aruValue).toFixed(0)) >= 100) {
+          return Number(aruValue).toFixed(0);
+        } else if (Math.abs(Number(aruValue).toFixed(1)) >= 10) {
+          return Number(aruValue).toFixed(1);
+        } else if (Math.abs(Number(aruValue).toFixed(2)) >= 1) {
+          return Number(aruValue).toFixed(2);
+        } else {
+          return Number(aruValue).toFixed(3);
+        }
       } else {
-        return Number(aruValue).toFixed(3);
+        return Number(aruValue).toFixed(0);
       }
     } else {
       return "";
     }
   } else {
     return value;
+  }
+  // } else {
+  //   return value;
+  // }
+}
+
+/**
+ * Rounds a number to 1 decimal place.
+ * @param {number} num - The number to be rounded.
+ * @returns {string} - The rounded number with 1 decimal place as a string.
+ */
+export function roundNMOS(num) {
+  if (num == null) {
+    return "";
+  } else {
+    if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {   
+    return parseFloat(
+      Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)
+    ).toFixed(1);
+  }else{
+    return parseFloat(
+      Math.round(num * Math.pow(10, 1)) / Math.pow(10, 1)
+    ).toFixed(0);
+  }
   }
 }

@@ -49,7 +49,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
-                (instance).setValueFromCoords(8, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*R${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(8, data[i].y, `=ROUND(G${parseInt(data[i].y) + 1}*R${parseInt(data[i].y) + 1},8)`, true);
                 var index = (instance).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     (instance).setValueFromCoords(12, data[i].y, "", true);
@@ -113,7 +113,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 6 && !isNaN(rowData[6]) && rowData[6].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(6, y, parseFloat(rowData[6]), true);
+            elInstance.setValueFromCoords(6, y, Math.round(Number(rowData[6])), true);
         } else if (x == 9 && !isNaN(rowData[9]) && rowData[9].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(9, y, parseFloat(rowData[9]), true);
         }
@@ -267,7 +267,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             data[5] = consumptionList[j].realmCountryPlanningUnit.id; 
                             data[6] = Math.round(consumptionList[j].consumptionRcpuQty); 
                             data[7] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                            data[8] = `=ROUND(G${parseInt(j) + 1}*R${parseInt(j) + 1},0)`; 
+                            data[8] = `=ROUND(G${parseInt(j) + 1}*R${parseInt(j) + 1},8)`; 
                             data[9] = consumptionList[j].dayOfStockOut;
                             if (consumptionList[j].notes === null || ((consumptionList[j].notes) == "NULL")) {
                                 data[10] = "";
@@ -305,7 +305,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             data[5] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
                             data[6] = ""; 
                             data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";
-                            data[8] = `=ROUND(G${parseInt(0) + 1}*R${parseInt(0) + 1},0)`; 
+                            data[8] = `=ROUND(G${parseInt(0) + 1}*R${parseInt(0) + 1},8)`; 
                             data[9] = "";
                             data[10] = "";
                             data[11] = true;
@@ -711,7 +711,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[5] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
         data[6] = ""; 
         data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ""; 
-        data[8] = `=ROUND(G${parseInt(json.length) + 1}*R${parseInt(json.length) + 1},0)`; 
+        data[8] = `=ROUND(G${parseInt(json.length) + 1}*R${parseInt(json.length) + 1},8)`; 
         data[9] = "";
         data[10] = "";
         data[11] = true;
@@ -1729,7 +1729,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                     consumptionDataList[parseInt(map.get("13"))].realmCountryPlanningUnit.label = (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("5"))[0].label;
                                     consumptionDataList[parseInt(map.get("13"))].multiplier = map.get("17");
                                     consumptionDataList[parseInt(map.get("13"))].consumptionRcpuQty = (elInstance.getValue(`G${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
-                                    consumptionDataList[parseInt(map.get("13"))].consumptionQty = (elInstance.getValue(`I${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
+                                    consumptionDataList[parseInt(map.get("13"))].consumptionQty = Number(Number((elInstance.getValue(`G${parseInt(i) + 1}`, true)).toString().replaceAll("\,", ""))*Number(map.get("17"))).toFixed(8);
                                     consumptionDataList[parseInt(map.get("13"))].dayOfStockOut = (elInstance.getValue(`J${parseInt(i) + 1}`, true)).toString().replaceAll("\,", "");
                                     consumptionDataList[parseInt(map.get("13"))].notes = map.get("10");
                                     consumptionDataList[parseInt(map.get("13"))].actualFlag = actualFlag;
@@ -1760,7 +1760,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                         },
                                         consumptionDate: moment(map.get("1")).startOf('month').format("YYYY-MM-DD"),
                                         consumptionRcpuQty: elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
-                                        consumptionQty: (elInstance.getValue(`I${parseInt(i) + 1}`, true)).toString().replaceAll("\,", ""),
+                                        consumptionQty: Number(Number((elInstance.getValue(`G${parseInt(i) + 1}`, true)).toString().replaceAll("\,", ""))*Number(map.get("17"))).toFixed(8),
                                         dayOfStockOut: elInstance.getValue(`J${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
                                         active: map.get("11"),
                                         realmCountryPlanningUnit: {

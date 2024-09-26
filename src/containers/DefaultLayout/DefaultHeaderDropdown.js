@@ -15,6 +15,7 @@ import image6 from '../../assets/img/avatars/6.jpg';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
+import { Switch } from '@material-ui/core';
 
 const propTypes = {
   notif: PropTypes.bool,
@@ -191,6 +192,22 @@ class DefaultHeaderDropdown extends Component {
   applyDarkTheme() {
     setDark();
   }
+  handleDefaultRounding(e){
+    var showDecimals=e.target.checked;
+    localStorage.setItem("roundingEnabled",!(showDecimals));
+    AuthenticationService.updateUserTheme(1);
+    if (localStorage.getItem("sessionType") === 'Online') {
+      AuthenticationService.setupAxiosInterceptors();
+      UserService.updateUserDecimalPreference(showDecimals)
+        .then(response => {
+        }).catch(
+          error => {
+          })
+    }
+    setTimeout(() => {
+      window.location.reload(false);
+    }, 0);
+  }
   /**
    * Renders the user profile dropdown.
    * @returns {JSX.Element} The rendered JSX element.
@@ -237,6 +254,7 @@ class DefaultHeaderDropdown extends Component {
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.common.changetheme')}</b></DropdownItem>
           <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
           <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem>
+          <DropdownItem style={{borderTop:"2px solid #000"}}>.00 Show Decimals <Switch defaultChecked checked={localStorage.getItem("roundingEnabled")!=undefined && localStorage.getItem("roundingEnabled").toString()=="false"?true:false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>
         </DropdownMenu>
         {/* <DropdownMenu>
         <div className="toggle-theme-wrapper">

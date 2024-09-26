@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundARU, roundN, roundNMOS } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -68,6 +68,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
+        this.loaded=this.loaded.bind(this);
     }
     /**
      * Retrieves tracer categories based on the selected program and version.
@@ -301,7 +302,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],1), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? roundN(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],1), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],1), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],0), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? roundNMOS(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],1), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],1), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 200,
@@ -655,12 +656,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (dataStockStatus[j].mos == null) {
                     data1 = i18n.t('static.supplyPlanFormula.na')
                 }
-                else if (roundN(dataStockStatus[j].mos) == 0) {
+                else if ((dataStockStatus[j].mos) == 0) {
                     data1 = i18n.t('static.report.stockout')
                 } else {
-                    if (roundN(dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
+                    if ((dataStockStatus[j].mos) < dataStockStatus[j].minMos) {
                         data1 = i18n.t('static.report.lowstock')
-                    } else if (roundN(dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
+                    } else if ((dataStockStatus[j].mos) > dataStockStatus[j].maxMos) {
                         data1 = i18n.t('static.report.overstock')
                     } else {
                         data1 = i18n.t('static.report.okaystock')
@@ -670,12 +671,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                 if (dataStockStatus[j].stock == null) {
                     data1 = i18n.t('static.supplyPlanFormula.na')
                 }
-                else if (roundN(dataStockStatus[j].stock) == 0) {
+                else if ((dataStockStatus[j].stock) == 0) {
                     data1 = i18n.t('static.report.stockout')
                 } else {
-                    if (roundN(dataStockStatus[j].stock) < dataStockStatus[j].minMos) {
+                    if ((dataStockStatus[j].stock) < dataStockStatus[j].minMos) {
                         data1 = i18n.t('static.report.lowstock')
-                    } else if (roundN(dataStockStatus[j].stock) > dataStockStatus[j].maxMos) {
+                    } else if ((dataStockStatus[j].stock) > dataStockStatus[j].maxMos) {
                         data1 = i18n.t('static.report.overstock')
                     } else {
                         data1 = i18n.t('static.report.okaystock')
@@ -686,8 +687,8 @@ class StockStatusAcrossPlanningUnits extends Component {
             data[0] = getLabelText(dataStockStatus[j].planningUnit.label, this.state.lang)
             data[1] = dataStockStatus[j].planBasedOn;
             data[2] = data1;
-            data[3] = (dataStockStatus[j].stock);
-            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? roundN(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
+            data[3] = roundARU(dataStockStatus[j].stock,1);
+            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? roundNMOS(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
             data[5] = (dataStockStatus[j].minMos);
             data[6] = (dataStockStatus[j].maxMos);
             data[7] = roundAMC(dataStockStatus[j].amc);
@@ -720,7 +721,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'numeric', mask: '#,##',
+                    type: 'numeric', 
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.mos'),
@@ -728,15 +730,18 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.minMosOrQty'),
-                    type: 'numeric', mask: '#,##.0', decimal: '.',
+                    type: 'numeric', 
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.0':'#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.maxMosOrQty'),
-                    type: 'numeric', mask: '#,##.0', decimal: '.',
+                    type: 'numeric',
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.0':'#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.amc'),
-                    type: 'numeric', mask: '#,##.000', decimal: '.',
+                    type: 'numeric', 
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.supplyPlan.lastinventorydt'),
@@ -791,9 +796,10 @@ class StockStatusAcrossPlanningUnits extends Component {
         var colArrB = ['C', 'D', 'E'];
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
-            var mos = rowData[1] == 1 ? parseFloat(rowData[4]) : rowData[3];
-            var minMos = parseFloat(rowData[5]);
-            var maxMos = parseFloat(rowData[6]);
+            let dataStockStatus = this.state.data;
+            var mos = rowData[1] == 1 ? parseFloat(dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? dataStockStatus[j].mos : i18n.t("static.supplyPlanFormula.na") : "-") : dataStockStatus[j].stock;
+            var minMos = parseFloat(dataStockStatus[j].minMos);
+            var maxMos = parseFloat(dataStockStatus[j].maxMos);
             if (mos == 0) {
                 for (var i = 0; i < colArrB.length; i++) {
                     var cell = elInstance.getCell(`${colArrB[i]}${parseInt(j) + 1}`);

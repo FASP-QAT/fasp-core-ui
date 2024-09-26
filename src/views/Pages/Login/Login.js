@@ -351,6 +351,7 @@ class Login extends Component {
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
                                 localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
+                                localStorage.setItem('showDecimals', decoded.user.showDecimals.toString()=="true"?false:true);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 localStorage.setItem("lastFocus", new Date());
@@ -412,6 +413,7 @@ class Login extends Component {
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.setItem('theme', user.defaultThemeId==1?'light':'dark');
                                   document.documentElement.setAttribute("data-theme", user.defaultThemeId==1?'light':'dark');
+                                  localStorage.setItem('showDecimals', user.showDecimals.toString()=="true"?false:true);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   localStorage.setItem("lastFocus", new Date());

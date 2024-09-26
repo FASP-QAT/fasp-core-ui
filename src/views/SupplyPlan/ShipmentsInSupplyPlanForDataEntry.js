@@ -89,7 +89,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
 
                 (instance).setValueFromCoords(26, data[i].y, moment(Date.now()).format("YYYY-MM-DD"), true);
                 (instance).setValueFromCoords(20, data[i].y, `=ROUND(T${parseInt(data[i].y) + 1}*O${parseInt(data[i].y) + 1},2)`, true);
-                (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*AP${parseInt(data[i].y) + 1},0)`, true);
+                (instance).setValueFromCoords(14, data[i].y, `=ROUND(M${parseInt(data[i].y) + 1}*AP${parseInt(data[i].y) + 1},8)`, true);
                 (instance).setValueFromCoords(23, data[i].y, `=ROUND(ROUND(O${parseInt(data[i].y) + 1}*T${parseInt(data[i].y) + 1},2)+W${parseInt(data[i].y) + 1},2)`, true);
                 (instance).setValueFromCoords(2, false, false, true);
                 if (index === "" || index == null || index == undefined) {
@@ -181,7 +181,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         var elInstance = instance;
         var rowData = elInstance.getRowData(y);
         if (x == 12 && !isNaN(rowData[12]) && rowData[12].toString().indexOf('.') != -1) {
-            elInstance.setValueFromCoords(12, y, parseFloat(rowData[12]), true);
+            elInstance.setValueFromCoords(12, y, Math.round(Number(rowData[12])), true);
         } else if (x == 19 && !isNaN(rowData[19]) && rowData[19].toString().indexOf('.') != -1) {
             elInstance.setValueFromCoords(19, y, parseFloat(rowData[19]), true);
         } else if (x == 20 && !isNaN(rowData[20]) && rowData[20].toString().indexOf('.') != -1) {
@@ -580,7 +580,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[11] = shipmentList[i].realmCountryPlanningUnit.id
                                                 data[12] = Math.round(shipmentList[i].shipmentRcpuQty);
                                                 data[13] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                                                data[14] = `=ROUND(M${parseInt(i) + 1}*AP${parseInt(i) + 1},0)`
+                                                data[14] = `=ROUND(M${parseInt(i) + 1}*AP${parseInt(i) + 1},8)`
                                                 data[15] = isEmergencyOrder;
                                                 data[16] = shipmentList[i].fundingSource.id;
                                                 data[17] = shipmentList[i].budget.id == 0 ? "" : shipmentList[i].budget.id;
@@ -627,7 +627,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 data[11] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
                                                 data[12] = 0;
                                                 data[13] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";
-                                                data[14] = `=ROUND(M${parseInt(0) + 1}*AP${parseInt(0) + 1},0)`;
+                                                data[14] = `=ROUND(M${parseInt(0) + 1}*AP${parseInt(0) + 1},8)`;
                                                 data[15] = false;
                                                 data[16] = "";
                                                 data[17] = "";
@@ -675,7 +675,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                     { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                                     { type: 'numeric', title: i18n.t("static.shipment.shipmentQtyARU"), width: 130, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true },
                                                     { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 100, readOnly: true },
-                                                    { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##', width: 120, readOnly: true },
+                                                    { title: i18n.t('static.shipment.shipmentQtyPU'), type: 'numeric', mask: '#,##.00',decimal:'.', width: 120, readOnly: true },
                                                     { type: 'checkbox', title: i18n.t('static.supplyPlan.emergencyOrder'), width: 100, readOnly: !shipmentEditable },
                                                     { type: 'autocomplete', title: i18n.t('static.subfundingsource.fundingsource'), source: fundingSourceList, filter: this.filterFundingSource, width: 100 },
                                                     { type: 'autocomplete', title: i18n.t('static.dashboard.budget'), source: budgetList, filter: this.budgetDropdownFilter, width: 120 },
@@ -1343,7 +1343,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         data[11] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
         data[12] = 0;
         data[13] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";
-        data[14] = `=ROUND(M${parseInt(json.length) + 1}*AP${parseInt(json.length) + 1},0)`;
+        data[14] = `=ROUND(M${parseInt(json.length) + 1}*AP${parseInt(json.length) + 1},8)`;
         data[15] = false;
         data[16] = "";
         data[17] = "";
@@ -4343,8 +4343,9 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                     }
                                     var selectedShipmentStatus = map.get("4");
                                     var shipmentStatusId = selectedShipmentStatus;
+                                    var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
                                     var shipmentQty = elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
-                                    var shipmentPUQty = elInstance.getValue(`O${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
+                                    var shipmentPUQty = Number(Number(elInstance.getValue(`M${parseInt(j) + 1}`, true).toString().replaceAll("\,", ""))*Number(rcpu.multiplier)).toFixed(8);
                                     var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                     var rate = elInstance.getValue(`T${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
                                     var freightCost = elInstance.getValue(`W${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
@@ -4395,7 +4396,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                         var pa = this.state.procurementAgentList.filter(c => c.id == map.get("7"))[0];
                                         shipmentDataList[parseInt(map.get("28"))].procurementAgent.code = pa.name;
                                         shipmentDataList[parseInt(map.get("28"))].procurementAgent.label = pa.label;
-                                        var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
                                         shipmentDataList[parseInt(map.get("28"))].realmCountryPlanningUnit.id = rcpu.id;
                                         shipmentDataList[parseInt(map.get("28"))].realmCountryPlanningUnit.label = rcpu.label;
                                         shipmentDataList[parseInt(map.get("28"))].realmCountryPlanningUnit.multiplier = rcpu.multiplier;
@@ -4563,7 +4563,6 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                         var b = this.state.budgetList.filter(c => c.id == map.get("17"))[0];
                                         var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0]);
                                         var fs = this.state.fundingSourceList.filter(c => c.id == map.get("16"))[0];
-                                        var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == map.get("11"))[0];
                                         var tempShipmentId=map.get("3").toString().concat(shipmentDataList.length);
                                         var shipmentJson = {
                                             accountFlag: map.get("0"),

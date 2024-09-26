@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, formatter, makeText, roundARU, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
 const pickerLang = {
@@ -372,7 +372,7 @@ export default class CostOfInventory extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
+        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), roundARU(ele.stock,1), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -440,7 +440,7 @@ export default class CostOfInventory extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), formatter(ele.stock,0), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')),formatter(ele.catalogPrice,0), formatter(ele.cost,0)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), formatter(roundARU(ele.stock,1),0), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')),formatter(ele.catalogPrice,0), formatter(ele.cost,0)]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 170,
@@ -539,7 +539,7 @@ export default class CostOfInventory extends Component {
         for (var j = 0; j < costOfInventory.length; j++) {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang)
-            data[1] = costOfInventory[j].stock
+            data[1] = roundARU(costOfInventory[j].stock,1)
             data[2] = (costOfInventory[j].calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes'))
             data[3] = costOfInventory[j].catalogPrice;
             data[4] = costOfInventory[j].cost;
@@ -561,7 +561,7 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.actualInv'),
