@@ -16183,3 +16183,9 @@ label.arrow_label:before {
   border-left: 0px solid #ccc !important;
   font-weight: bold;
 }
+.MuiSwitch-colorPrimary.Mui-checked + .MuiSwitch-track {
+  background-color: #23a8d8!important;
+}
+.MuiSwitch-colorPrimary.Mui-checked {
+  color: #23a8d8!important;
+}
