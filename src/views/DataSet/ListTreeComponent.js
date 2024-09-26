@@ -155,8 +155,8 @@ export default class ListTreeComponent extends Component {
         this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
       }
       /**
-       * Hides the message in div3 after 30 seconds.
-       */
+     * Hides the message in div3 after 30 seconds.
+     */
       hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
@@ -2585,6 +2585,9 @@ export default class ListTreeComponent extends Component {
             })
         }
     }
+    /**
+     * Toggle modal for copy or delete tree
+     */
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
@@ -2807,6 +2810,7 @@ export default class ListTreeComponent extends Component {
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
+            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
         });
         const { datasetList } = this.state;
         let datasets = datasetList.length > 0
@@ -3218,7 +3222,7 @@ export default class ListTreeComponent extends Component {
                                                         {this.state.missingPUList.length > 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t("static.tree.createTreeWithoutPU")}</Button>}
                                                         {localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.addAbovePUs")}</Button>}
                                                         {!localStorage.getItem('sessionType') === 'Online' && this.state.missingPUList.length > 0 && <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.updateMissingPUs()}><i className="fa fa-check"></i>{i18n.t("static.tree.updateSelectedPU")}</Button>}
-                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
+                                                        {this.state.missingPUList.length == 0 && (this.state.treeTemplate != "" || this.state.downloadAcrossProgram == 1) && <strong className='text-blackD'>{i18n.t("static.tree.allTemplatePUAreInProgram")}</strong>}
                                                         &nbsp;
                                                     </FormGroup>
                                                 </div>

@@ -4073,6 +4073,9 @@ export default class syncPage extends Component {
               programJson.versionType = { id: versionType };
               programJson.versionStatus = { id: PENDING_APPROVAL_VERSION_STATUS};
               programJson.notes = document.getElementById("notes").value;
+              if(programJson.batchInventoryList==undefined){
+                programJson.batchInventoryList=[];
+              }
               const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {

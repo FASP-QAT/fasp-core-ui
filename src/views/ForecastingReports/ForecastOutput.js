@@ -56,6 +56,7 @@ class ForecastOutput extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
+            isDarkMode: false,
             popoverOpen: false,
             popoverOpen1: false,
             programs: [],
@@ -1431,9 +1432,25 @@ class ForecastOutput extends Component {
      * Calls getPrograms function on component mount
      */
     componentDidMount() {
+        // Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+    
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+    
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+    
         this.getPrograms();
         document.getElementById("forecastingUnitDiv").style.display = "none";
     }
+    
     /**
      * Sets the program ID in the component's state, resets related state variables, and triggers data filtering and version ID retrieval. 
      * @param {Event} event - The event object containing the selected program ID.
@@ -2134,8 +2151,9 @@ class ForecastOutput extends Component {
      * Renders the Forecast output report table.
      * @returns {JSX.Element} - Forecast output report table.
      */
+    
     render() {
-        const backgroundColor = [
+        const lightModeColors = [
             "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
             "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
             "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
@@ -2149,10 +2167,30 @@ class ForecastOutput extends Component {
             "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
             "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         ]
+        const darkModeColors = [
+            "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#757575",
+            "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#757575",
+            "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#757575",
+            "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#757575",
+            "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#757575",
+            "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#ba4e00", "#6C6463", "#F48521", "#49A4A1", "#757575",
+        ]
+        
+        const { isDarkMode } = this.state;
+        const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var chartOptions = {
             title: {
                 display: true,
-                text: i18n.t('static.dashboard.monthlyForecast') + ' - ' + (this.state.programs.filter(c => c.id == this.state.programId).length > 0 ? this.state.programs.filter(c => c.id == this.state.programId)[0].code : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
+                text: i18n.t('static.dashboard.monthlyForecast') + ' - ' + (this.state.programs.filter(c => c.id == this.state.programId).length > 0 ? this.state.programs.filter(c => c.id == this.state.programId)[0].code : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : ''),
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -2161,12 +2199,12 @@ class ForecastOutput extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit'))),
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: (this.state.yaxisEquUnit > 0 ? true : false),
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -2181,17 +2219,23 @@ class ForecastOutput extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, 
+                            lineWidth: 0, 
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor 
                         },
                         position: 'left',
                     }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true,
+                        lineWidth: 0, 
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2214,7 +2258,10 @@ class ForecastOutput extends Component {
                 },
                 enabled: false,
                 intersect: false,
-                custom: CustomTooltips
+                custom: CustomTooltips,
+                backgroundColor: isDarkMode ? '#333' : '#fff',
+                titleFontColor: fontColor,
+                bodyFontColor: fontColor,
             },
             options: {
                 // other chart options
@@ -2228,7 +2275,7 @@ class ForecastOutput extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black',
+                    fontColor: fontColor
                 }
             }
         }
@@ -2376,7 +2423,26 @@ class ForecastOutput extends Component {
                         {this.state.consumptionData.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
@@ -2398,7 +2464,7 @@ class ForecastOutput extends Component {
                         </div>
                     </div>
                     <div className='col-md-12 pt-lg-2 pb-lg-3'>
-                        <span className="pr-lg-0 pt-lg-1">{i18n.t('static.placeholder.monthlyForecastReport')}</span>
+                        <span className="pr-lg-0 pt-lg-1 DarkThColr">{i18n.t('static.placeholder.monthlyForecastReport')}</span>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>

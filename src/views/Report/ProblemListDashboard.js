@@ -105,10 +105,12 @@ export default class ProblemListDashboardComponent extends React.Component {
                                     <td><b>{c.name}</b></td>
                                     {this.state.problemCategoryListFiltered.map(pc => {
                                         var count = this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory.id == pc.id)[0].count;
-                                        return (<td style={{ backgroundColor: count == 0 ? '#d9d9d9' : "" }}>{count}</td>)
+                                        return (
+                                        <td className={count == 0 ? 'countZero' : ''}>{count}
+                                        </td>)
                                     })
                                     }
-                                    <td style={{ backgroundColor: (this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count) == 0 ? '#d9d9d9' : "" }}><b>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count}</b></td>
+                                    <td style={{ backgroundColor: (this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count) == 0 ? 'countZero' : "" }}><b>{this.state.problemDashboardList.filter(f => f.problemStatus.id == c.id && f.problemCategory == -1)[0].count}</b></td>
                                 </tr>
                             ))
                         }
@@ -116,10 +118,10 @@ export default class ProblemListDashboardComponent extends React.Component {
                             <td><b>{i18n.t("static.supplyPlan.total")}</b></td>
                             {this.state.problemCategoryListFiltered.map(pc => {
                                 var count = this.state.problemDashboardList.filter(f => f.problemCategory.id == pc.id && f.problemStatus == -1)[0].count;
-                                return (<td style={{ backgroundColor: count == 0 ? '#d9d9d9' : "" }}><b>{count}</b></td>)
+                                return (<td className={count == 0 ? 'countZero' : ''}><b>{count}</b></td>)
                             })
                             }
-                            <td style={{ backgroundColor: (this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0) == 0 ? '#d9d9d9' : "" }}><b>{this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0}</b></td>
+                            <td style={{ backgroundColor: (this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0) == 0 ? 'countZero' : "" }}><b>{this.state.problemDashboardList.length > 0 ? this.state.problemDashboardList.filter(f => f.problemCategory == -1 && f.problemStatus == -1)[0].count : 0}</b></td>
                         </tr>
                     </tbody>
                 </Table>
