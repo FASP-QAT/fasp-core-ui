@@ -2234,7 +2234,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 let endDate = moment(rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate()).format("YYYY-MM");
                 const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
                 let tempMonthsDiff = Math.round(monthsDiff) + 1;
-                console.log("consumptionExtrapolationTESM", tempMonthsDiff)
 
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
@@ -2887,7 +2886,8 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                                 var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => this.state.missingTESAndARIMAFlag ?
                                     c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 2 && c.extrapolationMethod.id != 4)))
-                                    : c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)));
+                                    : c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 5 && c.extrapolationMethod.id != 6 && c.extrapolationMethod.id != 7)));
+                                console.log("consumptionExtrapolationList====", consumptionExtrapolationList)
                                 var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                                 var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
                                 var id = a > b ? a : b;
