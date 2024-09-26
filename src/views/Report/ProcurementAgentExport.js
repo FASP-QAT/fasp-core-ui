@@ -1445,7 +1445,7 @@ class ProcurementAgentExport extends Component {
         },
         {
           title: i18n.t("static.report.qty"),
-          mask: "#,##.000",
+          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
           decimal: ".",
         },
         {

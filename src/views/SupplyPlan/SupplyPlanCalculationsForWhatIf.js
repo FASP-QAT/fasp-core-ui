@@ -330,8 +330,8 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             }
                             myArray.push(json);
                         } else if (moment(batchDetails[b].expiryDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM")) {
-                            expiredStock += Number(Number(batchDetails[b].qty)).toFixed(8);
-                            expiredStockWps += Number(Number(batchDetails[b].qtyWps)).toFixed(8);
+                            expiredStock += Number(Number(Number(batchDetails[b].qty)).toFixed(8));
+                            expiredStockWps += Number(Number(Number(batchDetails[b].qtyWps)).toFixed(8));
                             var json = {
                                 batchId: batchDetails[b].batchId,
                                 batchNo: batchDetails[b].batchNo,
@@ -444,7 +444,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                     bd = bd[0];
                                     var shipmentQtyWps = 0;
                                     if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                        shipmentQtyWps = Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8);
+                                        shipmentQtyWps = Number(Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
                                     }
                                     var json = {
                                         batchId: bd.batchId,
@@ -457,7 +457,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                         consumption: 0,
                                         adjustment: 0,
                                         stock: 0,
-                                        shipment: Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8),
+                                        shipment: Number(Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8)),
                                         shipmentWps: shipmentQtyWps,
                                         expiredQty: 0,
                                         expiredQtyWps: 0
@@ -465,9 +465,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                     myArray.push(json);
                                 }
                             } else {
-                                myArray[index].shipment = Number(myArray[index].shipment) + Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8);
+                                myArray[index].shipment = Number(myArray[index].shipment) + Number(Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
                                 if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8);
+                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number(Number(Number(batchListForShipments[b].shipmentQty) * Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
                                 }
                             }
                             var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
@@ -494,10 +494,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         for (var inv = 0; inv < inventoryListForRegion.length; inv++) {
                             if (noOfEntriesOfActualStockCount > 0) {
                                 if (inventoryListForRegion[inv].actualQty !== "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
-                                    actualStockCount += Number(Number(inventoryListForRegion[inv].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                    actualStockCount += Number(Number(Number(inventoryListForRegion[inv].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                 }
                                 if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
-                                    adjustmentQty += Number(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                    adjustmentQty += Number(Number(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                 }
                                 var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
                                 for (var b = 0; b < batchListForInventory.length; b++) {
@@ -517,8 +517,8 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                                 openingBalance: 0,
                                                 openingBalanceWps: 0,
                                                 consumption: 0,
-                                                adjustment: Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8),
-                                                stock: Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8),
+                                                adjustment: Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
+                                                stock: Number(Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
                                                 shipment: 0,
                                                 shipmentWps: 0,
                                                 expiredQty: 0,
@@ -527,15 +527,15 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                             myArray.push(json);
                                         }
                                     } else {
-                                        myArray[index].stock = Number(myArray[index].stock) + Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
-                                        myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                        myArray[index].stock = Number(Number(myArray[index].stock) + Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                        myArray[index].adjustment = Number(Number(myArray[index].adjustment) + Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                     }
                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                    actualBatchQtyTotal += Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                    actualBatchQtyTotal += Number(Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                 }
                             } else {
                                 if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
-                                    adjustmentQty += Number(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                    adjustmentQty += Number(Number(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                 }
                                 var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
                                 for (var b = 0; b < batchListForInventory.length; b++) {
@@ -555,7 +555,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                                 openingBalance: 0,
                                                 openingBalanceWps: 0,
                                                 consumption: 0,
-                                                adjustment: Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8),
+                                                adjustment: Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
                                                 stock: 0,
                                                 shipment: 0,
                                                 shipmentWps: 0,
@@ -563,12 +563,12 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                                 expiredQtyWps: 0
                                             }
                                             myArray.push(json);
-                                            adjustmentBatchQtyTotal += Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                            adjustmentBatchQtyTotal += Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                         }
                                     } else {
-                                        myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                        myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                         if (myArray[index].stock == 0) {
-                                            adjustmentBatchQtyTotal += Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8);
+                                            adjustmentBatchQtyTotal += Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                         }
                                     }
                                 }
@@ -586,23 +586,23 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     var regionList = regionListFiltered;
                     for (var c = 0; c < consumptionList.length; c++) {
                         if (consumptionList[c].actualFlag.toString() == "true") {
-                            actualConsumptionQty += Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8);
+                            actualConsumptionQty += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8));
                             if (consumptionList[c].dayOfStockOut > 0) {
                                 var daysPerMonth = moment(startDate).daysInMonth();
                                 var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
                                 if (daysOfData > 0) {
-                                    var trueDemandPerDay = Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8) / daysOfData;
-                                    trueDemandPerMonth += Number(trueDemandPerDay * daysPerMonth).toFixed(8);
+                                    var trueDemandPerDay = Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8)) / daysOfData;
+                                    trueDemandPerMonth += Number(Number(trueDemandPerDay * daysPerMonth).toFixed(8));
                                 }
                             } else {
-                                trueDemandPerMonth += Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8)
+                                trueDemandPerMonth += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8))
                             }
                             var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
                             if (index == -1) {
                                 regionsReportingActualConsumption.push(consumptionList[c].region.id);
                             }
                         } else {
-                            forecastedConsumptionQty += Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8)
+                            forecastedConsumptionQty += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8))
                         }
                     }
                     noOfRegionsReportingActualConsumption = regionsReportingActualConsumption.length;
@@ -631,7 +631,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                             autoGenerated: bd.autoGenerated,
                                             openingBalance: 0,
                                             openingBalanceWps: 0,
-                                            consumption: Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8),
+                                            consumption: Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8)),
                                             adjustment: 0,
                                             stock: 0,
                                             shipment: 0,
@@ -642,10 +642,10 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                         myArray.push(json);
                                     }
                                 } else {
-                                    myArray[index].consumption = Number(myArray[index].consumption) + Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8);
+                                    myArray[index].consumption = Number(myArray[index].consumption) + Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8));
                                 }
                                 var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                consumptionBatchQtyTotal += Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8);
+                                consumptionBatchQtyTotal += Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8));
                             }
                         }
                     } else {
@@ -691,7 +691,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             batchInfoList.map(item => {
                                 batchQty += Number(item.qty)
                             })
-                            if (Number(stock).toFixed(8) == Number(batchQty).toFixed(8)) {
+                            if (Number(Number(stock).toFixed(8)) == Number(Number(batchQty).toFixed(8))) {
                                 useInventoryCalculations = true;
                             }
                             batchInfoList.map(item => {
@@ -1001,15 +1001,15 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             if (amcFilter[c].actualFlag.toString() == "true") {
                                 var daysPerMonthPast = moment(amcDate).daysInMonth();
                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
-                                var trueDemandPerDayPast = Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8) / daysOfDataPast;
-                                var trueDemandPerMonth1 = Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8);
+                                var trueDemandPerDayPast = Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8)) / daysOfDataPast;
+                                var trueDemandPerMonth1 = Number(Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8));
                                 actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                 }
                             } else {
-                                forecastedConsumptionQtyAmc += Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8);
+                                forecastedConsumptionQtyAmc += Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8));
                             }
                         }
                         noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
@@ -1047,15 +1047,15 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                             if (amcFilter[c].actualFlag.toString() == "true") {
                                 var daysPerMonthPast = moment(amcDate).daysInMonth();
                                 var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
-                                var trueDemandPerDayPast = Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8) / daysOfDataPast;
-                                var trueDemandPerMonth1 = Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8);
+                                var trueDemandPerDayPast = Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8)) / daysOfDataPast;
+                                var trueDemandPerMonth1 = Number(Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8));
                                 actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
                                 var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
                                 if (index == -1) {
                                     regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
                                 }
                             } else {
-                                forecastedConsumptionQtyAmc += Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8);
+                                forecastedConsumptionQtyAmc += Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8));
                             }
                         }
                         noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
@@ -1077,7 +1077,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     if (totalMonths == 0) {
                         amc = null;
                     } else {
-                        amc = Number((Number(amcTotal) / Number(totalMonths))).toFixed(8);
+                        amc = Number(Number((Number(amcTotal) / Number(totalMonths))).toFixed(8));
                     }
                     // var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
                     // if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
@@ -1107,12 +1107,12 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     var maxStock = 0;
                     if (programPlanningUnitList.planBasedOn == 2) {
                         minStock = programPlanningUnitList.minQty;
-                        maxStock = Number(Number(programPlanningUnitList.minQty) + Number(programPlanningUnitList.reorderFrequencyInMonths) * Number(amc)).toFixed(8);
-                        minStockMoSQty = Number(Number(programPlanningUnitList.minQty) / Number(amc)).toFixed(8);
-                        maxStockMoSQty = Number(Number(Number(programPlanningUnitList.minQty) / Number(amc)) + Number(programPlanningUnitList.reorderFrequencyInMonths)).toFixed(8);
+                        maxStock = Number(Number(Number(programPlanningUnitList.minQty) + Number(programPlanningUnitList.reorderFrequencyInMonths) * Number(amc)).toFixed(8));
+                        minStockMoSQty = Number(Number(Number(programPlanningUnitList.minQty) / Number(amc)).toFixed(8));
+                        maxStockMoSQty = Number(Number(Number(Number(programPlanningUnitList.minQty) / Number(amc)) + Number(programPlanningUnitList.reorderFrequencyInMonths)).toFixed(8));
                     } else {
-                        minStock = Number(Number(amc) * Number(minStockMoSQty)).toFixed(8);
-                        maxStock = Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8);
+                        minStock = Number(Number(Number(amc) * Number(minStockMoSQty)).toFixed(8));
+                        maxStock = Number(Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8));
                     }
                     var closingBalance = 0;
                     var closingBalanceWps = 0;
@@ -1152,7 +1152,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     }
                     var mos = "";
                     if (closingBalance != 0 && amc != 0 && amc != null) {
-                        mos = Number(closingBalance / amc).toFixed(8);
+                        mos = Number(Number(closingBalance / amc).toFixed(8));
                     } else if (amc == 0 || amc == null) {
                         mos = null;
                     } else {
@@ -1160,7 +1160,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     }
                     var mosWps = "";
                     if (closingBalanceWps != 0 && amc != 0 && amc != null) {
-                        mosWps = Number(closingBalanceWps / amc).toFixed(8);
+                        mosWps = Number(Number(closingBalanceWps / amc).toFixed(8));
                     } else if (amc == 0 || amc == null) {
                         mosWps = null;
                     } else {

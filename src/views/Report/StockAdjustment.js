@@ -651,8 +651,8 @@ class StockAdjustmentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.report.stockAdjustment'),
-                    type: 'numeric', mask: '[-]#,##.000',
-                    decimal:'.'
+                    type: 'numeric', 
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'[-]#,##.000':'[-]#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.lastmodifiedby'),

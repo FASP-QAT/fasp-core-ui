@@ -907,8 +907,7 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.expiredQty'),
-                    type: 'numeric', mask: '#,##.000',
-                    decimal:'.'
+                    type: 'numeric', mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.inventory.batchNumber'),

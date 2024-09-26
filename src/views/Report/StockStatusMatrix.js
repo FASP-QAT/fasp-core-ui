@@ -39,7 +39,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { addDoubleQuoteToRowContent, filterOptions, formatter, roundAMC, roundN } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, roundAMC, roundN, roundNMOS } from "../../CommonComponent/JavascriptCommonFunctions";
 const { RangePicker } = DatePicker;
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
@@ -1577,133 +1577,133 @@ export default class StockStatusMatrix extends React.Component {
             ? ele.jan != null
               ? isNaN(ele.jan)
                 ? ""
-                : roundN(ele.jan)
+                : roundNMOS(ele.jan)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.janStock != null
               ? isNaN(ele.janStock)
                 ? ""
-                : roundN(ele.janStock)
+                : roundNMOS(ele.janStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.feb != null
               ? isNaN(ele.feb)
                 ? ""
-                : roundN(ele.feb)
+                : roundNMOS(ele.feb)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.febStock != null
               ? isNaN(ele.febStock)
                 ? ""
-                : roundN(ele.febStock)
+                : roundNMOS(ele.febStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.mar != null
               ? isNaN(ele.mar)
                 ? ""
-                : roundN(ele.mar)
+                : roundNMOS(ele.mar)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.marStock != null
               ? isNaN(ele.marStock)
                 ? ""
-                : roundN(ele.marStock)
+                : roundNMOS(ele.marStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.apr != null
               ? isNaN(ele.apr)
                 ? ""
-                : roundN(ele.apr)
+                : roundNMOS(ele.apr)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.aprStock != null
               ? isNaN(ele.aprStock)
                 ? ""
-                : roundN(ele.aprStock)
+                : roundNMOS(ele.aprStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.may != null
               ? isNaN(ele.may)
                 ? ""
-                : roundN(ele.may)
+                : roundNMOS(ele.may)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.mayStock != null
               ? isNaN(ele.mayStock)
                 ? ""
-                : roundN(ele.mayStock)
+                : roundNMOS(ele.mayStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.jun != null
               ? isNaN(ele.jun)
                 ? ""
-                : roundN(ele.jun)
+                : roundNMOS(ele.jun)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.junStock != null
               ? isNaN(ele.junStock)
                 ? ""
-                : roundN(ele.junStock)
+                : roundNMOS(ele.junStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.jul != null
               ? isNaN(ele.jul)
                 ? ""
-                : roundN(ele.jul)
+                : roundNMOS(ele.jul)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.julStock != null
               ? isNaN(ele.julStock)
                 ? ""
-                : roundN(ele.julStock)
+                : roundNMOS(ele.julStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.aug != null
               ? isNaN(ele.aug)
                 ? ""
-                : roundN(ele.aug)
+                : roundNMOS(ele.aug)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.augStock != null
               ? isNaN(ele.augStock)
                 ? ""
-                : roundN(ele.augStock)
+                : roundNMOS(ele.augStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.sep != null
               ? isNaN(ele.sep)
                 ? ""
-                : roundN(ele.sep)
+                : roundNMOS(ele.sep)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.sepStock != null
               ? isNaN(ele.sepStock)
                 ? ""
-                : roundN(ele.sepStock)
+                : roundNMOS(ele.sepStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.oct != null
               ? isNaN(ele.oct)
                 ? ""
-                : roundN(ele.oct)
+                : roundNMOS(ele.oct)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.octStock != null
               ? isNaN(ele.octStock)
                 ? ""
-                : roundN(ele.octStock)
+                : roundNMOS(ele.octStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.nov != null
               ? isNaN(ele.nov)
                 ? ""
-                : roundN(ele.nov)
+                : roundNMOS(ele.nov)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.novStock != null
               ? isNaN(ele.novStock)
                 ? ""
-                : roundN(ele.novStock)
+                : roundNMOS(ele.novStock)
               : i18n.t("static.supplyPlanFormula.na"),
           ele.planBasedOn == 1
             ? ele.dec != null
               ? isNaN(ele.dec)
                 ? ""
-                : roundN(ele.dec)
+                : roundNMOS(ele.dec)
               : i18n.t("static.supplyPlanFormula.na")
             : ele.decStock != null
               ? isNaN(ele.decStock)
                 ? ""
-                : roundN(ele.decStock)
+                : roundNMOS(ele.decStock)
               : i18n.t("static.supplyPlanFormula.na"),
         ])
       )
