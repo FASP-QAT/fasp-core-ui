@@ -103,7 +103,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         inventoryList: [],
                                         shipmentList: [],
                                         batchInfoList: [],
-                                        supplyPlan: []
+                                        supplyPlan: [],
+                                        dashboardBottomList: []
                                     }
                                 }
                                 var programJsonForStoringTheResult = programJson;
@@ -1076,6 +1077,45 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                                 programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                                 programJsonForStoringTheResult.supplyPlan = supplyPlanData;
+
+                                var dashboardStartDate = generalProgramJson.startDate;
+                                var dashboardStopDate = generalProgramJson.stopDate;
+                                if (dashboardStartDate == undefined) {
+                                    dashboardStartDate = "2023-01-01";
+                                    dashboardStopDate = "2023-12-31";
+                                }
+                                var planBasedOn = programPlanningUnitList[ppL].planBasedOn;
+
+                                var spFilteredForDashboard = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDate).format("YYYY-MM"));
+                                var stockOut = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length;
+                                var underStock = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) < (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var adequate = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) >= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock))) && (Number(c.mos).toFixed(1) <= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var overStock = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) > (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var monthCount = spFilteredForDashboard;
+                                var na = monthCount - stockOut - underStock - adequate - overStock;
+                                var stockOutPerc = Number(stockOut) / Number(monthCount);
+                                var underStockPerc = Number(underStock) / Number(monthCount);
+                                var adequatePerc = Number(adequate) / Number(monthCount);
+                                var overStockPerc = Number(overStock) / Number(monthCount);
+                                var naPerc = Number(na) / Number(monthCount);
+                                var expiresList = [];
+                                var expiresList=spFilteredForDashboard.filter(c=>Number(c.expiredStock)>0);
+                                
+                                var dashboardBottomList = {
+                                    "stockStatus": {
+                                        "stockOut": stockOut,
+                                        "underStock": underStock,
+                                        "adequate": adequate,
+                                        "overStock": overStock,
+                                        "na": na,
+                                        "total": monthCount,
+                                        "naPerc": naPerc,
+                                        "underStockPerc": underStockPerc,
+                                        "stockOutPerc": stockOutPerc,
+                                        "overStockPerc": overStockPerc,
+                                        "adequatePerc": adequatePerc
+                                    }
+                                }
                                 if (planningUnitDataIndex != -1) {
                                     planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
                                 } else {
