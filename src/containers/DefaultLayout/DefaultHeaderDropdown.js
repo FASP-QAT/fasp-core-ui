@@ -15,6 +15,7 @@ import image6 from '../../assets/img/avatars/6.jpg';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
+import { Switch } from '@material-ui/core';
 
 const propTypes = {
   notif: PropTypes.bool,
@@ -32,28 +33,28 @@ const defaultProps = {
 const setDark = () => {
   localStorage.setItem("theme", "dark");
   AuthenticationService.updateUserTheme(2);
-    if (localStorage.getItem("sessionType") === 'Online') {
-      AuthenticationService.setupAxiosInterceptors();
-      UserService.updateUserTheme(2)
-        .then(response => {
-        }).catch(
-          error => {
-          })
-    }
+  if (localStorage.getItem("sessionType") === 'Online') {
+    AuthenticationService.setupAxiosInterceptors();
+    UserService.updateUserTheme(2)
+      .then(response => {
+      }).catch(
+        error => {
+        })
+  }
   document.documentElement.setAttribute("data-theme", "dark");
 };
 
 const setLight = () => {
   localStorage.setItem("theme", "light");
   AuthenticationService.updateUserTheme(1);
-    if (localStorage.getItem("sessionType") === 'Online') {
-      AuthenticationService.setupAxiosInterceptors();
-      UserService.updateUserTheme(1)
-        .then(response => {
-        }).catch(
-          error => {
-          })
-    }
+  if (localStorage.getItem("sessionType") === 'Online') {
+    AuthenticationService.setupAxiosInterceptors();
+    UserService.updateUserTheme(1)
+      .then(response => {
+      }).catch(
+        error => {
+        })
+  }
   document.documentElement.setAttribute("data-theme", "light");
 };
 
@@ -69,6 +70,7 @@ const defaultDark =
 if (defaultDark) {
   setDark();
 }
+
 /**
  * Component representing the default header dropdown in the application.
  * This dropdown includes user profile information, language selection, and user actions.
@@ -191,6 +193,30 @@ class DefaultHeaderDropdown extends Component {
   applyDarkTheme() {
     setDark();
   }
+  handleDefaultRounding(e) {
+    var showDecimals = e.target.checked;
+    localStorage.setItem("roundingEnabled", !(showDecimals));
+    AuthenticationService.updateUserTheme(1);
+    if (localStorage.getItem("sessionType") === 'Online') {
+      AuthenticationService.setupAxiosInterceptors();
+      UserService.updateUserDecimalPreference(showDecimals)
+        .then(response => {
+        }).catch(
+          error => {
+          })
+    }
+    setTimeout(() => {
+      window.location.reload(false);
+    }, 0);
+  }
+
+  toggleTheme(e) {
+    if (e.target.checked) {
+      setDark();
+    } else {
+      setLight();
+    }
+  };
   /**
    * Renders the user profile dropdown.
    * @returns {JSX.Element} The rendered JSX element.
@@ -234,28 +260,16 @@ class DefaultHeaderDropdown extends Component {
                 </DropdownItem>
               </>
           )}
-          {/* <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.common.changetheme')}</b></DropdownItem>
-          <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
+          {/* <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.common.changetheme')}</b></DropdownItem> */}
+          <DropdownItem style={{ borderTop: "2px solid #000" }}><b>{i18n.t('static.common.changetheme')}</b>&nbsp;&nbsp; <Switch className='form-check form-switch' checked={localStorage.getItem("theme") === "dark"}
+            color="primary"
+            onChange={this.toggleTheme} /></DropdownItem>
+          {/* <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
           <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
+          <DropdownItem style={{ borderTop: "2px solid #000" }}>.00 Show Decimals <Switch defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>
         </DropdownMenu>
-        {/* <DropdownMenu>
-        <div className="toggle-theme-wrapper">
-      
-      <label className="toggle-theme" htmlFor="checkbox">
-        <input
-          type="checkbox"
-          id="checkbox"
-          onChange={toggleTheme}
-          defaultChecked={defaultDark}
-        />
-        <div className="slider round"></div>
-      </label>
-      
-    </div>
-          </DropdownMenu>
-         */}
       </Dropdown>
-      
+
     );
   }
   /**
