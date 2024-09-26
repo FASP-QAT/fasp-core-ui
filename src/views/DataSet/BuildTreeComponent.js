@@ -4583,7 +4583,7 @@ export default class BuildTree extends Component {
             editable: true,
             onload: this.loadedMom,
             pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
+            search: this.state.currentItemConfig.context.payload.nodeType.id != 6 ? true : false,
             columnSorting: true,
             wordWrap: true,
             allowInsertColumn: false,
@@ -6852,11 +6852,54 @@ export default class BuildTree extends Component {
             e.result2 = this.getPayloadData(items1[i], 5)
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
+            e.dataSetObj = this.state.dataSetObj;
+            e.treeId = this.state.treeId;
             delete e.templateName;
             newItems.push(e)
         }
+        for (var i = 0; i < newItems.length; i++) {
+            if(newItems[i].payload.downwardAggregationList) {
+                for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                    if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections){
+                        treeLevelItems.push(new ConnectorAnnotationConfig({
+                            annotationType: AnnotationType.Connector,
+                            fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                            toItem: parseInt(newItems[i].id),
+                            labelSize: { width: 80, height: 30 },
+                            connectorShapeType: ConnectorShapeType.OneWay,
+                            color: "#000000",
+                            offset: 0,
+                            lineWidth: 1,
+                            lineType: LineType.Solid,
+                            connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
+                            selectItems: false
+                        }));
+                    }
+                    treeLevelItems.push({
+                        annotationType: AnnotationType.HighlightPath,
+                        items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                        color: "#FFFFFF",
+                        lineWidth: 10,
+                        opacity: 1,
+                        showArrows: false
+                    })
+                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
+                    for(var k = 0; k < tempValidLines.length; k++) {
+                        treeLevelItems.push({
+                            annotationType: AnnotationType.HighlightPath,
+                            items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
+                            color: "#000000",
+                            lineWidth: 1,
+                            opacity: 1,
+                            showArrows: false
+                        })
+                    }
+                }
+            }
+        }
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
+            items: newItems,
             pageFitMode: PageFitMode.Enabled,
             hasSelectorCheckbox: Enabled.False,
             hasButtons: Enabled.True,
@@ -12661,8 +12704,7 @@ export default class BuildTree extends Component {
                 this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             if(itemConfig.payload.downwardAggregationAllowed) {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
-            }
-            if(itemConfig.payload.downwardAggregationList) {
+            }else if(itemConfig.payload.downwardAggregationList) {
                 outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId).length == itemConfig.payload.downwardAggregationList.length ? false: true;
             }
             return connectDropTarget(connectDragSource(

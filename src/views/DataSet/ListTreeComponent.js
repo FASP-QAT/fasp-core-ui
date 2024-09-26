@@ -115,6 +115,7 @@ export default class ListTreeComponent extends Component {
             forecastMethodList: [],
             datasetIdModal: '',
             tempTreeId: '',
+            oldTreeId: '',
             versions: [],
             allProgramList: [],
             programs: [],
@@ -266,9 +267,29 @@ export default class ListTreeComponent extends Component {
                             var nodeId = nodeDataMomList[i].nodeId;
                             var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
                             var node = items.filter(n => n.id == nodeId)[0];
-                            (node.payload.nodeDataMap[1])[0].nodeDataMomList = nodeDataMomListForNode;
+                            (node.payload.nodeDataMap[tree.scenarioList[0].id])[0].nodeDataMomList = nodeDataMomListForNode;
                             var findNodeIndex = items.findIndex(n => n.id == nodeId);
                             items[findNodeIndex] = node;
+                        }
+                    }
+                    items.map(x => x.payload.downwardAggregationList);
+                    for(let i = 0; i < items.length; i++){
+                        if(items[i].payload.downwardAggregationList && items[i].payload.downwardAggregationList.filter(x => x.treeId == this.state.oldTreeId).length > 0) {
+                            let tempDownwardAggregationList = [];
+                            for(let j = 0; j < items[i].payload.downwardAggregationList.length; j++){
+                                if(items[i].payload.downwardAggregationList[j].treeId == this.state.oldTreeId) {
+                                    let tempData = {
+                                        treeId: this.state.tempTreeId,
+                                        scenarioId: items[i].payload.downwardAggregationList[j].scenarioId,
+                                        nodeId: items[i].payload.downwardAggregationList[j].nodeId
+                                    }
+                                    tempDownwardAggregationList.push(tempData)
+                                }
+                                else {
+                                    tempDownwardAggregationList.push(items[i].payload.downwardAggregationList[j])
+                                }
+                            }
+                            items[i].payload.downwardAggregationList = tempDownwardAggregationList
                         }
                     }
                     tree.flatList = items;
@@ -2490,7 +2511,8 @@ export default class ListTreeComponent extends Component {
                                         notes: this.state.treeEl.getValueFromCoords(6, y),
                                         downloadedProgramListAcrossProgram: downloadedProgramListAcrossProgram,
                                         downloadAcrossProgram: 1,
-                                        treeIdAcrossProgram: this.state.treeEl.getValueFromCoords(0, y)
+                                        treeIdAcrossProgram: this.state.treeEl.getValueFromCoords(0, y),
+                                        oldTreeId: this.state.treeEl.getValueFromCoords(0, y)
                                     }, () => {
                                         if (this.state.datasetIdModal != "") {
                                             let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == this.state.datasetIdModal.split("~v")[0] && c.currentVersion.versionId == this.state.datasetIdModal.split("~v")[1].toString().split(" ")[0])[0];
