@@ -4292,12 +4292,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <Form name='simpleForm'>
                                 <div className=" pl-0">
                                     <div className="row">
-                                        <FormGroup className="col-md-3 ">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}
+                                        <FormGroup className="col-md-3">
+                                        <div className="d-flex align-items-center">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
-                                                    <div className="tab-ml-1 ml-lg-3">
+                                                    <div className="d-flex align-items-center ml-3 col-md-12">
                                                         <Input
-                                                            className="form-check-input"
+                                                            className="form-check-input MarginTopCheck"
                                                             type="checkbox"
                                                             id="onlyDownloadedProgram"
                                                             name="onlyDownloadedProgram"
@@ -4311,7 +4312,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div>
                                                 }
-                                            </Label>
+                                            </div>
                                             <div className="controls ">
                                                 <Input
                                                     type="select"
@@ -4326,7 +4327,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Input>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-lg-2">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                             <div className="controls ">
                                                 <Input
@@ -4342,7 +4343,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Input>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6 pl-lg-3 pt-lg-3">
+                                        <FormGroup className="col-md-6 pl-lg-3 pt-lg-4">
                                             {this.state.forecastProgramId && this.state.versionId &&
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
