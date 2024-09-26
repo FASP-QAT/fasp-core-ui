@@ -152,7 +152,6 @@ class AddBudgetComponent extends Component {
                 id: programId[i].value
             }
         }
-        console.log("programIdArray Test@123",programIdArray);
         budget.programs = programIdArray;
         this.setState({
             budget,
@@ -420,7 +419,6 @@ class AddBudgetComponent extends Component {
      * @returns {JSX.Element} - Budget details form.
      */
     render() {
-        console.log("this.state.programId Test@123",this.state.programId)
         const { fundingSources } = this.state;
         const { currencyList } = this.state;
         const pickerLang = {

@@ -37,6 +37,10 @@ import showguidanceModelingTransferEn from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferFr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferFr.html'
 import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferSp.html'
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
+import showguidanceTreeTableEn from '../../../src/ShowGuidanceFiles/TreeTableEn.html'
+import showguidanceTreeTableFr from '../../../src/ShowGuidanceFiles/TreeTableFr.html'
+import showguidanceTreeTablePr from '../../../src/ShowGuidanceFiles/TreeTablePr.html'
+import showguidanceTreeTableSp from '../../../src/ShowGuidanceFiles/TreeTableSp.html'
 import { LOGO } from '../../CommonComponent/Logo';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -433,6 +437,7 @@ export default class TreeTable extends Component {
             isTreeDataChanged: false,
             percentForOneMonth: '',
             popoverOpenStartValueModelingTool: false,
+            showGuidanceTreeTable: false,
             showGuidanceModelingTransfer: false,
             showGuidanceModelingTransfer: false,
             showGuidanceNodeData: false,
@@ -3143,7 +3148,7 @@ export default class TreeTable extends Component {
             // data[7] = currentScenario.dataValue;//Node Value
             data[7] = data[6] * data[5] / 100; //currentScenario.calculatedDataValue;
             data[8] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
-            data[9] = fuNode ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en; // Forecasting unit
+            data[9] = fuNode ? (this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id).length>0?this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en:"") : (this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id).length>0?this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en:""); // Forecasting unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[11] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
             data[12] = !fuNode ? this.qatCalculatedPUPerVisitForJexcel(items[i]) : ""; // # PU / Interval / Patient (Reference)
@@ -5441,6 +5446,15 @@ export default class TreeTable extends Component {
         const { items } = this.state;
         this.setState(this.getDeletedItems(items, [id]));
     }
+
+    /**
+     * Toggle show guidance popup
+     */
+    toggleShowGuidanceTreeTable() {
+        this.setState({
+            showGuidanceTreeTable: !this.state.showGuidanceTreeTable
+        })
+    }
     /**
      * Retrieves updated item list with specified items removed and cursor parent item.
      * @param {Array} items - Array of tree items.
@@ -6152,7 +6166,26 @@ export default class TreeTable extends Component {
                             {this.state.selectedScenario != "" && this.state.treeId != "" && this.state.programId != "" &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                     </a>
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
@@ -6169,7 +6202,7 @@ export default class TreeTable extends Component {
                         <div className="row pt-lg-0 pr-lg-4">
                             <div className="col-md-12">
                                 <a style={{ float: 'right' }}>
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidanceTreeTable() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                                 </a>
                             </div>
                         </div>
@@ -6253,8 +6286,8 @@ export default class TreeTable extends Component {
                                             </div>
                                         </CardBody>
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
-                                            <i>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
-                                            <i>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
+                                            <i className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
+                                            <i className='text-blackD'>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
                                             <Row>
                                                 <Col xs="12" md="12" className="mb-4">
                                                     <Nav tabs>
@@ -6300,6 +6333,25 @@ export default class TreeTable extends Component {
                             </div>
                         </CardBody>
                     </Card></Col></Row>
+                    <Modal isOpen={this.state.showGuidanceTreeTable}
+                className={'modal-lg ' + this.props.className} >
+                <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                </ModalHeader>
+                <div>
+                    <ModalBody className="ModalBodyPadding">
+                        <div dangerouslySetInnerHTML={{
+                            __html: localStorage.getItem('lang') == 'en' ?
+                            showguidanceTreeTableEn :
+                                localStorage.getItem('lang') == 'fr' ?
+                                showguidanceTreeTableFr :
+                                    localStorage.getItem('lang') == 'sp' ?
+                                    showguidanceTreeTableSp :
+                                    showguidanceTreeTablePr
+                        }} />
+                    </ModalBody>
+                </div>
+            </Modal>
             <Modal isOpen={this.state.showGuidanceModelingTransfer}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">

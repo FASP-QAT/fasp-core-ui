@@ -18,9 +18,9 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import CryptoJS from 'crypto-js';
 import csvicon from '../../assets/img/csv.png';
 import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import CryptoJS from 'crypto-js';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.programPlanningUnit');
 /**
@@ -758,7 +758,6 @@ class AddprogramPlanningUnit extends Component {
                                         }
                                     }).catch(
                                         error => {
-                                            console.log("Error error Test@123",error);
                                             if (error.message === "Network Error") {
                                                 this.setState({
                                                     message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -805,7 +804,6 @@ class AddprogramPlanningUnit extends Component {
                             }
                         }).catch(
                             error => {
-                                console.log("Error error Test@123",error);
                                 if (error.message === "Network Error") {
                                     this.setState({
                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -852,7 +850,6 @@ class AddprogramPlanningUnit extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("Error error Test@123",error);
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -1370,7 +1367,6 @@ class AddprogramPlanningUnit extends Component {
                     }
                 }).catch(
                     error => {
-                        console.log("Error error Test@123",error);
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
