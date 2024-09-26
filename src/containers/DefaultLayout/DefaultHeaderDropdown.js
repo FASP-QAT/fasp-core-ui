@@ -251,10 +251,9 @@ class DefaultHeaderDropdown extends Component {
                 </DropdownItem>
               </>
           )}
-          <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.common.changetheme')}</b></DropdownItem>
+          {/* <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.common.changetheme')}</b></DropdownItem>
           <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
-          <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem>
-          <DropdownItem style={{borderTop:"2px solid #000"}}>.00 Show Decimals <Switch defaultChecked checked={localStorage.getItem("roundingEnabled")!=undefined && localStorage.getItem("roundingEnabled").toString()=="false"?true:false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>
+          <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
         </DropdownMenu>
         {/* <DropdownMenu>
         <div className="toggle-theme-wrapper">

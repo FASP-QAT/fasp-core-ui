@@ -2749,7 +2749,7 @@ observer.observe(document.documentElement, {
         
         const lightModeColors = [
             '#002F6C',  // Color 1 
-            '#212721',   
+            '#cfcdc9',   
         ];
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -5387,7 +5387,7 @@ observer.observe(document.documentElement, {
                                                     var isAllCheckForReviewed = true;
                                                     for (var i = 0; i < json.length; i++) {
                                                         var map = new Map(Object.entries(json[i]));
-                                                        if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != "")) {
+                                                        if ((map.get("0") == "" || map.get("0") == 0) || (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
                                                             reviewedProblemList.push({
                                                                 problemReportId: map.get("0"),
                                                                 problemStatus: {
