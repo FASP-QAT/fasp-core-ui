@@ -157,6 +157,7 @@ class Login extends Component {
    */
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
+    localStorage.setItem("theme", localStorage.getItem('theme')==undefined?'light':localStorage.getItem('theme'));
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     AuthenticationService.clearUserDetails()
