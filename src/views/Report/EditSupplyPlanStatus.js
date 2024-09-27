@@ -3948,6 +3948,7 @@ observer.observe(document.documentElement, {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
+            editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -5391,7 +5392,7 @@ observer.observe(document.documentElement, {
                                                     var j=0;
                                                     for (var i = 0; i < json.length; i++) {
                                                         var map = new Map(Object.entries(json[i]));
-                                                        if ((map.get("0") == "" || map.get("0") == 0) || (map.get("23") == 1 && (this.state.problemList[j].problemStatus.id != map.get("11") || this.state.problemList[j].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
+                                                        if ((map.get("0") != "" && map.get("0") != 0) && (map.get("23") == 1 && (this.state.problemList[j].problemStatus.id != map.get("11") || this.state.problemList[j].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
                                                             reviewedProblemList.push({
                                                                 problemReportId: map.get("0"),
                                                                 problemStatus: {
