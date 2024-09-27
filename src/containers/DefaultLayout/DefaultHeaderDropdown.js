@@ -261,9 +261,14 @@ class DefaultHeaderDropdown extends Component {
               </>
           )}
           {/* <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.common.changetheme')}</b></DropdownItem> */}
-          <DropdownItem style={{ borderTop: "2px solid #000" }}><b>{i18n.t('static.common.changetheme')}</b>&nbsp;&nbsp; <Switch className='form-check form-switch' checked={localStorage.getItem("theme") === "dark"}
-            color="primary"
-            onChange={this.toggleTheme} /></DropdownItem>
+          <DropdownItem style={{ borderTop: "2px solid #000" }}>
+            <i className={`fa ${localStorage.getItem("theme") === "dark" ? "fa-moon-o" : "fa-sun-o"}`}></i>
+            {localStorage.getItem("theme") === "dark" ? i18n.t('static.common.darktheme') : i18n.t('static.common.lighttheme')}
+            <Switch className='form-check form-switch swichMarginLeft'
+              checked={localStorage.getItem("theme") === "dark"}
+              color="primary"
+              onChange={this.toggleTheme} />
+          </DropdownItem>
           {/* <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
           <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
           <DropdownItem style={{ borderTop: "2px solid #000" }}>.00 Show Decimals <Switch defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>
