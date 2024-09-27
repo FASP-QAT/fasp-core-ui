@@ -12625,6 +12625,7 @@ legend.scheduler-border {
 .AggregationDownwardNodeSize {
   width: 20px;
   height: 20px;
+  margin-top: -2px;
 }
 
 .ExtraCheckboxFieldWidth {
@@ -16196,6 +16197,14 @@ label.arrow_label:before {
   font-size: 12px !important;
   font-weight: bold !important;
 }
+.paddinCheckbox{
+  padding-left:24px ;
+}
+@media screen and (min-width: 1920px) {
+  .paddinCheckbox{
+    padding-left:112px ;
+  }
+  }
 
 .jss>tfoot>tr>td:not(:nth-child(2)) {
   border-left: 0px solid #ccc !important;
