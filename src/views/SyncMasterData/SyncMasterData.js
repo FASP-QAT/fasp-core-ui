@@ -981,7 +981,6 @@ export default class SyncMasterData extends Component {
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var pIds = [];
                         var tm = this.state.totalMasters;
-                        console.log("realmId", realmId, "===", userId)
 
                         myResult.filter(c => c.userId == userId).map(program => {
                             pIds.push(program.programId);
@@ -1022,8 +1021,13 @@ export default class SyncMasterData extends Component {
                                     })
 
                                     if (validation) {
+                                    console.log("realmId===>validation", validation)
+
                                         AuthenticationService.setupAxiosInterceptors();
+                                    console.log("realmId===>validation1", validation)
+
                                         if (localStorage.getItem("sessionType") === 'Online' && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
+                                            console.log("realmId===>", realmId, "===", response)
 
                                             MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)
                                                 .then(response => {
@@ -1720,6 +1724,8 @@ export default class SyncMasterData extends Component {
                                                     }
                                                 }).catch(
                                                     error => {
+                                                        console.log("realmId===>===", error)
+
                                                         if (document.getElementById('div1') != null) {
                                                             document.getElementById('div1').style.display = 'none';
                                                         }
