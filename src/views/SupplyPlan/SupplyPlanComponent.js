@@ -1192,7 +1192,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         this.setState({
                                             ledgerForBatch: []
                                         })
-                                        this.showBatchLedgerClicked(obj.getRowData(y)[0].toString().split("~")[0], moment(obj.getRowData(y)[1]).format("YYYY-MM-DD"), moment(obj.getRowData(y)[2]).format("YYYY-MM-DD"));
+                                        this.showBatchLedgerClicked(obj.getRowData(y)[0].toString().split("~")[0], moment(obj.getRowData(y)[1]).format("YYYY-MM-DD"), moment(obj.getRowData(y)[0].toString().split("~")[1]).format("YYYY-MM-DD"));
                                     }.bind(this)
                                 })
                             }
@@ -1434,7 +1434,7 @@ export default class SupplyPlanComponent extends React.Component {
             
             const lightModeColors = [
                 '#002F6C',  // Color 1 
-                '#212721',   
+                '#cfcdc9',   
             ];
             const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
