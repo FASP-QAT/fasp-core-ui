@@ -1959,7 +1959,7 @@ export default class SupplyPlanComponent extends React.Component {
         
         const lightModeColors = [
             '#002F6C',
-            '#212721',      
+            '#cfcdc9',      
         ];
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;

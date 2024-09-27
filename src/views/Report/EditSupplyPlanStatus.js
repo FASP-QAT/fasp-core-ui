@@ -2749,7 +2749,7 @@ observer.observe(document.documentElement, {
         
         const lightModeColors = [
             '#002F6C',  // Color 1 
-            '#212721',   
+            '#cfcdc9',   
         ];
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -5376,9 +5376,10 @@ observer.observe(document.documentElement, {
                                                     var json = elInstance.getJson();
                                                     var reviewedProblemList = [];
                                                     var isAllCheckForReviewed = true;
+                                                    var j=0;
                                                     for (var i = 0; i < json.length; i++) {
                                                         var map = new Map(Object.entries(json[i]));
-                                                        if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != "")) {
+                                                        if ((map.get("0") != "" && map.get("0") != 0) && (map.get("23") == 1 && (this.state.problemList[j].problemStatus.id != map.get("11") || this.state.problemList[j].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
                                                             reviewedProblemList.push({
                                                                 problemReportId: map.get("0"),
                                                                 problemStatus: {
@@ -5388,6 +5389,9 @@ observer.observe(document.documentElement, {
                                                                 reviewedNotes: map.get("22"),
                                                                 notes: map.get("22")
                                                             });
+                                                        }
+                                                        if((map.get("0") != "" && map.get("0") != 0)){
+                                                            j+=1;
                                                         }
                                                         if (map.get("21") == false && map.get("13") != 4) {
                                                             isAllCheckForReviewed = false
