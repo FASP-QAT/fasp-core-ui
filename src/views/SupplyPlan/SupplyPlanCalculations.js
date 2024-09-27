@@ -518,6 +518,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         consumptionType = 0;
                                         trueDemandPerMonth = forecastedConsumptionQty;
                                     }
+                                    myArray.map(item=>{
+                                        if (moment(item.expiryDate).format("YYYY-MM") <= moment(startDate).format("YYYY-MM")) {
+                                            expiredStock += Number(Number(Number(item.openingBalance)+Number(item.shipment)).toFixed(8));
+                                            expiredStockWps += Number(Number(Number(item.openingBalanceWps)+Number(item.shipmentWps)).toFixed(8));
+                                            var index = myArray.findIndex(c => c.batchNo == item.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM"));
+                                            myArray[index].expiredQty=Number(Number(Number(item.openingBalance)+Number(item.shipment)).toFixed(8));
+                                            myArray[index].expiredQtyWps=Number(Number(Number(item.openingBalanceWps)+Number(item.shipmentWps)).toFixed(8));
+                                        }
+                                    })
                                     var expectedStock = 0;
                                     expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
                                     var expectedStockWps = 0;
