@@ -2215,12 +2215,10 @@ export default class TreeTable extends Component {
         tr.children[3].title = i18n.t('static.tooltip.NodeType');
         tr.children[4].classList.add('InfoTr');
         tr.children[4].title = i18n.t('static.tooltip.NodeTitle');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = "Available to be aggregated by funnel nodes";
         tr.children[7].classList.add('InfoTr');
-        tr.children[7].title = i18n.t('static.treeTable.numberOrPercentageTooltip');
-        tr.children[8].classList.add('InfoTr');
-        tr.children[8].title = i18n.t('static.treeTable.parentValueTooltip');
-        tr.children[9].classList.add('InfoTr');
-        tr.children[9].title = i18n.t('static.treeTable.nodeValueTooltip');
+        tr.children[7].title = i18n.t('static.treeTable.nodeValueTooltip');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -2531,18 +2529,19 @@ export default class TreeTable extends Component {
                 this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == items[i].payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i style='color:#002f6c' class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i style='color:#002f6c' class='fa fa-link'></i>" : ""}
                         <b>
                             ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
-                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px">Σ</div>' : ""}
-                            ${items[i].payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? '<img src="../../assets/img/aggregateAllowed.png" />' : ""}
+                            ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i style="color:#002f6c" class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i style="color:#002f6c" class="fa fa-cube"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 5 ? '<i style="color:#002f6c" class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px;color:#002f6c">Σ</div>' : ""}
+                            ${items[i].payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? '<img height="18px" src="/aggregateAllowed.png" />' : ""}
+                            ${items[i].payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? '<img height="18px" src="/aggregateAllowedRed.png" />' : ""}
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
@@ -3220,17 +3219,17 @@ export default class TreeTable extends Component {
             data[0] = items[i].id;
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i style='color:#002f6c' class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i style='color:#002f6c' class='fa fa-link'></i>" : ""}
                         <b>
                             ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
-                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px">Σ</div>' : ""}
+                            ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i style="color:#002f6c" class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i style="color:#002f6c" class="fa fa-cube"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 5 ? '<i style="color:#002f6c" class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px;color:#002f6c">Σ</div>' : ""}
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
@@ -3331,6 +3330,10 @@ export default class TreeTable extends Component {
         try {
             this.el = jexcel(document.getElementById("tableDiv2"), '');
             jexcel.destroy(document.getElementById("tableDiv2"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv3"), '');
+            jexcel.destroy(document.getElementById("tableDiv3"), true);
         } catch (err) { }
         var data = treeArray;
         var columns = [
@@ -3755,18 +3758,19 @@ export default class TreeTable extends Component {
             }
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i color:#002f6c class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i color:#002f6c class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i color:#002f6c class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i color:#002f6c class='fa fa-link'></i>" : ""}
+                        ${items[i].payload.nodeType.id == 6 ? '<b style="color:#002f6c" class="'+(items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length == 0 ? "red" : "" : "red") +'" style="font-size:16px">'+(items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length : 0)+'</b>' : ""}
                         <b>
                             ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
-                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px">Σ</div>' : ""}
-                            ${items[i].payload.nodeType.id == 6 ? '<img src="../../assets/img/funnel.png" />' : ""}
+                            ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i style="color:#002f6c" class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i style="color:#002f6c" class="fa fa-cube"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 5 ? '<i style="color:#002f6c" class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px;color:#002f6c">Σ</div>' : ""}
+                            ${items[i].payload.nodeType.id == 6 ? '<img height="18px" src="/funnel.png" />' : ""}
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
@@ -3813,9 +3817,18 @@ export default class TreeTable extends Component {
             treeArray[count] = data;
             count++;
         }
-
-        this.el = jexcel(document.getElementById("tableDiv3"), '');
-        jexcel.destroy(document.getElementById("tableDiv3"), true);
+        try {
+            this.el = jexcel(document.getElementById("tableDiv3"), '');
+            jexcel.destroy(document.getElementById("tableDiv3"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+        } catch (err) { }
         var data = treeArray;
         var columns = [
             {
@@ -5382,8 +5395,11 @@ export default class TreeTable extends Component {
                                         jexcel.destroy(document.getElementById('tableDiv3'), true);
                                     }
                                 }
-                                else if (this.state.treeTabl3El != "") {
-                                    jexcel.destroy(document.getElementById('tableDiv3'), true);
+                                else if (this.state.treeTabl1El != "") {
+                                    jexcel.destroy(document.getElementById('tableDiv1'), true);
+                                }
+                                else if (this.state.treeTabl2El != "") {
+                                    jexcel.destroy(document.getElementById('tableDiv2'), true);
                                 }
                             }
                             this.buildTab3Jexcel();
@@ -5436,8 +5452,11 @@ export default class TreeTable extends Component {
                                     jexcel.destroy(document.getElementById('tableDiv3'), true);
                                 }
                             }
-                            else if (this.state.treeTabl3El != "") {
-                                jexcel.destroy(document.getElementById('tableDiv3'), true);
+                            else if (this.state.treeTabl1El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv1'), true);
+                            }
+                            else if (this.state.treeTabl2El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv2'), true);
                             }
                         }
                         this.buildTab3Jexcel();
