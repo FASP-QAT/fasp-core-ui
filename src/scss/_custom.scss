@@ -11100,3 +11100,11 @@ legend.scheduler-border {
   font-size: 12px !important;
   font-weight: bold !important;
 }
+.paddinCheckbox{
+  padding-left:24px ;
+}
+@media screen and (min-width: 1920px) {
+  .paddinCheckbox{
+    padding-left:112px ;
+  }
+  }

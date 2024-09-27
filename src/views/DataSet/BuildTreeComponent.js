@@ -13585,7 +13585,7 @@ export default class BuildTree extends Component {
                                         <div className="row ml-lg-1 pb-lg-2 d-flex">
                                             <b>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
                                             <FormGroup>
-                                                <div className="check inline pl-lg-4 pt-lg-0">
+                                                <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
@@ -13603,7 +13603,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup>
-                                            <div className="check inline pl-lg-4 pt-lg-0">
+                                            <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
@@ -13621,7 +13621,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup>
-                                            <div className="check inline pl-lg-4 pt-lg-0">
+                                            <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
@@ -13639,7 +13639,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup>
-                                            <div className="check inline pl-lg-4 pt-lg-0">
+                                            <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
@@ -13663,7 +13663,7 @@ export default class BuildTree extends Component {
                                                 </Popover>
                                             </div>
                                             <FormGroup>
-                                            <div className="check inline pl-lg-4 pt-lg-0">
+                                            <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
@@ -13682,7 +13682,7 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup>
-                                            <div className="check inline pl-lg-4 pt-lg-0">
+                                            <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
