@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { generateRandomAplhaNumericCode, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE } from '../../Constants.js';
 import i18n from '../../i18n';
 import { convertSuggestedShipmentsIntoPlannedShipments } from '../SupplyPlan/SupplyPlanCalculationsForWhatIf.js';
 /**
@@ -103,8 +103,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         inventoryList: [],
                                         shipmentList: [],
                                         batchInfoList: [],
-                                        supplyPlan: [],
-                                        dashboardBottomList: []
+                                        supplyPlan: []
                                     }
                                 }
                                 var programJsonForStoringTheResult = programJson;
@@ -1077,31 +1076,74 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                                 programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                                 programJsonForStoringTheResult.supplyPlan = supplyPlanData;
-
-                                var dashboardStartDate = generalProgramJson.startDate;
-                                var dashboardStopDate = generalProgramJson.stopDate;
-                                if (dashboardStartDate == undefined) {
-                                    dashboardStartDate = "2023-01-01";
-                                    dashboardStopDate = "2023-12-31";
+                                var dashboardStartDateBottom = generalProgramJson.startDateBottom;
+                                var dashboardStopDateBottom = generalProgramJson.stopDateBottom;
+                                var dashboardStartDateTop = generalProgramJson.startDateTop;
+                                var dashboardStopDateTop = generalProgramJson.stopDateTop;
+                                if (dashboardStartDateBottom == undefined) {
+                                    dashboardStartDateBottom = "2023-01-01";
+                                    dashboardStopDateBottom = "2023-12-31";
+                                    dashboardStartDateTop = "2023-01-01";
+                                    dashboardStopDateTop = "2023-12-31";
                                 }
                                 var planBasedOn = programPlanningUnitList[ppL].planBasedOn;
-
-                                var spFilteredForDashboard = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDate).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDate).format("YYYY-MM"));
-                                var stockOut = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length;
-                                var underStock = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) < (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
-                                var adequate = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) >= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock))) && (Number(c.mos).toFixed(1) <= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
-                                var overStock = spFilteredForDashboard.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) > (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
-                                var monthCount = spFilteredForDashboard;
-                                var na = monthCount - stockOut - underStock - adequate - overStock;
+                                var spFilteredForDashboardBottom = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM"));
+                                console.log("spFilteredForDashboardBottom Test@123",spFilteredForDashboardBottom);
+                                console.log("dashboardStartDateBottom Test@123",dashboardStartDateBottom)
+                                console.log("dashboardStopDateBottom Test@123",dashboardStopDateBottom)
+                                var stockOut = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length;
+                                var underStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) < (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var adequate = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) >= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock))) && (Number(c.mos).toFixed(1) <= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var overStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) > (planBasedOn == 1 ? Number(c.maxStockMoS) : Number(c.maxStock)))).length;
+                                var monthCount = moment(dashboardStopDateBottom).diff(moment(dashboardStartDateBottom), 'months')+1;
+                                console.log("MOnth Count Test@123",monthCount)
+                                var na = Number(monthCount) - Number(stockOut) - Number(underStock) - Number(adequate) - Number(overStock);
                                 var stockOutPerc = Number(stockOut) / Number(monthCount);
                                 var underStockPerc = Number(underStock) / Number(monthCount);
                                 var adequatePerc = Number(adequate) / Number(monthCount);
                                 var overStockPerc = Number(overStock) / Number(monthCount);
                                 var naPerc = Number(na) / Number(monthCount);
-                                var expiresList = [];
-                                var expiresList=spFilteredForDashboard.filter(c=>Number(c.expiredStock)>0);
-                                
-                                var dashboardBottomList = {
+                                var expiriesList = [];
+                                spFilteredForDashboardBottom.flatMap(item=>item.batchDetails).filter(c=>Number(c.expiredQty)>0).map(item => {
+                                    var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
+                                    var expiryJson = {
+                                        "expDate": moment(item.expiryDate).format("YYYY-MM-DD"),
+                                        "batchId": item.batchId,
+                                        "batchNo": item.batchNo,
+                                        "autoGenerated": item.autoGenerated,
+                                        "expiringQty": item.expiredQty,
+                                        "price": price,
+                                        "expiryAmt": Number(price)*Number(item.expiredQty)
+                                    }
+                                    expiriesList.push(expiryJson)
+                                })
+                                var shipmentListFiltered=shipmentList.filter(c => c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (moment(c.receivedDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.receivedDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")) : (moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")));
+                                var shipmentDetailsByFundingSource=Object.values(shipmentListFiltered.reduce((acc, { fundingSource, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
+                                    const { id, label, code } = fundingSource; // Destructure id and label
+                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0 };
+                                    acc[id].quantity += shipmentQty;
+                                    acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
+                                    acc[id].orderCount += 1;
+                                    return acc;
+                                }, {}));
+                                var shipmentDetailsByProcurementAgent=Object.values(shipmentListFiltered.reduce((acc, { procurementAgent, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
+                                    const { id, label, code } = procurementAgent; // Destructure id and label
+                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0 };
+                                    acc[id].quantity += shipmentQty;
+                                    acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
+                                    acc[id].orderCount += 1;
+                                    return acc;
+                                }, {}));
+                                var shipmentDetailsByShipmentStatus=Object.values(shipmentListFiltered.reduce((acc, { shipmentStatus, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
+                                    const { id, label } = shipmentStatus; // Destructure id and label
+                                    acc[id] = acc[id] || { reportBy: { id, label, code:"" }, quantity: 0, cost: 0, orderCount: 0 };
+                                    acc[id].quantity += shipmentQty;
+                                    acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
+                                    acc[id].orderCount += 1;
+                                    return acc;
+                                }, {}));
+
+                                var dashboardBottom = {
                                     "stockStatus": {
                                         "stockOut": stockOut,
                                         "underStock": underStock,
@@ -1114,6 +1156,40 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         "stockOutPerc": stockOutPerc,
                                         "overStockPerc": overStockPerc,
                                         "adequatePerc": adequatePerc
+                                    },
+                                    "expiriesList":expiriesList,
+                                    "shipmentDetailsByFundingSource":shipmentDetailsByFundingSource,
+                                    "shipmentDetailsByProcurementAgent":shipmentDetailsByProcurementAgent,
+                                    "shipmentDetailsByShipmentStatus":shipmentDetailsByShipmentStatus,
+                                    "countOfTbdFundingSource":shipmentListFiltered.filter(c=>c.fundingSource.id==TBD_FUNDING_SOURCE).length,
+                                    "forecastError":0,
+                                    "forecastConsumptionQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].forecastConsumptionQplPassed:false,
+                                    "inventoryQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].inventoryQplPassed:false,
+                                    "shipmentQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].shipmentQplPassed:false,
+                                    "actualConsumptionQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].actualConsumptionQplPassed:false,
+                                }
+                                if(generalProgramJson.bottomPuData==undefined || generalProgramJson.bottomPuData==""){
+                                    generalProgramJson.bottomPuData=[];
+                                }
+                                generalProgramJson.bottomPuData[programPlanningUnitList[ppL].planningUnit.id]=dashboardBottom;
+                                var spFilteredForDashboardTop = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateTop).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateTop).format("YYYY-MM"));
+                                var stockOutFlag = spFilteredForDashboardTop.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length>0?true:false;
+
+                                var valueOfExpiredStock = 0;
+                                spFilteredForDashboardTop.flatMap(item=>item.batchDetails).filter(c=>Number(c.expiredQty)>0).map(item => {
+                                    var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
+                                    valueOfExpiredStock+= Number(price)*Number(item.expiredQty);
+                                })
+                                if(generalProgramJson.topPuData==undefined || generalProgramJson.topPuData==""){
+                                    generalProgramJson.topPuData=[];
+                                }
+                                if(generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=undefined && generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=""){
+                                    generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id].stockOut=stockOutFlag;
+                                    generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id].valueOfExpiredStock=valueOfExpiredStock;
+                                }else{
+                                    generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id]={
+                                        "stockOut":stockOutFlag,
+                                        "valueOfExpiredStock":valueOfExpiredStock
                                     }
                                 }
                                 if (planningUnitDataIndex != -1) {
@@ -1123,9 +1199,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         } catch (err) {
+                            console.log("Error Test@123",err)
                             props.fetchData(1, programId)
                         }
                         programDataJson.planningUnitDataList = planningUnitDataList;
+                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                         programRequest.result.programData = programDataJson;
                         var programDataTransaction = db1.transaction([objectStoreName], 'readwrite');
                         var programDataOs = programDataTransaction.objectStore(objectStoreName);

@@ -773,6 +773,7 @@ export default class SyncMasterData extends Component {
                                                 })
                                             }
                                             generalJson.actionList = actionList;
+                                            generalJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                             generalJson.shipmentBudgetList = shipmentBudgetList;
                                             generalJson.shipmentLinkingList = linkedShipmentsList.concat(inactiveLinkedShipmentsList);
                                             generalJson.problemReportList = problemReportList;

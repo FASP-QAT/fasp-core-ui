@@ -1613,6 +1613,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     })
                     programJson.inventoryList = inventoryDataList;
                     generalProgramJson.actionList = actionList;
+                    generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     if (planningUnitDataIndex != -1) {
                         planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     } else {

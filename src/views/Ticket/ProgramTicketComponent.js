@@ -82,6 +82,10 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.arrivedToDeliveredLeadTime'))
             .min(0, i18n.t('static.program.validvaluetext'))
             .matches(/^\s*(?=.*[1-9])\d{1,2}(?:\.\d{1,2})?\s*$/, i18n.t('static.message.2digitDecimal')),
+        noOfMonthsInPastForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
     })
 }
 /**
@@ -112,7 +116,8 @@ export default class ProgramTicketComponent extends Component {
                 shippedToArrivedByRoadLeadTime: '',
                 arrivedToDeliveredLeadTime: '',
                 notes: "",
-                priority: 3
+                priority: 3,
+                noOfMonthsInPastForBottomDashboard:18
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -189,6 +194,9 @@ export default class ProgramTicketComponent extends Component {
         }
         if (event.target.name == "roadFreightPerc") {
             program.roadFreightPerc = event.target.value;
+        }
+        if (event.target.name == "noOfMonthsInPastForBottomDashboard") {
+            program.noOfMonthsInPastForBottomDashboard = event.target.value;
         }
         if (event.target.name == "plannedToSubmittedLeadTime") {
             program.plannedToSubmittedLeadTime = event.target.value;
@@ -680,6 +688,7 @@ export default class ProgramTicketComponent extends Component {
         program.airFreightPerc = '';
         program.seaFreightPerc = '';
         program.roadFreightPerc = '';
+        program.noOfMonthsInPastForBottomDashboard=18;
         program.plannedToSubmittedLeadTime = '';
         program.submittedToApprovedLeadTime = '';
         program.approvedToShippedLeadTime = '';
@@ -783,6 +792,7 @@ export default class ProgramTicketComponent extends Component {
                             airFreightPerc: '',
                             seaFreightPerc: '',
                             roadFreightPerc: '',
+                            noOfMonthsInPastForBottomDashboard:18,
                             plannedToSubmittedLeadTime: '',
                             submittedToApprovedLeadTime: '',
                             approvedToShippedLeadTime: '',
@@ -1151,6 +1161,20 @@ export default class ProgramTicketComponent extends Component {
                                             min="0"
                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                         <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInPastForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInPastForBottomDashboard"
+                                            id="noOfMonthsInPastForBottomDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInPastForBottomDashboard}
+                                            invalid={touched.noOfMonthsInPastForBottomDashboard && !!errors.noOfMonthsInPastForBottomDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.program.noOfMonthsInPastForBottomDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>

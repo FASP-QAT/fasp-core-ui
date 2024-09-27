@@ -42,7 +42,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
-import { DashboardTop } from '../Dashboard/DashboardTop.js';
+import { Dashboard } from '../Dashboard/Dashboard.js';
 /**
  * Component for showing the dashboard.
  */
@@ -387,7 +387,7 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    DashboardTop(this, false);
+    Dashboard(this, "2535_v119_uId_6",1,true,true);
     Chart.plugins.register({
       beforeDraw: function (chart) {
         if (chart.config.type === 'doughnut') {
