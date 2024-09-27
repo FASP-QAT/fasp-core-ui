@@ -65,7 +65,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             if(treeId != -1) {
                 var sourceNodes = treeList[0].tree.flatList.filter(x => x.payload.downwardAggregationAllowed);
                 if(sourceNodes.length > 0){
-                    datasetJson.treeList.map(t => t.tree.flatList.filter(f => f.payload.nodeType.id == 6).map(n => n.payload.downwardAggregationList.filter(da => {
+                    datasetJson.treeList.map(t => t.tree.flatList.filter(f => f.payload.nodeType.id == 6).map(n => n.payload.downwardAggregationList && n.payload.downwardAggregationList.filter(da => {
                         if(sourceNodes.map(c => c.payload.nodeId.toString()).includes(da.nodeId.toString()) && da.treeId == treeList[0].treeId) {
                             treeList = treeList.concat(t);
                         }
@@ -98,7 +98,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     }
                 }
                 flatListUnsorted.filter(x => x.payload.nodeType.id == 6).map(t => {
-                    t.payload.downwardAggregationList.map(x => {
+                    t.payload.downwardAggregationList && t.payload.downwardAggregationList.map(x => {
                         if(flatList.filter(e => e.payload.nodeId == x.nodeId).length > 0) {
                             flatList = flatList.concat(flatListUnsorted.filter(c => c.sortOrder.toString().startsWith(t.sortOrder.toString())))
                         }

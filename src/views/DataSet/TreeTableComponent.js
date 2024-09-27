@@ -1162,7 +1162,7 @@ export default class TreeTable extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId = scenarioId;
         for (let i = 0; i < items.length; i++) {
-            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2 || items[i].payload.nodeType.id == 6) {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
@@ -1827,6 +1827,8 @@ export default class TreeTable extends Component {
         tr.children[8].title = i18n.t('static.treeTable.parentValueTooltip');
         tr.children[9].classList.add('InfoTr');
         tr.children[9].title = i18n.t('static.treeTable.nodeValueTooltip');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[10].title = "Available to be aggregated by funnel nodes";
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -2639,7 +2641,7 @@ export default class TreeTable extends Component {
                 type: 'numeric',
             },
             {
-                title: "Source Node (available to be aggregated by Funnel Nodes)",
+                title: "Source Node",
                 type: 'checkbox',
                 width: 200
             },
@@ -4494,12 +4496,17 @@ export default class TreeTable extends Component {
                         for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
                             if(this.state.treeData[i].scenarioList[j].active) {
                                 tempDownwardAggregationList.filter(x => x.value.split("~")[0] == this.state.treeData[i].treeId).map(x => downwardAggregationList.push({
-                                    name: x.label.split("~")[0]+" > "+this.state.treeData[i].scenarioList[j].label.label_en+" > "+x.label.split("~")[1],
+                                    name: x.label.split("~")[0]+(this.state.treeData[i].scenarioList.filter(s => s.active).length > 1 ? (" > "+this.state.treeData[i].scenarioList[j].label.label_en) : "")+" > ... "+(this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent).length > 0 ? this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent)[0].payload.label.label_en : "")+" > "+x.label.split("~")[1],
                                     id: x.value.split("~")[0]+"~"+this.state.treeData[i].scenarioList[j].id+"~"+x.value.split("~")[1]
                                 }))
                             }
                         }
                     }
+                    downwardAggregationList = downwardAggregationList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }.bind(this))
                     this.setState({ downwardAggregationList });
                     if (this.state.treeId != "" && this.state.treeId != 0) {
                         this.getTreeByTreeId(this.state.treeId);
