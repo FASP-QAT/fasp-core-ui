@@ -35,13 +35,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
         ,
         approvedToShippedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -852,13 +848,11 @@ class AddProcurementAgentComponent extends Component {
                                                         bsSize="sm"
                                                         name="submittedToApprovedLeadTime"
                                                         id="submittedToApprovedLeadTime"
-                                                        valid={!errors.submittedToApprovedLeadTime && this.state.procurementAgent.submittedToApprovedLeadTime != ''}
+                                                        valid={!errors.submittedToApprovedLeadTime}
                                                         invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.submittedToApprovedLeadTime}
-                                                        min="0"
                                                     />
                                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </FormGroup>
@@ -868,13 +862,11 @@ class AddProcurementAgentComponent extends Component {
                                                         bsSize="sm"
                                                         name="approvedToShippedLeadTime"
                                                         id="approvedToShippedLeadTime"
-                                                        valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
+                                                        valid={!errors.approvedToShippedLeadTime}
                                                         invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.approvedToShippedLeadTime}
-                                                        min="1"
                                                     />
                                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </FormGroup>
