@@ -78,6 +78,7 @@ class AddProcurementAgentComponent extends Component {
                 approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
                 colorHtmlCode: '#F17013',
+                colorHtmlDarkCode: '#F17013',
                 procurementAgentType: {
                     id: ''
                 },
@@ -642,6 +643,7 @@ class AddProcurementAgentComponent extends Component {
                                         submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
                                         approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
+                                        colorHtmlDarkCode: this.state.procurementAgent.colorHtmlDarkCode,
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
                                         programId: this.state.procurementAgent.programList.id
                                     }}
@@ -915,6 +917,7 @@ class AddProcurementAgentComponent extends Component {
         procurementAgent.submittedToApprovedLeadTime = ''
         procurementAgent.approvedToShippedLeadTime = ''
         procurementAgent.colorHtmlCode = ''
+        procurementAgent.colorHtmlDarkCode = ''
         this.setState({
             procurementAgent
         },
