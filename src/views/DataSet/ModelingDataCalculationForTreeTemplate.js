@@ -49,7 +49,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
         }
         var transferToNodeList = [];
         flatListUnsorted.filter(x => x.payload.nodeType.id == 6).map(t => {
-            t.payload.downwardAggregationList.map(x => {
+            t.payload.downwardAggregationList && t.payload.downwardAggregationList.map(x => {
                 if(flatList.filter(e => e.payload.nodeId == x.nodeId).length > 0) {
                     flatList = flatList.concat(flatListUnsorted.filter(c => c.sortOrder.toString().startsWith(t.sortOrder.toString())))
                 }
@@ -667,7 +667,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
         var aggregateDownwardNodeList = flatList.filter(c => c.payload.nodeType.id == 6);
         var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
         for (var fl = 0; fl < aggregateDownwardNodeList.length; fl++) {
-            if(!calculateAggregationDownward || (calculateAggregationDownward && !calculatedNodeList.includes(aggregateDownwardNodeList[fl].id))) {
+            if((!calculateAggregationDownward || (calculateAggregationDownward && !calculatedNodeList.includes(aggregateDownwardNodeList[fl].id))) && aggregateDownwardNodeList[fl].payload.downwardAggregationList && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId) {
                 var payload = aggregateDownwardNodeList[fl].payload;
                 if (payload.nodeType.id == 6) {
                     calculatedNodeList.push(aggregateDownwardNodeList[fl].id);

@@ -6858,7 +6858,17 @@ export default class BuildTree extends Component {
             newItems.push(e)
         }
         for (var i = 0; i < newItems.length; i++) {
-            if(newItems[i].payload.downwardAggregationList) {
+            if(newItems[i].payload.downwardAggregationList || newItems[i].payload.nodeType.id == 6) {
+                if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
+                    treeLevelItems.push({
+                        annotationType: AnnotationType.HighlightPath,
+                        items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                        color: "#FFFFFF",
+                        lineWidth: 10,
+                        opacity: 1,
+                        showArrows: false
+                    })
+                }
                 for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
                     if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections){
                         treeLevelItems.push(new ConnectorAnnotationConfig({
@@ -6883,7 +6893,7 @@ export default class BuildTree extends Component {
                         opacity: 1,
                         showArrows: false
                     })
-                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
+                    var tempValidLines = newItems.filter(x => x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
                     for(var k = 0; k < tempValidLines.length; k++) {
                         treeLevelItems.push({
                             annotationType: AnnotationType.HighlightPath,
@@ -6899,14 +6909,13 @@ export default class BuildTree extends Component {
         }
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
-            items: newItems,
             pageFitMode: PageFitMode.Enabled,
             hasSelectorCheckbox: Enabled.False,
             hasButtons: Enabled.True,
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "ContactTemplate",
-            linesColor: Colors.Black,
+            linesColor: Colors.White,
             annotations: treeLevelItems,
             items: newItems,
             templates: (templates || [])
@@ -12929,23 +12938,8 @@ export default class BuildTree extends Component {
         }
         var newItems = this.state.items;   
         for (var i = 0; i < newItems.length; i++) {
-            if(newItems[i].payload.downwardAggregationList) {
-                for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections){
-                        treeLevelItems.push(new ConnectorAnnotationConfig({
-                            annotationType: AnnotationType.Connector,
-                            fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
-                            toItem: parseInt(newItems[i].id),
-                            labelSize: { width: 80, height: 30 },
-                            connectorShapeType: ConnectorShapeType.OneWay,
-                            color: "#000000",
-                            offset: 0,
-                            lineWidth: 1,
-                            lineType: LineType.Solid,
-                            connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
-                            selectItems: false
-                        }));
-                    }
+            if(newItems[i].payload.nodeType.id == 6) {
+                if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
                     treeLevelItems.push({
                         annotationType: AnnotationType.HighlightPath,
                         items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
@@ -12954,16 +12948,42 @@ export default class BuildTree extends Component {
                         opacity: 1,
                         showArrows: false
                     })
-                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
-                    for(var k = 0; k < tempValidLines.length; k++) {
+                } else {
+                    for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                        if(newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections){
+                            treeLevelItems.push(new ConnectorAnnotationConfig({
+                                annotationType: AnnotationType.Connector,
+                                fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                                toItem: parseInt(newItems[i].id),
+                                labelSize: { width: 80, height: 30 },
+                                connectorShapeType: ConnectorShapeType.OneWay,
+                                color: "#000000",
+                                offset: 0,
+                                lineWidth: 1,
+                                lineType: LineType.Solid,
+                                connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
+                                selectItems: false
+                            }));
+                        }
                         treeLevelItems.push({
                             annotationType: AnnotationType.HighlightPath,
-                            items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
-                            color: "#000000",
-                            lineWidth: 1,
+                            items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                            color: "#FFFFFF",
+                            lineWidth: 10,
                             opacity: 1,
                             showArrows: false
                         })
+                        var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
+                        for(var k = 0; k < tempValidLines.length; k++) {
+                            treeLevelItems.push({
+                                annotationType: AnnotationType.HighlightPath,
+                                items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
+                                color: "#000000",
+                                lineWidth: 1,
+                                opacity: 1,
+                                showArrows: false
+                            })
+                        }
                     }
                 }
             }

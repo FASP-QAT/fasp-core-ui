@@ -34,6 +34,9 @@ import { grey } from '@material-ui/core/colors';
 import ModelingTypeService from "../../api/ModelingTypeService";
 import docicon from '../../assets/img/doc.png';
 import AggregationNode from '../../assets/img/Aggregation-icon.png';
+import AggregationDown from '../../assets/img/funnel.png';
+import AggregationAllowed from '../../assets/img/aggregateAllowed.png';
+import AggregationAllowedRed from '../../assets/img/aggregateAllowedRed.png';
 import { saveAs } from "file-saver";
 import { convertInchesToTwip, Document, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingDataForTreeTemplate } from '../../views/DataSet/ModelingDataCalculationForTreeTemplate';
@@ -121,7 +124,7 @@ const validationSchemaNodeData = function (values) {
         nodeUnitId: Yup.string()
             .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2 || parseInt(document.getElementById("nodeTypeId").value) == 4) && document.getElementById("nodeUnitId").value == "") {
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 6) && document.getElementById("nodeUnitId").value == "") {
                         return false;
                     } else {
                         return true;
@@ -830,7 +833,9 @@ export default class CreateTreeTemplate extends Component {
             invalidNodeType: "",
             invalidParentNodeType: "",
             downwardAggregationList: [],
-            multiselectError: false
+            multiselectError: false,
+            showConnections: true,
+            sourceNodeUsageList: []
         }
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
@@ -964,6 +969,7 @@ export default class CreateTreeTemplate extends Component {
         this.toggleTooltipNodeUnit = this.toggleTooltipNodeUnit.bind(this);
         this.setCopyModeling = this.setCopyModeling.bind(this);
         this.downwardAggregationListChange = this.downwardAggregationListChange.bind(this);
+        this.changeShowConnections = this.changeShowConnections.bind(this);
     }
     /**
        * Hides the message in div3 after 30 seconds.
@@ -3067,8 +3073,60 @@ export default class CreateTreeTemplate extends Component {
             e.result2 = this.getPayloadData(items1[i], 5)
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
+            e.flatList = this.state.treeTemplate.flatList;
+            e.treeId = this.state.treeTemplate.treeTemplateId;
             delete e.templateName;
             newItems.push(e)
+        }
+        for (var i = 0; i < newItems.length; i++) {
+            if(newItems[i].payload.downwardAggregationList || newItems[i].payload.nodeType.id == 6) {
+                if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
+                    treeLevelItems.push({
+                        annotationType: AnnotationType.HighlightPath,
+                        items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                        color: "#FFFFFF",
+                        lineWidth: 10,
+                        opacity: 1,
+                        showArrows: false
+                    })
+                }
+                for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                    if(this.state.showConnections){
+                        treeLevelItems.push(new ConnectorAnnotationConfig({
+                            annotationType: AnnotationType.Connector,
+                            fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                            toItem: parseInt(newItems[i].id),
+                            labelSize: { width: 80, height: 30 },
+                            connectorShapeType: ConnectorShapeType.OneWay,
+                            color: "#000000",
+                            offset: 0,
+                            lineWidth: 1,
+                            lineType: LineType.Solid,
+                            connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
+                            selectItems: false
+                        }));
+                    }
+                    treeLevelItems.push({
+                        annotationType: AnnotationType.HighlightPath,
+                        items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                        color: "#FFFFFF",
+                        lineWidth: 10,
+                        opacity: 1,
+                        showArrows: false
+                    })
+                    var tempValidLines = newItems.filter(x => x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
+                    for(var k = 0; k < tempValidLines.length; k++) {
+                        treeLevelItems.push({
+                            annotationType: AnnotationType.HighlightPath,
+                            items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
+                            color: "#000000",
+                            lineWidth: 1,
+                            opacity: 1,
+                            showArrows: false
+                        })
+                    }
+                }
+            }
         }
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
@@ -3078,7 +3136,7 @@ export default class CreateTreeTemplate extends Component {
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "ContactTemplate",
-            linesColor: Colors.Black,
+            linesColor: Colors.White,
             annotations: treeLevelItems,
             items: newItems,
             templates: (templates || [])
@@ -5147,20 +5205,20 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
-                    type: 'numeric',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id != 6 ? 'hidden' : 'numeric',
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
                 {
                     title: i18n.t('static.tree.seasonalityIndex'),
-                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    type: this.state.seasonality == true && this.state.currentItemConfig.context.payload.nodeType.id != 6 ? 'numeric' : 'hidden',
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
                 },
                 {
                     title: i18n.t('static.tree.manualChange+-'),
-                    type: this.state.seasonality == true ? 'numeric' : 'hidden',
+                    type: this.state.seasonality == true && this.state.currentItemConfig.context.payload.nodeType.id != 6 ? 'numeric' : 'hidden',
                     mask: '#,##0.00', decimal: '.',
                 },
                 {
@@ -6100,7 +6158,7 @@ export default class CreateTreeTemplate extends Component {
         var nodeType;
         var nodeTypeList = [];
         var downwardAggregationList = [];
-        this.state.treeTemplate.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (t.level == (this.state.addNodeFlag ? this.state.currentItemConfig.context.level : this.state.currentItemConfig.context.level-1) ? downwardAggregationList.push({label: t.payload.label.label_en, value: this.state.treeTemplate.treeTemplateId+"~"+"0"+"~"+t.payload.nodeId}) : "" ))
+        this.state.treeTemplate.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => downwardAggregationList.push({label: t.payload.label.label_en, value: this.state.treeTemplate.treeTemplateId+"~"+"0"+"~"+t.payload.nodeId}));
         // for(var i = 0; i < this.state.treeTemplate.length; i++) {
         //     for(var j = 0; j < this.state.treeTemplate[i].scenarioList.length; j++) {
         //         if(this.state.treeTemplate[i].scenarioList[j].active) {
@@ -6270,6 +6328,12 @@ export default class CreateTreeTemplate extends Component {
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
                 child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level+1;
+                if(child.payload.nodeType.id == 6 ){
+                    child.payload.downwardAggregationList = [];
+                }
+                if(child.payload.downwardAggregationAllowed) {
+                    child.payload.downwardAggregationAllowed = false;
+                }
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = items.filter(c => c.parent == itemConfig.parent);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -6291,6 +6355,12 @@ export default class CreateTreeTemplate extends Component {
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
                 child.level = parentNode.newLevel+1;
+                if(child.payload.nodeType.id == 6 ){
+                    child.payload.downwardAggregationList = [];
+                }
+                if(child.payload.downwardAggregationAllowed) {
+                    child.payload.downwardAggregationAllowed = false;
+                }
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7323,6 +7393,9 @@ export default class CreateTreeTemplate extends Component {
         }, () => {
             this.calculateMOMData(0, 2);
         });
+    }
+    changeShowConnections(e) {
+        this.setState({ showConnections: !e.target.checked })
     }
     /**
      * Gets the value of a node based on its type.
@@ -9071,7 +9144,10 @@ export default class CreateTreeTemplate extends Component {
     onCursoChanged(event, data) {
         const { context: item } = data;
         if (item != null) {
+            var sourceNodeUsageList = [];
+            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == data.context.payload.nodeId) ? sourceNodeUsageList.push({treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
             this.setState({
+                sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
                 usageTemplateId: '',
                 sameLevelNodeList: [],
@@ -10000,7 +10076,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id < 4 ? 'block' : 'none' }}>
+                                                <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 6 || (this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id < 4) ? 'block' : 'none' }}>
                                                     <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="select"
@@ -10012,7 +10088,7 @@ export default class CreateTreeTemplate extends Component {
                                                         onBlur={handleBlur}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         required
-                                                        disabled={!this.state.editable ? true : this.state.currentItemConfig.context.payload.nodeType.id > 3 && this.state.currentItemConfig.context.parent != null ? true : false}
+                                                        disabled={!this.state.editable ? true : this.state.currentItemConfig.context.payload.nodeType.id > 3 && this.state.currentItemConfig.context.payload.nodeType.id != 6 && this.state.currentItemConfig.context.parent != null ? true : false}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.parent != null ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -10130,11 +10206,11 @@ export default class CreateTreeTemplate extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="downwardAggregationAllowed" style={{ fontSize: '12px' }}>
-                                                        <b>{'Available to be aggregated'}</b>
+                                                        <b>{'Source Node (available to be aggregated by Funnel Nodes)'}</b>
                                                     </Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 6 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">Source Node</Label>
+                                                    <Label htmlFor="currencyId"><b>Source</b> (Tree Name &gt; Scenario Name &gt; … Parent Name &gt; Node Name)</Label>
                                                     <MultiSelect
                                                         name="downwardAggregationList"
                                                         id="downwardAggregationList"
@@ -10154,6 +10230,13 @@ export default class CreateTreeTemplate extends Component {
                                                         value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].notes}
                                                     ></Input>
                                                 </FormGroup>
+                                                {this.state.currentItemConfig.context.payload.downwardAggregationAllowed && <div className="col-md-6">
+                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>Used by the following funnel nodes </b> (Node Name)</>}
+                                                    {this.state.sourceNodeUsageList.length == 0 && <b className='red'>Not used by any nodes.</b>}<br></br>
+                                                    {this.state.sourceNodeUsageList.map(sn => (<>
+                                                        {sn.nodeName}
+                                                    <br></br></>))}
+                                                </div>}
                                             </div>
                                         </>
                                     }
@@ -11965,6 +12048,7 @@ export default class CreateTreeTemplate extends Component {
             }, this);
         const Node = ({ itemConfig, isDragging, connectDragSource, canDrop, isOver, connectDropTarget }) => {
             var illegalNode = false;
+            var outerLink = false;
             var itemConfigParent = this.state.treeTemplate.flatList.filter(x => x.id == itemConfig.parent);
             var allowedNodeTypeList = []; 
             if(itemConfigParent.length > 0) {
@@ -11984,13 +12068,15 @@ export default class CreateTreeTemplate extends Component {
                     itemTitleColor = "#BA0C2F";
                 }
             }
+            var sourceNodeUsageListCount = [];
+            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
                     </div>
                     :
                     <div className={(itemConfig.payload.nodeDataMap[0] != undefined && itemConfig.payload.nodeDataMap[0][0].isPUMappingCorrect == 0) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[0][0].notes}>
-                        <div className={itemConfig.payload.nodeType.id == 5
+                        <div className={outerLink ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : itemConfig.payload.nodeType.id == 5
                             || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                             (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
                         >
@@ -12000,23 +12086,28 @@ export default class CreateTreeTemplate extends Component {
                                     {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                     {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                     {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                    <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
+                                    <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : (itemConfig.payload.nodeType.id == 6 ? <><span style={{color: '#002f6c'}} className={itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length == 0 ? "red" : "" : "red"}>{itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length : 0}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
+                                    {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
+                                    {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? <i><img src={AggregationAllowedRed} className="AggregationDownwardNodeSize" /></i> : ""}
                                 </div>
                             </div>
                         </div>
                         <div className="ContactPhone ContactPhoneValue">
-                            <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
-                            <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}> {this.getPayloadData(itemConfig, 2)}</p></div>
-                            <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>
+                            <span style={{ textAlign: 'center', fontWeight: '500' }}>{itemConfig.payload.nodeType.id == 6 ? this.getPayloadData(itemConfig, 2).split(" ")[1] : this.getPayloadData(itemConfig, 1)}</span>
+                            {itemConfig.payload.nodeType.id != 6 && <div style={{ overflow: 'inherit', fontStyle: 'italic' }}><p className="" style={{ textAlign: 'center' }}> {this.getPayloadData(itemConfig, 2)}</p></div>}
+                            {itemConfig.payload.nodeType.id != 6 && <div className="treeValidation"><span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 3) != "" ? i18n.t('static.ManageTree.SumofChildren') + ": " : ""}</span><span className={this.getPayloadData(itemConfig, 3) != 100 ? "treeValidationRed" : ""}>{this.getPayloadData(itemConfig, 3) != "" ? this.getPayloadData(itemConfig, 3) + "%" : ""}</span></div>}
                         </div>
                     </div>)
             ))
         }
         const HighlightNode = ({ itemConfig }) => {
             let itemTitleColor = Colors.RoyalBlue;
+            var sourceNodeUsageListCount = [];
+            var outerLink = false;
+            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes} style={{ height: "88px", width: "200px", zIndex: "1" }}>
-                    <div className={itemConfig.payload.nodeType.id == 5
+                    <div className={outerLink ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                         (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
                     >
@@ -12134,21 +12225,8 @@ export default class CreateTreeTemplate extends Component {
         }
         var newItems = this.state.items;       
         for (var i = 0; i < newItems.length; i++) {
-            if(newItems[i].payload.downwardAggregationList) {
-                for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    treeLevelItems.push(new ConnectorAnnotationConfig({
-                        annotationType: AnnotationType.Connector,
-                        fromItem: parseInt(newItems[i].id),
-                        toItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
-                        labelSize: { width: 80, height: 30 },
-                        connectorShapeType: ConnectorShapeType.OneWay,
-                        color: Colors.Green,
-                        offset: 0,
-                        lineWidth: 2,
-                        lineType: LineType.Dashed,
-                        connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
-                        selectItems: false
-                    }));
+            if(newItems[i].payload.nodeType.id == 6) {
+                if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
                     treeLevelItems.push({
                         annotationType: AnnotationType.HighlightPath,
                         items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
@@ -12157,16 +12235,42 @@ export default class CreateTreeTemplate extends Component {
                         opacity: 1,
                         showArrows: false
                     })
-                    var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent).filter(x => x.id != parseInt(newItems[i].id));
-                    for(var k = 0; k < tempValidLines.length; k++) {
+                } else {
+                    for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                        if(true) {
+                            treeLevelItems.push(new ConnectorAnnotationConfig({
+                                annotationType: AnnotationType.Connector,
+                                fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
+                                toItem: parseInt(newItems[i].id),
+                                labelSize: { width: 80, height: 30 },
+                                connectorShapeType: ConnectorShapeType.OneWay,
+                                color: Colors.Black,
+                                offset: 0,
+                                lineWidth: 1,
+                                lineType: LineType.Solid,
+                                connectorPlacementType: ConnectorPlacementType.Straight, //Offbeat
+                                selectItems: false
+                            }));
+                        }
                         treeLevelItems.push({
                             annotationType: AnnotationType.HighlightPath,
-                            items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
-                            color: "#000000",
-                            lineWidth: 1,
+                            items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
+                            color: "#FFFFFF",
+                            lineWidth: 10,
                             opacity: 1,
                             showArrows: false
                         })
+                        var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent).filter(x => x.id != parseInt(newItems[i].id));
+                        for(var k = 0; k < tempValidLines.length; k++) {
+                            treeLevelItems.push({
+                                annotationType: AnnotationType.HighlightPath,
+                                items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
+                                color: "#000000",
+                                lineWidth: 1,
+                                opacity: 1,
+                                showArrows: false
+                            })
+                        }
                     }
                 }
             }
@@ -13100,6 +13204,25 @@ export default class CreateTreeTemplate extends Component {
                                                                             {i18n.t('static.dataentry.inactive')}
                                                                         </Label>
                                                                     </FormGroup>
+                                                                </FormGroup>
+                                                                <FormGroup>
+                                                                    <div className="check inline paddinCheckbox pt-lg-0">
+                                                                        <div>
+                                                                            <Input
+                                                                                className="form-check-input checkboxMargin"
+                                                                                type="checkbox"
+                                                                                id="active10"
+                                                                                name="active10"
+                                                                                checked={!this.state.showConnections}
+                                                                                onClick={(e) => { this.changeShowConnections(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>Hide Funnel node connections</b>
+                                                                            </Label>
+                                                                        </div>
+                                                                    </div>
                                                                 </FormGroup>
                                                             </Row>
                                                         </div>
