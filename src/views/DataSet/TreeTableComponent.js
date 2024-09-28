@@ -3967,11 +3967,13 @@ export default class TreeTable extends Component {
                             curItem.context = items.filter(c => c.id == json[i][9])[0];
                             curItem.context.payload.label.label_en = json[i][3];
                             let tempList = [];
-                            json[i][5].split(";").map(x => tempList.push({
-                                treeId: x.split("~")[0],
-                                scenarioId: x.split("~")[1],
-                                nodeId: x.split("~")[2]
-                            }));
+                            if(json[i][5] != ""){
+                                json[i][5].split(";").map(x => tempList.push({
+                                    treeId: x.split("~")[0],
+                                    scenarioId: x.split("~")[1],
+                                    nodeId: x.split("~")[2]
+                                }));
+                            }   
                             curItem.context.payload.downwardAggregationList = tempList;
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
@@ -3981,11 +3983,11 @@ export default class TreeTable extends Component {
                                 currentItemConfig: curItem
                             }, () => {
                                 this.updateNodeInfoInJson(curItem).then(() => {
-                                    this.setState({
-                                        items: this.state.dataSetObj.programData.treeList.filter(x => x.treeid == this.state.treeId)[0].tree.flatList
-                                    }, () => {
-                                        this.buildTab3Jexcel();
-                                    })
+                                    // this.setState({
+                                    //     items: this.state.dataSetObj.programData.treeList.filter(x => x.treeid == this.state.treeId)[0].tree.flatList
+                                    // }, () => {
+                                    //     this.buildTab3Jexcel();
+                                    // })
                                 })
                             })
                         }

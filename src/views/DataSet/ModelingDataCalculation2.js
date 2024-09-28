@@ -66,7 +66,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 var sourceNodes = treeList[0].tree.flatList.filter(x => x.payload.downwardAggregationAllowed);
                 if(sourceNodes.length > 0){
                     datasetJson.treeList.map(t => t.tree.flatList.filter(f => f.payload.nodeType.id == 6).map(n => n.payload.downwardAggregationList && n.payload.downwardAggregationList.filter(da => {
-                        if(sourceNodes.map(c => c.payload.nodeId.toString()).includes(da.nodeId.toString()) && da.treeId == treeList[0].treeId) {
+                        if(da.nodeId && sourceNodes.map(c => c.payload.nodeId.toString()).includes(da.nodeId.toString()) && da.treeId == treeList[0].treeId) {
                             treeList = treeList.concat(t);
                         }
                     })))
@@ -692,7 +692,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var count = maxCount ? maxCount : 0; 
                     var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
                     for (var fl = 0; fl < aggregateDownwardNodeList.length; fl++) {
-                        if((!calculateAggregationDownward || (calculateAggregationDownward && aggregateDownwardNodeList[fl].id != nodeId && treeList[tl].treeId == treeId) || (calculateAggregationDownward && treeList[tl].treeId != treeId)) && count <= aggregateDownwardNodeList.length) {
+                        if((!calculateAggregationDownward || (calculateAggregationDownward && aggregateDownwardNodeList[fl].id != nodeId && treeList[tl].treeId == treeId) || (calculateAggregationDownward && treeList[tl].treeId != treeId)) && count <= aggregateDownwardNodeList.length && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId) {
                             var payload = aggregateDownwardNodeList[fl].payload;
                             count++;
                             if (payload.nodeType.id == 6) {
