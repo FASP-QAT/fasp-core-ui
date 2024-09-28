@@ -31,13 +31,14 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                             var stockedOutCount = 0;
                             var valueOfExpiredPU = 0;
                             if (topPuData != "" && topPuData != undefined) {
-                                topPuData.map(item => {
-                                    if (item != undefined && item!=null) {
-                                        if (item.stockOut.toString() == "true") {
-                                            stockedOutCount += 1;
-                                        }
-                                        valueOfExpiredPU += Number(item.valueOfExpiredStock)
+                                var puIds=ppu.filter(c => c.active.toString() == "true")
+                                console.log("Pu Ids Test@123",puIds);
+                                puIds.map(pu => {
+                                    var item = topPuData[pu.planningUnit.id];
+                                    if (item.stockOut.toString() == "true") {
+                                        stockedOutCount += 1;
                                     }
+                                    valueOfExpiredPU += Number(item.valueOfExpiredStock)
                                 })
                             }
                             var dashboradTop = {
@@ -112,28 +113,25 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                     var totalQpl = 0;
                     var expiryTotal = 0;
                     if (bottomPuData != "" && bottomPuData != undefined) {
-                        var puIds = Object.keys(bottomPuData);
+                        var puIds=ppuListForProgram.filter(c => c.active.toString() == "true")
                         puIds.map(item => {
-                            var value = bottomPuData[item];
-                            // console.log("Value Test@123",value);
-                            // console.log("Key Test@123",item);
-                            var ppu = ppuListForProgram.filter(c => c.planningUnit.id == item && c.active.toString() == "true");
-                            if (ppu.length > 0) {
+                            var value = bottomPuData[item.planningUnit.id];
+                            if (value!=undefined) {
                                 stockOut += Number(value.stockStatus.stockOut);
                                 underStock += Number(value.stockStatus.underStock);
                                 adequate += Number(value.stockStatus.adequate);
                                 overStock += Number(value.stockStatus.overStock);
-                                console.log("value.stockStatus.na Test@123",value.stockStatus.na)
+                                console.log("value.stockStatus.na Test@123", value.stockStatus.na)
                                 na += Number(value.stockStatus.na);
                                 if (Number(value.stockStatus.stockOut)) {
                                     puStockOutList.push({
-                                        "planningUnit": ppu[0].planningUnit,
+                                        "planningUnit": item.planningUnit,
                                         "count": Number(value.stockOut)
                                     })
                                 }
                                 var expiryList = value.expiriesList;
                                 expiryList.forEach(expiry => {
-                                    expiry.planningUnit = ppu[0].planningUnit;
+                                    expiry.planningUnit = item.planningUnit;
                                     expiryTotal += Number(expiry.expiryAmt);
                                 });
                                 expiriesList = expiriesList.concat(expiryList);
@@ -146,7 +144,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 }
                                 if (Number(value.countOfTbdFundingSource) > 0) {
                                     shipmentWithFundingSourceTbd.push({
-                                        "planningUnit": ppu[0].planningUnit,
+                                        "planningUnit": item.planningUnit,
                                         "count": Number(value.countOfTbdFundingSource)
                                     })
                                 }
