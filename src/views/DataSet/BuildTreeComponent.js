@@ -13404,7 +13404,7 @@ export default class BuildTree extends Component {
                                                     )} />
                                         </div>
                                         <div className="row ml-lg-1 pb-lg-2">
-                                            <b>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
+                                            <b><span className='text-blackD'>{i18n.t('static.tree.editIn')}</span>&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
                                             <FormGroup className="col-md-2"  style={{ marginLeft: '2%' }}>
                                                 <div className="check inline  pl-lg-1 pt-lg-0">
                                                     <div>
