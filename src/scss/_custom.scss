@@ -3038,9 +3038,9 @@ label.arrow_label:before {
 .jss>tbody>tr>td.readonly {
   color: #212721 !important;
 }
-.jss > thead > tr > td{
-  z-index: 1!important;
-}
+// .jss > thead > tr > td{
+//   z-index: 1!important;
+// }
 .jexcelRedCell {
   color: #BA0C2F !important;
   font-weight: bolder;
@@ -3056,6 +3056,9 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
 .jcontextmenu > div a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   color: #555!important;
   text-decoration: none;
+}
+.black{
+  color: #e5edf5;
 }
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
