@@ -3052,6 +3052,9 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   color: #e4e5e6;
   text-decoration: none;
 }
+.Iconclr{
+  filter: brightness(15);
+}
 .jcontextmenu > div:hover {
   /* background: #ebebeb; */
   color: #555 !important;
@@ -12638,7 +12641,7 @@ legend.scheduler-border {
   width: 20px;
   height: 20px;
   margin-top: -2px;
-  filter: brightness(3);
+  // filter: brightness(3);
 }
 
 .ExtraCheckboxFieldWidth {
