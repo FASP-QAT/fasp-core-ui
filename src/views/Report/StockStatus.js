@@ -149,7 +149,11 @@ class StockStatus extends Component {
       // equivalencyUnitId: "",
       // dataList: [],
     }, () => {
-      ReportService.getDropdownListByProgramIds(this.state.programId.map(ele => ele.value)).then(response => {
+      var json={
+        programIds:this.state.programId.map(ele => ele.value),
+        onlyAllowPuPresentAcrossAllPrograms:false
+      }
+      ReportService.getDropdownListByProgramIds(json).then(response => {
         this.setState({
           equivalencyUnitList: response.data.equivalencyUnitList,
           planningUnitListAll: response.data.planningUnitList,
@@ -1650,7 +1654,7 @@ class StockStatus extends Component {
       var inventoryList = [];
       var consumptionList = [];
       var shipmentList = [];
-      var responseData = response.data;
+      var responseData = response.data.stockStatusVerticalAggregateList;
       let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
       var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
       filteredResponseData.map(c => {
