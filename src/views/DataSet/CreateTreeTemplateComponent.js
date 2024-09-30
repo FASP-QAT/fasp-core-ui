@@ -4406,7 +4406,7 @@ export default class CreateTreeTemplate extends Component {
                             return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2)) + "% of parent" + val2 + (val < 0.01 ? addCommasThreeDecimal(Number(val).toFixed(3)) : addCommasTwoDecimal(Number(val).toFixed(2))) + val1;
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2)) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
-                        } else {
+                        } else if (itemConfig.payload.nodeType.id != 6) {
                             return addCommasTwoDecimal(Number((itemConfig.payload.nodeDataMap[0])[0].displayDataValue).toFixed(2)) + "% of parent";
                         }
                     } else if (type == 3) {
@@ -11885,6 +11885,9 @@ export default class CreateTreeTemplate extends Component {
             }
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas(this.getPayloadData(items[i], 1)))
+                row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
+            } else if(items[i].payload.nodeType.id == 6) {
+                row = row.concat(this.getPayloadData(items[i], 2).split(" ")[1])
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             } else {
                 row = row.concat(this.getPayloadData(items[i], 1))
