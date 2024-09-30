@@ -1208,14 +1208,16 @@ export default class QatProblemActionNew extends Component {
                                                                 }
                                                             }
                                                         }
-                                                        if(programList[pp].generalData.bottomPuData==undefined || programList[pp].generalData.bottomPuData==""){
-                                                            programList[pp].generalData.bottomPuData=[]
+                                                        if(programList[pp].generalData.dashboardData!=undefined){
+                                                        if(programList[pp].generalData.dashboardData.bottomPuData==undefined || programList[pp].generalData.dashboardData.bottomPuData==""){
+                                                            programList[pp].generalData.dashboardData.bottomPuData=[]
                                                         }
                                                         var paListForDashboard=problemActionList.filter(c => c.program.id == programList[pp].generalData.programId && c.planningUnit.id==planningUnitList[p].planningUnit.id && c.problemStatus.id==1);
-                                                        programList[pp].generalData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
-                                                        programList[pp].generalData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==23).length>0?false:true;
-                                                        programList[pp].generalData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
-                                                        programList[pp].generalData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=shipmentQplPassed;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==23).length>0?false:true;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=shipmentQplPassed;
+                                                    }
                                                     }
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);

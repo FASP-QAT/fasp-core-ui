@@ -27,41 +27,39 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson = JSON.parse(programData);
                             var generalProgramJson = programJson;
-                            var topPuData = generalProgramJson.topPuData;
-                            var stockedOutCount = 0;
-                            var valueOfExpiredPU = 0;
-                            if (topPuData != "" && topPuData != undefined) {
-                                var puIds=ppu.filter(c => c.active.toString() == "true")
-                                console.log("Pu Ids Test@123",puIds);
-                                puIds.map(pu => {
-                                    var item = topPuData[pu.planningUnit.id];
-                                    if (item.stockOut.toString() == "true") {
-                                        stockedOutCount += 1;
-                                    }
-                                    valueOfExpiredPU += Number(item.valueOfExpiredStock)
-                                })
+                            var dashboardData = generalProgramJson.dashboardData;
+                            if (dashboardData != undefined) {
+                                var topPuData = dashboardData.topPuData;
+                                var stockedOutCount = 0;
+                                var valueOfExpiredPU = 0;
+                                if (topPuData != "" && topPuData != undefined) {
+                                    var puIds = ppu.filter(c => c.active.toString() == "true")
+                                    console.log("Pu Ids Test@123", puIds);
+                                    puIds.map(pu => {
+                                        var item = topPuData[pu.planningUnit.id];
+                                        if (item.stockOut.toString() == "true") {
+                                            stockedOutCount += 1;
+                                        }
+                                        valueOfExpiredPU += Number(item.valueOfExpiredStock)
+                                    })
+                                }
+                                var dashboradTop = {
+                                    "program": {
+                                        "id": item.id,
+                                        "label": programJson.label
+                                    },
+                                    "activePlanningUnits": ppu.filter(c => c.active).length,
+                                    "disabledPlanningUnits": ppu.filter(c => c.active == false).length,
+                                    "countOfStockOutPU": stockedOutCount,
+                                    "valueOfExpiredPU": valueOfExpiredPU,
+                                    "countOfOpenProblem": programJson.problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length,
+                                    "lastModifiedDate": moment(programJson.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss"),
+                                    "commitDate": programJson.currentVersion.createdDate,
+                                    "versionType": programJson.currentVersion.versionType,
+                                    "versionStatus": programJson.currentVersion.versionStatus
+                                }
+                                dashboradTopList.push(dashboradTop);
                             }
-                            var dashboradTop = {
-                                "program": {
-                                    "id": item.id,
-                                    "label": programJson.label
-                                },
-                                "activePlanningUnits": ppu.filter(c => c.active).length,
-                                "disabledPlanningUnits": ppu.filter(c => c.active == false).length,
-                                "countOfStockOutPU": stockedOutCount,
-                                "valueOfExpiredPU": valueOfExpiredPU,
-                                "countOfOpenProblem": programJson.problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length,
-                                "lastModifiedDate": moment(programJson.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss"),
-                                "commitDate": programJson.currentVersion.createdDate,
-                                "versionType": programJson.currentVersion.versionType,
-                                "versionStatus": programJson.currentVersion.versionStatus
-                            }
-                            dashboradTopList.push(dashboradTop);
-                            generalProgramJson.dashboradTop = dashboradTop;
-                            item.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                            var programTransaction = db1.transaction(['programData'], 'readwrite');
-                            var programObjectStore = programTransaction.objectStore('programData');
-                            programObjectStore.put(item);
                         })
                         console.log("dashboradTopList Test@123", dashboradTopList)
                         props.updateStateDashboard("dashboardTopList", dashboradTopList);
@@ -96,120 +94,125 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                     console.log("ProgramJson Test@123", programJson);
                     var generalProgramJson = programJson;
                     var dashboardBottomData = {};
-                    var bottomPuData = generalProgramJson.bottomPuData;
-                    var stockOut = 0;
-                    var underStock = 0;
-                    var adequate = 0;
-                    var overStock = 0;
-                    var na = 0;
-                    var puStockOutList = [];
-                    var expiriesList = [];
-                    var shipmentDetailsList = [];
-                    var shipmentWithFundingSourceTbd = [];
-                    var forecastConsumptionQplCount = 0;
-                    var actualConsumptionQplCount = 0;
-                    var inventoryQplCount = 0;
-                    var shipmentQplCount = 0;
-                    var totalQpl = 0;
-                    var expiryTotal = 0;
-                    if (bottomPuData != "" && bottomPuData != undefined) {
-                        var puIds=ppuListForProgram.filter(c => c.active.toString() == "true")
-                        puIds.map(item => {
-                            var value = bottomPuData[item.planningUnit.id];
-                            if (value!=undefined) {
-                                stockOut += Number(value.stockStatus.stockOut);
-                                underStock += Number(value.stockStatus.underStock);
-                                adequate += Number(value.stockStatus.adequate);
-                                overStock += Number(value.stockStatus.overStock);
-                                console.log("value.stockStatus.na Test@123", value.stockStatus.na)
-                                na += Number(value.stockStatus.na);
-                                if (Number(value.stockStatus.stockOut)) {
-                                    puStockOutList.push({
-                                        "planningUnit": item.planningUnit,
-                                        "count": Number(value.stockOut)
-                                    })
+                    var dashboardData = generalProgramJson.dashboardData;
+                    if (dashboardData != undefined) {
+                        var bottomPuData = dashboardData.bottomPuData;
+                        var stockOut = 0;
+                        var underStock = 0;
+                        var adequate = 0;
+                        var overStock = 0;
+                        var na = 0;
+                        var puStockOutList = [];
+                        var expiriesList = [];
+                        var shipmentDetailsList = [];
+                        var shipmentWithFundingSourceTbd = [];
+                        var forecastConsumptionQplCount = 0;
+                        var actualConsumptionQplCount = 0;
+                        var inventoryQplCount = 0;
+                        var shipmentQplCount = 0;
+                        var totalQpl = 0;
+                        var expiryTotal = 0;
+                        if (bottomPuData != "" && bottomPuData != undefined) {
+                            var puIds = ppuListForProgram.filter(c => c.active.toString() == "true")
+                            puIds.map(item => {
+                                var value = bottomPuData[item.planningUnit.id];
+                                if (value != undefined) {
+                                    stockOut += Number(value.stockStatus.stockOut);
+                                    underStock += Number(value.stockStatus.underStock);
+                                    adequate += Number(value.stockStatus.adequate);
+                                    overStock += Number(value.stockStatus.overStock);
+                                    console.log("value.stockStatus.na Test@123", value.stockStatus.na)
+                                    na += Number(value.stockStatus.na);
+                                    if (Number(value.stockStatus.stockOut)) {
+                                        puStockOutList.push({
+                                            "planningUnit": item.planningUnit,
+                                            "count": Number(value.stockOut)
+                                        })
+                                    }
+                                    var expiryList = value.expiriesList;
+                                    expiryList.forEach(expiry => {
+                                        expiry.planningUnit = item.planningUnit;
+                                        expiryTotal += Number(expiry.expiryAmt);
+                                    });
+                                    expiriesList = expiriesList.concat(expiryList);
+                                    if (reportBy == 1) {
+                                        shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByFundingSource)
+                                    } else if (reportBy == 2) {
+                                        shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByProcurementAgent)
+                                    } else {
+                                        shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByShipmentStatus)
+                                    }
+                                    if (Number(value.countOfTbdFundingSource) > 0) {
+                                        shipmentWithFundingSourceTbd.push({
+                                            "planningUnit": item.planningUnit,
+                                            "count": Number(value.countOfTbdFundingSource)
+                                        })
+                                    }
+                                    totalQpl += 1;
+                                    if (value.forecastConsumptionQplPassed.toString() == "true") {
+                                        forecastConsumptionQplCount += 1;
+                                    }
+                                    if (value.actualConsumptionQplPassed.toString() == "true") {
+                                        actualConsumptionQplCount += 1;
+                                    }
+                                    if (value.inventoryQplPassed.toString() == "true") {
+                                        inventoryQplCount += 1;
+                                    }
+                                    if (value.shipmentQplPassed.toString() == "true") {
+                                        shipmentQplCount += 1;
+                                    }
                                 }
-                                var expiryList = value.expiriesList;
-                                expiryList.forEach(expiry => {
-                                    expiry.planningUnit = item.planningUnit;
-                                    expiryTotal += Number(expiry.expiryAmt);
-                                });
-                                expiriesList = expiriesList.concat(expiryList);
-                                if (reportBy == 1) {
-                                    shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByFundingSource)
-                                } else if (reportBy == 2) {
-                                    shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByProcurementAgent)
-                                } else {
-                                    shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByShipmentStatus)
-                                }
-                                if (Number(value.countOfTbdFundingSource) > 0) {
-                                    shipmentWithFundingSourceTbd.push({
-                                        "planningUnit": item.planningUnit,
-                                        "count": Number(value.countOfTbdFundingSource)
-                                    })
-                                }
-                                totalQpl += 1;
-                                if (value.forecastConsumptionQplPassed.toString() == "true") {
-                                    forecastConsumptionQplCount += 1;
-                                }
-                                if (value.actualConsumptionQplPassed.toString() == "true") {
-                                    actualConsumptionQplCount += 1;
-                                }
-                                if (value.inventoryQplPassed.toString() == "true") {
-                                    inventoryQplCount += 1;
-                                }
-                                if (value.shipmentQplPassed.toString() == "true") {
-                                    shipmentQplCount += 1;
-                                }
+                            });
+                            var totalStock = Number(stockOut) + Number(underStock) + Number(adequate) + Number(overStock) + Number(na);
+                            var shipmentTotal = 0;
+                            shipmentDetailsList.map(item => {
+                                shipmentTotal += Number(item.cost)
+                            })
+                            dashboardBottomData = {
+                                "stockStatus": {
+                                    "stockOut": stockOut,
+                                    "underStock": underStock,
+                                    "adequate": adequate,
+                                    "overStock": overStock,
+                                    "na": na,
+                                    "total": totalStock,
+                                    "puStockOutList": puStockOutList,
+                                    "stockOutPerc": Number(stockOut) / Number(totalStock),
+                                    "underStockPerc": Number(underStock) / Number(totalStock),
+                                    "adequatePerc": Number(adequate) / Number(totalStock),
+                                    "overStockPerc": Number(overStock) / Number(totalStock),
+                                    "naPerc": Number(na) / Number(totalStock)
+                                },
+                                "expiriesList": expiriesList,
+                                "shipmentDetailsList": shipmentDetailsList,
+                                "shipmentWithFundingSourceTbd": shipmentWithFundingSourceTbd,
+                                "forecastErrorList": [],
+                                "forecastConsumptionQpl": {
+                                    "puCount": totalQpl,
+                                    "correctCount": forecastConsumptionQplCount
+                                },
+                                "actualConsumptionQpl": {
+                                    "puCount": totalQpl,
+                                    "correctCount": actualConsumptionQplCount
+                                },
+                                "inventoryQpl": {
+                                    "puCount": totalQpl,
+                                    "correctCount": inventoryQplCount
+                                },
+                                "shipmentQpl": {
+                                    "puCount": totalQpl,
+                                    "correctCount": shipmentQplCount
+                                },
+                                "expiryTotal": expiryTotal,
+                                "shipmentTotal": shipmentTotal
                             }
-                        });
-                        var totalStock = Number(stockOut) + Number(underStock) + Number(adequate) + Number(overStock) + Number(na);
-                        var shipmentTotal = 0;
-                        shipmentDetailsList.map(item => {
-                            shipmentTotal += Number(item.cost)
-                        })
-                        dashboardBottomData = {
-                            "stockStatus": {
-                                "stockOut": stockOut,
-                                "underStock": underStock,
-                                "adequate": adequate,
-                                "overStock": overStock,
-                                "na": na,
-                                "total": totalStock,
-                                "puStockOutList": puStockOutList,
-                                "stockOutPerc": Number(stockOut) / Number(totalStock),
-                                "underStockPerc": Number(underStock) / Number(totalStock),
-                                "adequatePerc": Number(adequate) / Number(totalStock),
-                                "overStockPerc": Number(overStock) / Number(totalStock),
-                                "naPerc": Number(na) / Number(totalStock)
-                            },
-                            "expiriesList": expiriesList,
-                            "shipmentDetailsList": shipmentDetailsList,
-                            "shipmentWithFundingSourceTbd": shipmentWithFundingSourceTbd,
-                            "forecastErrorList": [],
-                            "forecastConsumptionQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": forecastConsumptionQplCount
-                            },
-                            "actualConsumptionQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": actualConsumptionQplCount
-                            },
-                            "inventoryQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": inventoryQplCount
-                            },
-                            "shipmentQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": shipmentQplCount
-                            },
-                            "expiryTotal": expiryTotal,
-                            "shipmentTotal": shipmentTotal
+                            console.log("dashboardBottomData Test@123", dashboardBottomData)
+                            props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
+                            props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.stopDateBottom);
+                            props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
+                        } else {
+                            props.updateStateDashboard("dashboardBottomData", "");
                         }
-                        console.log("dashboardBottomData Test@123", dashboardBottomData)
-                        props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.startDateBottom);
-                        props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.stopDateBottom);
-                        props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
                     } else {
                         props.updateStateDashboard("dashboardBottomData", "");
                     }

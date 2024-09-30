@@ -1076,10 +1076,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                                 programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                                 programJsonForStoringTheResult.supplyPlan = supplyPlanData;
-                                var dashboardStartDateBottom = generalProgramJson.startDateBottom;
-                                var dashboardStopDateBottom = generalProgramJson.stopDateBottom;
-                                var dashboardStartDateTop = generalProgramJson.startDateTop;
-                                var dashboardStopDateTop = generalProgramJson.stopDateTop;
+                                var dashboardData=generalProgramJson.dashboardData;
+                                if(dashboardData!=undefined){
+                                var dashboardStartDateBottom = dashboardData.startDateBottom;
+                                var dashboardStopDateBottom = dashboardData.stopDateBottom;
+                                var dashboardStartDateTop = dashboardData.startDateTop;
+                                var dashboardStopDateTop = dashboardData.stopDateTop;
                                 if (dashboardStartDateBottom == undefined) {
                                     dashboardStartDateBottom = "2023-01-01";
                                     dashboardStopDateBottom = "2023-12-31";
@@ -1163,15 +1165,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     "shipmentDetailsByShipmentStatus":shipmentDetailsByShipmentStatus,
                                     "countOfTbdFundingSource":shipmentListFiltered.filter(c=>c.fundingSource.id==TBD_FUNDING_SOURCE).length,
                                     "forecastError":0,
-                                    "forecastConsumptionQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].forecastConsumptionQplPassed:false,
-                                    "inventoryQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].inventoryQplPassed:false,
-                                    "shipmentQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].shipmentQplPassed:false,
-                                    "actualConsumptionQplPassed":generalProgramJson.bottomPuData!=undefined && generalProgramJson.bottomPuData!="" && generalProgramJson.bottomPuData[planningUnitId]!=undefined?generalProgramJson.bottomPuData[planningUnitId].actualConsumptionQplPassed:false,
+                                    "forecastConsumptionQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].forecastConsumptionQplPassed:false,
+                                    "inventoryQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].inventoryQplPassed:false,
+                                    "shipmentQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].shipmentQplPassed:false,
+                                    "actualConsumptionQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].actualConsumptionQplPassed:false,
                                 }
-                                if(generalProgramJson.bottomPuData==undefined || generalProgramJson.bottomPuData==""){
-                                    generalProgramJson.bottomPuData=[];
+                                if(generalProgramJson.dashboardData.bottomPuData==undefined || generalProgramJson.dashboardData.bottomPuData==""){
+                                    generalProgramJson.dashboardData.bottomPuData=[];
                                 }
-                                generalProgramJson.bottomPuData[programPlanningUnitList[ppL].planningUnit.id]=dashboardBottom;
+                                generalProgramJson.dashboardData.bottomPuData[programPlanningUnitList[ppL].planningUnit.id]=dashboardBottom;
                                 var spFilteredForDashboardTop = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateTop).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateTop).format("YYYY-MM"));
                                 var stockOutFlag = spFilteredForDashboardTop.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length>0?true:false;
 
@@ -1180,18 +1182,19 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
                                     valueOfExpiredStock+= Number(price)*Number(item.expiredQty);
                                 })
-                                if(generalProgramJson.topPuData==undefined || generalProgramJson.topPuData==""){
-                                    generalProgramJson.topPuData=[];
+                                if(generalProgramJson.dashboardData.topPuData==undefined || generalProgramJson.dashboardData.topPuData==""){
+                                    generalProgramJson.dashboardData.topPuData=[];
                                 }
-                                if(generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=undefined && generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=""){
-                                    generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id].stockOut=stockOutFlag;
-                                    generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id].valueOfExpiredStock=valueOfExpiredStock;
+                                if(generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=undefined && generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=""){
+                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].stockOut=stockOutFlag;
+                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].valueOfExpiredStock=valueOfExpiredStock;
                                 }else{
-                                    generalProgramJson.topPuData[programPlanningUnitList[ppL].planningUnit.id]={
+                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]={
                                         "stockOut":stockOutFlag,
                                         "valueOfExpiredStock":valueOfExpiredStock
                                     }
                                 }
+                            }
                                 if (planningUnitDataIndex != -1) {
                                     planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
                                 } else {
