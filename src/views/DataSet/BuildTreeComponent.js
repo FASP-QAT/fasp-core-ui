@@ -12933,7 +12933,8 @@ export default class BuildTree extends Component {
                 }));
             }
         }
-        var newItems = this.state.items;   
+        var newItems = this.state.items;
+        var curTheme = localStorage.getItem("theme");   
         for (var i = 0; i < newItems.length; i++) {
             if(newItems[i].payload.nodeType.id == 6) {
                 if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
@@ -12942,7 +12943,7 @@ export default class BuildTree extends Component {
                         items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
                         color: "#FFFFFF",
                         lineWidth: 10,
-                        opacity: 1,
+                        opacity: curTheme == "dark" ? 0 : 1,
                         showArrows: false
                     })
                 } else {
@@ -12954,7 +12955,7 @@ export default class BuildTree extends Component {
                                 toItem: parseInt(newItems[i].id),
                                 labelSize: { width: 80, height: 30 },
                                 connectorShapeType: ConnectorShapeType.OneWay,
-                                color: "#000000",
+                                color: curTheme == "dark" ? "#FFFFFF" : "#000000",
                                 offset: 0,
                                 lineWidth: 1,
                                 lineType: LineType.Solid,
@@ -12965,9 +12966,9 @@ export default class BuildTree extends Component {
                         treeLevelItems.push({
                             annotationType: AnnotationType.HighlightPath,
                             items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
-                            color: "#FFFFFF",
+                            color: curTheme == "dark" ? "#ff0000" : "#FFFFFF",
                             lineWidth: 10,
-                            opacity: 1,
+                            opacity: curTheme == "dark" ? 0 : 1,
                             showArrows: false
                         })
                         var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
@@ -12975,7 +12976,7 @@ export default class BuildTree extends Component {
                             treeLevelItems.push({
                                 annotationType: AnnotationType.HighlightPath,
                                 items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
-                                color: "#000000",
+                                color: curTheme == "dark" ? "#FFFFFF" : "#000000",
                                 lineWidth: 1,
                                 opacity: 1,
                                 showArrows: false
