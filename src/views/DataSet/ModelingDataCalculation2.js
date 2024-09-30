@@ -692,7 +692,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var count = maxCount ? maxCount : 0; 
                     var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
                     for (var fl = 0; fl < aggregateDownwardNodeList.length; fl++) {
-                        if((!calculateAggregationDownward || (calculateAggregationDownward && aggregateDownwardNodeList[fl].id != nodeId && treeList[tl].treeId == treeId) || (calculateAggregationDownward && treeList[tl].treeId != treeId)) && count <= aggregateDownwardNodeList.length && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId) {
+                        if((!calculateAggregationDownward || (calculateAggregationDownward && aggregateDownwardNodeList[fl].id != nodeId && treeList[tl].treeId == treeId) || (calculateAggregationDownward && treeList[tl].treeId != treeId)) && count <= aggregateDownwardNodeList.length) {
                             var payload = aggregateDownwardNodeList[fl].payload;
                             count++;
                             if (payload.nodeType.id == 6) {
@@ -704,9 +704,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                                     var childNodeFlatList = [];
                                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                                    aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => {
-                                        childNodeFlatList.push(datasetJson.treeList.filter(c => c.treeId.toString() == x.treeId.toString())[0].tree.flatList.filter(t => t.id.toString() == x.nodeId.toString())[0])
-                                    })
+                                    if (aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId ) {
+                                        aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => {
+                                            childNodeFlatList.push(datasetJson.treeList.filter(c => c.treeId.toString() == x.treeId.toString())[0].tree.flatList.filter(t => t.id.toString() == x.nodeId.toString())[0])
+                                        })
+                                    }
                                     // var treeListAD = datasetJson.treeList.map.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId))
                                     // var childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
                                     var monthList = [];

@@ -667,7 +667,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
         var aggregateDownwardNodeList = flatList.filter(c => c.payload.nodeType.id == 6);
         var aggregateNodeList = flatList.filter(c => c.payload.nodeType.id == 1);
         for (var fl = 0; fl < aggregateDownwardNodeList.length; fl++) {
-            if((!calculateAggregationDownward || (calculateAggregationDownward && !calculatedNodeList.includes(aggregateDownwardNodeList[fl].id))) && aggregateDownwardNodeList[fl].payload.downwardAggregationList && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId) {
+            if((!calculateAggregationDownward || (calculateAggregationDownward && !calculatedNodeList.includes(aggregateDownwardNodeList[fl].id)))) {
                 var payload = aggregateDownwardNodeList[fl].payload;
                 if (payload.nodeType.id == 6) {
                     calculatedNodeList.push(aggregateDownwardNodeList[fl].id);
@@ -682,7 +682,10 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     }
                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                         var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                        var childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
+                        var childNodeFlatList = [];
+                        if(aggregateDownwardNodeList[fl].payload.downwardAggregationList && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId) {
+                            childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
+                        }
                         var monthList = [];
                         childNodeFlatList.map(d => {
                             if (d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList != undefined && d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList.length > 0) {

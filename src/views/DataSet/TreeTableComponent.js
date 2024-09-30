@@ -1043,38 +1043,42 @@ export default class TreeTable extends Component {
      * @param {*} type Type of the node
      */
     calculateMOMData(nodeId, type, currentItemConfig) {
-        let { curTreeObj } = this.state;
-        let { treeData } = this.state;
-        let { dataSetObj } = this.state;
-        var items = this.state.items;
-        var programData = dataSetObj.programData;
-        programData.treeList = treeData;
-        if (this.state.selectedScenario !== "") {
-            curTreeObj.tree.flatList = items;
-        }
-        curTreeObj.scenarioList = this.state.scenarioList;
-        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-        treeData[findTreeIndex] = curTreeObj;
-        programData.treeList = treeData;
-        dataSetObj.programData = programData;
-        if (this.state.autoCalculate) {
-            var scenarioId = this.state.selectedScenario;
-            if (this.state.calculateAllScenario) {
-                scenarioId = -1;
+        return new Promise((resolve, reject) => {
+            let { curTreeObj } = this.state;
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            var items = this.state.items;
+            var programData = dataSetObj.programData;
+            programData.treeList = treeData;
+            if (this.state.selectedScenario !== "") {
+                curTreeObj.tree.flatList = items;
             }
-            this.setState({
-                calculateAllScenario: false
-            })
-            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, true);
-        } else {
-            this.setState({
-                loading: false,
-                modelingJexcelLoader: false,
-                momJexcelLoader: false,
-                message1: "Data updated successfully"
-            }, () => {
-            })
-        }      
+            curTreeObj.scenarioList = this.state.scenarioList;
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+            programData.treeList = treeData;
+            dataSetObj.programData = programData;
+            if (this.state.autoCalculate) {
+                var scenarioId = this.state.selectedScenario;
+                if (this.state.calculateAllScenario) {
+                    scenarioId = -1;
+                }
+                this.setState({
+                    calculateAllScenario: false
+                })
+                calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, true).then(() => {
+                    resolve();
+                });
+            } else {
+                this.setState({
+                    loading: false,
+                    modelingJexcelLoader: false,
+                    momJexcelLoader: false,
+                    message1: "Data updated successfully"
+                }, () => {
+                })
+            }      
+        })
     }
     /**
      * Fetches tracer category list from program data and updates state accordingly.
@@ -1401,7 +1405,7 @@ export default class TreeTable extends Component {
      * Function to update the node info in json
      * @param {*} currentItemConfig The item configuration object that needs to be updated
      */
-    updateNodeInfoInJson(currentItemConfig) {
+    updateNodeInfoInJson(currentItemConfig, isTab3) {
         return new Promise((resolve, reject) => {
             var nodes = this.state.items;
             let { noFURequired, noOfMonthsInUsagePeriod } = this.getNoFURequiredForJexcel(currentItemConfig);
@@ -1470,8 +1474,13 @@ export default class TreeTable extends Component {
                 curTreeObj,
                 isTabDataChanged: false
             }, () => {
-                this.calculateMOMData(currentItemConfig.context.id, 0, currentItemConfig);
-                resolve();
+                this.calculateMOMData(currentItemConfig.context.id, 0, currentItemConfig).then(() => {
+                    if(isTab3) {
+                        setTimeout(() => {
+                            this.toggleModal(0, '3');
+                        }, 2000)
+                    }
+                })
             });
         });
     }
@@ -2642,7 +2651,7 @@ export default class TreeTable extends Component {
             {
                 title: "Source Node",
                 type: 'checkbox',
-                width: 200
+                width: 100
             },
             {
                 title: i18n.t('static.common.notes'),
@@ -3982,13 +3991,7 @@ export default class TreeTable extends Component {
                             this.setState({
                                 currentItemConfig: curItem
                             }, () => {
-                                this.updateNodeInfoInJson(curItem).then(() => {
-                                    // this.setState({
-                                    //     items: this.state.dataSetObj.programData.treeList.filter(x => x.treeid == this.state.treeId)[0].tree.flatList
-                                    // }, () => {
-                                    //     this.buildTab3Jexcel();
-                                    // })
-                                })
+                                this.updateNodeInfoInJson(curItem, true);
                             })
                         }
                     }
@@ -5400,9 +5403,6 @@ export default class TreeTable extends Component {
                                 else if (this.state.treeTabl1El != "") {
                                     jexcel.destroy(document.getElementById('tableDiv1'), true);
                                 }
-                                else if (this.state.treeTabl2El != "") {
-                                    jexcel.destroy(document.getElementById('tableDiv2'), true);
-                                }
                             }
                             this.buildTab3Jexcel();
                         }
@@ -5456,9 +5456,6 @@ export default class TreeTable extends Component {
                             }
                             else if (this.state.treeTabl1El != "") {
                                 jexcel.destroy(document.getElementById('tableDiv1'), true);
-                            }
-                            else if (this.state.treeTabl2El != "") {
-                                jexcel.destroy(document.getElementById('tableDiv2'), true);
                             }
                         }
                         this.buildTab3Jexcel();
@@ -6391,8 +6388,12 @@ export default class TreeTable extends Component {
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab1'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
-                }else{
+                } else if (this.state.activeTab1[0] === '2'){
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab2'), doc.internal.pageSize.width / 2, 50, {
+                        align: 'center'
+                    })
+                } else {
+                    doc.text(i18n.t('static.common.treeTable') + " - " + "Funnel Node", doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
                 }
@@ -6445,8 +6446,10 @@ export default class TreeTable extends Component {
         var json = "";
         if (this.state.activeTab1[0] === '1') {
             json = this.state.treeTabl1El.getJson(null, true);
-        } else {
+        } else if (this.state.activeTab1[0] === '2') {
             json = this.state.treeTabl2El.getJson(null, true);
+        } else {
+            json = this.state.treeTabl3El.getJson(null, true);
         }
         json.map(ele => {
             dataArr = [];
@@ -6467,7 +6470,7 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             dataArr.push(ele[13]);
-                        } else {
+                        } else if (this.state.activeTab1[0] === '2') {
                             dataArr.push(ele[39]);
                         }
                     } else {
