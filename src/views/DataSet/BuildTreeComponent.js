@@ -11934,7 +11934,7 @@ export default class BuildTree extends Component {
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 6 ? "none" : "block" }}>
-                                    <span>{i18n.t('static.modelingTable.note')}</span>
+                                    <span className='DarkThColr'>{i18n.t('static.modelingTable.note')}</span>
                                     <div className="calculatorimg calculatorTable consumptionDataEntryTable">
                                         <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                         </div>
@@ -12939,7 +12939,8 @@ export default class BuildTree extends Component {
                 }));
             }
         }
-        var newItems = this.state.items;   
+        var newItems = this.state.items;
+        var curTheme = localStorage.getItem("theme");   
         for (var i = 0; i < newItems.length; i++) {
             if(newItems[i].payload.nodeType.id == 6) {
                 if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
@@ -12948,7 +12949,7 @@ export default class BuildTree extends Component {
                         items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
                         color: "#FFFFFF",
                         lineWidth: 10,
-                        opacity: 1,
+                        opacity: curTheme == "dark" ? 0 : 1,
                         showArrows: false
                     })
                 } else {
@@ -12960,7 +12961,7 @@ export default class BuildTree extends Component {
                                 toItem: parseInt(newItems[i].id),
                                 labelSize: { width: 80, height: 30 },
                                 connectorShapeType: ConnectorShapeType.OneWay,
-                                color: "#000000",
+                                color: curTheme == "dark" ? "#FFFFFF" : "#000000",
                                 offset: 0,
                                 lineWidth: 1,
                                 lineType: LineType.Solid,
@@ -12971,9 +12972,9 @@ export default class BuildTree extends Component {
                         treeLevelItems.push({
                             annotationType: AnnotationType.HighlightPath,
                             items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
-                            color: "#FFFFFF",
+                            color: curTheme == "dark" ? "#ff0000" : "#FFFFFF",
                             lineWidth: 10,
-                            opacity: 1,
+                            opacity: curTheme == "dark" ? 0 : 1,
                             showArrows: false
                         })
                         var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent && x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
@@ -12981,7 +12982,7 @@ export default class BuildTree extends Component {
                             treeLevelItems.push({
                                 annotationType: AnnotationType.HighlightPath,
                                 items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
-                                color: "#000000",
+                                color: curTheme == "dark" ? "#FFFFFF" : "#000000",
                                 lineWidth: 1,
                                 opacity: 1,
                                 showArrows: false
