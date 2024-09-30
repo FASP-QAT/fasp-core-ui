@@ -321,7 +321,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? value != 0 : value == 0))) {
+            if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? 1==0 : value == 0))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invalidnumber'));

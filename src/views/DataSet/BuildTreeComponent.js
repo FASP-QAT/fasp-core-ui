@@ -494,6 +494,7 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.pickAMonth6 = React.createRef()
         this.state = {
+            isDarkMode: false,
             isBranchTemplateModalOpen: false,
             branchTemplateList: [],
             isValidError: '',
@@ -8683,6 +8684,21 @@ export default class BuildTree extends Component {
      * Calls multiple function on component mount
      */
     componentDidMount() {
+          // Detect initial theme
+          const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+          this.setState({ isDarkMode });
+      
+          // Listening for theme changes
+          const observer = new MutationObserver(() => {
+              const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+              this.setState({ isDarkMode: updatedDarkMode });
+          });
+      
+          observer.observe(document.documentElement, {
+              attributes: true,
+              attributeFilter: ['data-theme'],
+          });
+      
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
@@ -10224,10 +10240,25 @@ export default class BuildTree extends Component {
      * @returns {JSX.Element} - Node details and modeling data.
      */
     tabPane1() {
+        const darkModeColors = [
+            '#d4bbff', 
+            
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+            
+        ];
+        
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         var chartOptions = {
             title: {
                 display: true,
-                text: this.state.showMomData ? this.state.dataSetObj.programData.programCode + "~" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + " - " + document.getElementById("treeId").selectedOptions[0].text + " - " + document.getElementById("scenarioId").selectedOptions[0].text + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomData ? this.state.dataSetObj.programData.programCode + "~" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + " - " + document.getElementById("treeId").selectedOptions[0].text + " - " + document.getElementById("scenarioId").selectedOptions[0].text + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -10236,12 +10267,12 @@ export default class BuildTree extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
-                            fontColor: 'black'
+                            fontColor:fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -10256,17 +10287,21 @@ export default class BuildTree extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 1,
+                            color:gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'left',
                     }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color:gridLineColor,
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -10295,7 +10330,7 @@ export default class BuildTree extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -10310,7 +10345,7 @@ export default class BuildTree extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -10334,7 +10369,8 @@ export default class BuildTree extends Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.showMomDataPercent ? this.state.dataSetObj.programData.programCode + "~" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + " - " + document.getElementById("treeId").selectedOptions[0].text + " - " + document.getElementById("scenarioId").selectedOptions[0].text + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
+                text: this.state.showMomDataPercent ? this.state.dataSetObj.programData.programCode + "~" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + " - " + document.getElementById("treeId").selectedOptions[0].text + " - " + document.getElementById("scenarioId").selectedOptions[0].text + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : "",
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [
@@ -10349,12 +10385,12 @@ export default class BuildTree extends Component {
                                             : getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                     : ""
                                 : "",
-                            fontColor: 'black'
+                                fontColor:fontColor
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -10369,7 +10405,8 @@ export default class BuildTree extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 1
+                            drawBorder: true, lineWidth: 1,
+                            color: gridLineColor,
                         },
                         position: 'left',
                     },
@@ -10383,7 +10420,7 @@ export default class BuildTree extends Component {
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor:fontColor,
                             callback: function (value) {
                                 var cell1 = value + " %";
                                 return cell1;
@@ -10391,17 +10428,21 @@ export default class BuildTree extends Component {
                             min: 0,
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'right',
                     }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -10435,7 +10476,7 @@ export default class BuildTree extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -10449,7 +10490,7 @@ export default class BuildTree extends Component {
                     stack: 3,
                     yAxisID: 'A',
                     backgroundColor: 'transparent',
-                    borderColor: '#002F6C',
+                    borderColor: colors[0],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -11888,7 +11929,7 @@ export default class BuildTree extends Component {
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 6 ? "none" : "block" }}>
-                                    <span>{i18n.t('static.modelingTable.note')}</span>
+                                    <span className='DarkThColr'>{i18n.t('static.modelingTable.note')}</span>
                                     <div className="calculatorimg calculatorTable consumptionDataEntryTable">
                                         <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                         </div>
@@ -12290,7 +12331,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{
+                                <div className="pt-lg-2 pl-lg-0"><i className='text-blackD'>{i18n.t('static.tree.tableDisplays')} <b>{
                                     this.state.currentItemConfig.context.payload.nodeType.id > 2 ?
                                         this.state.currentItemConfig.context.payload.nodeUnit.id != "" ?
                                             this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.unit.id != "" ? getLabelText(this.state.unitList.filter(c => c.unitId == this.state.currentScenario.fuNode.forecastingUnit.unit.id)[0].label, this.state.lang) : ""
@@ -12954,6 +12995,15 @@ export default class BuildTree extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelBackgroundRender: ((data) => {
+                var {context, width, height } = data;
+                var { title, fillColor, opacity } = context;
+                return !opacity ? <div style={{
+                    background: "#212631"}}>
+                </div> : <div style={{
+                  background: "#212631"}}>
+                </div>
+            }),
             onLevelTitleRender: ((data) => {
                 var { context, width, height } = data;
                 var { title, titleColor } = context;
@@ -13410,7 +13460,7 @@ export default class BuildTree extends Component {
                                                                 {treeList}
                                                             </Input>
                                                             <InputGroupAddon addonType="append" onClick={this.toggleCollapse}>
-                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-cog icons Iconinvert" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                     </FormGroup>
@@ -13732,7 +13782,26 @@ export default class BuildTree extends Component {
                                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
                                                                 {this.state.selectedScenario > 0 && <a style={{ marginRight: '7px' }} href="javascript:void();" title={i18n.t('static.qpl.recalculate')} onClick={() => this.recalculate(0, 2)}><i className="fa fa-refresh"></i></a>}
                                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                                                    onClick={() => this.exportPDF()}
+                                                                    onClick={() => {
+                                                                        var curTheme = localStorage.getItem("theme");
+                                                                        if(curTheme == "dark") {
+                                                                            this.setState({
+                                                                                isDarkMode: false
+                                                                            }, () => {
+                                                                                setTimeout(() => {
+                                                                                    this.exportPDF();
+                                                                                    if(curTheme == "dark") {
+                                                                                        this.setState({
+                                                                                            isDarkMode: true
+                                                                                        })
+                                                                                    }
+                                                                                }, 0)
+                                                                            })
+                                                                        } else {
+                                                                            this.exportPDF();
+                                                                        }
+                                                                    }}
+                                                                    
                                                                 />}
                                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />}
                                                             </FormGroup>
@@ -13798,7 +13867,7 @@ export default class BuildTree extends Component {
                                             <div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-12">
-                                                        <p>{i18n.t('static.tree.branchTemplateNotes1') + " "}<b>{this.state.nodeTypeParentNode}</b>{" " + i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" " + i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" " + i18n.t('static.dataset.TreeTemplate')}</a>{" " + i18n.t('static.tree.branchTemplateNotes4')}</p>
+                                                        <p className='DarkThColr'>{i18n.t('static.tree.branchTemplateNotes1') + " "}<b>{this.state.nodeTypeParentNode}</b>{" " + i18n.t('static.tree.branchTemplateNotes2')}{" "}<b>{this.state.possibleNodeTypes.toString()}</b>{" " + i18n.t('static.tree.branchTemplateNotes3')}<a href="/#/dataset/listTreeTemplate">{" " + i18n.t('static.dataset.TreeTemplate')}</a>{" " + i18n.t('static.tree.branchTemplateNotes4')}</p>
                                                         <div className="controls">
                                                             <Input
                                                                 type="select"
@@ -13908,7 +13977,7 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody className="ModalBodyPadding">
+                    <ModalBody className="ModalBodyPadding Darkmode">
                         <div dangerouslySetInnerHTML={{
                             __html: localStorage.getItem('lang') == 'en' ?
                                 showguidanceBuildTreeEn :

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
+		body{padding: 0;margin: 0;color: #272127;}
+	
+/* .table1 td, th {
+  border: 1px solid #c8ced3;
+  text-align: left;
+  padding: 8px;
+  border-collapse: collapse!important;
+  width: 100%;
+}*/
+.table1 td {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 th {
+  border: 1px solid #c8ced3!important;
+  padding: 6px;
+  font-size: 13px;
+}
+.table1 {
+  /* width: 100%; */
+  border-collapse: collapse;
+}
+a {
+    color: #205493;
+    /* text-decoration: none; */
+    background-color: transparent;
+}
+	</style>
+</head>
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Tree Table</h3>
+										
+										<p>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Node Type:</span></p>
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table  style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Node Type</th>
+															<th>Value</th>
+															<th>Potential Children</th>
+															<th>Advanced Functionality</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td style="background: #a7c6ed;color: #002f6c;"><b>Aggregation ∑</b></td>
+															<td>Sum of children</td>
+															<td><b style="color: rgb(0, 47, 108);">∑</b> or Number</td>
+															<td>-</td>
+														</tr>
+														<tr>
+															<td style="background: #a7c6ed;color: #002f6c;"><b>Number #</b></td>
+															<td>Defined at this node</td>
+															<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
+														</tr>
+														<tr>
+															<td style="background: #a7c6ed;color: #002f6c;"><b>Percentage %</b></td>
+															<td>Defined as a percentage of the parent</td>
+															<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+														<tr>
+															<td style="background:#002f6c;color: #fff;"><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>Defined as a percentage of the parent and forecasting unit parameters</td>
+															<td><b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+														<tr>
+															<td style="background:#002f6c;color: #fff;"><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td>Defined as a percentage of the parent and planning unit parameters</td>
+															<td>-</td>
+															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</p>
+									
+										<p>
+											<span style="font-size: 13px; font-weight: bold;">Using Scenarios :</span>Scenarios are used to model different values for 
+											the same tree.
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table  style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Fixed for All Scenarios</th>
+															<th style="width: 230px;">Unique to each Scenario</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td>Tree structure</td>
+															<td>Node value</td>
+														</tr>
+														<tr>
+															<td>Node Title</td>
+															<td>Month</td>
+														</tr>
+														<tr>
+															<td>Node Type</td>
+															<td>Notes</td>
+														</tr>
+														<tr>
+															<td></td>
+															<td>Modeling/Transfer/Extrapolation</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</p>
+										<p style="font-size: 13px;">
+											<span classnames="UnderLineText" style="font-size: 13px;"><b>Tips for specific use cases:</b></span>
+											<ul style="font-size: 13px;">
+												<li><b> Forecasting Node-Type :</b> Select discrete if this product will be used for limited time, and continuous 
+													if it will be used indefinitely.</li>
+												<li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher 
+													levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field 
+													to indicate this delay.
+											<ul style="font-size: 13px;">
+												<li>For example, if the product usage will begin 2 months after the parent node dates, 
+													enter 2 in this field.  </li>
+												<li>This field can also be used where the product switches over time for example, 
+													if forecasting units A, B, and C are used in secession for two months at a time, 
+													you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), 
+													Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C 
+													(discrete for 2 months, lag = 4).</li>
+													<li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same 
+														settings, consider using the <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Usage Templates </a>screen to save your common usages, and then using 
+														the “Copy from Template” field to populate the fields in the forecasting unit nodes. </li>
+											</ul>
+											</li>
+											
+											</ul>
+										</p>
+
+									</li>
+								</ol>
+							</p>
+				</td>
+				</tr>
+				
+		
+							</table>
+						</td>
+					</tr>
+					
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

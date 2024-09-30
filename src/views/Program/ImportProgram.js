@@ -323,7 +323,6 @@ export default class ImportProgram extends Component {
                                     planningUnitDataList[h].planningUnitData = programJsonForPlanningUnit;
                                 }
                                 json.programData.planningUnitDataList = planningUnitDataList;
-                                console.log("json Test@123", json);
                                 var json1 = JSON.parse(fileData.split("@~-~@")[1]);
                                 var userBytes1 = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                 var userId1 = userBytes1.toString(CryptoJS.enc.Utf8);
