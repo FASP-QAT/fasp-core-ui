@@ -1368,6 +1368,7 @@ label.arrow_label:before {
     width: 13px;
     height: 13px;
     color: #e4e5e6;
+    filter: brightness(2);
   }
 
   .collapse-bg {
@@ -2110,6 +2111,8 @@ label.arrow_label:before {
 
   .placeholder.TreeTemplateHeight svg path {
     stroke: #e4e5e6 !important;
+    fill: #fff !important;
+    stroke-width: 2px!important;
   }
 
   .month-picker>.rmp-container .rmp-popup.light .rmp-pad .rmp-btn.select {
@@ -3059,6 +3062,12 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
 }
 .black{
   color: #e5edf5;
+}
+.AggregationDownwardNodeSize {
+  width: 20px;
+  height: 20px;
+  margin-top: -2px;
+  filter:brightness(2);
 }
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
