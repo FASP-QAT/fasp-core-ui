@@ -6640,6 +6640,9 @@ export default class BuildTree extends Component {
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas(this.getPayloadData(items[i], 1)))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
+            } else if(items[i].payload.nodeType.id == 6) {
+                row = row.concat(this.getPayloadData(items[i], 2).split(" ")[1])
+                row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             } else {
                 row = row.concat(this.getPayloadData(items[i], 1)).concat(" ").concat(this.getPayloadData(items[i], 2))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
