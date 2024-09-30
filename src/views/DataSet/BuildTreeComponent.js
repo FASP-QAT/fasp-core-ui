@@ -7323,7 +7323,7 @@ export default class BuildTree extends Component {
         var tempDownwardAggregationList = [];
         var downwardAggregationList = [];
         // this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (x.treeId != this.state.treeId ? (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId})) : (t.level == (this.state.addNodeFlag ? this.state.currentItemConfig.context.level : this.state.currentItemConfig.context.level - 1) ? tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}) : "" ))))
-        this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}))))
+        this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.id}))))
         for(var i = 0; i < this.state.treeData.length; i++) {
             for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
                 if(this.state.treeData[i].scenarioList[j].active) {
