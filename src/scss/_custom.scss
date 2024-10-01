@@ -16205,3 +16205,28 @@ label.arrow_label:before {
   border-left: 0px solid #ccc !important;
   font-weight: bold;
 }
+@media only screen and (min-width: 1474px) {
+  .paddinCheckbox{
+    padding-left:45px ;
+   }
+}
+@media only screen and (min-width: 1656px) {
+  .paddinCheckbox{
+    padding-left:77px ;
+   }
+}
+@media only screen and (min-width: 1769px) {
+  .paddinCheckbox {
+      padding-left: 95px;
+  }
+}
+@media only screen and (min-width: 1990px) {
+  .paddinCheckbox {
+      padding-left: 127px;
+  }
+}
+@media only screen and (min-width: 2654px) {
+  .paddinCheckbox {
+      padding-left: 236px;
+  }
+}

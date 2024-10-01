@@ -13774,7 +13774,8 @@ export default class BuildTree extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-                                        </div>
+                                            </div>
+                                    
                                         <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
                                             <div className="card-header-actions">
                                                 <div className="card-header-action pr-0 pt-lg-0">
