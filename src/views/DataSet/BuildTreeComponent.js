@@ -10860,7 +10860,7 @@ export default class BuildTree extends Component {
                                                     ></Input>
                                                 </FormGroup>
                                                 {this.state.currentItemConfig.context.payload.downwardAggregationAllowed && <div className="col-md-6">
-                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>Used by the following funnel nodes </b> (Tree Name &gt; Scenario Name &gt; … Parent Name &gt; Node Name)</>}
+                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>Aggregated by the following funnel nodes </b> (Tree Name &gt; Scenario Name &gt; … Parent Name &gt; Node Name)</>}
                                                     {this.state.sourceNodeUsageList.length == 0 && <b className='red'>Not used by any nodes.</b>}<br></br>
                                                     {this.state.sourceNodeUsageList.map(sn => (<><u><a href={"/#/dataSet/buildTree/tree/" + sn.treeId + "/" + this.state.programId + "/" + "-1"} target="_blank">
                                                         {sn.treeName+(sn.isScenarioVisible.length > 1 ? (" > "+sn.scenarioName) : "")+" > ... "+sn.parentName+" > "+sn.nodeName}
@@ -11893,7 +11893,7 @@ export default class BuildTree extends Component {
                 </TabPane>
                 <TabPane tabId="2">
                     <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
-                        <div className="row pl-lg-0 pr-lg-3">
+                        <div className="row pl-lg-0 pr-lg-3" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 6 ? "none" : "block" }}>
                             <a className="">
                                 <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>

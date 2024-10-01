@@ -2622,7 +2622,7 @@ export default class TreeTable extends Component {
             {
                 title: i18n.t('static.ManageTree.NodeType'),
                 type: 'html',
-                width: '100'
+                width: '70'
             },
             {
                 title: i18n.t('static.tree.nodeTitle'),
@@ -2631,12 +2631,14 @@ export default class TreeTable extends Component {
             },
             {
                 title: i18n.t('static.tree.nodeUnit'),
+                width: '80',
                 source: this.state.nodeUnitListForDropdown,
                 type: 'dropdown',
             },
             {
                 title: i18n.t('static.supplyPlan.startMonth'),
                 options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                width: '80',
                 type: 'calendar'
             },
             {
@@ -2656,7 +2658,7 @@ export default class TreeTable extends Component {
             {
                 title: "Source Node",
                 type: 'checkbox',
-                width: 100
+                width: 80
             },
             {
                 title: i18n.t('static.common.notes'),
@@ -4514,7 +4516,7 @@ export default class TreeTable extends Component {
                 }, () => {
                     var tempDownwardAggregationList = [];
                     var downwardAggregationList = [];
-                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}))))
+                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.id}))))
                     for(var i = 0; i < this.state.treeData.length; i++) {
                         for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
                             if(this.state.treeData[i].scenarioList[j].active) {
