@@ -212,6 +212,7 @@ export default class PlanningUnitSetting extends Component {
      */
     onPaste(instance, data) {
         var z = -1;
+        console.log('pasted data: ',data);
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
@@ -241,11 +242,32 @@ export default class PlanningUnitSetting extends Component {
                     name: data[i].value
                 };
                 let temp_list = this.state.dropdownList;
-                temp_list[data[i].y] = temp_obj;
+                console.log(i + ' temp_list: ',temp_list);
+
+                // temp_list[data[i].y] = temp_obj;
+
+
+                let index = temp_list.findIndex(c => c.id == temp_obj.id);
+                console.log(temp_obj.id + ' : index: ',index);
+
+                if(index == -1) {
+                    //if new planning unit push to list
+                    temp_list.push(temp_obj);
+                } 
+                // else {
+                //     continue loop1;
+                // }
+
+                //to find unique entries
+                // const uniqueById = [...new Map(temp_list.map(item => [item.id, item])).values()];
+                // console.log('uniqueById: ',uniqueById);
+
+                console.log('temp_list updated: ',temp_list);
                 this.setState(
                     {
                         dropdownList: temp_list
                     }, () => {
+                        (instance).setValueFromCoords(1, data[i].y, '', true);//temp added
                         (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
                     }
                 )
@@ -879,12 +901,29 @@ export default class PlanningUnitSetting extends Component {
         let count = 0;
         let indexVar = 1;
         let dropdownList = this.state.dropdownList;
-        for (var j = 0; j < outPutList.length; j++) {
+        console.log('\noutPutList.length buildJExcel : ',outPutList.length);
+        console.log('outPutList: ',outPutList);
+        console.log('dropdownList buildJExcel 1: ',dropdownList);
+    loop1: for (var j = 0; j < outPutList.length; j++) {
             data = [];
-            dropdownList[j] = {
-                id: outPutList[j].planningUnit.id,
-                name: outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
-            };
+
+            let index = dropdownList.findIndex(c => c.id == outPutList[j].planningUnit.id);
+            console.log(outPutList[j].planningUnit.id + ' : index: ',index);
+
+            if(index == -1) {
+                //if new planning unit push to list
+                dropdownList.push({
+                    id: outPutList[j].planningUnit.id,
+                    name: outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
+                });
+            } else {
+                continue loop1;
+            }
+
+            // dropdownList[j] = {
+            //     id: outPutList[j].planningUnit.id,
+            //     name: outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
+            // };
             data[0] = outPutList[j].planningUnit.forecastingUnit.productCategory.id
             data[1] = outPutList[j].planningUnit.id;
             data[2] = (outPutList[j].planningUnit.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
@@ -938,6 +977,7 @@ export default class PlanningUnitSetting extends Component {
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
         var data = outPutListArray;
+        console.log('dropdownList after updated by outPutList: ',dropdownList);
         this.setState({ dropdownList: dropdownList })
         var options = {
             data: data,
