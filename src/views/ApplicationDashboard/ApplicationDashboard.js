@@ -1954,17 +1954,17 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
               <div className='col-md-12'>
                 <div className='row'>
                   <div className='col-md-3'>
-                    <div className="card custom-card" style={{ height: '375px' }}>
+                    <div className="card custom-card CustomHeight">
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Stock Status </div>
                       </div>
-                      <div class="card-body">
+                      <div class="card-body pt-lg-0">
                         <HorizontalBar data={stockStatusData} options={stockStatusOptions} />
                       </div>
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Stocked out Planning Units (3) </div>
                       </div>
-                      <div class="card-body pt-2 pb-0">
+                      <div class="card-body pt-0 pb-0">
                         <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
                           <li class="success">
                             <div class="d-flex align-items-center justify-content-between">
@@ -1989,18 +1989,18 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="card custom-card" style={{ height: '375px' }}>
+                    <div className="card custom-card CustomHeight">
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Forecast Error </div>
                       </div>
-                      <div class="card-body px-0 py-0">
-                        <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable'>
+                      <div class="card-body px-0 py-0" style={{overflow:'hidden'}}>
+                        <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="card custom-card" style={{ height: '375px' }}>
+                    <div className="card custom-card CustomHeight">
                       <div class="card-header  justify-content-between">
                         <div class="card-title">Shipments </div>
                       </div>
@@ -2012,12 +2012,12 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="card custom-card" style={{ height: '375px' }}>
+                    <div className="card custom-card CustomHeight">
                       <div class="card-header  justify-content-between">
                         <div class="card-title"># of Shipments with funding TBD </div>
                       </div>
-                      <div class="card-body px-0 py-0">
-                        <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable1'>
+                      <div class="card-body px-0 py-0" style={{overflow:'hidden'}}>
+                        <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2'>
                         </div>
                       </div>
                     </div>
@@ -2025,12 +2025,12 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                 </div>
                 <div className='row'>
                   <div className='col-md-6'>
-                    <div class="card custom-card" style={{ height: '375px' }}>
+                    <div class="card custom-card CustomHeight">
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Data Quality (doesn't use date selector) </div>
                       </div>
                       <div class="card-body py-2">
-                        <div className='row pt-lg-4'>
+                        <div className='row pt-lg-1'>
                           <div class="col-md-6 container1">
                             <p class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
                             <div class="pie-wrapper">
@@ -2046,7 +2046,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                             </div>
                           </div>
                         </div>
-                        <div className='row pt-lg-4'>
+                        <div className='row pt-lg-1'>
                           <div class="col-md-6 container1">
                             <p class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
                             <div class="pie-wrapper">
@@ -2068,11 +2068,11 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                   <div className='col-md-6'>
                     <div className='row'>
                       <div class="col-md-12 pl-lg-4 pr-lg-4">
-                        <div class="card custom-card" style={{ height: '375px' }}>
+                        <div class="card custom-card CustomHeight">
                           <div class="card-header justify-content-between">
                             <div class="card-title"> Expiries</div>
                           </div>
-                          <div class="card-body px-0 py-0">
+                          <div class="card-body px-0 py-0" style={{overflow:'hidden'}}>
                             <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
                             <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
                             </div>

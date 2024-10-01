@@ -3085,7 +3085,9 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   max-height: calc(100vh - 391px) !important;
 }
 .dashboardTable2 .jss_content {
-  max-height: calc(100vh - 393px) !important;
+  // max-height: calc(100vh - 393px) !important;
+  height: 375px;
+  overflow: scroll;
 }
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
@@ -16590,4 +16592,17 @@ label.arrow_label:before {
 }
 .text-mutedDashboard {
   color: #000 !important;
+}
+.dashboardTable2 .jss_content {
+  // max-height: calc(100vh - 393px) !important;
+  height: 375px;
+  overflow: scroll;
+}
+.CustomHeight{
+  height: 375px;
+}
+@media screen and (min-width: 1920px) {
+  .CustomHeight{
+    height: 412px;
+  }
 }
