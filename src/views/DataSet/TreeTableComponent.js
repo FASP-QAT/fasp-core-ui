@@ -2622,7 +2622,7 @@ export default class TreeTable extends Component {
             {
                 title: i18n.t('static.ManageTree.NodeType'),
                 type: 'html',
-                width: '100'
+                width: '70'
             },
             {
                 title: i18n.t('static.tree.nodeTitle'),
@@ -2631,12 +2631,14 @@ export default class TreeTable extends Component {
             },
             {
                 title: i18n.t('static.tree.nodeUnit'),
+                width: '80',
                 source: this.state.nodeUnitListForDropdown,
                 type: 'dropdown',
             },
             {
                 title: i18n.t('static.supplyPlan.startMonth'),
                 options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                width: '80',
                 type: 'calendar'
             },
             {
@@ -2656,7 +2658,7 @@ export default class TreeTable extends Component {
             {
                 title: "Source Node",
                 type: 'checkbox',
-                width: 100
+                width: 80
             },
             {
                 title: i18n.t('static.common.notes'),
@@ -3802,6 +3804,8 @@ export default class TreeTable extends Component {
                 nodeType = i18n.t("static.ManageTree.Percentage")
             } else if (items[i].payload.nodeType.id == 1) {
                 nodeType = i18n.t("static.ManageTree.Aggregation")
+            }else if (items[i].payload.nodeType.id == 6) {
+                nodeType = "Funnel Node"
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
                 if (nodeType != "") {
@@ -3827,7 +3831,7 @@ export default class TreeTable extends Component {
                 }
                 nodeType += i18n.t('static.ManageTree.Transfer')
             }
-            data[13] = nodeType;
+            data[11] = nodeType;
             treeArray[count] = data;
             count++;
         }
@@ -4514,7 +4518,7 @@ export default class TreeTable extends Component {
                 }, () => {
                     var tempDownwardAggregationList = [];
                     var downwardAggregationList = [];
-                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}))))
+                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.id}))))
                     for(var i = 0; i < this.state.treeData.length; i++) {
                         for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
                             if(this.state.treeData[i].scenarioList[j].active) {
@@ -6486,9 +6490,11 @@ export default class TreeTable extends Component {
                             dataArr.push(ele[13]);
                         } else if (this.state.activeTab1[0] === '2') {
                             dataArr.push(ele[39]);
+                        }else if (this.state.activeTab1[0] === '3') {
+                            dataArr.push(ele[11]);
                         }
                     } else {
-                        dataArr.push(ele[idx].toString().replaceAll(/&amp;/g, '&'));
+                        dataArr.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(/&gt;/g, '>'));
                     }
                 }
             })
@@ -6547,11 +6553,13 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             B.push(ele[13].toString().replaceAll(',', '').replaceAll(' ', '%20'));
-                        } else {
+                        } else if(this.state.activeTab1[0] === '2'){
                             B.push(ele[39].toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                        }else{
+                            B.push(ele[11].toString().replaceAll(',', '').replaceAll(' ', '%20'));
                         }
                     } else {
-                        B.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(',', '').replaceAll(' ', '%20'));
+                        B.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(/&gt;/g, '>').replaceAll(',', '').replaceAll(' ', '%20'));
                     }
                 }
             })
