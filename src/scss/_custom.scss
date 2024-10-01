@@ -16258,3 +16258,9 @@ label.arrow_label:before {
 .swichMarginLeft{
   margin-left: 22px;
 }
+.MuiSwitch-colorPrimary.Mui-checked + .MuiSwitch-track {
+  background-color: #23a8d8!important;
+}
+.MuiSwitch-colorPrimary.Mui-checked {
+  color: #23a8d8!important;
+}

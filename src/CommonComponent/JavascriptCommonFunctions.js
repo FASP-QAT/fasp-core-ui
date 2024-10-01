@@ -403,3 +403,25 @@ export function roundNMOS(num) {
   }
   }
 }
+/**
+ * Formats a numerical value into a string with thousands separators.
+ * @param {number} value - The numerical value to be formatted.
+ * @returns {string} - The formatted string with thousands separators.
+ */
+export function formatterMOS(value, withRoundN) {
+  if (value != null) {
+    var cell1 = withRoundN ? roundNMOS(value) : value;
+    cell1 += '';
+    var x = cell1.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
+  else {
+    return ''
+  }
+}
