@@ -2514,6 +2514,9 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                               </> :
                                 <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li></>}
                             </ul>
+                            {this.state.stockStatusList[0].ppuNotes!=undefined && this.state.stockStatusList[0].ppuNotes!=null && this.state.stockStatusList[0].ppuNotes.length>0 && 
+                            <span  style={{"marginTop":"10px"}} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes}</span>
+                        }
                           </FormGroup>
                         }
                         <div className="col-md-12 text-center">
