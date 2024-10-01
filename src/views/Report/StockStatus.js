@@ -102,7 +102,9 @@ class StockStatus extends Component {
       realmCountryPlanningUnitListAll: [],
       shipmentPopup: false,
       isAggregate: false,
-      PlanningUnitIdDataForExport: ""
+      PlanningUnitIdDataForExport: "",
+      onlyShowAllPUs:false,
+      ppuList:[]
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -133,6 +135,7 @@ class StockStatus extends Component {
       planningUnitList: [],
       realmCountryPlanningUnitList: [],
       planningUnitId: [],
+      onlyShowAllPUs:false,
       realmCountryPlanningUnitId: [],
       stockStatusList: []
       // planningUnits: [],
@@ -149,61 +152,68 @@ class StockStatus extends Component {
       // equivalencyUnitId: "",
       // dataList: [],
     }, () => {
-      var json={
-        programIds:this.state.programId.map(ele => ele.value),
-        onlyAllowPuPresentAcrossAllPrograms:false
-      }
-      ReportService.getDropdownListByProgramIds(json).then(response => {
+      this.getDropdownLists()
+    })
+  }
+
+  getDropdownLists(){
+    var json={
+      programIds:this.state.programId.map(ele => ele.value),
+      onlyAllowPuPresentAcrossAllPrograms:this.state.onlyShowAllPUs
+    }
+    ReportService.getDropdownListByProgramIds(json).then(response => {
+      this.setState({
+        equivalencyUnitList: response.data.equivalencyUnitList,
+        planningUnitListAll: response.data.planningUnitList,
+        realmCountryPlanningUnitListAll: response.data.realmCountryPlanningUnitList,
+        planningUnitList: response.data.planningUnitList,
+        realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList,
+        planningUnitId: [],
+        realmCountryPlanningUnitId: [],
+        stockStatusList: []
+      })
+    }).catch(
+      error => {
         this.setState({
-          equivalencyUnitList: response.data.equivalencyUnitList,
-          planningUnitListAll: response.data.planningUnitList,
-          realmCountryPlanningUnitListAll: response.data.realmCountryPlanningUnitList,
-          planningUnitList: response.data.planningUnitList,
-          realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList
+          stockStatusList: [], loading: false
         })
-      }).catch(
-        error => {
+        if (error.message === "Network Error") {
           this.setState({
-            stockStatusList: [], loading: false
-          })
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+            loading: false
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                loading: false
+              });
+              break;
+            case 412:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                loading: false
+              });
+              break;
+            default:
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+              break;
           }
         }
-      );
-    })
+      }
+    );
   }
   /**
    * Toggles the value of the 'show' state variable.
@@ -279,6 +289,17 @@ class StockStatus extends Component {
           csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].planBasedOn == 1 ? item.data[0].minStockMos : item.data.minStockQty)).replaceAll(' ', '%20') + '"');
           if (item.data[0].planBasedOn == 1) {
             csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + ' : ' + (item.data[0].maxStockMos)).replaceAll(' ', '%20') + '"');
+          }
+          if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
+            var notes=item.data[0].ppuNotes.split("|");
+            var finalNotes="";
+            notes.map((item,index)=>{
+              if(index!=0){
+                finalNotes+=", ";
+              }
+              finalNotes+=item.split(":")[0]+": "+item.split(":")[1]
+            })
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ' : ' + finalNotes + '"'))
           }
         }
         csvRow.push("")
@@ -487,10 +508,23 @@ class StockStatus extends Component {
               align: 'left'
             })
           }
+          if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
+            var notes=item.data[0].ppuNotes.split("|");
+            var finalNotes="";
+            notes.map((item,index)=>{
+              if(index!=0){
+                finalNotes+=", ";
+              }
+              finalNotes+=item.split(":")[0]+": "+item.split(":")[1]
+            })
+            doc.text(i18n.t('static.program.notes') + ' : ' + finalNotes, doc.internal.pageSize.width / 10, 120, {
+              align: 'left'
+            })
+          }
         }
         var canv = document.getElementById("cool-canvas" + count)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg1, 'png', 50, (this.state.isAggregate.toString() == "false" ? 160 : 120), 750, 300, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, (this.state.isAggregate.toString() == "false" ? 160 : 130), 750, 300, "a" + count, 'CANVAS')
         count++
         var height = doc.internal.pageSize.height;
         let otherdata;
@@ -864,11 +898,13 @@ class StockStatus extends Component {
     ReportService.getStockStatusData(inputjson)
       .then(response => {
         let tempOutput;
+        var ppuList;
         if (this.state.isAggregate.toString() == "true") {
           var tempKey = this.state.programId.map(ele => ele.value).toString() + "~" + (this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString());
           tempOutput = {
-            [tempKey]: response.data
+            [tempKey]: response.data.stockStatusVerticalAggregateList
           }
+          ppuList=response.data.programPlanningUnitList;
         } else {
           tempOutput = response.data
         }
@@ -876,12 +912,39 @@ class StockStatus extends Component {
         var tempOutputProgramId = tempOutputIndex.map(a => a.split("~")[0]);
         var tempOutputPlanningUnitId = tempOutputIndex.map(a => a.split("~")[1]);
         tempOutput = Object.values(tempOutput);
-        var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
-          a = a.label.toLowerCase();
-          b = b.label.toLowerCase();
-          return a < b ? -1 : a > b ? 1 : 0;
-        });
-        tempOutput.map((plannningUnitItem, outputIndex) => {
+        console.log("tempOutput Test@123",tempOutput)
+        // var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
+        //   a = a.label.toLowerCase();
+        //   b = b.label.toLowerCase();
+        //   return a < b ? -1 : a > b ? 1 : 0;
+        // });
+        // First, create an array of indices to keep track of sorting order
+const indices = tempOutput.map((_, index) => index);
+
+// Sort `indices` based on the corresponding values in `programList` and `planningUnitList`
+indices.sort((indexA, indexB) => {
+    const programA = this.state.programs.filter(c => c.programId == tempOutputProgramId[indexA])[0].programCode.toString();
+    const programB = this.state.programs.filter(c => c.programId == tempOutputProgramId[indexB])[0].programCode.toString()
+    
+    const planningUnitA = getLabelText(tempOutput[indexA].reportingUnit.label, this.state.lang);
+    const planningUnitB = getLabelText(tempOutput[indexB].reportingUnit.label, this.state.lang);
+    
+    // First compare by program
+    const programComparison = programA.localeCompare(programB);
+    
+    // If programs are the same, compare by planning unit
+    if (programComparison === 0) {
+        return planningUnitA.localeCompare(planningUnitB);
+    }
+    
+    return programComparison;
+});
+
+// Use the sorted indices to rearrange `tempOutput`, `programList`, and `planningUnitList`
+const sortedTempOutput = indices.map(index => tempOutput[index]);
+const sortedProgramList = indices.map(index => tempOutputProgramId[index]);
+const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[index]);
+        sortedTempOutput.map((plannningUnitItem, outputIndex) => {
           var planningUnitItemFilter = plannningUnitItem; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
           let startDateForFilter = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
           var filteredPlanningUnitData = this.state.isAggregate.toString() == "true" ? plannningUnitItem : plannningUnitItem.stockStatusVertical; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
@@ -891,6 +954,7 @@ class StockStatus extends Component {
               yAxisID: 'A',
               type: 'line',
               stack: 7,
+              order:7,
               data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
               fill: false,
               borderColor: 'rgb(75, 192, 192)',
@@ -907,6 +971,7 @@ class StockStatus extends Component {
               label: i18n.t('static.supplyPlan.consumption'),
               backgroundColor: 'transparent',
               borderColor: '#ba0c2f',
+              order:7,
               ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',
@@ -923,6 +988,7 @@ class StockStatus extends Component {
               yAxisID: 'A',
               type: 'line',
               stack: 7,
+              order:7,
               data: filteredPlanningUnitData.map((item, index) => (item.actualConsumption ? item.finalConsumptionQty : null)),
               fill: false,
               borderColor: 'rgb(75, 192, 192)',
@@ -938,6 +1004,7 @@ class StockStatus extends Component {
               yAxisID: 'A',
               type: 'line',
               stack:7,
+              order:7,
               borderColor: '#cfcdc9',
               ticks: {
                 fontSize: 2,
@@ -956,6 +1023,7 @@ class StockStatus extends Component {
               backgroundColor: 'rgba(255,193,8,0.2)',
               borderColor: '#59cacc',
               borderStyle: 'dotted',
+              order:7,
               borderDash: [10, 10],
               fill: '+1',
               backgroundColor: 'transparent',
@@ -976,6 +1044,7 @@ class StockStatus extends Component {
               label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
               backgroundColor: 'rgba(0,0,0,0)',
               borderColor: '#59cacc',
+              order:7,
               borderStyle: 'dotted',
               backgroundColor: 'transparent',
               borderDash: [10, 10],
@@ -1004,6 +1073,7 @@ class StockStatus extends Component {
                 fontColor: 'transparent',
               },
               lineTension: 0,
+              order:7,
               showInLegend: true,
               pointStyle: 'line',
               pointRadius: 0,
@@ -1030,6 +1100,7 @@ class StockStatus extends Component {
                   var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
                   planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
                 }
+                if(ppuList.filter(c=>c.programId==e.value && c.planningUnitId==planningUnitId).length>0){
                 if (count > 10) {
                   count = 0;
                 }
@@ -1037,6 +1108,7 @@ class StockStatus extends Component {
                   label: e.label + " - " + r.label,
                   yAxisID: 'A',
                   stack: 1,
+                  order:1,
                   backgroundColor: colourArray[count],
                   borderColor: colourArray[count],
                   pointBackgroundColor: colourArray[count],
@@ -1052,14 +1124,16 @@ class StockStatus extends Component {
                   })
                 })
                 count += 1;
+              }
               })
             })
           } else {
-            graphLabel = entityname1 + " - " + (this.state.programs.filter(c => c.programId == tempOutputProgramId[outputIndex])[0].programCode.toString() + " - " + getLabelText(planningUnitItemFilter.reportingUnit.label, this.state.lang));
+            graphLabel = entityname1 + " - " + (this.state.programs.filter(c => c.programId == sortedProgramList[outputIndex])[0].programCode.toString() + " - " + getLabelText(planningUnitItemFilter.reportingUnit.label, this.state.lang));
             datasets.push({
               label: i18n.t('static.supplyPlan.delivered'),
               yAxisID: 'A',
               stack: 1,
+              order:1,
               backgroundColor: '#002f6c',
               borderColor: '#002f6c',
               pointBackgroundColor: '#002f6c',
@@ -1078,6 +1152,7 @@ class StockStatus extends Component {
               label: i18n.t('static.supplyPlan.shipped'),
               yAxisID: 'A',
               stack: 1,
+              order:1,
               backgroundColor: '#49A4A1',
               borderColor: '#49A4A1',
               pointBackgroundColor: '#49A4A1',
@@ -1096,6 +1171,7 @@ class StockStatus extends Component {
               label: i18n.t('static.supplyPlan.approved'),
               yAxisID: 'A',
               stack: 1,
+              order:1,
               backgroundColor: '#0067B9',
               borderColor: '#0067B9',
               pointBackgroundColor: '#0067B9',
@@ -1120,6 +1196,7 @@ class StockStatus extends Component {
               pointHoverBorderColor: '#A7C6ED',
               yAxisID: 'A',
               stack: 1,
+              order:1,
               data: filteredPlanningUnitData.map((item, index) => {
                 let count = 0;
                 (item.shipmentInfo.map((ele, index) => {
@@ -1256,7 +1333,7 @@ class StockStatus extends Component {
           var data = this.state.isAggregate.toString() == "true" ? planningUnitItemFilter : planningUnitItemFilter.stockStatusVertical;
           let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
           var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-          var planningUnit = this.state.planningUnitListAll.filter(e => e.id == tempOutputPlanningUnitId[outputIndex])[0];
+          var planningUnit = this.state.planningUnitListAll.filter(e => e.id == sortedPlanningUnitList[outputIndex])[0];
           var conList = [];
           var invList = [];
           var shipList = [];
@@ -1280,12 +1357,12 @@ class StockStatus extends Component {
             coList: conList,
             shList: shipList,
             planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : "",
-            programId: tempOutputProgramId[outputIndex],
+            programId: sortedProgramList[outputIndex],
             PlanningUnitIdDataForExport: planningUnitItemFilter
           }
           PlanningUnitDataForExport.push(planningUnitexport)
-          PlanningUnitIdForExport = tempOutputPlanningUnitId[outputIndex]
-          ProgramIdForExport = tempOutputProgramId[outputIndex]
+          PlanningUnitIdForExport = sortedPlanningUnitList[outputIndex]
+          ProgramIdForExport = sortedProgramList[outputIndex]
           PlanningUnitIdDataForExport = this.state.isAggregate.toString() == "false" ? planningUnitItemFilter : "";
         })
         this.setState({
@@ -1612,7 +1689,8 @@ class StockStatus extends Component {
       realmCountryPlanningUnitList: realmCountryPlanningUnitList,
       planningUnitId: [],
       realmCountryPlanningUnitId: [],
-      stockStatusList: []
+      stockStatusList: [],
+      onlyShowAllPUs:false
       // planningUnits: [],
       // planningUnitIds: [],
       // planningUnitValues: [],
@@ -1632,6 +1710,14 @@ class StockStatus extends Component {
         // this.getPlanningUnitAndForcastingUnit();
         // this.fetchData();
       }
+    })
+  }
+  setOnlyShowAllPUs(e) {
+    var checked = e.target.checked;
+    this.setState({
+      onlyShowAllPUs:checked
+    },()=>{
+      this.getDropdownLists();
     })
   }
   fetchData() {
@@ -1672,6 +1758,7 @@ class StockStatus extends Component {
         inList: inventoryList,
         coList: consumptionList,
         shList: shipmentList,
+        ppuList:response.data.programPlanningUnitList,
         loading:false
       })
     }).catch(
@@ -2046,6 +2133,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         yAxisID: 'A',
         type: 'line',
         stack: 7,
+        order:7,
         data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
@@ -2070,6 +2158,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         },
         lineTension: 0,
         showInLegend: true,
+        order:7,
         pointStyle: 'line',
         pointRadius: 0,
         yValueFormatString: "$#,##0",
@@ -2080,6 +2169,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         yAxisID: 'A',
         type: 'line',
         stack: 7,
+        order:7,
         data: this.state.stockStatusList.map((item, index) => (item.actualConsumption ? item.finalConsumptionQty : null)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
@@ -2096,6 +2186,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         yAxisID: 'A',
         type: 'line',
         stack:7,
+        order:7,
         borderColor: '#cfcdc9',
         ticks: {
           fontSize: 2,
@@ -2113,6 +2204,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
         backgroundColor: 'rgba(255,193,8,0.2)',
         borderColor: '#59cacc',
+        order:7,
         pointBackgroundColor: '#59cacc',
         pointBorderColor: '#59cacc',
         borderStyle: 'dotted',
@@ -2136,6 +2228,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         label: this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
         backgroundColor: 'rgba(0,0,0,0)',
         borderColor: '#59cacc',
+        order:7,
         pointBackgroundColor: '#59cacc',
         pointBorderColor: '#59cacc',
         borderStyle: 'dotted',
@@ -2160,6 +2253,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
           label: i18n.t('static.supplyPlan.delivered'),
           yAxisID: 'A',
           stack: 1,
+          order:1,
           backgroundColor: colors[0],
           borderColor: colors[0],
           pointBackgroundColor: colors[0],
@@ -2178,6 +2272,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
           label: i18n.t('static.supplyPlan.shipped'),
           yAxisID: 'A',
           stack: 1,
+          order:1,
           backgroundColor: '#49a4a1',
           borderColor: '#49a4a1',
           pointBackgroundColor: '#49a4a1',
@@ -2196,6 +2291,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
           label: i18n.t('static.supplyPlan.approved'),
           yAxisID: 'A',
           stack: 1,
+          order:1,
           backgroundColor: '#0067B9',
           borderColor: '#0067B9',
           pointBackgroundColor: '#0067B9',
@@ -2215,6 +2311,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
           backgroundColor: '#A7C6ED',
           borderColor: '#A7C6ED',
           pointBackgroundColor: '#A7C6ED',
+          order:1,
           pointBorderColor: '#A7C6ED',
           pointHoverBackgroundColor: '#A7C6ED',
           pointHoverBorderColor: '#A7C6ED',
@@ -2243,6 +2340,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
               var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
               planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
             }
+            var ppuList=this.state.ppuList;
+            if(ppuList.filter(c=>c.programId==e.value && c.planningUnitId==planningUnitId).length>0){
             if (count > 10) {
               count = 0;
             }
@@ -2250,6 +2349,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
               label: e.label + " - " + r.label,
               yAxisID: 'A',
               stack: 1,
+              order:1,
               backgroundColor: colourArray[count],
               borderColor: colourArray[count],
               pointBackgroundColor: colourArray[count],
@@ -2265,6 +2365,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
               })
             })
             count += 1;
+          }
           })
         })
       }
@@ -2282,6 +2383,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         pointBackgroundColor: '#118b70',
         pointBorderColor: '#118b70',
         backgroundColor: 'transparent',
+        order:7,
         ticks: {
           fontSize: 2,
           fontColor: 'transparent',
@@ -2378,12 +2480,13 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="col-md-3">
-                        <FormGroup check inline>
+                      <FormGroup className="col-md-3" style={{"margin-top": "-18px"}}>
+                        <FormGroup check inline style={{"padding-left":"0px","margin-left":"0px"}}>
                           <Input
                             type="radio"
                             id="viewById"
                             name="viewById"
+                            style={{"margin-left":"0px"}}
                             value={"1"}
                             checked={this.state.viewById == 1}
                             title={i18n.t('static.report.planningUnit')}
@@ -2396,11 +2499,12 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                             {i18n.t('static.report.planningUnit')}
                           </Label>
                         </FormGroup>
-                        <FormGroup check inline>
+                        <FormGroup check inline style={{"padding-left":"0px","margin-left":"0px"}}>
                           <Input
                             type="radio"
                             id="viewById"
                             name="viewById"
+                            style={{"margin-left":"0px"}}
                             value={"2"}
                             checked={this.state.viewById == 2}
                             title={i18n.t('static.planningunit.countrysku')}
@@ -2483,6 +2587,23 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                           </div>
                         </FormGroup>
                       </FormGroup>
+                      <FormGroup>
+                        <div className="col-md-12" style={{"padding-left": "34px","margin-top": "-15px !important"}}>
+                          <Input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="onlyShowAllPUs"
+                            name="onlyShowAllPUs"
+                            checked={this.state.onlyShowAllPUs}
+                            onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                            {i18n.t('static.stockStatus.onlyShowPUsThatArePartOfAllPrograms')}
+                          </Label>
+                        </div>
+                      </FormGroup>
                     </div>
                   </div>
                 </Form>
@@ -2515,13 +2636,15 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                 <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li></>}
                             </ul>
                             {this.state.stockStatusList[0].ppuNotes!=undefined && this.state.stockStatusList[0].ppuNotes!=null && this.state.stockStatusList[0].ppuNotes.length>0 && 
-                            <span  style={{"marginTop":"10px"}} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes}</span>
+                            <span  style={{"marginTop":"10px"}} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes.toString().split("|").map((item,index)=>{
+                              return (<>{(index!=0?", ":"")}<b>{item.toString().split(":")[0]}</b>&nbsp;{": "+item.toString().split(":")[1]}</>)
+                            })}</span>
                         }
                           </FormGroup>
                         }
                         <div className="col-md-12 text-center">
                           {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br/>
-                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.map(ele => ele.label).join(", ")):""}</span>}<br/>
+                          {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.filter(c=>[...new Set(this.state.ppuList).map(ele=>ele.programId)].includes(c.value)).map(ele => ele.label).join(", ")):""}</span>}<br/>
                           {this.state.yaxisEquUnit!=-1 || this.state.programId.length>1 && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")):""}</span>}
                           <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
@@ -2683,8 +2806,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                   <FormGroup className="col-md-12">
                     <div className="controls ">
                       <FormGroup>
-                        <Label>Do you want to aggregate?</Label>
-                        <FormGroup check inline>
+                        <Label>{i18n.t('static.stockStatus.doYouWantToAggregate')}</Label>
+                        <FormGroup check inline  style={{"padding-left":"0px","margin-left":"0px"}}>
                           <Input
                             className="form-check-input"
                             type="radio"
