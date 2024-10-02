@@ -51,7 +51,7 @@ class ApplicationDashboard extends Component {
     super(props);
     this.toggle = this.toggle.bind(this);
     this.state = {
-      isDarkMode:false,
+      isDarkMode: false,
       popoverOpenMa: false,
       id: this.props.match.params.id,
       dropdownOpen: false,
@@ -69,6 +69,7 @@ class ApplicationDashboard extends Component {
       addressedIssues: '',
       supplyPlanReviewCount: '',
       roleArray: [],
+      dashboardTopList: []
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -321,7 +322,8 @@ class ApplicationDashboard extends Component {
           });
         }
         this.setState({
-          programList: programList
+          programList: programList,
+          bottomProgramId: programList[0].id
         })
         this.checkNewerVersions(programList);
       }.bind(this);
@@ -384,10 +386,25 @@ class ApplicationDashboard extends Component {
     }.bind(this)
   }
   /**
+     * Handles data change in the budget form.
+     * @param {Event} event - The change event.
+     */
+  dataChange(event) {
+    let bottomProgramId = this.state.bottomProgramId;
+    if (event.target.name === "bottomProgramId") {
+      bottomProgramId = event.target.value;
+      localStorage.setItem("bottomProgramId", bottomProgramId)
+      Dashboard(this, bottomProgramId, 1, true, true);
+    }
+    this.setState({
+      bottomProgramId
+    }, () => { });
+  };
+  /**
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    Dashboard(this, "2535_v119_uId_6",1,true,true);
+    Dashboard(this, localStorage.getItem("bottomProgramId"), 1, true, true);
     Chart.plugins.register({
       beforeDraw: function (chart) {
         if (chart.config.type === 'doughnut') {
@@ -496,25 +513,22 @@ class ApplicationDashboard extends Component {
           })
         })
     }
-    this.buildForecastErrorJexcel();
-    this.buildShipmentsTBDJexcel();
-    this.buildExpiriesJexcel();
     hideFirstComponent();
 
     // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
 
 
 
@@ -581,6 +595,12 @@ observer.observe(document.documentElement, {
   updateStateDashboard(key, value) {
     this.setState({
       [key]: value
+    }, () => {
+      if (key == "dashboardBottomData") {
+        this.buildForecastErrorJexcel();
+        this.buildShipmentsTBDJexcel();
+        this.buildExpiriesJexcel();
+      }
     })
   }
   /**
@@ -605,6 +625,7 @@ observer.observe(document.documentElement, {
   }
 
   buildForecastErrorJexcel() {
+    var forecastErrorList = this.state.dashboardBottomData.forecastErrorList;
     var missingPUList = [
       { name: "TLD30", percentage: "50%" },
       { name: "TLD60", percentage: "100%" },
@@ -629,11 +650,11 @@ observer.observe(document.documentElement, {
     ];
     var dataArray = [];
     let count = 0;
-    if (missingPUList.length > 0) {
-      for (var j = 0; j < missingPUList.length; j++) {
+    if (forecastErrorList.length > 0) {
+      for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
-        data[0] = missingPUList[j].name
-        data[1] = missingPUList[j].percentage
+        data[0] = forecastErrorList[j].name
+        data[1] = forecastErrorList[j].percentage
         dataArray[count] = data;
         count++;
       }
@@ -687,6 +708,7 @@ observer.observe(document.documentElement, {
   }
 
   buildShipmentsTBDJexcel() {
+    var shipmentWithFundingSourceTbdList = this.state.dashboardBottomData.shipmentWithFundingSourceTbd;
     var missingPUList = [
       { name: "TLD30", percentage: "50%" },
       { name: "TLD60", percentage: "100%" },
@@ -711,11 +733,11 @@ observer.observe(document.documentElement, {
     ];
     var dataArray = [];
     let count = 0;
-    if (missingPUList.length > 0) {
-      for (var j = 0; j < missingPUList.length; j++) {
+    if (shipmentWithFundingSourceTbdList.length > 0) {
+      for (var j = 0; j < shipmentWithFundingSourceTbdList.length; j++) {
         data = [];
-        data[0] = missingPUList[j].name
-        data[1] = missingPUList[j].percentage
+        data[0] = shipmentWithFundingSourceTbdList[j].name
+        data[1] = shipmentWithFundingSourceTbdList[j].percentage
         dataArray[count] = data;
         count++;
       }
@@ -769,6 +791,7 @@ observer.observe(document.documentElement, {
   }
 
   buildExpiriesJexcel() {
+    var expiriesList = this.state.dashboardBottomData.expiriesList;
     var missingPUList = [
       { name: "TLD30", percentage: "50%" },
       { name: "TLD60", percentage: "100%" },
@@ -793,11 +816,11 @@ observer.observe(document.documentElement, {
     ];
     var dataArray = [];
     let count = 0;
-    if (missingPUList.length > 0) {
-      for (var j = 0; j < missingPUList.length; j++) {
+    if (expiriesList.length > 0) {
+      for (var j = 0; j < expiriesList.length; j++) {
         data = [];
-        data[0] = missingPUList[j].name
-        data[1] = missingPUList[j].percentage
+        data[0] = expiriesList[j].name
+        data[1] = expiriesList[j].percentage
         dataArray[count] = data;
         count++;
       }
@@ -871,10 +894,10 @@ observer.observe(document.documentElement, {
    */
   render() {
 
-const { isDarkMode } = this.state;
-// const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#fff';
+    const { isDarkMode } = this.state;
+    // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#fff';
 
 
     const checkOnline = localStorage.getItem('sessionType');
@@ -947,22 +970,22 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
       datasets: [
         {
           label: 'Overstock',
-          data: [7],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc).toFixed(2)] : [],
           backgroundColor: 'rgba(0, 51, 102, 0.8)', // Dark Blue
         },
         {
           label: 'Adequate',
-          data: [67],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc).toFixed(2)] : [],
           backgroundColor: 'rgba(0, 153, 51, 0.8)', // Green
         },
         {
           label: 'Below Min',
-          data: [20],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc).toFixed(2)] : [],
           backgroundColor: 'rgba(255, 204, 0, 0.8)', // Yellow
         },
         {
           label: 'Stockout',
-          data: [6],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc).toFixed(2)] : [],
           backgroundColor: 'rgba(204, 0, 0, 0.8)', // Red
         }
       ]
@@ -985,9 +1008,9 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
           gridLines: {
             display: false, // Remove grid lines
             color: gridLineColor,
-                    drawBorder: true,
-                    lineWidth: 0,
-                    zeroLineColor: gridLineColor 
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor
           }
         }]
       },
@@ -997,7 +1020,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
         labels: {
           pointStyle: 'rect',
           boxWidth: 12,
-          fontColor:fontColor,
+          fontColor: fontColor,
         }
       },
       tooltips: {
@@ -1046,9 +1069,28 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
         labels: {
           pointStyle: 'rect',
           boxWidth: 12,
-          fontColor:fontColor,
+          fontColor: fontColor,
         }
       },
+    }
+
+    let forecastConsumptionQplCorrectCount = 0;
+    let forecastConsumptionQplPuCount = 0;
+    let inventoryQplCorrectCount = 0;
+    let inventoryQplPuCount = 0;
+    let actualConsumptionQplCorrectCount = 0;
+    let actualConsumptionQplPuCount = 0;
+    let shipmentQplCorrectCount = 0;
+    let shipmentQplPuCount = 0;
+    if (this.state.dashboardBottomData) {
+      forecastConsumptionQplCorrectCount = this.state.dashboardBottomData.forecastConsumptionQpl.correctCount;
+      forecastConsumptionQplPuCount = this.state.dashboardBottomData.forecastConsumptionQpl.puCount;
+      inventoryQplCorrectCount = this.state.dashboardBottomData.inventoryQpl.correctCount;
+      inventoryQplPuCount = this.state.dashboardBottomData.inventoryQpl.puCount;
+      actualConsumptionQplCorrectCount = this.state.dashboardBottomData.actualConsumptionQpl.correctCount;
+      actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
+      shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
+      shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
     }
 
     const forecastConsumptionData = {
@@ -1059,11 +1101,10 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
       ],
       datasets: [{
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
-          'rgb(255, 99, 132)',
-          'rgb(54, 162, 235)',
-          'rgb(255, 205, 86)'
+          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "green" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#F5F5F7'
         ],
         hoverOffset: 4
       }]
@@ -1086,11 +1127,10 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
       ],
       datasets: [{
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
         backgroundColor: [
-          'rgb(255, 99, 132)',
-          'rgb(54, 162, 235)',
-          'rgb(255, 205, 86)'
+          (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "green" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#F5F5F7'
         ],
         hoverOffset: 4
       }]
@@ -1113,11 +1153,10 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
       ],
       datasets: [{
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
         backgroundColor: [
-          'rgb(255, 99, 132)',
-          'rgb(54, 162, 235)',
-          'rgb(255, 205, 86)'
+          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "green" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#F5F5F7'
         ],
         hoverOffset: 4
       }]
@@ -1140,11 +1179,10 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
       ],
       datasets: [{
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
-          'rgb(255, 99, 132)',
-          'rgb(54, 162, 235)',
-          'rgb(255, 205, 86)'
+          (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "green" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#F5F5F7'
         ],
         hoverOffset: 4
       }]
@@ -1155,14 +1193,21 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
       cutout: '50%', // Doughnut hole size
       responsive: true,
       legend: {
-        display: false ,// Hide the legend
-        color: gridLineColor, 
-                drawBorder: true,
-                lineWidth: 0,
-                zeroLineColor: gridLineColor 
+        display: false,// Hide the legend
+        color: gridLineColor,
+        drawBorder: true,
+        lineWidth: 0,
+        zeroLineColor: gridLineColor
       }
     }
-
+    let bottomProgramList = this.state.programList.length > 0
+      && this.state.programList.map((item, i) => {
+        return (
+          <option key={i} value={item.id}>
+            {item.programCode}
+          </option>
+        )
+      }, this);
     return (
       <div className="animated fadeIn">
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
@@ -1603,7 +1648,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
               <div class="card custom-card">
                 <div class="card-body px-0 py-0">
                   <div class="table-responsive fixTableHead tableFixHeadDash">
-                  <Table className="table-striped table-bordered text-center">
+                    <Table className="table-striped table-bordered text-center">
                       <thead>
                         <th scope="col">Program</th>
                         <th scope="col"># of active planning units</th>
@@ -1614,279 +1659,29 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                         <th scope='col'>Review​(looks at last final vers)</th>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
+                        {this.state.dashboardTopList.map(d => {
+                          return (
+                            <tr>
+                              <td scope="row">AGO-MAL ~v3​</td>
+                              <td>
+                                <div id="example-1" class="examples">
+                                  <div class="cssProgress">
+                                    <div class="progress1">
+                                      <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
+                                        <span class="cssProgress-label">{d.activePlanningUnits}</span>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
 
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-                        <tr>
-                          <td scope="row">AGO-MAL ~v3​</td>
-                          <td>
-                            <div id="example-1" class="examples">
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                    <span class="cssProgress-label">75%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-info" data-percent="65" style={{ width: '65%' }}>
-                                    <span class="cssProgress-label">65%</span>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="cssProgress">
-                                <div class="progress1">
-                                  <div class="cssProgress-bar cssProgress-danger" data-percent="55" style={{ width: '55%' }}>
-                                    <span class="cssProgress-label">55%</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </td>
-                          <td>1</td>
-                          <td>$11.112</td>
-                          <td>8</td>
-                          <td>15-Sep-2024</td>
-                          <td>Pending Review (15-June-24)​</td>
-                        </tr>
-
+                              </td>
+                              <td>{d.countOfStockOutPU}</td>
+                              <td>$11.112</td>
+                              <td>{d.countOfOpenProblem}</td>
+                              <td>{d.lastModifiedDate}</td>
+                              <td>Pending Review (15-June-24)​</td>
+                            </tr>)
+                        })}
                       </tbody>
                     </Table>
                   </div>
@@ -1902,15 +1697,15 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                 <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
                 <Input
                   type="select"
-                  name="organisationTypeId"
-                  id="organisationTypeId"
+                  name="bottomProgramId"
+                  id="bottomProgramId"
+                  value={this.state.bottomProgramId}
+                  onChange={(e) => { this.dataChange(e) }}
                   bsSize="sm"
                   required
                 >
                   <option selected>Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  {bottomProgramList}
                 </Input>
               </FormGroup>
 
@@ -1918,8 +1713,8 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                 <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
                 <Input
                   type="select"
-                  name="organisationTypeId"
-                  id="organisationTypeId"
+                  name="reportPeriod"
+                  id="reportPeriod"
                   bsSize="sm"
                   required
                 >
@@ -1966,24 +1761,14 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                       </div>
                       <div class="card-body pt-0 pb-0">
                         <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
-                          <li class="success">
-                            <div class="d-flex align-items-center justify-content-between">
-                              <div className='text-mutedDashboard'>Product B </div>
-                              <div class="fs-12 text-mutedDashboard">4 months​</div>
-                            </div>
-                          </li>
-                          <li class="info">
-                            <div class="d-flex align-items-center justify-content-between">
-                              <div className='text-mutedDashboard'>Product A </div>
-                              <div class="fs-12 text-mutedDashboard">3 months​</div>
-                            </div>
-                          </li>
-                          <li class="warning">
-                            <div class="d-flex align-items-center justify-content-between">
-                              <div className='text-mutedDashboard'>Product C </div>
-                              <div class="fs-12 text-mutedDashboard">1 months​</div>
-                            </div>
-                          </li>
+                          {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
+                            return (<li class="success">
+                              <div class="d-flex align-items-center justify-content-between">
+                                <div className='text-mutedDashboard'>{x.planningUnit.name} </div>
+                                <div class="fs-12 text-mutedDashboard">{x.count}​</div>
+                              </div>
+                            </li>)
+                          })}
                         </ul>
                       </div>
                     </div>
@@ -1993,7 +1778,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                       <div class="card-header  justify-content-between">
                         <div class="card-title"> Forecast Error </div>
                       </div>
-                      <div class="card-body px-0 py-0" style={{overflow:'hidden'}}>
+                      <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
                         <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                         </div>
                       </div>
@@ -2016,7 +1801,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                       <div class="card-header  justify-content-between">
                         <div class="card-title"># of Shipments with funding TBD </div>
                       </div>
-                      <div class="card-body px-0 py-0" style={{overflow:'hidden'}}>
+                      <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
                         <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2'>
                         </div>
                       </div>
@@ -2072,7 +1857,7 @@ const gridLineColor = isDarkMode ? '#444' : '#fff';
                           <div class="card-header justify-content-between">
                             <div class="card-title"> Expiries</div>
                           </div>
-                          <div class="card-body px-0 py-0" style={{overflow:'hidden'}}>
+                          <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
                             <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
                             <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
                             </div>
