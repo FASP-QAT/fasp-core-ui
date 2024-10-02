@@ -3932,6 +3932,7 @@ observer.observe(document.documentElement, {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
+            editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
