@@ -725,7 +725,7 @@ class AddprogramPlanningUnit extends Component {
                                                         }
                                                         if (x) {
                                                         }
-                                                        if (AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
                                                             let cordsValue = `${this.el.getValueFromCoords(1, y)}`;
                                                             if (obj.options.allowInsertRow == true) {
                                                                 if (cordsValue.length != 0) {

@@ -884,7 +884,7 @@ export default class ProblemList extends React.Component {
                 } else {
                     if (this.state.data.length != 0) {
                         var programId = document.getElementById('programId').value;
-                        if (AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_PROBLEM')) {
+                        if (AuthenticationService.checkUserACL([programId.toString().split("_")[0]], 'ROLE_BF_EDIT_PROBLEM')) {
                             if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
                                 var planningunitId = this.el.getValueFromCoords(13, x);
                                 var versionId = this.el.getValueFromCoords(3, x)

@@ -223,7 +223,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             consumptionEditable = false;
                         }
                         // var roleList = AuthenticationService.getLoggedInUserRole();
-                        if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
+                        if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                             consumptionEditable = false;
                         }
                         if (document.getElementById("addConsumptionRowSupplyPlan") != null) {
@@ -383,7 +383,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                             } else {
                                                 lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                                             }
-                                            if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                                            if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                                                 if (rowData[15] > 0) {
                                                     for (var c = 0; c < colArr.length; c++) {
                                                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
@@ -567,7 +567,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionBatchEditable = consumptionEditable;
         var lastEditableDate = "";
         lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
-        if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[12] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+        if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[12] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
             consumptionBatchEditable = false;
         }
         if (document.getElementById("showConsumptionBatchInfoButtonsDiv") != null) {
@@ -781,7 +781,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
-                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     if (rowData[15] > 0) {
                         for (var c = 0; c < colArr.length; c++) {
                             var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -887,7 +887,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
-                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     if (rowData[15] > 0) {
                         for (var c = 0; c < colArr.length; c++) {
                             var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -1029,7 +1029,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                 }
-                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     if (rowData[15] > 0) {
                         for (var c = 0; c < colArr.length; c++) {
                             var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -1450,7 +1450,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                     } else {
                         lastEditableDate = moment(Date.now()).subtract(this.state.realm.forecastConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
                     }
-                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                    if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     } else {
                         var colArr = ['E'];
                         for (var c = 0; c < colArr.length; c++) {

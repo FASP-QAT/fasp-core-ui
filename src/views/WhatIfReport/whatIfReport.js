@@ -4933,7 +4933,7 @@ export default class WhatIfReportComponent extends React.Component {
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
                 // var roleList = AuthenticationService.getLoggedInUserRole();
-                if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                     this.setState({
@@ -7675,7 +7675,7 @@ export default class WhatIfReportComponent extends React.Component {
                 shipmentList = [];
             }
             // var roleList = AuthenticationService.getLoggedInUserRole();
-            if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).map(c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+            if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).toString().split("_")[0].map(c=>c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 if (document.getElementById("addRowId") != null) {
                     document.getElementById("addRowId").style.display = "none"
                 }

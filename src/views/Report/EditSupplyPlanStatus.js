@@ -708,7 +708,7 @@ class EditSupplyPlanStatus extends Component {
             this.formSubmit(monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
             // var roleList = AuthenticationService.getLoggedInUserRole();
-            if (AuthenticationService.checkUserACLBasedOnRoleId([this.state.programId.toString.split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+            if (AuthenticationService.checkUserACLBasedOnRoleId([this.props.match.params.programId.toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
             } else {
                 var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                 this.setState({

@@ -493,7 +493,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 shipmentEditable = false;
                                             }
                                             // var roleList = AuthenticationService.getLoggedInUserRole();
-                                            if (AuthenticationService.checkUserACLBasedOnRoleId([programId.split("_")[0].toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
+                                            var programId = (document.getElementById("programId").value).split("_")[0];
+                                            if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                                                 shipmentEditable = false;
                                             }
                                             var paginationOption = false;

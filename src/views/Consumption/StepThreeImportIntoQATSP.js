@@ -499,7 +499,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             v15: regionFilter[0].forecastPercentage,// % of forecast
                                             v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                             v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                            v18: AuthenticationService.checkUserACL([this.props.items.forecastProgramId.toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
+                                            v18: AuthenticationService.checkUserACL([this.props.items.programId.split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
                                         });
                                     }
                                 }

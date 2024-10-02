@@ -367,12 +367,13 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
-        let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.forecastProgramId.toString()], "ROLE_FORECAST_VIEWER");
-        // AuthenticationService.getLoggedInUserRole().map(c => {
-        //     if (c.roleId == 'ROLE_FORECAST_VIEWER') {
-        //         hasRole = true;
-        //     }
-        // });
+        // let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.forecastProgramId.toString()], "ROLE_FORECAST_VIEWER");
+        let hasRole = false;
+        AuthenticationService.getLoggedInUserRole().map(c => {
+            if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+                hasRole = true;
+            }
+        });
         this.setState({ loading: true, onlyDownloadedProgram: !hasRole })
         // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';

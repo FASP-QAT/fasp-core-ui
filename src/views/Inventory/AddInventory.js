@@ -606,7 +606,7 @@ export default class AddInventory extends Component {
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
                     // var roleList = AuthenticationService.getLoggedInUserRole();
-                    if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString.split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                    if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }

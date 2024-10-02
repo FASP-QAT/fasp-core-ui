@@ -864,7 +864,7 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentTypeIds).includes(1)) {
                         document.getElementById("addRowButtonId").style.display = "block";
                         // var roleList = AuthenticationService.getLoggedInUserRole();
-                        if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                        if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {

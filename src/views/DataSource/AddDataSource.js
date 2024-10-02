@@ -692,7 +692,7 @@ export default class AddDataSource extends Component {
     this.state.label.label_en = "";
     this.state.dataSourceType.id = "";
     if (
-      AuthenticationService.checkUserACL(this.state.programId.map(c => c.id.toString()),
+      AuthenticationService.checkUserACL([this.state.program.id],
         "ROLE_BF_SHOW_REALM_COLUMN"
       )
     ) {

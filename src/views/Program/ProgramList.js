@@ -238,7 +238,7 @@ export default class ProgramList extends Component {
       filters: true,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM') || AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, y).toString()], 'ROLE_BF_MAP_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, y).toString()], 'ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
           var items = [];
           if (y != null) {
             if (obj.options.allowInsertRow == true) {
