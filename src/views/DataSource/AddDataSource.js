@@ -271,7 +271,7 @@ export default class AddDataSource extends Component {
   getProgramByRealmId(e) {
     let realmId = AuthenticationService.getRealmId();
     if (realmId != 0) {
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then((response) => {
           var proList = [];
           for (var i = 0; i < response.data.length; i++) {

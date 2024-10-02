@@ -217,6 +217,8 @@ class ListBudgetComponent extends Component {
       data[14] = budgetList[j].budgetAmt;
       data[15] = budgetList[j].usedUsdAmt;
       data[16] = budgetList[j].stopDate;
+      data[17] = budgetList[j].programs.filter(x => x.id != 0).map(x => x.id.toString())
+
       budgetArray[count] = data;
       count++;
     }
@@ -300,6 +302,10 @@ class ListBudgetComponent extends Component {
           title: 'Date',
           type: 'hidden',
         },
+        {
+          title: 'programIds',
+          type: 'hidden'
+        },
       ],
       editable: false,
       license: JEXCEL_PRO_KEY,
@@ -344,7 +350,8 @@ class ListBudgetComponent extends Component {
       if ((x == 0 && value != 0) || (y == 0)) {
       } else {
         if (this.state.selBudget.length != 0) {
-          if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(1, x).map(c.toString()), 'ROLE_BF_EDIT_BUDGET')) {
+          let program = this.el.getValueFromCoords(17, x);
+          if (AuthenticationService.checkUserACL(program, 'ROLE_BF_EDIT_BUDGET')) {
             this.props.history.push({
               pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
             });
@@ -392,7 +399,7 @@ class ListBudgetComponent extends Component {
     // Fetch realmId
     let realmId = AuthenticationService.getRealmId();
     //Fetch Program list
-    DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+    DropdownService.getSPProgramBasedOnRealmId(realmId)
       .then(response => {
         if (response.status == 200) {
           var listArray = response.data.filter(c => c.active);
@@ -416,6 +423,7 @@ class ListBudgetComponent extends Component {
       })
       .catch(
         error => {
+          console.log("============??????", error)
           if (error.message === "Network Error") {
             this.setState({
               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -634,7 +642,7 @@ class ListBudgetComponent extends Component {
             <span className="pl-0 text-blackD">{i18n.t("static.budget.budgetNoteForCommitingLocalVersion")}</span>
             <div className="card-header-actions">
               <div className="card-header-action">
-                {AuthenticationService.checkUserACL(this.state.programs.map(c => c.id.toString()), 'ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_BUDGET') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>}
               </div>
             </div>
           </div>

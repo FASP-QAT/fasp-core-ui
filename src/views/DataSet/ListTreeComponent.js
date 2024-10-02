@@ -1822,7 +1822,7 @@ export default class ListTreeComponent extends Component {
         this.setState({ loading: true })
         if (localStorage.getItem('sessionType') === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            DropdownService.getFCProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = [];
                     if (response.status == 200) {
@@ -2011,7 +2011,7 @@ export default class ListTreeComponent extends Component {
             const program = this.state.datasetList.filter(c => c.programId == programId)
             if (program.length > 0) {
                 if (localStorage.getItem('sessionType') === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []

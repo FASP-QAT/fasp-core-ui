@@ -90,7 +90,7 @@ class AddprogramPlanningUnit extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     let myReasponse = response.data.sort((a, b) => {
@@ -725,7 +725,7 @@ class AddprogramPlanningUnit extends Component {
                                                         }
                                                         if (x) {
                                                         }
-                                                        if (AuthenticationService.checkUserACL(programId.map(c.toString()), 'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                        if (AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
                                                             let cordsValue = `${this.el.getValueFromCoords(1, y)}`;
                                                             if (obj.options.allowInsertRow == true) {
                                                                 if (cordsValue.length != 0) {

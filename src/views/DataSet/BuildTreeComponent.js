@@ -4363,7 +4363,7 @@ export default class BuildTree extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
-                    readOnly: AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') ? false : true,
+                    readOnly: AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') ? false : true,
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
@@ -5920,7 +5920,7 @@ export default class BuildTree extends Component {
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-            if (y == 8 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
+            if (y == 8 && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -11716,7 +11716,7 @@ export default class BuildTree extends Component {
                                                 })
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -11778,8 +11778,8 @@ export default class BuildTree extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
-                                {this.state.aggregationNode && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                         </div>
                         {this.state.showCalculatorFields &&
@@ -12101,7 +12101,7 @@ export default class BuildTree extends Component {
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                                    {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -12200,7 +12200,7 @@ export default class BuildTree extends Component {
                                             })
                                         }
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                    {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -12816,7 +12816,7 @@ export default class BuildTree extends Component {
                 },
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
-                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -12838,7 +12838,7 @@ export default class BuildTree extends Component {
                         }
                         {itemConfig.parent != null &&
                             <>
-                                {!this.state.hideActionButtons && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -12860,7 +12860,7 @@ export default class BuildTree extends Component {
                                         <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                     </button>}
                             </>}
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -12869,7 +12869,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-sitemap" aria-hidden="true"></i>
                             </button>
                         }
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     this.setState({
@@ -13072,7 +13072,7 @@ export default class BuildTree extends Component {
                                 }}>
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') &&
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') &&
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     var items = this.state.items;
@@ -13227,7 +13227,7 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {scenarios}
                                                             </Input>
-                                                            {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                                            {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                                                 <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                     <InputGroupText className='SettingIcon'>
                                                                         <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
@@ -13397,7 +13397,7 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
-                                                                    {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>

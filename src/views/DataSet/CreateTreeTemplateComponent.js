@@ -773,7 +773,7 @@ export default class CreateTreeTemplate extends Component {
             actualOrTargetValueListOriginal: [],
             modelingTypeOriginal: "",
             monthListForModelingCalculator: [],
-            editable: AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE_TEMPLATE') ? true : false,
+            editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? true : false,
             treeTemplateList: [],
             treeTemplateId: this.props.match.params.templateId != undefined && this.props.match.params.templateId != -1 ? this.props.match.params.templateId : "",
             isModalForCreateTree: false,
@@ -7315,21 +7315,21 @@ export default class CreateTreeTemplate extends Component {
      * Reterives node type, usage template, procurement agent, forecast method, unit, usage period, usage type, tracer category, modeling type and tree template list on component mount
      */
     componentDidMount() {
-         // Detect initial theme
+        // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
-    
+
         // Listening for theme changes
         const observer = new MutationObserver(() => {
             const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
             this.setState({ isDarkMode: updatedDarkMode });
         });
-    
+
         observer.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['data-theme'],
         });
-    
+
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         this.procurementAgentList();
@@ -8584,7 +8584,7 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = event.target.value;
-            let usagePeriodJson = {usagePeriodId: 1 };//to fix error at the time of edit template
+            let usagePeriodJson = { usagePeriodId: 1 };//to fix error at the time of edit template
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod = usagePeriodJson;
             this.getUsageText();
         }
@@ -9488,12 +9488,12 @@ export default class CreateTreeTemplate extends Component {
      */
     tabPane1() {
         const darkModeColors = [
-            '#d4bbff',   
+            '#d4bbff',
         ];
-        
+
         const lightModeColors = [
             '#002F6C',  // Color 1    
-        ]; 
+        ];
         const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -9628,7 +9628,7 @@ export default class CreateTreeTemplate extends Component {
                                         : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                             : ""
                                 : "",
-                                fontColor: fontColor
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
@@ -12051,12 +12051,14 @@ export default class CreateTreeTemplate extends Component {
             linesColor: Colors.Black,
             annotations: treeLevelItems,
             onLevelBackgroundRender: ((data) => {
-                var {context, width, height } = data;
+                var { context, width, height } = data;
                 var { title, fillColor, opacity } = context;
                 return !opacity ? <div style={{
-                    background: "#212631"}}>
+                    background: "#212631"
+                }}>
                 </div> : <div style={{
-                  background: "#212631"}}>
+                    background: "#212631"
+                }}>
                 </div>
             }),
             onLevelTitleRender: ((data) => {
@@ -12323,7 +12325,7 @@ export default class CreateTreeTemplate extends Component {
                                 }}>
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                        {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE_TEMPLATE') &&
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') &&
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     var items = this.state.items;
@@ -12414,13 +12416,13 @@ export default class CreateTreeTemplate extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                         onClick={() => {
                                             var curTheme = localStorage.getItem("theme");
-                                            if(curTheme == "dark") {
+                                            if (curTheme == "dark") {
                                                 this.setState({
                                                     isDarkMode: false
                                                 }, () => {
                                                     setTimeout(() => {
                                                         this.exportPDF();
-                                                        if(curTheme == "dark") {
+                                                        if (curTheme == "dark") {
                                                             this.setState({
                                                                 isDarkMode: true
                                                             })
@@ -12431,10 +12433,10 @@ export default class CreateTreeTemplate extends Component {
                                                 this.exportPDF();
                                             }
                                         }}
-                                        
+
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
-                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id == 1 || this.state.treeTemplate.flatList[0].payload.nodeType.id == 2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span> : <span className='WhiteText'><i>{"Create a tree first, then add this template to a node."}</i></span>}
+                                    {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id == 1 || this.state.treeTemplate.flatList[0].payload.nodeType.id == 2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span> : <span className='WhiteText'><i>{"Create a tree first, then add this template to a node."}</i></span>}
                                 </a>
                             </div>
                         </div>
@@ -12969,7 +12971,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup>
                                                             </Row>
                                                         </div>
-                                                        {(AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_ADD_TREE_TEMPLATE')) &&
+                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) &&
                                                             <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                                 <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                                 {(this.state.isChanged || this.state.isTemplateChanged) && <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md"><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>}

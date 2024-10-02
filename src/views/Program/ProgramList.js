@@ -238,11 +238,11 @@ export default class ProgramList extends Component {
       filters: true,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(0, y).map(c.toString()), 'ROLE_BF_ADD_INTEGRATION_PROGRAM') || AuthenticationService.checkUserACL(this.el.getValueFromCoords(0, y).map(c.toString()), 'ROLE_BF_MAP_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM') || AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, y).toString()], 'ROLE_BF_MAP_PROCUREMENT_AGENT')) {
           var items = [];
           if (y != null) {
             if (obj.options.allowInsertRow == true) {
-              if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(0, y).map(c.toString()), 'ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
+              if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
                 items.push({
                   title: i18n.t('static.integration.addProgramIntegration'),
                   onclick: function () {

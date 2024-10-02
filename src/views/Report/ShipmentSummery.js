@@ -165,7 +165,7 @@ class ShipmentSummery extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
-      isDarkMode:false,
+      isDarkMode: false,
       planningUnitValues: [],
       planningUnitLabels: [],
       sortType: "asc",
@@ -838,7 +838,7 @@ class ShipmentSummery extends Component {
   getFundingSourceList() {
     if (localStorage.getItem("sessionType") === 'Online') {
       this.setState({
-        loading:true
+        loading: true
       })
       var programIds = [Number(this.state.programId)];
       DropdownService.getFundingSourceForProgramsDropdownList(programIds)
@@ -852,7 +852,7 @@ class ShipmentSummery extends Component {
           this.setState(
             {
               fundingSources: listArray,
-              loading:false,
+              loading: false,
               fundingSourceValues: [],
               fundingSourceLabels: [],
               filteredBudgetList: [],
@@ -909,7 +909,7 @@ class ShipmentSummery extends Component {
         fSourceRequest.onerror = function (event) {
         }.bind(this);
         fSourceRequest.onsuccess = function (event) {
-          fSourceResult = fSourceRequest.result.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId)));
+          fSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId)));
           var fundingSource = [];
           for (var i = 0; i < fSourceResult.length; i++) {
             var arr = {
@@ -1499,7 +1499,7 @@ class ShipmentSummery extends Component {
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then((response) => {
           var proList = [];
           for (var i = 0; i < response.data.length; i++) {
@@ -1673,8 +1673,7 @@ class ShipmentSummery extends Component {
               planningUnitValues: [],
             },
             () => {
-              DropdownService.getVersionListForProgram(
-                PROGRAM_TYPE_SUPPLY_PLAN,
+              DropdownService.getVersionListForSPProgram(
                 programId
               )
                 .then((response) => {
@@ -1832,7 +1831,7 @@ class ShipmentSummery extends Component {
             var programData = databytes.toString(CryptoJS.enc.Utf8);
             var version = JSON.parse(programData).currentVersion;
             version.versionId = `${version.versionId} (Local)`;
-            version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+            version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
             verList.push(version);
           }
         }
@@ -1905,12 +1904,12 @@ class ShipmentSummery extends Component {
           });
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
-          var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
           var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
           var rangeValue = this.state.rangeValue;
           if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-              var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-              rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+            var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+            rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
           }
           this.setState({
             minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
@@ -2077,19 +2076,19 @@ class ShipmentSummery extends Component {
    */
   componentDidMount() {
     // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
 
 
     this.getPrograms();
@@ -2124,18 +2123,18 @@ observer.observe(document.documentElement, {
           versionId: event.target.value,
         },
         () => {
-            var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
-            var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-            var rangeValue = this.state.rangeValue;
-            if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
-                // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
-            }
-            this.setState({
-              minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-              rangeValue: rangeValue
-            })
+          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
+          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+          var rangeValue = this.state.rangeValue;
+          if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+            var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+            rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
+            // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+          }
+          this.setState({
+            minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+            rangeValue: rangeValue
+          })
           localStorage.setItem("sesVersionIdReport", this.state.versionId);
           this.fetchData();
         }
@@ -2789,22 +2788,22 @@ observer.observe(document.documentElement, {
   render() {
     const darkModeColors = [
       '#d4bbff',
-  ];
-  
-  const lightModeColors = [
+    ];
+
+    const lightModeColors = [
       '#002F6C',
-  ];
-  
+    ];
+
     const { isDarkMode } = this.state;
-const colors = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     const options = {
       title: {
         display: true,
         text: "Shipments",
-        fontColor:fontColor
+        fontColor: fontColor
       },
       scales: {
         xAxes: [
@@ -2812,7 +2811,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             labelMaxWidth: 100,
             stacked: true,
             gridLines: {
-              display: false, 
+              display: false,
             },
             ticks: {
               fontColor: fontColor, // Apply font color to x-axis labels
@@ -2824,7 +2823,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             scaleLabel: {
               display: true,
               labelString: i18n.t("static.graph.costInUSD"),
-              fontColor:fontColor
+              fontColor: fontColor
             },
             gridLines: {
               display: true, // Ensure grid lines are displayed
@@ -2835,7 +2834,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             stacked: true,
             ticks: {
               beginAtZero: true,
-              fontColor:fontColor,
+              fontColor: fontColor,
               callback: function (value) {
                 var cell1 = value;
                 cell1 += "";
@@ -2878,7 +2877,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         position: "bottom",
         labels: {
           usePointStyle: true,
-          fontColor:fontColor,
+          fontColor: fontColor,
         },
       },
     };
@@ -2899,7 +2898,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
       ],
       from: "From",
       to: "To",
-      fontColor:fontColor
+      fontColor: fontColor
     };
 
     jexcel.setDictionary({
@@ -2916,7 +2915,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             {item.versionStatus.id == 2 && item.versionType.id == 2
               ? item.versionId + "*"
               : item.versionId}{" "}
-            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
           </option>
         );
       }, this);
@@ -3058,23 +3057,23 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     title="Export PDF"
                     onClick={() => {
                       var curTheme = localStorage.getItem("theme");
-                      if(curTheme == "dark") {
-                          this.setState({
-                              isDarkMode: false
-                          }, () => {
-                              setTimeout(() => {
-                                  this.exportPDF();
-                                  if(curTheme == "dark") {
-                                      this.setState({
-                                          isDarkMode: true
-                                      })
-                                  }
-                              }, 0)
-                          })
+                      if (curTheme == "dark") {
+                        this.setState({
+                          isDarkMode: false
+                        }, () => {
+                          setTimeout(() => {
+                            this.exportPDF();
+                            if (curTheme == "dark") {
+                              this.setState({
+                                isDarkMode: true
+                              })
+                            }
+                          }, 0)
+                        })
                       } else {
-                          this.exportPDF();
+                        this.exportPDF();
                       }
-                  }}                  
+                    }}
                   />
                 </a>
                 <img

@@ -246,7 +246,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryEditable = false;
                         }
                         // var roleList = AuthenticationService.getLoggedInUserRole();
-                        if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).map(c.toString()), 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
+                        if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
                             inventoryEditable = false;
                         }
                         if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
@@ -539,7 +539,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var inventoryBatchEditable = inventoryEditable;
         var lastEditableDate = "";
         lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
-        if (moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[15] != -1 && !AuthenticationService.checkUserACL((document.getElementById("programId").value).map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+        if (moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[15] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
             inventoryBatchEditable = false;
         }
         if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
@@ -823,7 +823,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var cell1 = elInstance.getCell(col1)
                 cell1.classList.add('readonly');
             }
-            if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL((document.getElementById("programId").value).map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+            if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 if (rowData[18] > 0) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
@@ -883,7 +883,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var cell1 = elInstance.getCell(col1)
                 cell1.classList.add('readonly');
             }
-            if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL((document.getElementById("programId").value).map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+            if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 if (rowData[18] > 0) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
@@ -965,7 +965,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var cell1 = elInstance.getCell(col1)
                 cell1.classList.add('readonly');
             }
-            if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL((document.getElementById("programId").value).map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+            if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 if (rowData[18] > 0) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -1434,7 +1434,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             } else {
                 var rowData = elInstance.getRowData(y);
                 var lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
-                if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL((document.getElementById("programId").value).map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                if (rowData[15] != -1 && rowData[15] !== "" && rowData[15] != undefined && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 } else {
                     var colArr = ['E'];
                     for (var c = 0; c < colArr.length; c++) {

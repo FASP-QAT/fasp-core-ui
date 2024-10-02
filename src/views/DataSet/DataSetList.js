@@ -252,7 +252,7 @@ export default class ProgramList extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(0, x).map(c.toString()), 'ROLE_BF_EDIT_DATASET')) {
+                if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, x).toString()], 'ROLE_BF_EDIT_DATASET')) {
                     this.props.history.push({
                         pathname: `/dataset/editDataSet/${this.el.getValueFromCoords(0, x)}`,
                     });

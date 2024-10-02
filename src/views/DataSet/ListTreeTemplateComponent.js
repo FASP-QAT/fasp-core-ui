@@ -1549,7 +1549,7 @@ export default class ListTreeTemplate extends Component {
                 var items = [];
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
-                        if (AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_ADD_TREE_TEMPLATE')) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE')) {
                             items.push({
                                 title: i18n.t('static.common.duplicateTemplate'),
                                 onclick: function () {
@@ -1561,7 +1561,7 @@ export default class ListTreeTemplate extends Component {
                                 }.bind(this)
                             });
                         }
-                        if (AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 1 || this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 2)) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 1 || this.state.treeEl.getValueFromCoords(10, y).rootNodeType.id == 2)) {
                             items.push({
                                 title: "Create tree from this template",
                                 onclick: function () {
@@ -1673,7 +1673,7 @@ export default class ListTreeTemplate extends Component {
         if (e.buttons == 1) {
             if (x == 0 && value != 0) {
             } else {
-                if (AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_VIEW_TREE_TEMPLATES')) {
+                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_TREE_TEMPLATES')) {
                     var treeTemplateId = this.state.treeEl.getValueFromCoords(0, x);
                     this.props.history.push({
                         pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
@@ -1921,7 +1921,7 @@ export default class ListTreeTemplate extends Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_ADD_TREE_TEMPLATE') &&
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE') &&
                                     <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addTreeTemplate}><i className="fa fa-plus-square"></i></a>
                                 }
                             </div>
@@ -1952,7 +1952,7 @@ export default class ListTreeTemplate extends Component {
                         </div>
                         <div className="col-md-10 pl-0 DarkThColr" style={{ marginTop: '58px' }}>{"Left click on any tree template to preview. Right click to create tree from template (only available for templates starting from aggregation or number nodes)."}</div>
                         <div className="TreeTemplateTable consumptionDataEntryTable treeTemplateSearchMarginTop1">
-                            <div id="tableDiv" className={AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>

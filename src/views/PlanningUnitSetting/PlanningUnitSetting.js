@@ -991,13 +991,13 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
@@ -1006,7 +1006,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     decimal: false,
@@ -1023,7 +1023,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     decimal: false,
@@ -1040,7 +1040,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##',
                     disabledMaskOnEdition: true,
                     width: '150',
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     decimal: false,
@@ -1059,7 +1059,7 @@ export default class PlanningUnitSetting extends Component {
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
                     width: '120',
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: i18n.t('static.forecastReport.unitPrice'),
@@ -1069,7 +1069,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##.00',
                     width: '120',
                     disabledMaskOnEdition: true,
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     minValue: {
@@ -1115,12 +1115,12 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: 'Active',
                     type: 'checkbox',
-                    readOnly: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: 'active',
@@ -1150,7 +1150,7 @@ export default class PlanningUnitSetting extends Component {
                 if (y == null) {
                 } else {
                     if (localStorage.getItem("sessionType") === 'Online') {
-                        if (obj.options.allowInsertRow == true && AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) {
+                        if (obj.options.allowInsertRow == true && this.state.forecastProgramId != "" && AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
@@ -1192,7 +1192,7 @@ export default class PlanningUnitSetting extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            editable: ((AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
+            editable: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -2166,7 +2166,7 @@ export default class PlanningUnitSetting extends Component {
                                 <p>{i18n.t("static.planningUnitSetting.offlineMsg")}</p>
                             </div>
                         </Col>}
-                        {!AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
+                        {this.state.forecastProgramId != "" && !AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
                             <p>
                                 {i18n.t('static.versionSettings.note')}:
                                 <i>
@@ -2191,7 +2191,7 @@ export default class PlanningUnitSetting extends Component {
                     {
                         this.state.allowAdd &&
                         <CardFooter>
-                            {AuthenticationService.checkUserACL(this.state.datasetId.map(c.toString()), 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
+                            {this.state.forecastProgramId != "" && AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
                                 <FormGroup>
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.isChanged1 &&

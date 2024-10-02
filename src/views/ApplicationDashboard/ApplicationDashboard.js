@@ -389,7 +389,7 @@ class ApplicationDashboard extends Component {
               dashboard: response.data
             })
           })
-        DashboardService.realmLevelDashboardUserList(this.state.realmId)
+        DashboardService.realmLevelDashboardUserList()
           .then(response => {
             this.setState({
               users: response.data

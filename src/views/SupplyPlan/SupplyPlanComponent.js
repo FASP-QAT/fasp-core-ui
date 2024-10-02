@@ -4319,7 +4319,7 @@ export default class SupplyPlanComponent extends React.Component {
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
                 // var roleList = AuthenticationService.getLoggedInUserRole();
-                if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).map(c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                     this.setState({

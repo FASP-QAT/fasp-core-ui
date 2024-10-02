@@ -74,5 +74,9 @@ class UserService {
         return axios.post(`${API_URL}/api/user/theme/${json}`, {}
         );
     }
+    getAccessControls() {
+        return axios.get(`${API_URL}/api/user/accessControls`, {}
+        );
+    }
 }
 export default new UserService()

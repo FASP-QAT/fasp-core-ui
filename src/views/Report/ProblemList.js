@@ -284,7 +284,7 @@ export default class ProblemList extends React.Component {
      */
     filterProblemStatus = function (instance, cell, c, r, source) {
         var pId = document.getElementById('programId').value;
-        var hasRole = AuthenticationService.checkUserACLBasedOnRoleId(pId.toString.split("_")[0].map(c.toString()), "ROLE_SUPPLY_PLAN_REVIEWER");
+        var hasRole = AuthenticationService.checkUserACLBasedOnRoleId([pId.toString().split("_")[0].toString()], "ROLE_SUPPLY_PLAN_REVIEWER");
         // AuthenticationService.getLoggedInUserRole().map(c => {
         //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
         //         hasRole = true;
@@ -884,7 +884,7 @@ export default class ProblemList extends React.Component {
                 } else {
                     if (this.state.data.length != 0) {
                         var programId = document.getElementById('programId').value;
-                        if (AuthenticationService.checkUserACL(programId.map(c.toString()), 'ROLE_BF_EDIT_PROBLEM')) {
+                        if (AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_PROBLEM')) {
                             if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
                                 var planningunitId = this.el.getValueFromCoords(13, x);
                                 var versionId = this.el.getValueFromCoords(3, x)

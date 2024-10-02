@@ -218,7 +218,8 @@ export default class EditProgram extends Component {
             loading: true,
             healthAreaCode: '',
             organisationCode: '',
-            realmCountryCode: ''
+            realmCountryCode: '',
+            programId: [this.props.match.params.programId.toString()]
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -450,7 +451,7 @@ export default class EditProgram extends Component {
                 .then(response => {
                     if (response.status == 200) {
                         var haList = [];
-                        if (AuthenticationService.checkUserACL(this.props.match.params.programId.map(c.toString()), "ROLE_BF_UPDATE_TA_FOR_SP")) {
+                        if (AuthenticationService.checkUserACL([this.state.programId.toString()], "ROLE_BF_UPDATE_TA_FOR_SP")) {
                             var json = response.data;
                             for (var i = 0; i < json.length; i++) {
                                 haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
@@ -914,7 +915,7 @@ export default class EditProgram extends Component {
                                                                     type="text"
                                                                     maxLength={6}
                                                                     value={this.state.uniqueCode}
-                                                                    disabled={!AuthenticationService.checkUserACL(this.props.match.params.programId.map(c.toString()), "ROLE_BF_UPDATE_PC_FOR_SP") ? true : false}
+                                                                    disabled={!AuthenticationService.checkUserACL([this.state.programId.toString()], "ROLE_BF_UPDATE_PC_FOR_SP") ? true : false}
                                                                     name="programCode1" id="programCode1" />
                                                             </FormGroup>
                                                         </Col>
@@ -970,7 +971,7 @@ export default class EditProgram extends Component {
                                                             type="select"
                                                             name="organisationId"
                                                             id="organisationId"
-                                                            disabled={!AuthenticationService.checkUserACL(this.props.match.params.programId.map(c.toString()), "ROLE_BF_UPDATE_ORG_FOR_SP") ? true : false}
+                                                            disabled={!AuthenticationService.checkUserACL([this.state.programId.toString()], "ROLE_BF_UPDATE_ORG_FOR_SP") ? true : false}
                                                             value={this.state.program.organisation.id}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                         >
@@ -1017,7 +1018,7 @@ export default class EditProgram extends Component {
                                                             multi
                                                             options={this.state.healthAreaList}
                                                             value={this.state.program.healthAreaArray}
-                                                            disabled={!AuthenticationService.checkUserACL(this.props.match.params.programId.map(c.toString()), "ROLE_BF_UPDATE_TA_FOR_SP") ? true : false}
+                                                            disabled={!AuthenticationService.checkUserACL([this.state.programId.toString()], "ROLE_BF_UPDATE_TA_FOR_SP") ? true : false}
                                                             name="healthAreaId"
                                                             id="healthAreaId"
                                                         />

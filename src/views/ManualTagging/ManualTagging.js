@@ -497,8 +497,8 @@ export default class ManualTagging extends Component {
      * Sets the state variables 'finalShipmentId', 'selectedShipment', and 'originalQty'.
      */
     displayShipmentData() {
-        let selectedShipmentId = (this.state.checkboxValue && document.getElementById("notLinkedShipmentId")!=null ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
-        let selectedPlanningUnitId = (!this.state.checkboxValue && document.getElementById("planningUnitId1")!=null ? parseInt(document.getElementById("planningUnitId1").value) : 0);
+        let selectedShipmentId = (this.state.checkboxValue && document.getElementById("notLinkedShipmentId") != null ? parseInt(document.getElementById("notLinkedShipmentId").value) : 0);
+        let selectedPlanningUnitId = (!this.state.checkboxValue && document.getElementById("planningUnitId1") != null ? parseInt(document.getElementById("planningUnitId1").value) : 0);
         let selectedShipment;
         if (selectedShipmentId != null && selectedShipmentId != 0 && this.state.checkboxValue) {
             selectedShipment = this.state.notLinkedShipments.filter(c => (c.shipmentId == selectedShipmentId));
@@ -507,14 +507,14 @@ export default class ManualTagging extends Component {
         }
         for (var ss = 0; ss < selectedShipment.length; ss++) {
             selectedShipment[ss].tempIndex = selectedShipment[ss].shipmentId > 0 ? selectedShipment[ss].shipmentId : selectedShipment[ss].tempShipmentId;
-            var rcpuForTable=this.state.realmCountryPlanningUnitList.filter(c=>c.id==selectedShipment[ss].realmCountryPlanningUnit.id);
-            selectedShipment[ss].tempMultiplier=(rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+            var rcpuForTable = this.state.realmCountryPlanningUnitList.filter(c => c.id == selectedShipment[ss].realmCountryPlanningUnit.id);
+            selectedShipment[ss].tempMultiplier = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
         }
         this.setState({
             finalShipmentId: [],
             selectedShipment: selectedShipment.sort((a, b) => {
-                var itemLabelA = moment(a.expectedDeliveryDate).format("YYYY-MM-DD"); 
-                var itemLabelB = moment(b.expectedDeliveryDate).format("YYYY-MM-DD"); 
+                var itemLabelA = moment(a.expectedDeliveryDate).format("YYYY-MM-DD");
+                var itemLabelB = moment(b.expectedDeliveryDate).format("YYYY-MM-DD");
                 return itemLabelA > itemLabelB ? 1 : -1;
             }),
             originalQty: ''
@@ -570,7 +570,7 @@ export default class ManualTagging extends Component {
             .then(response => {
                 this.setState({
                     productCategories: response.data
-                },()=>{
+                }, () => {
                     this.getPlanningUnitListByProductcategoryIds();
                 })
             }).catch(
@@ -744,12 +744,12 @@ export default class ManualTagging extends Component {
                     var json = this.el.getJson(null, false);
                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.el.getValueFromCoords(8, y))[0];
                     this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier), true);
-                    this.el.setValueFromCoords(10, y, (rcpu.conversionMethod==1?"*":"/")+rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                    this.el.setValueFromCoords(10, y, (rcpu.conversionMethod == 1 ? "*" : "/") + rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                     this.el.setValueFromCoords(35, y, rcpu.multiplier, true);
                     for (var j = 0; j < json.length; j++) {
                         if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
                             this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
-                            this.el.setValueFromCoords(10, y, (rcpu.conversionMethod==1?"*":"/")+rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                            this.el.setValueFromCoords(10, y, (rcpu.conversionMethod == 1 ? "*" : "/") + rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                             this.el.setValueFromCoords(35, j, rcpu.multiplier, true);
                             this.el.setValueFromCoords(8, j, rcpu.id, true);
                         }
@@ -852,7 +852,7 @@ export default class ManualTagging extends Component {
                         var rcpuFilter = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
                         if (rowData[0].toString() == "true") {
                             this.state.instance.setValueFromCoords(12, y, Math.round(this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
-                            this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod==1?"*":"/")+rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                            this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod == 1 ? "*" : "/") + rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                             this.state.instance.setValueFromCoords(21, y, Number(rcpuFilter.multiplier), true);
                             this.state.instance.setValueFromCoords(19, y, Math.round(this.state.instance.getValueFromCoords(10, y)), true);
                             for (var j = 0; j < json.length; j++) {
@@ -860,7 +860,7 @@ export default class ManualTagging extends Component {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(9, j, rcpuFilter.id, true);
                                         this.state.instance.setValueFromCoords(12, j, Math.round(this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
-                                        this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod==1?"*":"/")+rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                                        this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod == 1 ? "*" : "/") + rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                                         this.state.instance.setValueFromCoords(21, y, Number(rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(19, j, Math.round(this.state.instance.getValueFromCoords(10, j)), true);
                                     }
@@ -1037,13 +1037,13 @@ export default class ManualTagging extends Component {
                     .then(response => {
                         if (response.status == 200) {
                             var listArray = response.data.map(ele => ele.realmCountry);
-                            var lang=this.state.lang;
+                            var lang = this.state.lang;
                             this.setState({
                                 countryList: response.data.sort(function (a, b) {
-                                    a = getLabelText(a.realmCountry.label,lang).toLowerCase();
-                                    b = getLabelText(b.realmCountry.label,lang).toLowerCase();
+                                    a = getLabelText(a.realmCountry.label, lang).toLowerCase();
+                                    b = getLabelText(b.realmCountry.label, lang).toLowerCase();
                                     return a < b ? -1 : a > b ? 1 : 0;
-                                  })
+                                })
                             }, () => {
                                 if (this.state.countryList.length == 1) {
                                     var event = {
@@ -1155,8 +1155,8 @@ export default class ManualTagging extends Component {
                     let fundingSourceList = response.data.filter(c => c.active == true && c.fundingSourceId != TBD_FUNDING_SOURCE)
                     this.setState({
                         fundingSourceList: fundingSourceList.sort((a, b) => {
-                            var itemLabelA = a.fundingSourceCode.toUpperCase(); 
-                            var itemLabelB = b.fundingSourceCode.toUpperCase(); 
+                            var itemLabelA = a.fundingSourceCode.toUpperCase();
+                            var itemLabelB = b.fundingSourceCode.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         })
                     }, () => {
@@ -1336,7 +1336,7 @@ export default class ManualTagging extends Component {
         let planningUnits1 = this.state.planningUnits1;
         localStorage.setItem("sesCountryId", event.target.value);
         this.setState({
-            loading:true,
+            loading: true,
             planningUnitValues: [],
             productCategoryValues: [],
             planningUnits1: (this.state.productCategoryValues != null && this.state.productCategoryValues != "" ? planningUnits1 : []),
@@ -1532,7 +1532,7 @@ export default class ManualTagging extends Component {
                                 }
                                 var shipmentIndex = shipmentList.findIndex(c => selectedShipment[ss][17].shipmentId > 0 ? c.shipmentId == selectedShipment[ss][17].shipmentId : c.tempShipmentId == selectedShipment[ss][17].tempShipmentId);
                                 shipmentList[shipmentIndex].active = false;
-                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex].tempShipmentId))
+                                shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex].tempShipmentId))
                                 shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
                                 shipmentList[shipmentIndex].lastModifiedBy.username = username;
                                 shipmentList[shipmentIndex].lastModifiedDate = curDate;
@@ -1551,15 +1551,15 @@ export default class ManualTagging extends Component {
                                             shipmentAmt: Number(shipmentList[parentShipmentIndex].productCost) + Number(shipmentList[parentShipmentIndex].freightCost),
                                             budgetId: shipmentList[parentShipmentIndex].budget.id,
                                             conversionRateToUsd: shipmentList[parentShipmentIndex].currency.conversionRateToUsd,
-                                            shipmentId:shipmentList[parentShipmentIndex].shipmentId,
-                                            tempShipmentId:shipmentList[parentShipmentIndex].tempShipmentId,
-                                            currencyId:shipmentList[parentShipmentIndex].currency.currencyId
+                                            shipmentId: shipmentList[parentShipmentIndex].shipmentId,
+                                            tempShipmentId: shipmentList[parentShipmentIndex].tempShipmentId,
+                                            currencyId: shipmentList[parentShipmentIndex].currency.currencyId
                                         })
-                                    }else{
-                                        shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentList[parentShipmentIndex].productCost) + Number(shipmentList[parentShipmentIndex].freightCost);
-                                        shipmentBudgetList[sblIndex].budgetId=shipmentList[parentShipmentIndex].budget.id;
-                                        shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentList[parentShipmentIndex].currency.conversionRateToUsd;
-                                        shipmentBudgetList[sblIndex].currencyId=shipmentList[parentShipmentIndex].currency.currencyId;
+                                    } else {
+                                        shipmentBudgetList[sblIndex].shipmentAmt = Number(shipmentList[parentShipmentIndex].productCost) + Number(shipmentList[parentShipmentIndex].freightCost);
+                                        shipmentBudgetList[sblIndex].budgetId = shipmentList[parentShipmentIndex].budget.id;
+                                        shipmentBudgetList[sblIndex].conversionRateToUsd = shipmentList[parentShipmentIndex].currency.conversionRateToUsd;
+                                        shipmentBudgetList[sblIndex].currencyId = shipmentList[parentShipmentIndex].currency.currencyId;
                                     }
                                     shipmentList[parentShipmentIndex].erpFlag = false;
                                     shipmentList[parentShipmentIndex].lastModifiedBy.userId = curUser;
@@ -1581,15 +1581,15 @@ export default class ManualTagging extends Component {
                                                 shipmentAmt: Number(shipmentList[parentShipmentIndex1].productCost) + Number(shipmentList[parentShipmentIndex1].freightCost),
                                                 budgetId: shipmentList[parentShipmentIndex1].budget.id,
                                                 conversionRateToUsd: shipmentList[parentShipmentIndex1].currency.conversionRateToUsd,
-                                                shipmentId:shipmentList[parentShipmentIndex1].shipmentId,
-                                                tempShipmentId:shipmentList[parentShipmentIndex1].tempShipmentId,
-                                                currencyId:shipmentList[parentShipmentIndex1].currency.currencyId
+                                                shipmentId: shipmentList[parentShipmentIndex1].shipmentId,
+                                                tempShipmentId: shipmentList[parentShipmentIndex1].tempShipmentId,
+                                                currencyId: shipmentList[parentShipmentIndex1].currency.currencyId
                                             })
-                                        }else{
-                                            shipmentBudgetList[sblIndex].shipmentAmt=Number(shipmentList[parentShipmentIndex1].productCost) + Number(shipmentList[parentShipmentIndex1].freightCost);
-                                            shipmentBudgetList[sblIndex].budgetId=shipmentList[parentShipmentIndex1].budget.id;
-                                            shipmentBudgetList[sblIndex].conversionRateToUsd=shipmentList[parentShipmentIndex1].currency.conversionRateToUsd;
-                                            shipmentBudgetList[sblIndex].currencyId=shipmentList[parentShipmentIndex1].currency.currencyId;
+                                        } else {
+                                            shipmentBudgetList[sblIndex].shipmentAmt = Number(shipmentList[parentShipmentIndex1].productCost) + Number(shipmentList[parentShipmentIndex1].freightCost);
+                                            shipmentBudgetList[sblIndex].budgetId = shipmentList[parentShipmentIndex1].budget.id;
+                                            shipmentBudgetList[sblIndex].conversionRateToUsd = shipmentList[parentShipmentIndex1].currency.conversionRateToUsd;
+                                            shipmentBudgetList[sblIndex].currencyId = shipmentList[parentShipmentIndex1].currency.currencyId;
                                         }
                                         shipmentList[parentShipmentIndex1].erpFlag = false;
                                         shipmentList[parentShipmentIndex1].lastModifiedBy.userId = curUser;
@@ -1782,14 +1782,14 @@ export default class ManualTagging extends Component {
                                             var shipmentIndex = shipmentList.findIndex(c => shipmentId > 0 ? (c.shipmentId == shipmentId) : (c.tempShipmentId == index));
                                             shipmentList[shipmentIndex].erpFlag = true;
                                             shipmentList[shipmentIndex].active = false;
-                                            shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex].tempShipmentId))
+                                            shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex].tempShipmentId))
                                             var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
                                             for (var i = 1; i < this.state.finalShipmentId.length; i++) {
                                                 var shipmentId1 = this.state.active1 ? this.state.finalShipmentId[i].shipmentId : this.state.finalShipmentId[i].shipmentId;
                                                 var index1 = this.state.active1 ? this.state.finalShipmentId[i].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
                                                 var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
                                                 shipmentList[shipmentIndex1].erpFlag = true;
-                                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex1].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex1].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex1].tempShipmentId))
+                                                shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex1].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex1].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex1].tempShipmentId))
                                                 shipmentList[shipmentIndex1].active = false;
                                                 shipmentList[shipmentIndex1].parentLinkedShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
                                                 shipmentList[shipmentIndex1].tempParentLinkedShipmentId = this.state.finalShipmentId[0].tempShipmentId;
@@ -1842,7 +1842,7 @@ export default class ManualTagging extends Component {
                                                     if (this.state.active4 && uq == 0) {
                                                         var c = (cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0]);
                                                         var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
-                                                        var tempShipmentId=ppuObject.planningUnit.id.toString().concat(shipmentList.length);
+                                                        var tempShipmentId = ppuObject.planningUnit.id.toString().concat(shipmentList.length);
                                                         shipmentList.push({
                                                             accountFlag: true,
                                                             active: false,
@@ -1948,7 +1948,7 @@ export default class ManualTagging extends Component {
                                                         lastModifiedDate: curDate,
                                                     })
                                                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
-                                                    var tempShipmentId=shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
+                                                    var tempShipmentId = shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
                                                     shipmentList.push({
                                                         accountFlag: true,
                                                         active: true,
@@ -2004,12 +2004,12 @@ export default class ManualTagging extends Component {
                                                         tempParentLinkedShipmentId: null
                                                     })
                                                     shipmentBudgetList.push({
-                                                        shipmentAmt: Number(Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty))+Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].shippingCost),
+                                                        shipmentAmt: Number(Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty)) + Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].shippingCost),
                                                         budgetId: shipmentList[shipmentIndex].budget.id,
                                                         conversionRateToUsd: shipmentList[shipmentIndex].currency.conversionRateToUsd,
-                                                        shipmentId:0,
-                                                        tempShipmentId:tempShipmentId,
-                                                        currencyId:shipmentList[shipmentIndex].currency.currencyId
+                                                        shipmentId: 0,
+                                                        tempShipmentId: tempShipmentId,
+                                                        currencyId: shipmentList[shipmentIndex].currency.currencyId
                                                     })
                                                     for (var bi = 0; bi < batchInfo.length; bi++) {
                                                         var index = batchInfoList.findIndex(c => c.batchNo == batchInfo[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfo[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == planningUnitId);
@@ -2081,7 +2081,7 @@ export default class ManualTagging extends Component {
      */
     getOrderDetails = (takeFromLocalProgram) => {
         var roNoOrderNo = (this.state.searchedValue != null && this.state.searchedValue != "" ? this.state.searchedValue : "0");
-        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 && this.state.localProgramList.length>0 ? this.state.localProgramList[0].programId : this.state.programId1!=undefined?this.state.programId1.toString().split("_")[0]:"") : document.getElementById("programId").value);
+        var programId = (this.state.active3 ? (takeFromLocalProgram != undefined && takeFromLocalProgram == 1 && this.state.localProgramList.length > 0 ? this.state.localProgramList[0].programId : this.state.programId1 != undefined ? this.state.programId1.toString().split("_")[0] : "") : document.getElementById("programId").value);
         var versionId = this.state.active1 ? this.state.versionId.toString().split(" ")[0] : 0;
         var erpPlanningUnitId = (this.state.planningUnitIdUpdated != null && this.state.planningUnitIdUpdated != "" ? this.state.planningUnitIdUpdated : 0);
         var linkedRoNoAndRoPrimeLineNo = [];
@@ -2179,7 +2179,7 @@ export default class ManualTagging extends Component {
                                     }, () => {
                                         hideSecondComponent()
                                     });
-                                       break;
+                                    break;
                             }
                         }
                     }
@@ -2235,11 +2235,11 @@ export default class ManualTagging extends Component {
      * Retrieves active planning units based on selected product category IDs.
      */
     getPlanningUnitListByProductcategoryIds = () => {
-        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.length>0?this.state.productCategoryValues.map(ele => (ele.value).toString()):this.state.productCategories.map(ele => (ele.productCategoryId).toString()),this.state.countryId)
+        PlanningUnitService.getActivePlanningUnitByProductCategoryIds(this.state.productCategoryValues.length > 0 ? this.state.productCategoryValues.map(ele => (ele.value).toString()) : this.state.productCategories.map(ele => (ele.productCategoryId).toString()), this.state.countryId)
             .then(response => {
                 this.setState({
                     planningUnits1: response.data
-                },()=>{
+                }, () => {
                     this.filterErpData();
                 })
             }).catch(
@@ -2637,8 +2637,8 @@ export default class ManualTagging extends Component {
                 }
                 var listArray = tracercategoryPlanningUnit;
                 listArray.sort((a, b) => {
-                    var itemLabelA = a.label.toUpperCase(); 
-                    var itemLabelB = b.label.toUpperCase(); 
+                    var itemLabelA = a.label.toUpperCase();
+                    var itemLabelB = b.label.toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -2789,7 +2789,7 @@ export default class ManualTagging extends Component {
      */
     getProgramList() {
         let realmId = AuthenticationService.getRealmId()
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
@@ -2804,8 +2804,8 @@ export default class ManualTagging extends Component {
                         proList[i] = programJson;
                     }
                     proList.sort((a, b) => {
-                        var itemLabelA = a.programCode.toUpperCase(); 
-                        var itemLabelB = b.programCode.toUpperCase(); 
+                        var itemLabelA = a.programCode.toUpperCase();
+                        var itemLabelB = b.programCode.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     if (proList.length == 1) {
@@ -2931,7 +2931,7 @@ export default class ManualTagging extends Component {
                     var shipmentListArr = [...new Set(finalShipmentId.filter(c => c.shipmentId != 0).map(ele => (ele.shipmentId)))]
                     var tempShipmentListArr = [...new Set(finalShipmentId.filter(c => c.tempShipmentId != 0 && c.tempShipmentId != null).map(ele => (ele.tempShipmentId)))]
                     for (var i = 0; i < list.length; i++) {
-                        var rcpuForTable=this.state.realmCountryPlanningUnitList.filter(c=>c.id==list[i].realmCountryPlanningUnit.id);
+                        var rcpuForTable = this.state.realmCountryPlanningUnitList.filter(c => c.id == list[i].realmCountryPlanningUnit.id);
                         data1 = []
                         data1[0] = list[i].shipmentId > 0 ? (shipmentListArr.includes(list[i].shipmentId) ? true : false) : (tempShipmentListArr.includes(list[i].tempShipmentId) ? true : false);
                         data1[1] = getLabelText(list[i].planningUnit.label, this.state.lang);
@@ -2943,7 +2943,7 @@ export default class ManualTagging extends Component {
                         data1[7] = list[i].receivedDate != "" && list[i].receivedDate != null && list[i].receivedDate != undefined && list[i].receivedDate != "Invalid date" ? list[i].receivedDate : list[i].expectedDeliveryDate;
                         data1[8] = getLabelText(list[i].shipmentStatus.label, this.state.lang)
                         data1[9] = list[i].shipmentQty
-                        data1[10] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                        data1[10] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                         data1[11] = Math.round(Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
                         data1[12] = list[i].notes
                         data1[13] = i;
@@ -3190,7 +3190,7 @@ export default class ManualTagging extends Component {
                                 readOnly: true,
                                 width: 80
                             },
-                            { title: i18n.t('static.manualTagging.conversionERPToPU'), type: 'text', width: 100},
+                            { title: i18n.t('static.manualTagging.conversionERPToPU'), type: 'text', width: 100 },
                             {
                                 title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                                 type: 'numeric',
@@ -3317,8 +3317,8 @@ export default class ManualTagging extends Component {
                     active: c.active,
                     label: c.label,
                     planningUnit: c.planningUnit,
-                    conversionMethod:c.conversionMethod,
-                    conversionNumber:c.conversionNumber
+                    conversionMethod: c.conversionMethod,
+                    conversionNumber: c.conversionNumber
                 })
             })
             let manualTaggingList = this.state.outputList;
@@ -3349,8 +3349,8 @@ export default class ManualTagging extends Component {
                     data = [];
                     let shipmentQty = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].erpQty : manualTaggingList[j].shipmentQty;
                     let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
-                    var realmCountryPlanningUnitId=!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.id : manualTaggingList[j].realmCountryPlanningUnit.id;
-                    var rcpuForTable=rcpuList.filter(c=>c.id==realmCountryPlanningUnitId);
+                    var realmCountryPlanningUnitId = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.id : manualTaggingList[j].realmCountryPlanningUnit.id;
+                    var rcpuForTable = rcpuList.filter(c => c.id == realmCountryPlanningUnitId);
                     data[0] = true;
                     data[1] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) + " (" + manualTaggingList[j].childShipmentId : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + manualTaggingList[j].shipmentId) + ")";
                     data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
@@ -3382,7 +3382,7 @@ export default class ManualTagging extends Component {
                     data[28] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roPrimeLineNo : "";
                     data[29] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0));
                     data[30] = manualTaggingArray.filter(c => (c[29] == data[29])).length > 0 ? 1 : 0;
-                    data[10] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                    data[10] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
                     data[32] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
                     data[33] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatPlanningUnit.id : manualTaggingList[j].planningUnit.id
                     data[34] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.id : manualTaggingList[j].realmCountryPlanningUnit.id;
@@ -3908,7 +3908,7 @@ export default class ManualTagging extends Component {
      * @param {number} r - Row index.
      * @param {Array} source - The source array for autocomplete options (unused).
      * @returns {Array} - Returns an array of active countries.
-     */   
+     */
     filterRealmCountryPlanningUnit = function (o, cell, x, y, value, config) {
         var planningUnitId = this.el.getValueFromCoords(33, y);
         return this.state.realmCountryPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
@@ -3933,12 +3933,12 @@ export default class ManualTagging extends Component {
      */
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 0);
-        try{
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
-        var tr = asterisk.firstChild;
-        tr.children[11].classList.add('InfoTr');
-        tr.children[11].title = i18n.t('static.dataentry.conversionFactorTooltip')
-        }catch(err){
+        try {
+            var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+            var tr = asterisk.firstChild;
+            tr.children[11].classList.add('InfoTr');
+            tr.children[11].title = i18n.t('static.dataentry.conversionFactorTooltip')
+        } catch (err) {
 
         }
     }
@@ -4151,8 +4151,8 @@ export default class ManualTagging extends Component {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); 
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); 
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         listArray = listArray.filter(c => (c.active == true))
@@ -4166,11 +4166,11 @@ export default class ManualTagging extends Component {
                                     active: c.active,
                                     label: c.label,
                                     planningUnit: c.planningUnit,
-                                    conversionMethod:c.conversionMethod,
-                                    conversionNumber:c.conversionNumber
+                                    conversionMethod: c.conversionMethod,
+                                    conversionNumber: c.conversionNumber
                                 })
                             })
-                            if (document.getElementById("planningUnitId1")!=null && listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length == 0) {
+                            if (document.getElementById("planningUnitId1") != null && listArray.filter(c => c.planningUnit.id == document.getElementById("planningUnitId1").value).length == 0) {
                                 document.getElementById("planningUnitId1").value = -1;
                             }
                             this.setState({
@@ -4272,8 +4272,8 @@ export default class ManualTagging extends Component {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); 
-                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); 
+                            var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         listArray = listArray.filter(c => (c.active == true))
@@ -4559,7 +4559,7 @@ export default class ManualTagging extends Component {
             )
         }, this);
         const { fundingSourceList } = this.state;
-        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId1))).map((item, i) => {
+        let newFundingSourceList = fundingSourceList.length > 0 && fundingSourceList.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId1))).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {item.fundingSourceCode}
@@ -4727,7 +4727,7 @@ export default class ManualTagging extends Component {
                     </div>
                     <CardBody className="pb-lg-5" >
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
-                            <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}> 
+                            <b><div className="col-md-11 pl-3" style={{ 'marginLeft': '-15px', 'marginTop': '-13px' }}>
                                 <span className='DarkThColr' style={{ 'color': '#002f6c', 'fontSize': '13px' }}>{i18n.t('static.mt.manualTaggingNotePart1')}<a href="#/program/downloadProgram" target="_blank">{i18n.t('static.mt.manualTaggingNotePart2')}</a>{i18n.t('static.mt.manualTaggingNotePart3')}</span></div></b><br />
                             <div className="col-md-12 pl-0">
                                 <Row>
@@ -5146,7 +5146,7 @@ export default class ManualTagging extends Component {
                                                                                 tracercategoryPlanningUnit: []
                                                                             }, () => { this.getOrderDetails() });
                                                                         }
-                                                                    }} 
+                                                                    }}
                                                                     renderInput={(params) => <TextField
                                                                         {...params}
                                                                         variant="outlined"
@@ -5180,7 +5180,7 @@ export default class ManualTagging extends Component {
                                                                                 , autocompleteData: []
                                                                             }, () => { this.getOrderDetails() });
                                                                         }
-                                                                    }} 
+                                                                    }}
                                                                     renderInput={(params) => <TextField {...params} variant="outlined"
                                                                         onChange={(e) => {
                                                                             this.searchErpOrderData(e.target.value)

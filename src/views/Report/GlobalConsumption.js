@@ -334,7 +334,7 @@ class GlobalConsumption extends Component {
     }, () => {
       if (countryIds.length != 0) {
         let newCountryList = [... new Set(countryIds)];
-        DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+        DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
           .then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {

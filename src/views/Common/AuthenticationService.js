@@ -213,11 +213,11 @@ class AuthenticationService {
      */
     updateUserTheme(themeId) {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        decryptedUser.defaultThemeId = themeId;
-        localStorage.removeItem('user-' + decryptedCurUser);
-        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+            decryptedUser.defaultThemeId = themeId;
+            localStorage.removeItem('user-' + decryptedCurUser);
+            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
         }
     }
     /**
@@ -290,6 +290,7 @@ class AuthenticationService {
      * @returns {boolean} True user has access to program and business funtion, otherwise false.
      */
     checkUserACL(programIds, businessFunctionId) {
+        console.log("checkUserACL====>", programIds, "=====", businessFunctionId)
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             try {

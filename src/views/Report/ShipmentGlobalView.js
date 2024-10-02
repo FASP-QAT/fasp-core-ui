@@ -52,7 +52,7 @@ class ShipmentGlobalView extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
-            isDarkMode:false,
+            isDarkMode: false,
             labels: ['GF', 'Govt', 'Local', 'PSM'],
             datasets: [{
                 data: [13824000, 26849952, 0, 5615266],
@@ -546,19 +546,19 @@ class ShipmentGlobalView extends Component {
      */
     componentDidMount() {
         // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
 
         this.getCountrys();
         document.getElementById("procurementAgentDiv").style.display = "none";
@@ -661,7 +661,7 @@ observer.observe(document.documentElement, {
         let programIds = this.state.programValues.map((ele) =>
             Number(ele.value)
         );
-                DropdownService.getFundingSourceForProgramsDropdownList(programIds)
+        DropdownService.getFundingSourceForProgramsDropdownList(programIds)
             .then(response => {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -671,7 +671,7 @@ observer.observe(document.documentElement, {
                 });
                 this.setState({
                     fundingSources: listArray, loading: false
-                }, () => { this.getProcurementAgentType(); this.getFundingSourceType();})
+                }, () => { this.getProcurementAgentType(); this.getFundingSourceType(); })
             }).catch(
                 error => {
                     this.setState({
@@ -733,7 +733,7 @@ observer.observe(document.documentElement, {
                 // });
                 this.setState({
                     productCategories: list, loading: false
-                }, () => {  })
+                }, () => { })
             }).catch(
                 error => {
                     this.setState({
@@ -786,7 +786,7 @@ observer.observe(document.documentElement, {
         let programIds = this.state.programValues.map((ele) =>
             Number(ele.value)
         );
-                DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
+        DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
             .then(response => {
                 if (response.status == 200) {
                     var fundingSourceTypeValues = [];
@@ -795,7 +795,7 @@ observer.observe(document.documentElement, {
                         a = a.code.toLowerCase();
                         b = b.code.toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
-                    })                    
+                    })
 
                     this.setState({
                         fundingSourceTypes: fundingSourceTypes, loading: false,
@@ -851,7 +851,7 @@ observer.observe(document.documentElement, {
                     }
                 }
             );
-    } 
+    }
 
     /**
      * Handles the dismiss of the range picker component.
@@ -897,9 +897,9 @@ observer.observe(document.documentElement, {
             fundingSourceProcurementAgentIds = fundingSourceIds;
         } else if (viewby == 2) {
             fundingSourceProcurementAgentIds = procurementAgentIds;
-        } else if (viewby == 3){
+        } else if (viewby == 3) {
             fundingSourceProcurementAgentIds = procurementAgentTypeIds;
-        } else if (viewby == 4){//for funding source type
+        } else if (viewby == 4) {//for funding source type
             fundingSourceProcurementAgentIds = fundingSourcetypeIds;
         }
 
@@ -1239,7 +1239,7 @@ observer.observe(document.documentElement, {
         }, () => {
             if (countryIds.length != 0) {
                 let newCountryList = [... new Set(countryIds)];
-                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -1351,11 +1351,11 @@ observer.observe(document.documentElement, {
         const { fundingSourceTypes } = this.state;
         let fundingSourceTypeList = [];
         fundingSourceTypeList = fundingSourceTypes.length > 0
-        && fundingSourceTypes.map((item, i) => {
-            return (
-                { label: item.code, value: item.id }
-            )
-        }, this);
+            && fundingSourceTypes.map((item, i) => {
+                return (
+                    { label: item.code, value: item.id }
+                )
+            }, this);
 
         const { countrys } = this.state;
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
@@ -1373,7 +1373,7 @@ observer.observe(document.documentElement, {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
-            fontColor:fontColor
+            fontColor: fontColor
         }
         const { rangeValue } = this.state
         const makeText = m => {
@@ -1401,43 +1401,43 @@ observer.observe(document.documentElement, {
             '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
         ]
         const { isDarkMode } = this.state;
-const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+        const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
         const options = {
             title: {
                 display: true,
                 text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     ticks: {
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                     }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1455,7 +1455,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                 }
                 ],
@@ -1487,7 +1487,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -1495,35 +1495,35 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentfundingSource'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     ticks: {
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                     }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1541,7 +1541,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                 }],
             },
@@ -1572,7 +1572,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -1580,38 +1580,38 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgent'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     ticks: {
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                     }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                 }],
             },
             tooltips: {
@@ -1625,7 +1625,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -1633,38 +1633,38 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentProcurementAgentType'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     ticks: {
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                     }
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                 }],
             },
             tooltips: {
@@ -1678,7 +1678,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -1687,32 +1687,32 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: i18n.t('static.shipment.shipmentFundingSourceType'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
                     labelMaxWidth: 100,
                     stacked: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     gridLines: {
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                 }],
                 yAxes: [{
                     scaleLabel: {
                         display: true,
                         labelString: this.state.puUnit.label.label_en,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                     },
                     stacked: true,
                     labelString: i18n.t('static.shipment.amount'),
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1730,7 +1730,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         display: true,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                 }],
             },
@@ -1761,7 +1761,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                 }
             }
         }
@@ -1817,25 +1817,25 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                             <div className="card-header-actions">
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                        var curTheme = localStorage.getItem("theme");
+                                        if (curTheme == "dark") {
+                                            this.setState({
+                                                isDarkMode: false
+                                            }, () => {
+                                                setTimeout(() => {
+                                                    this.exportPDF();
+                                                    if (curTheme == "dark") {
+                                                        this.setState({
+                                                            isDarkMode: true
+                                                        })
+                                                    }
+                                                }, 0)
+                                            })
+                                        } else {
+                                            this.exportPDF();
+                                        }
+                                    }}
+                                    />
                                     {(this.state.shipmentList.length > 0 || this.state.countrySplitList.length > 0) &&
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                     }

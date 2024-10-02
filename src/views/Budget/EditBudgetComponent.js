@@ -187,7 +187,7 @@ class EditBudgetComponent extends Component {
         // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         //Fetch Program list
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
@@ -594,7 +594,7 @@ class EditBudgetComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         required
-                                                        disabled={!AuthenticationService.checkUserACL(this.state.programs.map(c => c.id.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                        disabled={!AuthenticationService.checkUserACL(this.state.programs.map(c => c.value.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
                                                         value={this.state.budget.fundingSource.fundingSourceId}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>

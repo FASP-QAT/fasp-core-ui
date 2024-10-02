@@ -499,7 +499,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             v15: regionFilter[0].forecastPercentage,// % of forecast
                                             v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                             v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                            v18: AuthenticationService.checkUserACL(this.props.items.forecastProgramId.map(c.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
+                                            v18: AuthenticationService.checkUserACL([this.props.items.forecastProgramId.toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
                                         });
                                     }
                                 }
@@ -886,7 +886,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </div>
                 <FormGroup>
                     <Button color="success" size="md" className="float-right mr-1" id="stepThreeImportBtn" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
-                    <span class="red float-right " style={{marginTop: '7px', marginRight: '5px', display: this.props.items.isForecastOver ? "block" : "none"}}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.forecastRestrictionNotes')}</i></span>
+                    <span class="red float-right " style={{ marginTop: '7px', marginRight: '5px', display: this.props.items.isForecastOver ? "block" : "none" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.forecastRestrictionNotes')}</i></span>
                     &nbsp;
                     <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                     &nbsp;

@@ -1037,7 +1037,7 @@ class VersionSettingsComponent extends Component {
             onchange: this.changed,
             onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
-            editable: ((AuthenticationService.checkUserACL(this.state.programValues.map(c.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
+            editable: ((AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1194,7 +1194,7 @@ class VersionSettingsComponent extends Component {
      */
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+        DropdownService.getFCProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var responseData = response.data;
@@ -1542,7 +1542,7 @@ class VersionSettingsComponent extends Component {
                         </div>
                     </CardBody>
                     <CardFooter className="CardFooterVesionsettingMarginTop">
-                        {(AuthenticationService.checkUserACL(this.state.programValues.map(c.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) &&
+                        {(AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}

@@ -49,7 +49,7 @@ export default class DataSourceListComponent extends Component {
         let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
         let programId = document.getElementById("programId").value;
         let realmId = 0;
-        if (AuthenticationService.checkUserACL(programId.map(c.toString()), 'ROLE_BF_SHOW_REALM_COLUMN')) {
+        if (AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_SHOW_REALM_COLUMN')) {
             realmId = document.getElementById("realmId").value;
         }
         if (realmId != 0 && dataSourceTypeId != 0 && programId != 0) {
@@ -118,6 +118,7 @@ export default class DataSourceListComponent extends Component {
             data[5] = dataSourceList[j].lastModifiedBy.username;
             data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;
+            data[8] = dataSourceList[j].program != null ? dataSourceList[j].program.id : null
             dataSourceArray[count] = data;
             count++;
         }
@@ -166,6 +167,10 @@ export default class DataSourceListComponent extends Component {
                         { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
+                {
+                    title: 'programId',
+                    type: 'hidden'
+                }
             ],
             editable: false,
             onload: loadedForNonEditableTables,
@@ -200,7 +205,7 @@ export default class DataSourceListComponent extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var proList = []
@@ -427,7 +432,7 @@ export default class DataSourceListComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(0, x).map(c.toString()), 'ROLE_BF_EDIT_DATA_SOURCE')) {
+                if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) {
                     this.props.history.push({
                         pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     });

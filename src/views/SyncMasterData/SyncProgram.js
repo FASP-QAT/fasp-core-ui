@@ -81,7 +81,6 @@ export default class SyncProgram extends Component {
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     myResult = getRequest.result.filter(c => c.userId == userId);
-                    console.log("userId=====>", userId)
                     var datasetMyResult = [];
                     datasetMyResult = datasetGetRequest.result.filter(c => c.userId == userId);
                     var programList = myResult;

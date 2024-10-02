@@ -3148,7 +3148,7 @@ export default class TreeTable extends Component {
             // data[7] = currentScenario.dataValue;//Node Value
             data[7] = data[6] * data[5] / 100; //currentScenario.calculatedDataValue;
             data[8] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
-            data[9] = fuNode ? (this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id).length>0?this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en:"") : (this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id).length>0?this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en:""); // Forecasting unit
+            data[9] = fuNode ? (this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id).length > 0 ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : "") : (this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id).length > 0 ? this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en : ""); // Forecasting unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[11] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
             data[12] = !fuNode ? this.qatCalculatedPUPerVisitForJexcel(items[i]) : ""; // # PU / Interval / Patient (Reference)
@@ -5529,9 +5529,9 @@ export default class TreeTable extends Component {
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>}
                 </TabPane>
@@ -5541,9 +5541,9 @@ export default class TreeTable extends Component {
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.checkUserACL(this.state.programId.map(c.toString()), 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>}
                 </TabPane>
@@ -6167,25 +6167,25 @@ export default class TreeTable extends Component {
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                            var curTheme = localStorage.getItem("theme");
+                                            if (curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if (curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        />
                                     </a>
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
@@ -6333,7 +6333,7 @@ export default class TreeTable extends Component {
                             </div>
                         </CardBody>
                     </Card></Col></Row>
-                    <Modal isOpen={this.state.showGuidanceTreeTable}
+            <Modal isOpen={this.state.showGuidanceTreeTable}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
@@ -6342,12 +6342,12 @@ export default class TreeTable extends Component {
                     <ModalBody className="ModalBodyPadding">
                         <div dangerouslySetInnerHTML={{
                             __html: localStorage.getItem('lang') == 'en' ?
-                            showguidanceTreeTableEn :
+                                showguidanceTreeTableEn :
                                 localStorage.getItem('lang') == 'fr' ?
-                                showguidanceTreeTableFr :
+                                    showguidanceTreeTableFr :
                                     localStorage.getItem('lang') == 'sp' ?
-                                    showguidanceTreeTableSp :
-                                    showguidanceTreeTablePr
+                                        showguidanceTreeTableSp :
+                                        showguidanceTreeTablePr
                         }} />
                     </ModalBody>
                 </div>

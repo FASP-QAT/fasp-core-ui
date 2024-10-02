@@ -358,10 +358,7 @@ class EditUserComponent extends Component {
                         healthAreas: listArray,
                         selHealthArea: listArray,
                       });
-                      DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(
-                        realmId,
-                        0
-                      )
+                      DropdownService.getAllProgramListByRealmId(realmId)
                         .then((response1) => {
                           if (response1.status == "200") {
                             var listArray = response1.data;
@@ -702,7 +699,6 @@ class EditUserComponent extends Component {
     const { selOrganisation } = this.state;
     const { selHealthArea } = this.state;
     const { selRoleList } = this.state;
-
     let programList = [];
     let countryList = [];
     let organisationList = [];
@@ -803,6 +799,7 @@ class EditUserComponent extends Component {
       roleList.unshift(paJson);
     }
     var papuList = this.state.rows;
+    console.log("papuList", roleList)
     var data = [];
     var papuDataArr = [];
     var count = 0;
@@ -1303,7 +1300,7 @@ class EditUserComponent extends Component {
         if (response.status == 200) {
           var roleList = [];
           for (var i = 0; i < response.data.length; i++) {
-            roleList[i + 1] = {
+            roleList[i] = {
               value: response.data[i].roleId,
               label: getLabelText(response.data[i].label, this.state.lang),
             };
@@ -1420,7 +1417,8 @@ class EditUserComponent extends Component {
                       var map1 = new Map(Object.entries(tableJson[i]));
                       let json = {
                         userId: "",
-                        realmCountryId: parseInt(map1.get("1")),
+                        roleId: map1.get("1"),
+                        realmCountryId: parseInt(map1.get("2")),
                         countryName: {
                           createdBy: null,
                           createdDate: null,
@@ -1433,7 +1431,7 @@ class EditUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        healthAreaId: parseInt(map1.get("2")),
+                        healthAreaId: parseInt(map1.get("3")),
                         healthAreaName: {
                           createdBy: null,
                           createdDate: null,
@@ -1446,7 +1444,7 @@ class EditUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        organisationId: parseInt(map1.get("3")),
+                        organisationId: parseInt(map1.get("4")),
                         organisationName: {
                           createdBy: null,
                           createdDate: null,
@@ -1459,7 +1457,7 @@ class EditUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        programId: parseInt(map1.get("4")),
+                        programId: parseInt(map1.get("5")),
                         programName: {
                           createdBy: null,
                           createdDate: null,

@@ -715,8 +715,7 @@ export default class ConsumptionDetails extends Component {
         if (countryIds.length != 0) {
           var programValues = [];
           let newCountryList = [...new Set(countryIds)];
-          DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(
-            PROGRAM_TYPE_SUPPLY_PLAN,
+          DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(
             newCountryList
           )
             .then((programResponse) => {
@@ -861,8 +860,7 @@ export default class ConsumptionDetails extends Component {
           var keys = [];
           var values = [];
           let newProgramList = [...new Set(programValues)];
-          DropdownService.getVersionListForPrograms(
-            PROGRAM_TYPE_SUPPLY_PLAN,
+          DropdownService.getVersionListForSPPrograms(
             newProgramList
           )
             .then((versionResponse) => {

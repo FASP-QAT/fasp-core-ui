@@ -367,7 +367,7 @@ export default class ExtrapolateDataComponent extends React.Component {
      * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
-        let hasRole = AuthenticationService.checkUserACLBasedOnRoleId(this.state.forecastProgramId.toString.split("_")[0].map(c.toString()), "ROLE_FORECAST_VIEWER");
+        let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.forecastProgramId.toString()], "ROLE_FORECAST_VIEWER");
         // AuthenticationService.getLoggedInUserRole().map(c => {
         //     if (c.roleId == 'ROLE_FORECAST_VIEWER') {
         //         hasRole = true;
@@ -445,7 +445,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({ loading: true })
         if (localStorage.getItem('sessionType') === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            DropdownService.getFCProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = [];
                     if (response.status == 200) {
@@ -1253,7 +1253,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             const program = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -1334,7 +1334,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             const program = this.state.forecastProgramList.filter(c => c.id == programId)
             if (program.length == 1) {
                 if (localStorage.getItem('sessionType') === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []

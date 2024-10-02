@@ -330,7 +330,7 @@ class ProductCatalog extends Component {
     getPrograms() {
         let realmId = AuthenticationService.getRealmId();
         if (localStorage.getItem("sessionType") === 'Online') {
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            DropdownService.getSPProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var listArray = response.data;
                     var proList = []
@@ -1046,7 +1046,7 @@ class ProductCatalog extends Component {
                 }
             }
         ];
-        
+
         const checkOnline = localStorage.getItem('sessionType');
         return (
             <div className="animated fadeIn" >

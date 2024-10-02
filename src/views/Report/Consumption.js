@@ -345,7 +345,7 @@ class Consumption extends Component {
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecasted'),
     i18n.t('static.report.actual')]];
-    const data = localStorage.getItem("sessionType") === 'Online' ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), formatter(elt.forecastedConsumption,0), formatter(elt.actualConsumption,0)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, formatter(elt.forecastedConsumption,0), formatter(elt.actualConsumption,0)]);
+    const data = localStorage.getItem("sessionType") === 'Online' ? this.state.consumptions.map(elt => [moment(elt.transDate, 'yyyy-MM-dd').format('MMM YYYY'), formatter(elt.forecastedConsumption, 0), formatter(elt.actualConsumption, 0)]) : this.state.offlineConsumptionList.map(elt => [elt.transDate, formatter(elt.forecastedConsumption, 0), formatter(elt.actualConsumption, 0)]);
     let head = [];
     let head1 = [];
     let row1 = [];
@@ -358,8 +358,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(formatter(consumptionArray[i].forecastedConsumption,0));
-        row2.push(formatter(consumptionArray[i].actualConsumption,0));
+        row1.push(formatter(consumptionArray[i].forecastedConsumption, 0));
+        row2.push(formatter(consumptionArray[i].actualConsumption, 0));
       }
     } else {
       let consumptionArray = this.state.offlineConsumptionList;
@@ -368,8 +368,8 @@ class Consumption extends Component {
       row2.push(i18n.t('static.report.actual'));
       for (let i = 0; i < consumptionArray.length; i++) {
         head.push((moment(consumptionArray[i].transDate, 'yyyy-MM-dd').format('MMM YYYY')));
-        row1.push(formatter(consumptionArray[i].forecastedConsumption,0));
-        row2.push(formatter(consumptionArray[i].actualConsumption,0));
+        row1.push(formatter(consumptionArray[i].forecastedConsumption, 0));
+        row2.push(formatter(consumptionArray[i].actualConsumption, 0));
       }
     }
     head1[0] = head;
@@ -586,7 +586,7 @@ class Consumption extends Component {
   getPrograms() {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then(response => {
           var proList = []
           for (var i = 0; i < response.data.length; i++) {
@@ -839,7 +839,7 @@ class Consumption extends Component {
             planningUnitValues: [],
             planningUnitLabels: []
           }, () => {
-            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+            DropdownService.getVersionListForSPProgram(programId)
               .then(response => {
                 this.setState({
                   versions: []
@@ -1228,25 +1228,25 @@ class Consumption extends Component {
               <div className="card-header-actions">
                 <a className="card-header-action">
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                    var curTheme = localStorage.getItem("theme");
+                    if (curTheme == "dark") {
+                      this.setState({
+                        isDarkMode: false
+                      }, () => {
+                        setTimeout(() => {
+                          this.exportPDF();
+                          if (curTheme == "dark") {
+                            this.setState({
+                              isDarkMode: true
+                            })
+                          }
+                        }, 0)
+                      })
+                    } else {
+                      this.exportPDF();
+                    }
+                  }}
+                  />
                 </a>
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               </div>
@@ -1256,25 +1256,25 @@ class Consumption extends Component {
               <div className="card-header-actions">
                 <a className="card-header-action">
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                    var curTheme = localStorage.getItem("theme");
+                    if (curTheme == "dark") {
+                      this.setState({
+                        isDarkMode: false
+                      }, () => {
+                        setTimeout(() => {
+                          this.exportPDF();
+                          if (curTheme == "dark") {
+                            this.setState({
+                              isDarkMode: true
+                            })
+                          }
+                        }, 0)
+                      })
+                    } else {
+                      this.exportPDF();
+                    }
+                  }}
+                  />
                 </a>
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               </div>
@@ -1469,7 +1469,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.consumptions.map((item, idx) =>
                                     <td id="addr0" key={idx} className="textcolor-purple">
-                                      {formatter(this.state.consumptions[idx].forecastedConsumption,0)}
+                                      {formatter(this.state.consumptions[idx].forecastedConsumption, 0)}
                                     </td>
                                   )
                                 }
@@ -1481,7 +1481,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.consumptions.map((item, idx) =>
                                     <td id="addr0" key={idx}>
-                                      {formatter(this.state.consumptions[idx].actualConsumption,0)}
+                                      {formatter(this.state.consumptions[idx].actualConsumption, 0)}
                                     </td>
                                   )
                                 }
@@ -1512,7 +1512,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.offlineConsumptionList.map((item, idx) =>
                                     <td id="addr0" key={idx} className="textcolor-purple">
-                                      {formatter(this.state.offlineConsumptionList[idx].forecastedConsumption,0)}
+                                      {formatter(this.state.offlineConsumptionList[idx].forecastedConsumption, 0)}
                                     </td>
                                   )
                                 }
@@ -1524,7 +1524,7 @@ class Consumption extends Component {
                                   &&
                                   this.state.offlineConsumptionList.map((item, idx) =>
                                     <td id="addr0" key={idx}>
-                                      {formatter(this.state.offlineConsumptionList[idx].actualConsumption,0)}
+                                      {formatter(this.state.offlineConsumptionList[idx].actualConsumption, 0)}
                                     </td>
                                   )
                                 }

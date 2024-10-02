@@ -136,7 +136,7 @@ class CountrySpecificPrices extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 var proList = []
                 for (var i = 0; i < response.data.length; i++) {

@@ -1021,14 +1021,8 @@ export default class SyncMasterData extends Component {
                                     })
 
                                     if (validation) {
-                                    console.log("realmId===>validation", validation)
-
                                         AuthenticationService.setupAxiosInterceptors();
-                                    console.log("realmId===>validation1", validation)
-
                                         if (localStorage.getItem("sessionType") === 'Online' && window.getComputedStyle(document.getElementById("retryButtonDiv")).display == "none") {
-                                            console.log("realmId===>", realmId, "===", response)
-
                                             MasterSyncService.getSyncAllMastersForProgram(lastSyncDateRealm, pIds)
                                                 .then(response => {
                                                     if (response.status == 200) {

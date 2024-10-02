@@ -325,8 +325,13 @@ class AddUserComponent extends Component {
    */
   getAccessControlData() {
     let realmId = AuthenticationService.getRealmId();
+    var roleList = AuthenticationService.getLoggedInUserRole();
+    console.log("response===>roleList", roleList)
+
     DropdownService.getRealmCountryDropdownList(realmId)
       .then((response) => {
+        console.log("response===>", response)
+
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {
@@ -382,10 +387,7 @@ class AddUserComponent extends Component {
                         healthAreas: listArray,
                         selHealthArea: listArray,
                       });
-                      DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(
-                        realmId,
-                        0
-                      )
+                      DropdownService.getAllProgramListByRealmId(realmId)
                         .then((response1) => {
                           if (response1.status == "200") {
                             var listArray = response1.data;
@@ -1436,7 +1438,8 @@ class AddUserComponent extends Component {
                       var map1 = new Map(Object.entries(tableJson[i]));
                       let json = {
                         userId: "",
-                        realmCountryId: parseInt(map1.get("1")),
+                        roleId: map1.get("1"),
+                        realmCountryId: parseInt(map1.get("2")),
                         countryName: {
                           createdBy: null,
                           createdDate: null,
@@ -1449,7 +1452,7 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        healthAreaId: parseInt(map1.get("2")),
+                        healthAreaId: parseInt(map1.get("3")),
                         healthAreaName: {
                           createdBy: null,
                           createdDate: null,
@@ -1462,7 +1465,7 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        organisationId: parseInt(map1.get("3")),
+                        organisationId: parseInt(map1.get("4")),
                         organisationName: {
                           createdBy: null,
                           createdDate: null,
@@ -1475,7 +1478,7 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        programId: parseInt(map1.get("4")),
+                        programId: parseInt(map1.get("5")),
                         programName: {
                           createdBy: null,
                           createdDate: null,
@@ -1493,6 +1496,7 @@ class AddUserComponent extends Component {
                       userAcls.push(json);
                     }
                     user.userAcls = userAcls;
+                    user.userAclList = userAcls;
                     this.setState({
                       loading: true,
                     });
