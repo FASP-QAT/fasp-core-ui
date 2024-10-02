@@ -3070,7 +3070,11 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   width: 20px;
   height: 20px;
   margin-top: -2px;
-  filter:brightness(2);
+  // filter:brightness(2);
+}
+.addtreebg option {
+  background-color: #212631 !important; 
+  color: #e4e5e6 !important;
 }
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
