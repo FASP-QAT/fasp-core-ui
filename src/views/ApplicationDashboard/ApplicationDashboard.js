@@ -1061,6 +1061,8 @@ class ApplicationDashboard extends Component {
     let actualConsumptionQplPuCount = 0;
     let shipmentQplCorrectCount = 0;
     let shipmentQplPuCount = 0;
+    let expiryTotal = 0;
+    let shipmentTotal = 0;
     if (this.state.dashboardBottomData) {
       forecastConsumptionQplCorrectCount = this.state.dashboardBottomData.forecastConsumptionQpl.correctCount;
       forecastConsumptionQplPuCount = this.state.dashboardBottomData.forecastConsumptionQpl.puCount;
@@ -1070,11 +1072,35 @@ class ApplicationDashboard extends Component {
       actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
       shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
       shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
-      shipmentDetailsList = this.state.dashboardBottomData.shipmentDetailsList;
+      expiryTotal = this.state.dashboardBottomData.expiryTotal;
+      shipmentTotal = this.state.dashboardBottomData.shipmentTotal;
+      if(this.state.displayBy == 1 || this.state.displayBy == 2){
+        shipmentDetailsList = Object.values(
+          this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
+            if (!acc[curr.reportBy.code]) {
+              acc[curr.reportBy.code] = { code: curr.reportBy.code, cost: curr.cost };
+            } else {
+              acc[curr.reportBy.code].cost += curr.cost;
+            }
+            return acc;
+          }, {})
+        );
+      } else {
+        shipmentDetailsList = Object.values(
+          this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
+            if (!acc[getLabelText(curr.reportBy.label, this.state.lang)]) {
+              acc[getLabelText(curr.reportBy.label, this.state.lang)] = { code: getLabelText(curr.reportBy.label, this.state.lang), cost: curr.cost };
+            } else {
+              acc[getLabelText(curr.reportBy.label, this.state.lang)].cost += curr.cost;
+            }
+            return acc;
+          }, {})
+        );
+      }
     }
 
     const shipmentsPieData = {
-      labels: shipmentDetailsList.map(x => x.reportBy.code),
+      labels: shipmentDetailsList.map(x => x.code),
       datasets: [{
         label: 'My First Dataset',
         data: shipmentDetailsList.map(x => x.cost),
@@ -1655,6 +1681,7 @@ class ApplicationDashboard extends Component {
                   <div class="table-responsive fixTableHead tableFixHeadDash">
                     <Table className="table-striped table-bordered text-center">
                       <thead>
+                        <th scope="col">Delete</th>
                         <th scope="col">Program</th>
                         <th scope="col"># of active planning units</th>
                         <th scope="col"># of products with stockouts</th>
@@ -1667,6 +1694,7 @@ class ApplicationDashboard extends Component {
                         {this.state.dashboardTopList.map(d => {
                           return (
                             <tr>
+                              <td scope="row"><i class="fa fa-trash" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i></td>
                               <td scope="row">AGO-MAL ~v3​</td>
                               <td>
                                 <div id="example-1" class="examples">
@@ -1744,7 +1772,7 @@ class ApplicationDashboard extends Component {
                   <option value="2">Procurement Agent</option>
                   <option value="3">Status</option>
                 </Input>
-                <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment $1.176,003.49</p></div>
+                <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment ${shipmentTotal}</p></div>
               </FormGroup>
             </div>
           </div>
@@ -1864,7 +1892,7 @@ class ApplicationDashboard extends Component {
                             <div class="card-title"> Expiries</div>
                           </div>
                           <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                            <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries $1.176,003.49</p>
+                            <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries ${expiryTotal}</p>
                             <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
                             </div>
                           </div>
