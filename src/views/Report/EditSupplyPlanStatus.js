@@ -1257,6 +1257,7 @@ class EditSupplyPlanStatus extends Component {
                                             this.setState({
                                                 currencyList: cList
                                             })
+                                            var programPlanningUnit = ((this.state.planningUnits).filter(p => p.planningUnit.id == document.getElementById("planningUnitId").value))[0];
                                             if (supplyPlanType == 'deliveredShipments') {
                                                 shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'shippedShipments') {
@@ -1293,6 +1294,7 @@ class EditSupplyPlanStatus extends Component {
                                                 programJson: programJson,
                                                 generalProgramJson: programJson,
                                                 shipmentStartDateClicked: startDate,
+                                                programPlanningUnitForPrice: programPlanningUnit,
                                                 loading: true
                                             }, () => {
                                                 if (this.refs.shipmentChild != undefined) {
@@ -2281,6 +2283,7 @@ class EditSupplyPlanStatus extends Component {
                     b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
                 }.bind(this)),
+                planningUnitListAll: (response.data),
                 planningUnitDropdownList: response.data.map((item, i) => ({ id: item.planningUnit.id, name: getLabelText(item.planningUnit.label, this.state.lang) })),
                 message: ''
             })
