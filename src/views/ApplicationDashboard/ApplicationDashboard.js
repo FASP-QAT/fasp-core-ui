@@ -69,7 +69,9 @@ class ApplicationDashboard extends Component {
       addressedIssues: '',
       supplyPlanReviewCount: '',
       roleArray: [],
-      dashboardTopList: []
+      dashboardTopList: [],
+      bottomProgramId: localStorage.getItem('bottomProgramId'),
+      displayBy: 1
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -322,8 +324,7 @@ class ApplicationDashboard extends Component {
           });
         }
         this.setState({
-          programList: programList,
-          bottomProgramId: programList[0].id
+          programList: programList
         })
         this.checkNewerVersions(programList);
       }.bind(this);
@@ -391,20 +392,26 @@ class ApplicationDashboard extends Component {
      */
   dataChange(event) {
     let bottomProgramId = this.state.bottomProgramId;
+    let displayBy = this.state.displayBy;
     if (event.target.name === "bottomProgramId") {
       bottomProgramId = event.target.value;
       localStorage.setItem("bottomProgramId", bottomProgramId)
-      Dashboard(this, bottomProgramId, 1, true, true);
+      Dashboard(this, bottomProgramId, this.state.displayBy, true, true);
+    }
+    if (event.target.name === "displayBy") {
+      displayBy = event.target.value;
+      Dashboard(this, bottomProgramId, displayBy, true, true);
     }
     this.setState({
-      bottomProgramId
+      bottomProgramId,
+      displayBy
     }, () => { });
   };
   /**
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    Dashboard(this, localStorage.getItem("bottomProgramId"), 1, true, true);
+    Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true);
     Chart.plugins.register({
       beforeDraw: function (chart) {
         if (chart.config.type === 'doughnut') {
@@ -1045,15 +1052,32 @@ class ApplicationDashboard extends Component {
       }
     };
 
+    let shipmentDetailsList = [];
+    let forecastConsumptionQplCorrectCount = 0;
+    let forecastConsumptionQplPuCount = 0;
+    let inventoryQplCorrectCount = 0;
+    let inventoryQplPuCount = 0;
+    let actualConsumptionQplCorrectCount = 0;
+    let actualConsumptionQplPuCount = 0;
+    let shipmentQplCorrectCount = 0;
+    let shipmentQplPuCount = 0;
+    if (this.state.dashboardBottomData) {
+      forecastConsumptionQplCorrectCount = this.state.dashboardBottomData.forecastConsumptionQpl.correctCount;
+      forecastConsumptionQplPuCount = this.state.dashboardBottomData.forecastConsumptionQpl.puCount;
+      inventoryQplCorrectCount = this.state.dashboardBottomData.inventoryQpl.correctCount;
+      inventoryQplPuCount = this.state.dashboardBottomData.inventoryQpl.puCount;
+      actualConsumptionQplCorrectCount = this.state.dashboardBottomData.actualConsumptionQpl.correctCount;
+      actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
+      shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
+      shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
+      shipmentDetailsList = this.state.dashboardBottomData.shipmentDetailsList;
+    }
+
     const shipmentsPieData = {
-      labels: [
-        'Red',
-        'Blue',
-        'Yellow'
-      ],
+      labels: shipmentDetailsList.map(x => x.reportBy.code),
       datasets: [{
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: shipmentDetailsList.map(x => x.cost),
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
@@ -1072,25 +1096,6 @@ class ApplicationDashboard extends Component {
           fontColor: fontColor,
         }
       },
-    }
-
-    let forecastConsumptionQplCorrectCount = 0;
-    let forecastConsumptionQplPuCount = 0;
-    let inventoryQplCorrectCount = 0;
-    let inventoryQplPuCount = 0;
-    let actualConsumptionQplCorrectCount = 0;
-    let actualConsumptionQplPuCount = 0;
-    let shipmentQplCorrectCount = 0;
-    let shipmentQplPuCount = 0;
-    if (this.state.dashboardBottomData) {
-      forecastConsumptionQplCorrectCount = this.state.dashboardBottomData.forecastConsumptionQpl.correctCount;
-      forecastConsumptionQplPuCount = this.state.dashboardBottomData.forecastConsumptionQpl.puCount;
-      inventoryQplCorrectCount = this.state.dashboardBottomData.inventoryQpl.correctCount;
-      inventoryQplPuCount = this.state.dashboardBottomData.inventoryQpl.puCount;
-      actualConsumptionQplCorrectCount = this.state.dashboardBottomData.actualConsumptionQpl.correctCount;
-      actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
-      shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
-      shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
     }
 
     const forecastConsumptionData = {
@@ -1725,18 +1730,19 @@ class ApplicationDashboard extends Component {
                 </Input>
               </FormGroup>
               <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
-                <Label htmlFor="organisationTypeId">Display By<span class="red Reqasterisk">*</span></Label>
+                <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
                 <Input
                   type="select"
-                  name="organisationTypeId"
-                  id="organisationTypeId"
+                  name="displayBy"
+                  id="displayBy"
                   bsSize="sm"
+                  onChange={(e) => { this.dataChange(e) }}
+                  value={this.state.displayBy}
                   required
                 >
-                  <option selected>Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  <option value="1">Funding Source</option>
+                  <option value="2">Procurement Agent</option>
+                  <option value="3">Status</option>
                 </Input>
                 <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment $1.176,003.49</p></div>
               </FormGroup>
