@@ -16268,3 +16268,28 @@ label.arrow_label:before {
 .MuiSwitch-colorPrimary.Mui-checked {
   color: #23a8d8!important;
 }
+@media only screen and (min-width: 1474px) {
+  .paddinCheckbox{
+    padding-left:45px ;
+   }
+}
+@media only screen and (min-width: 1656px) {
+  .paddinCheckbox{
+    padding-left:77px ;
+   }
+}
+@media only screen and (min-width: 1769px) {
+  .paddinCheckbox {
+      padding-left: 95px;
+  }
+}
+@media only screen and (min-width: 1990px) {
+  .paddinCheckbox {
+      padding-left: 127px;
+  }
+}
+@media only screen and (min-width: 2654px) {
+  .paddinCheckbox {
+      padding-left: 236px;
+  }
+}
