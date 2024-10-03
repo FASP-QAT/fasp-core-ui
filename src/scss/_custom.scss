@@ -2668,19 +2668,19 @@ label.arrow_label:before {
   .TreeTable .jss>tbody>tr:nth-child(odd)>td:nth-child(5) {
     width: 120px !important;
     min-width: 120px;
-    left: 220px !important;
+    left: 190px !important;
     z-index: 2 !important;
     position: sticky !important;
-    background: transparent !important;
+    background: #212631 !important;
   }
 
   .TreeTable .jss>tbody>tr:nth-child(even)>td:nth-child(5) {
     width: 120px !important;
     min-width: 120px;
-    left: 220px !important;
+    left: 190px !important;
     z-index: 2 !important;
     position: sticky !important;
-    background: transparent !important;
+    background: #373c46 !important;
   }
 
   .MuiSvgIcon-root {
@@ -16108,7 +16108,7 @@ label.arrow_label:before {
   width: 120px !important;
   min-width: 120px;
   cursor: unset !important;
-  left: 220px !important;
+  left: 190px !important;
   z-index: 4 !important;
   position: sticky !important;
 }
@@ -16116,19 +16116,19 @@ label.arrow_label:before {
 .TreeTable .jss>tbody>tr:nth-child(odd)>td:nth-child(5) {
   width: 120px !important;
   min-width: 120px;
-  left: 220px !important;
+  left: 190px !important;
   z-index: 2 !important;
   position: sticky !important;
-  background: #e5edf5 !important;
+  background: #212631 !important;
 }
 
 .TreeTable .jss>tbody>tr:nth-child(even)>td:nth-child(5) {
   width: 120px !important;
   min-width: 120px;
-  left: 220px !important;
+  left: 190px !important;
   z-index: 2 !important;
   position: sticky !important;
-  background: #fff !important;
+  background: #373c46 !important;
 }
 
 .TreeTable .jexcel>thead {

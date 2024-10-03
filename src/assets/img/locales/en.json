@@ -3455,5 +3455,8 @@
     "static.stockStatus.amcTooltipMultiProgram":"Sum of the individually calculated AMC values for selected programs each month",
     "static.stockStatus.amcTooltipEU":"Sum of the individually calculated AMC values for selected programs & planning units each month after converting to EU",
     "static.stockStatus.onlyShowPUsThatArePartOfAllPrograms":"Only show PUs/ARUs that are available in ALL selected programs",
-    "static.stockStatus.doYouWantToAggregate":"Do you want to aggregate selected programs"
+    "static.stockStatus.doYouWantToAggregate":"Do you want to aggregate selected programs",
+    "static.common.allitemsselected":"All items are selected.",
+    "static.treeTemplate.returnToList":"Tree Templates",
+    "static.treeTemplate.monthSelector":"Month Selector"
 }
