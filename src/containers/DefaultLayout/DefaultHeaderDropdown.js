@@ -271,7 +271,7 @@ class DefaultHeaderDropdown extends Component {
           </DropdownItem>
           {/* <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
           <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
-          <DropdownItem style={{ borderTop: "2px solid #000" }}>.00 Show Decimals <Switch defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>
+          {this.props.item == 2 && <DropdownItem style={{ borderTop: "2px solid #000" }}>.00 Show Decimals <Switch defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>}
         </DropdownMenu>
       </Dropdown>
 

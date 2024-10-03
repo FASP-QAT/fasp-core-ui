@@ -339,7 +339,7 @@ export default class WhatIfReportComponent extends React.Component {
      */
     roundAMC(amc) {
         if (amc != null) {
-            if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
+            // if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
             if (Number(amc).toFixed(0) >= 100) {
                 return Number(amc).toFixed(0);
             } else if (Number(amc).toFixed(1) >= 10) {
@@ -349,9 +349,9 @@ export default class WhatIfReportComponent extends React.Component {
             } else {
                 return Number(amc).toFixed(3);
             }
-        }else{
-            return Number(amc).toFixed(0);
-        }
+        // }else{
+        //     return Number(amc).toFixed(0);
+        // }
         } else {
             return null;
         }
