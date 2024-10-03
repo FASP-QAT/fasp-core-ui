@@ -5582,7 +5582,7 @@ export default class TreeTable extends Component {
                     scenarioList: []
                 }, () => {
                     this.handleAMonthDissmis3(this.state.singleValue2, 0);
-                    this.toggleModal(0, this.state.activeTab1[0]);
+                    // this.toggleModal(0, this.state.activeTab1[0]);
                 });
             } else {
                 this.setState({
@@ -6354,8 +6354,10 @@ export default class TreeTable extends Component {
         }, () => {
             if (this.state.activeTab1[0] === '1') {
                 this.buildTab1Jexcel();
-            } else {
+            } else if(this.state.activeTab1[0] === '2') {
                 this.buildTab2Jexcel();
+            } else {
+                this.buildTab3Jexcel();
             }
         })
     }
