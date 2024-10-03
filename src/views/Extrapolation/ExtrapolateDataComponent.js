@@ -597,9 +597,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this);
         }.bind(this);
     }
-    getPUListForTesAndArimaExtrapolationWhileOffline = () => {
+    getPUListForTesAndArimaExtrapolationWhileOffline = (programId, versionId) => {
         // this.setState({ loading: true })
-        var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        var tempForecastProgramId = programId + "_v" + versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -625,6 +625,23 @@ export default class ExtrapolateDataComponent extends React.Component {
                     this.setState({ showMissingTESANDARIMA: false });
                 }
             }.bind(this);
+        }.bind(this);
+    }
+
+    /**
+     * Deletes the saved PU for bulk extrapolation after calculations via Missing ARIMA and TES modal
+     */
+    deletesPUListForTesAndArimaExtrapolation = () => {
+        // this.setState({ loading: true })
+        var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+            var extrapolationList = transaction.objectStore('planningUnitBulkExtrapolation');
+            var deleteRequest = extrapolationList.delete(tempForecastProgramId);
         }.bind(this);
     }
     /**
@@ -1498,7 +1515,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var forecastProgramId = document.getElementById("forecastProgramId").value;
             var versionId = document.getElementById("versionId").value;
             if (forecastProgramId != "" && versionId != "") {
-                this.getPUListForTesAndArimaExtrapolationWhileOffline();
+                this.getPUListForTesAndArimaExtrapolationWhileOffline(forecastProgramId, versionId);
             }
             if (forecastProgramId != "" && versionId.includes("Local")) {
                 var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
@@ -2887,7 +2904,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => this.state.missingTESAndARIMAFlag ?
                                     c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 2 && c.extrapolationMethod.id != 4)))
                                     : c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 5 && c.extrapolationMethod.id != 6 && c.extrapolationMethod.id != 7)));
-                                console.log("consumptionExtrapolationList====", consumptionExtrapolationList)
                                 var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                                 var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
                                 var id = a > b ? a : b;
@@ -3063,6 +3079,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         putRequest.onerror = function (event) {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
+                            if (this.state.missingTESAndARIMAFlag) {
+                                this.deletesPUListForTesAndArimaExtrapolation();
+                            }
                             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
                             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
                             localStorage.setItem("messageColor", "green");
@@ -3570,6 +3589,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 optimizeTESAndARIMA: !this.state.optimizeTESAndARIMA,
             })
         } else if (modalView == 3) {
+            console.log("missingTESAndARIMA====>", this.state.missingTESAndARIMA)
             this.setState({
                 missingTESAndARIMA: !this.state.missingTESAndARIMA
             })
@@ -4293,8 +4313,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 <div className=" pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
-                                        <div className="d-flex align-items-center">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                            <div className="d-flex align-items-center">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
                                                     <div className="d-flex align-items-center ml-3 col-md-12">
                                                         <Input
