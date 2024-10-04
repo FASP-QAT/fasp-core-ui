@@ -1431,8 +1431,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.props.items.multiplier):"");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.props.items.multiplier) : "");
-                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.props.items.multiplier):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.props.items.multiplier) : 0),this.props.items.multiplier):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),this.props.items.multiplier) : "");
+                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.props.items.multiplier):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.props.items.multiplier) : 0),1):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;

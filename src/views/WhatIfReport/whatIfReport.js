@@ -32,7 +32,7 @@ import * as Yup from 'yup';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast, filterOptions, roundARU } from "../../CommonComponent/JavascriptCommonFunctions";
+import { contrast, filterOptions, roundAMC, roundARU } from "../../CommonComponent/JavascriptCommonFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -330,31 +330,6 @@ export default class WhatIfReportComponent extends React.Component {
         this.scenarioCheckedChanged = this.scenarioCheckedChanged.bind(this);
         this.saveScenario = this.saveScenario.bind(this);
         this.setFundingSource = this.setFundingSource.bind(this)
-        this.roundAMC = this.roundAMC.bind(this);
-    }
-    /**
-     * This is function is used to round the AMC value
-     * @param {*} amc The value of the AMC
-     * @returns This function returns the rounded AMC
-     */
-    roundAMC(amc) {
-        if (amc != null) {
-            // if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
-            if (Number(amc).toFixed(0) >= 100) {
-                return Number(amc).toFixed(0);
-            } else if (Number(amc).toFixed(1) >= 10) {
-                return Number(amc).toFixed(1);
-            } else if (Number(amc).toFixed(2) >= 1) {
-                return Number(amc).toFixed(2);
-            } else {
-                return Number(amc).toFixed(3);
-            }
-        // }else{
-        //     return Number(amc).toFixed(0);
-        // }
-        } else {
-            return null;
-        }
     }
     /**
      * This method is used to add commas to the number
@@ -4541,8 +4516,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                 }
                                                 totalExpiredStockArr.push({ qty: roundARU(jsonList[0].expiredStock, 1), details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                                maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
-                                                amcTotalData.push(jsonList[0].amc != null ? this.roundAMC(Number(jsonList[0].amc)) : "");
+                                                maxQtyArray.push(roundAMC(jsonList[0].maxStock))
+                                                amcTotalData.push(jsonList[0].amc != null ? roundAMC(Number(jsonList[0].amc)) : "");
                                                 minStockMoS.push(jsonList[0].minStockMoS)
                                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : roundARU(jsonList[0].unmetDemand, 1));
@@ -4683,8 +4658,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                     }
                                                 })
                                                 adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):"");
-                                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
-                                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
+                                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
+                                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
                                                 var consumptionTotalForRegion = 0;
                                                 var totalAdjustmentsQtyForRegion = 0;
                                                 var totalActualQtyForRegion = 0;
@@ -4770,8 +4745,8 @@ export default class WhatIfReportComponent extends React.Component {
                                                     mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos,
                                                     minMos: minStockMoSQty,
                                                     maxMos: maxStockMoSQty,
-                                                    minQty: this.roundAMC(jsonList[0].minStock),
-                                                    maxQty: this.roundAMC(jsonList[0].maxStock),
+                                                    minQty: roundAMC(jsonList[0].minStock),
+                                                    maxQty: roundAMC(jsonList[0].maxStock),
                                                     planBasedOn: programPlanningUnit.planBasedOn
                                                 }
                                                 jsonArrForGraph.push(json);

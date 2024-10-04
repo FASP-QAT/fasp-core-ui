@@ -1107,8 +1107,8 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number(this.state.closingBalanceArray[count].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","),
-                            editable?Number(this.state.closingBalanceArray[count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","):Number(this.state.closingBalanceArray[count].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",")
+                            Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","),
+                            editable?Number(this.state.closingBalanceArray[count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","):Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",")
                         ]
                     ],
                     onchange: function (instance, cell, x, y, value) {
@@ -4057,8 +4057,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.state.multiplier):"");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : "");
-                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.state.multiplier):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : 0),this.state.multiplier):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : "");
+                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null)) ?roundARU(Number(adjustmentCount>0?Number(roundARU(Number(adjustmentTotal), this.state.multiplier)):0)+Number(jsonList[0].regionCountForStock > 0 ? Number(roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier)) : 0),1):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -5908,8 +5908,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                 }
                                             })
                                             adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.state.multiplier):"");
-                                            nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : "");
-                                            inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.state.multiplier):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : 0),this.state.multiplier):"");
+                                            nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0  && jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : "");
+                                            inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), this.state.multiplier):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),this.state.multiplier) : 0),1):"");
                                             var consumptionTotalForRegion = 0;
                                             var totalAdjustmentsQtyForRegion = 0;
                                             var totalActualQtyForRegion = 0;
