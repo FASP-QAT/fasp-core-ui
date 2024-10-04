@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundARU, roundN, roundNMOS } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundAMC, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
@@ -302,7 +302,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],0), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? roundNMOS(ele[4]) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],1), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],1), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],0), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? formatter(ele[4],0) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],0), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],0), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 200,
@@ -688,9 +688,9 @@ class StockStatusAcrossPlanningUnits extends Component {
             data[1] = dataStockStatus[j].planBasedOn;
             data[2] = data1;
             data[3] = roundARU(dataStockStatus[j].stock,1);
-            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? roundNMOS(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
+            data[4] = dataStockStatus[j].planBasedOn == 1 ? dataStockStatus[j].mos != null ? roundAMC(dataStockStatus[j].mos) : i18n.t("static.supplyPlanFormula.na") : "-";
             data[5] = (dataStockStatus[j].minMos);
-            data[6] = (dataStockStatus[j].maxMos);
+            data[6] = roundAMC(dataStockStatus[j].maxMos);
             data[7] = roundAMC(dataStockStatus[j].amc);
             data[8] = (dataStockStatus[j].lastStockCount ? moment(dataStockStatus[j].lastStockCount).format('YYYY-MM-DD') : null);
             data[9] = dataStockStatus[j].planningUnit.id
@@ -731,12 +731,12 @@ class StockStatusAcrossPlanningUnits extends Component {
                 {
                     title: i18n.t('static.report.minMosOrQty'),
                     type: 'numeric', 
-                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.0':'#,##', decimal: '.',
+                    mask: '#,##',
                 },
                 {
                     title: i18n.t('static.report.maxMosOrQty'),
                     type: 'numeric',
-                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.0':'#,##', decimal: '.',
+                    mask: '#,##.000', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.amc'),
@@ -840,19 +840,19 @@ class StockStatusAcrossPlanningUnits extends Component {
                 var min = ele.minMos
                 var max = ele.maxMos
                 if (stockStatusId == 0) {
-                    if ((ele.mos != null && roundN(ele.mos) == 0)) {
+                    if ((ele.mos != null && roundAMC(ele.mos) == 0)) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 1) {
-                    if ((ele.mos != null && roundN(ele.mos) != 0 && roundN(ele.mos) < min)) {
+                    if ((ele.mos != null && roundAMC(ele.mos) != 0 && roundAMC(ele.mos) < min)) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 3) {
-                    if (roundN(ele.mos) > max) {
+                    if (roundAMC(ele.mos) > max) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 2) {
-                    if (roundN(ele.mos) < max && roundN(ele.mos) > min) {
+                    if (roundAMC(ele.mos) < max && roundAMC(ele.mos) > min) {
                         filteredData.push(ele)
                     }
                 } else if (stockStatusId == 4) {
@@ -984,7 +984,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                                             var json = {
                                                 planningUnit: { id: planningUnit.planningUnitId, label: planningUnit.label },
                                                 lastStockCount: maxDate == '' ? '' : maxDate.format('MMM-DD-YYYY'),
-                                                mos: includePlanningShipments.toString() == 'true' ? list[0].mos != null ? roundN(list[0].mos) : null : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : null,
+                                                mos: includePlanningShipments.toString() == 'true' ? list[0].mos != null ? roundAMC(list[0].mos) : null : (list[0].amc > 0) ? (list[0].closingBalanceWps / list[0].amc) : null,
                                                 minMos: pu.planBasedOn == 1 ? minStockMoS : list[0].minStock,
                                                 maxMos: pu.planBasedOn == 1 ? maxStockMoS : list[0].maxStock,
                                                 stock: includePlanningShipments.toString() == 'true' ? list[0].closingBalance : list[0].closingBalanceWps,

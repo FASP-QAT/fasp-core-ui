@@ -1907,7 +1907,7 @@ class EditSupplyPlanStatus extends Component {
                                     onholdShipmentsTotalData.push("")
                                 }
                                 totalExpiredStockArr.push({ qty: roundARU(jsonList[0].expiredStock, 1), details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
-                                monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
+                                monthsOfStockArray.push(jsonList[0].mos != null ? roundAMC(jsonList[0].mos) : jsonList[0].mos);
                                 maxQtyArray.push(roundAMC(jsonList[0].maxStock))
                                 amcTotalData.push(jsonList[0].amc != null ? roundAMC(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
