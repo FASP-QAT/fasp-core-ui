@@ -764,11 +764,21 @@ class StockStatus extends Component {
               doc.addPage();
               y = 80;
             }
+            if((this.state.programId.length > 1 && this.state.isAggregate.toString() == "true")){
+            doc.text(ele.program.code +" "+ (ele.actualFlag.toString() == "true" ? moment(ele.consumptionDate).format('DD-MMM-YY') + "*" : moment(ele.consumptionDate).format('DD-MMM-YY') + ""), doc.internal.pageSize.width / 8, y, {
+              align: 'left'
+            })
+          }else{
             doc.text((ele.actualFlag.toString() == "true" ? moment(ele.consumptionDate).format('DD-MMM-YY') + "*" : moment(ele.consumptionDate).format('DD-MMM-YY') + ""), doc.internal.pageSize.width / 8, y, {
               align: 'left'
             })
+          }
             var splitTitle = doc.splitTextToSize("(" + getLabelText(ele.region.label, this.state.lang) + " | " + getLabelText(ele.dataSource.label, this.state.lang) + ") " + ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+            if((this.state.programId.length > 1 && this.state.isAggregate.toString() == "true")){
+            doc.text(doc.internal.pageSize.width / 4.0, y, splitTitle);
+            }else{
+              doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+            }
             for (var i = 0; i < splitTitle.length; i++) {
               if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -802,11 +812,21 @@ class StockStatus extends Component {
               doc.addPage();
               y = 80;
             }
+            if((this.state.programId.length > 1 && this.state.isAggregate.toString() == "true")){
+              doc.text(ele.program.code +" "+ moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
+                align: 'left'
+              })  
+            }else{
             doc.text(moment(ele.receivedDate == null || ele.receivedDate == '' ? ele.expectedDeliveryDate : ele.receivedDate).format('DD-MMM-YY'), doc.internal.pageSize.width / 8, y, {
               align: 'left'
             })
+          }
             var splitTitle = doc.splitTextToSize("(" + getLabelText(ele.dataSource.label, this.state.lang) + ") " + ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+            if((this.state.programId.length > 1 && this.state.isAggregate.toString() == "true")){
+              doc.text(doc.internal.pageSize.width / 4.0, y, splitTitle);
+              }else{
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+              }
             for (var i = 0; i < splitTitle.length; i++) {
               if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -841,11 +861,21 @@ class StockStatus extends Component {
               doc.addPage();
               y = 80;
             }
+            if((this.state.programId.length > 1 && this.state.isAggregate.toString() == "true")){
+              doc.text(ele.program.code +" "+ (ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null ? moment(ele.inventoryDate).format('DD-MMM-YY') + "" : moment(ele.inventoryDate).format('DD-MMM-YY') + "*"), doc.internal.pageSize.width / 8, y, {
+                align: 'left'
+              })
+            }else{
             doc.text((ele.actualQty !== "" && ele.actualQty != undefined && ele.actualQty != null ? moment(ele.inventoryDate).format('DD-MMM-YY') + "" : moment(ele.inventoryDate).format('DD-MMM-YY') + "*"), doc.internal.pageSize.width / 8, y, {
               align: 'left'
             })
+          }
             var splitTitle = doc.splitTextToSize("(" + getLabelText(ele.region.label, this.state.lang) + " | " + getLabelText(ele.dataSource.label, this.state.lang) + ") " + ele.notes.replace(/[\r\n]+/gm, " "), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+            if((this.state.programId.length > 1 && this.state.isAggregate.toString() == "true")){
+              doc.text(doc.internal.pageSize.width / 4.0, y, splitTitle);
+              }else{
+                doc.text(doc.internal.pageSize.width / 5.7, y, splitTitle);
+              }
             for (var i = 0; i < splitTitle.length; i++) {
               if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -1191,11 +1221,11 @@ const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[ind
                   planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
                 }
                 if(ppuList.filter(c=>c.programId==e.value && c.planningUnitId==planningUnitId).length>0){
-                if (count > 10) {
+                if (count >= 10) {
                   count = 0;
                 }
                 datasets.push({
-                  label: e.label + " - " + r.label,
+                  label: this.state.viewById==2?(e.label + " - " + r.label+ " | "+r.value):(e.label + " - " + r.label),
                   yAxisID: 'A',
                   stack: 1,
                   order:1,
@@ -1819,7 +1849,8 @@ const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[ind
   setOnlyShowAllPUs(e) {
     var checked = e.target.checked;
     this.setState({
-      onlyShowAllPUs:checked
+      onlyShowAllPUs:checked,
+      yaxisEquUnit:-1
     },()=>{
       this.getDropdownLists();
     })
@@ -2446,11 +2477,11 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             }
             var ppuList=this.state.ppuList;
             if(ppuList.filter(c=>c.programId==e.value && c.planningUnitId==planningUnitId).length>0){
-            if (count > 10) {
+            if (count >= 10) {
               count = 0;
             }
             datasets.push({
-              label: e.label + " - " + r.label,
+              label: this.state.viewById==2?(e.label + " - " + r.label+ " | "+r.value):(e.label + " - " + r.label),
               yAxisID: 'A',
               stack: 1,
               order:1,
@@ -2500,6 +2531,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         data: this.state.stockStatusList.map((item, index) => (item.mos != null ? roundN(item.mos) : item.mos))
       })
     }
+    console.log("datasets Test@123",datasets);
     const bar = {
       labels: this.state.stockStatusList.map((item, index) => (dateFormatter(item.dt))),
       datasets: datasets,
@@ -2584,7 +2616,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="col-md-3"  style={{"marginTop": "3px"}}>
+                      <FormGroup className="col-md-3" >
                         <FormGroup check inline>
                           <Input
                             type="radio"
