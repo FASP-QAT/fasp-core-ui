@@ -261,33 +261,39 @@ class StockStatus extends Component {
         }
         var ppu = item.PlanningUnitIdDataForExport;
         if (this.state.isAggregate == "false" || this.state.isAggregate == false) {
-          csvRow.push('"' + (i18n.t('static.program.program') + ': ' + (this.state.programs.filter(c => c.programId == item.programId)[0].programCode)) + '"')
-          csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ': ' + getLabelText(ppu.reportingUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"');
-          csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + ': ' + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
-          if (item.data.length > 0 && ppu.planBasedOn == 1) {
-            csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ': ' + item.data[0].minMos + '"'))
-          } else {
-            csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + ': ' + item.data[0].minStock + '"'))
+          csvRow.push('"' + ((i18n.t('static.program.program') + ': ' + (this.state.programs.filter(c => c.programId == item.programId)[0].programCode))).replaceAll(' ','%20') + '"')
+          if(this.state.yaxisEquUnit!=-1){
+            csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnits') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
           }
-          csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + ': ' + ppu.shelfLife + '"'))
+          csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + getLabelText(item.reportBy.label, this.state.lang)).replaceAll(' ', '%20') + '"');
+          csvRow.push('"' + (i18n.t('static.supplyPlan.amcPastOrFuture').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (ppu.monthsInPastForAmc) + "/" + (ppu.monthsInFutureForAmc) + '"'))
           if (item.data.length > 0 && ppu.planBasedOn == 1) {
-            csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + ': ' + item.data[0].maxMos + '"'))
+            csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + item.data[0].minMos + '"'))
           } else {
-            csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + ': ' + item.data[0].distributionLeadTime + '"'))
+            csvRow.push('"' + (i18n.t('static.product.minQuantity').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + item.data[0].minStock + '"'))
           }
-          csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + ': ' + ppu.reorderFrequencyInMonths + '"'))
+          csvRow.push('"' + (i18n.t('static.report.shelfLife').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + ppu.shelfLife + '"'))
+          if (item.data.length > 0 && ppu.planBasedOn == 1) {
+            csvRow.push('"' + (i18n.t('static.supplyPlan.maxStockMos').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + item.data[0].maxMos + '"'))
+          } else {
+            csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + item.data[0].distributionLeadTime + '"'))
+          }
+          csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + ppu.reorderFrequencyInMonths + '"'))
           if (ppu.notes != null && ppu.notes != undefined && ppu.notes.length > 0) {
-            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ': ' + ppu.notes + '"'))
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (ppu.notes).replaceAll(' ', '%20') + '"'))
           }
         } else {
           var programLabel = this.state.programId.map(ele => ele.label).join(', ');
           var reportingUnitList = this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport;
           var planningUnitLabel = reportingUnitList.map(ele => ele.label).join(', ');
           csvRow.push('"' + (i18n.t('static.program.program') + ': ' + programLabel).replaceAll(' ', '%20') + '"')
-          csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + ': ' + planningUnitLabel).replaceAll(' ', '%20') + '"');
-          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + ': ' + (item.data[0].planBasedOn == 1 ? roundARU(item.data[0].minStockMos,1) : roundARU(item.data.minStockQty,1))).replaceAll(' ', '%20') + '"');
+          if(this.state.yaxisEquUnit!=-1){
+            csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnits') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+          }
+          csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + planningUnitLabel).replaceAll(' ', '%20') + '"');
+          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (item.data[0].planBasedOn == 1 ? roundARU(item.data[0].minStockMos,1) : roundARU(item.data.minStockQty,1))).replaceAll(' ', '%20') + '"');
           if (item.data[0].planBasedOn == 1) {
-            csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + ': ' + (roundARU(item.data[0].maxStockMos,1))).replaceAll(' ', '%20') + '"');
+            csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (roundARU(item.data[0].maxStockMos,1))).replaceAll(' ', '%20') + '"');
           }
           if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
             var notes=item.data[0].ppuNotes.split("|");
@@ -298,7 +304,7 @@ class StockStatus extends Component {
               }
               finalNotes+=item.split(":")[0]+": "+item.split(":")[1]
             })
-            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + ': ' + finalNotes + '"'))
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (finalNotes).replaceAll(' ', '%20') + '"'))
           }
         }
         csvRow.push("")
@@ -444,6 +450,7 @@ class StockStatus extends Component {
     var count = 0;
     list.map(
       (item, itemCount) => {
+        console.log("Item Test@123",item);
         if (itemCount != 0) {
           doc.addPage()
         }
@@ -454,38 +461,52 @@ class StockStatus extends Component {
           doc.text(i18n.t('static.program.program') + ': ' + (this.state.programs.filter(c => c.programId == item.programId)[0].programCode), doc.internal.pageSize.width / 10, 80, {
             align: 'left'
           })
-          doc.text((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')) + ': ' + getLabelText(ppu1.reportingUnit.label, this.state.lang), doc.internal.pageSize.width / 10, 90, {
+          var y=80;
+          if(this.state.yaxisEquUnit!=-1){
+            y+=10;
+          doc.text(i18n.t('static.equivalancyUnit.equivalancyUnits') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text), doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
-          doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ': ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, 100, {
+        }
+        y+=10;
+          doc.text((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')) + ': ' + getLabelText(item.reportBy.label, this.state.lang), doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
-          doc.text(i18n.t('static.report.shelfLife') + ': ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, 110, {
+          y+=10;
+          doc.text(i18n.t('static.supplyPlan.amcPastOrFuture') + ': ' + (ppu1.monthsInPastForAmc) + "/" + (ppu1.monthsInFutureForAmc), doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
+          y+=10;
+          doc.text(i18n.t('static.report.shelfLife') + ': ' + ppu1.shelfLife, doc.internal.pageSize.width / 10, y, {
+            align: 'left'
+          })
+          y+=10;
           if (ppu1.planBasedOn == 1) {
-            doc.text(i18n.t('static.supplyPlan.minStockMos') + ': ' + item.data[0].minMos, doc.internal.pageSize.width / 10, 120, {
+            doc.text(i18n.t('static.supplyPlan.minStockMos') + ': ' + item.data[0].minMos, doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           } else {
-            doc.text(i18n.t('static.product.minQuantity') + ': ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, 120, {
+            doc.text(i18n.t('static.product.minQuantity') + ': ' + formatter(ppu1.minQty, 0), doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           }
-          doc.text(i18n.t('static.supplyPlan.reorderInterval') + ': ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, 130, {
+          y+=10;
+          doc.text(i18n.t('static.supplyPlan.reorderInterval') + ': ' + ppu1.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
+          y+=10;
           if (ppu1.planBasedOn == 1) {
-            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ': ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, 140, {
+            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ': ' + item.data[0].maxMos, doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           } else {
-            doc.text(i18n.t('static.product.distributionLeadTime') + ': ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, 140, {
+            doc.text(i18n.t('static.product.distributionLeadTime') + ': ' + formatter(ppu1.distributionLeadTime, 0), doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           }
           if (ppu1.notes != null && ppu1.notes != undefined && ppu1.notes.length > 0) {
-            doc.text(i18n.t('static.program.notes') + ': ' + ppu1.notes, doc.internal.pageSize.width / 10, 150, {
+            y+=10;
+            doc.text(i18n.t('static.program.notes') + ': ' + ppu1.notes, doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           }
@@ -504,6 +525,18 @@ class StockStatus extends Component {
               y = y + 10
             }
           }
+          if(this.state.yaxisEquUnit!=-1){
+            var planningText = doc.splitTextToSize(i18n.t('static.equivalancyUnit.equivalancyUnits') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
+            doc.text(doc.internal.pageSize.width / 10, y, planningText)
+            for (var i = 0; i < planningText.length; i++) {
+              if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+              } else {
+                y = y + 10
+              }
+            }
+          }
           var planningText = doc.splitTextToSize((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')) + ': ' + planningUnitLabel, doc.internal.pageSize.width * 3 / 4);
           doc.text(doc.internal.pageSize.width / 10, y, planningText)
           for (var i = 0; i < planningText.length; i++) {
@@ -514,7 +547,7 @@ class StockStatus extends Component {
               y = y + 10
             }
           }
-          y=y-3
+          // y=y-3
           doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ': ' + (item.data[0].planBasedOn == 1 ? formatterMOS(roundARU(item.data[0].minStockMos, 1), 0) : formatter(roundARU(item.data.minStockQty, 1), 0)), doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
@@ -548,7 +581,7 @@ class StockStatus extends Component {
         }
         var canv = document.getElementById("cool-canvas" + count)
         var canvasImg1 = canv.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg1, 'png', 50, (this.state.isAggregate.toString() == "false" ? 160 : y), 750, 300, "a" + count, 'CANVAS')
+        doc.addImage(canvasImg1, 'png', 50, (this.state.isAggregate.toString() == "false" ? 170 : y), 750, 300, "a" + count, 'CANVAS')
         count++
         var height = doc.internal.pageSize.height;
         let otherdata;
@@ -557,7 +590,7 @@ class StockStatus extends Component {
             item.data.map(ele => [dateFormatter(ele.dt), formatter(roundARU(ele.openingBalance,1), 0), formatter(roundARU(ele.forecastedConsumptionQty,1), 0), formatter(roundARU(ele.actualConsumptionQty,1), 0), formatter(roundARU(ele.finalConsumptionQty,1), 0), formatter(roundARU(ele.shipmentQty,1), 0),
             ele.shipmentInfo.map(item1 => {
               return (
-                item1.program.code+" | "+roundARU(item1.shipmentQty,1) + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
+                (this.state.programId.length>1?item1.program.code+" | ":"")+formatter(roundARU(item1.shipmentQty,1)) + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
                   item1.primeLineNo == null &&
                   item1.roNo == null &&
                   item1.roPrimeLineNo == null
@@ -572,13 +605,13 @@ class StockStatus extends Component {
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
             }).join(' \n')
-              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatterMOS(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
         } else {
           otherdata =
             item.data.map(ele => [dateFormatter(ele.dt), formatter(roundARU(ele.openingBalance,1), 0), formatter(roundARU(ele.forecastedConsumptionQty,1), 0), formatter(roundARU(ele.actualConsumptionQty,1), 0), formatter(roundARU(ele.shipmentQty,1), 0),
             ele.shipmentInfo.map(item1 => {
               return (
-                roundARU(item1.shipmentQty,1) + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
+                formatter(roundARU(item1.shipmentQty,1)) + " | " + item1.fundingSource.code + " | " + getLabelText(item1.shipmentStatus.label, this.state.lang) + " | " + item1.procurementAgent.code + (item1.orderNo == null &&
                   item1.primeLineNo == null &&
                   item1.roNo == null &&
                   item1.roPrimeLineNo == null
@@ -593,7 +626,7 @@ class StockStatus extends Component {
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
             }).join(' \n')
-              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatterMOS(roundNMOS(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
         }
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
@@ -643,13 +676,13 @@ class StockStatus extends Component {
             startY: height,
             head: header1,
             body: otherdata,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 55, halign: 'center' },
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 52, halign: 'center' },
             headStyles: { fillColor: "#e5edf5", textColor: "#000", fontStyle: "normal" },
             columnStyles: {
-              6: { cellWidth: 156.89 },
+              6: { cellWidth: 146.89 },
             },
             didParseCell: function (data) {
-              if (data.column.index === 8 && data.row.section != "head") {
+              if (data.column.index === 9 && data.row.section != "head") {
                 if (item.data[data.row.index].regionCount == item.data[data.row.index].regionCountForStock) {
                   data.cell.styles.fontStyle = 'bold';
                 }
@@ -679,7 +712,7 @@ class StockStatus extends Component {
               5: { cellWidth: 156.89 },
             },
             didParseCell: function (data) {
-              if (data.column.index === 7 && data.row.section != "head") {
+              if (data.column.index === 8 && data.row.section != "head") {
                 if (item.data[data.row.index].regionCount == item.data[data.row.index].regionCountForStock) {
                   data.cell.styles.fontStyle = 'bold';
                 }
@@ -1145,7 +1178,7 @@ const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[ind
             graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
             var count = 0;
             var programCount = 0;
-            var colourArray = ["#002F6C","#BA0C2F","#118B70","#F48521","#A7C6ED","#651D32","#6C6463","#f0bc52","#49A4A1","#212721"]
+            var colourArray = ["#002F6C","#BA0C2F","#118B70","#f0bc52","#A7C6ED","#651D32","#6C6463","#F48521","#49A4A1","#212721"]
             this.state.programId.map((e, i) => {
               reportingUnitList.map((r, j) => {
                 programCount += 1;
@@ -1415,7 +1448,8 @@ const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[ind
             shList: shipList,
             planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : "",
             programId: sortedProgramList[outputIndex],
-            PlanningUnitIdDataForExport: planningUnitItemFilter
+            PlanningUnitIdDataForExport: planningUnitItemFilter,
+            reportBy: this.state.viewById==1?planningUnit:this.state.realmCountryPlanningUnitListAll.filter(c=>c.id==sortedPlanningUnitList[outputIndex])[0]
           }
           PlanningUnitDataForExport.push(planningUnitexport)
           PlanningUnitIdForExport = sortedPlanningUnitList[outputIndex]
@@ -1726,7 +1760,8 @@ const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[ind
       regionListFiltered: [],
       show: false,
       loading: false,
-      stockStatusList: []
+      stockStatusList: [],
+      yaxisEquUnit:-1
     }, () => {
       if (viewById == 2) {
         document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
@@ -2397,7 +2432,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
       } else {
         var count = 0;
         var programCount = 0;
-        var colourArray = ["#002F6C","#BA0C2F","#118B70","#F48521","#A7C6ED","#651D32","#6C6463","#f0bc52","#49A4A1","#212721"]
+        var colourArray = ["#002F6C","#BA0C2F","#118B70","#f0bc52","#A7C6ED","#651D32","#6C6463","#F48521","#49A4A1","#212721"]
         this.state.programId.map((e, i) => {
           reportingUnitList.map((r, j) => {
             programCount += 1;
@@ -2549,7 +2584,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="col-md-3"  style={{"marginTop": "-17px"}}>
+                      <FormGroup className="col-md-3"  style={{"marginTop": "3px"}}>
                         <FormGroup check inline>
                           <Input
                             type="radio"
@@ -2769,7 +2804,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.actualTooltipSingleProgram'):i18n.t('static.stockStatus.actualTooltipMultiProgram')):i18n.t('static.stockStatus.actualTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>
                         {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.consensusTooltipSingleProgram'):i18n.t('static.stockStatus.consensusTooltipMultiProgram')):i18n.t('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> Consensus<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i> </th>}
                         <th className="text-center" title={this.state.yaxisEquUnit!=-1?i18n.t('static.stockStatus.shipmentQtyTooltipEU'):''} style={{ width: "200px" }}>{i18n.t('static.report.qty')}{this.state.yaxisEquUnit!=-1 && <i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i>}</th>
-                        <th className="text-center" style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
+                        <th className="text-center" title={i18n.t('static.stockStatus.shipmemtTooltip')} style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
                         <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.adjustmentQtyTooltipSingleProgram'):i18n.t('static.stockStatus.adjustmentQtyTooltipMultiProgram')):i18n.t('static.stockStatus.adjustmentQtyTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
                         <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.expiredStockTooltipSingleProgram'):i18n.t('static.stockStatus.expiredStockTooltipMultiProgram')):i18n.t('static.stockStatus.expiredStockTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
                         <th title={this.state.yaxisEquUnit==-1?(this.state.programId.length==1?i18n.t('static.stockStatus.endingBalanceTooltipSingleProgram'):i18n.t('static.stockStatus.endingBalanceTooltipMultiProgram')):i18n.t('static.stockStatus.endingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c'}}></i></th>
@@ -2803,7 +2838,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                             <td align="center"><table >
                               {this.state.stockStatusList[idx].shipmentInfo.map((item, index) => {
                                 return (<tr  >
-                                  <td title={getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.planningUnit.id} padding="0" id={"shipmentPopup" + idx + index}>{item.program.code + ` | ` + formatter(roundARU(item.shipmentQty,1), 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
+                                  <td title={getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.planningUnit.id} padding="0" id={"shipmentPopup" + idx + index}>{(this.state.programId.length > 1?item.program.code + ` | `:"") + formatter(roundARU(item.shipmentQty,1), 0) + `   |    ${item.fundingSource.code}    |    ${item.shipmentStatus.label.label_en}   |    ${item.procurementAgent.code} `} {item.orderNo == null &&
                                     item.primeLineNo == null &&
                                     item.roNo == null &&
                                     item.roPrimeLineNo == null

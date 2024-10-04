@@ -3455,5 +3455,6 @@
     "static.stockStatus.amcTooltipMultiProgram":"Sum of the individually calculated AMC values for selected programs each month",
     "static.stockStatus.amcTooltipEU":"Sum of the individually calculated AMC values for selected programs & planning units each month after converting to EU",
     "static.stockStatus.onlyShowPUsThatArePartOfAllPrograms":"Only show PUs/ARUs that are available in ALL selected programs",
-    "static.stockStatus.doYouWantToAggregate":"Do you want to aggregate selected programs"
+    "static.stockStatus.doYouWantToAggregate":"Do you want to aggregate selected programs",
+    "static.stockStatus.shipmemtTooltip":"Hover over each shipment box to see its assigned PU"
 }
