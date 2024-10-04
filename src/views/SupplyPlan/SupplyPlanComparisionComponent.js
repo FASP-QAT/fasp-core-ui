@@ -1288,7 +1288,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     onholdShipmentsTotalData.push("")
                                 }
                                 totalExpiredStockArr.push({ qty: roundARU(jsonList[0].expiredStock, this.props.items.multiplier), details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
-                                monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
+                                monthsOfStockArray.push(jsonList[0].mos != null ? roundAMC(jsonList[0].mos) : jsonList[0].mos);
                                 maxQtyArray.push(roundAMC(jsonList[0].maxStock !== "" && jsonList[0].maxStock != undefined ? Number(jsonList[0].maxStock) / Number(this.props.items.multiplier) : jsonList[0].maxStock))
                                 amcTotalData.push(jsonList[0].amc != null ? roundAMC(jsonList[0].amc != "" && jsonList[0].amc != undefined ? Number(jsonList[0].amc) / Number(this.props.items.multiplier) : Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
