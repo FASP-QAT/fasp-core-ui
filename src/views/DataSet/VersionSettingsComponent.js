@@ -893,7 +893,7 @@ class VersionSettingsComponent extends Component {
                 } else {
                     data[9] = pd.currentVersion.forecastStopDate
                 }
-                data[10] = 1
+                data[10] = AuthenticationService.checkUserACL([versionSettingsList[j].programId.toString()], 'ROLE_BF_EDIT_VERSION_SETTINGS') ? 1 : 0
                 data[11] = versionSettingsList[j].id
                 data[12] = 0
                 data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
@@ -1037,7 +1037,7 @@ class VersionSettingsComponent extends Component {
             onchange: this.changed,
             onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
-            editable: ((AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
+            // editable: ((AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1542,7 +1542,7 @@ class VersionSettingsComponent extends Component {
                         </div>
                     </CardBody>
                     <CardFooter className="CardFooterVesionsettingMarginTop">
-                        {(AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) &&
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}

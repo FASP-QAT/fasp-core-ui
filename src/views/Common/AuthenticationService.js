@@ -306,6 +306,7 @@ class AuthenticationService {
                         }
                     }
                 })
+                console.log("hasaccess=>", hasAccess)
                 return hasAccess;
             } catch (err) {
                 localStorage.setItem('curUser', '')

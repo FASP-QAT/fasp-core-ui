@@ -1762,7 +1762,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.checkUserACL(programId.map(c=>c.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(programId.map(c=>c.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1796,7 +1796,7 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
             }
-            if (!AuthenticationService.checkUserACL(programId.map(c=>c.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(programId.map(c=>c.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+            if (!AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))

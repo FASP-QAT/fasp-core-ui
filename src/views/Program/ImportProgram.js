@@ -611,6 +611,7 @@ export default class ImportProgram extends Component {
                                 const fileDataList = mz.extract(fileInfo.filepath, { password });
                                 var fileData = new TextDecoder().decode(fileDataList)
                                 var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                                console.log("programDataJson.programData.generalData",programDataJson.programData)
                                 var cutOffDate=programDataJson.programData.generalData.cutOffDate!=undefined && programDataJson.programData.generalData.cutOffDate!=null && programDataJson.programData.generalData.cutOffDate!=""?programDataJson.programData.generalData.cutOffDate:"";
                                 fileName[i] = {
                                     value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.generalData.label), lan)) + "~v" + programDataJson.version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""), fileData: fileData
