@@ -14,7 +14,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast, filterOptions, hideSecondComponent, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+import { contrast, filterOptions, hideSecondComponent, roundAMC, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
@@ -261,34 +261,9 @@ class EditSupplyPlanStatus extends Component {
         this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
         this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
         this.loaded1 = this.loaded1.bind(this);
-        this.roundAMC = this.roundAMC.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.toggleLargeNotes = this.toggleLargeNotes.bind(this);
         this.actionCanceledNotes = this.actionCanceledNotes.bind(this);
-    }
-    /**
-     * This is function is used to round the AMC value
-     * @param {*} amc The value of the AMC
-     * @returns This function returns the rounded AMC
-     */
-    roundAMC(amc) {
-        if (amc != null) {
-            // if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
-            if (Number(amc).toFixed(0) >= 100) {
-                return Number(amc).toFixed(0);
-            } else if (Number(amc).toFixed(1) >= 10) {
-                return Number(amc).toFixed(1);
-            } else if (Number(amc).toFixed(2) >= 1) {
-                return Number(amc).toFixed(2);
-            } else {
-                return Number(amc).toFixed(3);
-            }
-        // }else{
-        //     return Number(amc).toFixed(0);
-        // }
-        } else {
-            return null;
-        }
     }
     /**
      * This method is used to add commas to the number
@@ -1933,8 +1908,8 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 totalExpiredStockArr.push({ qty: roundARU(jsonList[0].expiredStock, 1), details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
                                 monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
-                                amcTotalData.push(jsonList[0].amc != null ? this.roundAMC(Number(jsonList[0].amc)) : "");
+                                maxQtyArray.push(roundAMC(jsonList[0].maxStock))
+                                amcTotalData.push(jsonList[0].amc != null ? roundAMC(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : roundARU(jsonList[0].unmetDemand, 1));
@@ -2075,8 +2050,8 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):"");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
-                                inventoryTotalData.push(adjustmentCount>0 || jsonList[0].regionCountForStock > 0?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
+                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -2162,8 +2137,8 @@ class EditSupplyPlanStatus extends Component {
                                     mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(2) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
                                     maxMos: maxStockMoSQty,
-                                    minQty: this.roundAMC(jsonList[0].minStock),
-                                    maxQty: this.roundAMC(jsonList[0].maxStock),
+                                    minQty: roundAMC(jsonList[0].minStock),
+                                    maxQty: roundAMC(jsonList[0].maxStock),
                                     planBasedOn: programPlanningUnit.planBasedOn
                                 }
                                 jsonArrForGraph.push(json);

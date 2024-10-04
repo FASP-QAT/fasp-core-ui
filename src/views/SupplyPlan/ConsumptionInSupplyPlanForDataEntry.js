@@ -329,7 +329,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
                                 { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 90, readOnly: true },
-                                { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: '#,##.00', decimal: '.', width: 120, readOnly: true },
+                                { title: i18n.t('static.supplyPlan.quantityPU'), type: 'numeric', mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.00':'#,##', decimal: '.', width: 120, readOnly: true },
                                 { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', decimal: '.', disabledMaskOnEdition: true, textEditor: true, width: 80 },
                                 { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
                                 { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !consumptionEditable },

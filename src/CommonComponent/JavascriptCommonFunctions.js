@@ -203,13 +203,13 @@ export function roundAMC(amc) {
   if (amc != null) {
     // if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
     if (Number(amc).toFixed(0) >= 100) {
-      return Number(amc).toFixed(0);
+      return parseFloat(Number(amc).toFixed(0));
     } else if (Number(amc).toFixed(1) >= 10) {
-      return Number(amc).toFixed(1);
+      return parseFloat(Number(amc).toFixed(1));
     } else if (Number(amc).toFixed(2) >= 1) {
-      return Number(amc).toFixed(2);
+      return parseFloat(Number(amc).toFixed(2));
     } else {
-      return Number(amc).toFixed(3);
+      return parseFloat(Number(amc).toFixed(3));
     }
   // }else{
   //   return Number(amc).toFixed(0);
@@ -361,16 +361,16 @@ export function roundARU(value, multiplier) {
       var aruValue = Number(value) / Number(multiplier);
       if (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") {
         if (Math.abs(Number(aruValue).toFixed(0)) >= 100) {
-          return Number(aruValue).toFixed(0);
+          return parseFloat(Number(aruValue).toFixed(0));
         } else if (Math.abs(Number(aruValue).toFixed(1)) >= 10) {
-          return Number(aruValue).toFixed(1);
+          return parseFloat(Number(aruValue).toFixed(1));
         } else if (Math.abs(Number(aruValue).toFixed(2)) >= 1) {
-          return Number(aruValue).toFixed(2);
+          return parseFloat(Number(aruValue).toFixed(2));
         } else {
-          return Number(aruValue).toFixed(3);
+          return parseFloat(Number(aruValue).toFixed(3));
         }
       } else {
-        return Number(aruValue).toFixed(0);
+        return parseFloat(Number(aruValue).toFixed(0));
       }
     } else {
       return "";
