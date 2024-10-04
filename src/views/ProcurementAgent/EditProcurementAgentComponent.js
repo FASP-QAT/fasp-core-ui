@@ -291,6 +291,7 @@ class EditProcurementAgentComponent extends Component {
                 })
                 .catch(
                     error => {
+                        console.log("Error",error)
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -345,7 +346,7 @@ class EditProcurementAgentComponent extends Component {
                     procurementAgent: response.data, loading: false
                 });
                 let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
-                let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode);
+                let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode!=""?this.state.procurementAgent.colorHtmlDarkCode:this.state.procurementAgent.colorHtmlCode);
                 this.setState({ rgba: color, rgbaDarkMode:colorDark })
                 var proramListArray = [];
                 let { procurementAgent } = this.state;
@@ -365,6 +366,7 @@ class EditProcurementAgentComponent extends Component {
             }
         }).catch(
             error => {
+                console.log("Error",error)
                 if (error.message === "Network Error") {
                     this.setState({
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -430,6 +432,7 @@ class EditProcurementAgentComponent extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("Error",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -530,8 +533,8 @@ class EditProcurementAgentComponent extends Component {
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
                                         procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
-                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
+                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime!=null?this.state.procurementAgent.submittedToApprovedLeadTime:'',
+                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime!=null?this.state.procurementAgent.approvedToShippedLeadTime:'',
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
                                         colorHtmlDarkCode: this.state.procurementAgent.colorHtmlDarkCode,
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
@@ -563,6 +566,7 @@ class EditProcurementAgentComponent extends Component {
                                             }
                                         }).catch(
                                             error => {
+                                                console.log("Error",error)
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -830,10 +834,11 @@ class EditProcurementAgentComponent extends Component {
                 procurementAgent: response.data, loading: false
             });
             let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
-            let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode);
+            let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode!=""?this.state.procurementAgent.colorHtmlDarkCode:this.state.procurementAgent.colorHtmlCode);
             this.setState({ rgba: color, rgbaDarkMode:colorDark })
         }).catch(
             error => {
+                console.log("Error",error)
                 if (error.message === "Network Error") {
                     this.setState({
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
