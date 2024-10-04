@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 import classNames from 'classnames';
 import moment from 'moment';
 import React, { Component } from 'react';
+import { MultiSelect } from 'react-multi-select-component';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
@@ -34,15 +35,37 @@ import {
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
 import DashboardService from "../../api/DashboardService";
 import ProgramService from "../../api/ProgramService";
+import DropdownService from "../../api/DropdownService";
 import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, hideSecondComponent, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Dashboard } from '../Dashboard/Dashboard.js';
+/**
+ * Formats a numerical value by adding commas as thousand separators.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators.
+ */
+function addCommas(cell1, row) {
+  if (cell1 != null && cell1 != "") {
+      cell1 += '';
+      var x = cell1.replaceAll(",", "").split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+  } else {
+      return "";
+  }
+}
 /**
  * Component for showing the dashboard.
  */
@@ -70,8 +93,11 @@ class ApplicationDashboard extends Component {
       supplyPlanReviewCount: '',
       roleArray: [],
       dashboardTopList: [],
+      topProgramId: localStorage.getItem('topProgramId') && false ? [localStorage.getItem('topProgramId')] : [],
       bottomProgramId: localStorage.getItem('bottomProgramId'),
-      displayBy: 1
+      displayBy: 1,
+      onlyDownloadedTopProgram: true,
+      onlyDownloadedBottomProgram: true
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -79,6 +105,7 @@ class ApplicationDashboard extends Component {
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
+    this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
     this.checkNewerVersionsDataset = this.checkNewerVersionsDataset.bind(this);
     this.updateState = this.updateState.bind(this);
@@ -279,9 +306,59 @@ class ApplicationDashboard extends Component {
     }
   }
   /**
+    * Retrieves the list of programs.
+    */
+  getPrograms() {
+    if (localStorage.getItem("sessionType") === 'Online') {
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            .then(response => {
+                var proList = []
+                for (var i = 0; i < response.data.length; i++) {
+                    var programJson = {
+                        id: response.data[i].id,
+                        programId: response.data[i].id,
+                        label: response.data[i].label,
+                        programCode: response.data[i].code
+                    }
+                    proList[i] = programJson
+                }
+                this.setState({
+                  programList: proList, loading: false
+                }, () => { this.consolidatedProgramList() })
+            }).catch(
+                error => {
+                    this.setState({
+                      programList: []
+                    }, () => { this.consolidatedProgramList() })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    } else {
+        this.consolidatedProgramList()
+    }
+  }
+  /**
    * Retrieves supply plan programs from indexedDB and updates the state with the fetched program list.
    */
-  getPrograms() {
+  consolidatedProgramList() {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -296,7 +373,8 @@ class ApplicationDashboard extends Component {
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      var programList = [];
+      var programList = this.state.programList;
+      let tempProgramList = [];
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -311,22 +389,36 @@ class ApplicationDashboard extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
         for (var i = 0; i < filteredGetRequestList.length; i++) {
-          programList.push({
-            openCount: filteredGetRequestList[i].openCount,
-            addressedCount: filteredGetRequestList[i].addressedCount,
-            programCode: filteredGetRequestList[i].programCode,
-            programVersion: filteredGetRequestList[i].version,
-            programId: filteredGetRequestList[i].programId,
-            versionId: filteredGetRequestList[i].version,
-            id: filteredGetRequestList[i].id,
-            loading: false,
-            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
-          });
+          var f = 0
+          for (var k = 0; k < programList.length; k++) {
+              if (filteredGetRequestList[i].programId == programList[k].programId) {
+                  f = 1;
+              }
+          }
+          // if (f == 0) {
+            tempProgramList.push({
+              openCount: filteredGetRequestList[i].openCount,
+              addressedCount: filteredGetRequestList[i].addressedCount,
+              programCode: filteredGetRequestList[i].programCode + " (Local)",
+              programVersion: filteredGetRequestList[i].version,
+              programId: filteredGetRequestList[i].programId,
+              versionId: filteredGetRequestList[i].version,
+              id: filteredGetRequestList[i].id,
+              loading: false,
+              local: true,
+              cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
+            });
+          // }
         }
+        tempProgramList.sort(function (a, b) {
+          a = a.programCode.toLowerCase();
+          b = b.programCode.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
         this.setState({
-          programList: programList
+          programList: tempProgramList.concat(programList)
         })
-        this.checkNewerVersions(programList);
+        this.checkNewerVersions(programList.filter(x => x.local));
       }.bind(this);
     }.bind(this)
   }
@@ -387,9 +479,22 @@ class ApplicationDashboard extends Component {
     }.bind(this)
   }
   /**
-     * Handles data change in the budget form.
-     * @param {Event} event - The change event.
-     */
+    * Handle region change function.
+    * This function updates the state with the selected region values and generates a list of regions.
+    * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+    */
+  handleTopProgramIdChange = (programIds) => {
+    localStorage.setItem("topProgramId", programIds.map(x => x.value).toString())
+    this.setState({
+      topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+    }, () => { 
+      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true)  
+    });
+  }
+  /**
+    * Handles data change in the budget form.
+    * @param {Event} event - The change event.
+    */
   dataChange(event) {
     let bottomProgramId = this.state.bottomProgramId;
     let displayBy = this.state.displayBy;
@@ -408,6 +513,46 @@ class ApplicationDashboard extends Component {
     }, () => { });
   };
   /**
+    * Handles the change event of the diplaying only downloaded programs.
+    * @param {Object} event - The event object containing the checkbox state.
+    */
+  changeOnlyDownloadedTopProgram(event) {
+    var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedTopProgram: true,
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedTopProgram: false,
+            }, () => {
+                this.getPrograms();
+            })
+        }
+  }
+  /**
+    * Handles the change event of the diplaying only downloaded programs.
+    * @param {Object} event - The event object containing the checkbox state.
+    */
+  changeOnlyDownloadedBottomProgram(event) {
+    var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedBottomProgram: true,
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedBottomProgram: false,
+            }, () => {
+                this.getPrograms();
+            })
+        }
+  }
+  /**
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
@@ -418,13 +563,12 @@ class ApplicationDashboard extends Component {
           const width = chart.chart.width;
           const height = chart.chart.height;
           const ctx = chart.chart.ctx;
-
           ctx.restore();
           const fontSize = "1";
           ctx.font = `bold ${fontSize}em Arial`;
           ctx.textBaseline = "middle";
 
-          const text = "Center Text",
+          const text = chart.config.data.datasets[0].data[1] + " missing",
             textX = Math.round((width - ctx.measureText(text).width) / 2),
             textY = height / 1.5;
 
@@ -441,7 +585,7 @@ class ApplicationDashboard extends Component {
             meta.data.forEach(function (element, index) {
               // Get the percentage value
               const dataValue = dataset.data[index];
-              const percentageText = `${dataValue}%`;
+              const percentageText = dataValue == 0 ? '' : `${dataValue}%`;
 
               // Calculate position for centered text
               const position = element.tooltipPosition();
@@ -799,35 +943,15 @@ class ApplicationDashboard extends Component {
 
   buildExpiriesJexcel() {
     var expiriesList = this.state.dashboardBottomData.expiriesList;
-    var missingPUList = [
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-    ];
     var dataArray = [];
     let count = 0;
     if (expiriesList.length > 0) {
       for (var j = 0; j < expiriesList.length; j++) {
         data = [];
-        data[0] = expiriesList[j].name
-        data[1] = expiriesList[j].percentage
+        data[0] = expiriesList[j].planningUnit.label.label_en
+        data[1] = addCommas(roundARU(expiriesList[j].expiringQty, 1))
+        data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
+        data[3] = addCommas(roundARU(expiriesList[j].expiryAmt, 1))
         dataArray[count] = data;
         count++;
       }
@@ -854,7 +978,7 @@ class ApplicationDashboard extends Component {
           readOnly: true
         },
         {
-          title: "Expiring MOS",
+          title: "Expiry Date",
           type: 'text',
           editable: false,
           readOnly: true
@@ -977,23 +1101,28 @@ class ApplicationDashboard extends Component {
       datasets: [
         {
           label: 'Overstock',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc*100).toFixed(2)] : [],
           backgroundColor: 'rgba(0, 51, 102, 0.8)', // Dark Blue
         },
         {
           label: 'Adequate',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc*100).toFixed(2)] : [],
           backgroundColor: 'rgba(0, 153, 51, 0.8)', // Green
         },
         {
           label: 'Below Min',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc*100).toFixed(2)] : [],
           backgroundColor: 'rgba(255, 204, 0, 0.8)', // Yellow
         },
         {
           label: 'Stockout',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc*100).toFixed(2)] : [],
           backgroundColor: 'rgba(204, 0, 0, 0.8)', // Red
+        },
+        {
+          label: 'NA',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc*100).toFixed(2)] : [],
+          backgroundColor: 'grey', // Red
         }
       ]
     };
@@ -1047,7 +1176,7 @@ class ApplicationDashboard extends Component {
           color: 'white',
           anchor: 'center',
           align: 'center',
-          formatter: (value) => `${value}%` // Display percentage values
+          formatter: (value) => `${value}%`
         }
       }
     };
@@ -1113,6 +1242,24 @@ class ApplicationDashboard extends Component {
       }]
     };
     const shipmentsPieOptions = {
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return "$ "+ x1 + x2;
+          }
+        }
+      },
       legend: {
         display: true,
         position: 'bottom',
@@ -1135,7 +1282,7 @@ class ApplicationDashboard extends Component {
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
           (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "green" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
-          '#F5F5F7'
+          '#c8ced3'
         ],
         hoverOffset: 4
       }]
@@ -1161,7 +1308,7 @@ class ApplicationDashboard extends Component {
         data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
         backgroundColor: [
           (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "green" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "ornage" : "red",
-          '#F5F5F7'
+          '#c8ced3'
         ],
         hoverOffset: 4
       }]
@@ -1187,7 +1334,7 @@ class ApplicationDashboard extends Component {
         data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
         backgroundColor: [
           (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "green" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
-          '#F5F5F7'
+          '#c8ced3'
         ],
         hoverOffset: 4
       }]
@@ -1213,7 +1360,7 @@ class ApplicationDashboard extends Component {
         data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
           (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "green" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "ornage" : "red",
-          '#F5F5F7'
+          '#c8ced3'
         ],
         hoverOffset: 4
       }]
@@ -1231,8 +1378,13 @@ class ApplicationDashboard extends Component {
         zeroLineColor: gridLineColor
       }
     }
+    let topProgramList = []
+    this.state.programList.length > 0 && 
+      this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : true).map(c => {
+        topProgramList.push({ label: c.programCode, value: c.id })
+      })
     let bottomProgramList = this.state.programList.length > 0
-      && this.state.programList.map((item, i) => {
+      && this.state.programList.filter(c => this.state.onlyDownloadedBottomProgram ? c.local : true).map((item, i) => {
         return (
           <option key={i} value={item.id}>
             {item.programCode}
@@ -1241,7 +1393,7 @@ class ApplicationDashboard extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
-        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.consolidatedProgramList} objectStore="programData" page="dashboard"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -1574,46 +1726,7 @@ class ApplicationDashboard extends Component {
               </Col>
             ))
           }
-          {
-            this.state.programList.length > 0 && activeTab1 == 2 &&
-            this.state.programList.map((item) => (
-              <Col xs="12" sm="6" lg="3">
-                <Card className=" CardHeight">
-                  <CardBody className="box-p">
-                    <div style={{ display: item.loading ? "none" : "block" }}>
-                      <div class="h1 text-muted text-left mb-2">
-                        <i class="fa fa-list-alt icon-color"></i>
-                        <ButtonGroup className="float-right BtnZindex">
-                          <Dropdown id={item.id} isOpen={this.state[item.id]} toggle={() => { this.setState({ [item.id]: !this.state[item.id] }); }}>
-                            <DropdownToggle caret className="p-0" color="transparent">
-                            </DropdownToggle>
-                            <DropdownMenu right>
-                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{i18n.t("static.common.delete")}</DropdownItem>
-                              <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
-                        </ButtonGroup>
-                      </div>
-                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : "")}</div>
-                      <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
-                      <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
-                    </div>
-                    <div style={{ display: item.loading ? "block" : "none" }}>
-                      <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >
-                        <div class="align-items-center">
-                          <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                          <div class="spinner-border blue ml-4" role="status">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
-            ))
-          }
-          {checkOnline === 'Online' &&
+          {checkOnline === 'Online' && activeTab1 == 1 &&
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">
@@ -1630,270 +1743,286 @@ class ApplicationDashboard extends Component {
               </Card>
             </Col>
           }
-
         </Row>
-        <div className='row px-3'>
-          {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-            <div>
-              <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
-            </div>
-          </div> */}
-          <div className='col-md-12'>
-            <div className='row'>
-              <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
-                <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
-                <Input
-                  type="select"
-                  name="organisationTypeId"
-                  id="organisationTypeId"
-                  bsSize="sm"
-                  required
-                >
-                  <option selected>Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </Input>
-              </FormGroup>
-              <FormGroup className='col-md-3' style={{ marginTop: '34px' }}>
-                <div className="tab-ml-1 ml-lg-3">
-                  <Input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="onlyDownloadedProgram"
-                    name="onlyDownloadedProgram"
-                    checked={this.state.onlyDownloadedProgram}
-                    onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+        {activeTab1 == 2 && <>
+          <div className='row px-3'>
+            {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
+              <div>
+                <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
+              </div>
+            </div> */}
+            <div className='col-md-12'>
+              <div className='row'>
+                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
+                  <MultiSelect
+                    name="topProgramId"
+                    id="topProgramId"
+                    bsSize="sm"
+                    value={this.state.topProgramId}
+                    onChange={(e) => { this.handleTopProgramIdChange(e) }}
+                    options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
+                    labelledBy={i18n.t('static.common.regiontext')}
                   />
-                  <Label
-                    className="form-check-label"
-                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                    Only show local program
-                  </Label>
-                </div>
-              </FormGroup>
+                </FormGroup>
+                <FormGroup className='col-md-3' style={{ marginTop: '34px' }}>
+                  <div className="tab-ml-1 ml-lg-3">
+                    <Input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="onlyDownloadedTopProgram"
+                      name="onlyDownloadedTopProgram"
+                      checked={this.state.onlyDownloadedTopProgram}
+                      onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
+                    />
+                    <Label
+                      className="form-check-label"
+                      check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                      Only show local program
+                    </Label>
+                  </div>
+                </FormGroup>
 
-            </div>
+              </div>
 
-            <div class="col-xl-12 pl-lg-0 pr-lg-0">
-              <div class="card custom-card">
-                <div class="card-body px-0 py-0">
-                  <div class="table-responsive fixTableHead tableFixHeadDash">
-                    <Table className="table-striped table-bordered text-center">
-                      <thead>
-                        <th scope="col">Delete</th>
-                        <th scope="col">Program</th>
-                        <th scope="col"># of active planning units</th>
-                        <th scope="col"># of products with stockouts</th>
-                        <th scope="col">Expiries*</th>
-                        <th scope='col'># of open QAT Problems​</th>
-                        <th scope='col'>Last updated date</th>
-                        <th scope='col'>Review​(looks at last final vers)</th>
-                      </thead>
-                      <tbody>
-                        {this.state.dashboardTopList.map(d => {
-                          return (
-                            <tr>
-                              <td scope="row"><i class="fa fa-trash" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i></td>
-                              <td scope="row">AGO-MAL ~v3​</td>
-                              <td>
-                                <div id="example-1" class="examples">
-                                  <div class="cssProgress">
-                                    <div class="progress1">
-                                      <div class="cssProgress-bar" data-percent="75" style={{ width: '75%' }}>
-                                        <span class="cssProgress-label">{d.activePlanningUnits}</span>
+              <div class="col-xl-12 pl-lg-0 pr-lg-0">
+                <div class="card custom-card">
+                  <div class="card-body px-0 py-0">
+                    <div class="table-responsive fixTableHead tableFixHeadDash">
+                      <Table className="table-striped table-bordered text-center">
+                        <thead>
+                          <th scope="col">Delete</th>
+                          <th scope="col">Program</th>
+                          <th scope="col"># of active planning units</th>
+                          <th scope="col"># of products with stockouts</th>
+                          <th scope="col">Expiries*</th>
+                          <th scope='col'># of open QAT Problems​</th>
+                          <th scope='col'>Last updated date</th>
+                          <th scope='col'>Review​(looks at last final vers)</th>
+                        </thead>
+                        <tbody>
+                          {this.state.dashboardTopList.map(d => {
+                            return (
+                              <tr>
+                                <td scope="row"><i class="fa fa-trash" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i></td>
+                                <td scope="row">{d.program.code+" ~v"+d.program.version}​</td>
+                                <td>
+                                  <div id="example-1" class="examples">
+                                    <div class="cssProgress">
+                                      <div class="progress1">
+                                        <div class="cssProgress-bar" data-percent={(d.activePlanningUnits/(d.activePlanningUnits+d.disabledPlanningUnits))*100} style={{ width: (d.activePlanningUnits/(d.activePlanningUnits+d.disabledPlanningUnits))*100+'%' }}>
+                                          <span class="cssProgress-label">{d.activePlanningUnits}</span>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
-                                </div>
 
-                              </td>
-                              <td>{d.countOfStockOutPU}</td>
-                              <td>$11.112</td>
-                              <td>{d.countOfOpenProblem}</td>
-                              <td>{d.lastModifiedDate}</td>
-                              <td>Pending Review (15-June-24)​</td>
-                            </tr>)
-                        })}
-                      </tbody>
-                    </Table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className='row'>
-          <div className='col-md-12'>
-            <div className='row'>
-              <FormGroup className='col-md-3 FormGroupD'>
-                <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
-                <Input
-                  type="select"
-                  name="bottomProgramId"
-                  id="bottomProgramId"
-                  value={this.state.bottomProgramId}
-                  onChange={(e) => { this.dataChange(e) }}
-                  bsSize="sm"
-                  required
-                >
-                  <option selected>Open this select menu</option>
-                  {bottomProgramList}
-                </Input>
-              </FormGroup>
-
-              <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
-                <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
-                <Input
-                  type="select"
-                  name="reportPeriod"
-                  id="reportPeriod"
-                  bsSize="sm"
-                  required
-                >
-                  <option selected>Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </Input>
-              </FormGroup>
-              <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
-                <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
-                <Input
-                  type="select"
-                  name="displayBy"
-                  id="displayBy"
-                  bsSize="sm"
-                  onChange={(e) => { this.dataChange(e) }}
-                  value={this.state.displayBy}
-                  required
-                >
-                  <option value="1">Funding Source</option>
-                  <option value="2">Procurement Agent</option>
-                  <option value="3">Status</option>
-                </Input>
-                <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment ${shipmentTotal}</p></div>
-              </FormGroup>
-            </div>
-          </div>
-        </div>
-        <div className='row'>
-          <div class="col-xl-12">
-            <div className='row pl-lg-1 pr-lg-1'>
-              <div className='col-md-12'>
-                <div className='row'>
-                  <div className='col-md-3'>
-                    <div className="card custom-card CustomHeight">
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title"> Stock Status </div>
-                      </div>
-                      <div class="card-body pt-lg-0">
-                        <HorizontalBar data={stockStatusData} options={stockStatusOptions} />
-                      </div>
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title"> Stocked out Planning Units (3) </div>
-                      </div>
-                      <div class="card-body pt-0 pb-0">
-                        <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
-                          {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
-                            return (<li class="success">
-                              <div class="d-flex align-items-center justify-content-between">
-                                <div className='text-mutedDashboard'>{x.planningUnit.name} </div>
-                                <div class="fs-12 text-mutedDashboard">{x.count}​</div>
-                              </div>
-                            </li>)
+                                </td>
+                                <td>{d.countOfStockOutPU}</td>
+                                <td>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td>{d.countOfOpenProblem}</td>
+                                <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
+                                <td>{getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)} ({moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY')})</td>
+                              </tr>)
                           })}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="card custom-card CustomHeight">
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title"> Forecast Error </div>
-                      </div>
-                      <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                        <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="card custom-card CustomHeight">
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title">Shipments </div>
-                      </div>
-                      <div class="card-body">
-                        <div className='d-flex align-items-center justify-content-center'>
-                          <Pie data={shipmentsPieData} options={shipmentsPieOptions} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <div className="card custom-card CustomHeight">
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title"># of Shipments with funding TBD </div>
-                      </div>
-                      <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                        <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2'>
-                        </div>
-                      </div>
+                        </tbody>
+                      </Table>
                     </div>
                   </div>
                 </div>
-                <div className='row'>
-                  <div className='col-md-6'>
-                    <div class="card custom-card CustomHeight">
-                      <div class="card-header  justify-content-between">
-                        <div class="card-title"> Data Quality (doesn't use date selector) </div>
+              </div>
+            </div>
+          </div>
+          <div className='row'>
+            <div className='col-md-12'>
+              <div className='row'>
+                <div className='col-md-3'>
+                  <FormGroup className='col FormGroupD'>
+                    <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
+                    <Input
+                      type="select"
+                      name="bottomProgramId"
+                      id="bottomProgramId"
+                      value={this.state.bottomProgramId}
+                      onChange={(e) => { this.dataChange(e) }}
+                      bsSize="sm"
+                      required
+                    >
+                      <option selected>Open this select menu</option>
+                      {bottomProgramList}
+                    </Input>
+                  </FormGroup>
+                  <FormGroup className='col' style={{ marginTop: '34px' }}>
+                    <div className="tab-ml-1 ml-lg-3">
+                      <Input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="onlyDownloadedBottomProgram"
+                        name="onlyDownloadedBottomProgram"
+                        checked={this.state.onlyDownloadedBottomProgram}
+                        onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                      />
+                      <Label
+                        className="form-check-label"
+                        check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                        Only show local program
+                      </Label>
+                    </div>
+                  </FormGroup>
+                </div>
+                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
+                  <Input
+                    type="select"
+                    name="reportPeriod"
+                    id="reportPeriod"
+                    bsSize="sm"
+                    required
+                  >
+                    <option selected>Open this select menu</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                  </Input>
+                </FormGroup>
+                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                  <Input
+                    type="select"
+                    name="displayBy"
+                    id="displayBy"
+                    bsSize="sm"
+                    onChange={(e) => { this.dataChange(e) }}
+                    value={this.state.displayBy}
+                    required
+                  >
+                    <option value="1">Funding Source</option>
+                    <option value="2">Procurement Agent</option>
+                    <option value="3">Status</option>
+                  </Input>
+                  <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
+                </FormGroup>
+              </div>
+            </div>
+          </div>
+          <div className='row'>
+            <div class="col-xl-12">
+              <div className='row pl-lg-1 pr-lg-1'>
+                <div className='col-md-12'>
+                  <div className='row'>
+                    <div className='col-md-3'>
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Stock Status </div>
+                        </div>
+                        <div class="card-body pt-lg-0">
+                          <HorizontalBar data={stockStatusData} options={stockStatusOptions} />
+                        </div>
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Stocked out Planning Units ({this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}) </div>
+                        </div>
+                        <div class="card-body pt-0 pb-0">
+                          <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
+                            {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
+                              return (<li class="success">
+                                <div class="d-flex align-items-center justify-content-between">
+                                  <div className='text-mutedDashboard'>{x.planningUnit.name} </div>
+                                  <div class="fs-12 text-mutedDashboard">{x.count}​</div>
+                                </div>
+                              </li>)
+                            })}
+                          </ul>
+                        </div>
                       </div>
-                      <div class="card-body py-2">
-                        <div className='row pt-lg-1'>
-                          <div class="col-md-6 container1">
-                            <p class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
-                            </div>
-                          </div>
-                          <div class="col-md-6 container1">
-                            <p class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
-                            </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Forecast Error </div>
+                        </div>
+                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
-                        <div className='row pt-lg-1'>
-                          <div class="col-md-6 container1">
-                            <p class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
-                            </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title">Shipments </div>
+                        </div>
+                        <div class="card-body">
+                          <div className='d-flex align-items-center justify-content-center'>
+                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300}/>
                           </div>
-                          <div class="col-md-6 container1">
-                            <p class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
-                            <div class="pie-wrapper">
-                              <div class="arc" data-value="24"></div>
-                              <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
-                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"># of Shipments with funding TBD </div>
+                        </div>
+                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                          <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className='col-md-6'>
-                    <div className='row'>
-                      <div class="col-md-12 pl-lg-4 pr-lg-4">
-                        <div class="card custom-card CustomHeight">
-                          <div class="card-header justify-content-between">
-                            <div class="card-title"> Expiries</div>
+                  <div className='row'>
+                    <div className='col-md-6'>
+                      <div class="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Data Quality (doesn't use date selector) </div>
+                        </div>
+                        <div class="card-body py-2">
+                          <div className='row pt-lg-1'>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
+                              </div>
+                            </div>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
+                              </div>
+                            </div>
                           </div>
-                          <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                            <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries ${expiryTotal}</p>
-                            <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                          <div className='row pt-lg-1'>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
+                              </div>
+                            </div>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='col-md-6'>
+                      <div className='row'>
+                        <div class="col-md-12 pl-lg-4 pr-lg-4">
+                          <div class="card custom-card CustomHeight">
+                            <div class="card-header justify-content-between">
+                              <div class="card-title"> Expiries</div>
+                            </div>
+                            <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                              <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</p>
+                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1904,7 +2033,7 @@ class ApplicationDashboard extends Component {
               </div>
             </div>
           </div>
-        </div>
+        </>}
       </div >
     );
   }
