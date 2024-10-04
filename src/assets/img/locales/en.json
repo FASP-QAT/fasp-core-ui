@@ -3458,5 +3458,6 @@
     "static.stockStatus.doYouWantToAggregate":"Do you want to aggregate selected programs",
     "static.common.allitemsselected":"All items are selected.",
     "static.treeTemplate.returnToList":"Tree Templates",
-    "static.treeTemplate.monthSelector":"Month Selector"
+    "static.treeTemplate.monthSelector":"Month Selector",
+    "static.stockStatus.shipmemtTooltip":"Hover over each shipment box to see its assigned PU"
 }
