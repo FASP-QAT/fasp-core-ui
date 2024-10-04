@@ -4273,11 +4273,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
                                     </a>
                                 }
-                                {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
+                                {/* {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
                                     <a className="card-header-action">
                                         <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
                                     </a>
-                                }
+                                } */}
                                 <a className="card-header-action">
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                                 </a>

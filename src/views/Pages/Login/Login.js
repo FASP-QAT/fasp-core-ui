@@ -157,6 +157,7 @@ class Login extends Component {
    */
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
+    localStorage.setItem("theme", localStorage.getItem('theme')==undefined?'light':localStorage.getItem('theme'));
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     AuthenticationService.clearUserDetails()
@@ -524,7 +525,7 @@ class Login extends Component {
                 <div className='row align-items-center'>
                   <div className='col-md-6 col-sm-6'>
                     <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
-                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} /> 
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} /> 
                       {" "+i18n.t('static.ticket.header')}
                     </a>
                   </div>
