@@ -3085,6 +3085,12 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   background-color: #fff; /* Light switch handle in dark mode */
   margin-top: 3px;
 }
+.DarkColorOK .jss_search_container>div {
+  display: inline-block;
+  padding: 8px;
+  align-items: center;
+  color: #e4e5e6;
+}
 
 // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
 //   content: "";
