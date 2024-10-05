@@ -7,16 +7,15 @@ class DashboardService {
     }
     realmLevelDashboard(realmId) {
         realmId = 1;
-        return axios.get(`${API_URL}/api/realmLevelDashboard`, {
+        return axios.get(`${API_URL}/api/dashboard/realmLevel`, {
         });
     }
     applicationLevelDashboardUserList() {
         return axios.get(`${API_URL}/api/applicationLevelDashboardUserList`, {
         });
     }
-    realmLevelDashboardUserList(realmId) {
-        realmId = 1;
-        return axios.get(`${API_URL}/api/realmLevelDashboardUserList`, {
+    realmLevelDashboardUserList() {
+        return axios.get(`${API_URL}/api/dashboard/realmLevel/userList`, {
         });
     }
     openIssues() {

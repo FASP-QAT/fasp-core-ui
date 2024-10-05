@@ -13,7 +13,7 @@ class ForecastMethodService {
         return axios.post(`${API_URL}/api/forecastMethod`, json, {});
     }
     getForecastMethodTypeList() {
-        return axios.get(`${API_URL}/api/forecastMethodType`, {
+        return axios.get(`${API_URL}/api/master/forecastMethodType`, {
         });
     }
 }

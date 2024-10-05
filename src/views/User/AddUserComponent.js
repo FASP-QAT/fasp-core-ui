@@ -1,8 +1,6 @@
-import classNames from "classnames";
 import { Formik } from "formik";
 import jexcel from "jspreadsheet";
 import React, { Component } from "react";
-import Select from "react-select";
 import "react-select/dist/react-select.min.css";
 import {
   Button,
@@ -40,7 +38,7 @@ let initialValues = {
   emailId: "",
   orgAndCountry: "",
   languageId: [],
-  roleId: [],
+  // roleId: [],
 };
 const entityname = i18n.t("static.user.user");
 /**
@@ -61,17 +59,17 @@ const validationSchema = function (values) {
       then: Yup.string().required(i18n.t("static.common.realmtext")),
       otherwise: Yup.string().notRequired(),
     }),
-    roleId: Yup.string()
-      .test(
-        "roleValid",
-        i18n.t("static.common.roleinvalidtext"),
-        function (value) {
-          if (document.getElementById("roleValid").value == "false") {
-            return true;
-          }
-        }
-      )
-      .required(i18n.t("static.user.validrole")),
+    // roleId: Yup.string()
+    //   .test(
+    //     "roleValid",
+    //     i18n.t("static.common.roleinvalidtext"),
+    //     function (value) {
+    //       if (document.getElementById("roleValid").value == "false") {
+    //         return true;
+    //       }
+    //     }
+    //   )
+    //   .required(i18n.t("static.user.validrole")),
     languageId: Yup.string().required(i18n.t("static.user.validlanguage")),
     emailId: Yup.string()
       .email(i18n.t("static.user.invalidemail"))
@@ -160,7 +158,7 @@ class AddUserComponent extends Component {
           showRealmValidation:
             this.state.user.realm.realmId != "" ? false : true,
         },
-        () => {}
+        () => { }
       );
       document.getElementById("showRealm").value = true;
     } else {
@@ -168,7 +166,7 @@ class AddUserComponent extends Component {
         {
           showRealmValidation: false,
         },
-        () => {}
+        () => { }
       );
       document.getElementById("showRealm").value = false;
     }
@@ -201,7 +199,7 @@ class AddUserComponent extends Component {
       {
         user,
       },
-      () => {}
+      () => { }
     );
   }
   /**
@@ -240,7 +238,7 @@ class AddUserComponent extends Component {
           showRealmValidation:
             this.state.user.realm.realmId != "" ? false : true,
         },
-        () => {}
+        () => { }
       );
       document.getElementById("showRealm").value = true;
       if (count1 > 0) {
@@ -272,7 +270,7 @@ class AddUserComponent extends Component {
         user,
         validateRealm: count > 0 ? true : false,
       },
-      () => {}
+      () => { }
     );
   }
   /**
@@ -326,19 +324,24 @@ class AddUserComponent extends Component {
    */
   getAccessControlData() {
     let realmId = AuthenticationService.getRealmId();
+    var roleList = AuthenticationService.getLoggedInUserRole();
+    console.log("response===>roleList", roleList)
+
     DropdownService.getRealmCountryDropdownList(realmId)
       .then((response) => {
+        console.log("response===>", response)
+
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
               a.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             var itemLabelB = getLabelText(
               b.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -353,11 +356,11 @@ class AddUserComponent extends Component {
                   var itemLabelA = getLabelText(
                     a.label,
                     this.state.lang
-                  ).toUpperCase(); 
+                  ).toUpperCase();
                   var itemLabelB = getLabelText(
                     b.label,
                     this.state.lang
-                  ).toUpperCase(); 
+                  ).toUpperCase();
                   return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -372,27 +375,24 @@ class AddUserComponent extends Component {
                         var itemLabelA = getLabelText(
                           a.label,
                           this.state.lang
-                        ).toUpperCase(); 
+                        ).toUpperCase();
                         var itemLabelB = getLabelText(
                           b.label,
                           this.state.lang
-                        ).toUpperCase(); 
+                        ).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                       });
                       this.setState({
                         healthAreas: listArray,
                         selHealthArea: listArray,
                       });
-                      DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(
-                        realmId,
-                        0
-                      )
+                      DropdownService.getAllProgramListByRealmId(realmId)
                         .then((response1) => {
                           if (response1.status == "200") {
                             var listArray = response1.data;
                             listArray.sort((a, b) => {
-                              var itemLabelA = a.code.toUpperCase(); 
-                              var itemLabelB = b.code.toUpperCase(); 
+                              var itemLabelA = a.code.toUpperCase();
+                              var itemLabelB = b.code.toUpperCase();
                               return itemLabelA > itemLabelB ? 1 : -1;
                             });
                             this.setState(
@@ -415,19 +415,19 @@ class AddUserComponent extends Component {
                               message: API_URL.includes("uat")
                                 ? i18n.t("static.common.uatNetworkErrorMessage")
                                 : API_URL.includes("demo")
-                                ? i18n.t(
+                                  ? i18n.t(
                                     "static.common.demoNetworkErrorMessage"
                                   )
-                                : i18n.t(
+                                  : i18n.t(
                                     "static.common.prodNetworkErrorMessage"
                                   ),
                               loading: false,
-                            },()=>{
+                            }, () => {
                               this.hideSecondComponent();
                             });
                           } else {
                             switch (
-                              error.response ? error.response.status : ""
+                            error.response ? error.response.status : ""
                             ) {
                               case 401:
                                 this.props.history.push(
@@ -443,7 +443,7 @@ class AddUserComponent extends Component {
                                 this.setState({
                                   message: error.response.data.messageCode,
                                   loading: false,
-                                },()=>{
+                                }, () => {
                                   this.hideSecondComponent();
                                 });
                                 break;
@@ -451,7 +451,7 @@ class AddUserComponent extends Component {
                                 this.setState({
                                   message: error.response.data.messageCode,
                                   loading: false,
-                                },()=>{
+                                }, () => {
                                   this.hideSecondComponent();
                                 });
                                 break;
@@ -459,7 +459,7 @@ class AddUserComponent extends Component {
                                 this.setState({
                                   message: "static.unkownError",
                                   loading: false,
-                                },()=>{
+                                }, () => {
                                   this.hideSecondComponent();
                                 });
                                 break;
@@ -483,10 +483,10 @@ class AddUserComponent extends Component {
                         message: API_URL.includes("uat")
                           ? i18n.t("static.common.uatNetworkErrorMessage")
                           : API_URL.includes("demo")
-                          ? i18n.t("static.common.demoNetworkErrorMessage")
-                          : i18n.t("static.common.prodNetworkErrorMessage"),
+                            ? i18n.t("static.common.demoNetworkErrorMessage")
+                            : i18n.t("static.common.prodNetworkErrorMessage"),
                         loading: false,
-                      },()=>{
+                      }, () => {
                         this.hideSecondComponent();
                       });
                     } else {
@@ -505,7 +505,7 @@ class AddUserComponent extends Component {
                           this.setState({
                             message: error.response.data.messageCode,
                             loading: false,
-                          },()=>{
+                          }, () => {
                             this.hideSecondComponent();
                           });
                           break;
@@ -513,7 +513,7 @@ class AddUserComponent extends Component {
                           this.setState({
                             message: error.response.data.messageCode,
                             loading: false,
-                          },()=>{
+                          }, () => {
                             this.hideSecondComponent();
                           });
                           break;
@@ -521,7 +521,7 @@ class AddUserComponent extends Component {
                           this.setState({
                             message: "static.unkownError",
                             loading: false,
-                          },()=>{
+                          }, () => {
                             this.hideSecondComponent();
                           });
                           break;
@@ -531,7 +531,7 @@ class AddUserComponent extends Component {
               } else {
                 this.setState({
                   message: response.data.message,
-                },()=>{
+                }, () => {
                   this.hideSecondComponent();
                 });
               }
@@ -542,10 +542,10 @@ class AddUserComponent extends Component {
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
-                },()=>{
+                }, () => {
                   this.hideSecondComponent();
                 });
               } else {
@@ -564,7 +564,7 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: error.response.data.messageCode,
                       loading: false,
-                    },()=>{
+                    }, () => {
                       this.hideSecondComponent();
                     });
                     break;
@@ -572,7 +572,7 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: error.response.data.messageCode,
                       loading: false,
-                    },()=>{
+                    }, () => {
                       this.hideSecondComponent();
                     });
                     break;
@@ -580,7 +580,7 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: "static.unkownError",
                       loading: false,
-                    },()=>{
+                    }, () => {
                       this.hideSecondComponent();
                     });
                     break;
@@ -604,10 +604,10 @@ class AddUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
-          },()=>{
+          }, () => {
             this.hideSecondComponent();
           });
         } else {
@@ -624,7 +624,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -632,7 +632,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -640,7 +640,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: "static.unkownError",
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -652,20 +652,8 @@ class AddUserComponent extends Component {
    * This function is called when something in the access control table is changed to add the validation and set values of other cell
    */
   changed = function (instance, cell, x, y, value) {
-    if (x == 1) {
-      this.el.setValueFromCoords(4, y, "", true);
-      var col = "B".concat(parseInt(y) + 1);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-    }
     if (x == 2) {
-      this.el.setValueFromCoords(4, y, "", true);
+      this.el.setValueFromCoords(5, y, "", true);
       var col = "C".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -677,6 +665,7 @@ class AddUserComponent extends Component {
       }
     }
     if (x == 3) {
+      this.el.setValueFromCoords(5, y, "", true);
       var col = "D".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -698,13 +687,24 @@ class AddUserComponent extends Component {
         this.el.setComments(col, "");
       }
     }
+    if (x == 5) {
+      var col = "F".concat(parseInt(y) + 1);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+    }
   }.bind(this);
   /**
    * This function is used to filter the program list based on user's selected realm country, health area and organisation
    */
   filterProgramByCountryId = function (instance, cell, c, r, source) {
-    var value = this.state.addUserEL.getJson(null, false)[r][1];
-    var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
+    var value = this.state.addUserEL.getJson(null, false)[r][2];
+    var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][3];
     var proList = [];
     var proListByCountryId = [];
     var proListByHealthAreaId = [];
@@ -745,9 +745,9 @@ class AddUserComponent extends Component {
     } else {
       proList = this.state.programListForFilter;
     }
-    var orgvalue = this.state.addUserEL.getJson(null, false)[r][3];
-    if(orgvalue!=-1){
-      proList=proList.filter(c=>c.id==-1 || c.organisation.id==orgvalue)
+    var orgvalue = this.state.addUserEL.getJson(null, false)[r][4];
+    if (orgvalue != -1) {
+      proList = proList.filter(c => c.id == -1 || c.organisation.id == orgvalue)
     }
     return proList;
   }.bind(this);
@@ -759,6 +759,8 @@ class AddUserComponent extends Component {
     const { selRealmCountry } = this.state;
     const { selOrganisation } = this.state;
     const { selHealthArea } = this.state;
+    const { selRoleList } = this.state;
+    let roleList = [];
     let programList = [];
     let countryList = [];
     let organisationList = [];
@@ -771,15 +773,15 @@ class AddUserComponent extends Component {
           (selProgram[i].programTypeId == 1
             ? "SP"
             : selProgram[i].programTypeId == 2
-            ? "FC"
-            : "") +
+              ? "FC"
+              : "") +
           ")";
         var paJson = {
           name: name,
           id: parseInt(selProgram[i].id),
           realmCountryId: selProgram[i].realmCountry.id,
           healthAreaList: selProgram[i].healthAreaList,
-          organisation:selProgram[i].organisation
+          organisation: selProgram[i].organisation
         };
         programList[i] = paJson;
       }
@@ -838,15 +840,33 @@ class AddUserComponent extends Component {
       };
       healthAreaList.unshift(paJson);
     }
+    if (selRoleList.length > 0) {
+      for (var i = 0; i < selRoleList.length; i++) {
+        if (selRoleList[i] != undefined) {
+          var paJson = {
+            name: selRoleList[i].label,
+            id: selRoleList[i].value,
+          };
+          roleList[i] = paJson;
+        }
+      }
+      var paJson = {
+        name: "Select",
+        id: "",
+        active: true,
+      };
+      roleList.unshift(paJson);
+    }
     var data = [];
     var papuDataArr = [];
     if (papuDataArr.length == 0) {
       data = [];
       data[0] = this.state.user.username;
-      data[1] = -1;
+      data[1] = "";
       data[2] = -1;
       data[3] = -1;
       data[4] = -1;
+      data[5] = -1;
       papuDataArr[0] = data;
     }
     jexcel.destroy(document.getElementById("paputableDiv"), true);
@@ -854,12 +874,17 @@ class AddUserComponent extends Component {
     var options = {
       data: data,
       columnDrag: false,
-      colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+      colWidths: [100, 300, 100, 100, 100, 100],
       columns: [
         {
           title: i18n.t("static.username.username"),
           type: "hidden",
           readOnly: true,
+        },
+        {
+          title: i18n.t("static.role.role"),
+          type: "dropdown",
+          source: roleList,
         },
         {
           title: i18n.t("static.program.realmcountry"),
@@ -946,6 +971,7 @@ class AddUserComponent extends Component {
                 data[2] = "";
                 data[3] = "";
                 data[4] = "";
+                data[5] = "";
                 obj.insertRow(data, parseInt(y), 1);
               }.bind(this),
             });
@@ -960,6 +986,7 @@ class AddUserComponent extends Component {
                 data[2] = "";
                 data[3] = "";
                 data[4] = "";
+                data[5] = "";
                 obj.insertRow(data, parseInt(y));
               }.bind(this),
             });
@@ -976,8 +1003,9 @@ class AddUserComponent extends Component {
                   data[2] = "";
                   data[3] = "";
                   data[4] = "";
+                  data[5] = "";
                   obj.insertRow(data, parseInt(y));
-                }else{
+                } else {
                   obj.deleteRow(parseInt(y));
                 }
               }.bind(this),
@@ -1008,10 +1036,10 @@ class AddUserComponent extends Component {
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
     var tr = asterisk.firstChild;
-    tr.children[2].classList.add("AsteriskTheadtrTd");
     tr.children[3].classList.add("AsteriskTheadtrTd");
     tr.children[4].classList.add("AsteriskTheadtrTd");
     tr.children[5].classList.add("AsteriskTheadtrTd");
+    tr.children[6].classList.add("AsteriskTheadtrTd");
   };
   /**
    * This function is called when user clicks on add row in access control table to add the access control
@@ -1023,6 +1051,7 @@ class AddUserComponent extends Component {
     data[2] = "";
     data[3] = "";
     data[4] = "";
+    data[5] = "";
     this.el.insertRow(data, 0, 1);
   }
   /**
@@ -1053,8 +1082,8 @@ class AddUserComponent extends Component {
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {
-            var itemLabelA = a.label.label_en.toUpperCase(); 
-            var itemLabelB = b.label.label_en.toUpperCase(); 
+            var itemLabelA = a.label.label_en.toUpperCase();
+            var itemLabelB = b.label.label_en.toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState(
@@ -1084,10 +1113,10 @@ class AddUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
-          },()=>{
+          }, () => {
             this.hideSecondComponent();
           });
         } else {
@@ -1104,7 +1133,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1112,7 +1141,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1120,7 +1149,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: "static.unkownError",
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1135,11 +1164,11 @@ class AddUserComponent extends Component {
             var itemLabelA = getLabelText(
               a.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             var itemLabelB = getLabelText(
               b.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -1164,10 +1193,10 @@ class AddUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
-          },()=>{
+          }, () => {
             this.hideSecondComponent();
           });
         } else {
@@ -1184,7 +1213,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1192,7 +1221,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1200,7 +1229,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: "static.unkownError",
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1210,7 +1239,7 @@ class AddUserComponent extends Component {
     UserService.getRoleList()
       .then((response) => {
         if (response.status == 200) {
-          var roleList = [{ value: "-1", label: i18n.t("static.common.all") }];
+          var roleList = [];
           for (var i = 0; i < response.data.length; i++) {
             roleList[i + 1] = {
               value: response.data[i].roleId,
@@ -1219,12 +1248,12 @@ class AddUserComponent extends Component {
           }
           var listArray = roleList;
           listArray.sort((a, b) => {
-            var itemLabelA = a.label.toUpperCase(); 
-            var itemLabelB = b.label.toUpperCase(); 
+            var itemLabelA = a.label.toUpperCase();
+            var itemLabelB = b.label.toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
-            roleList: listArray,
+            selRoleList: listArray,
             loading: false,
           });
         } else {
@@ -1245,10 +1274,10 @@ class AddUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
-          },()=>{
+          }, () => {
             this.hideSecondComponent();
           });
         } else {
@@ -1265,7 +1294,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1273,7 +1302,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1281,7 +1310,7 @@ class AddUserComponent extends Component {
               this.setState({
                 message: "static.unkownError",
                 loading: false,
-              },()=>{
+              }, () => {
                 this.hideSecondComponent();
               });
               break;
@@ -1309,7 +1338,7 @@ class AddUserComponent extends Component {
     var valid = true;
     var json = this.el.getJson(null, false);
     for (var y = 0; y < json.length; y++) {
-      var col = "B".concat(parseInt(y) + 1);
+      var col = "C".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(1, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1320,7 +1349,7 @@ class AddUserComponent extends Component {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setComments(col, "");
       }
-      var col = "C".concat(parseInt(y) + 1);
+      var col = "D".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(2, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1331,7 +1360,7 @@ class AddUserComponent extends Component {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setComments(col, "");
       }
-      var col = "D".concat(parseInt(y) + 1);
+      var col = "E".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(3, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1342,7 +1371,7 @@ class AddUserComponent extends Component {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setComments(col, "");
       }
-      var col = "E".concat(parseInt(y) + 1);
+      var col = "F".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(4, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1394,7 +1423,7 @@ class AddUserComponent extends Component {
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: "auto" }}>
             <Card>
-                            <Formik
+              <Formik
                 enableReinitialize={true}
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -1408,7 +1437,8 @@ class AddUserComponent extends Component {
                       var map1 = new Map(Object.entries(tableJson[i]));
                       let json = {
                         userId: "",
-                        realmCountryId: parseInt(map1.get("1")),
+                        roleId: map1.get("1"),
+                        realmCountryId: parseInt(map1.get("2")),
                         countryName: {
                           createdBy: null,
                           createdDate: null,
@@ -1421,7 +1451,7 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        healthAreaId: parseInt(map1.get("2")),
+                        healthAreaId: parseInt(map1.get("3")),
                         healthAreaName: {
                           createdBy: null,
                           createdDate: null,
@@ -1434,7 +1464,7 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        organisationId: parseInt(map1.get("3")),
+                        organisationId: parseInt(map1.get("4")),
                         organisationName: {
                           createdBy: null,
                           createdDate: null,
@@ -1447,7 +1477,7 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        programId: parseInt(map1.get("4")),
+                        programId: parseInt(map1.get("5")),
                         programName: {
                           createdBy: null,
                           createdDate: null,
@@ -1465,12 +1495,13 @@ class AddUserComponent extends Component {
                       userAcls.push(json);
                     }
                     user.userAcls = userAcls;
+                    user.userAclList = userAcls;
                     this.setState({
                       loading: true,
                     });
                     this.setState({
                       message: "",
-                    },()=>{
+                    }, () => {
                       this.hideSecondComponent();
                     });
                     UserService.addNewUser(user)
@@ -1478,8 +1509,8 @@ class AddUserComponent extends Component {
                         if (response.status == 200) {
                           this.props.history.push(
                             `/user/listUser/` +
-                              "green/" +
-                              i18n.t(response.data.messageCode, { entityname })
+                            "green/" +
+                            i18n.t(response.data.messageCode, { entityname })
                           );
                         } else {
                           this.setState(
@@ -1499,10 +1530,10 @@ class AddUserComponent extends Component {
                             message: API_URL.includes("uat")
                               ? i18n.t("static.common.uatNetworkErrorMessage")
                               : API_URL.includes("demo")
-                              ? i18n.t("static.common.demoNetworkErrorMessage")
-                              : i18n.t("static.common.prodNetworkErrorMessage"),
+                                ? i18n.t("static.common.demoNetworkErrorMessage")
+                                : i18n.t("static.common.prodNetworkErrorMessage"),
                             loading: false,
-                          },()=>{
+                          }, () => {
                             this.hideSecondComponent();
                           });
                         } else {
@@ -1523,7 +1554,7 @@ class AddUserComponent extends Component {
                                   "static.accesscontrol.duplicateAccessControl"
                                 ),
                                 loading: false,
-                              },()=>{
+                              }, () => {
                                 this.hideSecondComponent();
                               });
                               break;
@@ -1531,7 +1562,7 @@ class AddUserComponent extends Component {
                               this.setState({
                                 message: error.response.data.messageCode,
                                 loading: false,
-                              },()=>{
+                              }, () => {
                                 this.hideSecondComponent();
                               });
                               break;
@@ -1539,7 +1570,7 @@ class AddUserComponent extends Component {
                               this.setState({
                                 message: "static.unkownError",
                                 loading: false,
-                              },()=>{
+                              }, () => {
                                 this.hideSecondComponent();
                               });
                               break;
@@ -1550,7 +1581,7 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: "validation fail",
                       loading: false,
-                    },()=>{
+                    }, () => {
                       this.hideSecondComponent();
                     });
                   }
@@ -1674,7 +1705,7 @@ class AddUserComponent extends Component {
                           {errors.emailId}
                         </FormFeedback>
                       </FormGroup>
-                                            <FormGroup>
+                      <FormGroup>
                         <Label for="orgAndCountry">
                           {i18n.t("static.user.orgAndCountry")}
                           <span class="red Reqasterisk">*</span>
@@ -1703,48 +1734,6 @@ class AddUserComponent extends Component {
                         />
                         <FormFeedback className="red">
                           {errors.orgAndCountry}
-                        </FormFeedback>
-                      </FormGroup>
-                      <FormGroup className="Selectcontrol-bdrNone">
-                        <Label htmlFor="roleId">
-                          {i18n.t("static.role.role")}
-                          <span class="red Reqasterisk">*</span>
-                        </Label>
-                        <Select
-                          className={classNames(
-                            "form-control",
-                            "d-block",
-                            "w-100",
-                            "bg-light",
-                            {
-                              "is-valid":
-                                !errors.roleId &&
-                                this.state.user.roles.length != 0,
-                            },
-                            {
-                              "is-invalid":
-                                (touched.roleId && !!errors.roleId) ||
-                                this.state.appAdminRole,
-                            }
-                          )}
-                          bsSize="sm"
-                          onChange={(e) => {
-                            handleChange(e);
-                            setFieldValue("roleId", e);
-                            this.roleChange(e);
-                          }}
-                          onBlur={() => setFieldTouched("roleId", true)}
-                          name="roleId"
-                          id="roleId"
-                          multi
-                          required
-                          min={1}
-                          options={this.state.roleList}
-                          value={this.state.roleId}
-                          placeholder={i18n.t('static.common.select')}
-                        />
-                        <FormFeedback className="red">
-                          {errors.roleId}
                         </FormFeedback>
                       </FormGroup>
                       <FormGroup>
@@ -1909,8 +1898,8 @@ class AddUserComponent extends Component {
   cancelClicked() {
     this.props.history.push(
       `/user/listUser/` +
-        "red/" +
-        i18n.t("static.message.cancelled", { entityname })
+      "red/" +
+      i18n.t("static.message.cancelled", { entityname })
     );
   }
   /**

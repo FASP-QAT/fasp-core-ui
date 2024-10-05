@@ -195,7 +195,7 @@ export default class EditProgram extends Component {
             var healthAreaCode = splitCode[1];
             var organisationCode = splitCode[2];
             if (splitCode.length > 4) {
-                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3])+2, programCode.length);
+                uniqueCode = programCode.substring(programCode.indexOf(splitCode[3]) + 2, programCode.length);
             }
             if (uniqueCode == undefined) {
                 uniqueCode = ""
@@ -213,8 +213,8 @@ export default class EditProgram extends Component {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.username.toUpperCase(); 
-                            var itemLabelB = b.username.toUpperCase(); 
+                            var itemLabelA = a.username.toUpperCase();
+                            var itemLabelB = b.username.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         listArray = listArray.filter(c => c.active == true);
@@ -277,8 +277,8 @@ export default class EditProgram extends Component {
                             regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                         }
                         regList.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); 
-                            var itemLabelB = b.label.toUpperCase(); 
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -333,8 +333,8 @@ export default class EditProgram extends Component {
                     if (response.status == 200) {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
-                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -388,7 +388,7 @@ export default class EditProgram extends Component {
                 .then(response => {
                     if (response.status == 200) {
                         var haList = [];
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_FP")) {
+                        if (AuthenticationService.checkUserACL([this.props.match.params.dataSetId.toString()], "ROLE_BF_UPDATE_TA_FOR_FP")) {
                             var json = response.data;
                             for (var i = 0; i < json.length; i++) {
                                 haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
@@ -401,8 +401,8 @@ export default class EditProgram extends Component {
                         }
                         var listArray = haList;
                         listArray.sort((a, b) => {
-                            var itemLabelA = a.label.toUpperCase(); 
-                            var itemLabelB = b.label.toUpperCase(); 
+                            var itemLabelA = a.label.toUpperCase();
+                            var itemLabelB = b.label.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
                         this.setState({
@@ -577,7 +577,7 @@ export default class EditProgram extends Component {
         else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
         }
-        this.setState({ program, isChanged: true }, () => { 
+        this.setState({ program, isChanged: true }, () => {
         })
     }
     /**
@@ -599,7 +599,7 @@ export default class EditProgram extends Component {
             && organisationList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                                                {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -700,7 +700,7 @@ export default class EditProgram extends Component {
                                         setFieldTouched
                                     }) => (
                                         <Form onSubmit={handleSubmit} noValidate name='programForm' autocomplete="off">
-                                                                                        <CardBody>
+                                            <CardBody>
                                                 <FormGroup>
                                                     <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
@@ -733,7 +733,7 @@ export default class EditProgram extends Component {
                                                         multi
                                                         options={this.state.healthAreaList}
                                                         value={this.state.program.healthAreaArray}
-                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_FP") ? true : false}
+                                                        disabled={!AuthenticationService.checkUserACL([this.props.match.params.dataSetId.toString()], "ROLE_BF_UPDATE_TA_FOR_FP") ? true : false}
                                                         name="healthAreaId"
                                                         id="healthAreaId"
                                                     />
@@ -749,7 +749,7 @@ export default class EditProgram extends Component {
                                                         type="select"
                                                         name="organisationId"
                                                         id="organisationId"
-                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_ORG_FOR_FP") ? true : false}
+                                                        disabled={!AuthenticationService.checkUserACL([this.props.match.params.dataSetId.toString()], "ROLE_BF_UPDATE_ORG_FOR_FP") ? true : false}
                                                         value={this.state.program.organisation.id}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                     >
@@ -819,9 +819,9 @@ export default class EditProgram extends Component {
                                                                 type="text"
                                                                 maxLength={6}
                                                                 value={this.state.uniqueCode}
-                                                                disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_PC_FOR_FP") ? true : false}
+                                                                disabled={!AuthenticationService.checkUserACL([this.props.match.params.dataSetId.toString()], "ROLE_BF_UPDATE_PC_FOR_FP") ? true : false}
                                                                 name="programCode1" id="programCode1" />
-                                                                                                                    </FormGroup>
+                                                        </FormGroup>
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup>
@@ -833,7 +833,7 @@ export default class EditProgram extends Component {
                                                         invalid={touched.userId && !!errors.userId || this.state.program.programManager.userId == ''}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
-                                                                                                                                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        <option value="">{i18n.t('static.common.select')}</option>
                                                         {programManagers}
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>

@@ -524,7 +524,7 @@ class SupplyPlanVersionAndReview extends Component {
                 } else {
                     newCountryList = [CountryIds];
                 }
-                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -961,8 +961,8 @@ class SupplyPlanVersionAndReview extends Component {
         this.setState({
             versionTypeIdResetQPL: e,
             versionTypeIdResetQPLString: e.map(ele => ele.value).toString(),
-            versionStatusIdResetQPL:[],
-            versionStatusIdResetQPLString:""
+            versionStatusIdResetQPL: [],
+            versionStatusIdResetQPLString: ""
         }, () => {
             this.getProgramListForResetQPL()
         })
@@ -1172,9 +1172,9 @@ class SupplyPlanVersionAndReview extends Component {
             }, this);
         var statusMultiselect = [];
         statuses.length > 0 && statuses.map((item, i) => {
-            if(this.state.versionTypeIdResetQPLString.split(",").includes(DRAFT_VERSION_TYPE.toString()) && item.id==PENDING_APPROVAL_VERSION_STATUS){
+            if (this.state.versionTypeIdResetQPLString.split(",").includes(DRAFT_VERSION_TYPE.toString()) && item.id == PENDING_APPROVAL_VERSION_STATUS) {
                 statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
-            }else if(this.state.versionTypeIdResetQPLString.split(",").includes(FINAL_VERSION_TYPE.toString())){
+            } else if (this.state.versionTypeIdResetQPLString.split(",").includes(FINAL_VERSION_TYPE.toString())) {
                 statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }
         }, this);
@@ -1230,7 +1230,7 @@ class SupplyPlanVersionAndReview extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&
+                                {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_RESET_BULK_QPL') &&
                                     <Button
                                         color="info"
                                         size="md"
@@ -1355,7 +1355,7 @@ class SupplyPlanVersionAndReview extends Component {
                             <FormGroup className="col-md-12">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                 <div className="controls">
-                                <MultiSelect
+                                    <MultiSelect
                                         name="versionTypeIdResetQPL"
                                         id="versionTypeIdResetQPL"
                                         filterOptions={this.filterOptions}

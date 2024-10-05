@@ -213,11 +213,11 @@ class AuthenticationService {
      */
     updateUserTheme(themeId) {
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        decryptedUser.defaultThemeId = themeId;
-        localStorage.removeItem('user-' + decryptedCurUser);
-        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+            decryptedUser.defaultThemeId = themeId;
+            localStorage.removeItem('user-' + decryptedCurUser);
+            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
         }
     }
     /**
@@ -281,6 +281,74 @@ class AuthenticationService {
         } else {
             return [];
         }
+    }
+
+    /**
+     * Checks User access for program and business funtions.
+     * @param {string} programIds - Array of program ids in string.
+     * @param {string} businessFunctionId - Business funtion Id.
+     * @returns {boolean} True user has access to program and business funtion, otherwise false.
+     */
+    checkUserACL(programIds, businessFunctionId) {
+        console.log("checkUserACL====>", programIds, "=====", businessFunctionId)
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let userAclList = decryptedUser.userAclList;
+                var hasAccess = false;
+                userAclList.map(item => {
+                    var programFilter = item.programList.filter(c => programIds.includes(c.toString()));
+                    if (programFilter.length == [...new Set(programIds)].length) {
+                        var hasBusinessFunction = item.businessFunctionList.filter(c => c == businessFunctionId);
+                        if (hasBusinessFunction.length > 0) {
+                            hasAccess = true;
+                        }
+                    }
+                })
+                console.log("hasaccess=>", hasAccess)
+                return hasAccess;
+            } catch (err) {
+                localStorage.setItem('curUser', '')
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+    }
+
+    /**
+     * Checks User access for program and role.
+     * @param {string} programIds - Array of program ids in string.
+     * @param {string} roleId - Role Id.
+     * @returns {boolean} True user has access to program and role, otherwise false.
+     */
+    checkUserACLBasedOnRoleId(programIds, roleId) {
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let userAclList = decryptedUser.userAclList;
+                var hasAccess = false;
+                userAclList.map(item => {
+                    var programFilter = item.programList.filter(c => programIds.includes(c.toString()));
+                    if (programFilter.length == [...new Set(programIds)].length) {
+                        var hasRole = decryptedUser.roleList.filter(c => c == roleId);
+                        if (hasRole.length > 0) {
+                            hasAccess = true;
+                        }
+                    }
+                })
+                return hasAccess;
+            } catch (err) {
+                localStorage.setItem('curUser', '')
+                return false;
+            }
+        } else {
+            return false;
+        }
+
     }
     /**
      * Checks if the current user is authenticated to access a specific route.
@@ -527,7 +595,7 @@ class AuthenticationService {
                         if (bfunction.includes("ROLE_BF_EDIT_FUNDING_SOURCE")) {
                             return true;
                         }
-                        break;                    
+                        break;
                     case "/fundingSource/listFundingSource":
                     case "/fundingSource/listFundingSource/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_FUNDING_SOURCE")) {
@@ -836,7 +904,7 @@ class AuthenticationService {
                         if (bfunction.includes("ROLE_BF_MAP_FORECASTING_UNIT")) {
                             return true;
                         }
-                        break;                        
+                        break;
                     case "/programProduct/addProgramProduct":
                     case "/programProduct/addProgramProduct/:programId/:color/:message":
                         if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {

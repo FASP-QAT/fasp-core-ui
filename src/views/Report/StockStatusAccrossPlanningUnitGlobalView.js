@@ -476,7 +476,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[0].text),
       doc.internal.pageSize.width / 8 + 20,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -485,7 +485,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[1].text),
       doc.internal.pageSize.width / 8 + 120,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -494,7 +494,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[2].text),
       doc.internal.pageSize.width / 8 + 220,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -503,7 +503,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[3].text),
       doc.internal.pageSize.width / 8 + 320,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -512,7 +512,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[4].text),
       doc.internal.pageSize.width / 8 + 420,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -817,8 +817,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       () => {
         if (countryIds.length != 0) {
           let newCountryList = [...new Set(countryIds)];
-          DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(
-            PROGRAM_TYPE_SUPPLY_PLAN,
+          DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(
             newCountryList
           )
             .then((response) => {
@@ -1568,7 +1567,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                                       (c) =>
                                                         c.program.code == ele1
                                                     )[0].mos
-                                                  ),0)
+                                                  ), 0)
                                                   : i18n.t(
                                                     "static.supplyPlanFormula.na"
                                                   )}

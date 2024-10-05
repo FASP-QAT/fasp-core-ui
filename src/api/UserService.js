@@ -66,12 +66,20 @@ class UserService {
         return axios.post(`${API_URL}/api/user/module/${json}`, {}
         );
     }
-    updateUserTheme(json){
+    getUserDetails() {
+        return axios.get(`${API_URL}/api/user/details`, {
+        });
+    }
+    updateUserTheme(json) {
         return axios.post(`${API_URL}/api/user/theme/${json}`, {}
         );
     }
-    updateUserDecimalPreference(json){
+    updateUserDecimalPreference(json) {
         return axios.post(`${API_URL}/api/user/decimalPreference/${json}`, {}
+        );
+    }
+    getAccessControls() {
+        return axios.get(`${API_URL}/api/user/accessControls`, {}
         );
     }
 }

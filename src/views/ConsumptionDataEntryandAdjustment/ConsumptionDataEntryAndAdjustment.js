@@ -53,7 +53,6 @@ import DropdownService from '../../api/DropdownService.js';
 import DatasetService from "../../api/DatasetService.js";
 import ForecastingUnitService from "../../api/ForecastingUnitService.js";
 import PlanningUnitService from "../../api/PlanningUnitService.js";
-import TracerCategoryService from "../../api/TracerCategoryService.js";
 // Localized entity name
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const pickerLang = {
@@ -404,7 +403,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           filters: false,
           license: JEXCEL_PRO_KEY,
           parseFormulas: true,
-          editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
+          editable: AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
           contextMenu: function (obj, x, y, e) {
             return [];
           }.bind(this),
@@ -1598,12 +1597,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let currDate = Date.now();
     let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
     let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
-    let hasRole = false;
-    AuthenticationService.getLoggedInUserRole().map(c => {
-      if (c.roleId == 'ROLE_FORECAST_VIEWER') {
-        hasRole = true;
-      }
-    });
+    let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.datasetId.toString()], "ROLE_FORECAST_VIEWER");
+    // AuthenticationService.getLoggedInUserRole().map(c => {
+    //   if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+    //     hasRole = true;
+    //   }
+    // });
     this.setState({
       onlyDownloadedProgram: !hasRole,
       maxDate: maxDateTmp
@@ -1995,7 +1994,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({ loading: true })
     if (localStorage.getItem('sessionType') === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+      DropdownService.getFCProgramBasedOnRealmId(realmId)
         .then(response => {
           var proList = [];
           if (response.status == 200) {
@@ -2190,7 +2189,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       const program = this.state.datasetList.filter(c => c.id == datasetId)
       if (program.length == 1) {
         if (localStorage.getItem("sessionType") === 'Online') {
-          DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+          DropdownService.getVersionListForFCProgram(programId)
             .then(response => {
               this.setState({
                 versions: []
@@ -2271,7 +2270,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       const program = this.state.datasetList.filter(c => c.id == programId)
       if (program.length == 1) {
         if (localStorage.getItem('sessionType') === 'Online') {
-          DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+          DropdownService.getVersionListForFCProgram(programId)
             .then(response => {
               this.setState({
                 versions: []
@@ -3398,7 +3397,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </FormGroup>
                           </div>
                           <div className="row">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
+                            {AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
                               <FormGroup className="col-md-3 ">
                                 <div className="tab-ml-1 ml-lg-3">
                                   <Input
@@ -3445,7 +3444,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                       </Label><br />
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}</b>
                                         {!this.state.isDisabled && <a className="card-header-action">
-                                          {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
+                                          {AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><u>({i18n.t('static.dataentry.change')})</u></span>}
                                         </a>}
                                       </Label><br />
                                       <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.conversionToPu')}: <b>{this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier).toFixed(4) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? 1 : Number(1 / this.state.tempConsumptionUnitObject.planningUnit.multiplier * this.state.tempConsumptionUnitObject.otherUnit.multiplier).toFixed(4)}</b>
@@ -3465,7 +3464,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                         invalid={!!errors.consumptionNotes}
                                         disabled={this.state.isDisabled}
                                         bsSize="sm"
-                                        readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
+                                        readOnly={AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
                                         onChange={(e) => { handleChange(e); this.setState({ consumptionChanged: true }) }}
                                         onBlur={handleBlur}
                                       >
@@ -3475,7 +3474,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                   </div>
                                 </FormGroup>
                                 <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
-                                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && !this.state.isDisabled && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                                  {AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && !this.state.isDisabled && <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
                                     <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>}
                                 </FormGroup>
                               </div>

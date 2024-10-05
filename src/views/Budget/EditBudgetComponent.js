@@ -187,7 +187,7 @@ class EditBudgetComponent extends Component {
         // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         //Fetch Program list
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
@@ -425,7 +425,7 @@ class EditBudgetComponent extends Component {
         let selectedProgramIds = this.state.budget.programs.map((ele) =>
             Number(ele.id)
         );
-        
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -438,9 +438,10 @@ class EditBudgetComponent extends Component {
         const { fundingSources } = this.state;
         let fundingSourceList = fundingSources.length > 0 && fundingSources.filter(item => {
             // Check if the funding source is available in at least one of the selected programs
-            return selectedProgramIds.some(programId => 
-              item.programList.some(program => program.id === programId)
-            );}).map((item, i) => {
+            return selectedProgramIds.some(programId =>
+                item.programList.some(program => program.id === programId)
+            );
+        }).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {getLabelText(item.label, this.state.lang)}
@@ -593,7 +594,7 @@ class EditBudgetComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         required
-                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                        disabled={!AuthenticationService.checkUserACL(this.state.programs.map(c => c.value.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
                                                         value={this.state.budget.fundingSource.fundingSourceId}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>

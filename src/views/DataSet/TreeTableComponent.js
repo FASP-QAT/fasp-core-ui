@@ -1082,7 +1082,7 @@ export default class TreeTable extends Component {
                     message1: "Data updated successfully"
                 }, () => {
                 })
-            }      
+            }
         })
     }
     /**
@@ -1480,7 +1480,7 @@ export default class TreeTable extends Component {
                 isTabDataChanged: false
             }, () => {
                 this.calculateMOMData(currentItemConfig.context.id, 0, currentItemConfig).then(() => {
-                    if(isTab3) {
+                    if (isTab3) {
                         setTimeout(() => {
                             this.toggleModal(0, '3');
                         }, 2000)
@@ -2539,8 +2539,8 @@ export default class TreeTable extends Component {
                 }
             }
             var sourceNodeUsageListCount = [];
-            if(this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == items[i].payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+            if (this.state.dataSetObj.programData.treeList)
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == items[i].payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
                         ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i style='color:#002f6c' class='fa fa-line-chart'></i>" : ""}
@@ -3255,7 +3255,7 @@ export default class TreeTable extends Component {
             // data[7] = currentScenario.dataValue;//Node Value
             data[7] = data[6] * data[5] / 100; //currentScenario.calculatedDataValue;
             data[8] = fuNode ? currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""; // Tracer Category
-            data[9] = fuNode ? (this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id).length>0?this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en:"") : (this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id).length>0?this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en:""); // Forecasting unit
+            data[9] = fuNode ? (this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id).length > 0 ? this.state.forecastingUnitList.filter(c => c.id == currentScenario.fuNode.forecastingUnit.id)[0].label.label_en : "") : (this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id).length > 0 ? this.state.forecastingUnitList.filter(c => c.id == currentScenarioParent.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id)[0].label.label_en : ""); // Forecasting unit
             data[10] = fuNode ? "" : currentScenario.puNode.planningUnit.id; // Planning Unit
             data[11] = fuNode ? "" : currentScenario.puNode.planningUnit.multiplier; // Conversion Factor
             data[12] = !fuNode ? this.qatCalculatedPUPerVisitForJexcel(items[i]) : ""; // # PU / Interval / Patient (Reference)
@@ -3778,7 +3778,7 @@ export default class TreeTable extends Component {
                         ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i color:#002f6c class='fa fa-long-arrow-up'></i>" : ""}
                         ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i color:#002f6c class='fa fa-long-arrow-down'></i>" : ""}
                         ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i color:#002f6c class='fa fa-link'></i>" : ""}
-                        ${items[i].payload.nodeType.id == 6 ? '<b style="color:#002f6c" class="'+(items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length == 0 ? "red" : "" : "red") +'" style="font-size:16px">'+(items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length : 0)+'</b>' : ""}
+                        ${items[i].payload.nodeType.id == 6 ? '<b style="color:#002f6c" class="' + (items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length == 0 ? "red" : "" : "red") + '" style="font-size:16px">' + (items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length : 0) + '</b>' : ""}
                         <b>
                             ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
                             ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
@@ -3804,7 +3804,7 @@ export default class TreeTable extends Component {
                 nodeType = i18n.t("static.ManageTree.Percentage")
             } else if (items[i].payload.nodeType.id == 1) {
                 nodeType = i18n.t("static.ManageTree.Aggregation")
-            }else if (items[i].payload.nodeType.id == 6) {
+            } else if (items[i].payload.nodeType.id == 6) {
                 nodeType = "Funnel Node"
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
@@ -3985,13 +3985,13 @@ export default class TreeTable extends Component {
                             curItem.context = items.filter(c => c.id == json[i][9])[0];
                             curItem.context.payload.label.label_en = json[i][3];
                             let tempList = [];
-                            if(json[i][5] != ""){
+                            if (json[i][5] != "") {
                                 json[i][5].split(";").map(x => tempList.push({
                                     treeId: x.split("~")[0],
                                     scenarioId: x.split("~")[1],
                                     nodeId: x.split("~")[2]
                                 }));
-                            }   
+                            }
                             curItem.context.payload.downwardAggregationList = tempList;
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
@@ -4518,13 +4518,13 @@ export default class TreeTable extends Component {
                 }, () => {
                     var tempDownwardAggregationList = [];
                     var downwardAggregationList = [];
-                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.id}))))
-                    for(var i = 0; i < this.state.treeData.length; i++) {
-                        for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
-                            if(this.state.treeData[i].scenarioList[j].active) {
+                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({ label: x.label.label_en + "~" + t.payload.label.label_en, value: x.treeId + "~" + t.id }))))
+                    for (var i = 0; i < this.state.treeData.length; i++) {
+                        for (var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
+                            if (this.state.treeData[i].scenarioList[j].active) {
                                 tempDownwardAggregationList.filter(x => x.value.split("~")[0] == this.state.treeData[i].treeId).map(x => downwardAggregationList.push({
-                                    name: x.label.split("~")[0]+(this.state.treeData[i].scenarioList.filter(s => s.active).length > 1 ? (" > "+this.state.treeData[i].scenarioList[j].label.label_en) : "")+" > ... "+(this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent).length > 0 ? this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent)[0].payload.label.label_en : "")+" > "+x.label.split("~")[1],
-                                    id: x.value.split("~")[0]+"~"+this.state.treeData[i].scenarioList[j].id+"~"+x.value.split("~")[1]
+                                    name: x.label.split("~")[0] + (this.state.treeData[i].scenarioList.filter(s => s.active).length > 1 ? (" > " + this.state.treeData[i].scenarioList[j].label.label_en) : "") + " > ... " + (this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent).length > 0 ? this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent)[0].payload.label.label_en : "") + " > " + x.label.split("~")[1],
+                                    id: x.value.split("~")[0] + "~" + this.state.treeData[i].scenarioList[j].id + "~" + x.value.split("~")[1]
                                 }))
                             }
                         }
@@ -6035,9 +6035,9 @@ export default class TreeTable extends Component {
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>}
                 </TabPane>
@@ -6047,9 +6047,9 @@ export default class TreeTable extends Component {
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>}
                 </TabPane>
@@ -6354,7 +6354,7 @@ export default class TreeTable extends Component {
         }, () => {
             if (this.state.activeTab1[0] === '1') {
                 this.buildTab1Jexcel();
-            } else if(this.state.activeTab1[0] === '2') {
+            } else if (this.state.activeTab1[0] === '2') {
                 this.buildTab2Jexcel();
             } else {
                 this.buildTab3Jexcel();
@@ -6408,7 +6408,7 @@ export default class TreeTable extends Component {
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab1'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
-                } else if (this.state.activeTab1[0] === '2'){
+                } else if (this.state.activeTab1[0] === '2') {
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab2'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
@@ -6492,7 +6492,7 @@ export default class TreeTable extends Component {
                             dataArr.push(ele[13]);
                         } else if (this.state.activeTab1[0] === '2') {
                             dataArr.push(ele[39]);
-                        }else if (this.state.activeTab1[0] === '3') {
+                        } else if (this.state.activeTab1[0] === '3') {
                             dataArr.push(ele[11]);
                         }
                     } else {
@@ -6555,9 +6555,9 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             B.push(ele[13].toString().replaceAll(',', '').replaceAll(' ', '%20'));
-                        } else if(this.state.activeTab1[0] === '2'){
+                        } else if (this.state.activeTab1[0] === '2') {
                             B.push(ele[39].toString().replaceAll(',', '').replaceAll(' ', '%20'));
-                        }else{
+                        } else {
                             B.push(ele[11].toString().replaceAll(',', '').replaceAll(' ', '%20'));
                         }
                     } else {
@@ -6697,25 +6697,25 @@ export default class TreeTable extends Component {
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                            var curTheme = localStorage.getItem("theme");
+                                            if (curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if (curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        />
                                     </a>
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
@@ -6871,7 +6871,7 @@ export default class TreeTable extends Component {
                             </div>
                         </CardBody>
                     </Card></Col></Row>
-                    <Modal isOpen={this.state.showGuidanceTreeTable}
+            <Modal isOpen={this.state.showGuidanceTreeTable}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
@@ -6880,12 +6880,12 @@ export default class TreeTable extends Component {
                     <ModalBody className="ModalBodyPadding">
                         <div dangerouslySetInnerHTML={{
                             __html: localStorage.getItem('lang') == 'en' ?
-                            showguidanceTreeTableEn :
+                                showguidanceTreeTableEn :
                                 localStorage.getItem('lang') == 'fr' ?
-                                showguidanceTreeTableFr :
+                                    showguidanceTreeTableFr :
                                     localStorage.getItem('lang') == 'sp' ?
-                                    showguidanceTreeTableSp :
-                                    showguidanceTreeTablePr
+                                        showguidanceTreeTableSp :
+                                        showguidanceTreeTablePr
                         }} />
                     </ModalBody>
                 </div>

@@ -70,7 +70,7 @@ class StockAdjustmentComponent extends Component {
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            DropdownService.getSPProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
@@ -203,7 +203,7 @@ class StockAdjustmentComponent extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                    DropdownService.getVersionListForSPProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -304,7 +304,7 @@ class StockAdjustmentComponent extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
-                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
                         verList.push(version)
                     }
                 }
@@ -358,17 +358,17 @@ class StockAdjustmentComponent extends Component {
                 });
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
-                var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+                var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
                 var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                 var rangeValue = this.state.rangeValue;
                 if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                    var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                    rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                    var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                     // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                 }
                 this.setState({
-                  minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-                  rangeValue: rangeValue
+                    minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                    rangeValue: rangeValue
                 })
                 if (versionId.includes('Local')) {
                     var db1;
@@ -522,7 +522,7 @@ class StockAdjustmentComponent extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), roundARU(ele.stockAdjustemntQty,1), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), roundARU(ele.stockAdjustemntQty, 1), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -590,7 +590,7 @@ class StockAdjustmentComponent extends Component {
         doc.setFontSize(8);
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), formatter(roundARU(ele.stockAdjustemntQty,1),0), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), formatter(roundARU(ele.stockAdjustemntQty, 1), 0), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let startY = 150 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -621,7 +621,7 @@ class StockAdjustmentComponent extends Component {
             data[0] = getLabelText(stockAdjustmentList[j].dataSource.label, this.state.lang)
             data[1] = getLabelText(stockAdjustmentList[j].planningUnit.label, this.state.lang)
             data[2] = stockAdjustmentList[j].inventoryDate
-            data[3] = (roundARU(stockAdjustmentList[j].stockAdjustemntQty,1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
+            data[3] = (roundARU(stockAdjustmentList[j].stockAdjustemntQty, 1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[4] = stockAdjustmentList[j].lastModifiedBy.username;
             data[5] = new moment(stockAdjustmentList[j].lastModifiedDate).format(`YYYY-MM-DD`);
             data[6] = stockAdjustmentList[j].notes;
@@ -651,8 +651,8 @@ class StockAdjustmentComponent extends Component {
                 },
                 {
                     title: i18n.t('static.report.stockAdjustment'),
-                    type: 'numeric', 
-                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'[-]#,##.000':'[-]#,##', decimal: '.',
+                    type: 'numeric',
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '[-]#,##.000' : '[-]#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.lastmodifiedby'),
@@ -784,7 +784,7 @@ class StockAdjustmentComponent extends Component {
                                             program: programJson,
                                             inventoryDate: ele.inventoryDate,
                                             planningUnit: planningUnit.length > 0 ? planningUnit[0].planningUnit : ele.planningUnit,
-                                            stockAdjustemntQty: (Number(ele.adjustmentQty)*Number(ele.multiplier)),
+                                            stockAdjustemntQty: (Number(ele.adjustmentQty) * Number(ele.multiplier)),
                                             lastModifiedBy: generalProgramJson.currentVersion.lastModifiedBy,
                                             lastModifiedDate: generalProgramJson.currentVersion.lastModifiedDate,
                                             notes: ele.notes,
@@ -912,17 +912,17 @@ class StockAdjustmentComponent extends Component {
             this.setState({
                 versionId: event.target.value
             }, () => {
-                var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+                var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
                 var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                 var rangeValue = this.state.rangeValue;
                 if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                    var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                    rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                    var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                     // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                 }
                 this.setState({
-                  minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-                  rangeValue: rangeValue
+                    minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                    rangeValue: rangeValue
                 })
                 localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 this.fetchData();
@@ -956,7 +956,7 @@ class StockAdjustmentComponent extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
                     </option>
                 )
             }, this);
@@ -1044,7 +1044,7 @@ class StockAdjustmentComponent extends Component {
                 style: { width: '100px' },
             }
         ];
-        
+
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1133,8 +1133,10 @@ class StockAdjustmentComponent extends Component {
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             disabled={this.state.loading}
-                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                            selectSomeItems: i18n.t('static.common.select')}}
+                                            overrideStrings={{
+                                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                selectSomeItems: i18n.t('static.common.select')
+                                            }}
                                         />
                                     </div>
                                 </FormGroup>

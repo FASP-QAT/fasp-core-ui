@@ -22,7 +22,7 @@ class DatasetService {
         });
     }
     getUsageTypeList() {
-        return axios.get(`${API_URL}/api/usageType`, {
+        return axios.get(`${API_URL}/api/master/usageType`, {
         });
     }
     addTreeTemplate(json) {

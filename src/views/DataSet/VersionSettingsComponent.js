@@ -893,7 +893,7 @@ class VersionSettingsComponent extends Component {
                 } else {
                     data[9] = pd.currentVersion.forecastStopDate
                 }
-                data[10] = 1
+                data[10] = AuthenticationService.checkUserACL([versionSettingsList[j].programId.toString()], 'ROLE_BF_EDIT_VERSION_SETTINGS') ? 1 : 0
                 data[11] = versionSettingsList[j].id
                 data[12] = 0
                 data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
@@ -1037,7 +1037,7 @@ class VersionSettingsComponent extends Component {
             onchange: this.changed,
             onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
-            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
+            // editable: ((AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1059,8 +1059,8 @@ class VersionSettingsComponent extends Component {
                                     pageName: i18n.t('static.versionSettings.versionSettings'),
                                     programNameOriginal: getLabelText(rowData[18].label, this.state.lang),
                                     programId: rowData[11],
-                                    forecastStartDate:rowData[7],
-                                    forecastStopDate:rowData[9]
+                                    forecastStartDate: rowData[7],
+                                    forecastStopDate: rowData[9]
                                 })
                                 this.openModalPopup(rowData[18]);
                             }.bind(this)
@@ -1080,8 +1080,8 @@ class VersionSettingsComponent extends Component {
                                             pageName: i18n.t('static.versionSettings.versionSettings'),
                                             programNameOriginal: getLabelText(responseData.label, this.state.lang),
                                             programId: rowData[0],
-                                            forecastStartDate:rowData[7],
-                                            forecastStopDate:rowData[9]
+                                            forecastStartDate: rowData[7],
+                                            forecastStopDate: rowData[9]
                                         })
                                         this.openModalPopup(responseData);
                                     }
@@ -1194,7 +1194,7 @@ class VersionSettingsComponent extends Component {
      */
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+        DropdownService.getFCProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var responseData = response.data;

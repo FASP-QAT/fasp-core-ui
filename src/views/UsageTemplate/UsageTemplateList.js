@@ -87,7 +87,7 @@ class usageTemplate extends Component {
             tempTracerCategoryId: '',
             tracerCategoryLoading: true,
             tempForecastingUnitList: [],
-            tcListBasedOnProgram:[]
+            tcListBasedOnProgram: []
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.loaded = this.loaded.bind(this)
@@ -127,8 +127,8 @@ class usageTemplate extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.programCode.toUpperCase(); 
-                        var itemLabelB = b.programCode.toUpperCase(); 
+                        var itemLabelA = a.programCode.toUpperCase();
+                        var itemLabelB = b.programCode.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     let tempProgramList = [];
@@ -221,8 +221,8 @@ class usageTemplate extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     let tempList = [];
@@ -300,8 +300,8 @@ class usageTemplate extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = (a.unitCode).toUpperCase(); 
-                        var itemLabelB = (b.unitCode).toUpperCase(); 
+                        var itemLabelA = (a.unitCode).toUpperCase();
+                        var itemLabelB = (b.unitCode).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     let tempList = [];
@@ -378,8 +378,8 @@ class usageTemplate extends Component {
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 let tempList = [];
@@ -457,8 +457,8 @@ class usageTemplate extends Component {
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 let tempList = [];
@@ -620,10 +620,10 @@ class usageTemplate extends Component {
                 data = [];
                 dropdownList.push({
                     id: papuList[j].forecastingUnit.id,
-                    name : papuList[j].forecastingUnit.label.label_en + " | " + papuList[j].forecastingUnit.id,
+                    name: papuList[j].forecastingUnit.label.label_en + " | " + papuList[j].forecastingUnit.id,
                 });
                 data[0] = papuList[j].usageTemplateId
-                data[1] = (papuList[j].program == null ? -1 : papuList[j].program.id) 
+                data[1] = (papuList[j].program == null ? -1 : papuList[j].program.id)
                 data[2] = getLabelText(papuList[j].label, this.state.lang);
                 data[3] = papuList[j].tracerCategory.id
                 data[4] = papuList[j].forecastingUnit.id
@@ -648,7 +648,7 @@ class usageTemplate extends Component {
                 data[15] = (papuList[j].usageType.id == 1 ? (papuList[j].oneTimeUsage == false ? `=ROUND(${v13}/${usagePeriodConversion}*${s1},2)` : `=ROUND(${n1},2)`) : '')
                 let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
                 let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + "(s) - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en + "(s)";
-                if (!papuList[j].oneTimeUsage) { 
+                if (!papuList[j].oneTimeUsage) {
                     if (papuList[j].usageType.id == 2) {
                         string += " " + (papuList[j].usageFrequencyCount == null ? '' : " Every " + papuList[j].usageFrequencyCount) + " " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
                     } else {
@@ -671,7 +671,7 @@ class usageTemplate extends Component {
                 count++;
             }
         }
-        if(dropdownList.length > 0){
+        if (dropdownList.length > 0) {
             dropdownList = [
                 ...new Map(dropdownList.map((item) => [item["id"], item])).values(),
             ];
@@ -726,13 +726,13 @@ class usageTemplate extends Component {
                     type: 'text',
                     width: '150',
                     textEditor: true,//2 C
-                  
+
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
                     width: '130',
-                    source: this.state.tracerCategoryList, 
+                    source: this.state.tracerCategoryList,
                     filter: this.filterTracerCategoryByProgramId,
                     required: true,
                     regex: {
@@ -749,13 +749,13 @@ class usageTemplate extends Component {
                         url: `${API_URL}/api/dropdown/forecastingUnit/autocomplete/filter/tracerCategory/searchText/language/tracerCategoryId`,
                         autocomplete: true,
                         remoteSearch: true,
-                        onbeforesearch: function(instance, request) {
-                            if(this.state.tracerCategoryLoading == false  && instance.search.length > 2){
-                                request.method = 'GET';                                
+                        onbeforesearch: function (instance, request) {
+                            if (this.state.tracerCategoryLoading == false && instance.search.length > 2) {
+                                request.method = 'GET';
                                 let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 let jwtToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                                 request.beforeSend = (httpRequest) => {
-                                    httpRequest.setRequestHeader('Authorization', 'Bearer '+jwtToken);
+                                    httpRequest.setRequestHeader('Authorization', 'Bearer ' + jwtToken);
                                 }
                                 const searchText = instance.search;
                                 const language = this.state.lang;
@@ -775,7 +775,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
                     width: '100',
-                    textEditor: true, 
+                    textEditor: true,
                     required: true,
                     number: true,
                     minValue: {
@@ -804,7 +804,7 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.usageTemplate.persons'),
                     type: 'numeric',
-                    textEditor: true, 
+                    textEditor: true,
                     mask: '#,##',
                     width: '130',
                     disabledMaskOnEdition: true
@@ -814,7 +814,7 @@ class usageTemplate extends Component {
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.dimensionList,
-                    readOnly: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true ,
+                    readOnly: (AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true,
                     required: true,
                     regex: {
                         ex: /^\S+(?: \S+)*$/,
@@ -825,7 +825,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'numeric',
                     width: '130',
-                    textEditor: true, 
+                    textEditor: true,
                     required: true,
                     // number: true,
                     decimal: '.',
@@ -849,26 +849,26 @@ class usageTemplate extends Component {
                     type: 'numeric',
                     width: '130',
                     textEditor: true,
-                    decimal: '.', 
+                    decimal: '.',
                 },
                 {
                     title: i18n.t('static.usageTemplate.frequency'),
                     type: 'autocomplete',
                     width: '130',
-                    source: this.state.usagePeriodList, 
+                    source: this.state.usagePeriodList,
                     filter: this.filterUsagePeriod1
                 },
                 {
                     title: i18n.t('static.usagePeriod.usagePeriod'),
                     type: 'numeric',
                     width: '130',
-                    textEditor: true, 
+                    textEditor: true,
                 },
                 {
                     title: i18n.t('static.usageTemplate.periodUnit'),
                     type: 'autocomplete',
                     width: '130',
-                    source: this.state.usagePeriodList, 
+                    source: this.state.usagePeriodList,
                     filter: this.filterUsagePeriod2
                 },
                 {
@@ -876,30 +876,30 @@ class usageTemplate extends Component {
                     type: 'text',
                     readOnly: true,
                     width: '130',
-                    textEditor: true, 
+                    textEditor: true,
                 },
                 {
                     title: i18n.t('static.usagePeriod.usageInWords'),
                     type: 'text',
                     readOnly: true,
                     width: 180,
-                    textEditor: true, 
+                    textEditor: true,
                 },
                 {
                     type: 'text',
-                    visible: false, autoCasting: false  
+                    visible: false, autoCasting: false
                 },
                 {
                     type: 'text',
-                    visible: false, autoCasting: false   
+                    visible: false, autoCasting: false
                 },
                 {
                     type: 'text',
-                    visible: false, autoCasting: false   
+                    visible: false, autoCasting: false
                 },
                 {
                     type: 'text',
-                    visible: false, autoCasting: false   
+                    visible: false, autoCasting: false
                 },
                 {
                     title: i18n.t('static.checkbox.active'),
@@ -909,7 +909,7 @@ class usageTemplate extends Component {
                 },
                 {
                     type: 'text',
-                    visible: false, autoCasting: false  
+                    visible: false, autoCasting: false
                 },
             ],
             onload: this.loaded,
@@ -932,7 +932,7 @@ class usageTemplate extends Component {
                 this.setState({ tracerCategoryLoading: true })
                 let tempId = data[y][3]
                 this.setState({ tempTracerCategoryId: tempId }, () => {
-                    this.setState({tracerCategoryLoading: false})
+                    this.setState({ tracerCategoryLoading: false })
                 })
             }.bind(this),
             copyCompatibility: true,
@@ -984,7 +984,7 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+                        if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1018,7 +1018,7 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                         }
-                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+                        if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1102,7 +1102,7 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+                        if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1136,7 +1136,7 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                         }
-                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+                        if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1176,7 +1176,7 @@ class usageTemplate extends Component {
             }.bind(this),
             oneditionend: this.oneditionend,
             onchangepage: this.onchangepage,
-            editable: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? true : false,
+            editable: (AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? true : false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -1192,7 +1192,7 @@ class usageTemplate extends Component {
                             });
                         }
                         var typeId = this.el.getValueFromCoords(19, y);
-                        if (!this.el.getValueFromCoords(10, y) && ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && typeId == -1 && typeId != 0)) {
+                        if (!this.el.getValueFromCoords(10, y) && ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && typeId == -1 && typeId != 0)) {
                             items.push({
                                 title: i18n.t('static.usageTemplate.calculateUsageFrequency'),
                                 onclick: function () {
@@ -1244,7 +1244,7 @@ class usageTemplate extends Component {
      */
     filterDataset = function (instance, cell, c, r, source) {
         var mylist = this.state.typeList;
-        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
+        if (!AuthenticationService.checkUserACL(mylist.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
@@ -1253,11 +1253,11 @@ class usageTemplate extends Component {
      * This function is used to filter the tracer category list by program Id based on active
      */
     filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
-        var mylist = this.state.tracerCategoryList.filter(c=>c.active);
+        var mylist = this.state.tracerCategoryList.filter(c => c.active);
         var value = (this.state.dataEl.getJson(null, false)[r])[1];
         value = Number(value);
         if (value != -1 && value != 0) {
-            return this.state.tcListBasedOnProgram.filter(c=>c.active)
+            return this.state.tcListBasedOnProgram.filter(c => c.active)
         }
         return mylist;
     }.bind(this)
@@ -1436,7 +1436,7 @@ class usageTemplate extends Component {
         this.el.insertRow(
             data, 0, 1
         );
-        this.el.getCell("E1").classList.add('typing-'+this.state.lang);
+        this.el.getCell("E1").classList.add('typing-' + this.state.lang);
     };
     /**
      * This function is called when submit button of the usage template is clicked and is used to save usage templates if all the data is successfully validated.
@@ -1599,7 +1599,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -1633,7 +1633,7 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
             }
-            if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+            if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -1726,6 +1726,7 @@ class usageTemplate extends Component {
             elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
             var rowData = elInstance.getRowData(j);
             var typeId = rowData[6];
+            var programId = rowData[2];
             var oneTimeUsage = rowData[10];
             if (typeId == 2) {
                 var cell1 = elInstance.getCell(("H").concat(parseInt(j) + 1))
@@ -1761,7 +1762,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1795,7 +1796,7 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
             }
-            if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+            if (!AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1942,8 +1943,8 @@ class usageTemplate extends Component {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     let tempList = [];
@@ -2092,7 +2093,7 @@ class usageTemplate extends Component {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
-                    this.el.getCell(("E").concat(parseInt(y) + 1)).classList.remove('typing-'+this.state.lang);
+                    this.el.getCell(("E").concat(parseInt(y) + 1)).classList.remove('typing-' + this.state.lang);
                 }
             }
         }
@@ -2100,42 +2101,42 @@ class usageTemplate extends Component {
             this.el.setValueFromCoords(3, y, '', true)
             this.el.setValueFromCoords(4, y, '', true)
             let realmId = AuthenticationService.getRealmId();
-            if(value!=-1){
-        TracerCategoryService.getTracerCategoryByProgramIds(realmId, [value])
-          .then(response => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); 
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); 
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            var tcList=[];
-            listArray.map(item=>{
-                tcList.push({
-                    name: getLabelText(item.label, this.state.lang),
-                    id: parseInt(item.tracerCategoryId),
-                    active: item.active,
-                    healthAreaId: item.healthArea.id
-                })
-            })
-            this.setState({
-              tcListBasedOnProgram: tcList
-            }, () => {
-            });
-          }).catch(
-            error => {
-              this.setState({
-                tcListBasedOnProgram: []
-              }, () => {
-              });
+            if (value != -1) {
+                TracerCategoryService.getTracerCategoryByProgramIds(realmId, [value])
+                    .then(response => {
+                        var listArray = response.data;
+                        listArray.sort((a, b) => {
+                            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        var tcList = [];
+                        listArray.map(item => {
+                            tcList.push({
+                                name: getLabelText(item.label, this.state.lang),
+                                id: parseInt(item.tracerCategoryId),
+                                active: item.active,
+                                healthAreaId: item.healthArea.id
+                            })
+                        })
+                        this.setState({
+                            tcListBasedOnProgram: tcList
+                        }, () => {
+                        });
+                    }).catch(
+                        error => {
+                            this.setState({
+                                tcListBasedOnProgram: []
+                            }, () => {
+                            });
+                        }
+                    );
+            } else {
+                this.setState({
+                    tcListBasedOnProgram: []
+                }, () => {
+                });
             }
-          );
-        }else{
-            this.setState({
-                tcListBasedOnProgram: []
-              }, () => {
-              });
-        }
         }
 
         if (x == 7) {
@@ -2354,7 +2355,7 @@ class usageTemplate extends Component {
             }
         }
         if (x == 19) {
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && value == -1 && value != 0)) {
+            if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && value == -1 && value != 0)) {
                 var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(("C").concat(parseInt(y) + 1))
@@ -2385,7 +2386,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
         }
-        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+        if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
             var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))
             cell1.classList.add('readonly');
             var cell1 = this.el.getCell(("C").concat(parseInt(y) + 1))
@@ -2495,7 +2496,7 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.program.validvaluetext'));
-                    valid = false;   
+                    valid = false;
                 }
                 if (!this.el.getValueFromCoords(10, y)) {
                     var col = ("L").concat(parseInt(y) + 1);
@@ -2665,12 +2666,12 @@ class usageTemplate extends Component {
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <AuthenticationServiceComponent history={this.props.history} />
-                                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                                <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
                     <CardBody className="p-0">
                         <Col xs="12" sm="12">
-                                                                                    <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
+                            <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable leftAlignTable1 UsageTemplateTableFilter">
                                 <div id="paputableDiv" className="consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2688,7 +2689,7 @@ class usageTemplate extends Component {
                         </Col>
                     </CardBody>
                     <CardFooter>
-                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
+                        {(AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged1 &&
@@ -2706,7 +2707,7 @@ class usageTemplate extends Component {
                         </ModalHeader>
                         <ModalBody>
                             <h6 className="red" id="div3"></h6>
-                                                                                                                <Col sm={12} style={{ flexBasis: 'auto' }}>
+                            <Col sm={12} style={{ flexBasis: 'auto' }}>
                                 <Card>
                                     <Formik
                                         enableReinitialize={true}
@@ -2746,7 +2747,7 @@ class usageTemplate extends Component {
                                                                     <Label for="number1">{i18n.t('static.usageTemplate.every')}</Label>
                                                                 </FormGroup>
                                                                 <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
-                                                                                                                                                                                                            <div className="controls UsagePopUpInputField">
+                                                                    <div className="controls UsagePopUpInputField">
                                                                         <Input type="number"
                                                                             bsSize="sm"
                                                                             name="number1"
@@ -2763,7 +2764,7 @@ class usageTemplate extends Component {
                                                                     <FormFeedback className="red">{errors.number1}</FormFeedback>
                                                                 </FormGroup>
                                                                 <FormGroup className="tab-ml-1 mt-md-2 pl-lg-2 mb-md-0 ">
-                                                                                                                                                                                                            <div className="controls SelectGo">
+                                                                    <div className="controls SelectGo">
                                                                         <Input
                                                                             type="select"
                                                                             name="picker1"
@@ -2782,14 +2783,14 @@ class usageTemplate extends Component {
                                                                     </div>
                                                                     <FormFeedback className="red">{errors.picker1}</FormFeedback>
                                                                 </FormGroup>
-                                                                                                                            </fieldset>
+                                                            </fieldset>
                                                             <FormGroup className="tab-ml-1 mb-md-0 pr-lg-3 " style={{ marginTop: '56px' }}>
                                                                 <span>=</span>
                                                             </FormGroup>
                                                             <fieldset className="border pl-lg-2 pr-lg-2 pt-lg-0 pb-lg-2" style={{ display: 'flex' }}>
                                                                 <legend class="w-auto text-blackD" style={{ fontSize: '14px' }}>Frequency</legend>
                                                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                                                                                                                                                            <div className="controls SelectGo">
+                                                                    <div className="controls SelectGo">
                                                                         <Input type="number"
                                                                             bsSize="sm"
                                                                             name="number2"
@@ -2807,7 +2808,7 @@ class usageTemplate extends Component {
                                                                     <FormFeedback className="red">{errors.number2}</FormFeedback>
                                                                 </FormGroup>
                                                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                                                                                                                                                            <div className="controls SelectGo">
+                                                                    <div className="controls SelectGo">
                                                                         <Input type="text"
                                                                             name="label"
                                                                             id="label"
@@ -2822,7 +2823,7 @@ class usageTemplate extends Component {
                                                                     <FormFeedback className="red">{errors.textMessage}</FormFeedback>
                                                                 </FormGroup>
                                                                 <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
-                                                                                                                                                                                                            <div className="controls SelectGo">
+                                                                    <div className="controls SelectGo">
                                                                         <Input
                                                                             type="select"
                                                                             name="picker2"
@@ -2845,7 +2846,7 @@ class usageTemplate extends Component {
                                                         </div>
                                                     </CardBody>
                                                     <CardFooter>
-                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
+                                                        {(AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                                                             <FormGroup>
                                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                 <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -2857,9 +2858,9 @@ class usageTemplate extends Component {
                                             )} />
                                 </Card>
                             </Col>
-                                                                                                                <br />
+                            <br />
                         </ModalBody>
-                                            </Modal>
+                    </Modal>
                 </Card>
             </div>
         )

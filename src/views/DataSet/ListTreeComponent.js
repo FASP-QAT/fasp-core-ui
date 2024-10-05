@@ -154,11 +154,11 @@ export default class ListTreeComponent extends Component {
         this.getPlanningUnitWithPricesByIds = this.getPlanningUnitWithPricesByIds.bind(this);
         this.hideThirdComponent = this.hideThirdComponent.bind(this);
         this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
-      }
-      /**
-     * Hides the message in div3 after 30 seconds.
-     */
-      hideThirdComponent() {
+    }
+    /**
+   * Hides the message in div3 after 30 seconds.
+   */
+    hideThirdComponent() {
         document.getElementById('div3').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div3').style.display = 'none';
@@ -1553,7 +1553,7 @@ export default class ListTreeComponent extends Component {
                         "label_fr": null,
                         "label_pr": null
                     };
-                    treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(),username:AuthenticationService.getLoggedInUsername() };
+                    treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(), username: AuthenticationService.getLoggedInUsername() };
                     treeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
                     treeObj.createdBy = { userId: AuthenticationService.getLoggedInUserId() };
                     treeObj.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss")
@@ -1610,7 +1610,7 @@ export default class ListTreeComponent extends Component {
                     levelList: treeTemplate.levelList,
                     lastModifiedBy: {
                         userId: AuthenticationService.getLoggedInUserId(),
-                        username:AuthenticationService.getLoggedInUsername()
+                        username: AuthenticationService.getLoggedInUsername()
                     },
                     lastModifiedDate: moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     createdBy: {
@@ -1717,7 +1717,7 @@ export default class ListTreeComponent extends Component {
                     }],
                     lastModifiedBy: {
                         userId: AuthenticationService.getLoggedInUserId(),
-                        username:AuthenticationService.getLoggedInUsername()
+                        username: AuthenticationService.getLoggedInUsername()
                     },
                     lastModifiedDate: moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss"),
                     createdBy: {
@@ -1776,7 +1776,7 @@ export default class ListTreeComponent extends Component {
                 "label_fr": null,
                 "label_pr": null
             }
-            treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(),username:AuthenticationService.getLoggedInUsername() };
+            treeObj.lastModifiedBy = { userId: AuthenticationService.getLoggedInUserId(), username: AuthenticationService.getLoggedInUsername() };
             treeObj.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
             treeObj.createdBy = { userId: AuthenticationService.getLoggedInUserId() };
             treeObj.createdDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -1843,7 +1843,7 @@ export default class ListTreeComponent extends Component {
         this.setState({ loading: true })
         if (localStorage.getItem('sessionType') === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            DropdownService.getFCProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = [];
                     if (response.status == 200) {
@@ -1887,7 +1887,7 @@ export default class ListTreeComponent extends Component {
         const lan = 'en';
         const { datasetList } = this.state
         var proList;
-        if(this.state.onlyDownloadedProgram) {
+        if (this.state.onlyDownloadedProgram) {
             proList = [];
         } else {
             proList = datasetList;
@@ -1930,7 +1930,7 @@ export default class ListTreeComponent extends Component {
                                     f = 1;
                                 }
                             }
-                            if(this.state.onlyDownloadedProgram && proList.filter(c=>c.id==programData.id).length==0) {
+                            if (this.state.onlyDownloadedProgram && proList.filter(c => c.id == programData.id).length == 0) {
                                 proList.push(programData)
                             } else {
                                 if (f == 0) {
@@ -2032,7 +2032,7 @@ export default class ListTreeComponent extends Component {
             const program = this.state.datasetList.filter(c => c.programId == programId)
             if (program.length > 0) {
                 if (localStorage.getItem('sessionType') === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -2120,7 +2120,7 @@ export default class ListTreeComponent extends Component {
         const lan = 'en';
         const { versions } = this.state
         var verList;
-        if(this.state.onlyDownloadedProgram) {
+        if (this.state.onlyDownloadedProgram) {
             verList = [];
         } else {
             verList = versions;
@@ -2433,7 +2433,7 @@ export default class ListTreeComponent extends Component {
                         options: { format: JEXCEL_DATE_FORMAT_SM }
                     },
                     {
-                        width:60,
+                        width: 60,
                         // source: [
                         //     { id: true, name: i18n.t('static.common.active') },
                         //     { id: false, name: i18n.t('static.common.disabled') }
@@ -2986,7 +2986,7 @@ export default class ListTreeComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
                             <FormGroup className="col-md-3" style={{ marginTop: '45px' }}>
                                 <div className="tab-ml-1 ml-lg-3">
                                     <Input

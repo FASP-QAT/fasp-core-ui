@@ -266,7 +266,7 @@ export default class AddDataSource extends Component {
   getProgramByRealmId(e) {
     let realmId = AuthenticationService.getRealmId();
     if (realmId != 0) {
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then((response) => {
           var proList = [];
           for (var i = 0; i < response.data.length; i++) {
@@ -687,7 +687,7 @@ export default class AddDataSource extends Component {
     this.state.label.label_en = "";
     this.state.dataSourceType.id = "";
     if (
-      AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
+      AuthenticationService.checkUserACL([this.state.program.id],
         "ROLE_BF_SHOW_REALM_COLUMN"
       )
     ) {

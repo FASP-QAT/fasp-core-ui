@@ -158,8 +158,8 @@ class AddBudgetComponent extends Component {
         },
             () => {
                 let programIds = this.state.budget.programs.map((ele) =>
-            Number(ele.id)
-        );
+                    Number(ele.id)
+                );
                 DropdownService.getFundingSourceForProgramsDropdownList(programIds).then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -210,7 +210,7 @@ class AddBudgetComponent extends Component {
                         }
                     }
                 );
-             });
+            });
     }
     /**
      * Show budget date range picker
@@ -293,7 +293,7 @@ class AddBudgetComponent extends Component {
         // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         //Fetch Program list
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
@@ -322,6 +322,7 @@ class AddBudgetComponent extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("erroror==>1", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -360,7 +361,7 @@ class AddBudgetComponent extends Component {
                 }
             );
         //Fetch currency list
-        CurrencyService.getCurrencyList().then(response => {
+        CurrencyService.getCurrencyListActive().then(response => {
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -376,6 +377,8 @@ class AddBudgetComponent extends Component {
             }
         }).catch(
             error => {
+                console.log("erroror==>2", error)
+
                 if (error.message === "Network Error") {
                     this.setState({
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),

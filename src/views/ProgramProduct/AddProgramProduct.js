@@ -58,7 +58,7 @@ class AddprogramPlanningUnit extends Component {
             tempSortOrder: '',
             sortOrderLoading: true,
             dropdownList: [],
-            active:1
+            active: 1
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -90,7 +90,7 @@ class AddprogramPlanningUnit extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     let myReasponse = response.data.sort((a, b) => {
@@ -175,10 +175,10 @@ class AddprogramPlanningUnit extends Component {
                 this.buildJexcel();
             })
     }
-    setStatus(event){
+    setStatus(event) {
         this.setState({
-            active:event.target.value
-        },()=>{
+            active: event.target.value
+        }, () => {
             this.buildJexcel();
         })
     }
@@ -283,9 +283,9 @@ class AddprogramPlanningUnit extends Component {
                                                     data[20] = myReasponse[j].minQty;
                                                     data[21] = myReasponse[j].distributionLeadTime;
                                                     data[22] = indexVar;//to identify if new row added
-                                                    if((this.state.active==0 && myReasponse[j].active.toString()=="false") || (this.state.active==1 && myReasponse[j].active.toString()=="true") || (this.state.active==-1)){
+                                                    if ((this.state.active == 0 && myReasponse[j].active.toString() == "false") || (this.state.active == 1 && myReasponse[j].active.toString() == "true") || (this.state.active == -1)) {
                                                         productDataArr.push(data);
-                                                    }else{
+                                                    } else {
                                                         productDataArr2.push(data);
                                                     }
                                                     indexVar = indexVar + 1;
@@ -372,7 +372,7 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'dropdown',
                                                         source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
                                                         tooltip: i18n.t("static.programPU.planByTooltip"),
-                                                        width:120,
+                                                        width: 120,
                                                         required: true
                                                     },
                                                     {
@@ -484,7 +484,7 @@ class AddprogramPlanningUnit extends Component {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
                                                         },
-                                                        tooltip:i18n.t("static.programPlanningUnit.forecastErrorTooltip")
+                                                        tooltip: i18n.t("static.programPlanningUnit.forecastErrorTooltip")
                                                     },
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -570,20 +570,20 @@ class AddprogramPlanningUnit extends Component {
                                                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                                                         cell1.classList.add('readonly');
                                                     }
-                                                    var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X']
+                                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
                                                     if (rowData[16].toString() == "true") {
                                                         for (var c = 0; c < colArr.length; c++) {
-                                                            try{
-                                                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                                            cell.classList.remove('shipmentEntryDoNotInclude');
-                                                            }catch(err){}
+                                                            try {
+                                                                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                                                cell.classList.remove('shipmentEntryDoNotInclude');
+                                                            } catch (err) { }
                                                         }
                                                     } else {
                                                         for (var c = 0; c < colArr.length; c++) {
-                                                            try{
-                                                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                                            cell.classList.add('shipmentEntryDoNotInclude');
-                                                            }catch(err){}
+                                                            try {
+                                                                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                                                cell.classList.add('shipmentEntryDoNotInclude');
+                                                            } catch (err) { }
                                                         }
                                                     }
 
@@ -761,7 +761,7 @@ class AddprogramPlanningUnit extends Component {
                                             if (productDataArr.length == 0) {
                                                 this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
                                             }
-                                            this.setState({ mapPlanningUnitEl: elVar, loading: false,productDataArr2:productDataArr2 });
+                                            this.setState({ mapPlanningUnitEl: elVar, loading: false, productDataArr2: productDataArr2 });
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode, loading: false, color: '#BA0C2F'
@@ -1008,10 +1008,10 @@ class AddprogramPlanningUnit extends Component {
                     let temp_list = this.state.dropdownList;
                     let index = temp_list.findIndex(c => c.id == temp_obj.id);
 
-                    if(index == -1) {
+                    if (index == -1) {
                         //if new planning unit push to list
                         temp_list.push(temp_obj);
-                    } 
+                    }
 
                     // temp_list[data[i].y] = temp_obj;
                     this.setState(
@@ -1122,7 +1122,7 @@ class AddprogramPlanningUnit extends Component {
      * @param {number} y - The y-coordinate of the changed cell.
      * @param {any} value - The new value of the changed cell.
      */
-    changed = function (instance, cell, x, y, value) {        
+    changed = function (instance, cell, x, y, value) {
         var valid = true;
         var rowData = this.el.getRowData(y);
         changed(instance, cell, x, y, value)
@@ -1545,8 +1545,8 @@ class AddprogramPlanningUnit extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 {/* <div style={{ flexBasis: 'auto' }}> */}
-                    <Card>
-                        <CardBody className="pb-lg-5 pt-lg-1">
+                <Card>
+                    <CardBody className="pb-lg-5 pt-lg-1">
                         <Col md="12 pl-0">
                             {this.state.programId != "" && this.state.programId != null && this.state.programId != undefined && this.state.programId != 0 && <img className='float-right mr-1' style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             <div className='row'>
@@ -1587,37 +1587,37 @@ class AddprogramPlanningUnit extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                            </div>
+                        </Col>
+                        <div>
+                            <h4 className="red">{this.props.message}</h4>
+                            <h5>{i18n.t('static.updatePU.noteText1')} <a href="/#/programProduct/addCountrySpecificPrice">{i18n.t('static.countrySpecificPrices.countrySpecificPrices')}</a> {i18n.t("static.updatePU.noteText2")}</h5>
+                            <div className="consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                 </div>
-                                </Col>
-                            <div>
-                                <h4 className="red">{this.props.message}</h4>
-                                <h5>{i18n.t('static.updatePU.noteText1')} <a href="/#/programProduct/addCountrySpecificPrice">{i18n.t('static.countrySpecificPrices.countrySpecificPrices')}</a> {i18n.t("static.updatePU.noteText2")}</h5>
-                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
-                                    </div>
-                                </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-                                            <div class="spinner-border blue ml-4" role="status">
-                                            </div>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup>
-                                {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
-                                &nbsp;
-                                {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
-                                &nbsp;
-                            </FormGroup>
-                        </CardFooter>
-                    </Card>
+                        </div>
+                    </CardBody>
+                    <CardFooter>
+                        <FormGroup>
+                            {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
+                            &nbsp;
+                            {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            &nbsp;
+                            {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
+                            &nbsp;
+                        </FormGroup>
+                    </CardFooter>
+                </Card>
                 {/* </div> */}
             </div>
         );

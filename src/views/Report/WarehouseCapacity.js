@@ -300,7 +300,7 @@ class warehouseCapacity extends Component {
             let countryIds = this.state.countryValues.map(ele => ele.value);
             if (countryIds != "") {
                 let newCountryList = [... new Set(countryIds)];
-                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -424,7 +424,7 @@ class warehouseCapacity extends Component {
     }
     /**
      * Fetches report data based on the selected program and country.
-     */ 
+     */
     fetchData(e) {
         if (localStorage.getItem("sessionType") === 'Online') {
             let programId = this.state.programValues.length == this.state.programs.length ? [] : this.state.programValues.map(ele => (ele.value).toString());

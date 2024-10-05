@@ -1322,7 +1322,7 @@ export default class ListTreeTemplate extends Component {
     copyDeleteTree(treeTemplateId) {
         // Call API
         DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
-            var treeTemplate=response.data;
+            var treeTemplate = response.data;
             treeTemplate.label.label_en = this.state.treeTemplateName;
             DatasetService.addTreeTemplate(treeTemplate)
                 .then(response => {
@@ -1568,7 +1568,7 @@ export default class ListTreeTemplate extends Component {
                             items.push({
                                 title: "Create tree from this template",
                                 onclick: function () {
-                                    var treeTemplateId=this.state.treeEl.getValueFromCoords(0, y);
+                                    var treeTemplateId = this.state.treeEl.getValueFromCoords(0, y);
                                     DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                                         this.setState({
                                             isModalCreateTree: !this.state.isModalCreateTree,
@@ -1594,45 +1594,45 @@ export default class ListTreeTemplate extends Component {
                                             }
                                         })
                                     })
-                                    .catch(
-                                        error => {
-                                            if (error.message === "Network Error") {
-                                                this.setState({
-                                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                                    loading: false
-                                                });
-                                            } else {
-                                                switch (error.response ? error.response.status : "") {
-                                                    case 401:
-                                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                                        break;
-                                                    case 403:
-                                                        this.props.history.push(`/accessDenied`)
-                                                        break;
-                                                    case 500:
-                                                    case 404:
-                                                    case 406:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    case 412:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode,
-                                                            loading: false
-                                                        });
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: 'static.unkownError',
-                                                            loading: false
-                                                        });
-                                                        break;
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({
+                                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                                        loading: false
+                                                    });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 401:
+                                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 403:
+                                                            this.props.history.push(`/accessDenied`)
+                                                            break;
+                                                        case 500:
+                                                        case 404:
+                                                        case 406:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        case 412:
+                                                            this.setState({
+                                                                message: error.response.data.messageCode,
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                        default:
+                                                            this.setState({
+                                                                message: 'static.unkownError',
+                                                                loading: false
+                                                            });
+                                                            break;
+                                                    }
                                                 }
                                             }
-                                        }
-                                    );
+                                        );
                                 }.bind(this)
                             });
                         }
@@ -1789,7 +1789,7 @@ export default class ListTreeTemplate extends Component {
                     tree.flatList = items;
                     tree.lastModifiedBy = {
                         userId: AuthenticationService.getLoggedInUserId(),
-                        username:AuthenticationService.getLoggedInUsername()
+                        username: AuthenticationService.getLoggedInUsername()
                     };
                     tree.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     tree.createdBy = {

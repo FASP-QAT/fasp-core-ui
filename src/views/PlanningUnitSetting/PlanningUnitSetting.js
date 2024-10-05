@@ -100,7 +100,7 @@ export default class PlanningUnitSetting extends Component {
             sortOrderLoading: true,
             tempPlanningUnitList: [],
             dropdownList: [],
-            active:1
+            active: 1
         }
         this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
@@ -162,14 +162,14 @@ export default class PlanningUnitSetting extends Component {
                     valid = false;
                 }
             }
-            if(!valid){
+            if (!valid) {
                 this.setState({
                     message: i18n.t('static.supplyPlan.validationFailed'),
                     color: 'red'
                 },
-                () => {
-                    this.hideSecondComponent();
-                })
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         }
         return valid;
@@ -197,7 +197,7 @@ export default class PlanningUnitSetting extends Component {
             elInstance.setValueFromCoords(9, y, Number(rowData[9]), true);
         }
         elInstance.setValueFromCoords(11, y, 1, true);
-        if(x == 1){
+        if (x == 1) {
             PlanningUnitService.getPlanningUnitById(rowData[1]).then(response => {
                 if (response.status == 200) {
                     elInstance.setValueFromCoords(2, y, (response.data.multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
@@ -228,39 +228,39 @@ export default class PlanningUnitSetting extends Component {
             }
             if (data[i].x == 0) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
-                if(index==0){
+                if (index == 0) {
                     (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
                 }
             }
             if (data[i].x == 1) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
-                if(index==0){
-                let temp = data[i].value.split(" | ");
-                let temp_obj = {
-                    id: parseInt(temp[1]),
-                    name: data[i].value
-                };
-                let temp_list = this.state.dropdownList;
-                // temp_list[data[i].y] = temp_obj;
+                if (index == 0) {
+                    let temp = data[i].value.split(" | ");
+                    let temp_obj = {
+                        id: parseInt(temp[1]),
+                        name: data[i].value
+                    };
+                    let temp_list = this.state.dropdownList;
+                    // temp_list[data[i].y] = temp_obj;
 
 
-                let index = temp_list.findIndex(c => c.id == temp_obj.id);
-                if(index == -1) {
-                    //if new planning unit push to list
-                    temp_list.push(temp_obj);
-                } 
-                // else {
-                //     continue loop1;
-                // }                
-
-                this.setState(
-                    {
-                        dropdownList: temp_list
-                    }, () => {
-                        // (instance).setValueFromCoords(1, data[i].y, '', true);//temp added
-                        (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                    let index = temp_list.findIndex(c => c.id == temp_obj.id);
+                    if (index == -1) {
+                        //if new planning unit push to list
+                        temp_list.push(temp_obj);
                     }
-                )
+                    // else {
+                    //     continue loop1;
+                    // }                
+
+                    this.setState(
+                        {
+                            dropdownList: temp_list
+                        }, () => {
+                            // (instance).setValueFromCoords(1, data[i].y, '', true);//temp added
+                            (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                        }
+                    )
                 }
             }
         }
@@ -275,67 +275,67 @@ export default class PlanningUnitSetting extends Component {
      */
     changed = function (instance, cell, x, y, value) {
         changed(instance, cell, x, y, value)
-        
+
         if (x == 8) {
             if (value != -1 && value !== null && value !== '') {
                 let planningUnitId = this.el.getValueFromCoords(1, y);
                 let procurementAgentPlanningUnitList = this.state.originalPlanningUnitList;
                 let tempPaList = procurementAgentPlanningUnitList.filter(c => c.planningUnitId == planningUnitId)[0];
-                if(localStorage.getItem('sessionType') === 'Online'){
-                PlanningUnitService.getPlanningUnitWithPricesByIds([planningUnitId])
-                    .then(response => {
-                        if (response.status == 200) {
-                            if (response.data.length > 0) {
-                                let obj = response.data[0].procurementAgentPriceList.filter(c => c.id == value)[0];
-                                if (typeof obj != 'undefined') {
-                                    this.el.setValueFromCoords(9, y, obj.price, true);
+                if (localStorage.getItem('sessionType') === 'Online') {
+                    PlanningUnitService.getPlanningUnitWithPricesByIds([planningUnitId])
+                        .then(response => {
+                            if (response.status == 200) {
+                                if (response.data.length > 0) {
+                                    let obj = response.data[0].procurementAgentPriceList.filter(c => c.id == value)[0];
+                                    if (typeof obj != 'undefined') {
+                                        this.el.setValueFromCoords(9, y, obj.price, true);
+                                    } else {
+                                        let q = '';
+                                        q = (this.el.getValueFromCoords(9, y) != '' ? this.el.setValueFromCoords(9, y, '', true) : '');
+                                    }
+                                }
+                            }
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                        loading: false
+                                    });
                                 } else {
-                                    let q = '';
-                                    q = (this.el.getValueFromCoords(9, y) != '' ? this.el.setValueFromCoords(9, y, '', true) : '');
+                                    switch (error.response ? error.response.status : "") {
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
-                            }
-                        }
-                    );
-                }else{
-                    this.el.setValueFromCoords(9, y, '', true);   
+                        );
+                } else {
+                    this.el.setValueFromCoords(9, y, '', true);
                 }
             } else {
             }
@@ -357,7 +357,7 @@ export default class PlanningUnitSetting extends Component {
         if (x == 1) {
             var json = this.el.getJson(null, false).concat(this.state.outPutListArray2);
             var col = ("B").concat(parseInt(y) + 1);
-            
+
             var jsonLength = parseInt(json.length) - 1;
             for (var i = jsonLength; i >= 0; i--) {
                 var map = new Map(Object.entries(json[i]));
@@ -402,14 +402,14 @@ export default class PlanningUnitSetting extends Component {
                 cell.classList.add('readonly');
             }
         }
-        if(x==17){
-            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']
-            if(this.el.getValueFromCoords(17, y).toString()=="true"){
+        if (x == 17) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+            if (this.el.getValueFromCoords(17, y).toString() == "true") {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.remove('shipmentEntryDoNotInclude');
                 }
-            }else{
+            } else {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = this.el.getCell((colArr[c]).concat(parseInt(y) + 1))
                     cell.classList.add('shipmentEntryDoNotInclude');
@@ -808,10 +808,10 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
         }.bind(this)
     }
-    setStatus(event){
+    setStatus(event) {
         this.setState({
-            active:event.target.value
-        },()=>{
+            active: event.target.value
+        }, () => {
             this.filterData();
         })
     }
@@ -891,12 +891,12 @@ export default class PlanningUnitSetting extends Component {
         let count = 0;
         let indexVar = 1;
         let dropdownList = this.state.dropdownList;
-    loop1: for (var j = 0; j < outPutList.length; j++) {
+        loop1: for (var j = 0; j < outPutList.length; j++) {
             data = [];
 
             let index = dropdownList.findIndex(c => c.id == outPutList[j].planningUnit.id);
 
-            if(index == -1) {
+            if (index == -1) {
                 //if new planning unit push to list
                 dropdownList.push({
                     id: outPutList[j].planningUnit.id,
@@ -929,9 +929,9 @@ export default class PlanningUnitSetting extends Component {
             data[16] = outPutList[j].planningUnitNotes;
             data[17] = outPutList[j].active;
             data[18] = outPutList[j].active;
-            if((this.state.active==0 && outPutList[j].active.toString()=="false") || (this.state.active==1 && outPutList[j].active.toString()=="true") || (this.state.active==-1)){
+            if ((this.state.active == 0 && outPutList[j].active.toString() == "false") || (this.state.active == 1 && outPutList[j].active.toString() == "true") || (this.state.active == -1)) {
                 outPutListArray.push(data);
-            }else{
+            } else {
                 outPutListArray2.push(data);
             }
             count++;
@@ -974,7 +974,7 @@ export default class PlanningUnitSetting extends Component {
                     title: i18n.t('static.productCategory.productCategory'),
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
-                    width:150,
+                    width: 150,
                     required: true
                     // readOnly: true// 0A
                 },
@@ -1010,19 +1010,19 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.conversion.ConversionFactorFUPU'),
                     type: 'text',
-                    readOnly:true,
+                    readOnly: true,
                 },
                 {
                     title: i18n.t('static.commitTree.consumptionForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: i18n.t('static.TreeForecast.TreeForecast') + ' ?',
                     type: 'checkbox',
                     width: '150',
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: i18n.t('static.planningUnitSetting.stockEndOf') + ' ' + this.state.beforeEndDateDisplay + ')',
@@ -1031,7 +1031,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     decimal: false,
@@ -1048,7 +1048,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##',
                     width: '150',
                     disabledMaskOnEdition: true,
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     decimal: false,
@@ -1065,7 +1065,7 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##',
                     disabledMaskOnEdition: true,
                     width: '150',
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
                     number: true,
                     decimal: false,
@@ -1084,7 +1084,7 @@ export default class PlanningUnitSetting extends Component {
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
                     width: '120',
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: i18n.t('static.forecastReport.unitPrice'),
@@ -1094,9 +1094,9 @@ export default class PlanningUnitSetting extends Component {
                     mask: '#,##.00',
                     width: '120',
                     disabledMaskOnEdition: true,
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true),
                     empty: true,
-                    number:true,
+                    number: true,
                     minValue: {
                         value: 0,
                         text: i18n.t('static.planningUnitSetting.negativeValueNotAllowed')
@@ -1140,12 +1140,12 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: 'Active',
                     type: 'checkbox',
-                    readOnly: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
+                    readOnly: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? false : true)
                 },
                 {
                     title: 'active',
@@ -1175,7 +1175,7 @@ export default class PlanningUnitSetting extends Component {
                 if (y == null) {
                 } else {
                     if (localStorage.getItem("sessionType") === 'Online') {
-                        if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) {
+                        if (obj.options.allowInsertRow == true && this.state.forecastProgramId != "" && AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) {
                             items.push({
                                 title: i18n.t('static.common.addRow'),
                                 onclick: function () {
@@ -1217,12 +1217,12 @@ export default class PlanningUnitSetting extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
+            editable: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, allowAdd: true, tempPlanningUnitList: dropdownList,outPutListArray2:outPutListArray2
+            languageEl: languageEl, loading: false, allowAdd: true, tempPlanningUnitList: dropdownList, outPutListArray2: outPutListArray2
         }, () => {
             if (addRowInJexcel) {
                 this.addRow();
@@ -1275,13 +1275,13 @@ export default class PlanningUnitSetting extends Component {
                 var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
             }
-            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']
-            if(elInstance.getValueFromCoords(17, j).toString()=="true"){
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+            if (elInstance.getValueFromCoords(17, j).toString() == "true") {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                     cell.classList.remove('shipmentEntryDoNotInclude');
                 }
-            }else{
+            } else {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                     cell.classList.add('shipmentEntryDoNotInclude');
@@ -1344,13 +1344,13 @@ export default class PlanningUnitSetting extends Component {
                 cell.classList.add('readonly');
             }
 
-            var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R']
-            if(elInstance.getValueFromCoords(17, j).toString()=="true"){
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+            if (elInstance.getValueFromCoords(17, j).toString() == "true") {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                     cell.classList.remove('shipmentEntryDoNotInclude');
                 }
-            }else{
+            } else {
                 for (var c = 0; c < colArr.length; c++) {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(j) + 1))
                     cell.classList.add('shipmentEntryDoNotInclude');
@@ -1489,7 +1489,7 @@ export default class PlanningUnitSetting extends Component {
                                 listOfDisablePuNode.push(parseInt(map1.get("1")));
                             }
                         }
-                        programData.planningUnitList = planningUnitList.concat(this.state.active!=-1?originalPlanningUnitList.filter(c=>this.state.active==1?c.active.toString()=="false":c.active.toString()=="true"):[]);
+                        programData.planningUnitList = planningUnitList.concat(this.state.active != -1 ? originalPlanningUnitList.filter(c => this.state.active == 1 ? c.active.toString() == "false" : c.active.toString() == "true") : []);
                         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                         program.programData = programData;
                         programs.push(program);
@@ -1674,7 +1674,7 @@ export default class PlanningUnitSetting extends Component {
                         listOfDisablePuNode.push(parseInt(map1.get("1")));
                     }
                 }
-                programData.planningUnitList = planningUnitList.concat(this.state.active!=-1?originalPlanningUnitList.filter(c=>this.state.active==1?c.active.toString()=="false":c.active.toString()=="true"):[]);
+                programData.planningUnitList = planningUnitList.concat(this.state.active != -1 ? originalPlanningUnitList.filter(c => this.state.active == 1 ? c.active.toString() == "false" : c.active.toString() == "true") : []);
                 programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
                 program.programData = programData;
                 programs.push(program);
@@ -2002,7 +2002,7 @@ export default class PlanningUnitSetting extends Component {
         data[17] = true;
         data[18] = true;
         this.el.insertRow(
-            data,0,1
+            data, 0, 1
         );
         this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
     };
@@ -2043,7 +2043,7 @@ export default class PlanningUnitSetting extends Component {
         tableHeadTemp.push(i18n.t('static.program.notes').replaceAll(' ', '%20'));
         tableHeadTemp.push(i18n.t('static.common.active').replaceAll(' ', '%20'));
         A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
-        this.state.languageEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''),ele[2].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[3].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[4].toString() =="true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[16].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[17].toString() =="true" ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
+        this.state.languageEl.getJson(null, true).map(ele => A.push(addDoubleQuoteToRowContent([ele[0].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[1].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[2].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23').replaceAll('\'', '').replaceAll('\"', ''), ele[3].toString() == "true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[4].toString() == "true" ? i18n.t("static.program.yes") : i18n.t("static.realm.no"), ele[5].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[16].toString().replaceAll(',', ' ').replaceAll(' ', '%20'), ele[17].toString() == "true" ? i18n.t('static.common.active') : i18n.t('static.common.disabled')])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -2052,7 +2052,7 @@ export default class PlanningUnitSetting extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = (document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20')+"-"+i18n.t('static.updatePlanningUnit.updatePlanningUnit') + ".csv"
+        a.download = (document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20') + "-" + i18n.t('static.updatePlanningUnit.updatePlanningUnit') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -2173,7 +2173,7 @@ export default class PlanningUnitSetting extends Component {
                                                         name="active"
                                                         id="active"
                                                         bsSize="sm"
-                                                        onChange={(e) => {this.setStatus(e) }}
+                                                        onChange={(e) => { this.setStatus(e) }}
                                                         value={this.state.active}
                                                     >
                                                         <option value="-1">{i18n.t('static.common.all')}</option>
@@ -2192,7 +2192,7 @@ export default class PlanningUnitSetting extends Component {
                                 <p>{i18n.t("static.planningUnitSetting.offlineMsg")}</p>
                             </div>
                         </Col>}
-                        {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
+                        {this.state.forecastProgramId != "" && !AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
                             <p>
                                 {i18n.t('static.versionSettings.note')}:
                                 <i>
@@ -2217,7 +2217,7 @@ export default class PlanningUnitSetting extends Component {
                     {
                         this.state.allowAdd &&
                         <CardFooter>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
+                            {this.state.forecastProgramId != "" && AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS') &&
                                 <FormGroup>
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.isChanged1 &&
