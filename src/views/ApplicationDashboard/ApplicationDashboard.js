@@ -2,6 +2,8 @@ import CryptoJS from 'crypto-js';
 import classNames from 'classnames';
 import moment from 'moment';
 import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
 import { MultiSelect } from 'react-multi-select-component';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
@@ -35,7 +37,7 @@ import {
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DashboardService from "../../api/DashboardService";
 import ProgramService from "../../api/ProgramService";
 import DropdownService from "../../api/DropdownService";
@@ -73,6 +75,10 @@ class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       isDarkMode: false,
       popoverOpenMa: false,
@@ -93,11 +99,14 @@ class ApplicationDashboard extends Component {
       supplyPlanReviewCount: '',
       roleArray: [],
       dashboardTopList: [],
-      topProgramId: localStorage.getItem('topProgramId') && false ? [localStorage.getItem('topProgramId')] : [],
+      topProgramId: localStorage.getItem('topProgramId') ? JSON.parse(localStorage.getItem('topProgramId')) : [],
       bottomProgramId: localStorage.getItem('bottomProgramId'),
       displayBy: 1,
-      onlyDownloadedTopProgram: true,
-      onlyDownloadedBottomProgram: true
+      onlyDownloadedTopProgram: localStorage.getItem("topLocalProgram"),
+      onlyDownloadedBottomProgram: localStorage.getItem("bottomLocalProgram"),
+      rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -116,6 +125,8 @@ class ApplicationDashboard extends Component {
     this.buildForecastErrorJexcel = this.buildForecastErrorJexcel.bind(this);
     this.buildShipmentsTBDJexcel = this.buildShipmentsTBDJexcel.bind(this);
     this.buildExpiriesJexcel = this.buildExpiriesJexcel.bind(this);
+    this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
+    this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -280,6 +291,24 @@ class ApplicationDashboard extends Component {
     });
   }
   /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
+  handleRangeDissmis(value) {
+    this.setState({ rangeValue: value }, () => { 
+      localStorage.setItem("bottomReportPeriod", JSON.stringify(value))
+     })
+  }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
+  _handleClickRangeBox(e) {
+      this.refs.reportPeriod.show()
+  }
+  /**
    * Checks for newer versions of programs and updates local storage with the latest program information.
    * @param {Array} programs - List of programs to check for newer versions.
    */
@@ -399,7 +428,7 @@ class ApplicationDashboard extends Component {
             tempProgramList.push({
               openCount: filteredGetRequestList[i].openCount,
               addressedCount: filteredGetRequestList[i].addressedCount,
-              programCode: filteredGetRequestList[i].programCode + " (Local)",
+              programCode: filteredGetRequestList[i].programCode + " ~v"+ filteredGetRequestList[i].version + " (Local)",
               programVersion: filteredGetRequestList[i].version,
               programId: filteredGetRequestList[i].programId,
               versionId: filteredGetRequestList[i].version,
@@ -484,7 +513,7 @@ class ApplicationDashboard extends Component {
     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
     */
   handleTopProgramIdChange = (programIds) => {
-    localStorage.setItem("topProgramId", programIds.map(x => x.value).toString())
+    localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
       topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
     }, () => { 
@@ -500,7 +529,17 @@ class ApplicationDashboard extends Component {
     let displayBy = this.state.displayBy;
     if (event.target.name === "bottomProgramId") {
       bottomProgramId = event.target.value;
-      localStorage.setItem("bottomProgramId", bottomProgramId)
+      localStorage.setItem("bottomProgramId", bottomProgramId);
+      if(bottomProgramId.split("_").length == 1) {
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+        this.setState({
+          rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
+        })
+      }
       Dashboard(this, bottomProgramId, this.state.displayBy, true, true);
     }
     if (event.target.name === "displayBy") {
@@ -517,6 +556,7 @@ class ApplicationDashboard extends Component {
     * @param {Object} event - The event object containing the checkbox state.
     */
   changeOnlyDownloadedTopProgram(event) {
+    localStorage.setItem("topLocalProgram", event.target.checked);
     var flag = event.target.checked ? 1 : 0
         if (flag) {
             this.setState({
@@ -537,6 +577,7 @@ class ApplicationDashboard extends Component {
     * @param {Object} event - The event object containing the checkbox state.
     */
   changeOnlyDownloadedBottomProgram(event) {
+    localStorage.setItem("bottomLocalProgram", event.target.checked);
     var flag = event.target.checked ? 1 : 0
         if (flag) {
             this.setState({
@@ -744,13 +785,43 @@ class ApplicationDashboard extends Component {
    * @param {any} value The new value to set for the specified key.
    */
   updateStateDashboard(key, value) {
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.setState({
       [key]: value
     }, () => {
       if (key == "dashboardBottomData") {
+        // if(this.state.topProgramId.split("(Local)").length > 1){
+        //   DashboardService.getDashboardTop()
+        //     .then(response => {
+        //       this.setState({
+        //         dashboardTopList: response.data
+        //       }, () => {
+        //         if(this.state.bottomProgramId.split("_").length > 1){
+        //           DashboardService.getDashboardBottom()
+        //             .then(response => {
+        //               this.setState({
+        //                 dashboardBottomData: response.data
+        //               }, () => {
+        
+        //               })
+        //             })
+        //         }
+        //       })
+        //     })
+        // } else {
+
+        // }
         this.buildForecastErrorJexcel();
         this.buildShipmentsTBDJexcel();
         this.buildExpiriesJexcel();
+        this.setState({
+          rangeValue: this.state.bottomProgramId.split("_").length > 1 ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+        }, () => {
+          localStorage.setItem("bottomReportPeriod", JSON.stringify(this.state.rangeValue))
+        })
       }
     })
   }
@@ -1391,6 +1462,15 @@ class ApplicationDashboard extends Component {
           </option>
         )
       }, this);
+    const pickerLang = {
+      months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+      from: 'From', to: 'To',
+    }
+    const { rangeValue } = this.state
+    const makeText = m => {
+      if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+      return '?'
+    }
     return (
       <div className="animated fadeIn">
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.consolidatedProgramList} objectStore="programData" page="dashboard"></QatProblemActionNew>
@@ -1872,18 +1952,18 @@ class ApplicationDashboard extends Component {
                 </div>
                 <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
                   <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
-                  <Input
-                    type="select"
-                    name="reportPeriod"
-                    id="reportPeriod"
-                    bsSize="sm"
-                    required
-                  >
-                    <option selected>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                  </Input>
+                  <div className="controls edit">
+                    <Picker
+                      ref="reportPeriod"
+                      years={{ min: this.state.minDate, max: this.state.maxDate }}
+                      value={rangeValue}
+                      lang={pickerLang}
+                      key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
+                      onDismiss={this.handleRangeDissmis}
+                    >
+                      <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                    </Picker>
+                  </div>
                 </FormGroup>
                 <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
                   <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>

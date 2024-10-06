@@ -218,7 +218,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                             }
                             console.log("dashboardBottomData Test@123", dashboardBottomData)
                             props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
-                            props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.stopDateBottom);
+                            props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
                             props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
                         } else {
                             props.updateStateDashboard("dashboardBottomData", "");
