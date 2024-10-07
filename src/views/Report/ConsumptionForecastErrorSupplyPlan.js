@@ -2847,7 +2847,7 @@ observer.observe(document.documentElement, {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        {i18n.t('static.forecastMonthlyErrorReport.showConsumption')}
+                                                        Show consumption adjusted for stock out?
                                                     </Label>
                                                 </div>
                                             </FormGroup>
