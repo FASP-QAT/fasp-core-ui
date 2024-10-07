@@ -28,11 +28,11 @@ class DashboardService {
         });
     }
     getDashboardTop() {
-        return axios.get(`${API_URL}/api/getDashboardTop`, {
+        return axios.get(`${API_URL}/api/dashboardTop`, {
         });
     }
-    getDashboardBottom() {
-        return axios.get(`${API_URL}/api/getDashboardBottom`, {
+    getDashboardBottom(json) {
+        return axios.post(`${API_URL}/api/dashboardBottom`, json, {
         });
     }
 }

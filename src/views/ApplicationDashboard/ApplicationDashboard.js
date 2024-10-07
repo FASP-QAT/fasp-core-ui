@@ -102,8 +102,8 @@ class ApplicationDashboard extends Component {
       topProgramId: localStorage.getItem('topProgramId') ? JSON.parse(localStorage.getItem('topProgramId')) : [],
       bottomProgramId: localStorage.getItem('bottomProgramId'),
       displayBy: 1,
-      onlyDownloadedTopProgram: localStorage.getItem("topLocalProgram"),
-      onlyDownloadedBottomProgram: localStorage.getItem("bottomLocalProgram"),
+      onlyDownloadedTopProgram: localStorage.getItem("topLocalProgram") == "false" ? false : true,
+      onlyDownloadedBottomProgram: localStorage.getItem("bottomLocalProgram") == "false" ? false : true,
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -127,6 +127,7 @@ class ApplicationDashboard extends Component {
     this.buildExpiriesJexcel = this.buildExpiriesJexcel.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+    this.getOnlineDashboardBottom = this.getOnlineDashboardBottom.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -298,7 +299,16 @@ class ApplicationDashboard extends Component {
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value }, () => { 
       localStorage.setItem("bottomReportPeriod", JSON.stringify(value))
-     })
+      if(localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
+        var inputJson = {
+          programId: this.state.bottomProgramId,
+          startDate: this.state.rangeValue.from.year+"-"+this.state.rangeValue.from.month+"-01",
+          stopDate: this.state.rangeValue.to.year+"-"+this.state.rangeValue.to.month+"-01",
+          displayShipmentsBy: this.state.displayBy
+        }
+        this.getOnlineDashboardBottom(inputJson);
+      }
+    })
   }
   /**
    * Handles the click event on the range picker box.
@@ -517,7 +527,15 @@ class ApplicationDashboard extends Component {
     this.setState({
       topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
     }, () => { 
-      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true)  
+      if(this.state.onlyDownloadedTopProgram) {
+        Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
+      } else {
+        DashboardService.getDashboardTop().then(response => {
+          this.setState({
+            dashboardTopList: response.data
+          })
+        })
+      }
     });
   }
   /**
@@ -530,26 +548,34 @@ class ApplicationDashboard extends Component {
     if (event.target.name === "bottomProgramId") {
       bottomProgramId = event.target.value;
       localStorage.setItem("bottomProgramId", bottomProgramId);
-      if(bottomProgramId.split("_").length == 1) {
+    }
+    if (event.target.name === "displayBy") {
+      displayBy = event.target.value;
+    }
+    this.setState({
+      bottomProgramId,
+      displayBy
+    }, () => {
+      if(this.state.bottomProgramId && this.state.bottomProgramId.split("_").length == 1) {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+        var inputJson = {
+          programId: this.state.bottomProgramId,
+          startDate: dt.getFullYear()+"-"+(dt.getMonth()+1)+"-01",
+          stopDate: dt1.getFullYear()+"-"+(dt1.getMonth()+1)+"-01",
+          displayShipmentsBy: this.state.displayBy
+        }
+        this.getOnlineDashboardBottom(inputJson);
         this.setState({
           rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
         })
+      } else {
+        Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
       }
-      Dashboard(this, bottomProgramId, this.state.displayBy, true, true);
-    }
-    if (event.target.name === "displayBy") {
-      displayBy = event.target.value;
-      Dashboard(this, bottomProgramId, displayBy, true, true);
-    }
-    this.setState({
-      bottomProgramId,
-      displayBy
-    }, () => { });
+    });
   };
   /**
     * Handles the change event of the diplaying only downloaded programs.
@@ -593,11 +619,46 @@ class ApplicationDashboard extends Component {
             })
         }
   }
+  getOnlineDashboardBottom(inputJson) {
+    DashboardService.getDashboardBottom(inputJson)
+      .then(response => {
+        this.setState({
+          dashboardBottomData: response.data
+        }, () => {
+          this.buildForecastErrorJexcel();
+          this.buildShipmentsTBDJexcel();
+          this.buildExpiriesJexcel();
+        })
+      }
+    ).catch(
+      error => {
+          if (error.message === "Network Error") {
+              this.setState({
+                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              });
+          } else {
+              switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                      break;
+                  default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+              }
+          }
+      }
+    );
+  }
   /**
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
     var db1;
+    let tempProgramList = [];
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
@@ -611,7 +672,6 @@ class ApplicationDashboard extends Component {
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      let tempProgramList = [];
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -644,11 +704,33 @@ class ApplicationDashboard extends Component {
           b = b.programCode.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
-        if(tempProgramList.length > 0) {
-          Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true);
-        }
       }.bind(this);
     }.bind(this);
+    if(localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
+      var dt = new Date();
+      dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+      var dt1 = new Date();
+      dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+      localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+      var inputJson = {
+        programId: this.state.bottomProgramId,
+        startDate: dt.getFullYear()+"-"+(dt.getMonth()+1)+"-01",
+        stopDate: dt1.getFullYear()+"-"+(dt1.getMonth()+1)+"-01",
+        displayShipmentsBy: this.state.displayBy
+      }
+      this.getOnlineDashboardBottom(inputJson);
+    } else if(tempProgramList.length > 0) {
+      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, false, true);
+    }
+    if(this.state.onlyDownloadedTopProgram) {
+      Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
+    } else {
+      DashboardService.getDashboardTop().then(response => {
+        this.setState({
+          dashboardTopList: response.data
+        })
+      })
+    }
     Chart.plugins.register({
       beforeDraw: function (chart) {
         if (chart.config.type === 'doughnut') {
@@ -844,27 +926,6 @@ class ApplicationDashboard extends Component {
       [key]: value
     }, () => {
       if (key == "dashboardBottomData") {
-        // if(this.state.topProgramId.split("(Local)").length > 1){
-        //   DashboardService.getDashboardTop()
-        //     .then(response => {
-        //       this.setState({
-        //         dashboardTopList: response.data
-        //       }, () => {
-        //         if(this.state.bottomProgramId.split("_").length > 1){
-        //           DashboardService.getDashboardBottom()
-        //             .then(response => {
-        //               this.setState({
-        //                 dashboardBottomData: response.data
-        //               }, () => {
-        
-        //               })
-        //             })
-        //         }
-        //       })
-        //     })
-        // } else {
-
-        // }
         this.buildForecastErrorJexcel();
         this.buildShipmentsTBDJexcel();
         this.buildExpiriesJexcel();
@@ -899,35 +960,13 @@ class ApplicationDashboard extends Component {
 
   buildForecastErrorJexcel() {
     var forecastErrorList = this.state.dashboardBottomData.forecastErrorList;
-    var missingPUList = [
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-    ];
     var dataArray = [];
     let count = 0;
     if (forecastErrorList.length > 0) {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
-        data[0] = forecastErrorList[j].name
-        data[1] = forecastErrorList[j].percentage
+        data[0] = forecastErrorList[j].planningUnit.label.label_en
+        data[1] = forecastErrorList[j].errorPerc
         dataArray[count] = data;
         count++;
       }
@@ -982,35 +1021,13 @@ class ApplicationDashboard extends Component {
 
   buildShipmentsTBDJexcel() {
     var shipmentWithFundingSourceTbdList = this.state.dashboardBottomData.shipmentWithFundingSourceTbd;
-    var missingPUList = [
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-      { name: "TLD30", percentage: "50%" },
-      { name: "TLD60", percentage: "100%" },
-      { name: "TLD90", percentage: "60%" },
-      { name: "TLD120", percentage: "70%" },
-    ];
     var dataArray = [];
     let count = 0;
     if (shipmentWithFundingSourceTbdList.length > 0) {
       for (var j = 0; j < shipmentWithFundingSourceTbdList.length; j++) {
         data = [];
-        data[0] = shipmentWithFundingSourceTbdList[j].name
-        data[1] = shipmentWithFundingSourceTbdList[j].percentage
+        data[0] = shipmentWithFundingSourceTbdList[j].planningUnit.label.label_en
+        data[1] = shipmentWithFundingSourceTbdList[j].count
         dataArray[count] = data;
         count++;
       }
@@ -1502,11 +1519,11 @@ class ApplicationDashboard extends Component {
     }
     let topProgramList = []
     this.state.programList.length > 0 && 
-      this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : true).map(c => {
+      this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : !c.local).map(c => {
         topProgramList.push({ label: c.programCode, value: c.id })
       })
     let bottomProgramList = this.state.programList.length > 0
-      && this.state.programList.filter(c => this.state.onlyDownloadedBottomProgram ? c.local : true).map((item, i) => {
+      && this.state.programList.filter(c => this.state.onlyDownloadedBottomProgram ? c.local : !c.local).map((item, i) => {
         return (
           <option key={i} value={item.id}>
             {item.programCode}
@@ -2057,7 +2074,7 @@ class ApplicationDashboard extends Component {
                             {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
                               return (<li class="success">
                                 <div class="d-flex align-items-center justify-content-between">
-                                  <div className='text-mutedDashboard'>{x.planningUnit.name} </div>
+                                  <div className='text-mutedDashboard'>{x.planningUnit.label.label_en} </div>
                                   <div class="fs-12 text-mutedDashboard">{x.count}​</div>
                                 </div>
                               </li>)
