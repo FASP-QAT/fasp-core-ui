@@ -1971,7 +1971,7 @@ class ApplicationDashboard extends Component {
                       key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                       onDismiss={this.handleRangeDissmis}
                     >
-                      <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                      <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
                     </Picker>
                   </div>
                 </FormGroup>
