@@ -7334,6 +7334,8 @@ export default class BuildTree extends Component {
                 }
             }
         }
+        var funnelChildNodes = this.state.dataSetObj.programData.treeList.filter(t => t.treeId == this.state.treeId)[0].tree.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x =>x.id.toString())
+        downwardAggregationList = downwardAggregationList.filter(x => (x.value.split("~")[0] == this.state.treeId && !funnelChildNodes.includes(x.value.split("~")[2])) || x.value.split("~")[0] != this.state.treeId)
         downwardAggregationList = downwardAggregationList.sort(function (a, b) {
             a = a.label.toLowerCase();
             b = b.label.toLowerCase();
