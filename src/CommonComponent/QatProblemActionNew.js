@@ -306,6 +306,7 @@ export default class QatProblemActionNew extends Component {
                                                                         (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                                 );
                                                             }
+                                                            var shipmentQplPassed=true;
                                                             for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                                 switch (typeProblemList[prob].problem.problemId) {
                                                                     case 1:
@@ -441,6 +442,11 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.shipmentStatus.id != 7
                                                                             && c.shipmentId != 0
                                                                         );
+                                                                        shipmentQplPassed=shipmentListForMonths.filter(c =>
+                                                                            moment(c.expectedDeliveryDate).format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
+                                                                            && c.shipmentStatus.id != 7
+                                                                            && c.shipmentId != 0
+                                                                        ).length>0?false:shipmentQplPassed;
                                                                         if (filteredShipmentList.length > 0) {
                                                                             var shipmentIdsFromShipmnetList = [];
                                                                             for (var s = 0; s < filteredShipmentList.length; s++) {
@@ -637,6 +643,9 @@ export default class QatProblemActionNew extends Component {
                                                                                 shipmentDetailsJson["shipmentQuantity"] = filteredShipmentList[s].shipmentQty;
                                                                                 shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
                                                                                 shipmentDetailsJson["submittedDate"] = submittedDate;
+                                                                                if ((moment(submittedDate).format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
+                                                                                    shipmentQplPassed=false;
+                                                                                }
                                                                                 if ((moment(submittedDate).add(parseInt(typeProblemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                                     shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
                                                                                     var indexShipment = 0;
@@ -1192,6 +1201,7 @@ export default class QatProblemActionNew extends Component {
                                                                         break;
                                                                 }
                                                             }
+                                                            
                                                         } else {
                                                             for (var pal = 0; pal < problemActionList.length; pal++) {
                                                                 if (problemActionList[pal].planningUnit.id == planningUnitList[p].planningUnit.id) {
@@ -1199,6 +1209,16 @@ export default class QatProblemActionNew extends Component {
                                                                 }
                                                             }
                                                         }
+                                                        if(programList[pp].generalData.dashboardData!=undefined){
+                                                        if(programList[pp].generalData.dashboardData.bottomPuData==undefined || programList[pp].generalData.dashboardData.bottomPuData==""){
+                                                            programList[pp].generalData.dashboardData.bottomPuData=[]
+                                                        }
+                                                        var paListForDashboard=problemActionList.filter(c => c.program.id == programList[pp].generalData.programId && c.planningUnit.id==planningUnitList[p].planningUnit.id && c.problemStatus.id==1);
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==23).length>0?false:true;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
+                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=shipmentQplPassed;
+                                                    }
                                                     }
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);
@@ -1206,6 +1226,7 @@ export default class QatProblemActionNew extends Component {
                                                     programList[pp].generalData.problemReportList = paList;
                                                     programList[pp].generalData.actionList = [];
                                                     programList[pp].generalData.qplLastModifiedDate = curDate;
+                                                    programList[pp].generalData.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                                     var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                     var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                     var programQPLDetailsJson = {

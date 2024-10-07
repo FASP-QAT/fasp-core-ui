@@ -3052,6 +3052,46 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   color: #e4e5e6;
   text-decoration: none;
 }
+
+.tableFixHeadDash thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px !important;
+  vertical-align: middle;
+  line-height: 1.462;
+  background: #212631;
+}
+.DashboardreadonlyBg .jss > tbody > tr > td {
+  color: #e5edf5!important;
+}
+.text-mutedDashboard {
+  color: #e4e5e6 !important;
+}
+.cssProgress .cssProgress-label {
+ padding: 0px!important;
+}
+.card.custom-card .card-header {
+  padding: 10px 1.25rem !important;
+  background-color: transparent !important;
+  border-block-end: 1px solid #4d515a;
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+.dashboardTable .jss_content {
+  max-height: calc(100vh - 369px) !important;
+}
+.dashboardTable1 .jss_content {
+  max-height: calc(100vh - 391px) !important;
+}
+.dashboardTable2 .jss_content {
+  // max-height: calc(100vh - 393px) !important;
+  height: 375px;
+  overflow: scroll;
+}
 .Iconclr{
   filter: brightness(15);
 }
@@ -16245,6 +16285,389 @@ label.arrow_label:before {
 .jss>tfoot>tr>td:not(:nth-child(2)) {
   border-left: 0px solid #ccc !important;
   font-weight: bold;
+}
+
+
+/* -----------------------------------------------------
+	Dashboard css 
+-------------------------------------------------------- */
+.cssProgress {
+  width: 100%;
+  margin-bottom: 20px;
+}
+.cssProgress .progress1,
+.cssProgress .progress2,
+.cssProgress .progress3 {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+.cssProgress .cssProgress-bar {
+  display: block;
+  float: left;
+  width: 0%;
+  height: 100%;
+  background: #3798d9;
+  box-shadow: inset 0px -1px 2px rgba(0, 0, 0, 0.1);
+  transition: width 0.8s ease-in-out;
+}
+.cssProgress .cssProgress-label {
+  position: absolute;
+  overflow: hidden;
+  left: 0px;
+  right: 0px;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.7em;
+  text-align: center;
+  text-shadow: 0px 1px rgba(0, 0, 0, 0.3);
+}
+.cssProgress .cssProgress-info {
+  background-color: #9575cd !important;
+}
+.cssProgress .cssProgress-danger {
+  background-color: #ef5350 !important;
+}
+.cssProgress .cssProgress-success {
+  background-color: #66bb6a !important;
+}
+.cssProgress .cssProgress-warning {
+  background-color: #ffb74d !important;
+}
+.cssProgress .cssProgress-right {
+  float: right !important;
+}
+.cssProgress .cssProgress-label-left {
+  margin-left: 10px;
+  text-align: left !important;
+}
+.cssProgress .cssProgress-label-right {
+  margin-right: 10px;
+  text-align: right !important;
+}
+.cssProgress .cssProgress-label2 {
+  display: block;
+  margin: 2px 0;
+  padding: 0 8px;
+  font-size: 0.8em;
+}
+.cssProgress .cssProgress-label2.cssProgress-label2-right {
+  text-align: right;
+}
+.cssProgress .cssProgress-label2.cssProgress-label2-center {
+  text-align: center;
+}
+.cssProgress .cssProgress-stripes,
+.cssProgress .cssProgress-active,
+.cssProgress .cssProgress-active-right {
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.125) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.125) 50%, rgba(255, 255, 255, 0.125) 75%, transparent 75%, transparent);
+  background-size: 35px 35px;
+}
+.cssProgress .cssProgress-active {
+  -webkit-animation: cssProgressActive 2s linear infinite;
+  animation: cssProgressActive 2s linear infinite;
+}
+.cssProgress .cssProgress-active-right {
+  -webkit-animation: cssProgressActiveRight 2s linear infinite;
+  animation: cssProgressActiveRight 2s linear infinite;
+}
+@-webkit-keyframes cssProgressActive {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 35px 35px;
+  }
+}
+@keyframes cssProgressActive {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 35px 35px;
+  }
+}
+@-webkit-keyframes cssProgressActiveRight {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -35px -35px;
+  }
+}
+@keyframes cssProgressActiveRight {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: -35px -35px;
+  }
+}
+
+/* -----------------------------------------------------
+	Progress Bar 1
+-------------------------------------------------------- */
+.progress1 {
+  background-color: #EEE;
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+.progress1 .cssProgress-bar {
+  height: 18px;
+}
+.progress1 .cssProgress-label {
+  line-height: 18px;
+}
+
+.legend {
+  display: inline-block;
+  width: 150px;
+  vertical-align: text-bottom;
+  margin-left: 100px;
+  background-color: #f0f0f0;
+}
+
+.legend span {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin: 0 10px 0 20px;
+}
+
+.legend span.green {
+  background-color: #47CF73;
+}
+
+.legend span.orange {
+  background-color: #FCD000;
+}
+
+.legend span.red {
+  background-color: #FF3C41;
+}
+
+@-moz-keyframes fill {
+  0% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+    border-color: #FF3C41;
+  }
+
+  50% {
+    -moz-transform: rotate(180deg);
+    transform: rotate(180deg);
+    border-color: #47CF73;
+  }
+}
+
+@-webkit-keyframes fill {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+    border-color: #FF3C41;
+  }
+
+  50% {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    border-color: #47CF73;
+  }
+}
+
+@keyframes fill {
+  0% {
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+    border-color: #FF3C41;
+  }
+
+  50% {
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+    border-color: #47CF73;
+  }
+}
+
+.Card-custom {
+  border-radius: .5rem;
+  border: 0;
+  background-color: #fff;
+  box-shadow: 0 .125rem 0 rgba(10, 10, 10, .04);
+  position: relative;
+  margin-block-end: 1.5rem;
+  // width: 100%;
+}
+
+.tableFixHeadDash {
+  overflow: auto;
+  height: 524px;
+}
+
+.tableFixHeadDash thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px !important;
+  vertical-align: middle;
+  line-height: 1.462;
+  background: #fff;
+}
+
+/* Just common table stuff. Really. */
+.tableFixHeadDash table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+// .tableFixHeadDash th, td { padding: 8px 16px; }
+// .tableFixHeadDash th {
+//   background: #eee!important
+// }
+
+.fs-18 {
+  font-size: 16px;
+}
+
+.fw-semibold {
+  font-weight: 600 !important;
+}
+
+.FormGroupD .form-control-sm {
+  height: calc(2.5em + 0.5rem + 2px) !important;
+}
+.card.custom-card {
+  border-radius: .5rem;
+  border: 0;
+  // background-color: #fff;
+  box-shadow: 0 .125rem 0 rgba(10, 10, 10, .04);
+  position: relative;
+  margin-block-end: 1.5rem;
+  // width: 100%;
+}
+
+.card.custom-card .card-header {
+  padding: 1rem 1.25rem;
+  background-color: transparent !important;
+  border-block-end: 1px solid #f3f3f3;
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+
+.card.custom-card .card-header .card-title {
+  position: relative;
+  margin-block-end: 0;
+  font-size: .9375rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.card.custom-card .card-header .card-title:before {
+  content: "";
+  position: absolute;
+  height: 1rem;
+  width: .2rem;
+  inset-block-start: .15rem;
+  inset-inline-start: -.65rem;
+  background: linear-gradient(to bottom, #73818f 50%, #a7c6ed 50%);
+  border-radius: .5rem;
+}
+.avatar.avatar-md {
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  font-size: .8rem;
+}
+.avatar {
+  position: relative;
+  height: 2.625rem;
+  width: 2.625rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: .5rem;
+  color: #fff;
+  font-weight: 500;
+}
+.me-3 {
+  margin-right: 1rem !important;
+}
+.fs-10 {
+  font-size: 12px;
+}
+.op-7 {
+  opacity: .7;
+}
+.card.custom-card .card-header:first-child {
+  border-radius: .625rem .625rem 0 0;
+}
+.card.custom-card .card-header {
+  padding: 10px 1.25rem!important;
+  background-color: transparent !important;
+  border-block-end: 1px solid #f3f3f3;
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+.card.custom-card .card-header .card-title {
+  position: relative;
+  margin-block-end: 0;
+  font-size: .9375rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.crm-deals-status li {
+  position: relative;
+  margin-block-end: 1rem;
+  margin-inline-start: 1rem;
+}
+.crm-deals-status li.primary:before {
+  background-color: #845adf;
+}
+.crm-deals-status li.info:before {
+  background-color: #49b6f5;
+}
+.crm-deals-status li.warning:before {
+  background-color: #f5b849;
+}
+.crm-deals-status li.success:before {
+  background-color: #26bf94;
+}
+.crm-deals-status li:before {
+  content: "";
+  position: absolute;
+  width: .5rem;
+  height: .5rem;
+  inset-block-start: .375rem;
+  inset-inline-start: -1rem;
+  border-radius: 50%;
+}
+.bg-primaryD {
+  background-color: #002f6c !important;
+}
+.DashboardreadonlyBg .readonly {
+  background-color: transparent !important;
+}
+.text-mutedDashboard {
+  color: #000 !important;
+}
+.dashboardTable2 .jss_content {
+  // max-height: calc(100vh - 393px) !important;
+  height: 375px;
+  overflow: scroll;
+}
+.CustomHeight{
+  height: 375px;
+}
+@media screen and (min-width: 1920px) {
+  .CustomHeight{
+    height: 412px;
+  }
 }
 // .MuiSwitch-colorPrimary.Mui-checked {
 //     color: #23a8d8!important;

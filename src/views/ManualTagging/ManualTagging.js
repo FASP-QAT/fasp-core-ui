@@ -1661,6 +1661,7 @@ export default class ManualTagging extends Component {
                         }
                     }
                     generalProgramJson.actionList = actionList;
+                    generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                     generalProgramJson.delinkList = delinkList;
                     generalProgramJson.shipmentLinkingList = linkedShipmentsList;
@@ -2055,6 +2056,7 @@ export default class ManualTagging extends Component {
                                             planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                         }
                                         generalProgramJson.actionList = actionList;
+                                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                                         generalProgramJson.shipmentLinkingList = linkedShipmentsList;
                                         programDataJson.planningUnitDataList = planningUnitDataList;

@@ -40,6 +40,18 @@ const validationSchema = function (values) {
             .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.realm.realmCodeText'))
             .max(6, i18n.t('static.realm.realmCodeLength')),
+        noOfMonthsInFutureForTopDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForTopDashboard'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        noOfMonthsInPastForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForBottomDashboard'))
+            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -57,7 +69,9 @@ export default class RealmTicketComponent extends Component {
                 minMosMaxGaurdrail: "",
                 maxMosMaxGaurdrail: "",
                 notes: "",
-                priority: 3
+                priority: 3,
+                noOfMonthsInFutureForTopDashboard:18,
+                noOfMonthsInPastForBottomDashboard:18
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -85,6 +99,12 @@ export default class RealmTicketComponent extends Component {
         }
         if (event.target.name == "minMosMinGaurdrail") {
             realm.minMosMinGaurdrail = event.target.value;
+        }
+        if (event.target.name === "noOfMonthsInFutureForTopDashboard") {
+            realm.noOfMonthsInFutureForTopDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
+            realm.noOfMonthsInPastForBottomDashboard = event.target.value
         }
         if (event.target.name == "minMosMaxGaurdrail") {
             realm.minMosMaxGaurdrail = event.target.value;
@@ -136,6 +156,8 @@ export default class RealmTicketComponent extends Component {
         realm.maxMosMaxGaurdrail = '';
         realm.notes = '';
         realm.priority = 3;
+        realm.noOfMonthsInFutureForTopDashboard=18;
+        realm.noOfMonthsInPastForBottomDashboard=18;
         this.setState({
             realm
         },
@@ -162,7 +184,9 @@ export default class RealmTicketComponent extends Component {
                             minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
                             maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
                             notes: this.state.realm.notes,
-                            priority: 3
+                            priority: 3,
+                            noOfMonthsInFutureForTopDashboard:this.state.noOfMonthsInFutureForTopDashboard,
+                            noOfMonthsInPastForBottomDashboard:this.state.noOfMonthsInPastForBottomDashboard
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -316,6 +340,34 @@ export default class RealmTicketComponent extends Component {
                                             value={this.state.realm.maxMosMaxGaurdrail}
                                             required />
                                         <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInFutureForTopDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInFutureForTopDashboard"
+                                            id="noOfMonthsInFutureForTopDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInFutureForTopDashboard && this.state.realm.noOfMonthsInFutureForTopDashboard != ''}
+                                            invalid={touched.noOfMonthsInFutureForTopDashboard && !!errors.noOfMonthsInFutureForTopDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.noOfMonthsInFutureForTopDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInFutureForTopDashboard}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInPastForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInPastForBottomDashboard"
+                                            id="noOfMonthsInPastForBottomDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInPastForBottomDashboard && this.state.realm.noOfMonthsInPastForBottomDashboard != ''}
+                                            invalid={touched.noOfMonthsInPastForBottomDashboard && !!errors.noOfMonthsInPastForBottomDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.noOfMonthsInPastForBottomDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>

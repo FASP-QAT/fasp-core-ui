@@ -1688,6 +1688,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         }
                     }
                     generalProgramJson.actionList = actionList;
+                    generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     programDataJson.planningUnitDataList = planningUnitDataList;
                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                     programRequest.result.programData = programDataJson;

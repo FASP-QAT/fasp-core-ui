@@ -4564,6 +4564,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentDataList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();

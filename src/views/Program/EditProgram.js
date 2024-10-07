@@ -42,7 +42,8 @@ let initialValues = {
     fundingSources: [],
     programNotes: '',
     regionId: [],
-    programCode1: ''
+    programCode1: '',
+    noOfMonthsInPastForBottomDashboard: '',
 }
 /**
  * Defines the validation schema for program details.
@@ -119,6 +120,10 @@ const validationSchema = function (values) {
                         return true;
                     }
                 }),
+        noOfMonthsInPastForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
     })
 }
 /**
@@ -181,6 +186,7 @@ export default class EditProgram extends Component {
                 airFreightPerc: '',
                 seaFreightPerc: '',
                 roadFreightPerc: '',
+                noOfMonthsInPastForBottomDashboard:'',
                 plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
@@ -717,6 +723,9 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'roadFreightPerc') {
             program.roadFreightPerc = event.target.value;
         }
+        if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
+            program.noOfMonthsInPastForBottomDashboard = event.target.value
+        }
         if (event.target.name == 'plannedToSubmittedLeadTime') {
             program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
@@ -808,7 +817,8 @@ export default class EditProgram extends Component {
                                     regionArray: this.state.program.regionArray,
                                     regionId: this.state.program.regionArray,
                                     programCode1: this.state.uniqueCode,
-                                    programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode
+                                    programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
+                                    noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -1231,6 +1241,20 @@ export default class EditProgram extends Component {
                                                             name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
                                                         <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup className="col-md-4">
+                                                        <Label htmlFor="company">{i18n.t('static.realm.noOfMonthsInPastForBottomDashboard')}</Label>
+                                                        <Input
+                                                            value={this.state.program.noOfMonthsInPastForBottomDashboard}
+                                                            bsSize="sm"
+                                                            valid={!errors.noOfMonthsInPastForBottomDashboard}
+                                                            invalid={touched.noOfMonthsInPastForBottomDashboard && !!errors.noOfMonthsInPastForBottomDashboard}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            name="noOfMonthsInPastForBottomDashboard" id="noOfMonthsInPastForBottomDashboard"
+                                                             />
+                                                        <FormFeedback>{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
+                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
@@ -1332,7 +1356,8 @@ export default class EditProgram extends Component {
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray,
                 uniqueCode: this.state.uniqueCode,
-                healthAreaArray: this.state.program.healthAreaArray
+                healthAreaArray: this.state.program.healthAreaArray,
+                noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard
             }
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {
