@@ -597,7 +597,58 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true);
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: '#BA0C2F'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
+      var getRequest = program.getAll();
+      let tempProgramList = [];
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
+          tempProgramList.push({
+            openCount: filteredGetRequestList[i].openCount,
+            addressedCount: filteredGetRequestList[i].addressedCount,
+            programCode: filteredGetRequestList[i].programCode + " ~v"+ filteredGetRequestList[i].version + " (Local)",
+            programVersion: filteredGetRequestList[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version,
+            id: filteredGetRequestList[i].id,
+            loading: false,
+            local: true,
+            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
+          });
+        }
+        tempProgramList.sort(function (a, b) {
+          a = a.programCode.toLowerCase();
+          b = b.programCode.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+        if(tempProgramList.length > 0) {
+          Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true);
+        }
+      }.bind(this);
+    }.bind(this);
     Chart.plugins.register({
       beforeDraw: function (chart) {
         if (chart.config.type === 'doughnut') {
@@ -1985,7 +2036,7 @@ class ApplicationDashboard extends Component {
               </div>
             </div>
           </div>
-          <div className='row'>
+          {this.state.dashboardBottomData && <div className='row'>
             <div class="col-xl-12">
               <div className='row pl-lg-1 pr-lg-1'>
                 <div className='col-md-12'>
@@ -2112,7 +2163,7 @@ class ApplicationDashboard extends Component {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
         </>}
       </div >
     );
