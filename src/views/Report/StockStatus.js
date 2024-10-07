@@ -361,7 +361,7 @@ class StockStatus extends Component {
                   : "-" + item1.primeLineNo))
             )
           }).join(' \n')).replaceAll(' ', '%20')
-            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : ele.adjustment != null ? roundARU(ele.adjustment,1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock,1) : '', roundARU(ele.closingBalance,1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand,1) : ''])));
+            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(ele.adjustment != null ? roundARU(ele.adjustment,1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment,1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock,1) : '', roundARU(ele.closingBalance,1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand,1) : ''])));
         } else {
           item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), roundARU(ele.openingBalance,1), ele.forecastedConsumptionQty == null ? '' : roundARU(ele.forecastedConsumptionQty,1), ele.actualConsumptionQty == null ? '' : roundARU(ele.actualConsumptionQty,1), ele.shipmentQty == null ? '' : (ele.shipmentInfo.length>0?roundARU(ele.shipmentQty,1):""),
           (ele.shipmentInfo.map(item1 => {
@@ -385,7 +385,7 @@ class StockStatus extends Component {
                   : "-" + item1.primeLineNo))
             )
           }).join(' \n')).replaceAll(' ', '%20')
-            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : ele.adjustment != null ? roundARU(ele.adjustment,1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock,1) : '', roundARU(ele.closingBalance,1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand,1) : ''])));
+            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(ele.adjustment != null ? roundARU(ele.adjustment,1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment,1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock,1) : '', roundARU(ele.closingBalance,1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand,1) : ''])));
         }
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
@@ -605,7 +605,7 @@ class StockStatus extends Component {
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
             }).join(' \n')
-              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(roundARU(ele.adjustment,1)) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
         } else {
           otherdata =
             item.data.map(ele => [dateFormatter(ele.dt), formatter(roundARU(ele.openingBalance,1), 0), formatter(roundARU(ele.forecastedConsumptionQty,1), 0), formatter(roundARU(ele.actualConsumptionQty,1), 0), (ele.shipmentInfo.length>0?formatter(roundARU(ele.shipmentQty,1), 0):""),
@@ -626,7 +626,7 @@ class StockStatus extends Component {
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
             }).join(' \n')
-              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(roundARU(ele.adjustment,1)) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
         }
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
@@ -2901,7 +2901,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                               })}</table>
                             </td>
                             <td>
-                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? roundARU(this.state.stockStatusList[idx].nationalAdjustment,1) : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? roundARU(this.state.stockStatusList[idx].nationalAdjustment,1) : roundARU(this.state.stockStatusList[idx].adjustment,1), 0)}
+                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? roundARU(this.state.stockStatusList[idx].nationalAdjustment,1) : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? Number(roundARU(this.state.stockStatusList[idx].nationalAdjustment,1))+Number(roundARU(this.state.stockStatusList[idx].adjustment,1)) : roundARU(this.state.stockStatusList[idx].adjustment,1), 0)}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].expiredStock != 0 ? formatter(roundARU(this.state.stockStatusList[idx].expiredStock,1), 0) : ''}
