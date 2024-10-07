@@ -6169,6 +6169,8 @@ export default class CreateTreeTemplate extends Component {
         //         }
         //     }
         // }
+        var funnelChildNodes = this.state.treeTemplate.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x =>x.id.toString())
+        downwardAggregationList = downwardAggregationList.filter(x => !funnelChildNodes.includes(x.value.split("~")[2]))
         if (nodeTypeId != 0) {
             nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
             for (let i = 0; i < nodeType.allowedChildList.length; i++) {
