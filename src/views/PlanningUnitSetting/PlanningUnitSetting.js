@@ -228,21 +228,52 @@ export default class PlanningUnitSetting extends Component {
             }
             if (data[i].x == 0) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
-                if (index == 0) {
-                    (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
+                if(index==0){
+                    // let pCatList = this.state.productCategoryListNew;
+
+                    let inputText = data[i].value;
+
+                    // Replace non-breaking spaces with regular spaces
+                    let cleanedText = inputText.replace(/\u00A0/g, " ");
+
+                    // Replace zero-width spaces (if any)
+                    cleanedText = cleanedText.replace(/\u200B/g, "");
+
+                    // Remove any line breaks (if any)
+                    cleanedText = cleanedText.replace(/(\r\n|\n|\r)/gm, "");
+
+                    // let index = pCatList.findIndex(c => c.name == cleanedText);
+                    
+                    (instance).setValueFromCoords(0, data[i].y, cleanedText, true);
                 }
             }
             if (data[i].x == 1) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
-                if (index == 0) {
-                    let temp = data[i].value.split(" | ");
-                    let temp_obj = {
-                        id: parseInt(temp[1]),
-                        name: data[i].value
-                    };
-                    let temp_list = this.state.dropdownList;
-                    // temp_list[data[i].y] = temp_obj;
+                if(index==0){
 
+                //=====code to clear formatting in text=====
+
+                let inputText = data[i].value;
+
+                // Replace non-breaking spaces with regular spaces
+                let cleanedText = inputText.replace(/\u00A0/g, " ");
+
+                // Replace zero-width spaces (if any)
+                cleanedText = cleanedText.replace(/\u200B/g, "");
+
+                // Remove any line breaks (if any)
+                cleanedText = cleanedText.replace(/(\r\n|\n|\r)/gm, "");
+
+                //=====end of code to clear formatting=====
+
+                // let temp = data[i].value.split(" | ");
+                let temp = cleanedText.split(" | ");
+                let temp_obj = {
+                    id: parseInt(temp[1]),
+                    name: cleanedText
+                };
+                let temp_list = this.state.dropdownList;
+                // temp_list[data[i].y] = temp_obj;
 
                     let index = temp_list.findIndex(c => c.id == temp_obj.id);
                     if (index == -1) {
@@ -253,14 +284,14 @@ export default class PlanningUnitSetting extends Component {
                     //     continue loop1;
                     // }                
 
-                    this.setState(
-                        {
-                            dropdownList: temp_list
-                        }, () => {
-                            // (instance).setValueFromCoords(1, data[i].y, '', true);//temp added
-                            (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
-                        }
-                    )
+                this.setState(
+                    {
+                        dropdownList: temp_list
+                    }, () => {
+                        // (instance).setValueFromCoords(1, data[i].y, '', true);//temp added
+                        (instance).setValueFromCoords(1, data[i].y, cleanedText, true);
+                    }
+                )
                 }
             }
         }
