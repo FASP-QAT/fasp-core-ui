@@ -449,7 +449,7 @@ class Login extends Component {
                             setTouched
                           }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                              <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
+                              <h5 id="div1" className='DarkFontbold'>{i18n.t(this.props.match.params.message)}</h5>
                               <h5 id="div2" className='Colorchangetheme'>{i18n.t(this.state.message)}</h5>
                               <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
                               <InputGroup className="mb-3">
@@ -532,7 +532,7 @@ class Login extends Component {
                     </a>
                   </div>
                   <div className='col-md-6 col-sm-12'>
-                    <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
+                    <h5 className="text-right versionColor DarkFontbold">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
                   </div>
                 </div>
               </Col>
