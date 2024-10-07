@@ -1026,6 +1026,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 1) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
@@ -1071,6 +1072,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.consumptionList = consumptionList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             } else if (rows[r].scenarioId == 2) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
                                 let stopDate = moment(rows[r].stopDate).endOf('month').format("YYYY-MM-DD");
@@ -1115,6 +1117,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.consumptionList = consumptionList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             } else if (rows[r].scenarioId == 4) {
                                 var shipmentList = programJson.shipmentList;
                                 var actionList = generalProgramJson.actionList;
@@ -1308,6 +1311,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
                                 generalProgramJson.shipmentBudgetList = shipmentBudgetList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             } else if (rows[r].scenarioId == 5) {
                                 var shipmentList = programJson.shipmentList;
                                 var actionList = generalProgramJson.actionList;
@@ -1487,6 +1491,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 6) {
                                 var shipmentList = programJson.shipmentList;
@@ -1662,6 +1667,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (rows[r].scenarioId == 7) {
                                 let startDate = moment(rows[r].startDate).startOf('month').format("YYYY-MM-DD");
@@ -1710,6 +1716,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.shipmentList = shipmentList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                             } else if (this.state.scenarioId == 9) {
                                 var rangeValue = rows[r].rangeValue;
@@ -1818,6 +1825,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 })
                                 programJson.consumptionList = consumptionList;
                                 generalProgramJson.actionList = actionList;
+                                generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                 if (planningUnitDataIndex != -1) {
                                     planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                                 } else {
@@ -2002,6 +2010,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -2094,6 +2103,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.consumptionList = consumptionList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2187,6 +2197,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.consumptionList = consumptionList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {
@@ -2425,6 +2436,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -2648,6 +2660,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -2867,6 +2880,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -2953,6 +2967,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.shipmentList = shipmentList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -3139,6 +3154,7 @@ export default class WhatIfReportComponent extends React.Component {
                         })
                         programJson.consumptionList = consumptionList;
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         if (planningUnitDataIndex != -1) {
                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                         } else {

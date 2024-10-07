@@ -26,5 +26,13 @@ class DashboardService {
         return axios.get(`${API_URL}/api/supplyPlanReviewerLevelDashboard`, {
         });
     }
+    getDashboardTop() {
+        return axios.get(`${API_URL}/api/getDashboardTop`, {
+        });
+    }
+    getDashboardBottom() {
+        return axios.get(`${API_URL}/api/getDashboardBottom`, {
+        });
+    }
 }
 export default new DashboardService();

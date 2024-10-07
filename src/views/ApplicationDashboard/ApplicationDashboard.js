@@ -1,8 +1,18 @@
 import CryptoJS from 'crypto-js';
+import classNames from 'classnames';
 import moment from 'moment';
 import React, { Component } from 'react';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import { MultiSelect } from 'react-multi-select-component';
+import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
+import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
+import jexcel from 'jspreadsheet';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import {
   ButtonGroup,
   Card,
@@ -16,19 +26,48 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
-  Row
+  Row,
+  Input,
+  FormGroup,
+  Label,
+  Popover,
+  Table,
+  PopoverBody
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY } from '../../Constants.js';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DashboardService from "../../api/DashboardService";
 import ProgramService from "../../api/ProgramService";
+import DropdownService from "../../api/DropdownService";
 import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, hideSecondComponent, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+import { Dashboard } from '../Dashboard/Dashboard.js';
+/**
+ * Formats a numerical value by adding commas as thousand separators.
+ * @param {string|number} cell1 - The numerical value to be formatted.
+ * @param {Object} row - The row object if applicable.
+ * @returns {string} The formatted numerical value with commas as thousand separators.
+ */
+function addCommas(cell1, row) {
+  if (cell1 != null && cell1 != "") {
+      cell1 += '';
+      var x = cell1.replaceAll(",", "").split('.');
+      var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      return x1 + x2;
+  } else {
+      return "";
+  }
+}
 /**
  * Component for showing the dashboard.
  */
@@ -36,7 +75,13 @@ class ApplicationDashboard extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode: false,
+      popoverOpenMa: false,
       id: this.props.match.params.id,
       dropdownOpen: false,
       radioSelected: 2,
@@ -52,7 +97,16 @@ class ApplicationDashboard extends Component {
       openIssues: '',
       addressedIssues: '',
       supplyPlanReviewCount: '',
-      roleArray: []
+      roleArray: [],
+      dashboardTopList: [],
+      topProgramId: localStorage.getItem('topProgramId') ? JSON.parse(localStorage.getItem('topProgramId')) : [],
+      bottomProgramId: localStorage.getItem('bottomProgramId'),
+      displayBy: 1,
+      onlyDownloadedTopProgram: localStorage.getItem("topLocalProgram"),
+      onlyDownloadedBottomProgram: localStorage.getItem("bottomLocalProgram"),
+      rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+      minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+      maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -60,12 +114,19 @@ class ApplicationDashboard extends Component {
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
+    this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
     this.checkNewerVersionsDataset = this.checkNewerVersionsDataset.bind(this);
     this.updateState = this.updateState.bind(this);
+    this.updateStateDashboard = this.updateStateDashboard.bind(this);
     this.getDataSetList = this.getDataSetList.bind(this);
     this.deleteProgram = this.deleteProgram.bind(this);
     this.deleteSupplyPlanProgram = this.deleteSupplyPlanProgram.bind(this);
+    this.buildForecastErrorJexcel = this.buildForecastErrorJexcel.bind(this);
+    this.buildShipmentsTBDJexcel = this.buildShipmentsTBDJexcel.bind(this);
+    this.buildExpiriesJexcel = this.buildExpiriesJexcel.bind(this);
+    this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
+    this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -230,6 +291,24 @@ class ApplicationDashboard extends Component {
     });
   }
   /**
+   * Handles the dismiss of the range picker component.
+   * Updates the component state with the new range value and triggers a data fetch.
+   * @param {object} value - The new range value selected by the user.
+   */
+  handleRangeDissmis(value) {
+    this.setState({ rangeValue: value }, () => { 
+      localStorage.setItem("bottomReportPeriod", JSON.stringify(value))
+     })
+  }
+  /**
+   * Handles the click event on the range picker box.
+   * Shows the range picker component.
+   * @param {object} e - The event object containing information about the click event.
+   */
+  _handleClickRangeBox(e) {
+      this.refs.reportPeriod.show()
+  }
+  /**
    * Checks for newer versions of programs and updates local storage with the latest program information.
    * @param {Array} programs - List of programs to check for newer versions.
    */
@@ -256,9 +335,59 @@ class ApplicationDashboard extends Component {
     }
   }
   /**
+    * Retrieves the list of programs.
+    */
+  getPrograms() {
+    if (localStorage.getItem("sessionType") === 'Online') {
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            .then(response => {
+                var proList = []
+                for (var i = 0; i < response.data.length; i++) {
+                    var programJson = {
+                        id: response.data[i].id,
+                        programId: response.data[i].id,
+                        label: response.data[i].label,
+                        programCode: response.data[i].code
+                    }
+                    proList[i] = programJson
+                }
+                this.setState({
+                  programList: proList, loading: false
+                }, () => { this.consolidatedProgramList() })
+            }).catch(
+                error => {
+                    this.setState({
+                      programList: []
+                    }, () => { this.consolidatedProgramList() })
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+    } else {
+        this.consolidatedProgramList()
+    }
+  }
+  /**
    * Retrieves supply plan programs from indexedDB and updates the state with the fetched program list.
    */
-  getPrograms() {
+  consolidatedProgramList() {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -273,7 +402,8 @@ class ApplicationDashboard extends Component {
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
-      var programList = [];
+      var programList = this.state.programList;
+      let tempProgramList = [];
       getRequest.onerror = function (event) {
         this.setState({
           message: i18n.t('static.program.errortext'),
@@ -288,22 +418,36 @@ class ApplicationDashboard extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
         for (var i = 0; i < filteredGetRequestList.length; i++) {
-          programList.push({
-            openCount: filteredGetRequestList[i].openCount,
-            addressedCount: filteredGetRequestList[i].addressedCount,
-            programCode: filteredGetRequestList[i].programCode,
-            programVersion: filteredGetRequestList[i].version,
-            programId: filteredGetRequestList[i].programId,
-            versionId: filteredGetRequestList[i].version,
-            id: filteredGetRequestList[i].id,
-            loading: false,
-            cutOffDate:filteredGetRequestList[i].cutOffDate!=undefined && filteredGetRequestList[i].cutOffDate!=null && filteredGetRequestList[i].cutOffDate!=""?filteredGetRequestList[i].cutOffDate:""
-          });
+          var f = 0
+          for (var k = 0; k < programList.length; k++) {
+              if (filteredGetRequestList[i].programId == programList[k].programId) {
+                  f = 1;
+              }
+          }
+          // if (f == 0) {
+            tempProgramList.push({
+              openCount: filteredGetRequestList[i].openCount,
+              addressedCount: filteredGetRequestList[i].addressedCount,
+              programCode: filteredGetRequestList[i].programCode + " ~v"+ filteredGetRequestList[i].version + " (Local)",
+              programVersion: filteredGetRequestList[i].version,
+              programId: filteredGetRequestList[i].programId,
+              versionId: filteredGetRequestList[i].version,
+              id: filteredGetRequestList[i].id,
+              loading: false,
+              local: true,
+              cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
+            });
+          // }
         }
+        tempProgramList.sort(function (a, b) {
+          a = a.programCode.toLowerCase();
+          b = b.programCode.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
         this.setState({
-          programList: programList
+          programList: tempProgramList.concat(programList)
         })
-        this.checkNewerVersions(programList);
+        this.checkNewerVersions(programList.filter(x => x.local));
       }.bind(this);
     }.bind(this)
   }
@@ -364,9 +508,195 @@ class ApplicationDashboard extends Component {
     }.bind(this)
   }
   /**
+    * Handle region change function.
+    * This function updates the state with the selected region values and generates a list of regions.
+    * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+    */
+  handleTopProgramIdChange = (programIds) => {
+    localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
+    this.setState({
+      topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+    }, () => { 
+      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true)  
+    });
+  }
+  /**
+    * Handles data change in the budget form.
+    * @param {Event} event - The change event.
+    */
+  dataChange(event) {
+    let bottomProgramId = this.state.bottomProgramId;
+    let displayBy = this.state.displayBy;
+    if (event.target.name === "bottomProgramId") {
+      bottomProgramId = event.target.value;
+      localStorage.setItem("bottomProgramId", bottomProgramId);
+      if(bottomProgramId.split("_").length == 1) {
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+        this.setState({
+          rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
+        })
+      }
+      Dashboard(this, bottomProgramId, this.state.displayBy, true, true);
+    }
+    if (event.target.name === "displayBy") {
+      displayBy = event.target.value;
+      Dashboard(this, bottomProgramId, displayBy, true, true);
+    }
+    this.setState({
+      bottomProgramId,
+      displayBy
+    }, () => { });
+  };
+  /**
+    * Handles the change event of the diplaying only downloaded programs.
+    * @param {Object} event - The event object containing the checkbox state.
+    */
+  changeOnlyDownloadedTopProgram(event) {
+    localStorage.setItem("topLocalProgram", event.target.checked);
+    var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedTopProgram: true,
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedTopProgram: false,
+            }, () => {
+                this.getPrograms();
+            })
+        }
+  }
+  /**
+    * Handles the change event of the diplaying only downloaded programs.
+    * @param {Object} event - The event object containing the checkbox state.
+    */
+  changeOnlyDownloadedBottomProgram(event) {
+    localStorage.setItem("bottomLocalProgram", event.target.checked);
+    var flag = event.target.checked ? 1 : 0
+        if (flag) {
+            this.setState({
+                onlyDownloadedBottomProgram: true,
+            }, () => {
+                this.getPrograms();
+            })
+        } else {
+            this.setState({
+                onlyDownloadedBottomProgram: false,
+            }, () => {
+                this.getPrograms();
+            })
+        }
+  }
+  /**
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: '#BA0C2F'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
+      var getRequest = program.getAll();
+      let tempProgramList = [];
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
+          tempProgramList.push({
+            openCount: filteredGetRequestList[i].openCount,
+            addressedCount: filteredGetRequestList[i].addressedCount,
+            programCode: filteredGetRequestList[i].programCode + " ~v"+ filteredGetRequestList[i].version + " (Local)",
+            programVersion: filteredGetRequestList[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version,
+            id: filteredGetRequestList[i].id,
+            loading: false,
+            local: true,
+            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
+          });
+        }
+        tempProgramList.sort(function (a, b) {
+          a = a.programCode.toLowerCase();
+          b = b.programCode.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+        if(tempProgramList.length > 0) {
+          Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true);
+        }
+      }.bind(this);
+    }.bind(this);
+    Chart.plugins.register({
+      beforeDraw: function (chart) {
+        if (chart.config.type === 'doughnut') {
+          const width = chart.chart.width;
+          const height = chart.chart.height;
+          const ctx = chart.chart.ctx;
+          ctx.restore();
+          const fontSize = "1";
+          ctx.font = `bold ${fontSize}em Arial`;
+          ctx.textBaseline = "middle";
+
+          const text = chart.config.data.datasets[0].data[1] + " missing",
+            textX = Math.round((width - ctx.measureText(text).width) / 2),
+            textY = height / 1.5;
+
+          ctx.fillText(text, textX, textY);
+          ctx.save();
+        }
+      },
+      afterDatasetsDraw: function (chart) {
+        if (chart.config.type === 'horizontalBar') {
+          const ctx = chart.ctx;
+          chart.data.datasets.forEach(function (dataset, i) {
+            const meta = chart.getDatasetMeta(i);
+
+            meta.data.forEach(function (element, index) {
+              // Get the percentage value
+              const dataValue = dataset.data[index];
+              const percentageText = dataValue == 0 ? '' : `${dataValue}%`;
+
+              // Calculate position for centered text
+              const position = element.tooltipPosition();
+              const barWidth = element._model.x - element._model.base; // Get the width of the bar
+              const centerX = element._model.base + barWidth / 2; // Center horizontally in the bar segment
+
+              // Set text style
+              ctx.fillStyle = 'white'; // Set text color
+              ctx.font = 'bold 12px Arial'; // Set font
+              ctx.textAlign = 'center'; // Horizontally align text to center
+              ctx.textBaseline = 'middle'; // Vertically align text to middle
+
+              // Draw the text at the center of each segment
+              ctx.fillText(percentageText, centerX, position.y);
+            });
+          });
+        }
+      }
+    });
     if (localStorage.getItem('sessionType') === 'Online') {
       if (this.state.id == 1) {
         DashboardService.applicationLevelDashboard()
@@ -418,15 +748,33 @@ class ApplicationDashboard extends Component {
     this.getPrograms();
     this.getDataSetList();
     if (localStorage.getItem('sessionType') === 'Online') {
-    DashboardService.openIssues()
-      .then(response => {
-        this.setState({
-          openIssues: response.data.openIssues,
-          addressedIssues: response.data.addressedIssues
+      DashboardService.openIssues()
+        .then(response => {
+          this.setState({
+            openIssues: response.data.openIssues,
+            addressedIssues: response.data.addressedIssues
+          })
         })
-      })
     }
     hideFirstComponent();
+
+    // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+      const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+
+
   }
   /**
    * Callback function invoked when an animation is about to start exiting.
@@ -483,6 +831,52 @@ class ApplicationDashboard extends Component {
     })
   }
   /**
+   * Update a specific key-value pair in the state's programList array.
+   * @param {string} key The key of the item in the programList array to update.
+   * @param {any} value The new value to set for the specified key.
+   */
+  updateStateDashboard(key, value) {
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+    this.setState({
+      [key]: value
+    }, () => {
+      if (key == "dashboardBottomData") {
+        // if(this.state.topProgramId.split("(Local)").length > 1){
+        //   DashboardService.getDashboardTop()
+        //     .then(response => {
+        //       this.setState({
+        //         dashboardTopList: response.data
+        //       }, () => {
+        //         if(this.state.bottomProgramId.split("_").length > 1){
+        //           DashboardService.getDashboardBottom()
+        //             .then(response => {
+        //               this.setState({
+        //                 dashboardBottomData: response.data
+        //               }, () => {
+        
+        //               })
+        //             })
+        //         }
+        //       })
+        //     })
+        // } else {
+
+        // }
+        this.buildForecastErrorJexcel();
+        this.buildShipmentsTBDJexcel();
+        this.buildExpiriesJexcel();
+        this.setState({
+          rangeValue: this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+        }, () => {
+          localStorage.setItem("bottomReportPeriod", JSON.stringify(this.state.rangeValue))
+        })
+      }
+    })
+  }
+  /**
    * Retrieves the problem list after calculation for a specific program ID.
    * @param {number} id The ID of the program for which to retrieve the problem list. 
    */
@@ -495,6 +889,255 @@ class ApplicationDashboard extends Component {
     }
   }
   /**
+     * Toggles info for confidence level
+     */
+  togglepopoverOpenMa() {
+    this.setState({
+      popoverOpenMa: !this.state.popoverOpenMa,
+    });
+  }
+
+  buildForecastErrorJexcel() {
+    var forecastErrorList = this.state.dashboardBottomData.forecastErrorList;
+    var missingPUList = [
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+    ];
+    var dataArray = [];
+    let count = 0;
+    if (forecastErrorList.length > 0) {
+      for (var j = 0; j < forecastErrorList.length; j++) {
+        data = [];
+        data[0] = forecastErrorList[j].name
+        data[1] = forecastErrorList[j].percentage
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("forecastErrorJexcel"), '');
+    jexcel.destroy(document.getElementById("forecastErrorJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "PU",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Average %",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var forecastErrorJexcel = jexcel(document.getElementById("forecastErrorJexcel"), options);
+    this.el = forecastErrorJexcel;
+    this.setState({
+      forecastErrorJexcel
+    }
+    );
+  }
+
+  buildShipmentsTBDJexcel() {
+    var shipmentWithFundingSourceTbdList = this.state.dashboardBottomData.shipmentWithFundingSourceTbd;
+    var missingPUList = [
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+      { name: "TLD30", percentage: "50%" },
+      { name: "TLD60", percentage: "100%" },
+      { name: "TLD90", percentage: "60%" },
+      { name: "TLD120", percentage: "70%" },
+    ];
+    var dataArray = [];
+    let count = 0;
+    if (shipmentWithFundingSourceTbdList.length > 0) {
+      for (var j = 0; j < shipmentWithFundingSourceTbdList.length; j++) {
+        data = [];
+        data[0] = shipmentWithFundingSourceTbdList[j].name
+        data[1] = shipmentWithFundingSourceTbdList[j].percentage
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("shipmentsTBDJexcel"), '');
+    jexcel.destroy(document.getElementById("shipmentsTBDJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "PU",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "# of Shipments",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var shipmentsTBDJexcel = jexcel(document.getElementById("shipmentsTBDJexcel"), options);
+    this.el = shipmentsTBDJexcel;
+    this.setState({
+      shipmentsTBDJexcel
+    }
+    );
+  }
+
+  buildExpiriesJexcel() {
+    var expiriesList = this.state.dashboardBottomData.expiriesList;
+    var dataArray = [];
+    let count = 0;
+    if (expiriesList.length > 0) {
+      for (var j = 0; j < expiriesList.length; j++) {
+        data = [];
+        data[0] = expiriesList[j].planningUnit.label.label_en
+        data[1] = addCommas(roundARU(expiriesList[j].expiringQty, 1))
+        data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
+        data[3] = addCommas(roundARU(expiriesList[j].expiryAmt, 1))
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("expiriesJexcel"), '');
+    jexcel.destroy(document.getElementById("expiriesJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "Planning Unit",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Expired/Expiring Quanitity",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Expiry Date",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        },
+        {
+          title: "Total Cost",
+          type: 'text',
+          editable: false,
+          readOnly: true
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var expiriesJexcel = jexcel(document.getElementById("expiriesJexcel"), options);
+    this.el = expiriesJexcel;
+    this.setState({
+      expiriesJexcel
+    }
+    );
+  }
+  /**
    * Displays a loading indicator while data is being loaded.
    */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
@@ -503,6 +1146,13 @@ class ApplicationDashboard extends Component {
    * @returns {JSX.Element} - Application Dashboard.
    */
   render() {
+
+    const { isDarkMode } = this.state;
+    // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#fff';
+
+
     const checkOnline = localStorage.getItem('sessionType');
     let defaultModuleId;
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
@@ -567,9 +1217,314 @@ class ApplicationDashboard extends Component {
         </CarouselItem>
       );
     });
+
+    const stockStatusData = {
+      labels: ['Current Stock Status'],
+      datasets: [
+        {
+          label: 'Overstock',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc*100).toFixed(2)] : [],
+          backgroundColor: 'rgba(0, 51, 102, 0.8)', // Dark Blue
+        },
+        {
+          label: 'Adequate',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc*100).toFixed(2)] : [],
+          backgroundColor: 'rgba(0, 153, 51, 0.8)', // Green
+        },
+        {
+          label: 'Below Min',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc*100).toFixed(2)] : [],
+          backgroundColor: 'rgba(255, 204, 0, 0.8)', // Yellow
+        },
+        {
+          label: 'Stockout',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc*100).toFixed(2)] : [],
+          backgroundColor: 'rgba(204, 0, 0, 0.8)', // Red
+        },
+        {
+          label: 'NA',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc*100).toFixed(2)] : [],
+          backgroundColor: 'grey', // Red
+        }
+      ]
+    };
+
+    const stockStatusOptions = {
+      scales: {
+        xAxes: [{
+          stacked: true,
+          ticks: {
+            beginAtZero: true,
+            display: false // Hide the X-axis values
+          }
+        }],
+        yAxes: [{
+          stacked: true,
+          ticks: {
+            display: false // Hide the Y-axis values
+          },
+          gridLines: {
+            display: false, // Remove grid lines
+            color: gridLineColor,
+            drawBorder: true,
+            lineWidth: 0,
+            zeroLineColor: gridLineColor
+          }
+        }]
+      },
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          pointStyle: 'rect',
+          boxWidth: 12,
+          fontColor: fontColor,
+        }
+      },
+      tooltips: {
+        enabled: true,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            const dataset = data.datasets[tooltipItem.datasetIndex];
+            const currentValue = dataset.data[tooltipItem.index];
+            const label = dataset.label;
+            return label + ': ' + currentValue + '%';
+          }
+        }
+      },
+      plugins: {
+        datalabels: {
+          display: true,
+          color: 'white',
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => `${value}%`
+        }
+      }
+    };
+
+    let shipmentDetailsList = [];
+    let forecastConsumptionQplCorrectCount = 0;
+    let forecastConsumptionQplPuCount = 0;
+    let inventoryQplCorrectCount = 0;
+    let inventoryQplPuCount = 0;
+    let actualConsumptionQplCorrectCount = 0;
+    let actualConsumptionQplPuCount = 0;
+    let shipmentQplCorrectCount = 0;
+    let shipmentQplPuCount = 0;
+    let expiryTotal = 0;
+    let shipmentTotal = 0;
+    if (this.state.dashboardBottomData) {
+      forecastConsumptionQplCorrectCount = this.state.dashboardBottomData.forecastConsumptionQpl.correctCount;
+      forecastConsumptionQplPuCount = this.state.dashboardBottomData.forecastConsumptionQpl.puCount;
+      inventoryQplCorrectCount = this.state.dashboardBottomData.inventoryQpl.correctCount;
+      inventoryQplPuCount = this.state.dashboardBottomData.inventoryQpl.puCount;
+      actualConsumptionQplCorrectCount = this.state.dashboardBottomData.actualConsumptionQpl.correctCount;
+      actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
+      shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
+      shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
+      expiryTotal = this.state.dashboardBottomData.expiryTotal;
+      shipmentTotal = this.state.dashboardBottomData.shipmentTotal;
+      if(this.state.displayBy == 1 || this.state.displayBy == 2){
+        shipmentDetailsList = Object.values(
+          this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
+            if (!acc[curr.reportBy.code]) {
+              acc[curr.reportBy.code] = { code: curr.reportBy.code, cost: curr.cost };
+            } else {
+              acc[curr.reportBy.code].cost += curr.cost;
+            }
+            return acc;
+          }, {})
+        );
+      } else {
+        shipmentDetailsList = Object.values(
+          this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
+            if (!acc[getLabelText(curr.reportBy.label, this.state.lang)]) {
+              acc[getLabelText(curr.reportBy.label, this.state.lang)] = { code: getLabelText(curr.reportBy.label, this.state.lang), cost: curr.cost };
+            } else {
+              acc[getLabelText(curr.reportBy.label, this.state.lang)].cost += curr.cost;
+            }
+            return acc;
+          }, {})
+        );
+      }
+    }
+
+    const shipmentsPieData = {
+      labels: shipmentDetailsList.map(x => x.code),
+      datasets: [{
+        label: 'My First Dataset',
+        data: shipmentDetailsList.map(x => x.cost),
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const shipmentsPieOptions = {
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            let label = data.labels[tooltipItem.index];
+            let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return "$ "+ x1 + x2;
+          }
+        }
+      },
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          pointStyle: 'rect',
+          boxWidth: 12,
+          fontColor: fontColor,
+        }
+      },
+    }
+
+    const forecastConsumptionData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
+        backgroundColor: [
+          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "green" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#c8ced3'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const forecastConsumptionOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
+    const actualInventoryData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
+        backgroundColor: [
+          (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "green" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#c8ced3'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const actualInventoryOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
+    const actualConsumptionData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
+        backgroundColor: [
+          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "green" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#c8ced3'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const actualConsumptionOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false // Hide the legend
+      }
+    }
+
+    const shipmentsData = {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
+        backgroundColor: [
+          (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "green" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          '#c8ced3'
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const shipmentsOptions = {
+      rotation: -Math.PI, // Start angle (half-circle)
+      circumference: Math.PI,
+      cutout: '50%', // Doughnut hole size
+      responsive: true,
+      legend: {
+        display: false,// Hide the legend
+        color: gridLineColor,
+        drawBorder: true,
+        lineWidth: 0,
+        zeroLineColor: gridLineColor
+      }
+    }
+    let topProgramList = []
+    this.state.programList.length > 0 && 
+      this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : true).map(c => {
+        topProgramList.push({ label: c.programCode, value: c.id })
+      })
+    let bottomProgramList = this.state.programList.length > 0
+      && this.state.programList.filter(c => this.state.onlyDownloadedBottomProgram ? c.local : true).map((item, i) => {
+        return (
+          <option key={i} value={item.id}>
+            {item.programCode}
+          </option>
+        )
+      }, this);
+    const pickerLang = {
+      months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+      from: 'From', to: 'To',
+    }
+    const { rangeValue } = this.state
+    const makeText = m => {
+      if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+      return '?'
+    }
     return (
       <div className="animated fadeIn">
-        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.consolidatedProgramList} objectStore="programData" page="dashboard"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -902,46 +1857,7 @@ class ApplicationDashboard extends Component {
               </Col>
             ))
           }
-          {
-            this.state.programList.length > 0 && activeTab1 == 2 &&
-            this.state.programList.map((item) => (
-              <Col xs="12" sm="6" lg="3">
-                <Card className=" CardHeight">
-                  <CardBody className="box-p">
-                    <div style={{ display: item.loading ? "none" : "block" }}>
-                      <div class="h1 text-muted text-left mb-2">
-                        <i class="fa fa-list-alt icon-color"></i>
-                        <ButtonGroup className="float-right BtnZindex">
-                          <Dropdown id={item.id} isOpen={this.state[item.id]} toggle={() => { this.setState({ [item.id]: !this.state[item.id] }); }}>
-                            <DropdownToggle caret className="p-0" color="transparent">
-                            </DropdownToggle>
-                            <DropdownMenu right>
-                              <DropdownItem onClick={() => this.deleteSupplyPlanProgram(item.programId, item.versionId)}>{i18n.t("static.common.delete")}</DropdownItem>
-                              <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrud(`/report/problemList/1/` + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
-                        </ButtonGroup>
-                      </div>
-                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":"")}</div>
-                      <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
-                      <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
-                    </div>
-                    <div style={{ display: item.loading ? "block" : "none" }}>
-                      <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >
-                        <div class="align-items-center">
-                          <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                          <div class="spinner-border blue ml-4" role="status">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
-            ))
-          }
-          {checkOnline === 'Online' &&
+          {checkOnline === 'Online' && activeTab1 == 1 &&
             <Col xs="12" sm="6" lg="3">
               <Card className=" CardHeight">
                 <CardBody className="box-p">
@@ -959,6 +1875,296 @@ class ApplicationDashboard extends Component {
             </Col>
           }
         </Row>
+        {activeTab1 == 2 && <>
+          <div className='row px-3'>
+            {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
+              <div>
+                <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
+              </div>
+            </div> */}
+            <div className='col-md-12'>
+              <div className='row'>
+                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
+                  <MultiSelect
+                    name="topProgramId"
+                    id="topProgramId"
+                    bsSize="sm"
+                    value={this.state.topProgramId}
+                    onChange={(e) => { this.handleTopProgramIdChange(e) }}
+                    options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
+                    labelledBy={i18n.t('static.common.regiontext')}
+                  />
+                </FormGroup>
+                <FormGroup className='col-md-3' style={{ marginTop: '34px' }}>
+                  <div className="tab-ml-1 ml-lg-3">
+                    <Input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="onlyDownloadedTopProgram"
+                      name="onlyDownloadedTopProgram"
+                      checked={this.state.onlyDownloadedTopProgram}
+                      onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
+                    />
+                    <Label
+                      className="form-check-label"
+                      check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                      Only show local program
+                    </Label>
+                  </div>
+                </FormGroup>
+
+              </div>
+
+              <div class="col-xl-12 pl-lg-0 pr-lg-0">
+                <div class="card custom-card">
+                  <div class="card-body px-0 py-0">
+                    <div class="table-responsive fixTableHead tableFixHeadDash">
+                      <Table className="table-striped table-bordered text-center">
+                        <thead>
+                          <th scope="col">Delete</th>
+                          <th scope="col">Program</th>
+                          <th scope="col"># of active planning units</th>
+                          <th scope="col"># of products with stockouts</th>
+                          <th scope="col">Expiries*</th>
+                          <th scope='col'># of open QAT Problems​</th>
+                          <th scope='col'>Last updated date</th>
+                          <th scope='col'>Review​(looks at last final vers)</th>
+                        </thead>
+                        <tbody>
+                          {this.state.dashboardTopList.map(d => {
+                            return (
+                              <tr>
+                                <td scope="row"><i class="fa fa-trash" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i></td>
+                                <td scope="row">{d.program.code+" ~v"+d.program.version}​</td>
+                                <td>
+                                  <div id="example-1" class="examples">
+                                    <div class="cssProgress">
+                                      <div class="progress1">
+                                        <div class="cssProgress-bar" data-percent={(d.activePlanningUnits/(d.activePlanningUnits+d.disabledPlanningUnits))*100} style={{ width: (d.activePlanningUnits/(d.activePlanningUnits+d.disabledPlanningUnits))*100+'%' }}>
+                                          <span class="cssProgress-label">{d.activePlanningUnits}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                </td>
+                                <td>{d.countOfStockOutPU}</td>
+                                <td>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td>{d.countOfOpenProblem}</td>
+                                <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
+                                <td>{getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)} ({moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY')})</td>
+                              </tr>)
+                          })}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className='row'>
+            <div className='col-md-12'>
+              <div className='row'>
+                <div className='col-md-3'>
+                  <FormGroup className='col FormGroupD'>
+                    <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
+                    <Input
+                      type="select"
+                      name="bottomProgramId"
+                      id="bottomProgramId"
+                      value={this.state.bottomProgramId}
+                      onChange={(e) => { this.dataChange(e) }}
+                      bsSize="sm"
+                      required
+                    >
+                      <option selected>Open this select menu</option>
+                      {bottomProgramList}
+                    </Input>
+                  </FormGroup>
+                  <FormGroup className='col' style={{ marginTop: '34px' }}>
+                    <div className="tab-ml-1 ml-lg-3">
+                      <Input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="onlyDownloadedBottomProgram"
+                        name="onlyDownloadedBottomProgram"
+                        checked={this.state.onlyDownloadedBottomProgram}
+                        onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                      />
+                      <Label
+                        className="form-check-label"
+                        check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                        Only show local program
+                      </Label>
+                    </div>
+                  </FormGroup>
+                </div>
+                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
+                  <div className="controls edit">
+                    <Picker
+                      ref="reportPeriod"
+                      years={{ min: this.state.minDate, max: this.state.maxDate }}
+                      value={rangeValue}
+                      lang={pickerLang}
+                      key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
+                      onDismiss={this.handleRangeDissmis}
+                    >
+                      <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                    </Picker>
+                  </div>
+                </FormGroup>
+                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                  <Input
+                    type="select"
+                    name="displayBy"
+                    id="displayBy"
+                    bsSize="sm"
+                    onChange={(e) => { this.dataChange(e) }}
+                    value={this.state.displayBy}
+                    required
+                  >
+                    <option value="1">Funding Source</option>
+                    <option value="2">Procurement Agent</option>
+                    <option value="3">Status</option>
+                  </Input>
+                  <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
+                </FormGroup>
+              </div>
+            </div>
+          </div>
+          {this.state.dashboardBottomData && <div className='row'>
+            <div class="col-xl-12">
+              <div className='row pl-lg-1 pr-lg-1'>
+                <div className='col-md-12'>
+                  <div className='row'>
+                    <div className='col-md-3'>
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Stock Status </div>
+                        </div>
+                        <div class="card-body pt-lg-0">
+                          <HorizontalBar data={stockStatusData} options={stockStatusOptions} />
+                        </div>
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Stocked out Planning Units ({this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}) </div>
+                        </div>
+                        <div class="card-body pt-0 pb-0">
+                          <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
+                            {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
+                              return (<li class="success">
+                                <div class="d-flex align-items-center justify-content-between">
+                                  <div className='text-mutedDashboard'>{x.planningUnit.name} </div>
+                                  <div class="fs-12 text-mutedDashboard">{x.count}​</div>
+                                </div>
+                              </li>)
+                            })}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Forecast Error </div>
+                        </div>
+                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title">Shipments </div>
+                        </div>
+                        <div class="card-body">
+                          <div className='d-flex align-items-center justify-content-center'>
+                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300}/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-3">
+                      <div className="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"># of Shipments with funding TBD </div>
+                        </div>
+                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                          <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='row'>
+                    <div className='col-md-6'>
+                      <div class="card custom-card CustomHeight">
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title"> Data Quality (doesn't use date selector) </div>
+                        </div>
+                        <div class="card-body py-2">
+                          <div className='row pt-lg-1'>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
+                              </div>
+                            </div>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
+                              </div>
+                            </div>
+                          </div>
+                          <div className='row pt-lg-1'>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
+                              </div>
+                            </div>
+                            <div class="col-md-6 container1">
+                              <p class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="pie-wrapper">
+                                <div class="arc" data-value="24"></div>
+                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='col-md-6'>
+                      <div className='row'>
+                        <div class="col-md-12 pl-lg-4 pr-lg-4">
+                          <div class="card custom-card CustomHeight">
+                            <div class="card-header justify-content-between">
+                              <div class="card-title"> Expiries</div>
+                            </div>
+                            <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                              <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</p>
+                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>}
+        </>}
       </div >
     );
   }

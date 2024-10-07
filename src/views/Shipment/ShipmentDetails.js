@@ -1851,6 +1851,7 @@ export default class ShipmentDetails extends React.Component {
                                             showPlanningUnitAndQtyList: showPlanningUnitAndQtyList
                                         })
                                         generalProgramJson.actionList = actionList;
+                                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                                         programRequest.result.programData.planningUnitDataList = planningUnitDataList;
                                         programRequest.result.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString();

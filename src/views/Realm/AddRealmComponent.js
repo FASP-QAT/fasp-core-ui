@@ -24,7 +24,9 @@ const initialValues = {
     forecastConsumptionMonthsInPast: Number(FORECASTED_CONSUMPTION_MONTHS_IN_PAST),
     inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST),
     minCountForMode: '',
-    minPercForMode: ''
+    minPercForMode: '',
+    noOfMonthsInPastForBottomDashboard: 18,
+    noOfMonthsInFutureForTopDashboard: 18
 }
 /**
  * Defines the validation schema for realm details.
@@ -102,6 +104,18 @@ const validationSchema = function (values) {
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .required(i18n.t('static.validated.minPercForMode'))
             .min(0, i18n.t('static.program.validvaluetext')),
+        noOfMonthsInFutureForTopDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForTopDashboard'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        noOfMonthsInPastForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForBottomDashboard'))
+            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -131,7 +145,9 @@ export default class AddRealmComponent extends Component {
                 forecastConsumptionMonthsInPast: Number(FORECASTED_CONSUMPTION_MONTHS_IN_PAST),
                 inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST),
                 minCountForMode: '',
-                minPercForMode: ''
+                minPercForMode: '',
+                noOfMonthsInFutureForTopDashboard:18,
+                noOfMonthsInPastForBottomDashboard:18
             },
             message: ''
         }
@@ -186,6 +202,12 @@ export default class AddRealmComponent extends Component {
         }
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
+        }
+        if (event.target.name === "noOfMonthsInFutureForTopDashboard") {
+            realm.noOfMonthsInFutureForTopDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
+            realm.noOfMonthsInPastForBottomDashboard = event.target.value
         }
         this.setState(
             {
@@ -484,6 +506,34 @@ export default class AddRealmComponent extends Component {
                                                         value={this.state.realm.minPercForMode}
                                                         required />
                                                     <FormFeedback className="red">{errors.minPercForMode}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label>{i18n.t('static.realm.noOfMonthsInFutureForTopDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        name="noOfMonthsInFutureForTopDashboard"
+                                                        id="noOfMonthsInFutureForTopDashboard"
+                                                        bsSize="sm"
+                                                        valid={!errors.noOfMonthsInFutureForTopDashboard && this.state.realm.noOfMonthsInFutureForTopDashboard != ''}
+                                                        invalid={touched.noOfMonthsInFutureForTopDashboard && !!errors.noOfMonthsInFutureForTopDashboard}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.noOfMonthsInFutureForTopDashboard}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.noOfMonthsInFutureForTopDashboard}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label>{i18n.t('static.realm.noOfMonthsInPastForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        name="noOfMonthsInPastForBottomDashboard"
+                                                        id="noOfMonthsInPastForBottomDashboard"
+                                                        bsSize="sm"
+                                                        valid={!errors.noOfMonthsInPastForBottomDashboard && this.state.realm.noOfMonthsInPastForBottomDashboard != ''}
+                                                        invalid={touched.noOfMonthsInPastForBottomDashboard && !!errors.noOfMonthsInPastForBottomDashboard}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.noOfMonthsInPastForBottomDashboard}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>

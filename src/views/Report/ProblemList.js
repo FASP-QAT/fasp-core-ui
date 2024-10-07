@@ -441,6 +441,7 @@ export default class ProblemList extends React.Component {
                             }
                             programJson.problemReportList = problemReportListForUpdate;
                             programJson.currentVersionNotes = this.state.currentVersionNotes;
+                            programJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;

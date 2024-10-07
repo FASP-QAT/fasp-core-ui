@@ -4747,6 +4747,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                             }
                         }
                         generalProgramJson.actionList = actionList;
+                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                         programDataJson.planningUnitDataList = planningUnitDataList;
                         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
