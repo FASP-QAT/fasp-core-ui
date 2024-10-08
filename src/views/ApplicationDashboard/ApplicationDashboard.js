@@ -635,9 +635,11 @@ class ApplicationDashboard extends Component {
         this.setState({
           dashboardBottomData: response.data
         }, () => {
-          this.buildForecastErrorJexcel();
-          this.buildShipmentsTBDJexcel();
-          this.buildExpiriesJexcel();
+          if(document.getElementById("shipmentsTBDJexcel")) {
+            this.buildForecastErrorJexcel();
+            this.buildShipmentsTBDJexcel();
+            this.buildExpiriesJexcel();
+          }
         })
       }
       ).catch(
@@ -981,10 +983,8 @@ class ApplicationDashboard extends Component {
         count++;
       }
     }
-    if(document.getElementById("forecastErrorJexcel")) {
-      this.el = jexcel(document.getElementById("forecastErrorJexcel"), '');
-      jexcel.destroy(document.getElementById("forecastErrorJexcel"), true);
-    }
+    this.el = jexcel(document.getElementById("forecastErrorJexcel"), '');
+    jexcel.destroy(document.getElementById("forecastErrorJexcel"), true);
     var data = dataArray;
     var options = {
       data: data,
@@ -1023,13 +1023,11 @@ class ApplicationDashboard extends Component {
         return false;
       }.bind(this),
     };
-    if(document.getElementById("forecastErrorJexcel")) {
-      var forecastErrorJexcel = jexcel(document.getElementById("forecastErrorJexcel"), options);
-      this.el = forecastErrorJexcel;
-      this.setState({
-        forecastErrorJexcel
-      });
-    }
+    var forecastErrorJexcel = jexcel(document.getElementById("forecastErrorJexcel"), options);
+    this.el = forecastErrorJexcel;
+    this.setState({
+      forecastErrorJexcel
+    });
   }
 
   buildShipmentsTBDJexcel() {
