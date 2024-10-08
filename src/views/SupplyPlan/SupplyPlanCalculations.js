@@ -1090,13 +1090,16 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                                 var planBasedOn = programPlanningUnitList[ppL].planBasedOn;
                                 var spFilteredForDashboardBottom = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM"));
+                                console.log("programPlanningUnitList[ppL] Test@123",programPlanningUnitList[ppL])
                                 console.log("spFilteredForDashboardBottom Test@123",spFilteredForDashboardBottom);
                                 console.log("dashboardStartDateBottom Test@123",dashboardStartDateBottom)
-                                console.log("dashboardStopDateBottom Test@123",dashboardStopDateBottom)
-                                var stockOut = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length;
-                                var underStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) < (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
-                                var adequate = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) >= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock))) && (Number(c.mos).toFixed(1) <= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
-                                var overStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos).toFixed(1) != 0 && (Number(c.mos).toFixed(1) > (planBasedOn == 1 ? Number(c.maxStockMoS) : Number(c.maxStock)))).length;
+                                console.log("dashboardStopDateBottom Test@123",dashboardStopDateBottom);
+                                console.log("minStockMoSQty Test@123",minStockMoSQty);
+                                console.log("minStockMoSQty Test@123",maxStockMoSQty);
+                                var stockOut = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos) == 0).length;
+                                var underStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) < (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var adequate = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) >= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock))) && (Number(c.mos) <= (planBasedOn == 1 ? Number(c.minStockMoS) : Number(c.minStock)))).length;
+                                var overStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) > (planBasedOn == 1 ? Number(c.maxStockMoS) : Number(c.maxStock)))).length;
                                 var monthCount = moment(dashboardStopDateBottom).diff(moment(dashboardStartDateBottom), 'months')+1;
                                 console.log("MOnth Count Test@123",monthCount)
                                 var na = Number(monthCount) - Number(stockOut) - Number(underStock) - Number(adequate) - Number(overStock);
