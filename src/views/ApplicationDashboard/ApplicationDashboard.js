@@ -811,7 +811,6 @@ class ApplicationDashboard extends Component {
               dashboard: response.data
             })
           })
-        console.log("===>", AuthenticationService.getLoggedInUserRole())
         DashboardService.realmLevelDashboardUserList()
           .then(response => {
             this.setState({
