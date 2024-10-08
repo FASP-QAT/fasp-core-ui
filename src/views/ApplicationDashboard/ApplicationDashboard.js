@@ -971,8 +971,10 @@ class ApplicationDashboard extends Component {
         count++;
       }
     }
-    this.el = jexcel(document.getElementById("forecastErrorJexcel"), '');
-    jexcel.destroy(document.getElementById("forecastErrorJexcel"), true);
+    if(document.getElementById("forecastErrorJexcel")) {
+      this.el = jexcel(document.getElementById("forecastErrorJexcel"), '');
+      jexcel.destroy(document.getElementById("forecastErrorJexcel"), true);
+    }
     var data = dataArray;
     var options = {
       data: data,
