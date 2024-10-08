@@ -2050,8 +2050,8 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):"");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
-                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& jsonList[0].nationalAdjustment!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
+                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
