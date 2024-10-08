@@ -4241,7 +4241,7 @@ export default class SupplyPlanComponent extends React.Component {
     showInventoryForThatMonth(){
         localStorage.setItem('inventoryDateForBatch','');
         this.toggleLarge('Adjustments', '', '', '', '', '', '', 0);
-        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList,this.state.closingBalanceArray[0].isActual,0);
+        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList,this.state.closingBalanceArray[0].isActual,2);
     }
     /**
      * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
