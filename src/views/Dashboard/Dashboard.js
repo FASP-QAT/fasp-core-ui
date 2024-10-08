@@ -34,6 +34,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 var programJson = JSON.parse(programData);
                                 var generalProgramJson = programJson;
                                 var dashboardData = generalProgramJson.dashboardData;
+                                console.log("dashboardData Test@123",dashboardData)
                                 if (dashboardData != undefined) {
                                     var topPuData = dashboardData.topPuData;
                                     var stockedOutCount = 0;
