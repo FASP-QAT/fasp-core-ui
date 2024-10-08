@@ -699,6 +699,31 @@ class ApplicationDashboard extends Component {
             cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
           });
         }
+        if(localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
+          var dt = new Date();
+          dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+          var dt1 = new Date();
+          dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+          localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+          var inputJson = {
+            programId: this.state.bottomProgramId,
+            startDate: dt.getFullYear()+"-"+(dt.getMonth()+1)+"-01",
+            stopDate: dt1.getFullYear()+"-"+(dt1.getMonth()+1)+"-01",
+            displayShipmentsBy: this.state.displayBy
+          }
+          this.getOnlineDashboardBottom(inputJson);
+        } else if(tempProgramList.length > 0) {
+          Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, false, true);
+        }
+        if(this.state.onlyDownloadedTopProgram) {
+          Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
+        } else {
+          DashboardService.getDashboardTop().then(response => {
+            this.setState({
+              dashboardTopList: response.data
+            })
+          })
+        }
         tempProgramList.sort(function (a, b) {
           a = a.programCode.toLowerCase();
           b = b.programCode.toLowerCase();
@@ -706,31 +731,6 @@ class ApplicationDashboard extends Component {
         });
       }.bind(this);
     }.bind(this);
-    if(localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
-      var dt = new Date();
-      dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
-      var dt1 = new Date();
-      dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
-      localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
-      var inputJson = {
-        programId: this.state.bottomProgramId,
-        startDate: dt.getFullYear()+"-"+(dt.getMonth()+1)+"-01",
-        stopDate: dt1.getFullYear()+"-"+(dt1.getMonth()+1)+"-01",
-        displayShipmentsBy: this.state.displayBy
-      }
-      this.getOnlineDashboardBottom(inputJson);
-    } else if(tempProgramList.length > 0) {
-      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, false, true);
-    }
-    if(this.state.onlyDownloadedTopProgram) {
-      Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-    } else {
-      DashboardService.getDashboardTop().then(response => {
-        this.setState({
-          dashboardTopList: response.data
-        })
-      })
-    }
     Chart.plugins.register({
       beforeDraw: function (chart) {
         if (chart.config.type === 'doughnut') {
@@ -2058,7 +2058,7 @@ class ApplicationDashboard extends Component {
               <div className='row pl-lg-1 pr-lg-1'>
                 <div className='col-md-12'>
                   <div className='row'>
-                    <div className='col-md-3'>
+                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stock Status </div>
@@ -2083,7 +2083,7 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
