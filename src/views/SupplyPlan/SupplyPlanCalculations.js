@@ -1090,12 +1090,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                                 var planBasedOn = programPlanningUnitList[ppL].planBasedOn;
                                 var spFilteredForDashboardBottom = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM"));
-                                console.log("programPlanningUnitList[ppL] Test@123",programPlanningUnitList[ppL])
-                                console.log("spFilteredForDashboardBottom Test@123",spFilteredForDashboardBottom);
-                                console.log("dashboardStartDateBottom Test@123",dashboardStartDateBottom)
-                                console.log("dashboardStopDateBottom Test@123",dashboardStopDateBottom);
-                                console.log("minStockMoSQty Test@123",minStockMoSQty);
-                                console.log("minStockMoSQty Test@123",maxStockMoSQty);
                                 var maxForMonthsForDashboard = 0;
                                 var realmForDashboard = generalProgramJson.realmCountry.realm;
                                 var DEFAULT_MIN_MONTHS_OF_STOCKForDashboard = realmForDashboard.minMosMinGaurdrail;
@@ -1118,7 +1112,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 var adequate = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) >= (planBasedOn == 1 ? Number(minMoSForDashboard) : Number(c.minStock))) && (Number(c.mos) <= (planBasedOn == 1 ? Number(maxMoSForDashboard) : Number(c.maxStock)))).length;
                                 var overStock = spFilteredForDashboardBottom.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) > (planBasedOn == 1 ? Number(maxMoSForDashboard) : Number(c.maxStock)))).length;
                                 var monthCount = moment(dashboardStopDateBottom).diff(moment(dashboardStartDateBottom), 'months')+1;
-                                console.log("MOnth Count Test@123",monthCount)
                                 var na = Number(monthCount) - Number(stockOut) - Number(underStock) - Number(adequate) - Number(overStock);
                                 var stockOutPerc = Number(stockOut) / Number(monthCount);
                                 var underStockPerc = Number(underStock) / Number(monthCount);
@@ -1222,7 +1215,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                             }
                         } catch (err) {
-                            console.log("Error Test@123",err)
                             props.fetchData(1, programId)
                         }
                         programDataJson.planningUnitDataList = planningUnitDataList;
