@@ -938,9 +938,11 @@ class ApplicationDashboard extends Component {
       [key]: value
     }, () => {
       if (key == "dashboardBottomData") {
-        this.buildForecastErrorJexcel();
-        this.buildShipmentsTBDJexcel();
-        this.buildExpiriesJexcel();
+        if(document.getElementById("shipmentsTBDJexcel")) {
+          this.buildForecastErrorJexcel();
+          this.buildShipmentsTBDJexcel();
+          this.buildExpiriesJexcel();
+        }
         this.setState({
           rangeValue: this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
         }, () => {
