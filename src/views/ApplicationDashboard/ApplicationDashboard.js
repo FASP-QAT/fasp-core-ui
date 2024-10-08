@@ -55,17 +55,17 @@ import { Dashboard } from '../Dashboard/Dashboard.js';
  */
 function addCommas(cell1, row) {
   if (cell1 != null && cell1 != "") {
-      cell1 += '';
-      var x = cell1.replaceAll(",", "").split('.');
-      var x1 = x[0];
-      var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
-      var rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
+    cell1 += '';
+    var x = cell1.replaceAll(",", "").split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1].slice(0, 8) : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
   } else {
-      return "";
+    return "";
   }
 }
 /**
@@ -296,9 +296,9 @@ class ApplicationDashboard extends Component {
    * @param {object} value - The new range value selected by the user.
    */
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value }, () => { 
+    this.setState({ rangeValue: value }, () => {
       localStorage.setItem("bottomReportPeriod", JSON.stringify(value))
-     })
+    })
   }
   /**
    * Handles the click event on the range picker box.
@@ -306,7 +306,7 @@ class ApplicationDashboard extends Component {
    * @param {object} e - The event object containing information about the click event.
    */
   _handleClickRangeBox(e) {
-      this.refs.reportPeriod.show()
+    this.refs.reportPeriod.show()
   }
   /**
    * Checks for newer versions of programs and updates local storage with the latest program information.
@@ -339,49 +339,49 @@ class ApplicationDashboard extends Component {
     */
   getPrograms() {
     if (localStorage.getItem("sessionType") === 'Online') {
-        let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
-            .then(response => {
-                var proList = []
-                for (var i = 0; i < response.data.length; i++) {
-                    var programJson = {
-                        id: response.data[i].id,
-                        programId: response.data[i].id,
-                        label: response.data[i].label,
-                        programCode: response.data[i].code
-                    }
-                    proList[i] = programJson
-                }
-                this.setState({
-                  programList: proList, loading: false
-                }, () => { this.consolidatedProgramList() })
-            }).catch(
-                error => {
-                    this.setState({
-                      programList: []
-                    }, () => { this.consolidatedProgramList() })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
+        .then(response => {
+          var proList = []
+          for (var i = 0; i < response.data.length; i++) {
+            var programJson = {
+              id: response.data[i].id,
+              programId: response.data[i].id,
+              label: response.data[i].label,
+              programCode: response.data[i].code
+            }
+            proList[i] = programJson
+          }
+          this.setState({
+            programList: proList, loading: false
+          }, () => { this.consolidatedProgramList() })
+        }).catch(
+          error => {
+            this.setState({
+              programList: []
+            }, () => { this.consolidatedProgramList() })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
+            }
+          }
+        );
     } else {
-        this.consolidatedProgramList()
+      this.consolidatedProgramList()
     }
   }
   /**
@@ -420,23 +420,23 @@ class ApplicationDashboard extends Component {
         for (var i = 0; i < filteredGetRequestList.length; i++) {
           var f = 0
           for (var k = 0; k < programList.length; k++) {
-              if (filteredGetRequestList[i].programId == programList[k].programId) {
-                  f = 1;
-              }
+            if (filteredGetRequestList[i].programId == programList[k].programId) {
+              f = 1;
+            }
           }
           // if (f == 0) {
-            tempProgramList.push({
-              openCount: filteredGetRequestList[i].openCount,
-              addressedCount: filteredGetRequestList[i].addressedCount,
-              programCode: filteredGetRequestList[i].programCode + " ~v"+ filteredGetRequestList[i].version + " (Local)",
-              programVersion: filteredGetRequestList[i].version,
-              programId: filteredGetRequestList[i].programId,
-              versionId: filteredGetRequestList[i].version,
-              id: filteredGetRequestList[i].id,
-              loading: false,
-              local: true,
-              cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
-            });
+          tempProgramList.push({
+            openCount: filteredGetRequestList[i].openCount,
+            addressedCount: filteredGetRequestList[i].addressedCount,
+            programCode: filteredGetRequestList[i].programCode + " ~v" + filteredGetRequestList[i].version + " (Local)",
+            programVersion: filteredGetRequestList[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version,
+            id: filteredGetRequestList[i].id,
+            loading: false,
+            local: true,
+            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
+          });
           // }
         }
         tempProgramList.sort(function (a, b) {
@@ -516,8 +516,8 @@ class ApplicationDashboard extends Component {
     localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
       topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
-    }, () => { 
-      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true)  
+    }, () => {
+      Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true)
     });
   }
   /**
@@ -530,7 +530,7 @@ class ApplicationDashboard extends Component {
     if (event.target.name === "bottomProgramId") {
       bottomProgramId = event.target.value;
       localStorage.setItem("bottomProgramId", bottomProgramId);
-      if(bottomProgramId.split("_").length == 1) {
+      if (bottomProgramId.split("_").length == 1) {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
         var dt1 = new Date();
@@ -558,19 +558,19 @@ class ApplicationDashboard extends Component {
   changeOnlyDownloadedTopProgram(event) {
     localStorage.setItem("topLocalProgram", event.target.checked);
     var flag = event.target.checked ? 1 : 0
-        if (flag) {
-            this.setState({
-                onlyDownloadedTopProgram: true,
-            }, () => {
-                this.getPrograms();
-            })
-        } else {
-            this.setState({
-                onlyDownloadedTopProgram: false,
-            }, () => {
-                this.getPrograms();
-            })
-        }
+    if (flag) {
+      this.setState({
+        onlyDownloadedTopProgram: true,
+      }, () => {
+        this.getPrograms();
+      })
+    } else {
+      this.setState({
+        onlyDownloadedTopProgram: false,
+      }, () => {
+        this.getPrograms();
+      })
+    }
   }
   /**
     * Handles the change event of the diplaying only downloaded programs.
@@ -579,19 +579,19 @@ class ApplicationDashboard extends Component {
   changeOnlyDownloadedBottomProgram(event) {
     localStorage.setItem("bottomLocalProgram", event.target.checked);
     var flag = event.target.checked ? 1 : 0
-        if (flag) {
-            this.setState({
-                onlyDownloadedBottomProgram: true,
-            }, () => {
-                this.getPrograms();
-            })
-        } else {
-            this.setState({
-                onlyDownloadedBottomProgram: false,
-            }, () => {
-                this.getPrograms();
-            })
-        }
+    if (flag) {
+      this.setState({
+        onlyDownloadedBottomProgram: true,
+      }, () => {
+        this.getPrograms();
+      })
+    } else {
+      this.setState({
+        onlyDownloadedBottomProgram: false,
+      }, () => {
+        this.getPrograms();
+      })
+    }
   }
   /**
    * Reterives dashboard data from server on component mount
@@ -629,7 +629,7 @@ class ApplicationDashboard extends Component {
           tempProgramList.push({
             openCount: filteredGetRequestList[i].openCount,
             addressedCount: filteredGetRequestList[i].addressedCount,
-            programCode: filteredGetRequestList[i].programCode + " ~v"+ filteredGetRequestList[i].version + " (Local)",
+            programCode: filteredGetRequestList[i].programCode + " ~v" + filteredGetRequestList[i].version + " (Local)",
             programVersion: filteredGetRequestList[i].version,
             programId: filteredGetRequestList[i].programId,
             versionId: filteredGetRequestList[i].version,
@@ -644,7 +644,7 @@ class ApplicationDashboard extends Component {
           b = b.programCode.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
-        if(tempProgramList.length > 0) {
+        if (tempProgramList.length > 0) {
           Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, true, true);
         }
       }.bind(this);
@@ -719,6 +719,7 @@ class ApplicationDashboard extends Component {
               dashboard: response.data
             })
           })
+        console.log("===>", AuthenticationService.getLoggedInUserRole())
         DashboardService.realmLevelDashboardUserList()
           .then(response => {
             this.setState({
@@ -856,7 +857,7 @@ class ApplicationDashboard extends Component {
         //               this.setState({
         //                 dashboardBottomData: response.data
         //               }, () => {
-        
+
         //               })
         //             })
         //         }
@@ -1223,27 +1224,27 @@ class ApplicationDashboard extends Component {
       datasets: [
         {
           label: 'Overstock',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc*100).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
           backgroundColor: 'rgba(0, 51, 102, 0.8)', // Dark Blue
         },
         {
           label: 'Adequate',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc*100).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
           backgroundColor: 'rgba(0, 153, 51, 0.8)', // Green
         },
         {
           label: 'Below Min',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc*100).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc * 100).toFixed(2)] : [],
           backgroundColor: 'rgba(255, 204, 0, 0.8)', // Yellow
         },
         {
           label: 'Stockout',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc*100).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc * 100).toFixed(2)] : [],
           backgroundColor: 'rgba(204, 0, 0, 0.8)', // Red
         },
         {
           label: 'NA',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc*100).toFixed(2)] : [],
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
           backgroundColor: 'grey', // Red
         }
       ]
@@ -1325,7 +1326,7 @@ class ApplicationDashboard extends Component {
       shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
       expiryTotal = this.state.dashboardBottomData.expiryTotal;
       shipmentTotal = this.state.dashboardBottomData.shipmentTotal;
-      if(this.state.displayBy == 1 || this.state.displayBy == 2){
+      if (this.state.displayBy == 1 || this.state.displayBy == 2) {
         shipmentDetailsList = Object.values(
           this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
             if (!acc[curr.reportBy.code]) {
@@ -1376,9 +1377,9 @@ class ApplicationDashboard extends Component {
             var x2 = x.length > 1 ? '.' + x[1] : '';
             var rgx = /(\d+)(\d{3})/;
             while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+              x1 = x1.replace(rgx, '$1' + ',' + '$2');
             }
-            return "$ "+ x1 + x2;
+            return "$ " + x1 + x2;
           }
         }
       },
@@ -1501,7 +1502,7 @@ class ApplicationDashboard extends Component {
       }
     }
     let topProgramList = []
-    this.state.programList.length > 0 && 
+    this.state.programList.length > 0 &&
       this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : true).map(c => {
         topProgramList.push({ label: c.programCode, value: c.id })
       })
@@ -1936,12 +1937,12 @@ class ApplicationDashboard extends Component {
                             return (
                               <tr>
                                 <td scope="row"><i class="fa fa-trash" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i></td>
-                                <td scope="row">{d.program.code+" ~v"+d.program.version}​</td>
+                                <td scope="row">{d.program.code + " ~v" + d.program.version}​</td>
                                 <td>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
                                       <div class="progress1">
-                                        <div class="cssProgress-bar" data-percent={(d.activePlanningUnits/(d.activePlanningUnits+d.disabledPlanningUnits))*100} style={{ width: (d.activePlanningUnits/(d.activePlanningUnits+d.disabledPlanningUnits))*100+'%' }}>
+                                        <div class="cssProgress-bar" data-percent={(d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100} style={{ width: (d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
                                           <span class="cssProgress-label">{d.activePlanningUnits}</span>
                                         </div>
                                       </div>
@@ -2084,7 +2085,7 @@ class ApplicationDashboard extends Component {
                         </div>
                         <div class="card-body">
                           <div className='d-flex align-items-center justify-content-center'>
-                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300}/>
+                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} />
                           </div>
                         </div>
                       </div>
