@@ -1195,7 +1195,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }
                                 generalProgramJson.dashboardData.bottomPuData[programPlanningUnitList[ppL].planningUnit.id]=dashboardBottom;
                                 var spFilteredForDashboardTop = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateTop).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateTop).format("YYYY-MM"));
-                                var stockOutFlag = spFilteredForDashboardTop.filter(c => c.mos != null && Number(c.mos).toFixed(1) == 0).length>0?true:false;
+                                var stockOutFlag = spFilteredForDashboardTop.filter(c => c.mos != null && Number(c.mos) == 0).length>0?true:false;
 
                                 var valueOfExpiredStock = 0;
                                 spFilteredForDashboardTop.flatMap(item=>item.batchDetails).filter(c=>Number(c.expiredQty)>0).map(item => {
