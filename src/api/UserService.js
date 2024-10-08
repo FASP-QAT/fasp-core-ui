@@ -38,19 +38,19 @@ class UserService {
         });
     }
     updateExpiredPassword(emailId, oldPassword, newPassword) {
-        return axios.post(`${API_URL}/api/updateExpiredPassword`, { emailId, oldPassword, newPassword }, {});
+        return axios.post(`${API_URL}/api/user/updateExpiredPassword`, { emailId, oldPassword, newPassword }, {});
     }
     changePassword(userId, oldPassword, newPassword) {
-        return axios.post(`${API_URL}/api/changePassword`, { userId, oldPassword, newPassword }, {});
+        return axios.post(`${API_URL}/api/user/changePassword`, { userId, oldPassword, newPassword }, {});
     }
     forgotPassword(emailId) {
-        return axios.post(`${API_URL}/api/forgotPassword`, { emailId });
+        return axios.post(`${API_URL}/api/user/forgotPassword`, { emailId });
     }
     confirmForgotPasswordToken(emailId, token) {
-        return axios.post(`${API_URL}/api/confirmForgotPasswordToken`, { emailId, token }, {});
+        return axios.post(`${API_URL}/api/user/confirmForgotPasswordToken`, { emailId, token }, {});
     }
     updatePassword(emailId, token, password) {
-        return axios.post(`${API_URL}/api/updatePassword`, { emailId, token, password }, {});
+        return axios.post(`${API_URL}/api/user/updatePassword`, { emailId, token, password }, {});
     }
     getRoleById(json) {
         return axios.get(`${API_URL}/api/role/${json}`, {}
