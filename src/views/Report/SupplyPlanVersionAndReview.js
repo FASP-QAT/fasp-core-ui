@@ -406,10 +406,11 @@ class SupplyPlanVersionAndReview extends Component {
                     var elInstance = instance;
                     var rowData = elInstance.getRowData(x);
                     let programId = rowData[11];
+                    let versionId = rowData[1];
                     let versionStatusId = rowData[10];
                     let versionTypeId = rowData[9];
                     this.props.history.push({
-                        pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+                        pathname: `/report/editStatus/${programId}/${versionId}`,
                     });
                 }
             }

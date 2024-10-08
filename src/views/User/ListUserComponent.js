@@ -399,9 +399,11 @@ class ListUserComponent extends Component {
      * This function is used to get list of user from api
      */
     getAccessControls() {
+        this.setState({
+            loading: true
+        });
         UserService.getAccessControls()
             .then(response => {
-                console.log("====>response", response)
                 if (response.status == 200) {
                     this.setState({
                         // userList: response.data,

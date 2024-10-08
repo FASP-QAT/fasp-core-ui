@@ -591,6 +591,18 @@ class EditUserComponent extends Component {
    * This function is called when something in the access control table is changed to add the validation and set values of other cell
    */
   changed = function (instance, cell, x, y, value) {
+    if (x == 1) {
+      this.el.setValueFromCoords(5, y, "", true);
+      var col = "B".concat(parseInt(y) + 1);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+    }
     if (x == 2) {
       this.el.setValueFromCoords(5, y, "", true);
       var col = "C".concat(parseInt(y) + 1);
@@ -1039,6 +1051,17 @@ class EditUserComponent extends Component {
     var valid = true;
     var json = this.el.getJson(null, false);
     for (var y = 0; y < json.length; y++) {
+      var col = "B".concat(parseInt(y) + 1);
+      var value = this.el.getValueFromCoords(1, y);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+        valid = false;
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
       var col = "C".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(2, y);
       if (value == "") {

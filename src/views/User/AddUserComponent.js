@@ -324,13 +324,8 @@ class AddUserComponent extends Component {
    */
   getAccessControlData() {
     let realmId = AuthenticationService.getRealmId();
-    var roleList = AuthenticationService.getLoggedInUserRole();
-    console.log("response===>roleList", roleList)
-
     DropdownService.getRealmCountryDropdownList(realmId)
       .then((response) => {
-        console.log("response===>", response)
-
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {
@@ -652,6 +647,18 @@ class AddUserComponent extends Component {
    * This function is called when something in the access control table is changed to add the validation and set values of other cell
    */
   changed = function (instance, cell, x, y, value) {
+    if (x == 1) {
+      this.el.setValueFromCoords(5, y, "", true);
+      var col = "B".concat(parseInt(y) + 1);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+    }
     if (x == 2) {
       this.el.setValueFromCoords(5, y, "", true);
       var col = "C".concat(parseInt(y) + 1);
@@ -1338,7 +1345,7 @@ class AddUserComponent extends Component {
     var valid = true;
     var json = this.el.getJson(null, false);
     for (var y = 0; y < json.length; y++) {
-      var col = "C".concat(parseInt(y) + 1);
+      var col = "B".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(1, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1349,7 +1356,7 @@ class AddUserComponent extends Component {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setComments(col, "");
       }
-      var col = "D".concat(parseInt(y) + 1);
+      var col = "C".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(2, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1360,7 +1367,7 @@ class AddUserComponent extends Component {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setComments(col, "");
       }
-      var col = "E".concat(parseInt(y) + 1);
+      var col = "D".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(3, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -1371,8 +1378,19 @@ class AddUserComponent extends Component {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setComments(col, "");
       }
-      var col = "F".concat(parseInt(y) + 1);
+      var col = "E".concat(parseInt(y) + 1);
       var value = this.el.getValueFromCoords(4, y);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+        valid = false;
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+      var col = "F".concat(parseInt(y) + 1);
+      var value = this.el.getValueFromCoords(5, y);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setStyle(col, "background-color", "yellow");
