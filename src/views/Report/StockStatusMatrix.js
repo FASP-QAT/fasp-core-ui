@@ -2140,7 +2140,7 @@ export default class StockStatusMatrix extends React.Component {
       var actualValue = planBasedOn == 1 ? value : valueStock;
       var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
       if (actualValue != null) {
-        actualValue = roundAMC(actualValue);
+        actualValue = (actualValue);
         if (actualValue == 0) {
           return legendcolor[0].color;
         } else if (min > actualValue) {
@@ -2279,7 +2279,7 @@ export default class StockStatusMatrix extends React.Component {
     var actualValue = planBasedOn == 1 ? value : valueStock;
     var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
     if (actualValue != null) {
-      actualValue = roundAMC(actualValue);
+      actualValue = (actualValue);
       if (actualValue == 0) {
         return { backgroundColor: legendcolor[0].color };
       } else if (min > actualValue) {
