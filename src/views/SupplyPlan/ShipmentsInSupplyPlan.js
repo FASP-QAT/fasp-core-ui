@@ -494,7 +494,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             }
                                             // var roleList = AuthenticationService.getLoggedInUserRole();
                                             if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
-                                                inventoryEditable = false;
+                                                shipmentEditable = false;
                                             }
                                             var paginationOption = false;
                                             var searchOption = false;
