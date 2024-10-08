@@ -1011,12 +1011,13 @@ class ApplicationDashboard extends Component {
         return false;
       }.bind(this),
     };
-    var forecastErrorJexcel = jexcel(document.getElementById("forecastErrorJexcel"), options);
-    this.el = forecastErrorJexcel;
-    this.setState({
-      forecastErrorJexcel
+    if(document.getElementById("forecastErrorJexcel")) {
+      var forecastErrorJexcel = jexcel(document.getElementById("forecastErrorJexcel"), options);
+      this.el = forecastErrorJexcel;
+      this.setState({
+        forecastErrorJexcel
+      });
     }
-    );
   }
 
   buildShipmentsTBDJexcel() {
