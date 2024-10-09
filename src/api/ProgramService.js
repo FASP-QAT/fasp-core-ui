@@ -66,7 +66,7 @@ class ProgramService {
         );
     }
     saveProgramData(json, comparedVersionId) {
-        return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
+        return axios.put(`${API_URL}/api/commit/programData/${comparedVersionId}`, json, {}
         );
     }
     programInitialize(json) {
