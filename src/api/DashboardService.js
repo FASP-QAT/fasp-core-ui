@@ -23,7 +23,7 @@ class DashboardService {
         });
     }
     supplyPlanReviewerLevelDashboard() {
-        return axios.get(`${API_URL}/api/dashboard/supplyPlanReviewerLevelDashboard`, {
+        return axios.get(`${API_URL}/api/dashboard/supplyPlanReviewerLevel`, {
         });
     }
     getDashboardTop() {
