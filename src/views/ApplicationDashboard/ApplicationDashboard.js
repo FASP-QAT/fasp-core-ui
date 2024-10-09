@@ -934,7 +934,7 @@ class ApplicationDashboard extends Component {
           this.buildExpiriesJexcel();
         }
         this.setState({
-          rangeValue: this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+          rangeValue: this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 && this.state.dashboardStartDateBottom ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
         }, () => {
           localStorage.setItem("bottomReportPeriod", JSON.stringify(this.state.rangeValue))
         })
@@ -1973,7 +1973,7 @@ class ApplicationDashboard extends Component {
                                 <td>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                                 <td>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
-                                <td>{getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)} ({moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY')})</td>
+                                <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} ({d.latestFinalVersion ? moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') : ""})</td>
                               </tr>)
                           })}
                         </tbody>
