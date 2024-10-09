@@ -564,7 +564,7 @@ class DefaultLayout extends Component {
    * Logs the user out by redirecting to the login page with a session expired message.
    * @param {Event} e The event triggering the method.
    */
-  logout(e){
+  logout(e) {
     this.props.history.push('/login/static.message.sessionExpired')
   }
   /**
@@ -651,9 +651,9 @@ class DefaultLayout extends Component {
     var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
     var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
     var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
-    if((temp_time > this.state.timeout) || (localStorage.getItem('sessionType') === 'Online' && temp_time_token > this.state.timeout_token)){
-      console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime," End - ", new Date()," - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
-      console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus," End - ", new Date()," - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
+    if ((temp_time > this.state.timeout) || (localStorage.getItem('sessionType') === 'Online' && temp_time_token > this.state.timeout_token)) {
+      console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime, " End - ", new Date(), " - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
+      console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus, " End - ", new Date(), " - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
       this.props.history.push('/logout/static.message.sessionExpired')
     }
   };
@@ -666,9 +666,9 @@ class DefaultLayout extends Component {
     var tokenSetTime = localStorage.getItem("tokenSetTime") ? localStorage.getItem("tokenSetTime") : new Date();
     var temp_time = lastFocus == 0 ? 0 : (new Date().getTime() - new Date(lastFocus).getTime());
     var temp_time_token = tokenSetTime == 0 ? 0 : (new Date().getTime() - new Date(tokenSetTime).getTime());
-    if((temp_time > this.state.timeout) || (localStorage.getItem('sessionType') === 'Online' && temp_time_token > this.state.timeout_token)){
-      console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime," End - ", new Date()," - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
-      console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus," End - ", new Date()," - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
+    if ((temp_time > this.state.timeout) || (localStorage.getItem('sessionType') === 'Online' && temp_time_token > this.state.timeout_token)) {
+      console.log("Test Logout @@@ Logged Out - Token - Start - ", tokenSetTime, " End - ", new Date(), " - Total Time in ms - ", temp_time_token, " - ", (temp_time > this.state.timeout) ? "false" : "true");
+      console.log("Test Logout @@@ Logged Out - Idle - Start - ", lastFocus, " End - ", new Date(), " - Total Time in ms - ", temp_time, " - ", (temp_time > this.state.timeout) ? "true" : "false");
       this.props.history.push('/logout/static.message.sessionExpired')
     }
     localStorage.setItem("lastFocus", new Date())
@@ -789,7 +789,9 @@ class DefaultLayout extends Component {
    * Retrieves and updates the notification count.
    */
   getNotificationCount() {
-    if (localStorage.getItem("sessionType") === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DROPDOWN_SP')) {
+    if (localStorage.getItem("sessionType") === 'Online' &&
+      (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DELINKING') ||
+        AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING'))) {
       AuthenticationService.setupAxiosInterceptors();
       ManualTaggingService.getNotificationCount()
         .then(response => {
@@ -940,1853 +942,1853 @@ class DefaultLayout extends Component {
     const checkOnline = localStorage.getItem('sessionType');
     return (
       <ErrorBoundary>
-      <div className="app">
-                <IdleTimer
-          ref={ref => { this.idleTimer = ref }}
-          element={document}
-          onActive={this.onActive}
-          onIdle={this.onIdle}
-          onAction={this.checkEvent}
-          debounce={250}
-          timeout={this.state.timeout}
-          events={events}
-        />
-                <AppHeader fixed >
-          <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
-          </Suspense>
-        </AppHeader>
-        <div className="app-body">
-          <AppSidebar fixed display="lg" className={this.state.activeTab == 2 ? "module1" : "module2"}>
-            <AppSidebarHeader />
-            <AppSidebarForm />
-            <Suspense>
-              {checkOnline === 'Online' &&
-                <AppSidebarNav navConfig={{
-                  items:
-                    [
-                      {
-                        name: i18n.t('static.dashboard.datasync'),
-                        icon: 'fa fa-refresh',
-                        url: '/syncProgram',
-                      },
-                      {
-                        name: i18n.t('static.translations.translations'),
-                        icon: 'fa fa-list',
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS')) ? false : true) },
-                        children: [
-                          {
-                            name: i18n.t('static.label.labelTranslations'),
-                            url: '/translations/labelTranslations',
-                            icon: 'fa fa-exchange',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS') ? false : true),
-                              onClick: e => {
-                                this.refreshPage('/translations/labelTranslations');
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.label.databaseTranslations'),
-                            url: '/translations/databaseTranslations',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS') || this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS') || this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS')) ? false : true) }
-                          }
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.applicationmaster'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')))) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.uploadUserManual'),
-                            url: '/userManual/uploadUserManual',
-                            icon: 'fa fa-upload',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.country'),
-                            url: '/country/listCountry',
-                            icon: 'fa fa-globe',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY') ? false : true),
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.currency'),
-                            url: '/currency/listCurrency',
-                            icon: 'fa fa-money',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.dimension'),
-                            url: '/dimension/listDimension',
-                            icon: 'fa fa-map',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.language'),
-                            url: '/language/listLanguage',
-                            icon: 'fa fa-language',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.roleHead.role'),
-                            url: '/role/listRole',
-                            icon: 'fa fa-dot-circle-o',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.realmheader'),
-                            url: '/realm/listRealm',
-                            icon: 'fa fa-th-large',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.userHead.user'),
-                            url: '/user/listUser',
-                            icon: 'fa fa-users',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USER') ? false : true),
-                              onClick: e => {
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.usagePeriod.usagePeriod'),
-                            url: '/usagePeriod/listUsagePeriod',
-                            icon: 'fa fa-calendar',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          , {
-                            name: i18n.t('static.dashboard.unit'),
-                            url: '/unit/listUnit',
-                            icon: 'fa fa-th',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          }
-                          ,
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.realmlevelmaster'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION')))) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.realmcountry'),
-                            url: '/realmCountry/listRealmCountry',
-                            icon: 'fa fa-globe',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.datasource'),
-                            url: '/dataSource/listDataSource',
-                            icon: 'fa fa-database',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dataSourceTypeHead.dataSourceType'),
-                            url: '/dataSourceType/listDataSourceType',
-                            icon: 'fa fa-table',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.funderTypeHead.funderType'),
-                            icon: 'fa fa-bank',
-                            url: '/funderType/listFunderType',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.fundingSourceHead.fundingSource'),
-                            icon: 'fa fa-bank',
-                            url: '/fundingSource/listFundingSource',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.supplier'),
-                            url: '/supplier/listSupplier',
-                            icon: 'fa fa-industry',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.organisationHead.organisation'),
-                            url: '/organisation/listOrganisation',
-                            icon: 'fa fa-sitemap',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.organisationType.organisationType'),
-                            url: '/organisationType/listOrganisationType',
-                            icon: 'fa fa-object-group',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.procurementagentType'),
-                            url: '/procurementAgentType/listProcurementAgentType',
-                            icon: 'fa fa-user-circle-o',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.procurementagent'),
-                            url: '/procurementAgent/listProcurementAgent',
-                            icon: 'fa fa-user-circle-o',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.Productmenu'),
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY'))
-                                || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')))) ? false : true)
-                            },
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.forecastingunit'),
-                                url: '/forecastingUnit/listforecastingUnit',
-                                icon: 'fa fa-cube',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT') ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              }, {
-                                name: i18n.t('static.dashboard.planningunit'),
-                                url: '/planningUnit/listPlanningUnit',
-                                icon: 'fa fa-cubes',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT') ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.product.productcategory'),
-                                url: '/productCategory/productCategoryTree',
-                                icon: 'fa fa-th',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY') ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.planningUnitVolumeHead.planningUnitVolume'),
-                                url: '/planningUnitCapacity/listPlanningUnitcapacity',
-                                icon: 'fa fa-tasks',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY') ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.procurementUnit.procurementUnit'),
-                                url: '/procurementUnit/listProcurementUnit',
-                                icon: 'fa fa-building',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.tracerCategoryHead.tracerCategory'),
-                                url: '/tracerCategory/listTracerCategory',
-                                icon: 'fa fa-th',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY') ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
-                            url: '/equivalancyUnit/listEquivalancyUnit',
-                            icon: 'fa fa-exchange',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.healtharea.healtharea'),
-                            url: '/healthArea/listHealthArea',
-                            icon: 'fa fa-medkit',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.forecastMethod.forecastMethod'),
-                            url: '/forecastMethod/listForecastMethod',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.integration.integration'),
-                            url: '/integration/listIntegration',
-                            icon: 'fa fa-cogs',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.integration.manualProgramIntegration'),
-                            url: '/program/addManualIntegration',
-                            icon: 'fa fa-share-alt',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_INTEGRATION') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.common.datasetmanagement'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dataset.manageProgramInfo'),
-                            url: '/dataSet/listDataSet',
-                            icon: 'fa fa-cog',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.UpdateversionSettings.UpdateversionSettings'),
-                            url: '/dataset/versionSettings',
-                            icon: 'fa fa-sliders',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
-                            url: '/planningUnitSetting/listPlanningUnitSetting',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
-                            url: '/dataset/loadDeleteDataSet',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.importprogram'),
-                            url: '/dataset/importDataset',
-                            icon: 'fa fa-download',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.exportprogram'),
-                            url: '/dataset/exportDataset',
-                            icon: 'fa fa-upload',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.commitProgram.commitProgram'),
-                            url: '/dataset/commitTree',
-                            icon: 'cui-cloud-upload FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecast'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'),
-                            url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
-                            url: '/dataentry/consumptionDataEntryAndAdjustment',
-                            icon: 'fa fa-pencil',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.extrapolation'),
-                            url: '/Extrapolation/extrapolateData',
-                            icon: 'fa fa-line-chart',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.TreeForecast.TreeForecast'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_TREE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.common.managetree'),
-                            url: '/dataset/listTree',
-                            icon: 'fa fa-tree',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dataset.TreeTemplate'),
-                            url: '/dataset/listTreeTemplate',
-                            icon: 'fa fa-sitemap',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.usageTemplate.usageTemplate'),
-                            url: '/usageTemplate/listUsageTemplate',
-                            icon: 'fa fa-leaf',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.modelingValidation'),
-                            url: '/validation/modelingValidation',
-                            icon: 'fa fa-area-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.productValidation'),
-                            url: '/validation/productValidation',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.ForecastAnalysisOutput.ForecastAnalysisOutput'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.compareAndSelect'),
-                            url: '/report/compareAndSelectScenario',
-                            icon: 'fa fa-check-square-o',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
-                            url: '/forecastReport/forecastOutput',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.ForecastSummary.ForecastSummary'),
-                            url: '/forecastReport/forecastSummary',
-                            icon: 'fa fa-table',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.Versioncomarition'),
-                            url: '/report/compareVersion',
-                            icon: 'fa fa-files-o',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.programmaster'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW'))) && this.state.activeTab == 2) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboad.planningunitcountry'),
-                            url: '/realmCountry/listRealmCountryPlanningUnit',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.setupprogram'),
-                            url: '/program/programOnboarding',
-                            icon: 'fa fa-plus',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.programHead.program'),
-                            url: '/program/listProgram',
-                            icon: 'fa fa-cog',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.Update.PlanningUnits'),
-                            url: '/programProduct/addProgramProduct',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.countrySpecificPrices.countrySpecificPrices'),
-                            url: '/programProduct/addCountrySpecificPrice',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.budget'),
-                            url: '/budget/listBudget',
-                            icon: 'fa fa-money',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.importprogram'),
-                            url: '/program/importProgram',
-                            icon: 'fa fa-download',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.exportprogram'),
-                            url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
-                            url: '/program/downloadProgram',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.programimport'),
-                            url: '/pipeline/pieplineProgramList',
-                            icon: 'fa fa-database',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.commitVersion'),
-                            url: '/program/syncPage',
-                            icon: 'cui-cloud-upload FontBoldIcon',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
-                            url: '/report/supplyPlanVersionAndReview',
-                            icon: 'fa fa-list-ol',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.supplyPlandata'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT'))) && this.state.activeTab == 2) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
-                            url: '/consumptionDetails',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
-                            url: '/shipment/shipmentDetails',
-                            icon: 'fa fa-truck',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
-                            url: '/inventory/addInventory',
-                            icon: 'fa fa-archive',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.manualTagging'),
-                            url: '/shipment/manualTagging',
-                            icon: 'fa fa-link',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.mt.shipmentLinkingNotification'),
-                            url: '/shipmentLinkingNotification',
-                            icon: 'fa fa-bell',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'),
-                            url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
-                            icon: 'fa cui-cloud-download',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.quantimed.quantimedImport'),
-                            url: '/quantimed/quantimedImport',
-                            icon: 'fa fa-database',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.supplyPlan'),
-                        icon: 'fa fa-list',
-                        attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.supplyPlan'),
-                            url: '/supplyPlan',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.whatIf'),
-                            url: '/report/whatIf',
-                            icon: 'fa fa-calculator',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatus'),
-                            url: '/report/stockStatus',
-                            icon: 'fa fa-file-text',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.report'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_REGION'))) && this.state.activeTab == 2) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.qatProblemList'),
-                            url: '/report/problemList',
-                            icon: 'fa fa-flag',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.productcatalog'),
-                            url: '/report/productCatalog',
-                            icon: 'fa fa-list-ol',
-                            attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') && this.state.activeTab == 2) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatusmain'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.stockstatusovertime'),
-                                url: '/report/stockStatusOverTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.stockstatusmatrix'),
-                                url: '/report/stockStatusMatrix',
-                                icon: 'fa fa-table',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
-                                url: '/report/stockStatusAcrossPlanningUnits',
-                                icon: 'fa fa-camera',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
-                                url: '/report/stockStatusAccrossPlanningUnitGlobalView',
-                                icon: 'fa fa-globe',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.report.consumptionReports'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              // {
-                              //   name: i18n.t('static.dashboard.consumption'),
-                              //   url: '/report/consumption',
-                              //   icon: 'fa fa-bar-chart',
-                              //   attributes: {
-                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
-                              //     onClick: e => {
-                              //       this.refreshPage();
-                              //     }
-                              //   }
-                              // },
-                              {
-                                name: i18n.t('static.dashboard.globalconsumption'),
-                                url: '/report/globalConsumption',
-                                icon: 'fa fa-globe',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              // {
-                              //   name: i18n.t('static.report.forecasterrorovertime'),
-                              //   url: '/report/forecastOverTheTime',
-                              //   icon: 'fa fa-line-chart',
-                              //   attributes: {
-                              //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
-                              //     onClick: e => {
-                              //       this.refreshPage();
-                              //     }
-                              //   }
-                              // },
-                              {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/consumptionForecastErrorSupplyPlan',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.forecastmetrics'),
-                                url: '/report/forecastMetrics',
-                                icon: 'fa fa-table',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.report.shipmentReports'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                                url: '/report/shipmentGlobalView',
-                                icon: 'fa fa-globe',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
-                                url: '/report/shipmentGlobalDemandView',
-                                icon: 'fa fa-pie-chart',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.shipmentDetailReport'),
-                                url: '/report/shipmentSummery',
-                                icon: 'fa fa-truck',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.shipmentCostReport'),
-                                url: '/report/procurementAgentExport',
-                                icon: 'fa fa-wpforms',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.annualshipmentcost'),
-                                url: '/report/annualShipmentCost',
-                                icon: 'fa fa-file-pdf-o',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.budgetHead.budget'),
-                                url: '/report/budgets',
-                                icon: 'fa fa-money',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.supplierLeadTimes'),
-                                url: '/report/supplierLeadTimes',
-                                icon: 'fa fa-calendar',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.report.inventoryReports'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_REGION'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.report.expiredInventory'),
-                                url: '/report/expiredInventory',
-                                icon: 'fa fa-exclamation-triangle',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.costOfInventory'),
-                                url: '/report/costOfInventory',
-                                icon: 'fa fa-book',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.inventoryTurns'),
-                                url: '/report/inventoryTurns',
-                                icon: 'fa fa-refresh',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.stockAdjustment'),
-                                url: '/report/stockAdjustment',
-                                icon: 'fa fa-table',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.warehouseCapacity'),
-                                url: '/report/warehouseCapacity',
-                                icon: 'fa fa-building-o',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.regionHead.region'),
-                                url: '/region/listRegion',
-                                icon: 'fa fa-building',
-                                attributes: {
-                                  hidden: ((this.state.businessFunctions.includes('ROLE_BF_REGION') && this.state.activeTab == 2) ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                        ]
-                      },
-                      ,
-                    ]
-                }} {...this.props} />
-              }
-              {checkOnline === 'Offline' &&
-                <AppSidebarNav navConfig={{
-                  items:
-                    [
-                      {
-                        name: i18n.t('static.dashboard.programmaster'),
-                        icon: 'fa fa-list',
-                        attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM'))) && this.state.activeTab == 2) ? false : true) },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.importprogram'),
-                            url: '/program/importProgram',
-                            icon: 'fa fa-download',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.exportprogram'),
-                            url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          // {
-                          //   name: i18n.t('static.program.deleteLocalProgram'),
-                          //   url: '/program/deleteLocalProgram',
-                          //   icon: 'fa fa-trash',
-                          //   attributes: {
-                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2 ? false : true),
-                          //     onClick: e => {
-                          //       this.refreshPage();
-                          //     }
-                          //   }
-                          // },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.common.datasetmanagement'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.UpdateversionSettings.UpdateversionSettings'),
-                            url: '/dataset/versionSettings',
-                            icon: 'fa fa-sliders',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
-                            url: '/planningUnitSetting/listPlanningUnitSetting',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: 'Import Program',
-                            url: '/dataset/importDataset',
-                            icon: 'fa fa-download',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: 'Export Program',
-                            url: '/dataset/exportDataset',
-                            icon: 'fa fa-upload',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecast'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
-                            url: '/dataentry/consumptionDataEntryAndAdjustment',
-                            icon: 'fa fa-pencil',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.extrapolation'),
-                            url: '/Extrapolation/extrapolateData',
-                            icon: 'fa fa-line-chart',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.TreeForecast.TreeForecast'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_TREE')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.common.managetree'),
-                            url: '/dataset/listTree',
-                            icon: 'fa fa-tree',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.modelingValidation'),
-                            url: '/validation/modelingValidation',
-                            icon: 'fa fa-area-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.productValidation'),
-                            url: '/validation/productValidation',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.ForecastAnalysisOutput.ForecastAnalysisOutput'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.compareAndSelect'),
-                            url: '/report/compareAndSelectScenario',
-                            icon: 'fa fa-check-square-o',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
-                            url: '/forecastReport/forecastOutput',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.ForecastSummary.ForecastSummary'),
-                            url: '/forecastReport/forecastSummary',
-                            icon: 'fa fa-table',
-                            attributes: {
-                              hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.Versioncomarition'),
-                            url: '/report/compareVersion',
-                            icon: 'fa fa-files-o',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.supplyPlandata'),
-                        icon: 'fa fa-list',
-                        attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA'))) && this.state.activeTab == 2) ? false : true) },
-                        children: [
-                          {
-                            name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
-                            url: '/consumptionDetails',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
-                            url: '/shipment/shipmentDetails',
-                            icon: 'fa fa-truck',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
-                            url: '/inventory/addInventory',
-                            icon: 'fa fa-archive',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.supplyPlan'),
-                        icon: 'fa fa-list',
-                        attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.supplyPlan'),
-                            url: '/supplyPlan',
-                            icon: 'fa fa-bar-chart',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.whatIf'),
-                            url: '/report/whatIf',
-                            icon: 'fa fa-calculator',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatus'),
-                            url: '/report/stockStatus',
-                            icon: 'fa fa-file-text',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                        ]
-                      },
-                      {
-                        name: i18n.t('static.dashboard.report'),
-                        icon: 'fa fa-list',
-                        attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))) && this.state.activeTab == 2) ? false : true)
-                        },
-                        children: [
-                          {
-                            name: i18n.t('static.dashboard.qatProblemList'),
-                            url: '/report/problemList',
-                            icon: 'fa fa-flag',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.productcatalog'),
-                            url: '/report/productCatalog',
-                            icon: 'fa fa-list-ol',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') && this.state.activeTab == 2 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatusmain'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.stockstatusovertime'),
-                                url: '/report/stockStatusOverTime',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.stockstatusmatrix'),
-                                url: '/report/stockStatusMatrix',
-                                icon: 'fa fa-table',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
-                                url: '/report/stockStatusAcrossPlanningUnits',
-                                icon: 'fa fa-camera',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.report.consumptionReports'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              // {
-                              //   name: i18n.t('static.dashboard.consumption'),
-                              //   url: '/report/consumption',
-                              //   icon: 'fa fa-bar-chart',
-                              //   attributes: {
-                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
-                              //     onClick: e => {
-                              //       this.refreshPage();
-                              //     }
-                              //   }
-                              // },
-                              //  {
-                              //   name: i18n.t('static.report.forecasterrorovertime'),
-                              //   url: '/report/forecastOverTheTime',
-                              //   icon: 'fa fa-line-chart',
-                              //   attributes: {
-                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
-                              //     onClick: e => {
-                              //       this.refreshPage();
-                              //     }
-                              //   }
-                              // },
-                              {
-                                name: i18n.t('static.report.forecasterrorovertime'),
-                                url: '/report/consumptionForecastErrorSupplyPlan',
-                                icon: 'fa fa-line-chart',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.report.shipmentReports'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.report.shipmentDetailReport'),
-                                url: '/report/shipmentSummery',
-                                icon: 'fa fa-truck',
-                                attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') && this.state.activeTab == 2 ? false : true) }
-                              },
-                              {
-                                name: i18n.t('static.report.shipmentCostReport'),
-                                url: '/report/procurementAgentExport',
-                                icon: 'fa fa-wpforms',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.annualshipmentcost'),
-                                url: '/report/annualShipmentCost',
-                                icon: 'fa fa-file-pdf-o',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.supplierLeadTimes'),
-                                url: '/report/supplierLeadTimes',
-                                icon: 'fa fa-calendar',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            name: i18n.t('static.report.inventoryReports'),
-                            icon: 'fa fa-list',
-                            attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))) && this.state.activeTab == 2) ? false : true) },
-                            children: [
-                              {
-                                name: i18n.t('static.report.expiredInventory'),
-                                url: '/report/expiredInventory',
-                                icon: 'fa fa-exclamation-triangle',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.dashboard.costOfInventory'),
-                                url: '/report/costOfInventory',
-                                icon: 'fa fa-book',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              }, 
-                              // {
-                              //   name: i18n.t('static.dashboard.inventoryTurns'),
-                              //   url: '/report/inventoryTurns',
-                              //   icon: 'fa fa-refresh',
-                              //   attributes: {
-                              //     hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
-                              //     onClick: e => {
-                              //       this.refreshPage();
-                              //     }
-                              //   }
-                              // },
-                              {
-                                name: i18n.t('static.report.stockAdjustment'),
-                                url: '/report/stockAdjustment',
-                                icon: 'fa fa-table',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                              {
-                                name: i18n.t('static.report.warehouseCapacity'),
-                                url: '/report/warehouseCapacity',
-                                icon: 'fa fa-building-o',
-                                attributes: {
-                                  hidden: (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') && this.state.activeTab == 2 ? false : true),
-                                  onClick: e => {
-                                    this.refreshPage();
-                                  }
-                                }
-                              },
-                            ]
-                          },
-                        ]
-                      }
-                    ]
-                }} {...this.props} />
-              }
-            </Suspense>
-            <Row>
-              <Col xs="12" md="12">
-                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) && <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
-                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
-                    <NavLink
-                      className="bgColourRemoveLink tab1"
-                      active={this.state.activeTab === '1'}
-                      onClick={() => { this.toggle(0, '1'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
-                      style={{ border: "none" }}
-                      title={i18n.t('static.module.forecasting')}
-                    >
-                      <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
-                      <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
-                    </NavLink>
-                  </NavItem>}
-                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
-                    <NavLink
-                      className="bgColourRemoveLink tab2"
-                      active={this.state.activeTab === '2'}
-                      onClick={() => { this.toggle(0, '2'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
-                      style={{ border: "none", padding: "0.75rem 0.2rem" }}
-                      title={i18n.t('static.module.supplyPlanningMod')}
-                    >
-                                            <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
-                      <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
-                      <h6 className="tabtext">{i18n.t('static.module.supplyPlanningMod')}</h6>
-                    </NavLink>
-                  </NavItem>}
-                </Nav>}
-                              </Col>
-            </Row>
-            <AppSidebarFooter />
-            <AppSidebarMinimizer />
-          </AppSidebar>
-          <main className="main">
-                        <Container fluid>
-              <Suspense fallback={this.loading()}>
-                <Switch>
-                  {routes.map((route, idx) => {
-                    return route.component ? (
-                      <Route
-                        key={idx}
-                        path={route.path}
-                        exact={route.exact}
-                        name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
-                        render={props =>
-                          AuthenticationService.authenticatedRoute(route.path, this.state.url) ?
-                            (
-                              <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '', route.path)} />
-                            ) : (
-                              <Redirect to={{ pathname: "/accessDenied" }} />
-                            )
-                        }
-                      />
-                    ) : (null);
-                  })}
-                  <Redirect from="/" to="/login" />
-                </Switch>
-              </Suspense>
-            </Container>
-          </main>
-          <AppAside fixed>
+        <div className="app">
+          <IdleTimer
+            ref={ref => { this.idleTimer = ref }}
+            element={document}
+            onActive={this.onActive}
+            onIdle={this.onIdle}
+            onAction={this.checkEvent}
+            debounce={250}
+            timeout={this.state.timeout}
+            events={events}
+          />
+          <AppHeader fixed >
             <Suspense fallback={this.loading()}>
-                          </Suspense>
-          </AppAside>
+              <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            </Suspense>
+          </AppHeader>
+          <div className="app-body">
+            <AppSidebar fixed display="lg" className={this.state.activeTab == 2 ? "module1" : "module2"}>
+              <AppSidebarHeader />
+              <AppSidebarForm />
+              <Suspense>
+                {checkOnline === 'Online' &&
+                  <AppSidebarNav navConfig={{
+                    items:
+                      [
+                        {
+                          name: i18n.t('static.dashboard.datasync'),
+                          icon: 'fa fa-refresh',
+                          url: '/syncProgram',
+                        },
+                        {
+                          name: i18n.t('static.translations.translations'),
+                          icon: 'fa fa-list',
+                          attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS')) ? false : true) },
+                          children: [
+                            {
+                              name: i18n.t('static.label.labelTranslations'),
+                              url: '/translations/labelTranslations',
+                              icon: 'fa fa-exchange',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage('/translations/labelTranslations');
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.label.databaseTranslations'),
+                              url: '/translations/databaseTranslations',
+                              icon: 'fa fa-exchange',
+                              attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS') || this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS') || this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS')) ? false : true) }
+                            }
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.applicationmaster'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')))) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.uploadUserManual'),
+                              url: '/userManual/uploadUserManual',
+                              icon: 'fa fa-upload',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.country'),
+                              url: '/country/listCountry',
+                              icon: 'fa fa-globe',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY') ? false : true),
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.currency'),
+                              url: '/currency/listCurrency',
+                              icon: 'fa fa-money',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.dimension'),
+                              url: '/dimension/listDimension',
+                              icon: 'fa fa-map',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.language'),
+                              url: '/language/listLanguage',
+                              icon: 'fa fa-language',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.roleHead.role'),
+                              url: '/role/listRole',
+                              icon: 'fa fa-dot-circle-o',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.realmheader'),
+                              url: '/realm/listRealm',
+                              icon: 'fa fa-th-large',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.userHead.user'),
+                              url: '/user/listUser',
+                              icon: 'fa fa-users',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USER') ? false : true),
+                                onClick: e => {
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.usagePeriod.usagePeriod'),
+                              url: '/usagePeriod/listUsagePeriod',
+                              icon: 'fa fa-calendar',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            , {
+                              name: i18n.t('static.dashboard.unit'),
+                              url: '/unit/listUnit',
+                              icon: 'fa fa-th',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            }
+                            ,
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.realmlevelmaster'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION')))) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.realmcountry'),
+                              url: '/realmCountry/listRealmCountry',
+                              icon: 'fa fa-globe',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.datasource'),
+                              url: '/dataSource/listDataSource',
+                              icon: 'fa fa-database',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dataSourceTypeHead.dataSourceType'),
+                              url: '/dataSourceType/listDataSourceType',
+                              icon: 'fa fa-table',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.funderTypeHead.funderType'),
+                              icon: 'fa fa-bank',
+                              url: '/funderType/listFunderType',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.fundingSourceHead.fundingSource'),
+                              icon: 'fa fa-bank',
+                              url: '/fundingSource/listFundingSource',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.supplier'),
+                              url: '/supplier/listSupplier',
+                              icon: 'fa fa-industry',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.organisationHead.organisation'),
+                              url: '/organisation/listOrganisation',
+                              icon: 'fa fa-sitemap',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.organisationType.organisationType'),
+                              url: '/organisationType/listOrganisationType',
+                              icon: 'fa fa-object-group',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.procurementagentType'),
+                              url: '/procurementAgentType/listProcurementAgentType',
+                              icon: 'fa fa-user-circle-o',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.procurementagent'),
+                              url: '/procurementAgent/listProcurementAgent',
+                              icon: 'fa fa-user-circle-o',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.Productmenu'),
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY'))
+                                  || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')))) ? false : true)
+                              },
+                              children: [
+                                {
+                                  name: i18n.t('static.dashboard.forecastingunit'),
+                                  url: '/forecastingUnit/listforecastingUnit',
+                                  icon: 'fa fa-cube',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT') ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                }, {
+                                  name: i18n.t('static.dashboard.planningunit'),
+                                  url: '/planningUnit/listPlanningUnit',
+                                  icon: 'fa fa-cubes',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT') ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.product.productcategory'),
+                                  url: '/productCategory/productCategoryTree',
+                                  icon: 'fa fa-th',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY') ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.planningUnitVolumeHead.planningUnitVolume'),
+                                  url: '/planningUnitCapacity/listPlanningUnitcapacity',
+                                  icon: 'fa fa-tasks',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY') ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.procurementUnit.procurementUnit'),
+                                  url: '/procurementUnit/listProcurementUnit',
+                                  icon: 'fa fa-building',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.tracerCategoryHead.tracerCategory'),
+                                  url: '/tracerCategory/listTracerCategory',
+                                  icon: 'fa fa-th',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY') ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                              url: '/equivalancyUnit/listEquivalancyUnit',
+                              icon: 'fa fa-exchange',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.healtharea.healtharea'),
+                              url: '/healthArea/listHealthArea',
+                              icon: 'fa fa-medkit',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.forecastMethod.forecastMethod'),
+                              url: '/forecastMethod/listForecastMethod',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.integration.integration'),
+                              url: '/integration/listIntegration',
+                              icon: 'fa fa-cogs',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.integration.manualProgramIntegration'),
+                              url: '/program/addManualIntegration',
+                              icon: 'fa fa-share-alt',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_MANUAL_INTEGRATION') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.common.datasetmanagement'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dataset.manageProgramInfo'),
+                              url: '/dataSet/listDataSet',
+                              icon: 'fa fa-cog',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.UpdateversionSettings.UpdateversionSettings'),
+                              url: '/dataset/versionSettings',
+                              icon: 'fa fa-sliders',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
+                              url: '/planningUnitSetting/listPlanningUnitSetting',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
+                              url: '/dataset/loadDeleteDataSet',
+                              icon: 'cui-cloud-download FontBoldIcon',
+                              attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LOAD_DELETE_DATASET') && this.state.activeTab == 1 ? false : true) }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.importprogram'),
+                              url: '/dataset/importDataset',
+                              icon: 'fa fa-download',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.exportprogram'),
+                              url: '/dataset/exportDataset',
+                              icon: 'fa fa-upload',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.commitProgram.commitProgram'),
+                              url: '/dataset/commitTree',
+                              icon: 'cui-cloud-upload FontBoldIcon',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecast'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'),
+                              url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
+                              icon: 'cui-cloud-download FontBoldIcon',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
+                              url: '/dataentry/consumptionDataEntryAndAdjustment',
+                              icon: 'fa fa-pencil',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.extrapolation'),
+                              url: '/Extrapolation/extrapolateData',
+                              icon: 'fa fa-line-chart',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.TreeForecast.TreeForecast'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_TREE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.common.managetree'),
+                              url: '/dataset/listTree',
+                              icon: 'fa fa-tree',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dataset.TreeTemplate'),
+                              url: '/dataset/listTreeTemplate',
+                              icon: 'fa fa-sitemap',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.usageTemplate.usageTemplate'),
+                              url: '/usageTemplate/listUsageTemplate',
+                              icon: 'fa fa-leaf',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.modelingValidation'),
+                              url: '/validation/modelingValidation',
+                              icon: 'fa fa-area-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.productValidation'),
+                              url: '/validation/productValidation',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.ForecastAnalysisOutput.ForecastAnalysisOutput'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.compareAndSelect'),
+                              url: '/report/compareAndSelectScenario',
+                              icon: 'fa fa-check-square-o',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
+                              url: '/forecastReport/forecastOutput',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.ForecastSummary.ForecastSummary'),
+                              url: '/forecastReport/forecastSummary',
+                              icon: 'fa fa-table',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.Versioncomarition'),
+                              url: '/report/compareVersion',
+                              icon: 'fa fa-files-o',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.programmaster'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW'))) && this.state.activeTab == 2) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboad.planningunitcountry'),
+                              url: '/realmCountry/listRealmCountryPlanningUnit',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.setupprogram'),
+                              url: '/program/programOnboarding',
+                              icon: 'fa fa-plus',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.programHead.program'),
+                              url: '/program/listProgram',
+                              icon: 'fa fa-cog',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.Update.PlanningUnits'),
+                              url: '/programProduct/addProgramProduct',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.countrySpecificPrices.countrySpecificPrices'),
+                              url: '/programProduct/addCountrySpecificPrice',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.budget'),
+                              url: '/budget/listBudget',
+                              icon: 'fa fa-money',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.importprogram'),
+                              url: '/program/importProgram',
+                              icon: 'fa fa-download',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.exportprogram'),
+                              url: '/program/exportProgram',
+                              icon: 'fa fa-upload',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.loadDeleteProgram.loadDeleteProgram'),
+                              url: '/program/downloadProgram',
+                              icon: 'cui-cloud-download FontBoldIcon',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.programimport'),
+                              url: '/pipeline/pieplineProgramList',
+                              icon: 'fa fa-database',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.commitVersion'),
+                              url: '/program/syncPage',
+                              icon: 'cui-cloud-upload FontBoldIcon',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                              url: '/report/supplyPlanVersionAndReview',
+                              icon: 'fa fa-list-ol',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.supplyPlandata'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING')) || (this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT'))) && this.state.activeTab == 2) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
+                              url: '/consumptionDetails',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
+                              url: '/shipment/shipmentDetails',
+                              icon: 'fa fa-truck',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
+                              url: '/inventory/addInventory',
+                              icon: 'fa fa-archive',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.manualTagging'),
+                              url: '/shipment/manualTagging',
+                              icon: 'fa fa-link',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.mt.shipmentLinkingNotification'),
+                              url: '/shipmentLinkingNotification',
+                              icon: 'fa fa-bell',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'),
+                              url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
+                              icon: 'fa cui-cloud-download',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.quantimed.quantimedImport'),
+                              url: '/quantimed/quantimedImport',
+                              icon: 'fa fa-database',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.supplyPlan'),
+                          icon: 'fa fa-list',
+                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.supplyPlan'),
+                              url: '/supplyPlan',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.whatIf'),
+                              url: '/report/whatIf',
+                              icon: 'fa fa-calculator',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.stockstatus'),
+                              url: '/report/stockStatus',
+                              icon: 'fa fa-file-text',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.report'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_REGION'))) && this.state.activeTab == 2) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.qatProblemList'),
+                              url: '/report/problemList',
+                              icon: 'fa fa-flag',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.productcatalog'),
+                              url: '/report/productCatalog',
+                              icon: 'fa fa-list-ol',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.stockstatusmain'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                {
+                                  name: i18n.t('static.dashboard.stockstatusovertime'),
+                                  url: '/report/stockStatusOverTime',
+                                  icon: 'fa fa-line-chart',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.stockstatusmatrix'),
+                                  url: '/report/stockStatusMatrix',
+                                  icon: 'fa fa-table',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                                  url: '/report/stockStatusAcrossPlanningUnits',
+                                  icon: 'fa fa-camera',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.stockStatusAccrossPlanningUnitGlobalView'),
+                                  url: '/report/stockStatusAccrossPlanningUnitGlobalView',
+                                  icon: 'fa fa-globe',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.report.consumptionReports'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                // {
+                                //   name: i18n.t('static.dashboard.consumption'),
+                                //   url: '/report/consumption',
+                                //   icon: 'fa fa-bar-chart',
+                                //   attributes: {
+                                //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2) ? false : true),
+                                //     onClick: e => {
+                                //       this.refreshPage();
+                                //     }
+                                //   }
+                                // },
+                                {
+                                  name: i18n.t('static.dashboard.globalconsumption'),
+                                  url: '/report/globalConsumption',
+                                  icon: 'fa fa-globe',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_GLOBAL_VIEW_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                // {
+                                //   name: i18n.t('static.report.forecasterrorovertime'),
+                                //   url: '/report/forecastOverTheTime',
+                                //   icon: 'fa fa-line-chart',
+                                //   attributes: {
+                                //     hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                //     onClick: e => {
+                                //       this.refreshPage();
+                                //     }
+                                //   }
+                                // },
+                                {
+                                  name: i18n.t('static.report.forecasterrorovertime'),
+                                  url: '/report/consumptionForecastErrorSupplyPlan',
+                                  icon: 'fa fa-line-chart',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.forecastmetrics'),
+                                  url: '/report/forecastMetrics',
+                                  icon: 'fa fa-table',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_FORECAST_MATRIX_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.report.shipmentReports'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                {
+                                  name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                                  url: '/report/shipmentGlobalView',
+                                  icon: 'fa fa-globe',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                                  url: '/report/shipmentGlobalDemandView',
+                                  icon: 'fa fa-pie-chart',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.shipmentDetailReport'),
+                                  url: '/report/shipmentSummery',
+                                  icon: 'fa fa-truck',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.shipmentCostReport'),
+                                  url: '/report/procurementAgentExport',
+                                  icon: 'fa fa-wpforms',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.annualshipmentcost'),
+                                  url: '/report/annualShipmentCost',
+                                  icon: 'fa fa-file-pdf-o',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.budgetHead.budget'),
+                                  url: '/report/budgets',
+                                  icon: 'fa fa-money',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.supplierLeadTimes'),
+                                  url: '/report/supplierLeadTimes',
+                                  icon: 'fa fa-calendar',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.report.inventoryReports'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_REGION'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                {
+                                  name: i18n.t('static.report.expiredInventory'),
+                                  url: '/report/expiredInventory',
+                                  icon: 'fa fa-exclamation-triangle',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.costOfInventory'),
+                                  url: '/report/costOfInventory',
+                                  icon: 'fa fa-book',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.inventoryTurns'),
+                                  url: '/report/inventoryTurns',
+                                  icon: 'fa fa-refresh',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.stockAdjustment'),
+                                  url: '/report/stockAdjustment',
+                                  icon: 'fa fa-table',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.warehouseCapacity'),
+                                  url: '/report/warehouseCapacity',
+                                  icon: 'fa fa-building-o',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.regionHead.region'),
+                                  url: '/region/listRegion',
+                                  icon: 'fa fa-building',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_REGION') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                          ]
+                        },
+                        ,
+                      ]
+                  }} {...this.props} />
+                }
+                {checkOnline === 'Offline' &&
+                  <AppSidebarNav navConfig={{
+                    items:
+                      [
+                        {
+                          name: i18n.t('static.dashboard.programmaster'),
+                          icon: 'fa fa-list',
+                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM'))) && this.state.activeTab == 2) ? false : true) },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.importprogram'),
+                              url: '/program/importProgram',
+                              icon: 'fa fa-download',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.exportprogram'),
+                              url: '/program/exportProgram',
+                              icon: 'fa fa-upload',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            // {
+                            //   name: i18n.t('static.program.deleteLocalProgram'),
+                            //   url: '/program/deleteLocalProgram',
+                            //   icon: 'fa fa-trash',
+                            //   attributes: {
+                            //     hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM') && this.state.activeTab == 2 ? false : true),
+                            //     onClick: e => {
+                            //       this.refreshPage();
+                            //     }
+                            //   }
+                            // },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.common.datasetmanagement'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.UpdateversionSettings.UpdateversionSettings'),
+                              url: '/dataset/versionSettings',
+                              icon: 'fa fa-sliders',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_VERSION_SETTINGS') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
+                              url: '/planningUnitSetting/listPlanningUnitSetting',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: 'Import Program',
+                              url: '/dataset/importDataset',
+                              icon: 'fa fa-download',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_DATASET') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: 'Export Program',
+                              url: '/dataset/exportDataset',
+                              icon: 'fa fa-upload',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPORT_DATASET') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecast'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
+                              url: '/dataentry/consumptionDataEntryAndAdjustment',
+                              icon: 'fa fa-pencil',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_CONSUMPTION_DATA_ENTRY_ADJUSTMENT'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.extrapolation'),
+                              url: '/Extrapolation/extrapolateData',
+                              icon: 'fa fa-line-chart',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.TreeForecast.TreeForecast'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_TREE')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.common.managetree'),
+                              url: '/dataset/listTree',
+                              icon: 'fa fa-tree',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.modelingValidation'),
+                              url: '/validation/modelingValidation',
+                              icon: 'fa fa-area-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.productValidation'),
+                              url: '/validation/productValidation',
+                              icon: 'fa fa-cubes',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.ForecastAnalysisOutput.ForecastAnalysisOutput'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.compareAndSelect'),
+                              url: '/report/compareAndSelectScenario',
+                              icon: 'fa fa-check-square-o',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_COMPARE_AND_SELECT'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
+                              url: '/forecastReport/forecastOutput',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.ForecastSummary.ForecastSummary'),
+                              url: '/forecastReport/forecastSummary',
+                              icon: 'fa fa-table',
+                              attributes: {
+                                hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_VIEW_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.Versioncomarition'),
+                              url: '/report/compareVersion',
+                              icon: 'fa fa-files-o',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.supplyPlandata'),
+                          icon: 'fa fa-list',
+                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA'))) && this.state.activeTab == 2) ? false : true) },
+                          children: [
+                            {
+                              name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
+                              url: '/consumptionDetails',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
+                              url: '/shipment/shipmentDetails',
+                              icon: 'fa fa-truck',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DATA') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
+                              url: '/inventory/addInventory',
+                              icon: 'fa fa-archive',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_DATA') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.supplyPlan'),
+                          icon: 'fa fa-list',
+                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.supplyPlan'),
+                              url: '/supplyPlan',
+                              icon: 'fa fa-bar-chart',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.whatIf'),
+                              url: '/report/whatIf',
+                              icon: 'fa fa-calculator',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.stockstatus'),
+                              url: '/report/stockStatus',
+                              icon: 'fa fa-file-text',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                          ]
+                        },
+                        {
+                          name: i18n.t('static.dashboard.report'),
+                          icon: 'fa fa-list',
+                          attributes: {
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))) && this.state.activeTab == 2) ? false : true)
+                          },
+                          children: [
+                            {
+                              name: i18n.t('static.dashboard.qatProblemList'),
+                              url: '/report/problemList',
+                              icon: 'fa fa-flag',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.productcatalog'),
+                              url: '/report/productCatalog',
+                              icon: 'fa fa-list-ol',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_CATALOG_REPORT') && this.state.activeTab == 2 ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.dashboard.stockstatusmain'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                {
+                                  name: i18n.t('static.dashboard.stockstatusovertime'),
+                                  url: '/report/stockStatusOverTime',
+                                  icon: 'fa fa-line-chart',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.stockstatusmatrix'),
+                                  url: '/report/stockStatusMatrix',
+                                  icon: 'fa fa-table',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_MATRIX_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                                  url: '/report/stockStatusAcrossPlanningUnits',
+                                  icon: 'fa fa-camera',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.report.consumptionReports'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                // {
+                                //   name: i18n.t('static.dashboard.consumption'),
+                                //   url: '/report/consumption',
+                                //   icon: 'fa fa-bar-chart',
+                                //   attributes: {
+                                //     hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_REPORT') && this.state.activeTab == 2 ? false : true),
+                                //     onClick: e => {
+                                //       this.refreshPage();
+                                //     }
+                                //   }
+                                // },
+                                //  {
+                                //   name: i18n.t('static.report.forecasterrorovertime'),
+                                //   url: '/report/forecastOverTheTime',
+                                //   icon: 'fa fa-line-chart',
+                                //   attributes: {
+                                //     hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                //     onClick: e => {
+                                //       this.refreshPage();
+                                //     }
+                                //   }
+                                // },
+                                {
+                                  name: i18n.t('static.report.forecasterrorovertime'),
+                                  url: '/report/consumptionForecastErrorSupplyPlan',
+                                  icon: 'fa fa-line-chart',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_FORECAST_ERROR_OVER_TIME_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.report.shipmentReports'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                {
+                                  name: i18n.t('static.report.shipmentDetailReport'),
+                                  url: '/report/shipmentSummery',
+                                  icon: 'fa fa-truck',
+                                  attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT') && this.state.activeTab == 2 ? false : true) }
+                                },
+                                {
+                                  name: i18n.t('static.report.shipmentCostReport'),
+                                  url: '/report/procurementAgentExport',
+                                  icon: 'fa fa-wpforms',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.annualshipmentcost'),
+                                  url: '/report/annualShipmentCost',
+                                  icon: 'fa fa-file-pdf-o',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.supplierLeadTimes'),
+                                  url: '/report/supplierLeadTimes',
+                                  icon: 'fa fa-calendar',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              name: i18n.t('static.report.inventoryReports'),
+                              icon: 'fa fa-list',
+                              attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                              children: [
+                                {
+                                  name: i18n.t('static.report.expiredInventory'),
+                                  url: '/report/expiredInventory',
+                                  icon: 'fa fa-exclamation-triangle',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_EXPIRIES_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.dashboard.costOfInventory'),
+                                  url: '/report/costOfInventory',
+                                  icon: 'fa fa-book',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_COST_OF_INVENTORY_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                // {
+                                //   name: i18n.t('static.dashboard.inventoryTurns'),
+                                //   url: '/report/inventoryTurns',
+                                //   icon: 'fa fa-refresh',
+                                //   attributes: {
+                                //     hidden: (this.state.businessFunctions.includes('ROLE_BF_INVENTORY_TURNS_REPORT') && this.state.activeTab == 2 ? false : true),
+                                //     onClick: e => {
+                                //       this.refreshPage();
+                                //     }
+                                //   }
+                                // },
+                                {
+                                  name: i18n.t('static.report.stockAdjustment'),
+                                  url: '/report/stockAdjustment',
+                                  icon: 'fa fa-table',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_STOCK_ADJUSTMENT_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: i18n.t('static.report.warehouseCapacity'),
+                                  url: '/report/warehouseCapacity',
+                                  icon: 'fa fa-building-o',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_WAREHOUSE_CAPACITY_REPORT') && this.state.activeTab == 2 ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                              ]
+                            },
+                          ]
+                        }
+                      ]
+                  }} {...this.props} />
+                }
+              </Suspense>
+              <Row>
+                <Col xs="12" md="12">
+                  {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) && <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
+                      <NavLink
+                        className="bgColourRemoveLink tab1"
+                        active={this.state.activeTab === '1'}
+                        onClick={() => { this.toggle(0, '1'); }}
+                        href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
+                        style={{ border: "none" }}
+                        title={i18n.t('static.module.forecasting')}
+                      >
+                        <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
+                        <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
+                      </NavLink>
+                    </NavItem>}
+                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
+                      <NavLink
+                        className="bgColourRemoveLink tab2"
+                        active={this.state.activeTab === '2'}
+                        onClick={() => { this.toggle(0, '2'); }}
+                        href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}/green/Success`}
+                        style={{ border: "none", padding: "0.75rem 0.2rem" }}
+                        title={i18n.t('static.module.supplyPlanningMod')}
+                      >
+                        <i class="nav-icon whiteicon"><img className="" src={imgforcastmoduletab} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
+                        <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
+                        <h6 className="tabtext">{i18n.t('static.module.supplyPlanningMod')}</h6>
+                      </NavLink>
+                    </NavItem>}
+                  </Nav>}
+                </Col>
+              </Row>
+              <AppSidebarFooter />
+              <AppSidebarMinimizer />
+            </AppSidebar>
+            <main className="main">
+              <Container fluid>
+                <Suspense fallback={this.loading()}>
+                  <Switch>
+                    {routes.map((route, idx) => {
+                      return route.component ? (
+                        <Route
+                          key={idx}
+                          path={route.path}
+                          exact={route.exact}
+                          name={route.name != undefined ? (route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name) : ''}
+                          render={props =>
+                            AuthenticationService.authenticatedRoute(route.path, this.state.url) ?
+                              (
+                                <route.component {...props} onClick={this.displayHeaderTitle(route.name != undefined ? ((route.name.includes("static.") ? (route.entityname == '' || route.entityname == undefined ? i18n.t(route.name) : i18n.t(route.name, { entityname: i18n.t(route.entityname) })) : route.name)) : '', route.path)} />
+                              ) : (
+                                <Redirect to={{ pathname: "/accessDenied" }} />
+                              )
+                          }
+                        />
+                      ) : (null);
+                    })}
+                    <Redirect from="/" to="/login" />
+                  </Switch>
+                </Suspense>
+              </Container>
+            </main>
+            <AppAside fixed>
+              <Suspense fallback={this.loading()}>
+              </Suspense>
+            </AppAside>
+          </div>
+          <AppFooter>
+            <Suspense fallback={this.loading()}>
+              <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)} />
+            </Suspense>
+          </AppFooter>
         </div>
-        <AppFooter>
-          <Suspense fallback={this.loading()}>
-            <DefaultFooter syncProgram={e => this.goToMasterDataSync(e)} />
-          </Suspense>
-        </AppFooter>
-      </div>
       </ErrorBoundary>
     );
   }
