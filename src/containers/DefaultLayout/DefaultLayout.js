@@ -789,7 +789,7 @@ class DefaultLayout extends Component {
    * Retrieves and updates the notification count.
    */
   getNotificationCount() {
-    if (localStorage.getItem("sessionType") === 'Online') {
+    if (localStorage.getItem("sessionType") === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DROPDOWN_SP')) {
       AuthenticationService.setupAxiosInterceptors();
       ManualTaggingService.getNotificationCount()
         .then(response => {

@@ -358,7 +358,7 @@ class ApplicationDashboard extends Component {
     * Retrieves the list of programs.
     */
   getPrograms() {
-    if (localStorage.getItem("sessionType") === 'Online') {
+    if (localStorage.getItem("sessionType") === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DROPDOWN_SP')) {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then(response => {
