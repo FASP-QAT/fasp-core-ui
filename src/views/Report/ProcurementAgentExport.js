@@ -1391,7 +1391,7 @@ class ProcurementAgentExport extends Component {
         shipmentCosttList[j].planningUnit.label,
         this.state.lang
       );
-      data[3] = roundARU(shipmentCosttList[j].qty,1);
+      data[3] = shipmentCosttList[j].qty;
       data[4] = shipmentCosttList[j].productCost.toFixed(2);
       data[5] = shipmentCosttList[j].freightPerc.toFixed(2);
       data[6] = shipmentCosttList[j].freightCost;
