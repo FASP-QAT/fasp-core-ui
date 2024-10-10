@@ -1169,7 +1169,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
-                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT")) {
+                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT") && bfunction.includes('ROLE_BF_DROPDOWN_FC')) {
                             return true;
                         }
                         break;
@@ -1204,7 +1204,7 @@ class AuthenticationService {
                         break;
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
-                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING") && bfunction.includes('ROLE_BF_DROPDOWN_FC')) {
                             return true;
                         }
                         break;
