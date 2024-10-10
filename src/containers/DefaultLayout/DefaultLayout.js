@@ -1315,7 +1315,7 @@ class DefaultLayout extends Component {
                               url: '/equivalancyUnit/listEquivalancyUnit',
                               icon: 'fa fa-exchange',
                               attributes: {
-                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') ? false : true),
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.businessFunctions.includes('ROLE_BF_DROPDOWN_FC') ? false : true),
                                 onClick: e => {
                                   this.refreshPage();
                                 }
@@ -1817,7 +1817,7 @@ class DefaultLayout extends Component {
                               url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
                               icon: 'fa cui-cloud-download',
                               attributes: {
-                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.businessFunctions.includes('ROLE_BF_DROPDOWN_FC') && this.state.activeTab == 2) ? false : true),
                                 onClick: e => {
                                   this.refreshPage();
                                 }
