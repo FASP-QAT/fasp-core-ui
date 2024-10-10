@@ -372,7 +372,7 @@ export default class CostOfInventory extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), roundARU(ele.stock, 1), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
+        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.stock!="" && ele.stock!=null?Number(ele.stock).toFixed(3):""), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -440,7 +440,7 @@ export default class CostOfInventory extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), formatter(roundARU(ele.stock, 1), 0), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), formatter(ele.catalogPrice, 0), formatter(ele.cost, 0)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (ele.stock!="" && ele.stock!=null?formatter(Number(ele.stock).toFixed(3), 0):""), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), formatter(ele.catalogPrice, 0), formatter(ele.cost, 0)]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 170,

@@ -1027,7 +1027,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            roundARU(ele.qty,1),
+            Number(ele.qty).toFixed(3),
             Number(ele.productCost).toFixed(2),
             ele.freightPerc,
             ele.freightCost,
@@ -1047,7 +1047,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            roundARU(ele.qty,1),
+            Number(ele.qty).toFixed(3),
             Number(ele.productCost).toFixed(2),
             ele.freightPerc,
             ele.freightCost,
@@ -1063,7 +1063,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            roundARU(ele.qty,1),
+            Number(ele.qty).toFixed(3),
             Number(ele.productCost).toFixed(2),
             ele.freightPerc,
             ele.freightCost,
@@ -1253,7 +1253,7 @@ class ProcurementAgentExport extends Component {
         ele.procurementAgent.code,
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
-        (roundARU(ele.qty,1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+        (Number(ele.qty).toFixed(3)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
         Number(ele.productCost)
           .toFixed(2)
           .toString()
@@ -1279,7 +1279,7 @@ class ProcurementAgentExport extends Component {
         getLabelText(ele.fundingSourceType.label, this.state.lang),
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
-        (roundARU(ele.qty,1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+        (Number(ele.qty).toFixed(3)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
         Number(ele.productCost)
           .toFixed(2)
           .toString()
@@ -1304,7 +1304,7 @@ class ProcurementAgentExport extends Component {
       data = this.state.data.map((ele) => [
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
-        (roundARU(ele.qty,1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+        (Number(ele.qty).toFixed(3)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
         Number(ele.productCost)
           .toFixed(2)
           .toString()

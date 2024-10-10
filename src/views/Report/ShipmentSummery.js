@@ -408,8 +408,8 @@ class ShipmentSummery extends Component {
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
           viewById == 1
-            ? roundARU(re[item].shipmentQty,1)
-            : (roundARU(Number(re[item].shipmentQty) * re[item].multiplier)).toFixed(2),
+            ? Number(re[item].shipmentQty).toFixed(3)
+            : (Number(Number(re[item].shipmentQty) * re[item].multiplier)).toFixed(3),
           moment(re[item].expectedDeliveryDate)
             .format(DATE_FORMAT_CAP_FOUR_DIGITS)
             .replaceAll(",", " ")
@@ -661,8 +661,8 @@ class ShipmentSummery extends Component {
       ele.budget.code,
       getLabelText(ele.shipmentStatus.label, this.state.lang),
       this.state.viewById == 1
-        ? formatter(roundARU(ele.shipmentQty,1), 0)
-        : formatter(roundARU(Number(ele.shipmentQty) * ele.multiplier,1), 0),
+        ? formatter(Number(ele.shipmentQty).toFixed(3), 0)
+        : formatter(Number(Number(ele.shipmentQty) * ele.multiplier).toFixed(3), 0),
       moment(ele.expectedDeliveryDate).format("YYYY-MM-DD"),
       ele.productCost
         .toFixed(2)
