@@ -8,9 +8,6 @@
 export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
-export const API_URL = 'https://uatqatapi.altius.cc'
-
-
 // export const API_URL='http://192.168.43.70:8080/FASP'
 
 export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
