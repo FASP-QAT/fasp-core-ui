@@ -16813,3 +16813,6 @@ label.arrow_label:before {
   height: 230px!important;
   width: 230px!important;
 }
+.CursorDrag .jss > thead > tr > td:nth-child(2) {
+  cursor:default!important;
+ }
