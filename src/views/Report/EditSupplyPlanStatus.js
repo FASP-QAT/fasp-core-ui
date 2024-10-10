@@ -959,10 +959,8 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
-                        console.log("Error 1 Test@123", error)
                     });
                 }).catch(error => {
-                    console.log("Error 2 Test@123", error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1085,10 +1083,8 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
-                        console.log("Error 3 Test@123", error)
                     });
                 }).catch(error => {
-                    console.log("Error 4 Test@123", error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1285,25 +1281,18 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             })
                                         }).catch(error => {
-                                            console.log("Error 5 Test@123", error)
-                                        });
+                                         });
                                     }).catch(error => {
-                                        console.log("Error 6 Test@123", error)
-                                    });
-                                }).catch(error => {
-                                    console.log("Error 7 Test@123", error)
+                                     });
+                                }).catch(error => { 
                                 });
                             }).catch(error => {
-                                console.log("Error 8 Test@123", error)
-                            });
+                             });
                         }).catch(error => {
-                            console.log("Error 9 Test@123", error)
-                        });
-                    }).catch(error => {
-                        console.log("Error 10 Test@123", error)
+                         });
+                    }).catch(error => { 
                     });
-                }).catch(error => {
-                    console.log("Error 11 Test@123", error)
+                }).catch(error => { 
                 });
             }.bind(this)
         }.bind(this)
@@ -1909,7 +1898,7 @@ class EditSupplyPlanStatus extends Component {
                                     onholdShipmentsTotalData.push("")
                                 }
                                 totalExpiredStockArr.push({ qty: roundARU(jsonList[0].expiredStock, 1), details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
-                                monthsOfStockArray.push(jsonList[0].mos != null ? roundAMC(jsonList[0].mos) : jsonList[0].mos);
+                                monthsOfStockArray.push(jsonList[0].mos != null ? jsonList[0].mos : jsonList[0].mos);
                                 maxQtyArray.push(roundAMC(jsonList[0].maxStock))
                                 amcTotalData.push(jsonList[0].amc != null ? roundAMC(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
@@ -2052,8 +2041,8 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : "");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment != 0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
-                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && jsonList[0].nationalAdjustment != 0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
+                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -2269,7 +2258,6 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
-                    console.log("Error 12 Test@123", error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2446,7 +2434,6 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
-                    console.log("Error 13 Test@123", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -2491,7 +2478,6 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
-                    console.log("Error 14 Test@123", error)
                     this.setState({
                         statuses: [],
                     })
@@ -2549,7 +2535,6 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
-                    console.log("Error 15 Test@123", error)
                     this.setState({
                         statuses: [],
                     })
@@ -3565,7 +3550,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" className='text-blackDModal' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                                    <td align="right" className='text-blackDModal' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>}
@@ -4355,7 +4340,6 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
-                    console.log("Error 16 Test@123", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4459,7 +4443,6 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
-                    console.log("Error 17 Test@123", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -5424,8 +5407,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 } else {
                                                                     try {
                                                                         document.getElementById("submitButton").disabled = false;
-                                                                    } catch (err) {
-                                                                        console.log("Error 19 Test@123", err)
+                                                                    } catch (err) { 
                                                                     }
                                                                     this.setState({
                                                                         submitMessage: "static.message.supplyplanversionapprovedsuccess",
@@ -5445,7 +5427,6 @@ class EditSupplyPlanStatus extends Component {
                                                             })
                                                             .catch(
                                                                 error => {
-                                                                    console.log("Error 20 Test@123", error)
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
                                                                             // message: 'static.unkownError',
@@ -5532,7 +5513,6 @@ class EditSupplyPlanStatus extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                console.log("Error 21 Test@123", error)
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         // message: 'static.unkownError',

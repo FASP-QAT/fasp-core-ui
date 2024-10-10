@@ -1320,7 +1320,7 @@ class StockStatus extends Component {
               data: filteredPlanningUnitData.map((item, index) => {
                 let count = 0;
                 (item.shipmentInfo.map((ele, index) => {
-                  (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+                  (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
                 }))
                 return count
               })

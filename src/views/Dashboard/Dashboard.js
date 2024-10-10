@@ -34,13 +34,13 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 var programJson = JSON.parse(programData);
                                 var generalProgramJson = programJson;
                                 var dashboardData = generalProgramJson.dashboardData;
+                                console.log("dashboardData Test@123",dashboardData)
                                 if (dashboardData != undefined) {
                                     var topPuData = dashboardData.topPuData;
                                     var stockedOutCount = 0;
                                     var valueOfExpiredPU = 0;
                                     if (topPuData != "" && topPuData != undefined) {
                                         var puIds = ppu.filter(c => c.active.toString() == "true")
-                                        console.log("Pu Ids Test@123", puIds);
                                         puIds.map(pu => {
                                             var item = topPuData[pu.planningUnit.id];
                                             if (item.stockOut.toString() == "true") {
@@ -101,7 +101,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                     var programDataBytes = CryptoJS.AES.decrypt(programData.programData.generalData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    console.log("ProgramJson Test@123", programJson);
                     var generalProgramJson = programJson;
                     var dashboardBottomData = {};
                     var dashboardData = generalProgramJson.dashboardData;
@@ -131,7 +130,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     underStock += Number(value.stockStatus.underStock);
                                     adequate += Number(value.stockStatus.adequate);
                                     overStock += Number(value.stockStatus.overStock);
-                                    console.log("value.stockStatus.na Test@123", value.stockStatus.na)
                                     na += Number(value.stockStatus.na);
                                     if (Number(value.stockStatus.stockOut)) {
                                         puStockOutList.push({

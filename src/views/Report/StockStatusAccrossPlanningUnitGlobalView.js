@@ -569,20 +569,20 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     );
 
     const cellstyleWithData = (item) => {
-      if (item.mos != null && roundAMC(item.mos) == 0) {
+      if (item.mos != null && (item.mos) == 0) {
         return legendcolor[0].color;
       } else if (
-        roundAMC(item.mos) != 0 &&
-        roundAMC(item.mos) != null &&
-        roundAMC(item.mos) < item.minMos
+        (item.mos) != 0 &&
+        (item.mos) != null &&
+        (item.mos) < item.minMos
       ) {
         return legendcolor[1].color;
       } else if (
-        roundAMC(item.mos) >= item.minMos &&
-        roundAMC(item.mos) <= item.maxMos
+        (item.mos) >= item.minMos &&
+        (item.mos) <= item.maxMos
       ) {
         return legendcolor[2].color;
-      } else if (roundAMC(item.mos) > item.maxMos) {
+      } else if ((item.mos) > item.maxMos) {
         return legendcolor[3].color;
       } else if (item.mos == null) {
         return legendcolor[4].color;
