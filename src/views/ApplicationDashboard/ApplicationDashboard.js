@@ -1254,27 +1254,27 @@ class ApplicationDashboard extends Component {
         {
           label: 'Overstock',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: 'rgba(0, 51, 102, 0.8)', // Dark Blue
+          backgroundColor: '#002F6C', // Dark Blue
         },
         {
           label: 'Adequate',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
-          backgroundColor: 'rgba(0, 153, 51, 0.8)', // Green
+          backgroundColor: '#118B70', // Green
         },
         {
           label: 'Below Min',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: 'rgba(255, 204, 0, 0.8)', // Yellow
+          backgroundColor: '#F48521', // Yellow
         },
         {
           label: 'Stockout',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc * 100).toFixed(2)] : [],
-          backgroundColor: 'rgba(204, 0, 0, 0.8)', // Red
+          backgroundColor: '#BA0C2F', // Red
         },
         {
           label: 'NA',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
-          backgroundColor: 'grey', // Red
+          backgroundColor: '#6C6463', // Red
         }
       ]
     };
@@ -1906,7 +1906,7 @@ class ApplicationDashboard extends Component {
           }
         </Row>
         {activeTab1 == 2 && <>
-          <div className='row px-3'>
+          <div className='row px-2'>
             {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
               <div>
                 <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
@@ -1914,7 +1914,7 @@ class ApplicationDashboard extends Component {
             </div> */}
             <div className='col-md-12'>
               <div className='row'>
-                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                <FormGroup className='col-md-3 pl-lg-1 FormGroupD'>
                   <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
                   <MultiSelect
                     name="topProgramId"
@@ -1926,7 +1926,7 @@ class ApplicationDashboard extends Component {
                     labelledBy={i18n.t('static.common.regiontext')}
                   />
                 </FormGroup>
-                <FormGroup className='col-md-3' style={{ marginTop: '34px' }}>
+                <FormGroup className='col-md-3' style={{ marginTop: '29px' }}>
                   <div className="tab-ml-1 ml-lg-3">
                     <Input
                       className="form-check-input"
@@ -1946,9 +1946,9 @@ class ApplicationDashboard extends Component {
 
               </div>
 
-              <div class="col-xl-12 pl-lg-0 pr-lg-0">
+              <div class="col-xl-12 pl-lg-2 pr-lg-2">
                 <div class="card custom-card">
-                  <div class="card-body px-0 py-0">
+                  <div class="card-body px-2 py-2">
                     <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
@@ -1995,9 +1995,9 @@ class ApplicationDashboard extends Component {
             </div>
           </div>
           <div className='row'>
-            <div className='col-md-12'>
+            <div className='col-md-6'>
               <div className='row'>
-                <div className='col-md-3'>
+                <div className='col-md-6 pl-lg-0'>
                   <FormGroup className='col FormGroupD'>
                     <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
                     <Input
@@ -2013,8 +2013,8 @@ class ApplicationDashboard extends Component {
                       {bottomProgramList}
                     </Input>
                   </FormGroup>
-                  <FormGroup className='col' style={{ marginTop: '34px' }}>
-                    <div className="tab-ml-1 ml-lg-3">
+                  <FormGroup className='col-md-12' style={{ marginTop: '0px' }}>
+                    <div className="tab-ml-1 ml-lg-4">
                       <Input
                         className="form-check-input"
                         type="checkbox"
@@ -2031,8 +2031,8 @@ class ApplicationDashboard extends Component {
                     </div>
                   </FormGroup>
                 </div>
-                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
-                  <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span></Label>
+                <FormGroup className='col-md-6 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{marginTop:'0px',zIndex:'1'}}></span></Label>
                   <div className="controls edit">
                     <Picker
                       ref="reportPeriod"
@@ -2046,7 +2046,7 @@ class ApplicationDashboard extends Component {
                     </Picker>
                   </div>
                 </FormGroup>
-                <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
+                {/* <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
                   <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
                   <Input
                     type="select"
@@ -2062,7 +2062,7 @@ class ApplicationDashboard extends Component {
                     <option value="3">Status</option>
                   </Input>
                   <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
-                </FormGroup>
+                </FormGroup> */}
               </div>
             </div>
           </div>
@@ -2082,7 +2082,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stocked out Planning Units ({this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}) </div>
                         </div>
-                        <div class="card-body pt-0 pb-0">
+                        <div class="card-body pt-1 pb-0 StockplanningBoxD">
                           <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
                             {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
                               return (<li class="success">
@@ -2102,24 +2102,51 @@ class ApplicationDashboard extends Component {
                           <div class="card-title"> Forecast Error </div>
                         </div>
                         <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2' style={{padding:'0px 8px'}}>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3">
+                    <div className="col-md-6">
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title">Shipments </div>
                         </div>
                         <div class="card-body">
-                          <div className='d-flex align-items-center justify-content-center'>
-                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} />
+                          <div className='row'>
+                          <FormGroup className='col-md-12 pl-lg-0 FormGroupD'>
+                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                  <Input
+                    type="select"
+                    name="displayBy"
+                    id="displayBy"
+                    bsSize="sm"
+                    onChange={(e) => { this.dataChange(e) }}
+                    value={this.state.displayBy}
+                    required
+                  >
+                    <option value="1">Funding Source</option>
+                    <option value="2">Procurement Agent</option>
+                    <option value="3">Status</option>
+                  </Input>
+                  <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
+                </FormGroup> 
+                          </div>
+                          <div className='row'>     
+                          <div className='col-md-6'>
+                          <div className='d-flex align-items-center justify-content-center PieShipment'>
+                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300}/>
+                          </div>
+                          </div>
+                          <div className='col-md-6'>
+                          <div class="card-title"># of Shipments with funding TBD </div>
+                          <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{padding:'0px 8px'}}></div>
+                          </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3">
+                    {/* <div className="col-md-3">
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"># of Shipments with funding TBD </div>
@@ -2129,7 +2156,7 @@ class ApplicationDashboard extends Component {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   <div className='row'>
                     <div className='col-md-6'>
@@ -2182,7 +2209,7 @@ class ApplicationDashboard extends Component {
                             </div>
                             <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
                               <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</p>
-                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{padding:'0px 8px'}}>
                               </div>
                             </div>
                           </div>

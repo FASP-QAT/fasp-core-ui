@@ -3088,8 +3088,8 @@ a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
   max-height: calc(100vh - 391px) !important;
 }
 .dashboardTable2 .jss_content {
-  // max-height: calc(100vh - 393px) !important;
-  height: 375px;
+  max-height: calc(100vh - 300px) !important;
+  // height: 375px;
   overflow: scroll;
 }
 .Iconclr{
@@ -16504,13 +16504,13 @@ label.arrow_label:before {
 
 .tableFixHeadDash {
   overflow: auto;
-  height: 524px;
+  // height: 524px;
 }
 
 .tableFixHeadDash thead th {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 0;
   padding: 10px !important;
   vertical-align: middle;
   line-height: 1.462;
@@ -16537,7 +16537,7 @@ label.arrow_label:before {
 }
 
 .FormGroupD .form-control-sm {
-  height: calc(2.5em + 0.5rem + 2px) !important;
+  height: calc(1.5em + 0.5rem + 2px) !important;
 }
 .card.custom-card {
   border-radius: .5rem;
@@ -16659,16 +16659,22 @@ label.arrow_label:before {
   color: #000 !important;
 }
 .dashboardTable2 .jss_content {
-  // max-height: calc(100vh - 393px) !important;
-  height: 375px;
+  max-height: calc(100vh - 393px) !important;
+  // height: 375px;
   overflow: scroll;
 }
 .CustomHeight{
-  height: 375px;
+  // height: 375px;
+  // max-height: calc(100vh - 0px) !important;
+  height: auto;
+  max-height: 100% !important;
 }
 @media screen and (min-width: 1920px) {
   .CustomHeight{
-    height: 412px;
+    // height: 412px;
+    // max-height: calc(100vh - 0px) !important;
+    height: auto;
+    max-height: 100% !important;
   }
 }
 // .MuiSwitch-colorPrimary.Mui-checked {
@@ -16701,7 +16707,7 @@ label.arrow_label:before {
   margin-top: -6px!important;
 }
 .swichMarginLeft{
-  margin-left: 22px;
+  margin-left: 18px;
 }
 .MuiSwitch-root {
   width: 65px!important;
@@ -16789,4 +16795,21 @@ label.arrow_label:before {
   .paddinCheckbox {
       padding-left: 236px;
   }
+}
+.FormGroupD .box {
+    height:calc(1.5em + 0.5rem + 2px) !important;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border: 1px solid #fff;
+    border-radius: 0.2rem;
+    background-color: #fff;
+}
+.StockplanningBoxD{
+  max-height: 65px;
+  overflow-y: scroll;
+}
+.PieShipment{
+  height: 230px!important;
+  width: 230px!important;
 }
