@@ -4258,32 +4258,39 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataentry/consumptionDataEntryAndAdjustment" className="supplyplanformulas">{i18n.t('static.dashboard.dataEntryAndAdjustments')}</a></span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a></span><br />
+                                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')
+                                    || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) &&
+                                    <div>
+                                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a></span><br />
+                                    </div>
+                                }
                             </div>
                         </div>
-                        <div className="Card-header-reporticon pb-0">
-                            <div className="card-header-actions">
-                                {this.state.forecastProgramId &&
-                                    <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
-                                    </a>
-                                }
-                                {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' &&
-                                    <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
-                                    </a>
-                                }
-                                {/* {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                            <div className="Card-header-reporticon pb-0">
+                                <div className="card-header-actions">
+                                    {this.state.forecastProgramId &&
+                                        <a className="card-header-action">
+                                            <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
+                                        </a>
+                                    }
+                                    {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' &&
+                                        <a className="card-header-action">
+                                            <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
+                                        </a>
+                                    }
+                                    {/* {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
                                     <a className="card-header-action">
                                         <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
                                     </a>
                                 } */}
-                                <a className="card-header-action">
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                                </a>
-                                {this.state.showData && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                                    <a className="card-header-action">
+                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                    </a>
+                                    {this.state.showData && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                                </div>
                             </div>
-                        </div>
+                        }
                         <CardBody className="pb-lg-0 pt-lg-0">
                             <div className="row">
                                 <div className="col-md-12">
