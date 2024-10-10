@@ -635,7 +635,7 @@ class ApplicationDashboard extends Component {
         this.setState({
           dashboardBottomData: response.data
         }, () => {
-          if(document.getElementById("shipmentsTBDJexcel")) {
+          if (document.getElementById("shipmentsTBDJexcel")) {
             this.buildForecastErrorJexcel();
             this.buildShipmentsTBDJexcel();
             this.buildExpiriesJexcel();
@@ -711,7 +711,7 @@ class ApplicationDashboard extends Component {
             cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
           });
         }
-        if(localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
+        if (localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
           var dt = new Date();
           dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
           var dt1 = new Date();
@@ -719,15 +719,15 @@ class ApplicationDashboard extends Component {
           localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
           var inputJson = {
             programId: this.state.bottomProgramId,
-            startDate: dt.getFullYear()+"-"+(dt.getMonth()+1)+"-01",
-            stopDate: dt1.getFullYear()+"-"+(dt1.getMonth()+1)+"-01",
+            startDate: dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-01",
+            stopDate: dt1.getFullYear() + "-" + (dt1.getMonth() + 1) + "-01",
             displayShipmentsBy: this.state.displayBy
           }
           this.getOnlineDashboardBottom(inputJson);
-        } else if(tempProgramList.length > 0) {
+        } else if (tempProgramList.length > 0) {
           Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, false, true);
         }
-        if(this.state.onlyDownloadedTopProgram) {
+        if (this.state.onlyDownloadedTopProgram) {
           Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
         } else {
           DashboardService.getDashboardTop().then(response => {
@@ -938,7 +938,7 @@ class ApplicationDashboard extends Component {
       [key]: value
     }, () => {
       if (key == "dashboardBottomData") {
-        if(document.getElementById("shipmentsTBDJexcel")) {
+        if (document.getElementById("shipmentsTBDJexcel")) {
           this.buildForecastErrorJexcel();
           this.buildShipmentsTBDJexcel();
           this.buildExpiriesJexcel();
@@ -1913,7 +1913,7 @@ class ApplicationDashboard extends Component {
               </div>
             </div> */}
             <div className='col-md-12'>
-              <div className='row'>
+              {/* <div className='row'>
                 <FormGroup className='col-md-3 pl-lg-1 FormGroupD'>
                   <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
                   <MultiSelect
@@ -1944,11 +1944,43 @@ class ApplicationDashboard extends Component {
                   </div>
                 </FormGroup>
 
-              </div>
+              </div> */}
 
               <div class="col-xl-12 pl-lg-2 pr-lg-2">
                 <div class="card custom-card">
                   <div class="card-body px-2 py-2">
+                    <div className='row'>
+                      <FormGroup className='col-md-3 FormGroupD'>
+                        <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
+                        <MultiSelect
+                          name="topProgramId"
+                          id="topProgramId"
+                          bsSize="sm"
+                          value={this.state.topProgramId}
+                          onChange={(e) => { this.handleTopProgramIdChange(e) }}
+                          options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
+                          labelledBy={i18n.t('static.common.regiontext')}
+                        />
+                      </FormGroup>
+                      <FormGroup className='col-md-3' style={{ marginTop: '29px' }}>
+                        <div className="tab-ml-1 ml-lg-3">
+                          <Input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="onlyDownloadedTopProgram"
+                            name="onlyDownloadedTopProgram"
+                            checked={this.state.onlyDownloadedTopProgram}
+                            onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                            Only show local program
+                          </Label>
+                        </div>
+                      </FormGroup>
+
+                    </div>
                     <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
@@ -1994,7 +2026,7 @@ class ApplicationDashboard extends Component {
               </div>
             </div>
           </div>
-          <div className='row'>
+          {/* <div className='row'>
             <div className='col-md-6'>
               <div className='row'>
                 <div className='col-md-6 pl-lg-0'>
@@ -2046,32 +2078,72 @@ class ApplicationDashboard extends Component {
                     </Picker>
                   </div>
                 </FormGroup>
-                {/* <FormGroup className='col-md-3 pl-lg-0 FormGroupD'>
-                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
-                  <Input
-                    type="select"
-                    name="displayBy"
-                    id="displayBy"
-                    bsSize="sm"
-                    onChange={(e) => { this.dataChange(e) }}
-                    value={this.state.displayBy}
-                    required
-                  >
-                    <option value="1">Funding Source</option>
-                    <option value="2">Procurement Agent</option>
-                    <option value="3">Status</option>
-                  </Input>
-                  <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
-                </FormGroup> */}
+                
               </div>
             </div>
-          </div>
-          {this.state.dashboardBottomData && <div className='row'>
-            <div class="col-xl-12">
+          </div> */}
+          {this.state.dashboardBottomData && <div className='row pl-lg-2 pr-lg-2'>
+            <div class="col-xl-12 mb-lg-3" style={{ background: '#fff', borderRadius: '0.25rem' }}>
+              <div className='row pt-lg-2'>
+                <div className='col-md-12'>
+                  <div className='row'>
+                    {/* <div className='col-md-4 pl-lg-0'> */}
+                    <FormGroup className='col-md-4 FormGroupD'>
+                      <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
+                      <Input
+                        type="select"
+                        name="bottomProgramId"
+                        id="bottomProgramId"
+                        value={this.state.bottomProgramId}
+                        onChange={(e) => { this.dataChange(e) }}
+                        bsSize="sm"
+                        required
+                      >
+                        <option selected>Open this select menu</option>
+                        {bottomProgramList}
+                      </Input>
+                    </FormGroup>
+
+                    {/* </div> */}
+                    <FormGroup className='col-md-4 pl-lg-0 FormGroupD'>
+                      <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
+                      <div className="controls edit">
+                        <Picker
+                          ref="reportPeriod"
+                          years={{ min: this.state.minDate, max: this.state.maxDate }}
+                          value={rangeValue}
+                          lang={pickerLang}
+                          key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
+                          onDismiss={this.handleRangeDissmis}
+                        >
+                          <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                        </Picker>
+                      </div>
+                    </FormGroup>
+                    <FormGroup className='col-md-4' style={{ marginTop: '27px' }}>
+                      <div className="tab-ml-1 ml-lg-4">
+                        <Input
+                          className="form-check-input"
+                          type="checkbox"
+                          id="onlyDownloadedBottomProgram"
+                          name="onlyDownloadedBottomProgram"
+                          checked={this.state.onlyDownloadedBottomProgram}
+                          onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                        />
+                        <Label
+                          className="form-check-label"
+                          check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                          Only show local program
+                        </Label>
+                      </div>
+                    </FormGroup>
+                  </div>
+                </div>
+              </div>
               <div className='row pl-lg-1 pr-lg-1'>
                 <div className='col-md-12'>
                   <div className='row'>
-                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
+                  <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-6'}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stock Status </div>
@@ -2096,52 +2168,54 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
+                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'} style={{ display: this.state.onlyDownloadedBottomProgram ? "block" : "none" }}>                    
+                    {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
                         <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2' style={{padding:'0px 8px'}}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-6">
+                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-12 px-4' : 'col-md-6'}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title">Shipments </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body pt-lg-1">
                           <div className='row'>
-                          <FormGroup className='col-md-12 pl-lg-0 FormGroupD'>
-                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
-                  <Input
-                    type="select"
-                    name="displayBy"
-                    id="displayBy"
-                    bsSize="sm"
-                    onChange={(e) => { this.dataChange(e) }}
-                    value={this.state.displayBy}
-                    required
-                  >
-                    <option value="1">Funding Source</option>
-                    <option value="2">Procurement Agent</option>
-                    <option value="3">Status</option>
-                  </Input>
-                  <div className='col-md-12 pl-lg-0 pt-lg-1'> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
-                </FormGroup> 
+                            <FormGroup className='col-md-5 pl-lg-0 FormGroupD'>
+                              <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                              <Input
+                                type="select"
+                                name="displayBy"
+                                id="displayBy"
+                                bsSize="sm"
+                                onChange={(e) => { this.dataChange(e) }}
+                                value={this.state.displayBy}
+                                required
+                              >
+                                <option value="1">Funding Source</option>
+                                <option value="2">Procurement Agent</option>
+                                <option value="3">Status</option>
+                              </Input>
+
+                            </FormGroup>
+                            <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
                           </div>
-                          <div className='row'>     
-                          <div className='col-md-6'>
-                          <div className='d-flex align-items-center justify-content-center PieShipment'>
-                            <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300}/>
-                          </div>
-                          </div>
-                          <div className='col-md-6'>
-                          <div class="card-title"># of Shipments with funding TBD </div>
-                          <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{padding:'0px 8px'}}></div>
-                          </div>
+                          <div className='row'>
+                            <div className='col-md-6'>
+                              <div className='d-flex align-items-center justify-content-center PieShipment'>
+                                <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} />
+                              </div>
+                            </div>
+                            <div className='col-md-6'>
+                              <div class="card-title"># of Shipments with funding TBD </div>
+                              <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -2165,32 +2239,32 @@ class ApplicationDashboard extends Component {
                           <div class="card-title"> Data Quality (doesn't use date selector) </div>
                         </div>
                         <div class="card-body py-2">
-                          <div className='row pt-lg-1'>
+                          <div className='row pt-lg-4'>
                             <div class="col-md-6 container1">
-                              <p class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
                               </div>
                             </div>
                             <div class="col-md-6 container1">
-                              <p class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
                               </div>
                             </div>
                           </div>
-                          <div className='row pt-lg-1'>
+                          <div className='row pt-lg-4'>
                             <div class="col-md-6 container1">
-                              <p class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
                               </div>
                             </div>
                             <div class="col-md-6 container1">
-                              <p class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></p>
+                              <div class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
@@ -2202,14 +2276,26 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-6'>
                       <div className='row'>
-                        <div class="col-md-12 pl-lg-4 pr-lg-4">
+                        <div class="col-md-12 pl-lg-3 pr-lg-3">
                           <div class="card custom-card CustomHeight">
-                            <div class="card-header justify-content-between">
-                              <div class="card-title"> Expiries</div>
-                            </div>
+                          <div className="card-header d-flex justify-content-between align-items-center">
+  <div className="card-title">
+    <div className="d-flex justify-content-between w-100" style={{gap:'225px'}}>
+      <div className="left-section">
+        <span>Expiries</span>
+      </div>
+      <div className="right-section text-md-right">
+        <p className="mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2">
+          Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
                             <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                              <p className='mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2'>Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</p>
-                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{padding:'0px 8px'}}>
+
+                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
                               </div>
                             </div>
                           </div>

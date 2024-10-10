@@ -16543,10 +16543,16 @@ label.arrow_label:before {
   border-radius: .5rem;
   border: 0;
   // background-color: #fff;
-  box-shadow: 0 .125rem 0 rgba(10, 10, 10, .04);
+  box-shadow:0px 1px 2px 0px rgba(15,22,36,.06),0px 1px 3px 0px rgba(15,22,36,.1)!important;
   position: relative;
   margin-block-end: 1.5rem;
   // width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #ddd;
+  // height: 100%;
 }
 
 .card.custom-card .card-header {
@@ -16566,6 +16572,7 @@ label.arrow_label:before {
   font-size: .9375rem;
   font-weight: 700;
   text-transform: capitalize;
+  color: #002F6C;
 }
 .card.custom-card .card-header .card-title:before {
   content: "";
@@ -16666,15 +16673,17 @@ label.arrow_label:before {
 .CustomHeight{
   // height: 375px;
   // max-height: calc(100vh - 0px) !important;
-  height: auto;
-  max-height: 100% !important;
+  // height: auto;
+  // max-height: 100% !important;
+  min-height: 410px;
 }
 @media screen and (min-width: 1920px) {
   .CustomHeight{
     // height: 412px;
     // max-height: calc(100vh - 0px) !important;
-    height: auto;
-    max-height: 100% !important;
+    // height: auto;
+    // max-height: 100% !important;
+    min-height: 553px;
   }
 }
 // .MuiSwitch-colorPrimary.Mui-checked {
@@ -16801,7 +16810,7 @@ label.arrow_label:before {
     padding: 0.25rem 0.5rem;
     font-size: 0.76562rem;
     line-height: 1.5;
-    border: 1px solid #fff;
+    border: 1px solid #e4e7ea;
     border-radius: 0.2rem;
     background-color: #fff;
 }
@@ -16812,7 +16821,16 @@ label.arrow_label:before {
 .PieShipment{
   height: 230px!important;
   width: 230px!important;
+  margin: 0 auto;
 }
 .CursorDrag .jss > thead > tr > td:nth-child(2) {
   cursor:default!important;
  }
+ .left-section {
+  flex: 1;
+  text-align: left; 
+}
+
+.right-section {
+  text-align: right; 
+}
