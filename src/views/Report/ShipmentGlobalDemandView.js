@@ -2065,6 +2065,7 @@ class ShipmentGlobalDemandView extends Component {
             }
             ]
         };
+<<<<<<< HEAD
 
         // const { isDarkMode } = this.state;
         // const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
@@ -2089,10 +2090,36 @@ class ShipmentGlobalDemandView extends Component {
         //                     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         //                 ]
 
+=======
+        
+        const darkModeColors = [
+            '#d4bbff', '#BA0C2F', '#A7C6ED', '#0067B9', '#A7C6ED',
+            '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#A7C6ED', '#0067B9', '#A7C6ED',
+            '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#A7C6ED', '#0067B9', '#A7C6ED',
+        ];
+        
+        const lightModeColors = [
+            '#002F6C', '#BA0C2F', '#6C6463', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#6C6463', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#6C6463', '#0067B9', '#A7C6ED',
+        ];
+        
+        const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+        
+>>>>>>> QAT-5296
         const chartDataForPie = {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
                 data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
+<<<<<<< HEAD
                 backgroundColor: [
                     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
                     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -2104,6 +2131,20 @@ class ShipmentGlobalDemandView extends Component {
                 ],
 
 
+=======
+                backgroundColor: backgroundColor,  // Apply the color scheme
+                // backgroundColor: [
+                //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+                // ],
+                
+        
+>>>>>>> QAT-5296
                 legend: {
                     position: 'bottom',
                     fontColor: fontColor,
