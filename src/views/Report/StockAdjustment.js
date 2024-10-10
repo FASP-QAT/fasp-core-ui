@@ -522,7 +522,7 @@ class StockAdjustmentComponent extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), roundARU(ele.stockAdjustemntQty, 1), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), Number(ele.stockAdjustemntQty).toFixed(3), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -590,7 +590,7 @@ class StockAdjustmentComponent extends Component {
         doc.setFontSize(8);
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text) });
-        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), formatter(roundARU(ele.stockAdjustemntQty, 1), 0), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
+        let data = this.state.data.map(ele => [getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format('MMM YYYY'), formatter(Number(ele.stockAdjustemntQty).toFixed(3), 0), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP}`), ele.notes]);
         let startY = 150 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
         let content = {
             margin: { top: 80, bottom: 50 },
