@@ -16183,3 +16183,6 @@ label.arrow_label:before {
   border-left: 0px solid #ccc !important;
   font-weight: bold;
 }
+.CursorDrag .jss > thead > tr > td:nth-child(2) {
+    cursor:default!important;
+   }
