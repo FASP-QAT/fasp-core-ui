@@ -68,7 +68,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         this.buildJExcel = this.buildJExcel.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
-        this.loaded=this.loaded.bind(this);
+        this.loaded = this.loaded.bind(this);
     }
     /**
      * Retrieves tracer categories based on the selected program and version.
@@ -80,7 +80,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         let versionId = document.getElementById("versionId").value;
         if (programId > 0 && versionId != 0) {
             localStorage.setItem("sesVersionIdReport", versionId);
-            var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+            var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == versionId)[0].cutOffDate;
             var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
             var singleValue2 = this.state.singleValue2;
             if (moment(this.state.singleValue2.year + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
@@ -302,7 +302,7 @@ class StockStatusAcrossPlanningUnits extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3],0), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? formatter(ele[4],0) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5],0), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6],0), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7],0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
+        const data = this.state.jexcelData.map(ele => [ele[9], ele[0], ele[1] == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'), ele[2], formatter(ele[3], 0), ele[4] != i18n.t("static.supplyPlanFormula.na") && ele[4] != "-" ? formatter(ele[4], 0) : ele[4], isNaN(ele[5]) || ele[5] == undefined ? '' : formatter(ele[5], 0), isNaN(ele[6]) || ele[6] == undefined ? '' : formatter(ele[6], 0), isNaN(ele[7]) || ele[7] == null ? '' : formatter(ele[7], 0), ele[8] != null && ele[8] != '' ? new moment(ele[8]).format('MMM-yy') : '']);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 200,
@@ -559,7 +559,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
-                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
                         verList.push(version)
                     }
                 }
@@ -721,8 +721,8 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'numeric', 
-                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
+                    type: 'numeric',
+                    mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.mos'),
@@ -730,7 +730,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.minMosOrQty'),
-                    type: 'numeric', 
+                    type: 'numeric',
                     mask: '#,##',
                 },
                 {
@@ -740,7 +740,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 },
                 {
                     title: i18n.t('static.report.amc'),
-                    type: 'numeric', 
+                    type: 'numeric',
                     mask: '#,##.000', decimal: '.',
                 },
                 {
@@ -1120,7 +1120,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
                     </option>
                 )
             }, this);
