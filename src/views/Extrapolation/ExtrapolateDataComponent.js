@@ -4256,11 +4256,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <div className="card-header-actions">
                             <div className="Card-header-reporticon">
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                                <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataentry/consumptionDataEntryAndAdjustment" className="supplyplanformulas">{i18n.t('static.dashboard.dataEntryAndAdjustments')}</a></span>
                                 {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')
                                     || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) &&
                                     <div>
+                                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a></span><br />
                                     </div>
                                 }
