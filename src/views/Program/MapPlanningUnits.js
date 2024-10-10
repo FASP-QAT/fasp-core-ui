@@ -24,6 +24,7 @@ export default class MapPlanningUnits extends Component {
             lang: localStorage.getItem('lang'),
             tempSortOrder: '',
             sortOrderLoading: true,
+            dropdownList: []
         }
         this.changed = this.changed.bind(this);
         this.myFunction = this.myFunction.bind(this);
@@ -32,6 +33,7 @@ export default class MapPlanningUnits extends Component {
         this.checkValidation = this.checkValidation.bind(this);
         this.addRow = this.addRow.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
     /**
      * Function to add a new row to the jexcel table.
@@ -56,6 +58,7 @@ export default class MapPlanningUnits extends Component {
         data[15] = "";
         data[16] = "";
         data[17] = "";
+        data[18] = 0;//new row
         this.el.insertRow(
             data, 0, 1
         );
@@ -709,7 +712,7 @@ export default class MapPlanningUnits extends Component {
                     //                 var itemLabelB = b.name.toUpperCase(); 
                     //                 return itemLabelA > itemLabelB ? 1 : -1;
                     //             });
-                    let dropdownList = [];
+                    // let dropdownList = [];
                     var productDataArr = []
                     data = [];
                     data[0] = "-1";
@@ -730,6 +733,7 @@ export default class MapPlanningUnits extends Component {
                     data[15] = "";
                     data[16] = "";
                     data[17] = "";
+                    data[18] = 0;//new row
                     productDataArr[0] = data;                    
                     this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
                     jexcel.destroy(document.getElementById("mapPlanningUnit"), true);
@@ -747,7 +751,7 @@ export default class MapPlanningUnits extends Component {
                             {
                                 title: i18n.t('static.planningunit.planningunit'),
                                 type: 'dropdown',
-                                source: dropdownList,
+                                source: this.state.dropdownList,
                                 options: {
                                     url: `${API_URL}/api/dropdown/planningUnit/autocomplete/filter/productCategory/searchText/language/sortOrder`,
                                     autocomplete: true,
@@ -894,6 +898,10 @@ export default class MapPlanningUnits extends Component {
                                 title: 'Lead Distribution Time',
                                 type: 'hidden'
                             },
+                            {
+                                title: 'New Row Added Index',
+                                type: 'hidden'
+                            }
                         ],
                         updateTable: function (el, cell, x, y, source, value, id) {
                             var elInstance = el;
@@ -940,6 +948,7 @@ export default class MapPlanningUnits extends Component {
                         copyCompatibility: true,
                         allowManualInsertRow: false,
                         editable: true,
+                        onpaste: this.onPaste,
                         onload: this.loaded,
                         oneditionend: this.oneditionend,
                         license: JEXCEL_PRO_KEY,
@@ -1001,6 +1010,7 @@ export default class MapPlanningUnits extends Component {
                                             data[15] = "";
                                             data[16] = "";
                                             data[17] = "";
+                                            data[18] = 0;//new row
                                             obj.insertRow(data, parseInt(y), 1);
                                             obj.getCell(("B").concat(parseInt(y) + 1)).classList.add('typing-' + this.state.lang);
                                         }.bind(this)
@@ -1029,6 +1039,7 @@ export default class MapPlanningUnits extends Component {
                                             data[15] = "";
                                             data[16] = "";
                                             data[17] = "";
+                                            data[18] = 0;//new row
                                             obj.insertRow(data, parseInt(y));
                                             obj.getCell(("B").concat(parseInt(y) + 2)).classList.add('typing-' + this.state.lang);
                                         }.bind(this)
@@ -1204,6 +1215,48 @@ export default class MapPlanningUnits extends Component {
         var cell1 = instance.worksheets[0].getCell(`K1`)
         cell1.classList.add('readonly');
         jExcelLoadedFunctionWithoutPagination(instance);
+    }
+    /**
+     * Function to handle paste events in the jexcel table.
+     * @param {Object} instance - The jexcel instance.
+     * @param {Array} data - The data being pasted.
+     */
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {            
+            if (data[i].x == 0) {
+                // var index = (instance).getValue(`Q${parseInt(data[i].y) + 1}`, true);
+                // if (index == 0) {
+                    (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
+                // }
+            }
+            if (data[i].x == 1) {
+                var index = (instance).getValue(`S${parseInt(data[i].y) + 1}`, true);
+                if (index == 0) {
+                    let temp = data[i].value.split(" | ");
+                    let temp_obj = {
+                        id: parseInt(temp[1]),
+                        name: data[i].value
+                    };
+                    let temp_list = this.state.dropdownList;
+                    let index = temp_list.findIndex(c => c.id == temp_obj.id);
+
+                    if(index == -1) {
+                        //if new planning unit push to list
+                        temp_list.push(temp_obj);
+                    } 
+
+                    // temp_list[data[i].y] = temp_obj;
+                    this.setState(
+                        {
+                            dropdownList: temp_list
+                        }, () => {
+                            (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
+                        }
+                    )
+                }
+            }
+        }
     }
     /**
      * Builds planning unit data
