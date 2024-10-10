@@ -539,7 +539,7 @@ export default class CostOfInventory extends Component {
         for (var j = 0; j < costOfInventory.length; j++) {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang)
-            data[1] = roundARU(costOfInventory[j].stock,1)
+            data[1] = costOfInventory[j].stock
             data[2] = (costOfInventory[j].calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes'))
             data[3] = costOfInventory[j].catalogPrice;
             data[4] = costOfInventory[j].cost;

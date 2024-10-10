@@ -1295,9 +1295,9 @@ class ShipmentSummery extends Component {
       );
       data[10] =
         this.state.viewById == 1
-          ? roundARU(shipmentDetailsList[j].shipmentQty,1)
-          : roundARU((Number(shipmentDetailsList[j].shipmentQty) *
-          shipmentDetailsList[j].multiplier),1);
+          ? shipmentDetailsList[j].shipmentQty
+          : (Number(shipmentDetailsList[j].shipmentQty) *
+          shipmentDetailsList[j].multiplier);
       data[11] = moment(shipmentDetailsList[j].expectedDeliveryDate).format(
         "YYYY-MM-DD"
       );

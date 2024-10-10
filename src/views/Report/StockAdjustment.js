@@ -621,7 +621,7 @@ class StockAdjustmentComponent extends Component {
             data[0] = getLabelText(stockAdjustmentList[j].dataSource.label, this.state.lang)
             data[1] = getLabelText(stockAdjustmentList[j].planningUnit.label, this.state.lang)
             data[2] = stockAdjustmentList[j].inventoryDate
-            data[3] = (roundARU(stockAdjustmentList[j].stockAdjustemntQty,1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
+            data[3] = (stockAdjustmentList[j].stockAdjustemntQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
             data[4] = stockAdjustmentList[j].lastModifiedBy.username;
             data[5] = new moment(stockAdjustmentList[j].lastModifiedDate).format(`YYYY-MM-DD`);
             data[6] = stockAdjustmentList[j].notes;
