@@ -1203,7 +1203,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 var valueOfExpiredStock = 0;
                                 spFilteredForDashboardTop.flatMap(item=>item.batchDetails).filter(c=>Number(c.expiredQty)>0).map(item => {
                                     var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
-                                    valueOfExpiredStock+= Math.round(Number(price)*Number(item.expiredQty));
+                                    valueOfExpiredStock+= (Number(price)*Number(item.expiredQty));
                                 })
                                 if(generalProgramJson.dashboardData.topPuData==undefined || generalProgramJson.dashboardData.topPuData==""){
                                     generalProgramJson.dashboardData.topPuData=[];

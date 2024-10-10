@@ -432,7 +432,7 @@ export default class DataSourceListComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) {
+                if ((this.el.getValueFromCoords(8, x).toString()!=null && AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) || (this.el.getValueFromCoords(8, x).toString()==null && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE'))) {
                     this.props.history.push({
                         pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     });
