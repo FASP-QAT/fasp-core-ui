@@ -34,7 +34,7 @@ class ProcurementAgentService {
         );
     }
     savePlanningUnitProgramPriceForProcurementAgent(json) {
-        return axios.put(`${API_URL}/api/program/planningingUnit/procurementAgent`, json, {}
+        return axios.put(`${API_URL}/api/program/planningUnit/procurementAgent`, json, {}
         );
     }
     getProcurementAgentById(json) {

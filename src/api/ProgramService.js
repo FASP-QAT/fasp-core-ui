@@ -66,7 +66,7 @@ class ProgramService {
         );
     }
     saveProgramData(json, comparedVersionId) {
-        return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
+        return axios.put(`${API_URL}/api/commit/programData/${comparedVersionId}`, json, {}
         );
     }
     programInitialize(json) {
@@ -142,7 +142,7 @@ class ProgramService {
         );
     }
     sendNotificationAsync(commitRequestId) {
-        return axios.get(`${API_URL}/api/sendNotification/${commitRequestId}`, {}
+        return axios.get(`${API_URL}/api/commit/sendNotification/${commitRequestId}`, {}
         );
     }
     getPlanningUnitByProgramId(programId, json) {
