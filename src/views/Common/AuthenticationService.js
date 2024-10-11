@@ -350,6 +350,26 @@ class AuthenticationService {
         }
 
     }
+    getProgramListBasedOnBusinessFunction(businessFunctionId){
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let userAclList = decryptedUser.userAclList;
+                var programList=[]
+                userAclList.map(item=>{
+                    if(item.businessFunctionList.includes(businessFunctionId.toString())){
+                        programList=programList.concat(item.programList);
+                    }
+                })
+                return programList.toString();
+            }catch(err)        {
+                return "";
+            }
+        }else{
+                return "";
+            }
+    }
     /**
      * Checks if the current user is authenticated to access a specific route.
      * @param {string} route - The route to be checked for authentication.

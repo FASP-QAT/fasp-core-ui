@@ -139,14 +139,17 @@ class CountrySpecificPrices extends Component {
         DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 var proList = []
+                var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                 for (var i = 0; i < response.data.length; i++) {
                     if (response.data[i].active == true) {
+                        if(programIds.includes(response.data[i].id)){
                         var programJson = {
                             programId: response.data[i].id,
                             label: response.data[i].label,
                             programCode: response.data[i].code
                         }
                         proList.push(programJson)
+                    }
                     }
                 }
                 this.setState({

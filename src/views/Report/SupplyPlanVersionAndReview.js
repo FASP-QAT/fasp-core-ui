@@ -980,12 +980,15 @@ class SupplyPlanVersionAndReview extends Component {
                 .then(response => {
                     var listArray = response.data;
                     var proList = [];
+                    var allowedProgramIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_RESET_BULK_QPL')
                     for (var i = 0; i < listArray.length; i++) {
+                        if(allowedProgramIds.includes(listArray[i].id)){
                         var productJson = {
                             label: listArray[i].code,
                             value: listArray[i].id
                         }
                         proList.push(productJson);
+                    }
                     }
                     this.setState({
                         programIdsList: proList.sort(function (a, b) {
@@ -1231,7 +1234,7 @@ class SupplyPlanVersionAndReview extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF(columns)} />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '5px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV(columns)} />
-                                {AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_RESET_BULK_QPL') &&
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_RESET_BULK_QPL') &&
                                     <Button
                                         color="info"
                                         size="md"
