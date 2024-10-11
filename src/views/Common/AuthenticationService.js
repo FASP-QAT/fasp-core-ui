@@ -350,6 +350,26 @@ class AuthenticationService {
         }
 
     }
+    getProgramListBasedOnBusinessFunction(businessFunctionId){
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            try {
+                let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let userAclList = decryptedUser.userAclList;
+                var programList=[]
+                userAclList.map(item=>{
+                    if(item.businessFunctionList.includes(businessFunctionId.toString())){
+                        programList=programList.concat(item.programList);
+                    }
+                })
+                return programList.toString();
+            }catch(err)        {
+                return "";
+            }
+        }else{
+                return "";
+            }
+    }
     /**
      * Checks if the current user is authenticated to access a specific route.
      * @param {string} route - The route to be checked for authentication.
@@ -1169,7 +1189,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
-                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT")) {
+                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT") && bfunction.includes('ROLE_BF_DROPDOWN_FC')) {
                             return true;
                         }
                         break;
@@ -1204,7 +1224,7 @@ class AuthenticationService {
                         break;
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
-                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING") && bfunction.includes('ROLE_BF_DROPDOWN_FC')) {
                             return true;
                         }
                         break;

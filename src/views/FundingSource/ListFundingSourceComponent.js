@@ -93,6 +93,7 @@ class FundingSourceListComponent extends Component {
             data[6] = (fundingSourceList[j].lastModifiedDate ? moment(fundingSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = fundingSourceList[j].allowedInBudget;
             data[8] = fundingSourceList[j].active;
+            data[9] = fundingSourceList[j].programList.map(x => x.id.toString());
             fundingSourceArray[count] = data;
             count++;
         }
@@ -151,6 +152,10 @@ class FundingSourceListComponent extends Component {
                         { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
+                {
+                    title: 'programIds',
+                    type: 'hidden',
+                },
             ],
             onload: this.loaded,
             pagination: localStorage.getItem("sesRecordCount"),
@@ -203,7 +208,7 @@ class FundingSourceListComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FUNDING_SOURCE')) {
+                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(9, x), 'ROLE_BF_EDIT_FUNDING_SOURCE')) {
                     this.props.history.push({
                         pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
                     });

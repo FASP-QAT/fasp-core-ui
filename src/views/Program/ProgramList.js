@@ -287,10 +287,7 @@ export default class ProgramList extends Component {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || y == 0) {
       } else {
-        if (
-          AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
-            "ROLE_BF_EDIT_PROGRAM"
-          )
+        if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, x).toString()], 'ROLE_BF_EDIT_PROGRAM')
         ) {
           this.props.history.push({
             pathname: `/program/editProgram/${this.el.getValueFromCoords(
