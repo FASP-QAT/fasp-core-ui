@@ -11866,13 +11866,13 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
-                                        <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+                                        <div className="col-md-12 pt-2 pl-2 pb-lg-3 text-blackD"><b>{this.state.usageText}</b></div>
                                     }
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
-                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText3}</b> {this.state.usageText4} </div>
+                                        <div className="col-md-12 pl-2 pb-lg-3 text-blackD"><b>{this.state.usageText3}</b> {this.state.usageText4} </div>
                                     }
                                     {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
-                                        <div className="col-md-12 pl-2 pb-lg-3"><b>{this.state.usageText1}</b> {this.state.usageText2} </div>
+                                        <div className="col-md-12 pl-2 pb-lg-3 text-blackD"><b>{this.state.usageText1}</b> {this.state.usageText2} </div>
                                     }
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => {

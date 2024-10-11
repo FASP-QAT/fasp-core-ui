@@ -32,6 +32,7 @@ import UserService from "../../api/UserService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { hideFirstComponent } from "../../CommonComponent/JavascriptCommonFunctions.js";
 let initialValues = {
   username: "",
   realmId: [],
@@ -115,6 +116,7 @@ class AddUserComponent extends Component {
       loading1: true,
       programListForFilter: [],
       addUserEL: "",
+      aclMessage:""
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
@@ -1344,64 +1346,108 @@ class AddUserComponent extends Component {
   checkValidation() {
     var valid = true;
     var json = this.el.getJson(null, false);
-    for (var y = 0; y < json.length; y++) {
-      var col = "B".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(1, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
+    var hasApplicationRole = false;
+    if (json.length >= 2) {
+      hasApplicationRole = json.filter(c => c[1] == 'ROLE_APPLICATION_ADMIN').length > 0 ? true : false
+    }
+    if (hasApplicationRole) {
+      this.setState({
+        aclMessage: i18n.t('static.common.roleinvalidtext')
+      }, () => {
+        hideFirstComponent()
+      })
+      return false;
+    } else {
+      this.setState({
+        aclMessage: ""
+      })
+      let tempArray = json;
+      let seen = new Set();
+      var hasDuplicate = false;
+      const columnIndexes = [1, 2, 3, 4, 5];
+      tempArray.forEach(v => {
+        // Create a composite key by joining values from the selected columns
+        const key = columnIndexes.map(index => v[Object.keys(v)[index]]).join('|');
+
+        // Check if the key already exists in the set
+        if (seen.has(key)) {
+          hasDuplicate = true;
+        } else {
+          seen.add(key);
+        }
+      });
+      if (hasDuplicate) {
+        this.setState({
+          aclMessage: i18n.t('static.message.user.duplicateacl')
+        }, () => {
+          hideFirstComponent();
+        })
+        return false;
       } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "C".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(2, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "D".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(3, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "E".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(4, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "F".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(5, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
+        this.setState({
+          aclMessage: ""
+        }, () => {
+        })
+        for (var y = 0; y < json.length; y++) {
+          var col = "B".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(1, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "C".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(2, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "D".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(3, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "E".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(4, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "F".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(5, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+        }
+        return valid;
       }
     }
-    return valid;
   }
   /**
    * This is used to display the content
@@ -1797,6 +1843,9 @@ class AddUserComponent extends Component {
                           display: this.state.loading1 ? "none" : "block",
                         }}
                       >
+                        <h5 className="red" id="div1">
+                          {i18n.t(this.state.aclMessage)}
+                        </h5>
                         <div
                           style={{ width: "100%" }}
                           id="paputableDiv"
