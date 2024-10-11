@@ -779,7 +779,52 @@ class ApplicationDashboard extends Component {
               ctx.fillText(percentageText, centerX, position.y);
             });
           });
-        }
+        } else if (chart.config.type === 'pie') {
+          const ctx = chart.chart.ctx;
+          const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseFloat(value), 0);
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+              const meta = chart.getDatasetMeta(datasetIndex);
+              if (!meta.hidden) {
+                  meta.data.forEach((element, index) => {
+                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {                         
+                          const value = parseFloat(dataset.data[index]);
+                          const percentage = ((value / total) * 100).toFixed(2) + '%';
+                          ctx.fillStyle = 'white'; // Set text color
+                          ctx.font = 'bold 12px Arial'; // Set font
+                          ctx.textAlign = 'center'; // Horizontally align text to center
+                          ctx.textBaseline = 'middle';
+                          var meta1 = chart.getDatasetMeta(0).data[index]; 
+                          var centerPoint = meta1.tooltipPosition();
+                          // Draw the text at the center of each segment
+                          ctx.fillText(percentage, centerPoint.x, centerPoint.y);
+                      }
+                  });
+              }
+          });
+      }
+      // if(chart.config.type === 'pie') {
+      //     const ctx = chart.ctx;
+      //     const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+      //     chart.data.datasets.forEach(function (dataset, i) {
+      //       const meta = chart.getDatasetMeta(i);
+
+      //       meta.data.forEach(function (element, index) {
+      //         // Get the percentage value
+      //         const dataValue = dataset.data[i];
+      //         const percentageText = ((dataValue / total) * 100).toFixed(2) + '%';
+
+      //         // Set text style
+      //         ctx.fillStyle = 'white'; // Set text color
+      //         ctx.font = 'bold 12px Arial'; // Set font
+      //         ctx.textAlign = 'center'; // Horizontally align text to center
+      //         ctx.textBaseline = 'middle'; // Vertically align text to middle
+      //         var meta1 = chart.getDatasetMeta(0).data[index]; 
+      //         var centerPoint = meta1.tooltipPosition();
+      //         // Draw the text at the center of each segment
+      //         ctx.fillText(percentageText, centerPoint.x, centerPoint.y);
+      //       });
+      //     });
+      //   }
       }
     });
     if (localStorage.getItem('sessionType') === 'Online') {
@@ -1271,6 +1316,8 @@ class ApplicationDashboard extends Component {
     };
 
     const stockStatusOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
       scales: {
         xAxes: [{
           stacked: true,
@@ -1284,15 +1331,9 @@ class ApplicationDashboard extends Component {
           stacked: true,
           maxBarThickness: 20,
           ticks: {
+            beginAtZero: true,
             display: false // Hide the Y-axis values
           },
-          gridLines: {
-            display: false, // Remove grid lines
-            color: gridLineColor,
-            drawBorder: true,
-            lineWidth: 0,
-            zeroLineColor: gridLineColor
-          }
         }]
       },
       legend: {
@@ -1377,7 +1418,7 @@ class ApplicationDashboard extends Component {
       labels: shipmentDetailsList.map(x => x.code),
       datasets: [{
         label: 'My First Dataset',
-        data: shipmentDetailsList.map(x => x.cost),
+        data: shipmentDetailsList.map(x => x.cost.toFixed(2)),
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
@@ -1405,6 +1446,15 @@ class ApplicationDashboard extends Component {
           }
         }
       },
+      plugins: {
+        datalabels: {
+          display: true,
+          color: 'white',
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => `${value}%`
+        }
+      },
       legend: {
         display: true,
         position: 'bottom',
@@ -1421,7 +1471,7 @@ class ApplicationDashboard extends Component {
         label: 'My First Dataset',
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
-          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "green" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "green" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "orange" : "red",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -1444,9 +1494,10 @@ class ApplicationDashboard extends Component {
       pieceLabel: {
         render: function(d) { return d.value },
         fontColor: '#000',
-        fontSize: 16,
+        fontSize: 14,
         position: 'outside',
-        segment: false
+        segment: false,
+        textMargin: 10
       }
     }
 
@@ -1483,9 +1534,10 @@ class ApplicationDashboard extends Component {
       pieceLabel: {
         render: function(d) { return d.value },
         fontColor: '#000',
-        fontSize: 16,
+        fontSize: 14,
         position: 'outside',
-        segment: false
+        segment: false,
+        textMargin: 10
       }
     }
 
@@ -1522,9 +1574,10 @@ class ApplicationDashboard extends Component {
       pieceLabel: {
         render: function(d) { return d.value },
         fontColor: '#000',
-        fontSize: 16,
+        fontSize: 14,
         position: 'outside',
-        segment: false
+        segment: false,
+        textMargin: 10
       }
     }
 
@@ -1565,9 +1618,10 @@ class ApplicationDashboard extends Component {
       pieceLabel: {
         render: function(d) { return d.value },
         fontColor: '#000',
-        fontSize: 16,
+        fontSize: 14,
         position: 'outside',
-        segment: false
+        segment: false,
+        textMargin: 10
       }
     }
     let topProgramList = []
@@ -1594,7 +1648,7 @@ class ApplicationDashboard extends Component {
     }
     return (
       <div className="animated fadeIn">
-        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.consolidatedProgramList} objectStore="programData" page="dashboard"></QatProblemActionNew>
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -2039,14 +2093,20 @@ class ApplicationDashboard extends Component {
                           {this.state.dashboardTopList.map(d => {
                             return (
                               <tr>
-                                <td scope="row"><i class="fa fa-trash" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i></td>
-                                <td scope="row">{d.program.code + " ~v" + d.program.version}​</td>
+                                <td scope="row">
+                                  <i class="fa fa-trash" style={{color:"danger"}} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="fa fa-refresh" style={{color:"info"}} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
+                                </td>
+                                <td scope="row" title="QAT Problem List" style={{color:"blue"}} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>
                                 <td>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
-                                      <div class="progress1">
-                                        <div class="cssProgress-bar" data-percent={(d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100} style={{ width: (d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
-                                          <span class="cssProgress-label">{d.activePlanningUnits}</span>
+                                      <div class="progress">
+                                        <div class="progress-bar bg-danger" role="progressbar" style={{ width: (d.disabledPlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
+                                          {d.disabledPlanningUnits}
+                                        </div>
+                                        <div class="progress-bar bg-info" role="progressbar" style={{ width: (d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
+                                          {d.activePlanningUnits}
                                         </div>
                                       </div>
                                     </div>
@@ -2287,7 +2347,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
-                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
+                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={150} />
                                 <center><span>{forecastConsumptionQplPuCount-forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
@@ -2295,7 +2355,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
-                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
+                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={150} />
                                 <center><span>{inventoryQplPuCount-inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
@@ -2305,7 +2365,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
-                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
+                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={150} />
                                 <center><span>{actualConsumptionQplPuCount-actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
@@ -2313,7 +2373,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
-                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
+                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={150} />
                                 <center><span>{shipmentQplPuCount-shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>
