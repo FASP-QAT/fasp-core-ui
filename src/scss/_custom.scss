@@ -16581,7 +16581,6 @@ label.arrow_label:before {
   width: .2rem;
   inset-block-start: .15rem;
   inset-inline-start: -.65rem;
-  background: linear-gradient(to bottom, #73818f 50%, #a7c6ed 50%);
   border-radius: .5rem;
 }
 .avatar.avatar-md {
@@ -16675,7 +16674,7 @@ label.arrow_label:before {
   // max-height: calc(100vh - 0px) !important;
   // height: auto;
   // max-height: 100% !important;
-  min-height: 410px;
+  min-height: 310px;
 }
 @media screen and (min-width: 1920px) {
   .CustomHeight{
@@ -16683,7 +16682,7 @@ label.arrow_label:before {
     // max-height: calc(100vh - 0px) !important;
     // height: auto;
     // max-height: 100% !important;
-    min-height: 553px;
+    min-height: 410px;
   }
 }
 // .MuiSwitch-colorPrimary.Mui-checked {

@@ -6,6 +6,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import { MultiSelect } from 'react-multi-select-component';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
+import 'chart.piecelabel.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
@@ -14,6 +15,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import {
+  Button,
   ButtonGroup,
   Card,
   CardBody,
@@ -128,6 +130,7 @@ class ApplicationDashboard extends Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getOnlineDashboardBottom = this.getOnlineDashboardBottom.bind(this);
+    this.onTopSubmit = this.onTopSubmit.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -536,17 +539,23 @@ class ApplicationDashboard extends Component {
     localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
       topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
-    }, () => {
-      if (this.state.onlyDownloadedTopProgram) {
-        Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-      } else {
-        DashboardService.getDashboardTop().then(response => {
-          this.setState({
-            dashboardTopList: response.data
-          })
-        })
-      }
     });
+  }
+
+  onTopSubmit() {
+    if(this.state.topProgramId.length == 0){
+      this.setState({
+        dashboardTopList: []
+      })
+    } else if (this.state.onlyDownloadedTopProgram) {
+      Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
+    } else {
+      DashboardService.getDashboardTop().then(response => {
+        this.setState({
+          dashboardTopList: response.data
+        })
+      })
+    }
   }
   /**
     * Handles data change in the budget form.
@@ -744,24 +753,6 @@ class ApplicationDashboard extends Component {
       }.bind(this);
     }.bind(this);
     Chart.plugins.register({
-      beforeDraw: function (chart) {
-        if (chart.config.type === 'doughnut') {
-          const width = chart.chart.width;
-          const height = chart.chart.height;
-          const ctx = chart.chart.ctx;
-          ctx.restore();
-          const fontSize = "1";
-          ctx.font = `bold ${fontSize}em Arial`;
-          ctx.textBaseline = "middle";
-
-          const text = chart.config.data.datasets[0].data[1] + " missing",
-            textX = Math.round((width - ctx.measureText(text).width) / 2),
-            textY = height / 1.5;
-
-          ctx.fillText(text, textX, textY);
-          ctx.save();
-        }
-      },
       afterDatasetsDraw: function (chart) {
         if (chart.config.type === 'horizontalBar') {
           const ctx = chart.ctx;
@@ -1009,7 +1000,7 @@ class ApplicationDashboard extends Component {
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
       pagination: false,
-      search: true,
+      search: false,
       columnSorting: true,
       wordWrap: true,
       allowInsertColumn: false,
@@ -1069,7 +1060,7 @@ class ApplicationDashboard extends Component {
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
       pagination: false,
-      search: true,
+      search: false,
       columnSorting: true,
       wordWrap: true,
       allowInsertColumn: false,
@@ -1144,7 +1135,7 @@ class ApplicationDashboard extends Component {
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
       pagination: false,
-      search: true,
+      search: false,
       columnSorting: true,
       wordWrap: true,
       allowInsertColumn: false,
@@ -1283,6 +1274,7 @@ class ApplicationDashboard extends Component {
       scales: {
         xAxes: [{
           stacked: true,
+          maxBarThickness: 20,
           ticks: {
             beginAtZero: true,
             display: false // Hide the X-axis values
@@ -1290,6 +1282,7 @@ class ApplicationDashboard extends Component {
         }],
         yAxes: [{
           stacked: true,
+          maxBarThickness: 20,
           ticks: {
             display: false // Hide the Y-axis values
           },
@@ -1424,11 +1417,6 @@ class ApplicationDashboard extends Component {
     }
 
     const forecastConsumptionData = {
-      labels: [
-        'Red',
-        'Blue',
-        'Yellow'
-      ],
       datasets: [{
         label: 'My First Dataset',
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
@@ -1446,6 +1434,19 @@ class ApplicationDashboard extends Component {
       responsive: true,
       legend: {
         display: false // Hide the legend
+      },
+      tooltips: {
+        enabled: false
+      },
+      hover: {
+        mode: null
+      },
+      pieceLabel: {
+        render: function(d) { return d.value },
+        fontColor: '#000',
+        fontSize: 16,
+        position: 'outside',
+        segment: false
       }
     }
 
@@ -1472,6 +1473,19 @@ class ApplicationDashboard extends Component {
       responsive: true,
       legend: {
         display: false // Hide the legend
+      },
+      tooltips: {
+        enabled: false
+      },
+      hover: {
+        mode: null
+      },
+      pieceLabel: {
+        render: function(d) { return d.value },
+        fontColor: '#000',
+        fontSize: 16,
+        position: 'outside',
+        segment: false
       }
     }
 
@@ -1498,6 +1512,19 @@ class ApplicationDashboard extends Component {
       responsive: true,
       legend: {
         display: false // Hide the legend
+      },
+      tooltips: {
+        enabled: false
+      },
+      hover: {
+        mode: null
+      },
+      pieceLabel: {
+        render: function(d) { return d.value },
+        fontColor: '#000',
+        fontSize: 16,
+        position: 'outside',
+        segment: false
       }
     }
 
@@ -1528,6 +1555,19 @@ class ApplicationDashboard extends Component {
         drawBorder: true,
         lineWidth: 0,
         zeroLineColor: gridLineColor
+      },
+      tooltips: {
+        enabled: false
+      },
+      hover: {
+        mode: null
+      },
+      pieceLabel: {
+        render: function(d) { return d.value },
+        fontColor: '#000',
+        fontSize: 16,
+        position: 'outside',
+        segment: false
       }
     }
     let topProgramList = []
@@ -1561,7 +1601,7 @@ class ApplicationDashboard extends Component {
         <h5 className={this.props.match.params.color} id="div1" style={{ display: this.props.match.params.message == 'Success' ? 'none' : 'block' }}>{i18n.t(this.props.match.params.message)}</h5>
         <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
         <Row className="mt-2">
-          {checkOnline === 'Online' && this.state.id == 1 &&
+          {activeTab1 == 1 && checkOnline === 'Online' && this.state.id == 1 &&
             <>
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1636,7 +1676,7 @@ class ApplicationDashboard extends Component {
               </Col>
             </>
           }
-          {checkOnline === 'Online' && this.state.id == 2 &&
+          {activeTab1 == 1 && checkOnline === 'Online' && this.state.id == 2 &&
             <>
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1822,7 +1862,7 @@ class ApplicationDashboard extends Component {
               </Col>}
             </>
           }
-          {activeTab1 == 2 && checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
+          {activeTab1 == 1 && checkOnline === 'Online' && this.state.id != 2 && this.state.roleArray.includes('ROLE_SUPPLY_PLAN_REVIEWER') &&
             <>
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1979,9 +2019,11 @@ class ApplicationDashboard extends Component {
                           </Label>
                         </div>
                       </FormGroup>
-
+                      <FormGroup style={{ marginTop: '29px' }}>
+                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
+                      </FormGroup>
                     </div>
-                    <div class="table-responsive fixTableHead tableFixHeadDash">
+                    {this.state.dashboardTopList.length > 0 && this.state.topProgramId.length > 0 && <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           <th scope="col">Delete</th>
@@ -2020,7 +2062,7 @@ class ApplicationDashboard extends Component {
                           })}
                         </tbody>
                       </Table>
-                    </div>
+                    </div>}
                   </div>
                 </div>
               </div>
@@ -2082,7 +2124,7 @@ class ApplicationDashboard extends Component {
               </div>
             </div>
           </div> */}
-          {this.state.dashboardBottomData && <div className='row pl-lg-2 pr-lg-2'>
+          <div className='row pl-lg-2 pr-lg-2'>
             <div class="col-xl-12 mb-lg-3" style={{ background: '#fff', borderRadius: '0.25rem' }}>
               <div className='row pt-lg-2'>
                 <div className='col-md-12'>
@@ -2099,7 +2141,7 @@ class ApplicationDashboard extends Component {
                         bsSize="sm"
                         required
                       >
-                        <option selected>Open this select menu</option>
+                        <option value="" selected>Open this select menu</option>
                         {bottomProgramList}
                       </Input>
                     </FormGroup>
@@ -2140,16 +2182,16 @@ class ApplicationDashboard extends Component {
                   </div>
                 </div>
               </div>
-              <div className='row pl-lg-1 pr-lg-1'>
+              {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row pl-lg-1 pr-lg-1'>
                 <div className='col-md-12'>
                   <div className='row'>
-                  <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-6'}>
+                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stock Status </div>
                         </div>
                         <div class="card-body pt-lg-0">
-                          <HorizontalBar data={stockStatusData} options={stockStatusOptions} />
+                          <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150}/>
                         </div>
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stocked out Planning Units ({this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}) </div>
@@ -2168,48 +2210,49 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'} style={{ display: this.state.onlyDownloadedBottomProgram ? "block" : "none" }}>                    
+                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>                    
                     {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
                         <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-12 px-4' : 'col-md-6'}>
+                    <div className='col-md-6'>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title">Shipments </div>
+                          <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
                         </div>
                         <div class="card-body pt-lg-1">
                           <div className='row'>
-                            <FormGroup className='col-md-5 pl-lg-0 FormGroupD'>
-                              <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
-                              <Input
-                                type="select"
-                                name="displayBy"
-                                id="displayBy"
-                                bsSize="sm"
-                                onChange={(e) => { this.dataChange(e) }}
-                                value={this.state.displayBy}
-                                required
-                              >
-                                <option value="1">Funding Source</option>
-                                <option value="2">Procurement Agent</option>
-                                <option value="3">Status</option>
-                              </Input>
-
-                            </FormGroup>
-                            <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
-                          </div>
-                          <div className='row'>
                             <div className='col-md-6'>
-                              <div className='d-flex align-items-center justify-content-center PieShipment'>
-                                <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} />
+                              <div className='row'>
+                                <FormGroup className='col-md-11 pl-lg-2 FormGroupD'>
+                                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                                  <Input
+                                    type="select"
+                                    name="displayBy"
+                                    id="displayBy"
+                                    bsSize="sm"
+                                    onChange={(e) => { this.dataChange(e) }}
+                                    value={this.state.displayBy}
+                                    required
+                                  >
+                                    <option value="1">Funding Source</option>
+                                    <option value="2">Procurement Agent</option>
+                                    <option value="3">Status</option>
+                                  </Input>
+                              </FormGroup>
+                              </div>
+                              <div className='row'>
+                                <div className='d-flex align-items-center justify-content-center PieShipment'>
+                                  <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} />
+                                </div>
                               </div>
                             </div>
                             <div className='col-md-6'>
@@ -2241,33 +2284,37 @@ class ApplicationDashboard extends Component {
                         <div class="card-body py-2">
                           <div className='row pt-lg-4'>
                             <div class="col-md-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
+                              <div class="label-text text-center text-mutedDashboard"><h5><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
+                                <center><span>{forecastConsumptionQplPuCount-forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-md-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
+                              <div class="label-text text-center text-mutedDashboard"><h5><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
+                                <center><span>{inventoryQplPuCount-inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                           </div>
-                          <div className='row pt-lg-4'>
+                          <div className='row pt-lg-5'>
                             <div class="col-md-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
+                              <div class="label-text text-center text-mutedDashboard"><h5><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
+                                <center><span>{actualConsumptionQplPuCount-actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-md-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></div>
+                              <div class="label-text text-center text-mutedDashboard"><h5><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
+                                <center><span>{shipmentQplPuCount-shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
@@ -2276,25 +2323,13 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-6'>
                       <div className='row'>
-                        <div class="col-md-12 pl-lg-3 pr-lg-3">
+                        <div class="col-md-12">
                           <div class="card custom-card CustomHeight">
-                          <div className="card-header d-flex justify-content-between align-items-center">
-  <div className="card-title">
-    <div className="d-flex justify-content-between w-100" style={{gap:'225px'}}>
-      <div className="left-section">
-        <span>Expiries</span>
-      </div>
-      <div className="right-section text-md-right">
-        <p className="mb-2 fs-10 text-mutedDashboard fw-semibold pt-lg-0 pl-lg-2">
-          Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
+                            <div className="card-header d-flex justify-content-between align-items-center">
+                              <div className="card-title">Expiries</div>
+                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</p></div>  
+                            </div>
                             <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
                               </div>
                             </div>
@@ -2304,9 +2339,9 @@ class ApplicationDashboard extends Component {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>}
             </div>
-          </div>}
+          </div>
         </>}
       </div >
     );
