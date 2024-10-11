@@ -3238,18 +3238,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var columns = [];
         columns.push(i18n.t('static.inventoryDate.inventoryReport'))
         columns.push(i18n.t('static.extrapolation.adjustedActuals'))
-        if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
+        // if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
             columns.push(i18n.t('static.extrapolation.movingAverages'))
-        } if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
+        // } if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
             columns.push(i18n.t('static.extrapolation.semiAverages'))
-        } if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
+        // } if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
             columns.push(i18n.t('static.extrapolation.linearRegression'))
-        }
-        if (this.state.smoothingId && this.state.tesData.length > 0) {
+        // }
+        // if (this.state.smoothingId && this.state.tesData.length > 0) {
             columns.push(i18n.t('static.extrapolation.tes'))
-        } if (this.state.arimaId && this.state.arimaData.length > 0) {
+        // } if (this.state.arimaId && this.state.arimaData.length > 0) {
             columns.push(i18n.t('static.extrapolation.arima'))
-        }
+        // }
         headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
         var C = []
