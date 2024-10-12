@@ -1074,7 +1074,7 @@ class StockStatus extends Component {
               yAxisID: 'A',
               type: 'line',
               stack: 7,
-              order: 7,
+              order:0,
               data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
               fill: false,
               borderColor: 'rgb(75, 192, 192)',
@@ -1104,7 +1104,7 @@ class StockStatus extends Component {
               data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
             },
             {
-              label: i18n.t('static.report.actualConsumption'),
+              label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0))?"Consensus Consumption":i18n.t('static.report.actualConsumption'),
               yAxisID: 'A',
               type: 'line',
               stack: 7,
@@ -2268,7 +2268,7 @@ class StockStatus extends Component {
         yAxisID: 'A',
         type: 'line',
         stack: 7,
-        order: 7,
+        order:0,
         data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
@@ -2300,7 +2300,7 @@ class StockStatus extends Component {
         data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
       },
       {
-        label: i18n.t('static.report.actualConsumption'),
+        label: (this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1)?"Consensus Consumption":i18n.t('static.report.actualConsumption'),
         yAxisID: 'A',
         type: 'line',
         stack: 7,
@@ -2653,7 +2653,7 @@ class StockStatus extends Component {
                             {i18n.t('static.planningunit.countrysku')}
                           </Label>
                         </FormGroup>
-                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none" }}>
+                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop":"4px" }}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
@@ -2687,7 +2687,7 @@ class StockStatus extends Component {
                             </InputGroup>}
                           </div>
                         </FormGroup>
-                        <FormGroup id="planningUnitDiv">
+                        <FormGroup id="planningUnitDiv" style={{"marginTop":"4px"}}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
