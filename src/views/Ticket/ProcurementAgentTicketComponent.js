@@ -506,7 +506,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                                                                 <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}</Label>
                                         <Input type="number"
                                             bsSize="sm"
                                             name="submittedToApprovedLeadTime"
@@ -520,7 +520,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                                                                                 <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                        <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}</Label>
                                         <Input type="number"
                                             bsSize="sm"
                                             name="approvedToShippedLeadTime"
