@@ -536,13 +536,15 @@ class ApplicationDashboard extends Component {
     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
     */
   handleTopProgramIdChange = (programIds) => {
-    localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
+    // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
       topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
     });
   }
 
   onTopSubmit() {
+    localStorage.setItem("topLocalProgram", this.state.onlyDownloadedTopProgram);
+    localStorage.setItem("topProgramId", JSON.stringify(this.state.topProgramId))
     if(this.state.topProgramId.length == 0){
       this.setState({
         dashboardTopList: []
@@ -550,7 +552,8 @@ class ApplicationDashboard extends Component {
     } else if (this.state.onlyDownloadedTopProgram) {
       Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
     } else {
-      DashboardService.getDashboardTop().then(response => {
+      DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
+        localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
         this.setState({
           dashboardTopList: response.data
         })
@@ -601,17 +604,18 @@ class ApplicationDashboard extends Component {
     * @param {Object} event - The event object containing the checkbox state.
     */
   changeOnlyDownloadedTopProgram(event) {
-    localStorage.setItem("topLocalProgram", event.target.checked);
     var flag = event.target.checked ? 1 : 0
     if (flag) {
       this.setState({
         onlyDownloadedTopProgram: true,
+        topProgramId: []
       }, () => {
         this.getPrograms();
       })
     } else {
       this.setState({
         onlyDownloadedTopProgram: false,
+        topProgramId: []
       }, () => {
         this.getPrograms();
       })
@@ -627,12 +631,14 @@ class ApplicationDashboard extends Component {
     if (flag) {
       this.setState({
         onlyDownloadedBottomProgram: true,
+        bottomProgramId: ""
       }, () => {
         this.getPrograms();
       })
     } else {
       this.setState({
         onlyDownloadedBottomProgram: false,
+        bottomProgramId: ""
       }, () => {
         this.getPrograms();
       })
@@ -738,11 +744,9 @@ class ApplicationDashboard extends Component {
         }
         if (this.state.onlyDownloadedTopProgram) {
           Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-        } else {
-          DashboardService.getDashboardTop().then(response => {
-            this.setState({
-              dashboardTopList: response.data
-            })
+        } else if(localStorage.getItem("dashboardTopList") && !this.state.onlyDownloadedTopProgram) {
+          this.setState({
+            dashboardTopList: JSON.parse(localStorage.getItem("dashboardTopList"))
           })
         }
         tempProgramList.sort(function (a, b) {
@@ -2077,10 +2081,10 @@ class ApplicationDashboard extends Component {
                         <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                       </FormGroup>
                     </div>
-                    {this.state.dashboardTopList.length > 0 && this.state.topProgramId.length > 0 && <div class="table-responsive fixTableHead tableFixHeadDash">
+                    {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
-                          <th scope="col">Delete</th>
+                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action</th>}
                           <th scope="col">Program</th>
                           <th scope="col"># of active planning units</th>
                           <th scope="col"># of products with stockouts</th>
@@ -2093,11 +2097,12 @@ class ApplicationDashboard extends Component {
                           {this.state.dashboardTopList.map(d => {
                             return (
                               <tr>
-                                <td scope="row">
+                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash" style={{color:"danger"}} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   <i class="fa fa-refresh" style={{color:"info"}} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
-                                </td>
-                                <td scope="row" title="QAT Problem List" style={{color:"blue"}} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>
+                                </td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row" title="QAT Problem List" style={{color:"blue"}} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>}
+                                {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code}​</td>}
                                 <td>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
