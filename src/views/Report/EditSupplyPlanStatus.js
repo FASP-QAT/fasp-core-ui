@@ -1257,6 +1257,7 @@ class EditSupplyPlanStatus extends Component {
                                             this.setState({
                                                 currencyList: cList
                                             })
+                                            var programPlanningUnit = ((this.state.planningUnits).filter(p => p.planningUnit.id == document.getElementById("planningUnitId").value))[0];
                                             if (supplyPlanType == 'deliveredShipments') {
                                                 shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'shippedShipments') {
@@ -1293,6 +1294,7 @@ class EditSupplyPlanStatus extends Component {
                                                 programJson: programJson,
                                                 generalProgramJson: programJson,
                                                 shipmentStartDateClicked: startDate,
+                                                programPlanningUnitForPrice: programPlanningUnit,
                                                 loading: true
                                             }, () => {
                                                 if (this.refs.shipmentChild != undefined) {
@@ -2281,6 +2283,7 @@ class EditSupplyPlanStatus extends Component {
                     b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
                 }.bind(this)),
+                planningUnitListAll: (response.data),
                 planningUnitDropdownList: response.data.map((item, i) => ({ id: item.planningUnit.id, name: getLabelText(item.planningUnit.label, this.state.lang) })),
                 message: ''
             })
@@ -2745,7 +2748,7 @@ observer.observe(document.documentElement, {
         
         const lightModeColors = [
             '#002F6C',  // Color 1 
-            '#212721',   
+            '#cfcdc9',   
         ];
         const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -3932,6 +3935,7 @@ observer.observe(document.documentElement, {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
+            editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -5372,9 +5376,10 @@ observer.observe(document.documentElement, {
                                                     var json = elInstance.getJson();
                                                     var reviewedProblemList = [];
                                                     var isAllCheckForReviewed = true;
+                                                    var j=0;
                                                     for (var i = 0; i < json.length; i++) {
                                                         var map = new Map(Object.entries(json[i]));
-                                                        if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != "")) {
+                                                        if ((map.get("0") != "" && map.get("0") != 0) && (map.get("23") == 1 && (this.state.problemList[j].problemStatus.id != map.get("11") || this.state.problemList[j].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
                                                             reviewedProblemList.push({
                                                                 problemReportId: map.get("0"),
                                                                 problemStatus: {
@@ -5384,6 +5389,9 @@ observer.observe(document.documentElement, {
                                                                 reviewedNotes: map.get("22"),
                                                                 notes: map.get("22")
                                                             });
+                                                        }
+                                                        if((map.get("0") != "" && map.get("0") != 0)){
+                                                            j+=1;
                                                         }
                                                         if (map.get("21") == false && map.get("13") != 4) {
                                                             isAllCheckForReviewed = false

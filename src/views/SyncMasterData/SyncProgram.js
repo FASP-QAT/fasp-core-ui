@@ -20,7 +20,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 export default class SyncProgram extends Component {
     constructor(props) {
         super(props);
-        var pIds = this.props.location.state != undefined ? this.props.location.state.programIds : [];
+        var pIds = this.props.location.state != undefined && this.props.location.state.programIds != undefined ? this.props.location.state.programIds : [];
         this.state = {
             totalMasters: 0,
             syncedMasters: 0,

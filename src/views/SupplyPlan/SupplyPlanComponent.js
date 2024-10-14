@@ -904,7 +904,7 @@ export default class SupplyPlanComponent extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
     }
-    toggleInventoryActualBatchInfo(batchInfoList, isActual, count) {
+    toggleInventoryActualBatchInfo(batchInfoList, isActual, count, comingFromInventoryData) {
         var cont = false;
         if (this.state.actualInventoryChanged) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -1104,8 +1104,8 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            this.formatter(this.state.closingBalanceArray[count].balance),
-                            this.formatter(this.state.closingBalanceArray[count].balance)
+                            this.formatter(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance),
+                            this.formatter(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance)
                         ]
                     ],
                     onchange: function (instance, cell, x, y, value) {
@@ -1148,8 +1148,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 '',
                                 '',
                                 i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
-                                this.formatter(this.state.closingBalanceArray[this.state.actualCount].balance),
-                                this.formatter(this.state.closingBalanceArray[this.state.actualCount].balance)
+                                this.formatter(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?this.state.actualCount-2:this.state.actualCount].balance),
+                                this.formatter(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?this.state.actualCount-2:this.state.actualCount].balance)
                             ]])
                         }
                     }.bind(this),
@@ -1192,7 +1192,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         this.setState({
                                             ledgerForBatch: []
                                         })
-                                        this.showBatchLedgerClicked(obj.getRowData(y)[0].toString().split("~")[0], moment(obj.getRowData(y)[1]).format("YYYY-MM-DD"), moment(obj.getRowData(y)[2]).format("YYYY-MM-DD"));
+                                        this.showBatchLedgerClicked(obj.getRowData(y)[0].toString().split("~")[0], moment(obj.getRowData(y)[1]).format("YYYY-MM-DD"), moment(obj.getRowData(y)[0].toString().split("~")[1]).format("YYYY-MM-DD"));
                                     }.bind(this)
                                 })
                             }
@@ -1212,7 +1212,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var actualInventoryEl = jexcel(document.getElementById("inventoryActualBatchInfoTable"), options);
                 this.el = actualInventoryEl;
                 this.setState({
-                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: total, actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count
+                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: total, actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData:comingFromInventoryData
                 })
             })
         }
@@ -1434,7 +1434,7 @@ export default class SupplyPlanComponent extends React.Component {
             
             const lightModeColors = [
                 '#002F6C',  // Color 1 
-                '#212721',   
+                '#cfcdc9',   
             ];
             const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
@@ -2480,7 +2480,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList,item.isActual,count) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList,item.isActual,count,0) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
@@ -4241,7 +4241,7 @@ export default class SupplyPlanComponent extends React.Component {
     showInventoryForThatMonth(){
         localStorage.setItem('inventoryDateForBatch','');
         this.toggleLarge('Adjustments', '', '', '', '', '', '', 0);
-        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList,this.state.closingBalanceArray[0].isActual,0);
+        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList,this.state.closingBalanceArray[0].isActual,2,1);
     }
     /**
      * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
