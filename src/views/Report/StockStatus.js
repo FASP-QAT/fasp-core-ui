@@ -231,7 +231,7 @@ class StockStatus extends Component {
                 : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? Number(ele.nationalAdjustment)+Number(ele.adjustment != null ? ele.adjustment : 0) : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
         }
@@ -363,7 +363,7 @@ class StockStatus extends Component {
                     : " | " + item1.orderNo) +
                 (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
-            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), ele.planBasedOn == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC(ele.maxStock, 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
+            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? Number(ele.nationalAdjustment)+Number(ele.adjustment) : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), ele.planBasedOn == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC(ele.maxStock, 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
         { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
@@ -3212,7 +3212,7 @@ class StockStatus extends Component {
                               })}</table>
                             </td>
                             <td>
-                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment, 0)}
+                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? Number(this.state.stockStatusList[idx].nationalAdjustment)+Number(this.state.stockStatusList[idx].adjustment) : this.state.stockStatusList[idx].adjustment, 0)}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].expiredStock != 0 ? formatter(this.state.stockStatusList[idx].expiredStock, 0) : ''}
