@@ -227,7 +227,7 @@ class EquivalancyUnit extends Component {
             elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
             var typeId = rowData[14];
             let checkReadOnly = 0;
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && typeId == -1 && typeId != 0)) {
+            if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')))) {
                 checkReadOnly = checkReadOnly + 1;
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
@@ -377,7 +377,7 @@ class EquivalancyUnit extends Component {
                         cell1.classList.remove('readonly');
                     } else {
                         let checkReadOnly = 0;
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && rowData[4] == -1 && rowData[4] != 0) {
+                        if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && rowData[4] == -1 && rowData[4] != 0)) || ((rowData[4] != -1 && rowData[4]!=0) && (!AuthenticationService.checkUserACL([rowData[4].toString()],'ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.checkUserACL([rowData[4].toString()],'ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')))) {
                             checkReadOnly = checkReadOnly + 1;
                             var cell1 = elInstance.getCell(`A${parseInt(y) + 1}`)
                             cell1.classList.add('readonly');
@@ -1943,7 +1943,7 @@ class EquivalancyUnit extends Component {
             elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
             var typeId = rowData[14];
             let checkReadOnly = 0;
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && typeId == -1 && typeId != 0)) {
+            if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')))) {
                 checkReadOnly = checkReadOnly + 1;
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');

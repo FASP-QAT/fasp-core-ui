@@ -1026,7 +1026,7 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+                        if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1144,7 +1144,7 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+                        if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1285,7 +1285,8 @@ class usageTemplate extends Component {
      * This function is used to filter the dataset(Program) list based on the business function
      */
     filterDataset = function (instance, cell, c, r, source) {
-        var mylist = this.state.typeList;
+        var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN').concat(AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL'));
+        var mylist = this.state.typeList.filter(c=>programIds.includes(c.id) || c.id==-1);
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
@@ -1655,7 +1656,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -1818,7 +1819,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
