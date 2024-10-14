@@ -92,6 +92,8 @@ class ApplicationDashboard extends Component {
       problemActionList: [],
       programList: [],
       datasetList: [],
+      countryList: [],
+      technicalAreaList: [],
       message: '',
       dashboard: '',
       users: [],
@@ -102,6 +104,8 @@ class ApplicationDashboard extends Component {
       roleArray: [],
       dashboardTopList: [],
       topProgramId: localStorage.getItem('topProgramId') ? JSON.parse(localStorage.getItem('topProgramId')) : [],
+      topCountryId: [],
+      topTechnicalAreaId: [],
       bottomProgramId: localStorage.getItem('bottomProgramId'),
       displayBy: 1,
       onlyDownloadedTopProgram: localStorage.getItem("topLocalProgram") == "false" ? false : true,
@@ -131,6 +135,7 @@ class ApplicationDashboard extends Component {
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getOnlineDashboardBottom = this.getOnlineDashboardBottom.bind(this);
     this.onTopSubmit = this.onTopSubmit.bind(this);
+    this.getRealmCountryList = this.getRealmCountryList.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -365,6 +370,7 @@ class ApplicationDashboard extends Component {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then(response => {
+          console.log("hello",response.data)
           var proList = []
           for (var i = 0; i < response.data.length; i++) {
             var programJson = {
@@ -531,6 +537,141 @@ class ApplicationDashboard extends Component {
     }.bind(this)
   }
   /**
+     * Reterives realm country list
+     */
+  getRealmCountryList() {
+    let realmId = AuthenticationService.getRealmId();
+    DropdownService.getRealmCountryDropdownList(realmId)
+        .then(response => {
+            if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                console.log("hello",listArray)
+                this.setState({
+                    countryList: listArray
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+  }
+  /**
+   * Reterives health area list
+   */
+  getHealthAreaList() {
+    ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+        .then(response => {
+            if (response.status == 200) {
+                var json = (response.data).filter(c => c.active == true);
+                var regList = [];
+                for (var i = 0; i < json.length; i++) {
+                    regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                }
+                var listArray = regList;
+                listArray.sort((a, b) => {
+                    var itemLabelA = a.label.toUpperCase();
+                    var itemLabelB = b.label.toUpperCase();
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+                let { program } = this.state;
+                program.healthAreaArray = [];
+                this.setState({
+                    healthAreaList: listArray,
+                    healthAreaId: '',
+                    program
+                }, (
+                ) => {
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+  }
+  /**
     * Handle region change function.
     * This function updates the state with the selected region values and generates a list of regions.
     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
@@ -539,6 +680,28 @@ class ApplicationDashboard extends Component {
     // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
       topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+    });
+  }
+  /**
+    * Handle region change function.
+    * This function updates the state with the selected region values and generates a list of regions.
+    * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+    */
+  handleTopCountryIdChange = (countryIds) => {
+    // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
+    this.setState({
+      topCountryId: countryIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+    });
+  }
+  /**
+    * Handle region change function.
+    * This function updates the state with the selected region values and generates a list of regions.
+    * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+    */
+  handleTopTechnicalAreaIdChange = (technicalAreaIds) => {
+    // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
+    this.setState({
+      topTechnicalAreaId: technicalAreaIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
     });
   }
 
@@ -881,6 +1044,7 @@ class ApplicationDashboard extends Component {
     }
     this.getPrograms();
     this.getDataSetList();
+    this.getRealmCountryList();
     if (localStorage.getItem('sessionType') === 'Online') {
       DashboardService.openIssues()
         .then(response => {
@@ -1294,17 +1458,17 @@ class ApplicationDashboard extends Component {
         {
           label: 'Overstock',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#002F6C', // Dark Blue
+          backgroundColor: '#edb944', // Dark Blue
         },
         {
           label: 'Adequate',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
-          backgroundColor: '#118B70', // Green
+          backgroundColor: '#118b70', // Green
         },
         {
           label: 'Below Min',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#F48521', // Yellow
+          backgroundColor: '#f48521', // Yellow
         },
         {
           label: 'Stockout',
@@ -1314,7 +1478,7 @@ class ApplicationDashboard extends Component {
         {
           label: 'NA',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#6C6463', // Red
+          backgroundColor: '#cfcdc9', // Red
         }
       ]
     };
@@ -1418,16 +1582,30 @@ class ApplicationDashboard extends Component {
       }
     }
 
+    const darkModeColors = [
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff'
+    ];
+    
+    const lightModeColors = [
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
+      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C'
+    ];
+    
+    const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+
     const shipmentsPieData = {
       labels: shipmentDetailsList.map(x => x.code),
       datasets: [{
         label: 'My First Dataset',
         data: shipmentDetailsList.map(x => x.cost.toFixed(2)),
-        backgroundColor: [
-          'rgb(255, 99, 132)',
-          'rgb(54, 162, 235)',
-          'rgb(255, 205, 86)'
-        ],
+        backgroundColor: backgroundColor,
         hoverOffset: 4
       }]
     };
@@ -1475,7 +1653,7 @@ class ApplicationDashboard extends Component {
         label: 'My First Dataset',
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
-          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "green" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "orange" : "red",
+          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "#118b70" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -1515,7 +1693,7 @@ class ApplicationDashboard extends Component {
         label: 'My First Dataset',
         data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
         backgroundColor: [
-          (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "green" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "#118b70" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -1555,7 +1733,7 @@ class ApplicationDashboard extends Component {
         label: 'My First Dataset',
         data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
         backgroundColor: [
-          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "green" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "#118b70" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -1595,7 +1773,7 @@ class ApplicationDashboard extends Component {
         label: 'My First Dataset',
         data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
-          (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "green" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "ornage" : "red",
+          (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -1628,6 +1806,16 @@ class ApplicationDashboard extends Component {
         textMargin: 10
       }
     }
+    let topCountryList = []
+    this.state.countryList.length > 0 &&
+      this.state.countryList.map(c => {
+        topCountryList.push({ label: c.label.label_en, value: c.id })
+      })
+    let topTechnicalAreaList = []
+    this.state.programList.length > 0 &&
+      this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : !c.local).map(c => {
+        topTechnicalAreaList.push({ label: c.programCode, value: c.id })
+      })
     let topProgramList = []
     this.state.programList.length > 0 &&
       this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : !c.local).map(c => {
@@ -2049,6 +2237,30 @@ class ApplicationDashboard extends Component {
                   <div class="card-body px-2 py-2">
                     <div className='row'>
                       <FormGroup className='col-md-3 FormGroupD'>
+                        <Label htmlFor="topProgramId">Country<span class="red Reqasterisk">*</span></Label>
+                        <MultiSelect
+                          name="topCountryId"
+                          id="topCountryId"
+                          bsSize="sm"
+                          value={this.state.topCountryId}
+                          onChange={(e) => { this.handleTopCountryIdChange(e) }}
+                          options={topCountryList && topCountryList.length > 0 ? topCountryList : []}
+                          labelledBy={i18n.t('static.common.regiontext')}
+                        />
+                      </FormGroup>
+                      <FormGroup className='col-md-3 FormGroupD'>
+                        <Label htmlFor="topTechnicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
+                        <MultiSelect
+                          name="topTechnicalAreaId"
+                          id="topTechnicalAreaId"
+                          bsSize="sm"
+                          value={this.state.topTechnicalAreaId}
+                          onChange={(e) => { this.handleTopTechnicalAreaIdChange(e) }}
+                          options={topTechnicalAreaList && topTechnicalAreaList.length > 0 ? topTechnicalAreaList : []}
+                          labelledBy={i18n.t('static.common.regiontext')}
+                        />
+                      </FormGroup>
+                      <FormGroup className='col-md-3 FormGroupD'>
                         <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
                         <MultiSelect
                           name="topProgramId"
@@ -2107,10 +2319,10 @@ class ApplicationDashboard extends Component {
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
                                       <div class="progress">
-                                        <div class="progress-bar bg-danger" role="progressbar" style={{ width: (d.disabledPlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
+                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#BA0C2F", width: (d.disabledPlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
                                           {d.disabledPlanningUnits}
                                         </div>
-                                        <div class="progress-bar bg-info" role="progressbar" style={{ width: (d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
+                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#0067B9", width: (d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
                                           {d.activePlanningUnits}
                                         </div>
                                       </div>
@@ -2118,9 +2330,9 @@ class ApplicationDashboard extends Component {
                                   </div>
 
                                 </td>
-                                <td>{d.countOfStockOutPU}</td>
-                                <td>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                <td>{d.countOfOpenProblem}</td>
+                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfStockOutPU}</td>
+                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
                                 <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} ({d.latestFinalVersion ? moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') : ""})</td>
                               </tr>)
@@ -2291,7 +2503,7 @@ class ApplicationDashboard extends Component {
                       <div className="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title">Shipments </div>
-                          <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the shipment {shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</p></div>
+                          <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the shipment <b>{shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
                         <div class="card-body pt-lg-1">
                           <div className='row'>
@@ -2392,7 +2604,7 @@ class ApplicationDashboard extends Component {
                           <div class="card custom-card CustomHeight">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
-                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <p class="mb-2 fs-10 text-mutedDashboard fw-semibold">Total value of all the Expiries {expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</p></div>  
+                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>  
                             </div>
                             <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
