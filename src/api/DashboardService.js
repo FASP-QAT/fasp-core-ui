@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class DashboardService {
     applicationLevelDashboard() {
-        return axios.get(`${API_URL}/api/applicationLevelDashboard`, {}
+        return axios.get(`${API_URL}/api/dashboard/applicationLevelDashboard`, {}
         );
     }
     realmLevelDashboard(realmId) {
@@ -11,7 +11,7 @@ class DashboardService {
         });
     }
     applicationLevelDashboardUserList() {
-        return axios.get(`${API_URL}/api/applicationLevelDashboardUserList`, {
+        return axios.get(`${API_URL}/api/dashboard/applicationLevelDashboardUserList`, {
         });
     }
     realmLevelDashboardUserList() {

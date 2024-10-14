@@ -217,7 +217,6 @@ export default class EditProgram extends Component {
                             var itemLabelB = b.username.toUpperCase();
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
-                        listArray = listArray.filter(c => c.active == true);
                         this.setState({
                             programManagerList: listArray, loading: false
                         })
