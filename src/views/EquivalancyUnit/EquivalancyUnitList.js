@@ -861,7 +861,8 @@ class EquivalancyUnit extends Component {
      * This function is used to filter the forecast program list based on the business function
      */
     filterDataset1 = function (instance, cell, c, r, source) {
-        var mylist = this.state.typeList1;
+        var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL').concat(AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN'));
+        var mylist = this.state.typeList1.filter(c=>programIds.includes(c.id) || c.id==-1);
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
@@ -871,7 +872,8 @@ class EquivalancyUnit extends Component {
      * This function is used to filter the forecast program list based on the business function
      */
     filterDataset = function (instance, cell, c, r, source) {
-        let mylist = this.state.typeList;
+        var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL').concat(AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN'));
+        var mylist = this.state.typeList.filter(c=>programIds.includes(c.id) || c.id==-1);
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
