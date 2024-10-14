@@ -118,6 +118,13 @@ class ChangePasswordComponent extends Component {
                                                         switch (error.response ? error.response.status : "") {
                                                             case 500:
                                                             case 401:
+                                                            case 409:
+                                                                this.setState({
+                                                                    message: i18n.t('static.common.accessDenied'),
+                                                                    loading: false,
+                                                                    color: "#BA0C2F",
+                                                                });
+                                                                break;
                                                             case 403:
                                                             case 404:
                                                             case 406:

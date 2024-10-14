@@ -118,6 +118,13 @@ export default class DatabaseTranslations extends React.Component {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
+                            break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
                             break;
@@ -200,6 +207,13 @@ export default class DatabaseTranslations extends React.Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)

@@ -227,7 +227,7 @@ class EquivalancyUnit extends Component {
             elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
             var typeId = rowData[14];
             let checkReadOnly = 0;
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && typeId == -1 && typeId != 0)) {
                 checkReadOnly = checkReadOnly + 1;
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
@@ -377,7 +377,7 @@ class EquivalancyUnit extends Component {
                         cell1.classList.remove('readonly');
                     } else {
                         let checkReadOnly = 0;
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && rowData[4] == -1 && rowData[4] != 0) {
+                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && rowData[4] == -1 && rowData[4] != 0) {
                             checkReadOnly = checkReadOnly + 1;
                             var cell1 = elInstance.getCell(`A${parseInt(y) + 1}`)
                             cell1.classList.add('readonly');
@@ -539,6 +539,13 @@ class EquivalancyUnit extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -924,6 +931,13 @@ class EquivalancyUnit extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -1022,6 +1036,13 @@ class EquivalancyUnit extends Component {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
+                            break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
                             break;
@@ -1102,6 +1123,13 @@ class EquivalancyUnit extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -1178,6 +1206,13 @@ class EquivalancyUnit extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
@@ -1289,6 +1324,13 @@ class EquivalancyUnit extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -1370,6 +1412,13 @@ class EquivalancyUnit extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -1488,6 +1537,13 @@ class EquivalancyUnit extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -1651,7 +1707,14 @@ class EquivalancyUnit extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -1804,7 +1867,14 @@ class EquivalancyUnit extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -1873,7 +1943,7 @@ class EquivalancyUnit extends Component {
             elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
             var typeId = rowData[14];
             let checkReadOnly = 0;
-            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && typeId == -1 && typeId != 0)) {
+            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL') && typeId == -1 && typeId != 0)) {
                 checkReadOnly = checkReadOnly + 1;
                 var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
