@@ -184,6 +184,13 @@ class usageTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -263,6 +270,13 @@ class usageTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -340,6 +354,13 @@ class usageTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -421,6 +442,13 @@ class usageTemplate extends Component {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
+                            break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
                             break;
@@ -497,6 +525,13 @@ class usageTemplate extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
@@ -577,6 +612,13 @@ class usageTemplate extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
@@ -814,7 +856,7 @@ class usageTemplate extends Component {
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.dimensionList,
-                    readOnly: (AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true,
+                    readOnly: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? false : true,
                     required: true,
                     regex: {
                         ex: /^\S+(?: \S+)*$/,
@@ -984,7 +1026,7 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+                        if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1018,7 +1060,7 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                         }
-                        if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1102,7 +1144,7 @@ class usageTemplate extends Component {
                             cell1.classList.add('readonly');
                         }
                         var typeId = rowData[19];
-                        if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+                        if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1136,7 +1178,7 @@ class usageTemplate extends Component {
                             var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                         }
-                        if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+                        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                             var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                             cell1.classList.add('readonly');
                             var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1176,7 +1218,7 @@ class usageTemplate extends Component {
             }.bind(this),
             oneditionend: this.oneditionend,
             onchangepage: this.onchangepage,
-            editable: (AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? true : false,
+            editable: (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) ? true : false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -1192,7 +1234,7 @@ class usageTemplate extends Component {
                             });
                         }
                         var typeId = this.el.getValueFromCoords(19, y);
-                        if (!this.el.getValueFromCoords(10, y) && ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && typeId == -1 && typeId != 0)) {
+                        if (!this.el.getValueFromCoords(10, y) && ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && typeId == -1 && typeId != 0)) {
                             items.push({
                                 title: i18n.t('static.usageTemplate.calculateUsageFrequency'),
                                 onclick: function () {
@@ -1243,8 +1285,9 @@ class usageTemplate extends Component {
      * This function is used to filter the dataset(Program) list based on the business function
      */
     filterDataset = function (instance, cell, c, r, source) {
-        var mylist = this.state.typeList;
-        if (!AuthenticationService.checkUserACL(mylist.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
+        var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN').concat(AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL'));
+        var mylist = this.state.typeList.filter(c=>programIds.includes(c.id) || c.id==-1);
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
         return mylist;
@@ -1327,6 +1370,13 @@ class usageTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -1506,6 +1556,13 @@ class usageTemplate extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -1599,7 +1656,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -1633,7 +1690,7 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(`V${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
             }
-            if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+            if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -1762,7 +1819,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
             var typeId = rowData[19];
-            if ((AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) {
+            if (((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')) && (typeId == -1 && typeId != 0)) || ((typeId != -1 && typeId!=0) && (!AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && !AuthenticationService.checkUserACL([typeId.toString()],'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL')))) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1796,7 +1853,7 @@ class usageTemplate extends Component {
                 var cell1 = elInstance.getCell(("V").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
             }
-            if (!AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+            if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
                 var cell1 = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2028,6 +2085,13 @@ class usageTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -2355,7 +2419,7 @@ class usageTemplate extends Component {
             }
         }
         if (x == 19) {
-            if ((AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && value == -1 && value != 0)) {
+            if ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN') && value == -1 && value != 0)) {
                 var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))
                 cell1.classList.add('readonly');
                 var cell1 = this.el.getCell(("C").concat(parseInt(y) + 1))
@@ -2386,7 +2450,7 @@ class usageTemplate extends Component {
                 cell1.classList.add('readonly');
             }
         }
-        if (!AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
+        if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) {
             var cell1 = this.el.getCell(("B").concat(parseInt(y) + 1))
             cell1.classList.add('readonly');
             var cell1 = this.el.getCell(("C").concat(parseInt(y) + 1))
@@ -2689,7 +2753,7 @@ class usageTemplate extends Component {
                         </Col>
                     </CardBody>
                     <CardFooter>
-                        {(AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
+                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.isChanged1 &&
@@ -2846,7 +2910,7 @@ class usageTemplate extends Component {
                                                         </div>
                                                     </CardBody>
                                                     <CardFooter>
-                                                        {(AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.checkUserACL(this.state.typeList.map(c => c.id.toString()), 'ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
+                                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_ALL') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_TEMPLATE_OWN')) &&
                                                             <FormGroup>
                                                                 <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                 <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>

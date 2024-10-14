@@ -248,6 +248,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -303,6 +310,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -353,6 +367,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -397,6 +418,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -433,7 +461,7 @@ export default class DataSourceListComponent extends Component {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
                 var roleList = AuthenticationService.getLoggedInUserRole();
-                if ((this.el.getValueFromCoords(8, x).toString() != null && this.el.getValueFromCoords(8, x).toString() != "" && AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) || (roleList.length == 1 && roleList[0].roleId == 'ROLE_REALM_ADMIN')) {
+                if ((this.el.getValueFromCoords(8, x).toString() != null && this.el.getValueFromCoords(8, x).toString() != "" && AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) || ((this.el.getValueFromCoords(8, x).toString() == null || this.el.getValueFromCoords(8, x).toString() == "") && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_EDIT_DATA_SOURCE"))) {
                     this.props.history.push({
                         pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     });
