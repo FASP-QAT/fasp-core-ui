@@ -16677,6 +16677,7 @@ label.arrow_label:before {
   // height: auto;
   // max-height: 100% !important;
   min-height: 310px;
+  max-height: 310px;
 }
 @media screen and (min-width: 1920px) {
   .CustomHeight{
@@ -16685,6 +16686,25 @@ label.arrow_label:before {
     // height: auto;
     // max-height: 100% !important;
     min-height: 410px;
+    max-height: 410px;
+  }
+}
+.CustomHeight1{
+  // height: 375px;
+  // max-height: calc(100vh - 0px) !important;
+  // height: auto;
+  // max-height: 100% !important;
+  min-height: 510px;
+  max-height: 510px;
+}
+@media screen and (min-width: 1920px) {
+  .CustomHeight1{
+    // height: 412px;
+    // max-height: calc(100vh - 0px) !important;
+    // height: auto;
+    // max-height: 100% !important;
+    min-height: 610px;
+    max-height: 610px;
   }
 }
 // .MuiSwitch-colorPrimary.Mui-checked {

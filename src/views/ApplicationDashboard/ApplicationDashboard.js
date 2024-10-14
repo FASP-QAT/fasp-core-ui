@@ -1224,7 +1224,7 @@ class ApplicationDashboard extends Component {
       position: 'top',
       filters: true,
       license: JEXCEL_PRO_KEY,
-      height: 100,
+      height: 10,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -2236,7 +2236,7 @@ class ApplicationDashboard extends Component {
                 <div class="card custom-card">
                   <div class="card-body px-2 py-2">
                     <div className='row'>
-                      <FormGroup className='col-md-3 FormGroupD'>
+                      {/* <FormGroup className='col-md-3 FormGroupD'>
                         <Label htmlFor="topProgramId">Country<span class="red Reqasterisk">*</span></Label>
                         <MultiSelect
                           name="topCountryId"
@@ -2259,7 +2259,7 @@ class ApplicationDashboard extends Component {
                           options={topTechnicalAreaList && topTechnicalAreaList.length > 0 ? topTechnicalAreaList : []}
                           labelledBy={i18n.t('static.common.regiontext')}
                         />
-                      </FormGroup>
+                      </FormGroup> */}
                       <FormGroup className='col-md-3 FormGroupD'>
                         <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
                         <MultiSelect
@@ -2493,7 +2493,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
-                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden'}}>
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
@@ -2554,7 +2554,7 @@ class ApplicationDashboard extends Component {
                   </div>
                   <div className='row'>
                     <div className='col-md-6'>
-                      <div class="card custom-card CustomHeight">
+                      <div class="card custom-card CustomHeight1">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Data Quality (doesn't use date selector) </div>
                         </div>
@@ -2601,7 +2601,7 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div className='row'>
                         <div class="col-md-12">
-                          <div class="card custom-card CustomHeight">
+                          <div class="card custom-card CustomHeight1">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
                               <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>  
