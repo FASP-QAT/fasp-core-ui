@@ -461,7 +461,7 @@ export default class DataSourceListComponent extends Component {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
                 var roleList = AuthenticationService.getLoggedInUserRole();
-                if ((this.el.getValueFromCoords(8, x).toString() != null && this.el.getValueFromCoords(8, x).toString() != "" && AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) || (roleList.length == 1 && roleList[0].roleId == 'ROLE_REALM_ADMIN')) {
+                if ((this.el.getValueFromCoords(8, x).toString() != null && this.el.getValueFromCoords(8, x).toString() != "" && AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) || ((this.el.getValueFromCoords(8, x).toString() == null || this.el.getValueFromCoords(8, x).toString() == "") && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_EDIT_DATA_SOURCE"))) {
                     this.props.history.push({
                         pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     });
