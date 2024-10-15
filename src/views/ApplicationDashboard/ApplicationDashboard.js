@@ -136,6 +136,7 @@ class ApplicationDashboard extends Component {
     this.getOnlineDashboardBottom = this.getOnlineDashboardBottom.bind(this);
     this.onTopSubmit = this.onTopSubmit.bind(this);
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
+    this.getHealthAreaListByRealmCountryIds = this.getHealthAreaListByRealmCountryIds.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -363,6 +364,56 @@ class ApplicationDashboard extends Component {
     }
   }
   /**
+    * Retrieves the list of Realm Country.
+    */
+  getHealthAreaListByRealmCountryIds() {
+    if (localStorage.getItem("sessionType") === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DROPDOWN_SP') && this.state.topCountryId.length > 0) {
+      DropdownService.getHealthAreaListByRealmCountryIds(this.state.topCountryId.map(x => x.value))
+        .then(response => {
+          console.log("hello",response.data)
+          var proList = []
+          for (var i = 0; i < response.data.length; i++) {
+            // var programJson = {
+            //   id: response.data[i].id,
+            //   programId: response.data[i].id,
+            //   label: response.data[i].label,
+            //   programCode: response.data[i].code
+            // }
+            // proList[i] = programJson
+          }
+          this.setState({
+            technicalAreaList: proList, loading: false
+          }, () => { this.consolidatedProgramList() })
+        }).catch(
+          error => {
+            this.setState({
+              technicalAreaList: []
+            }, () => { this.consolidatedProgramList() })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
+      this.consolidatedProgramList()
+    }
+  }
+  /**
     * Retrieves the list of programs.
     */
   getPrograms() {
@@ -370,7 +421,6 @@ class ApplicationDashboard extends Component {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then(response => {
-          console.log("hello",response.data)
           var proList = []
           for (var i = 0; i < response.data.length; i++) {
             var programJson = {
@@ -550,7 +600,6 @@ class ApplicationDashboard extends Component {
                     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
-                console.log("hello",listArray)
                 this.setState({
                     countryList: listArray
                 })
@@ -691,6 +740,8 @@ class ApplicationDashboard extends Component {
     // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
       topCountryId: countryIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+    }, () => {
+      this.getHealthAreaListByRealmCountryIds();
     });
   }
   /**
@@ -1043,6 +1094,9 @@ class ApplicationDashboard extends Component {
       }
     }
     this.getPrograms();
+    if(this.state.topCountryId.length > 0) {
+      this.getHealthAreaListByRealmCountryIds();
+    }
     this.getDataSetList();
     this.getRealmCountryList();
     if (localStorage.getItem('sessionType') === 'Online') {

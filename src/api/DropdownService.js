@@ -188,5 +188,13 @@ class DropdownService {
     return axios.get(`${API_URL}/api/dropdown/program/all/expanded/realm/${realmId}`, {}
     );
   }
+  getHealthAreaListByRealmCountryIds(json) {
+    return axios.post(`${API_URL}/api/dropdown/healthArea/realmCountryIds`, json, {}
+    );
+  }
+  getSupplyPlanProgramListByRealmCountryIdsAndHealthAreaIds(json) {
+      return axios.post(`${API_URL}/api/dropdown/program/realmCountryIds/healthAreaIds`, json, {}
+      );
+  }
 }
 export default new DropdownService();
