@@ -2925,25 +2925,30 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonSemi.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(4) : null, ci: null })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
-                                            "jsonProperties": {
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 6 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                                        "jsonProperties": {
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -2953,28 +2958,33 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataMoving.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(4) : null, ci: null })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
-                                            "jsonProperties": {
-                                                months: this.state.monthsForMovingAverage,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 7 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                                        "jsonProperties": {
+                                            months: this.state.monthsForMovingAverage,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
+                                    id += 1;
                                 }
-                                id += 1;
                                 var data = [];
                                 var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                                 if (jsonDataLinearFilter.length > 0) {
@@ -2982,26 +2992,31 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataLinear.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(4) : null, ci: (jsonDataLinear[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelIdLinearRegression,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 5 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -3011,30 +3026,36 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataTes.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? Number(jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelId,
-                                                seasonality: this.state.noOfMonthsForASeason,
-                                                alpha: jsonDataTesFilter[0].alpha,
-                                                beta: jsonDataTesFilter[0].beta,
-                                                gamma: jsonDataTesFilter[0].gamma,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 2 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelId,
+                                            seasonality: this.state.noOfMonthsForASeason,
+                                            alpha: jsonDataTesFilter[0].alpha,
+                                            beta: jsonDataTesFilter[0].beta,
+                                            gamma: jsonDataTesFilter[0].gamma,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -3044,30 +3065,35 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataArima.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? Number(jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelIdArima,
-                                                seasonality: this.state.seasonality,
-                                                p: jsonDataArimaFilter[0].p,
-                                                d: jsonDataArimaFilter[0].d,
-                                                q: jsonDataArimaFilter[0].q,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 4 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdArima,
+                                            seasonality: this.state.seasonality,
+                                            p: jsonDataArimaFilter[0].p,
+                                            d: jsonDataArimaFilter[0].d,
+                                            q: jsonDataArimaFilter[0].q,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                             }
