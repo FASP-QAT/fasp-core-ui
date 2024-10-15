@@ -2940,25 +2940,30 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonSemi.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(4) : null, ci: null })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
-                                            "jsonProperties": {
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 6 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                                        "jsonProperties": {
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -2968,28 +2973,33 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataMoving.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(4) : null, ci: null })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
-                                            "jsonProperties": {
-                                                months: this.state.monthsForMovingAverage,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 7 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                                        "jsonProperties": {
+                                            months: this.state.monthsForMovingAverage,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
+                                    id += 1;
                                 }
-                                id += 1;
                                 var data = [];
                                 var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                                 if (jsonDataLinearFilter.length > 0) {
@@ -2997,26 +3007,31 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataLinear.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(4) : null, ci: (jsonDataLinear[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelIdLinearRegression,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 5 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -3026,30 +3041,36 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataTes.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? Number(jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelId,
-                                                seasonality: this.state.noOfMonthsForASeason,
-                                                alpha: jsonDataTesFilter[0].alpha,
-                                                beta: jsonDataTesFilter[0].beta,
-                                                gamma: jsonDataTesFilter[0].gamma,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 2 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelId,
+                                            seasonality: this.state.noOfMonthsForASeason,
+                                            alpha: jsonDataTesFilter[0].alpha,
+                                            beta: jsonDataTesFilter[0].beta,
+                                            gamma: jsonDataTesFilter[0].gamma,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -3059,30 +3080,35 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataArima.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? Number(jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelIdArima,
-                                                seasonality: this.state.seasonality,
-                                                p: jsonDataArimaFilter[0].p,
-                                                d: jsonDataArimaFilter[0].d,
-                                                q: jsonDataArimaFilter[0].q,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 4 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdArima,
+                                            seasonality: this.state.seasonality,
+                                            p: jsonDataArimaFilter[0].p,
+                                            d: jsonDataArimaFilter[0].d,
+                                            q: jsonDataArimaFilter[0].q,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                             }
@@ -4945,151 +4971,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div className="row pl-lg-3">
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="pt-lg-2 col-md-7">
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="arimaId"
-                                                                        name="arimaId"
-                                                                        disabled={this.state.isDisabled || this.state.arimaDisabled}
-                                                                        checked={this.state.arimaId}
-                                                                        onClick={(e) => { this.setArimaId(e); }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                        <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                </div>
-                                                                <div className="col-md-2 tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '9px' }}>
-                                                                    <Input
-                                                                        className="form-check-input checkboxMargin"
-                                                                        type="checkbox"
-                                                                        id="seasonality"
-                                                                        name="seasonality"
-                                                                        disabled={this.state.isDisabled}
-                                                                        checked={this.state.seasonality}
-                                                                        onClick={(e) => { this.seasonalityCheckbox(e); }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                        <b>{i18n.t('static.extrapolation.seasonality')}</b>
-                                                                    </Label>
-                                                                </div>
-                                                                <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel2} target="Popover62" trigger="hover" toggle={this.toggleConfidenceLevel2}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover62" onClick={this.toggleConfidenceLevel2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                        </Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="select"
-                                                                            bsSize="sm"
-                                                                            id="confidenceLevelIdArima"
-                                                                            name="confidenceLevelIdArima"
-                                                                            disabled={this.state.isDisabled}
-                                                                            value={this.state.confidenceLevelIdArima}
-                                                                            valid={!errors.confidenceLevelIdArima && this.state.confidenceLevelIdArima != null ? this.state.confidenceLevelIdArima : '' != ''}
-                                                                            invalid={touched.confidenceLevelIdArima && !!errors.confidenceLevelIdArima}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setConfidenceLevelIdArima(e) }}
-                                                                        >
-                                                                            <option value="0.85">85%</option>
-                                                                            <option value="0.90">90%</option>
-                                                                            <option value="0.95">95%</option>
-                                                                            <option value="0.99">99%</option>
-                                                                            <option value="0.995">99.5%</option>
-                                                                            <option value="0.999">99.9%</option>
-                                                                        </Input>
-                                                                        <FormFeedback>{errors.confidenceLevelIdArima}</FormFeedback>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
-                                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                        </Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="number"
-                                                                            id="pId"
-                                                                            bsSize="sm"
-                                                                            name="pId"
-                                                                            readOnly={this.state.isDisabled}
-                                                                            value={this.state.p}
-                                                                            valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
-                                                                            invalid={touched.pId && !!errors.pId}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setPId(e) }}
-                                                                        />
-                                                                        <FormFeedback>{errors.pId}</FormFeedback>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="number"
-                                                                            id="dId"
-                                                                            bsSize="sm"
-                                                                            name="dId"
-                                                                            readOnly={this.state.isDisabled}
-                                                                            value={this.state.d}
-                                                                            valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
-                                                                            invalid={touched.dId && !!errors.dId}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setDId(e) }}
-                                                                        />
-                                                                        <FormFeedback>{errors.dId}</FormFeedback>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
-                                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                        </Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="number"
-                                                                            id="qId"
-                                                                            bsSize="sm"
-                                                                            name="qId"
-                                                                            readOnly={this.state.isDisabled}
-                                                                            value={this.state.q}
-                                                                            valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
-                                                                            invalid={touched.qId && !!errors.qId}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setQId(e) }}
-                                                                        />
-                                                                        <FormFeedback>{errors.qId}</FormFeedback>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-12 mt-2">
-                                                                    <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
-                                                                </div>
+                                                            <div className="col-md-12 mt-2">
+                                                                <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
                                                             </div>
                                                         </div>
                                                         <div className=" col-md-4 pt-lg-0">
