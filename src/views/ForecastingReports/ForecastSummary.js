@@ -453,11 +453,11 @@ class ForecastSummary extends Component {
                             }
 
                             regionArray.push(((nameTC).replaceAll(',', ' ')).replaceAll(' ', '%20'));
-                            regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Number(filterForecastSelected.totalForecast).toFixed(2)) : ""));
+                            regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Number(filterForecastSelected.totalForecast).toFixed(4)) : ""));
                             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
                         }
 
-                        A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Number(total).toFixed(2))])));
+                        A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Number(total).toFixed(4))])));
                     }
                 }
 
@@ -510,10 +510,10 @@ class ForecastSummary extends Component {
                     let regionList = summeryData[j].regionListForSinglePlanningUnit;
                     for (var k = 0; k < regionList.length; k++) {
                         tempData.push(regionList[k].selectedForecast == null ? '' : regionList[k].selectedForecast);
-                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? '' : (regionList[k].forecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? '' : (regionList[k].forecastQuantity.toFixed(4)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
                         tempData.push(regionList[k].notes == null ? '' : regionList[k].notes);
                     }
-                    tempData.push((summeryData[j].totalForecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                    tempData.push(summeryData[j].totalForecastQuantity != null && summeryData[j].totalForecastQuantity != '' ?  Number(summeryData[j].totalForecastQuantity).toFixed(4).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '');
 
                     A.push(this.addDoubleQuoteToRowContent([((summeryData[j].planningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(tempData)));
 

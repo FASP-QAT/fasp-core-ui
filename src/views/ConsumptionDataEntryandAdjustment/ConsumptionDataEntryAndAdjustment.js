@@ -1759,7 +1759,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let headers = [];
     columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
     var A = [addDoubleQuoteToRowContent(headers)];
-    let ctn = 0;
     this.state.planningUnitList.map(item => {
       var total = 0;
       var totalPU = 0;
@@ -1770,15 +1769,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         total += Number(data[0].qty);
         totalPU += Number(data[0].qtyInPU);
         datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
-        
-        console.log('ctn :',ctn);
-        if(ctn < 2) {
-          console.log('data[0] ',data[0]);
-
-        }
       })
-      console.log('\n ');
-      ctn++;
 
       datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(totalPU) : this.roundingForPuQty(total));
       datacsv.push("100 %");
@@ -1802,13 +1793,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
     }
-    console.log('this.state.selectedConsumptionUnitId: ',this.state.selectedConsumptionUnitId);
     if (this.state.selectedConsumptionUnitId > 0) {
-      console.log('inside if....');
       csvRow.push('')
       csvRow.push('')
       if (this.state.selectedConsumptionUnitId > 0) {
-        console.log('---pu: ',getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang));
         csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
       }
       csvRow.push('')
@@ -1842,7 +1830,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         B.push(i18n.t('static.supplyPlan.actualConsumption').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push(elInstance.getValue(`${colArr[j + 1]}${parseInt(actualConsumption)}`, true).toString().replaceAll("\,", ""))
-          console.log('actualConsumption amount: ',elInstance.getValue(`${colArr[j + 1]}${parseInt(actualConsumption)}`, true).toString());
         }
         C.push(addDoubleQuoteToRowContent(B));
         B = [];
@@ -1889,7 +1876,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     var planningUnitList = this.state.planningUnitList.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId);
     for (var pul = 0; pul < planningUnitList.length; pul++) {
-      console.log(pul + ' pu: ',getLabelText(planningUnitList[pul].planningUnit.label, this.state.lang));
       
       var consumptionList = this.state.consumptionList.filter(c => c.planningUnit.id == planningUnitList[pul].planningUnit.id);
       csvRow.push('')
@@ -1927,7 +1913,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
           B.push(consumptionData.length > 0 ? consumptionData[0].amount.toString().replaceAll("\,", "") : "")
-          console.log('amount: ',consumptionData[0]);
         }
         C.push(addDoubleQuoteToRowContent(B));
         B = [];

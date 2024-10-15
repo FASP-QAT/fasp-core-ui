@@ -3088,7 +3088,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (document.getElementById("forecastProgramId").selectedOptions[0].text.toString().split("~")[0] + " " + (document.getElementById("forecastProgramId").selectedOptions[0].text.toString().split("~")[1])).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (document.getElementById("forecastProgramId").selectedOptions[0].text.toString().split("~")[0] + " v" + (document.getElementById("versionId").selectedOptions[0].text.toString())).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (getLabelText(this.state.datasetJson.label, this.state.lang)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -3127,19 +3127,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         var B = [];
         B.push(i18n.t('static.extrapolation.rmse'))
         if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
-            B.push(Number(this.state.movingAvgError.rmse).toFixed(3))
+            B.push(Number(this.state.movingAvgError.rmse).toFixed(4))
         }
         if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
-            B.push(Number(this.state.semiAvgError.rmse).toFixed(3))
+            B.push(Number(this.state.semiAvgError.rmse).toFixed(4))
         }
         if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
-            B.push(Number(this.state.linearRegressionError.rmse).toFixed(3))
+            B.push(Number(this.state.linearRegressionError.rmse).toFixed(4))
         }
         if (this.state.smoothingId && this.state.tesData.length > 0) {
-            B.push(Number(this.state.tesError.rmse).toFixed(3))
+            B.push(Number(this.state.tesError.rmse).toFixed(4))
         }
         if (this.state.arimaId && this.state.arimaData.length > 0) {
-            B.push(Number(this.state.arimaError.rmse).toFixed(3))
+            B.push(Number(this.state.arimaError.rmse).toFixed(4))
         }
         if (this.state.arimaId) {
             B.push("")
@@ -3148,19 +3148,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         B = [];
         B.push(i18n.t('static.extrapolation.mape'))
         if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
-            B.push(Number(this.state.movingAvgError.mape).toFixed(3))
+            B.push(Number(this.state.movingAvgError.mape).toFixed(4))
         }
         if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
-            B.push(Number(this.state.semiAvgError.mape).toFixed(3))
+            B.push(Number(this.state.semiAvgError.mape).toFixed(4))
         }
         if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
-            B.push(Number(this.state.linearRegressionError.mape).toFixed(3))
+            B.push(Number(this.state.linearRegressionError.mape).toFixed(4))
         }
         if (this.state.smoothingId && this.state.tesData.length > 0) {
-            B.push(Number(this.state.tesError.mape).toFixed(3))
+            B.push(Number(this.state.tesError.mape).toFixed(4))
         }
         if (this.state.arimaId && this.state.arimaData.length > 0) {
-            B.push(Number(this.state.arimaError.mape).toFixed(3))
+            B.push(Number(this.state.arimaError.mape).toFixed(4))
         }
         if (this.state.arimaId) {
             B.push("")
@@ -3169,19 +3169,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         B = [];
         B.push(i18n.t('static.extrapolation.mse'))
         if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
-            B.push(Number(this.state.movingAvgError.mse).toFixed(3))
+            B.push(Number(this.state.movingAvgError.mse).toFixed(4))
         }
         if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
-            B.push(Number(this.state.semiAvgError.mse).toFixed(3))
+            B.push(Number(this.state.semiAvgError.mse).toFixed(4))
         }
         if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
-            B.push(Number(this.state.linearRegressionError.mse).toFixed(3))
+            B.push(Number(this.state.linearRegressionError.mse).toFixed(4))
         }
         if (this.state.smoothingId && this.state.tesData.length > 0) {
-            B.push(Number(this.state.tesError.mse).toFixed(3))
+            B.push(Number(this.state.tesError.mse).toFixed(4))
         }
         if (this.state.arimaId && this.state.arimaData.length > 0) {
-            B.push(Number(this.state.arimaError.mse).toFixed(3))
+            B.push(Number(this.state.arimaError.mse).toFixed(4))
         }
         if (this.state.arimaId) {
             B.push("")
@@ -3190,19 +3190,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         B = [];
         B.push(i18n.t('static.extrapolation.wape'))
         if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
-            B.push(Number(this.state.movingAvgError.wape).toFixed(3))
+            B.push(Number(this.state.movingAvgError.wape).toFixed(4))
         }
         if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
-            B.push(Number(this.state.semiAvgError.wape).toFixed(3))
+            B.push(Number(this.state.semiAvgError.wape).toFixed(4))
         }
         if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
-            B.push(Number(this.state.linearRegressionError.wape).toFixed(3))
+            B.push(Number(this.state.linearRegressionError.wape).toFixed(4))
         }
         if (this.state.smoothingId && this.state.tesData.length > 0) {
-            B.push(Number(this.state.tesError.wape).toFixed(3))
+            B.push(Number(this.state.tesError.wape).toFixed(4))
         }
         if (this.state.arimaId && this.state.arimaData.length > 0) {
-            B.push(Number(this.state.arimaError.wape).toFixed(3))
+            B.push(Number(this.state.arimaError.wape).toFixed(4))
         }
         if (this.state.arimaId) {
             B.push("")
@@ -3211,19 +3211,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         B = [];
         B.push(i18n.t('static.extrapolation.rSquare'))
         if (this.state.movingAvgId && this.state.movingAvgData.length > 0) {
-            B.push(Number(this.state.movingAvgError.rSqd).toFixed(3))
+            B.push(Number(this.state.movingAvgError.rSqd).toFixed(4))
         }
         if (this.state.semiAvgId && this.state.semiAvgData.length > 0) {
-            B.push(Number(this.state.semiAvgError.rSqd).toFixed(3))
+            B.push(Number(this.state.semiAvgError.rSqd).toFixed(4))
         }
         if (this.state.linearRegressionId && this.state.linearRegressionData.length > 0) {
-            B.push(Number(this.state.linearRegressionError.rSqd).toFixed(3))
+            B.push(Number(this.state.linearRegressionError.rSqd).toFixed(4))
         }
         if (this.state.smoothingId && this.state.tesData.length > 0) {
-            B.push(Number(this.state.tesError.rSqd).toFixed(3))
+            B.push(Number(this.state.tesError.rSqd).toFixed(4))
         }
         if (this.state.arimaId && this.state.arimaData.length > 0) {
-            B.push(Number(this.state.arimaError.rSqd).toFixed(3))
+            B.push(Number(this.state.arimaError.rSqd).toFixed(4))
         }
         if (this.state.arimaId) {
             B.push("")
@@ -3270,29 +3270,29 @@ export default class ExtrapolateDataComponent extends React.Component {
             var arimaDataFilter = this.state.arimaData.length > 0 ? this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-                consumptionData.length > 0 ? consumptionData[0].puAmount : "")
+                consumptionData.length > 0 ? consumptionData[0].puAmount.toFixed(4) : "")
             if (this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null) {
-                B.push(movingAvgDataFilter[0].forecast.toFixed(2))
+                B.push(movingAvgDataFilter[0].forecast.toFixed(4))
             } else {
                 B.push("")
             }
             if (this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null) {
-                B.push(semiAvgDataFilter[0].forecast.toFixed(2))
+                B.push(semiAvgDataFilter[0].forecast.toFixed(4))
             } else {
                 B.push("")
             }
             if (this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null) {
-                B.push(linearRegressionDataFilter[0].forecast.toFixed(2))
+                B.push(linearRegressionDataFilter[0].forecast.toFixed(4))
             } else {
                 B.push("")
             }
             if (this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) {
-                B.push((Number(tesDataFilter[0].forecast) - CI) > 0 ? (Number(tesDataFilter[0].forecast)) - Number(CI).toFixed(2) : '')
+                B.push((Number(tesDataFilter[0].forecast) - CI) > 0 ? (Number(tesDataFilter[0].forecast) - Number(CI)).toFixed(4) : '')
             } else {
                 B.push("")
             }
             if (this.state.arimaId && arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null) {
-                B.push(Number(arimaDataFilter[0].forecast).toFixed(2))
+                B.push(Number(arimaDataFilter[0].forecast).toFixed(4))
             } else {
                 B.push("")
             }
@@ -3305,7 +3305,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = document.getElementById("forecastProgramId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("forecastProgramId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.extrapolation') + "-" + document.getElementById("planningUnitId").selectedOptions[0].text + "-" + document.getElementById("regionId").selectedOptions[0].text + ".csv"
+        a.download = document.getElementById("forecastProgramId").selectedOptions[0].text.toString().split("~")[0] + "-v" + document.getElementById("versionId").selectedOptions[0].text.toString() + "-" + i18n.t('static.dashboard.extrapolation') + "-" + document.getElementById("planningUnitId").selectedOptions[0].text + "-" + document.getElementById("regionId").selectedOptions[0].text + ".csv"
         document.body.appendChild(a)
         a.click()
     }
