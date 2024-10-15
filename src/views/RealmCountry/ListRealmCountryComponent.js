@@ -149,7 +149,7 @@ class ListRealmCountryComponent extends Component {
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
+                    if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_REGION')) {
                         items.push({
                             title: i18n.t('static.realmcountry.regionupdate'),
                             onclick: function () {
