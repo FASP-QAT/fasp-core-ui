@@ -205,10 +205,11 @@ class FundingSourceListComponent extends Component {
      * @param {Event} e - The selected event.
      */
     selected = function (instance, cell, x, y, value, e) {
+        console.log("Test@@@",this.el.getValueFromCoords(9, x))
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(9, x), 'ROLE_BF_EDIT_FUNDING_SOURCE')) {
+                if ((this.el.getValueFromCoords(9, x).toString() != null && this.el.getValueFromCoords(9, x).toString() != "" && this.el.getValueFromCoords(9, x).toString() != 0 && AuthenticationService.checkUserACL(this.el.getValueFromCoords(9, x), 'ROLE_BF_EDIT_FUNDING_SOURCE')) || ((this.el.getValueFromCoords(9, x).toString() == null || this.el.getValueFromCoords(9, x).toString() == "" || this.el.getValueFromCoords(9, x).toString() == 0) && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_EDIT_FUNDING_SOURCE"))) {
                     this.props.history.push({
                         pathname: `/fundingSource/editFundingSource/${this.el.getValueFromCoords(0, x)}`,
                     });
