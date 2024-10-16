@@ -694,6 +694,7 @@ class StockStatus extends Component {
                     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                     let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
                     var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
+                    var inventoryList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
                     var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
                     var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
                     var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
@@ -792,6 +793,12 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
+                          var iList = inventoryList.filter(c => c.adjustmentQty != undefined && c.adjustmentQty != null && c.adjustmentQty !== "" && (c.inventoryDate >= dt && c.inventoryDate <= enddtStr))
+                          var totalAdjustment = null;
+                          iList.map(elt => {
+                            totalAdjustment = (totalAdjustment == null) ? elt.adjustmentQty : totalAdjustment + elt.adjustmentQty
+                          })
+
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -800,7 +807,7 @@ class StockStatus extends Component {
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
                             shipmentInfo: shiplist,
-                            adjustment: list[0].adjustmentQty,
+                            adjustment: totalAdjustment,
                             closingBalance: list[0].closingBalance,
                             openingBalance: list[0].openingBalance,
                             mos: list[0].mos,
@@ -845,6 +852,7 @@ class StockStatus extends Component {
                         }
                         data.push(json)
                         if (month == this.state.rangeValue.to.month && from == to) {
+                          console.log("stockStatusList Test@123",data)
                           this.setState({
                             stockStatusList: data,
                             message: '', loading: false
@@ -1093,6 +1101,7 @@ class StockStatus extends Component {
                       firstMonthRegionCountForStock = prevMonthSupplyPlan[0].regionCountForStock
                     }
                     var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
+                    var inventoryList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value);
                     var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value);
                     var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
                     var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
@@ -1167,6 +1176,12 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
+
+                          var iList = inventoryList.filter(c => c.adjustmentQty != undefined && c.adjustmentQty != null && c.adjustmentQty !== "" && (c.inventoryDate >= dt && c.inventoryDate <= enddtStr))
+                          var totalAdjustment = null;
+                          iList.map(elt => {
+                            totalAdjustment = (totalAdjustment == null) ? elt.adjustmentQty : totalAdjustment + elt.adjustmentQty
+                          })
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -1175,7 +1190,7 @@ class StockStatus extends Component {
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
                             shipmentInfo: shiplist,
-                            adjustment: list[0].adjustmentQty,
+                            adjustment: totalAdjustment,
                             closingBalance: list[0].closingBalance,
                             openingBalance: list[0].openingBalance,
                             mos: list[0].mos,
