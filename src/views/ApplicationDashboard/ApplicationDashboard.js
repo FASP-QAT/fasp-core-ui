@@ -591,134 +591,138 @@ class ApplicationDashboard extends Component {
      */
   getRealmCountryList() {
     let realmId = AuthenticationService.getRealmId();
-    DropdownService.getRealmCountryDropdownList(realmId)
-        .then(response => {
-            if (response.status == 200) {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    countryList: listArray
-                })
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
-            }
-        );
+    if (localStorage.getItem('sessionType') === 'Online') {
+      DropdownService.getRealmCountryDropdownList(realmId)
+          .then(response => {
+              if (response.status == 200) {
+                  var listArray = response.data;
+                  listArray.sort((a, b) => {
+                      var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                      var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                      return itemLabelA > itemLabelB ? 1 : -1;
+                  });
+                  this.setState({
+                      countryList: listArray
+                  })
+              } else {
+                  this.setState({
+                      message: response.data.messageCode
+                  })
+              }
+          }).catch(
+              error => {
+                  if (error.message === "Network Error") {
+                      this.setState({
+                          message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                          loading: false
+                      });
+                  } else {
+                      switch (error.response ? error.response.status : "") {
+                          case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`)
+                              break;
+                          case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                          case 500:
+                          case 404:
+                          case 406:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          case 412:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          default:
+                              this.setState({
+                                  message: 'static.unkownError',
+                                  loading: false
+                              });
+                              break;
+                      }
+                  }
+              }
+          );
+    }
   }
   /**
    * Reterives health area list
    */
   getHealthAreaList() {
-    ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
-        .then(response => {
-            if (response.status == 200) {
-                var json = (response.data).filter(c => c.active == true);
-                var regList = [];
-                for (var i = 0; i < json.length; i++) {
-                    regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
-                }
-                var listArray = regList;
-                listArray.sort((a, b) => {
-                    var itemLabelA = a.label.toUpperCase();
-                    var itemLabelB = b.label.toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                let { program } = this.state;
-                program.healthAreaArray = [];
-                this.setState({
-                    healthAreaList: listArray,
-                    healthAreaId: '',
-                    program
-                }, (
-                ) => {
-                })
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
-            }
-        );
+    if (localStorage.getItem('sessionType') === 'Online') {
+      ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
+          .then(response => {
+              if (response.status == 200) {
+                  var json = (response.data).filter(c => c.active == true);
+                  var regList = [];
+                  for (var i = 0; i < json.length; i++) {
+                      regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+                  }
+                  var listArray = regList;
+                  listArray.sort((a, b) => {
+                      var itemLabelA = a.label.toUpperCase();
+                      var itemLabelB = b.label.toUpperCase();
+                      return itemLabelA > itemLabelB ? 1 : -1;
+                  });
+                  let { program } = this.state;
+                  program.healthAreaArray = [];
+                  this.setState({
+                      healthAreaList: listArray,
+                      healthAreaId: '',
+                      program
+                  }, (
+                  ) => {
+                  })
+              } else {
+                  this.setState({
+                      message: response.data.messageCode
+                  })
+              }
+          }).catch(
+              error => {
+                  if (error.message === "Network Error") {
+                      this.setState({
+                          message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                          loading: false
+                      });
+                  } else {
+                      switch (error.response ? error.response.status : "") {
+                          case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`)
+                              break;
+                          case 403:
+                              this.props.history.push(`/accessDenied`)
+                              break;
+                          case 500:
+                          case 404:
+                          case 406:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          case 412:
+                              this.setState({
+                                  message: error.response.data.messageCode,
+                                  loading: false
+                              });
+                              break;
+                          default:
+                              this.setState({
+                                  message: 'static.unkownError',
+                                  loading: false
+                              });
+                              break;
+                      }
+                  }
+              }
+          );
+    }
   }
   /**
     * Handle region change function.
@@ -766,12 +770,14 @@ class ApplicationDashboard extends Component {
     } else if (this.state.onlyDownloadedTopProgram) {
       Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
     } else {
-      DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
-        localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
-        this.setState({
-          dashboardTopList: response.data
+      if (localStorage.getItem('sessionType') === 'Online') {
+        DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
+          localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+          this.setState({
+            dashboardTopList: response.data
+          })
         })
-      })
+      }
     }
   }
   /**
@@ -859,40 +865,42 @@ class ApplicationDashboard extends Component {
     }
   }
   getOnlineDashboardBottom(inputJson) {
-    DashboardService.getDashboardBottom(inputJson)
-      .then(response => {
-        this.setState({
-          dashboardBottomData: response.data
-        }, () => {
-          if (document.getElementById("shipmentsTBDJexcel")) {
-            this.buildForecastErrorJexcel();
-            this.buildShipmentsTBDJexcel();
-            this.buildExpiriesJexcel();
-          }
-        })
-      }
-      ).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
+    if (localStorage.getItem('sessionType') === 'Online') {
+      DashboardService.getDashboardBottom(inputJson)
+        .then(response => {
+          this.setState({
+            dashboardBottomData: response.data
+          }, () => {
+            if (document.getElementById("shipmentsTBDJexcel")) {
+              this.buildForecastErrorJexcel();
+              this.buildShipmentsTBDJexcel();
+              this.buildExpiriesJexcel();
+            }
+          })
+        }
+        ).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
             }
           }
-        }
-      );
+        );
+    }
   }
   /**
    * Reterives dashboard data from server on component mount
