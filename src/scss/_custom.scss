@@ -16813,7 +16813,7 @@ label.arrow_label:before {
 }
 @media only screen and (min-width: 1769px) {
   .paddinCheckbox {
-      padding-left: 95px;
+      padding-left: 118px;
   }
 }
 @media only screen and (min-width: 1990px) {
@@ -16854,4 +16854,7 @@ label.arrow_label:before {
 
 .right-section {
   text-align: right; 
+}
+.ShowdecimalClr .MuiSwitch-root{
+margin-left: 1px;
 }
