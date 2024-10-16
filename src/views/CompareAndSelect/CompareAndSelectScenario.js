@@ -2435,13 +2435,16 @@ class CompareAndSelectScenario extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : this.state.xAxisDisplayBy == 1 ? "" : i18n.t('static.modelingValidation.fiscalYear'),
-                            fontColor: 'black'
+                            fontColor: fontColor
                         }
                     },
                     {
                         id: 'xAxis2',
                         gridLines: {
                             drawOnChartArea: false,
+                            lineWidth: 1,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         ticks: {
                             fontColor: fontColor,
