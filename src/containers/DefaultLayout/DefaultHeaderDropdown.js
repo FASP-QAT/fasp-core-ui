@@ -269,21 +269,26 @@ class DefaultHeaderDropdown extends Component {
               color="primary"
               onChange={this.toggleTheme} />
           </DropdownItem>  */}
-         <DropdownItem style={{ borderTop: "2px solid #000",padding:"0.25rem 20px" }}>
-            <i className={`fa ${localStorage.getItem("theme") === "dark" ? "fa-moon-o" : "fa-sun-o"}`}></i>
-            {localStorage.getItem("theme") === "dark" ? i18n.t('static.common.darktheme') : i18n.t('static.common.lighttheme')}
+         
+    <DropdownItem style={{ borderTop: "2px solid #000",padding:"10px 20px" }}>
+    <i className={`fa ${localStorage.getItem("theme") === "dark" ? "fa-moon-o" : "fa-sun-o"}`}></i>
+    {localStorage.getItem("theme") === "dark" ? i18n.t('static.common.darktheme') : i18n.t('static.common.lighttheme')}
 
-            <Switch
-              className={`form-check form-switch swichMarginLeft ${localStorage.getItem("theme") === "dark" ? 'dark-switch' : 'light-switch'}`}
-              checked={localStorage.getItem("theme") === "dark"}
-              color={localStorage.getItem("theme") === "dark" ? "default" : "primary"}
-              onChange={this.toggleTheme}
-            />
-          </DropdownItem>
+    <Switch
+      className={`form-check form-switch swichMarginLeft ${localStorage.getItem("theme") === "dark" ? 'dark-switch' : 'light-switch'}`}
+      checked={localStorage.getItem("theme") === "dark"}
+      color={localStorage.getItem("theme") === "dark" ? "default" : "primary"}
+      onChange={this.toggleTheme}
+    />
+  </DropdownItem>
 
-          {/* <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
-          <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
-          {this.props.item == 2 && <DropdownItem className='ShowdecimalClr' style={{ borderTop: "2px solid #000",padding:"0.25rem 22px" }}><i style={{fontStyle:'normal'}}>.00</i><span style={{marginLeft:'-2px'}}>Show Decimals</span><Switch className='form-check form-switch' defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} /></DropdownItem>}
+  {/* <DropdownItem onClick={this.applyLightTheme}><i className="fa fa-sun-o"></i> {i18n.t('static.common.lighttheme')}</DropdownItem>
+  <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
+  {this.props.item == 2 && <DropdownItem className='ShowdecimalClr' style={{ borderTop: "2px solid #000",padding:"10px 20px" }}>
+    <i style={{fontStyle:'normal',marginLeft:'-8px'}}>.00</i>
+    <span style={{marginLeft:'-3px'}}>Show Decimals</span>
+    <Switch className='form-check form-switch' defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} />
+    </DropdownItem>}
         </DropdownMenu>
       </Dropdown>
 
