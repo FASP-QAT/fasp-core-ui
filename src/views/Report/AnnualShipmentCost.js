@@ -1941,7 +1941,7 @@ class AnnualShipmentCost extends Component {
                                         {this.state.allFiltersSet == 1 && this.state.view == 1 && this.state.outPutList.length == 0 &&
                                             <FormGroup className="col-md-12">
                                             <span class="red " >
-                                                {i18n.t('static.versionSettings.note')}: <i>No shipments found. Ensure that you have shipments within this time period. If “Report Based On Submitted Date” is selected, please ensure you have manually entered actual submitted dates by right clicking on shipment records and selecting “Show Shipment Dates”.</i>
+                                                {i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.shipment.shipmentCostOverviewNotes')}</i>
                                             </span>
                                         </FormGroup>}
                                             {this.state.outPutList.length > 0 &&
