@@ -3466,5 +3466,6 @@
   "static.validated.restrictionNoOfMonthsInFutureForTopDashboard": "Please enter No of months in future for top dashboard",
   "static.validated.restrictionNoOfMonthsInPastForBottomDashboard": "Please enter No of months in past for bottom dashboard",
   "static.forecastMonthlyErrorReport.showConsumption": "Show consumption adjusted for stock out?",
-  "static.common.accessDenied":"You do not access to view this resource"
+  "static.common.accessDenied":"You do not access to view this resource",
+  "static.shipment.shipmentCostOverviewNotes": "No shipments found. Ensure that you have shipments within this time period. If “Report Based On Submitted Date” is selected, please ensure you have manually entered actual submitted dates by right clicking on shipment records and selecting “Show Shipment Dates”."
 }
