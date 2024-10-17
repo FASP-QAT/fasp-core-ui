@@ -372,6 +372,7 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'dropdown',
                                                         source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
                                                         tooltip: i18n.t("static.programPU.planByTooltip"),
+                                                        width:120,
                                                         required: true
                                                     },
                                                     {
@@ -1458,6 +1459,7 @@ class AddprogramPlanningUnit extends Component {
         tr.children[13].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[15].classList.add('InfoTr');
         tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImagePlanby');
     }
     /**
      * Exports the data to a CSV file.

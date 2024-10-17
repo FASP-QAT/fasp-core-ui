@@ -44,7 +44,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         dt.setMonth(dt.getMonth() - 10);
 
         this.state = {
-            isDarkMode:false,
+            isDarkMode: false,
             lang: localStorage.getItem("lang"),
             consumptionUnitShowArr: [],
             programId: '',
@@ -151,19 +151,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
      */
     componentDidMount() {
         // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
 
         this.getPrograms();
     }
@@ -394,7 +394,7 @@ observer.observe(document.documentElement, {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
-                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
                         verList.push(version)
                     }
                 }
@@ -634,12 +634,12 @@ observer.observe(document.documentElement, {
                 })
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
-                var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+                var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == versionId)[0].cutOffDate;
                 var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                 var rangeValue = this.state.rangeValue;
                 if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                    var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                    rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                    var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                     // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                 }
                 this.setState({
@@ -2310,7 +2310,7 @@ observer.observe(document.documentElement, {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
                     </option>
                 )
             }, this);
@@ -2322,20 +2322,20 @@ observer.observe(document.documentElement, {
 
             }, this);
 
-            const darkModeColors = [
-                '#d4bbff', // Color 1 
-            ];
-            
-            const lightModeColors = [
-                '#002F6C',  // Color 1
-            ];
-            
+        const darkModeColors = [
+            '#d4bbff', // Color 1 
+        ];
 
-            const { isDarkMode } = this.state;
-            const colors = isDarkMode ? darkModeColors : lightModeColors;
-            const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-            const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
-            
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+        ];
+
+
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
         var chartOptions = {
             title: {
                 display: true,
@@ -2344,7 +2344,7 @@ observer.observe(document.documentElement, {
                         this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
                     this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
                         this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : ''),
-                        fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -2353,12 +2353,12 @@ observer.observe(document.documentElement, {
                         scaleLabel: {
                             display: true,
                             labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit'))),
-                            fontColor:fontColor
+                            fontColor: fontColor
                         },
                         stacked: true,//stacked
                         ticks: {
                             beginAtZero: true,
-                            fontColor:fontColor,
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -2375,7 +2375,7 @@ observer.observe(document.documentElement, {
                         gridLines: {
                             drawBorder: true, lineWidth: 0,
                             color: gridLineColor,
-                            zeroLineColor: gridLineColor 
+                            zeroLineColor: gridLineColor
                         },
                         position: 'left',
                     },
@@ -2384,12 +2384,12 @@ observer.observe(document.documentElement, {
                         scaleLabel: {
                             display: true,
                             labelString: "Forecast Error",
-                            fontColor:fontColor,
+                            fontColor: fontColor,
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor:fontColor,
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += ' %';
@@ -2400,7 +2400,7 @@ observer.observe(document.documentElement, {
                         gridLines: {
                             drawBorder: true, lineWidth: 0,
                             color: gridLineColor,
-                            zeroLineColor: gridLineColor 
+                            zeroLineColor: gridLineColor
                         },
                         position: 'right',
 
@@ -2408,12 +2408,12 @@ observer.observe(document.documentElement, {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -2449,14 +2449,14 @@ observer.observe(document.documentElement, {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]     
+        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
 
         var elInstance = this.state.dataList;
         if (elInstance != undefined) {
@@ -2576,25 +2576,25 @@ observer.observe(document.documentElement, {
                             <div className="card-header-actions">
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                        var curTheme = localStorage.getItem("theme");
+                                        if (curTheme == "dark") {
+                                            this.setState({
+                                                isDarkMode: false
+                                            }, () => {
+                                                setTimeout(() => {
+                                                    this.exportPDF();
+                                                    if (curTheme == "dark") {
+                                                        this.setState({
+                                                            isDarkMode: true
+                                                        })
+                                                    }
+                                                }, 0)
+                                            })
+                                        } else {
+                                            this.exportPDF();
+                                        }
+                                    }}
+                                    />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
@@ -2681,8 +2681,10 @@ observer.observe(document.documentElement, {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
-                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                        overrideStrings={{
+                                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                            selectSomeItems: i18n.t('static.common.select')
+                                                        }}
                                                         filterOptions={filterOptions}
                                                     />
                                                 </div>
@@ -2847,7 +2849,7 @@ observer.observe(document.documentElement, {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Show consumption adjusted for stock out?
+                                                        {i18n.t("static.forecastMonthlyErrorReport.showConsumption")}
                                                     </Label>
                                                 </div>
                                             </FormGroup>
@@ -2900,9 +2902,9 @@ observer.observe(document.documentElement, {
                                                                         let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
                                                                         regionErrorTotal += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
                                                                         regionErrorTotalCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
-                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (errorDataRegionData[0].errorPerc * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter(errorDataRegionData[0].errorPerc * 100)}</span>) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
+                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (errorDataRegionData[0].errorPerc * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter(errorDataRegionData[0].errorPerc * 100)}</span>) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                     })}
-                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? <span className={this.state.showForecastThresholdLegend && ((regionErrorTotal / regionErrorTotalCount) * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100)}</span> : 0}</b></td>
+                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? <span className={this.state.showForecastThresholdLegend && ((regionErrorTotal / regionErrorTotalCount) * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100)}</span> : 0}</b></td>
                                                                 </tr>
                                                                     {/* actual */}
                                                                     {this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
@@ -2985,9 +2987,9 @@ observer.observe(document.documentElement, {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : data[0].errorPerc;
                                                                     countError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : 1;
-                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (data[0].errorPerc * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter(data[0].errorPerc * 100)}</span> : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
+                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (data[0].errorPerc * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter(data[0].errorPerc * 100)}</span> : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? <span className={this.state.showForecastThresholdLegend && ((totalError / countError) * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter((totalError / countError) * 100)}</span> : 0}</b></td>
+                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? <span className={this.state.showForecastThresholdLegend && ((totalError / countError) * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter((totalError / countError) * 100)}</span> : 0}</b></td>
                                                             </tr>
                                                             {/* Actual */}
                                                             <tr>

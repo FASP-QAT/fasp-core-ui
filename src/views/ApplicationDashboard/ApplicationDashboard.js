@@ -105,14 +105,19 @@ class ApplicationDashboard extends Component {
                   var programTransaction2 = transaction2.objectStore('programQPLDetails');
                   var deleteRequest2 = programTransaction2.delete(id);
                   deleteRequest2.onsuccess = function (event) {
-                    this.setState({
-                      loading: false,
-                      message: i18n.t("static.dashboard.programDeletedSuccessfully"),
-                      color: 'green'
-                    }, () => {
-                      hideSecondComponent()
-                    })
-                    this.getPrograms();
+                    var transaction3 = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+                    var programTransaction3 = transaction3.objectStore('planningUnitBulkExtrapolation');
+                    var deleteRequest3 = programTransaction3.delete(id);
+                    deleteRequest3.onsuccess = function (event) {
+                      this.setState({
+                        loading: false,
+                        message: i18n.t("static.dashboard.programDeletedSuccessfully"),
+                        color: 'green'
+                      }, () => {
+                        hideSecondComponent()
+                      })
+                      this.getPrograms();
+                    }.bind(this)
                   }.bind(this)
                 }.bind(this)
               }.bind(this)
@@ -166,14 +171,19 @@ class ApplicationDashboard extends Component {
                 var programTransaction2 = transaction2.objectStore('datasetDetails');
                 var deleteRequest2 = programTransaction2.delete(id);
                 deleteRequest2.onsuccess = function (event) {
-                  this.setState({
-                    loading: false,
-                    message: i18n.t("static.loadDelDataset.datasetDeleteSuccessfully"),
-                    color: 'green'
-                  }, () => {
-                    hideSecondComponent()
-                  })
-                  this.getDataSetList();
+                  var transaction3 = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+                  var programTransaction3 = transaction3.objectStore('planningUnitBulkExtrapolation');
+                  var deleteRequest3 = programTransaction3.delete(id);
+                  deleteRequest3.onsuccess = function (event) {
+                    this.setState({
+                      loading: false,
+                      message: i18n.t("static.loadDelDataset.datasetDeleteSuccessfully"),
+                      color: 'green'
+                    }, () => {
+                      hideSecondComponent()
+                    })
+                    this.getDataSetList();
+                  }.bind(this)
                 }.bind(this)
               }.bind(this)
             }.bind(this)
@@ -297,7 +307,7 @@ class ApplicationDashboard extends Component {
             versionId: filteredGetRequestList[i].version,
             id: filteredGetRequestList[i].id,
             loading: false,
-            cutOffDate:filteredGetRequestList[i].cutOffDate!=undefined && filteredGetRequestList[i].cutOffDate!=null && filteredGetRequestList[i].cutOffDate!=""?filteredGetRequestList[i].cutOffDate:""
+            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
           });
         }
         this.setState({
@@ -418,13 +428,13 @@ class ApplicationDashboard extends Component {
     this.getPrograms();
     this.getDataSetList();
     if (localStorage.getItem('sessionType') === 'Online') {
-    DashboardService.openIssues()
-      .then(response => {
-        this.setState({
-          openIssues: response.data.openIssues,
-          addressedIssues: response.data.addressedIssues
+      DashboardService.openIssues()
+        .then(response => {
+          this.setState({
+            openIssues: response.data.openIssues,
+            addressedIssues: response.data.addressedIssues
+          })
         })
-      })
     }
     hideFirstComponent();
   }
@@ -923,7 +933,7 @@ class ApplicationDashboard extends Component {
                           </Dropdown>
                         </ButtonGroup>
                       </div>
-                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":"")}</div>
+                      <div className="TextTittle ">{item.programCode + "~v" + item.programVersion + (item.cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : "")}</div>
                       <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div>
                       <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div>
                     </div>
