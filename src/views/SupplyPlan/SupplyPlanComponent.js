@@ -1099,16 +1099,16 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number((Number(total) * Number(this.state.multiplier))).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","),
-                            editable ? Number(total).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",") : Number(roundARU(total, this.state.multiplier)).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",")
+                            Number((Number(total) * Number(this.state.multiplier))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(total).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(roundARU(total, this.state.multiplier)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ],
                         [
                             '',
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","),
-                            editable ? Number(this.state.closingBalanceArray[count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",")
+                            Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(this.state.closingBalanceArray[count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ]
                     ],
                     onchange: function (instance, cell, x, y, value) {
@@ -1143,16 +1143,16 @@ export default class SupplyPlanComponent extends React.Component {
                                 '',
                                 '',
                                 i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
-                                this.formatter(Number((Number(totalProjected) * Number(this.state.multiplier))).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",")),
-                                this.formatter(Number(totalActual).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","))
+                                this.formatter(Number((Number(totalProjected) * Number(this.state.multiplier))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(totalActual).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             ],
                             [
                                 '',
                                 '',
                                 '',
                                 i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ",")),
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{8})+(?!\d))/g, ","))
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             ]])
                         }
                     }.bind(this),
