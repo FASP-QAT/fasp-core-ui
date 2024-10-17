@@ -3090,7 +3090,7 @@ export default class BuildTree extends Component {
      * @param {*} nodeId Node Id for which the month on month should be built
      * @param {*} type Type of the node
      */
-    calculateMOMData(nodeId, type, isCopy) {
+    calculateMOMData(nodeId, type, isCopy, treeList) {
         return new Promise((resolve, reject) => {
             let curTreeObj;
             var items;
@@ -3128,7 +3128,7 @@ export default class BuildTree extends Component {
                         resolve();
                     });
                 } else {
-                    calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), curTreeObj.scenarioList[0].id, type, curTreeObj.treeId, false, false, this.state.autoCalculate).then(() => {
+                    calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), curTreeObj.scenarioList[0].id, type, (treeList != undefined ? treeList.toString() : curTreeObj.treeId), false, false, this.state.autoCalculate).then(() => {
                         resolve();
                     });
                 }
@@ -9605,13 +9605,26 @@ export default class BuildTree extends Component {
     onRemoveButtonClick(itemConfig) {
         return new Promise((resolve, reject) => {
             var { items } = this.state;
+            var sourceNodes = items.filter(x => x.payload.downwardAggregationAllowed && x.sortOrder.startsWith(itemConfig.sortOrder));
             const ids = items.map(o => o.id)
             const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
             items = filtered;
+            var treeList = [this.state.curTreeObj.treeId];
+            if(sourceNodes.length > 0){
+                this.state.dataSetObj.programData.treeList.map(t => t.tree.flatList.filter(f => f.payload.nodeType.id == 6).map(n => n.payload.downwardAggregationList && n.payload.downwardAggregationList.length > 0 && n.payload.downwardAggregationList[0].nodeId && n.payload.downwardAggregationList.map(da => {
+                    if(da.nodeId && sourceNodes.map(c => c.id.toString()).includes(da.nodeId.toString()) && da.treeId == this.state.curTreeObj.treeId) {
+                        treeList = treeList.concat(t.treeId);
+                    }
+                })))
+            }
             this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
                 setTimeout(() => {
                     if (itemConfig.payload.nodeType.id == 2) {
                         this.calculateMOMData(itemConfig.parent, 2, false).then(() => {
+                            resolve();
+                        });
+                    } else if(itemConfig.payload.downwardAggregationAllowed) {
+                        this.calculateMOMData(itemConfig.id, 2, false, treeList).then(() => {
                             resolve();
                         });
                     } else {
@@ -9758,7 +9771,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             var sourceNodeUsageList = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId) ? sourceNodeUsageList.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : ""}) : "")) : ""))
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : ""}) : "")) : ""))
             this.setState({
                 sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
@@ -9870,6 +9883,9 @@ export default class BuildTree extends Component {
      */
     updateNodeInfoInJson(currentItemConfig) {
         var nodes = this.state.items;
+        // if (currentItemConfig.context.payload.nodeType.id != 2 && currentItemConfig.context.payload.nodeType.id != 3) {
+        //     delete currentItemConfig.context.payload.downwardAggregationAllowed;
+        // }
         if (currentItemConfig.context.level == 0 && currentItemConfig.context.newTree) {
             currentItemConfig.context.newTree = false;
         }
@@ -12733,7 +12749,7 @@ export default class BuildTree extends Component {
                     </div>
                     :
                     <div className={(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect == 0) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
-                        <div className={outerLink ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : itemConfig.payload.nodeType.id == 5
+                        <div className={outerLink ? itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : "ContactTitleBackground TemplateTitleBgpurple" : itemConfig.payload.nodeType.id == 5
                             || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                             (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
                         >
@@ -12761,8 +12777,8 @@ export default class BuildTree extends Component {
                                                             <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : 
                                                                 (itemConfig.payload.nodeType.id == 6 ?
                                                                     <><span style={{color: '#002f6c'}} className={itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length == 0 ? "red" : "" : "red"}>{itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length : 0}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
-                                    {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
-                                    {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? <i><img src={AggregationAllowedRed} className="AggregationDownwardNodeSize" /></i> : ""}
+                                    {(itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) && itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
+                                    {(itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) && itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? <i><img src={AggregationAllowedRed} className="AggregationDownwardNodeSize" /></i> : ""}
                                 </div>
                             </div>
                         </div>
@@ -14626,7 +14642,7 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
-                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : "PU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : "PU")}</p>
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : this.state.invalidNodeType ==  5 ? "PU" : "Funnel node").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : this.state.invalidParentNodeType == 5 ? "PU" : "Funnel node")}</p>
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>

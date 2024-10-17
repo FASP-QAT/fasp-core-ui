@@ -3288,6 +3288,7 @@ export default class CreateTreeTemplate extends Component {
         }
     }
     downwardAggregationListChange(daList) {
+        console.log("Test@@@ daList",daList)
         this.setState({
             isChanged: true
         })
@@ -3298,7 +3299,11 @@ export default class CreateTreeTemplate extends Component {
             scenarioId: x.value.split("~")[1],
             nodeId: x.value.split("~")[2]
         }))
+        console.log("Test@@@ tempList",tempList)
         currentItemConfig.context.payload.downwardAggregationList = tempList;
+        this.setState({
+            currentItemConfig: currentItemConfig,
+        })
         if(tempList.length == 0) {
             this.setState({
                 multiselectError: true
@@ -6164,6 +6169,7 @@ export default class CreateTreeTemplate extends Component {
         } else {
             nodeTypeList = this.state.nodeTypeList.filter(c => c.id != 5);
         }
+        console.log("Test@@@ downwardAggregationList",downwardAggregationList)
         this.setState({
             nodeTypeFollowUpList: nodeTypeList,
             downwardAggregationList: downwardAggregationList
@@ -9231,6 +9237,7 @@ export default class CreateTreeTemplate extends Component {
      * @param {*} currentItemConfig The item configuration object that needs to be updated
      */
     updateNodeInfoInJson(currentItemConfig) {
+        console.log("Test@@@ currentItemConfig",currentItemConfig)
         let isNodeChanged = currentItemConfig.context.newTemplateFlag;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
