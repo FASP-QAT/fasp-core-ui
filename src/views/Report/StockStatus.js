@@ -1335,7 +1335,7 @@ class StockStatus extends Component {
           }
           if (programCount > 10) {
             programCount = programCount - 10;
-            height = 400 + (30 * programCount);
+            height = 400 + (2 * programCount);
           }
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
@@ -2528,7 +2528,7 @@ class StockStatus extends Component {
     }
     if (programCount > 10) {
       programCount = programCount - 10;
-      height = 400 + (30 * programCount);
+      height = 400 + (2 * programCount);
     }
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
       datasets.push({
