@@ -10076,11 +10076,22 @@ label.arrow_label:before {
   text-overflow: ellipsis;
 }
 
-.lgTemplate .lgPhotoFrame {
-  top: 22px;
-  left: 2px;
-  width: 50px;
-  height: 60px;
+.TemplateTitleBgpurple {
+  background: #C3B1E1 !important;
+  // background: #eee!important;
+  border: none !important;
+  border-radius: 0px !important;
+  padding: 0px 0px 1px 0px !important;
+  top: 0px !important;
+  left: 0px !important;
+  right: 0px !important;
+  height: 33px !important;
+}
+
+.TitleColorWhite {
+  color: #fff !important;
+  font-weight: bold !important;
+  margin-left: 1px;
 }
 
 .lgTemplate .lgPhotoFrame .lgPhoto {
@@ -12551,8 +12562,10 @@ legend.scheduler-border {
   color: #002f6c;
 }
 
-.SelectFeildWidth {
-  width: 200px;
+.checkboxMargin {
+  margin-top: 2px !important;
+  cursor: pointer;
+  margin-left: -16px;
 }
 
 .ShowGuidanceIcon {
@@ -17080,7 +17093,7 @@ label.arrow_label:before {
 
 @media only screen and (min-width: 1769px) {
   .paddinCheckbox {
-    padding-left: 118px;
+      padding-left: 118px;
   }
 }
 

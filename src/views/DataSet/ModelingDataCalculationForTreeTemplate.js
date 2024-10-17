@@ -683,8 +683,15 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                         var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                         var childNodeFlatList = [];
+                        var invalidChild = [];
                         if(aggregateDownwardNodeList[fl].payload.downwardAggregationList && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId) {
-                            childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
+                            flatListUnsorted.map((c, index) => {
+                                if(aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()) && (c.payload.nodeType.id == 2 || c.payload.nodeType.id == 3) && c.payload.downwardAggregationAllowed)
+                                    childNodeFlatList.push(c);
+                                else
+                                invalidChild.push(index)
+                            });
+                            aggregateDownwardNodeList[fl].payload.downwardAggregationList = aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter((x, index) => !invalidChild.includes(index))
                         }
                         var monthList = [];
                         childNodeFlatList.map(d => {
@@ -745,8 +752,10 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                     // if (nodeId == -1) {
                         var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateDownwardNodeList[fl].id);
                         payload.nodeDataMap = nodeDataMap;
+                        flatListUnsorted[findIndex] = aggregateDownwardNodeList[fl];
                         flatListUnsorted[findIndex].payload = payload;
                         var findIndex1 = flatList.findIndex(c => c.id == aggregateDownwardNodeList[fl].id);
+                        flatList[findIndex1] = aggregateDownwardNodeList[fl];
                         flatList[findIndex1].payload = payload;
                     // }
                 }
