@@ -272,7 +272,7 @@ class DefaultHeaderDropdown extends Component {
          
     <DropdownItem style={{ borderTop: "2px solid #000",padding:"10px 20px" }}>
     <i className={`fa ${localStorage.getItem("theme") === "dark" ? "fa-moon-o" : "fa-sun-o"}`}></i>
-    {localStorage.getItem("theme") === "dark" ? i18n.t('static.common.darktheme') : i18n.t('static.common.lighttheme')}
+    <span style={{marginLeft:'-1px'}}>{localStorage.getItem("theme") === "dark" ? i18n.t('static.common.darktheme') : i18n.t('static.common.lighttheme')}</span>
 
     <Switch
       className={`form-check form-switch swichMarginLeft ${localStorage.getItem("theme") === "dark" ? 'dark-switch' : 'light-switch'}`}
