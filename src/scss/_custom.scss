@@ -2900,6 +2900,7 @@ label.arrow_label:before {
     position: sticky !important;
     //text-align: left !important;
     background: #212631;
+    cursor: default !important;
   }
 
   .FreezePlaningUnitColumn1 .jss_overflow>tbody>tr>td:nth-child(3) {
@@ -2909,6 +2910,7 @@ label.arrow_label:before {
     z-index: 2 !important;
     position: sticky !important;
     background: #212631;
+    cursor: default !important;
   }
 
   // .text-blackD {
@@ -15309,6 +15311,7 @@ label.arrow_label:before {
   left: 0 !important;
   z-index: 3 !important;
   position: sticky !important;
+  cursor: default !important;
   //text-align: left !important;
 }
 
@@ -15319,6 +15322,7 @@ label.arrow_label:before {
   position: sticky !important;
   //text-align: left !important;
   background: #fff;
+  cursor: default !important;
 }
 
 .FreezePlaningUnitColumn1 .jss>thead>tr>td:nth-child(3) {
@@ -15327,6 +15331,7 @@ label.arrow_label:before {
   // left: 90px !important;
   z-index: 3 !important;
   position: sticky !important;
+  cursor: default !important;
 
 }
 
@@ -15337,6 +15342,7 @@ label.arrow_label:before {
   z-index: 2 !important;
   position: sticky !important;
   background: #fff;
+  cursor: default !important;
 }
 
 .legend-erp {
