@@ -286,7 +286,7 @@ class DefaultHeaderDropdown extends Component {
   <DropdownItem onClick={this.applyDarkTheme}><i className="fa fa-moon-o"></i> {i18n.t('static.common.darktheme')}</DropdownItem> */}
   {this.props.item == 2 && <DropdownItem className='ShowdecimalClr' style={{ borderTop: "2px solid #000",padding:"10px 20px" }}>
     <i style={{fontStyle:'normal',marginLeft:'-8px'}}>.00</i>
-    <span style={{marginLeft:'-3px'}}>Show Decimals</span>
+    <span style={{marginLeft:'-2px'}}>Show Decimals</span>
     <Switch className='form-check form-switch' defaultChecked checked={localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false" ? true : false} color="primary" onChange={this.handleDefaultRounding} />
     </DropdownItem>}
         </DropdownMenu>
