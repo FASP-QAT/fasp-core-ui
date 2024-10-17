@@ -2301,15 +2301,24 @@ body {
     border-left: 0;
   }
 
-  .sidebar.module1 .nav-link:hover {
-    color: #002f6c !important;
-    background: #e4e5e6;
+  .FreezePlaningUnitColumn1 .jss_overflow>tbody>tr>td:nth-child(2) {
+    width: 200px !important;
+    left: 0 !important;
+    z-index: 2 !important;
+    position: sticky !important;
+    //text-align: left !important;
+    background: #212631;
+    cursor: default !important;
   }
 
-  .typing-en::before {
-    content: "Type at least 3 characters to search";
-    color: #e4e5e6;
-    font-style: italic;
+  .FreezePlaningUnitColumn1 .jss_overflow>tbody>tr>td:nth-child(3) {
+    width: 300px !important;
+    // left: 90px !important;
+    left: 149px !important;
+    z-index: 2 !important;
+    position: sticky !important;
+    background: #212631;
+    cursor: default !important;
   }
 
   .typing-fr::before {
@@ -16119,6 +16128,14 @@ label.arrow_label:before {
 .jss>tbody>tr>td.readonly.notLowestError {
   color: #000000 !important;
 }
+.FreezePlaningUnitColumn1 .jss>thead>tr>td:nth-child(2) {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 3 !important;
+  position: sticky !important;
+  cursor: default !important;
+  //text-align: left !important;
+}
 
 // .ForcastColumnFreeze .jss>thead .jss_nested td:nth-child(2) {
 .ForcastColumnFreeze .jss>thead .jss_nested td:nth-child(2) {
@@ -16127,6 +16144,20 @@ label.arrow_label:before {
   width: 150px;
   min-width: 150px;
   z-index: 2 !important;
+  position: sticky !important;
+  //text-align: left !important;
+  background: #fff;
+  cursor: default !important;
+}
+
+.FreezePlaningUnitColumn1 .jss>thead>tr>td:nth-child(3) {
+  width: 300px !important;
+  left: 149px !important;
+  // left: 90px !important;
+  z-index: 3 !important;
+  position: sticky !important;
+  cursor: default !important;
+
 }
 
 .ForcastColumnFreeze .jss>thead>tr>td.jss_filters_icon:nth-child(4) {
@@ -16135,6 +16166,9 @@ label.arrow_label:before {
   width: 150px;
   min-width: 150px;
   z-index: 2 !important;
+  position: sticky !important;
+  background: #fff;
+  cursor: default !important;
 }
 
 .ForcastColumnFreeze .jss_overflow>tbody>tr>td:nth-child(4) {
