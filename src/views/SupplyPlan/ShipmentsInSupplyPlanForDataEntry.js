@@ -82,6 +82,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
      * @param {*} data This is the data that is being pasted
      */
     onPaste(instance, data) {
+        console.log('onPaste data: ',data);
         var z = -1;
         for (var i = 0; i < data.length; i++) {
             if (z != data[i].y) {
@@ -109,6 +110,16 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
                 z = data[i].y;
             }
+
+            if (data[i].x == 3 && data[i].value != "") {//For PU
+                if(data[i].value.includes("|")) {
+                    let strPU = data[i].value.split("|")[0].trim();
+                    (instance).setValueFromCoords(3, data[i].y, strPU, true);
+                } else {
+                    (instance).setValueFromCoords(3, data[i].y, data[i].value, true);
+                }
+            }
+
             if (data[i].x == 5 && data[i].value != "") {
                 var minDate=this.props.items.generalProgramJson.cutOffDate!=undefined && this.props.items.generalProgramJson.cutOffDate!=null && this.props.items.generalProgramJson.cutOffDate!=""?moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD"):moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD");
                 if(moment(data[i].value).format("YYYY-MM")>=moment(minDate).format("YYYY-MM")){
@@ -117,6 +128,16 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     (instance).setValueFromCoords(5, data[i].y, "", true);
                 }
             }
+
+            if (data[i].x == 11 && data[i].value != "") {//For ARU
+                if(data[i].value.includes("|")) {
+                    let strPU = data[i].value.split("|")[0].trim();
+                    (instance).setValueFromCoords(11, data[i].y, strPU, true);
+                } else {
+                    (instance).setValueFromCoords(11, data[i].y, data[i].value, true);
+                }
+            }
+
             if (data[i].x == 19 && data[i].value == "") {
                 var rowData = (instance).getRowData(data[i].y);
                 if (rowData[3] != "") {
@@ -2370,22 +2391,30 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
                 var pricePerUnit = elInstance.getValue(`T${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                 if (rowData[28] == -1 || rowData[28] === "" || rowData[28] == null || rowData[28] == undefined) {
+                    console.log('\nrowData[3]:',rowData[3]);
+                    console.log('this.props.items.puData : ',this.props.items.puData);
                     var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0];
-                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
-                    if (programPriceList.length > 0 && programPriceList[0].price!==null) {
-                        pricePerUnit = Number(programPriceList[0].price);
-                    } else {
-                        if (procurementAgentPlanningUnit.length > 0) {
-                            pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                    console.log('----puData-----:',puData);
+                    // if(puData != undefined) {
+                        var programPriceList = [];
+                        try {
+                            programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
+                        } catch (error) {}
+                        if (programPriceList.length > 0 && programPriceList[0].price!==null) {
+                            pricePerUnit = Number(programPriceList[0].price);
                         } else {
-                            pricePerUnit = puData.catalogPrice
+                            if (procurementAgentPlanningUnit.length > 0) {
+                                pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                            } else {
+                                pricePerUnit = puData.catalogPrice
+                            }
                         }
-                    }
-                    if (rowData[18] != "") {
-                        var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[18])[0]).conversionRateToUsd);
-                        pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
-                        elInstance.setValueFromCoords(19, y, pricePerUnit, true);
-                    }
+                        if (rowData[18] != "") {
+                            var conversionRateToUsd = Number((this.state.currencyListAll.filter(c => c.currencyId == rowData[18])[0]).conversionRateToUsd);
+                            pricePerUnit = Number(pricePerUnit / conversionRateToUsd).toFixed(2);
+                            elInstance.setValueFromCoords(19, y, pricePerUnit, true);
+                        }
+                    // }
                 }
                 if ((rowData[28] == -1 || rowData[28] === "" || rowData[28] == null || rowData[28] == undefined) && (rowData[31].expectedDeliveryDate == "" || rowData[31].expectedDeliveryDate == null || rowData[31].expectedDeliveryDate == "Invalid date")) {
                     this.calculateLeadTimesOnChange(y);
@@ -2393,7 +2422,10 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 if (rowData[6]!="") {
                     var planningUnitId = rowData[3];
                     var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
-                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
+                    var programPriceList = [];
+                    try {
+                        programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
+                    } catch (error) {}
                     var freightCost = 0;
                     var rate = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
                     if (rowData[6] == 1) {
@@ -2592,7 +2624,13 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 if ((rowData[28] == -1 || rowData[28] === "" || rowData[28] == null || rowData[28] == undefined) || (this.state.editableAutogeneratedFlag && rowData[21].toString()=="true")) {
                     var planningUnitId = rowData[3];
                     var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
-                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
+                    console.log('puData: ',puData);
+                    var programPriceList = [];
+                    try {
+                        programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
+                    } catch (error) {
+                        console.error('error:', error);                   
+                    }
                     var freightCost = 0;
                     if (rowData[6] == 1) {
                         var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
