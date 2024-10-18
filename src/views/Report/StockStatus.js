@@ -2638,7 +2638,8 @@ class StockStatus extends Component {
                       </FormGroup>
 
                       <FormGroup className="col-md-3" >
-                        <FormGroup check inline>
+                        <div className='row' style={{marginBottom:'0.5rem'}}>
+                        <FormGroup check inline className='PaddingLeftSupplyReport'>
                           <Input
                             type="radio"
                             id="viewById"
@@ -2656,7 +2657,7 @@ class StockStatus extends Component {
                             {i18n.t('static.report.planningUnit')}
                           </Label>
                         </FormGroup>
-                        <FormGroup check inline>
+                        <FormGroup check inline className='PaddingLeftSupplyReport'>
                           <Input
                             type="radio"
                             id="viewById"
@@ -2674,6 +2675,7 @@ class StockStatus extends Component {
                             {i18n.t('static.planningunit.countrysku')}
                           </Label>
                         </FormGroup>
+                        </div>
                         <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop": "4px" }}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
@@ -2753,6 +2755,7 @@ class StockStatus extends Component {
                             name="onlyShowAllPUs"
                             checked={this.state.onlyShowAllPUs}
                             onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                            style={{marginTop:'2px'}}
                           />
                           <Label
                             className="form-check-label"

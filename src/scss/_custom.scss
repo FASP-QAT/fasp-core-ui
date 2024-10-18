@@ -16189,3 +16189,11 @@ label.arrow_label:before {
 .MuiSwitch-colorPrimary.Mui-checked {
   color: #23a8d8!important;
 }
+.PaddingLeftSupplyReport{
+  padding-left: 0px;
+  }
+@media (min-width: 1920px) {
+  .PaddingLeftSupplyReport{
+  padding-left: 15px;
+  }
+}
