@@ -65,8 +65,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             if(treeId != -1) {
                 var sourceNodes = treeList[0].tree.flatList.filter(x => x.payload.downwardAggregationAllowed);
                 if(sourceNodes.length > 0){
-                    datasetJson.treeList.map(t => t.tree.flatList.filter(f => f.payload.nodeType.id == 6).map(n => n.payload.downwardAggregationList && n.payload.downwardAggregationList > 0 && n.payload.downwardAggregationList[0].nodeId && n.payload.downwardAggregationList.filter(da => {
-                        if(da.nodeId && sourceNodes.map(c => c.payload.nodeId.toString()).includes(da.nodeId.toString()) && da.treeId == treeList[0].treeId) {
+                    datasetJson.treeList.map(t => t.tree.flatList.filter(f => f.payload.nodeType.id == 6).map(n => n.payload.downwardAggregationList && n.payload.downwardAggregationList.length > 0 && n.payload.downwardAggregationList[0].nodeId && n.payload.downwardAggregationList.map(da => {
+                        if(da.nodeId && sourceNodes.map(c => c.id.toString()).includes(da.nodeId.toString()) && da.treeId == treeList[0].treeId) {
                             treeList = treeList.concat(t);
                         }
                     })))
@@ -703,11 +703,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                                     var childNodeFlatList = [];
+                                    var invalidChild = [];
                                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                                     if (aggregateDownwardNodeList[fl].payload.downwardAggregationList && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId ) {
-                                        aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => {
-                                            childNodeFlatList.push(datasetJson.treeList.filter(c => c.treeId.toString() == x.treeId.toString())[0].tree.flatList.filter(t => t.id.toString() == x.nodeId.toString())[0])
+                                        aggregateDownwardNodeList[fl].payload.downwardAggregationList.map((x,index) => {
+                                            var aggDownNode = datasetJson.treeList.filter(c => c.treeId.toString() == x.treeId.toString())[0].tree.flatList.filter(t => t.id.toString() == x.nodeId.toString());
+                                            if(aggDownNode.length > 0 && (aggDownNode[0].payload.nodeType.id == 2 || aggDownNode[0].payload.nodeType.id == 3) && aggDownNode[0].payload.downwardAggregationAllowed)
+                                                childNodeFlatList.push(aggDownNode[0]);
+                                            else
+                                                invalidChild.push(index)
                                         })
+                                        aggregateDownwardNodeList[fl].payload.downwardAggregationList = aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter((x, index) => !invalidChild.includes(index))
                                     }
                                     // var treeListAD = datasetJson.treeList.map.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId))
                                     // var childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
@@ -770,8 +776,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 // if (nodeId == -1) {
                                     var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateDownwardNodeList[fl].id);
                                     payload.nodeDataMap = nodeDataMap;
+                                    flatListUnsorted[findIndex] = aggregateDownwardNodeList[fl];
                                     flatListUnsorted[findIndex].payload = payload;
                                     var findIndex1 = flatList.findIndex(c => c.id == aggregateDownwardNodeList[fl].id);
+                                    flatList[findIndex1] = aggregateDownwardNodeList[fl];
                                     flatList[findIndex1].payload = payload;
                                 // }
                             }
