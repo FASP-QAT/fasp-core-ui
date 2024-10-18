@@ -359,7 +359,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             seasonality: event.target.checked ? 1 : 0,
             arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
-            arimaDisabled: (event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+            arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "OnIline" ? false : true,
         }, () => {
             this.handleRangeDissmiss2(this.state.rangeValue1)
         });
@@ -677,8 +677,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
                 })
             }, 0)
         })
@@ -2180,7 +2180,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
                 var gamma = this.state.gamma;
-                if (consumptionExtrapolationTESM.length > 0) {
+                if (consumptionExtrapolationTESM.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevel = consumptionExtrapolationTESM[0].jsonProperties.confidenceLevel;
                     seasonality = consumptionExtrapolationTESM[0].jsonProperties.seasonality;
                     alpha = consumptionExtrapolationTESM[0].jsonProperties.alpha;
@@ -2192,7 +2192,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var p = this.state.p;
                 var d = this.state.d;
                 var q = this.state.q;
-                if (consumptionExtrapolationArima.length > 0) {
+                if (consumptionExtrapolationArima.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevelArima = consumptionExtrapolationArima[0].jsonProperties.confidenceLevel;
                     p = consumptionExtrapolationArima[0].jsonProperties.p;
                     d = consumptionExtrapolationArima[0].jsonProperties.d;
@@ -2281,8 +2281,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    arimaDisabled: (((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2))) && localStorage.getItem("sessionType") === "Online" ? false : true,
                     noDataMessage: "",
                     showDate: true,
                     minDate: minDate,
@@ -2330,8 +2330,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                         semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                         linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
-                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
-                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
+                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                        arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
                     }, () => {
                         this.getDateDifference();
                     })
@@ -4833,7 +4833,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                             type="checkbox"
                                                                             id="seasonality"
                                                                             name="seasonality"
-                                                                            disabled={this.state.isDisabled}
+                                                                            disabled={this.state.isDisabled || localStorage.getItem("sessionType") === "Offline"}
                                                                             checked={this.state.seasonality}
                                                                             onClick={(e) => { this.seasonalityCheckbox(e); }}
                                                                         />
