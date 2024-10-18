@@ -31,7 +31,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent, filterOptions, roundARU, formatterMOS, roundNMOS } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent, filterOptions, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -298,9 +298,9 @@ class StockStatus extends Component {
             csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnits') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
           }
           csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + planningUnitLabel).replaceAll(' ', '%20') + '"');
-          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (item.data[0].planBasedOn == 1 ? roundARU(item.data[0].minStockMos, 1) : roundARU(item.data.minStockQty, 1))).replaceAll(' ', '%20') + '"');
+          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (item.data[0].planBasedOn == 1 ? roundAMC(item.data[0].minStockMos) : roundAMC(item.data.minStockQty, 1))).replaceAll(' ', '%20') + '"');
           if (item.data[0].planBasedOn == 1) {
-            csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (roundARU(item.data[0].maxStockMos, 1))).replaceAll(' ', '%20') + '"');
+            csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (roundAMC(item.data[0].maxStockMos))).replaceAll(' ', '%20') + '"');
           }
           if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
             var notes = item.data[0].ppuNotes.split("|");
@@ -555,12 +555,12 @@ class StockStatus extends Component {
             }
           }
           // y=y-3
-          doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ': ' + (item.data[0].planBasedOn == 1 ? formatterMOS(roundARU(item.data[0].minStockMos, 1), 0) : formatter(roundARU(item.data.minStockQty, 1), 0)), doc.internal.pageSize.width / 10, y, {
+          doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ': ' + (item.data[0].planBasedOn == 1 ? formatter(roundAMC(item.data[0].minStockMos, 1), 0) : formatter(roundAMC(item.data.minStockQty, 1), 0)), doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
           if (item.data[0].planBasedOn == 1) {
             y += 10;
-            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ': ' + formatter(roundARU(item.data[0].maxStockMos, 1), 0), doc.internal.pageSize.width / 10, y, {
+            doc.text(i18n.t('static.supplyPlan.maxStockMos') + ': ' + formatter(roundAMC(item.data[0].maxStockMos), 0), doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           }
@@ -611,7 +611,7 @@ class StockStatus extends Component {
                       ? ""
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
-            }).join(' \n')
+            })
               , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(roundARU(ele.adjustment,1)) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
         } else {
           otherdata =
@@ -632,7 +632,7 @@ class StockStatus extends Component {
                       ? ""
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
-            }).join(' \n')
+            })
               , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(roundARU(ele.adjustment,1)) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
         }
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
@@ -1163,7 +1163,7 @@ class StockStatus extends Component {
               pointRadius: 0,
               yValueFormatString: "$#,##0",
               lineTension: 0,
-              data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundARU(item.minStockMos, 1) : roundARU(item.minStockQty, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.minMos : item.minStock))))
+              data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundAMC(item.minStockMos, 1) : roundAMC(item.minStockQty, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.minMos : item.minStock))))
             }
             , {
               type: "line",
@@ -1185,7 +1185,7 @@ class StockStatus extends Component {
               pointRadius: 0,
               showInLegend: true,
               yValueFormatString: "$#,##0",
-              data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundARU(item.maxStockMos, 1) : roundARU(item.maxStock, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.maxMos : roundARU(item.maxStock, 1)))))
+              data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundAMC(item.maxStockMos, 1) : roundAMC(item.maxStock, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.maxMos : roundAMC(item.maxStock, 1)))))
             }
           ];
           if ((this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1) {
@@ -1335,7 +1335,7 @@ class StockStatus extends Component {
           }
           if (programCount > 10) {
             programCount = programCount - 10;
-            height = 400 + (30 * programCount);
+            height = 400 + (2 * programCount);
           }
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
@@ -2376,7 +2376,7 @@ class StockStatus extends Component {
         pointRadius: 0,
         yValueFormatString: "$#,##0",
         lineTension: 0,
-        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? roundARU(item.minStockMos, 1) : roundARU(item.minStockQty, 1)))
+        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? roundAMC(item.minStockMos, 1) : roundAMC(item.minStockQty, 1)))
       }
       , {
         type: "line",
@@ -2400,7 +2400,7 @@ class StockStatus extends Component {
         pointRadius: 0,
         showInLegend: true,
         yValueFormatString: "$#,##0",
-        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? roundARU(item.maxStockMos, 1) : roundARU(item.maxStockQty, 1)))
+        data: this.state.stockStatusList.map((item, index) => (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1 ? roundAMC(item.maxStockMos, 1) : roundAMC(item.maxStockQty, 1)))
       }
     ]
     if (this.state.programId.length > 0 && reportingUnitList.length > 0) {
@@ -2528,7 +2528,7 @@ class StockStatus extends Component {
     }
     if (programCount > 10) {
       programCount = programCount - 10;
-      height = 400 + (30 * programCount);
+      height = 400 + (2 * programCount);
     }
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
       datasets.push({
@@ -2784,12 +2784,12 @@ class StockStatus extends Component {
                               {this.state.stockStatusList[0].planBasedOn == 1 ? <>
                                 <li><span className="redlegend "></span>
                                   <span className="legendcommitversionText">
-                                    <b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {formatter(roundARU(this.state.stockStatusList[0].minStockMos, 1), 0)}
+                                    <b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {formatter(roundAMC(this.state.stockStatusList[0].minStockMos), 0)}
                                   </span>
                                 </li>
                                 <li><span className="redlegend "></span>
                                   <span className="legendcommitversionText">
-                                    <b>{i18n.t("static.supplyPlan.maxStockMos")}</b>   : {formatter(roundARU(this.state.stockStatusList[0].maxStockMos, 1), 0)}
+                                    <b>{i18n.t("static.supplyPlan.maxStockMos")}</b>   : {formatter(roundAMC(this.state.stockStatusList[0].maxStockMos), 0)}
                                   </span>
                                 </li>
                               </> :
@@ -2805,7 +2805,7 @@ class StockStatus extends Component {
                         <div className="col-md-12 text-center">
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br />
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.filter(c => [...new Set(this.state.ppuList).map(ele => ele.programId)].includes(c.value)).map(ele => ele.label).join(", ")) : ""}</span>}<br />
-                          {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? ((this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")) : ""}</span>}
+                          {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.yaxisEquUnit!=-1?("EU: "+document.getElementById("yaxisEquUnit").selectedOptions[0].text):(this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")) : ""}</span>}
                           <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
@@ -2860,7 +2860,7 @@ class StockStatus extends Component {
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.actualTooltipSingleProgram') : i18n.t('static.stockStatus.actualTooltipMultiProgram')) : i18n.t('static.stockStatus.actualTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i> </th>
                         {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.consensusTooltipSingleProgram') : i18n.t('static.stockStatus.consensusTooltipMultiProgram')) : i18n.t('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> Consensus<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i> </th>}
                         <th className="text-center" title={this.state.yaxisEquUnit != -1 ? i18n.t('static.stockStatus.shipmentQtyTooltipEU') : ''} style={{ width: "200px" }}>{i18n.t('static.report.qty')}{this.state.yaxisEquUnit != -1 && <i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>}</th>
-                        <th className="text-center" title={i18n.t('static.stockStatus.shipmemtTooltip')} style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}</th>
+                        <th className="text-center" title={i18n.t('static.stockStatus.shipmemtTooltip')} style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.adjustmentQtyTooltipSingleProgram') : i18n.t('static.stockStatus.adjustmentQtyTooltipMultiProgram')) : i18n.t('static.stockStatus.adjustmentQtyTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.expiredStockTooltipSingleProgram') : i18n.t('static.stockStatus.expiredStockTooltipMultiProgram')) : i18n.t('static.stockStatus.expiredStockTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyplan.exipredStock')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.endingBalanceTooltipSingleProgram') : i18n.t('static.stockStatus.endingBalanceTooltipMultiProgram')) : i18n.t('static.stockStatus.endingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.endingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>

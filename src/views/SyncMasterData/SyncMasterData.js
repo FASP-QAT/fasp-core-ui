@@ -201,6 +201,10 @@ export default class SyncMasterData extends Component {
             }
             var lastSyncDate = date;
             lastSyncDate = moment(generalJson.currentVersion.createdDate).subtract(3, 'years').format("YYYY-MM-DD HH:mm:ss")
+            var lastSyncDateForShipments = date;
+            if(this.props.location.state.programIds.includes(programList[pl].programId)){
+                lastSyncDateForShipments=moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss");
+            }
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
                 programId: programList[pl].programId,
@@ -663,18 +667,23 @@ export default class SyncMasterData extends Component {
 
                                                 for (var pss = 0; pss < getPlannedShipments.length; pss++) {
                                                     var pricePerUnit = 0;
+                                                    var lastModifiedDateForShipment="";
                                                     var ppu = programPlanningUnitList.filter(c => c.program.id == generalJson.programId && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
                                                     var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalJson.programId && c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id && c.active);
                                                     if (programPriceList.length > 0) {
                                                         pricePerUnit = Number(programPriceList[0].price);
+                                                        lastModifiedDateForShipment=programPriceList[0].lastModifiedDate;
                                                     } else {
                                                         var procurementAgentPlanningUnit = procurementAgentPlanningUnitList.filter(c => c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id && c.active);
                                                         if (procurementAgentPlanningUnit.length > 0) {
                                                             pricePerUnit = Number(procurementAgentPlanningUnit[0].catalogPrice);
+                                                            lastModifiedDateForShipment=procurementAgentPlanningUnit[0].lastModifiedDate;
                                                         } else {
                                                             pricePerUnit = ppu[0].catalogPrice
+                                                            lastModifiedDateForShipment=ppu[0].lastModifiedDate;
                                                         }
                                                     }
+                                                    if(moment(lastModifiedDateForShipment).format("YYYY-MM-DD HH:mm:ss")>moment(lastSyncDateForShipments).format("YYYY-MM-DD HH:mm:ss")){
                                                     var shipmentIndex = shipmentDataList.findIndex(c => c.shipmentId > 0 ? c.shipmentId == getPlannedShipments[pss].shipmentId : c.tempShipmentId == getPlannedShipments[pss].tempShipmentId)
                                                     shipmentDataList[shipmentIndex].rate = Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2)
                                                     var productCost = Math.round(Number(pricePerUnit / shipmentDataList[shipmentIndex].currency.conversionRateToUsd).toFixed(2) * shipmentDataList[shipmentIndex].shipmentQty)
@@ -746,6 +755,7 @@ export default class SyncMasterData extends Component {
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                     shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
                                                     shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
+                                                }
                                                 }
                                                 programJson.shipmentList = shipmentDataList;
                                                 // if (planningUnitDataIndex != -1) {
