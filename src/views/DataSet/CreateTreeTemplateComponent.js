@@ -6342,11 +6342,11 @@ export default class CreateTreeTemplate extends Component {
                 child.parent = this.state.copyModalParentNode;
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
-                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
-                if (child.payload.nodeType.id == 6) {
-                    child.payload.downwardAggregationList = [];
-                }
-                if (child.payload.downwardAggregationAllowed) {
+                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level+1;
+                // if(child.payload.nodeType.id == 6 ){
+                //     child.payload.downwardAggregationList = [];
+                // }
+                if(child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
