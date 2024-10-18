@@ -2318,7 +2318,7 @@ body {
     z-index: 2 !important;
     position: sticky !important;
     background: #212631;
-    cursor: default !important;
+    // cursor: default !important;
   }
 
   .typing-fr::before {
@@ -3011,6 +3011,7 @@ body {
     position: sticky !important;
     //text-align: left !important;
     background: #212631;
+    cursor: default!important;
   }
 
   .FreezePlaningUnitColumn1 .jss_overflow>tbody>tr>td:nth-child(3) {
@@ -15590,6 +15591,7 @@ label.arrow_label:before {
   z-index: 3 !important;
   position: sticky !important;
   //text-align: left !important;
+  cursor: default!important;
 }
 
 .FreezePlaningUnitColumn1 .jss_overflow>tbody>tr>td:nth-child(2) {
@@ -16169,7 +16171,7 @@ label.arrow_label:before {
   // left: 90px !important;
   z-index: 3 !important;
   position: sticky !important;
-  cursor: default !important;
+  // cursor: default !important;
 
 }
 
