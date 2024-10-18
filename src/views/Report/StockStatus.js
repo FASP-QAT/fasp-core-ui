@@ -2638,7 +2638,7 @@ class StockStatus extends Component {
                       </FormGroup>
 
                       <FormGroup className="col-md-3" >
-                        <div className='row' style={{marginBottom:'0.5rem'}}>
+                        <div className='row MarginTopfieldsupply'>
                         <FormGroup check inline className='PaddingLeftSupplyReport'>
                           <Input
                             type="radio"
