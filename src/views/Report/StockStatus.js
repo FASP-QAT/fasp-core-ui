@@ -368,7 +368,7 @@ class StockStatus extends Component {
                   : "-" + item1.primeLineNo))
             )
           }).join(' \n')).replaceAll(' ', '%20')
-            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(ele.adjustment != null ? roundARU(ele.adjustment,1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment,1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock,1) : '', roundARU(ele.closingBalance,1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand,1) : ''])));
+            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment, 1)) + Number(ele.adjustment != null ? roundARU(ele.adjustment, 1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment, 1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock, 1) : '', roundARU(ele.closingBalance, 1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand, 1) : ''])));
         } else {
           item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), roundARU(ele.openingBalance, 1), ele.forecastedConsumptionQty == null ? '' : roundARU(ele.forecastedConsumptionQty, 1), ele.actualConsumptionQty == null ? '' : roundARU(ele.actualConsumptionQty, 1), ele.shipmentQty == null ? '' : (ele.shipmentInfo.length > 0 ? roundARU(ele.shipmentQty, 1) : ""),
           (ele.shipmentInfo.map(item1 => {
@@ -392,7 +392,7 @@ class StockStatus extends Component {
                   : "-" + item1.primeLineNo))
             )
           }).join(' \n')).replaceAll(' ', '%20')
-            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(ele.adjustment != null ? roundARU(ele.adjustment,1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment, 1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock, 1) : '', roundARU(ele.closingBalance, 1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand, 1) : ''])));
+            , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment, 1)) + Number(ele.adjustment != null ? roundARU(ele.adjustment, 1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment, 1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock, 1) : '', roundARU(ele.closingBalance, 1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand, 1) : ''])));
         }
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
@@ -612,7 +612,7 @@ class StockStatus extends Component {
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
             })
-              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(roundARU(ele.adjustment,1)) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment, 1)) + Number(roundARU(ele.adjustment, 1)) : roundARU(ele.adjustment, 1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock, 1), 0) : '', formatter(roundARU(ele.closingBalance, 1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand, 1), 0) : '']);
         } else {
           otherdata =
             item.data.map(ele => [dateFormatter(ele.dt), formatter(roundARU(ele.openingBalance, 1), 0), formatter(roundARU(ele.forecastedConsumptionQty, 1), 0), formatter(roundARU(ele.actualConsumptionQty, 1), 0), (ele.shipmentInfo.length > 0 ? formatter(roundARU(ele.shipmentQty, 1), 0) : ""),
@@ -633,7 +633,7 @@ class StockStatus extends Component {
                       : " | " + item1.orderNo) +
                   (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
             })
-              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment,1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment,1))+Number(roundARU(ele.adjustment,1)) : roundARU(ele.adjustment,1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock,1), 0) : '', formatter(roundARU(ele.closingBalance,1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand,1), 0) : '']);
+              , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment, 1)) + Number(roundARU(ele.adjustment, 1)) : roundARU(ele.adjustment, 1), 0), ele.expiredStock != 0 ? formatter(roundARU(ele.expiredStock, 1), 0) : '', formatter(roundARU(ele.closingBalance, 1), 0), formatter(roundAMC(ele.amc, 0)), (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? formatter(roundAMC(ele.mos, 0)) : formatter(roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty), 0)), ele.unmetDemand != 0 ? formatter(roundARU(ele.unmetDemand, 1), 0) : '']);
         }
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
@@ -1081,7 +1081,7 @@ class StockStatus extends Component {
               yAxisID: 'A',
               type: 'line',
               stack: 7,
-              order:0,
+              order: 0,
               data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
               fill: false,
               borderColor: 'rgb(75, 192, 192)',
@@ -1111,7 +1111,7 @@ class StockStatus extends Component {
               data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
             },
             {
-              label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0))?"Consensus Consumption":i18n.t('static.report.actualConsumption'),
+              label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) ? "Consensus Consumption" : i18n.t('static.report.actualConsumption'),
               yAxisID: 'A',
               type: 'line',
               stack: 7,
@@ -2289,7 +2289,7 @@ class StockStatus extends Component {
         yAxisID: 'A',
         type: 'line',
         stack: 7,
-        order:0,
+        order: 0,
         data: this.state.stockStatusList.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
@@ -2321,7 +2321,7 @@ class StockStatus extends Component {
         data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
       },
       {
-        label: (this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1)?"Consensus Consumption":i18n.t('static.report.actualConsumption'),
+        label: (this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) ? "Consensus Consumption" : i18n.t('static.report.actualConsumption'),
         yAxisID: 'A',
         type: 'line',
         stack: 7,
@@ -2644,7 +2644,7 @@ class StockStatus extends Component {
                             type="radio"
                             id="viewById"
                             name="viewById"
-                            style={{ "margin-left": "0px"}}
+                            style={{ "margin-left": "0px" }}
                             value={"1"}
                             checked={this.state.viewById == 1}
                             title={i18n.t('static.report.planningUnit')}
@@ -2676,7 +2676,7 @@ class StockStatus extends Component {
                           </Label>
                         </FormGroup>
                         </div>
-                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop":"4px" }}>
+                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop": "4px" }}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
@@ -2710,7 +2710,7 @@ class StockStatus extends Component {
                             </InputGroup>}
                           </div>
                         </FormGroup>
-                        <FormGroup id="planningUnitDiv" style={{"marginTop":"4px"}}>
+                        <FormGroup id="planningUnitDiv" style={{ "marginTop": "4px" }}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
@@ -2805,7 +2805,7 @@ class StockStatus extends Component {
                         <div className="col-md-12 text-center">
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br />
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.filter(c => [...new Set(this.state.ppuList).map(ele => ele.programId)].includes(c.value)).map(ele => ele.label).join(", ")) : ""}</span>}<br />
-                          {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.yaxisEquUnit!=-1?("EU: "+document.getElementById("yaxisEquUnit").selectedOptions[0].text):(this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")) : ""}</span>}
+                          {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.yaxisEquUnit != -1 ? ("EU: " + document.getElementById("yaxisEquUnit").selectedOptions[0].text) : (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")) : ""}</span>}
                           <div className="chart-wrapper" style={{ "height": height + "px" }}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
@@ -2925,7 +2925,7 @@ class StockStatus extends Component {
                               })}</table>
                             </td>
                             <td>
-                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? roundARU(this.state.stockStatusList[idx].nationalAdjustment, 1) : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? Number(roundARU(this.state.stockStatusList[idx].nationalAdjustment,1))+Number(roundARU(this.state.stockStatusList[idx].adjustment,1)) : roundARU(this.state.stockStatusList[idx].adjustment,1), 0)}
+                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? roundARU(this.state.stockStatusList[idx].nationalAdjustment, 1) : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? Number(roundARU(this.state.stockStatusList[idx].nationalAdjustment, 1)) + Number(roundARU(this.state.stockStatusList[idx].adjustment, 1)) : roundARU(this.state.stockStatusList[idx].adjustment, 1), 0)}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].expiredStock != 0 ? formatter(roundARU(this.state.stockStatusList[idx].expiredStock, 1), 0) : ''}
