@@ -17155,3 +17155,11 @@ label.arrow_label:before {
   .RowMarginToggle{
     margin-bottom: -9px;
   }
+  .PaddingLeftSupplyReport{
+    padding-left: 0px;
+    }
+  @media (min-width: 1920px) {
+    .PaddingLeftSupplyReport{
+    padding-left: 15px;
+    }
+  }
