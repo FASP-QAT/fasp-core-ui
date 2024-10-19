@@ -1055,7 +1055,8 @@ export default class SupplyPlanComponent extends React.Component {
                             title: i18n.t("static.supplyPlan.batchId"),
                             type: 'dropdown',
                             width: 200,
-                            source: batchListForJexcel
+                            source: batchListForJexcel,
+                            readonly: editable?false:true
                         },
                         {
                             title: i18n.t('static.report.createdDate'),
@@ -2518,7 +2519,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <br></br>
                                     <br></br>
                                         <br></br>
-                                        {i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo}
+                                        <>{i18n.t("static.inventory.batchNumber") + " : "}<span className='hoverTd' onClick={() => this.showShipmentWithBatch(this.state.ledgerForBatch[0].batchNo, moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM-DD"))}>{this.state.ledgerForBatch[0].batchNo}</span></>
                                         <br></br>
                                         {i18n.t("static.batchLedger.note")}
                                         <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
@@ -4266,7 +4267,14 @@ export default class SupplyPlanComponent extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            var supplyPlanType = supplyPlanType;
+            if(supplyPlanType!='shipments'){
+                this.setState({
+                    batchInfoInInventoryPopUp: [],
+                    actualInventoryChanged:false,
+                    actualInventoryBatchTotalNotMatching:"",
+                    ledgerForBatch:[]
+                })
+            }
             this.setState({
                 consumptionError: '',
                 inventoryError: '',
@@ -4302,11 +4310,7 @@ export default class SupplyPlanComponent extends React.Component {
                 shipmentDatesError: '',
                 showShipments: 0,
                 showInventory: 0,
-                showConsumption: 0,
-                batchInfoInInventoryPopUp: [],
-                actualInventoryChanged:false,
-                actualInventoryBatchTotalNotMatching:"",
-                ledgerForBatch:[]
+                showConsumption: 0
             })
             if (supplyPlanType == 'Consumption') {
                 var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -4408,6 +4412,14 @@ export default class SupplyPlanComponent extends React.Component {
             for (var i = 0; i < inputs.length; i++) {
                 inputs[i].disabled = true;
             }
+            if(supplyPlanType!='shipments'){
+                this.setState({
+                    batchInfoInInventoryPopUp: [],
+                    actualInventoryChanged:false,
+                    actualInventoryBatchTotalNotMatching:"",
+                    ledgerForBatch:[]
+                })
+            }
             this.setState({
                 loading: false,
                 message: i18n.t('static.actionCancelled'),
@@ -4452,13 +4464,13 @@ export default class SupplyPlanComponent extends React.Component {
                 qtyCalculatorValidationError: "",
                 showShipments: 0,
                 showInventory: 0,
-                showConsumption: 0,
-                batchInfoInInventoryPopUp: [],
-                actualInventoryChanged:false,
-                actualInventoryBatchTotalNotMatching:"",
-                ledgerForBatch:[]
+                showConsumption: 0
             },
                 () => {
+                    var inputs = document.getElementsByClassName("submitBtn");
+                    for (var i = 0; i < inputs.length; i++) {
+                        inputs[i].disabled = false;
+                    }
                     this.hideFirstComponent();
                     this.toggleLarge(supplyPlanType);
                 })
