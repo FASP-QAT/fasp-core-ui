@@ -1486,7 +1486,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
-        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var asterisk = document.getElementById("shipmentsDetailsTable").children[2].firstChild.children[1].firstChild.firstChild.firstChild.firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[2].classList.add('InfoTr');
         tr.children[3].classList.add('InfoTr');
