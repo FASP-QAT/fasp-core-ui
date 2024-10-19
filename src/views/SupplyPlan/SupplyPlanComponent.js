@@ -1027,9 +1027,13 @@ export default class SupplyPlanComponent extends React.Component {
                 let batchInfoList = this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0);
                 let dataArray = [];
                 var total = 0;
+                var maxDecimals=0;
                 for (var j = 0; j < batchInfoList.length; j++) {
                     data = [];
                     var item = batchInfoList[j];
+                    if(parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length>maxDecimals){
+                        maxDecimals=parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length;
+                    }
                     console.log("Item Test@123", batchInfoList[j]);
                     data[0] = item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD");
                     data[1] = moment(item.createdDate).format(DATE_FORMAT_CAP);
@@ -1040,6 +1044,12 @@ export default class SupplyPlanComponent extends React.Component {
                     data[6] = 0;
                     total += Number(item.qty);
                     dataArray.push(data);
+                }
+                if(parseFloat(Number(total).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length>maxDecimals){
+                    maxDecimals=parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length;
+                }
+                if(parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length>maxDecimals){
+                    maxDecimals=parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length;
                 }
                 try {
                     this.el = jexcel(document.getElementById("inventoryActualBatchInfoTable"), '');
@@ -1083,7 +1093,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         {
                             title: i18n.t('static.supplyPlan.actualQuantity'),
-                            type: editable ? 'numeric' : 'hidden', mask: '#,##.00000000', decimal: '.'
+                            type: editable ? 'numeric' : 'hidden', mask: (maxDecimals!=0?`#,##.` + '0'.repeat(maxDecimals):`#,##`), decimal: '.'
                         },
                         {
                             title: 'Is new',
@@ -1100,18 +1110,24 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number((Number(total) * Number(this.state.multiplier))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
-                            editable ? Number(total).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(roundARU(total, this.state.multiplier)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?Number((Number(total) * Number(this.state.multiplier))).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):Number((Number(total) * Number(this.state.multiplier))).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(total).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(roundARU(total, this.state.multiplier)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ],
                         [
                             '',
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
-                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ]
                     ],
+                    oneditionend: function (instance, cell, x, y, value) {
+                        var rowData = instance.getRowData(y);
+                        if (x == 5) {
+                            instance.setValueFromCoords(5, y, Number(rowData[5]).toFixed(this.state.maxDecimals), true);
+                        }
+                    }.bind(this),
                     onchange: function (instance, cell, x, y, value) {
                         this.setState({
                             actualInventoryChanged: true
@@ -1145,15 +1161,15 @@ export default class SupplyPlanComponent extends React.Component {
                                 '',
                                 i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
                                 this.formatter(Number((Number(totalProjected) * Number(this.state.multiplier))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
-                                this.formatter(Number(totalActual).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                                this.formatter(Number(totalActual).toFixed(this.state.maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             ],
                             [
                                 '',
                                 '',
                                 '',
                                 i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?this.state.actualCount-2:this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?this.state.actualCount-2:this.state.actualCount].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].balanceWithoutRounding).toFixed(this.state.maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             ]])
                         }
                     }.bind(this),
@@ -1210,7 +1226,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var actualInventoryEl = jexcel(document.getElementById("inventoryActualBatchInfoTable"), options);
                 this.el = actualInventoryEl;
                 this.setState({
-                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData:comingFromInventoryData
+                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData:comingFromInventoryData, maxDecimals:maxDecimals
                 })
             })
         }
