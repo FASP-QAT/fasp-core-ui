@@ -1108,8 +1108,8 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
-                            editable ? Number(this.state.closingBalanceArray[count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                            Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ]
                     ],
                     onchange: function (instance, cell, x, y, value) {
