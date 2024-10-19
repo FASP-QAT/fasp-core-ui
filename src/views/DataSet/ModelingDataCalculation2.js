@@ -677,8 +677,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
                             payload.nodeDataMap = nodeDataMap;
                             flatListUnsorted[findIndex].payload = payload;
+                            flatListUnsorted[findIndex].payload.downwardAggregationList=[];
                             var findIndex1 = flatList.findIndex(c => c.id == flatList[fl].id);
                             flatList[findIndex1].payload = payload;
+                            flatList[findIndex1].payload.downwardAggregationList=[];
                         // }
                         treeList[tl].tree.flatList = flatListUnsorted;
                         var treeIndex = dataset.programData.treeList.findIndex(t => t.treeId == treeList[tl].treeId);
