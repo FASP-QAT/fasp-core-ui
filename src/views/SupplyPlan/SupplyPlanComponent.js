@@ -904,7 +904,7 @@ export default class SupplyPlanComponent extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.supplyPlan') + ".pdf")
     }
-    toggleInventoryActualBatchInfo(batchInfoList, isActual, count) {
+    toggleInventoryActualBatchInfo(batchInfoList, isActual, count, comingFromInventoryData) {
         var cont = false;
         if (this.state.actualInventoryChanged) {
             var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -1056,7 +1056,8 @@ export default class SupplyPlanComponent extends React.Component {
                             title: i18n.t("static.supplyPlan.batchId"),
                             type: 'dropdown',
                             width: 200,
-                            source: batchListForJexcel
+                            source: batchListForJexcel,
+                            readonly: editable?false:true
                         },
                         {
                             title: i18n.t('static.report.createdDate'),
@@ -1107,8 +1108,8 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
-                            editable ? Number(this.state.closingBalanceArray[count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                            Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ]
                     ],
                     onchange: function (instance, cell, x, y, value) {
@@ -1151,8 +1152,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 '',
                                 '',
                                 i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.actualCount].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?this.state.actualCount-2:this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?this.state.actualCount-2:this.state.actualCount].balanceWithoutRounding).toFixed(8).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             ]])
                         }
                     }.bind(this),
@@ -1209,7 +1210,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var actualInventoryEl = jexcel(document.getElementById("inventoryActualBatchInfoTable"), options);
                 this.el = actualInventoryEl;
                 this.setState({
-                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count
+                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData:comingFromInventoryData
                 })
             })
         }
@@ -2478,7 +2479,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count,0) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
@@ -2516,7 +2517,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <br></br>
                                         <br></br>
                                         <br></br>
-                                        {i18n.t("static.inventory.batchNumber") + " : " + this.state.ledgerForBatch[0].batchNo}
+                                        <>{i18n.t("static.inventory.batchNumber") + " : "}<span className='hoverTd' onClick={() => this.showShipmentWithBatch(this.state.ledgerForBatch[0].batchNo, moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM-DD"))}>{this.state.ledgerForBatch[0].batchNo}</span></>
                                         <br></br>
                                         {i18n.t("static.batchLedger.note")}
                                         <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
@@ -4239,7 +4240,7 @@ export default class SupplyPlanComponent extends React.Component {
     showInventoryForThatMonth() {
         localStorage.setItem('inventoryDateForBatch', '');
         this.toggleLarge('Adjustments', '', '', '', '', '', '', 0);
-        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList, this.state.closingBalanceArray[0].isActual, 0);
+        this.toggleInventoryActualBatchInfo(this.state.closingBalanceArray[0].batchInfoList, this.state.closingBalanceArray[0].isActual, 2, 1);
     }
     /**
      * This function is used to toggle the different modals for consumption, inventory, suggested shipments,shipments, Expired stock
@@ -4264,7 +4265,14 @@ export default class SupplyPlanComponent extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            var supplyPlanType = supplyPlanType;
+            if(supplyPlanType!='shipments'){
+                this.setState({
+                    batchInfoInInventoryPopUp: [],
+                    actualInventoryChanged:false,
+                    actualInventoryBatchTotalNotMatching:"",
+                    ledgerForBatch:[]
+                })
+            }
             this.setState({
                 consumptionError: '',
                 inventoryError: '',
@@ -4300,11 +4308,7 @@ export default class SupplyPlanComponent extends React.Component {
                 shipmentDatesError: '',
                 showShipments: 0,
                 showInventory: 0,
-                showConsumption: 0,
-                batchInfoInInventoryPopUp: [],
-                actualInventoryChanged: false,
-                actualInventoryBatchTotalNotMatching: "",
-                ledgerForBatch: []
+                showConsumption: 0
             })
             if (supplyPlanType == 'Consumption') {
                 var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -4406,6 +4410,14 @@ export default class SupplyPlanComponent extends React.Component {
             for (var i = 0; i < inputs.length; i++) {
                 inputs[i].disabled = true;
             }
+            if(supplyPlanType!='shipments'){
+                this.setState({
+                    batchInfoInInventoryPopUp: [],
+                    actualInventoryChanged:false,
+                    actualInventoryBatchTotalNotMatching:"",
+                    ledgerForBatch:[]
+                })
+            }
             this.setState({
                 loading: false,
                 message: i18n.t('static.actionCancelled'),
@@ -4450,13 +4462,13 @@ export default class SupplyPlanComponent extends React.Component {
                 qtyCalculatorValidationError: "",
                 showShipments: 0,
                 showInventory: 0,
-                showConsumption: 0,
-                batchInfoInInventoryPopUp: [],
-                actualInventoryChanged: false,
-                actualInventoryBatchTotalNotMatching: "",
-                ledgerForBatch: []
+                showConsumption: 0
             },
                 () => {
+                    var inputs = document.getElementsByClassName("submitBtn");
+                    for (var i = 0; i < inputs.length; i++) {
+                        inputs[i].disabled = false;
+                    }
                     this.hideFirstComponent();
                     this.toggleLarge(supplyPlanType);
                 })

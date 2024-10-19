@@ -39,13 +39,9 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
-            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal')),
         approvedToShippedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
 /**
@@ -349,7 +345,7 @@ class EditProcurementAgentComponent extends Component {
                     procurementAgent: response.data, loading: false
                 });
                 let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
-                let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode);
+                let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode!=""?this.state.procurementAgent.colorHtmlDarkCode:this.state.procurementAgent.colorHtmlCode);
                 this.setState({ rgba: color, rgbaDarkMode:colorDark })
                 var proramListArray = [];
                 let { procurementAgent } = this.state;
@@ -534,8 +530,8 @@ class EditProcurementAgentComponent extends Component {
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
                                         procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
-                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
+                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime!=null?this.state.procurementAgent.submittedToApprovedLeadTime:'',
+                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime!=null?this.state.procurementAgent.approvedToShippedLeadTime:'',
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
                                         colorHtmlDarkCode: this.state.procurementAgent.colorHtmlDarkCode,
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
@@ -730,7 +726,7 @@ class EditProcurementAgentComponent extends Component {
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="submittedToApprovedLeadTime"
@@ -739,14 +735,12 @@ class EditProcurementAgentComponent extends Component {
                                                         invalid={(touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime) || !!errors.submittedToApprovedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
-                                                        min="0"
                                                         value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                                     />
                                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="approvedToShippedLeadTime"
@@ -755,9 +749,7 @@ class EditProcurementAgentComponent extends Component {
                                                         invalid={(touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime) || !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.approvedToShippedLeadTime}
-                                                        min="0"
                                                     />
                                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </FormGroup>
@@ -838,7 +830,7 @@ class EditProcurementAgentComponent extends Component {
                 procurementAgent: response.data, loading: false
             });
             let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
-            let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode);
+            let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode!=""?this.state.procurementAgent.colorHtmlDarkCode:this.state.procurementAgent.colorHtmlCode);
             this.setState({ rgba: color, rgbaDarkMode:colorDark })
         }).catch(
             error => {

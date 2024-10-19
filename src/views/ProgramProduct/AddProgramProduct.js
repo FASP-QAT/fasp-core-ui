@@ -252,6 +252,7 @@ class AddprogramPlanningUnit extends Component {
                                             this.setState({ rows: myReasponse });
                                             var data = [];
                                             let dropdownList = this.state.dropdownList;
+                                            let indexVar = 1;
                                             if (myReasponse.length != 0) {
                                                 for (var j = 0; j < myReasponse.length; j++) {
                                                     data = [];
@@ -281,11 +282,13 @@ class AddprogramPlanningUnit extends Component {
                                                     data[19] = myReasponse[j].minMonthsOfStock;
                                                     data[20] = myReasponse[j].minQty;
                                                     data[21] = myReasponse[j].distributionLeadTime;
+                                                    data[22] = indexVar;//to identify if new row added
                                                     if((this.state.active==0 && myReasponse[j].active.toString()=="false") || (this.state.active==1 && myReasponse[j].active.toString()=="true") || (this.state.active==-1)){
                                                         productDataArr.push(data);
                                                     }else{
                                                         productDataArr2.push(data);
                                                     }
+                                                    indexVar = indexVar + 1;
                                                 }
                                             }
                                             if (productDataArr.length == 0) {
@@ -312,6 +315,7 @@ class AddprogramPlanningUnit extends Component {
                                                 data[19] = "";
                                                 data[20] = "";
                                                 data[21] = "";
+                                                data[22] = 0;
                                                 productDataArr[0] = data;
                                             }
                                             this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
@@ -368,6 +372,7 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'dropdown',
                                                         source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
                                                         tooltip: i18n.t("static.programPU.planByTooltip"),
+                                                        width:120,
                                                         required: true
                                                     },
                                                     {
@@ -529,6 +534,10 @@ class AddprogramPlanningUnit extends Component {
                                                     {
                                                         title: 'Distribution Lead Time',
                                                         type: 'hidden'
+                                                    },
+                                                    {
+                                                        title: 'New Row Added Index',
+                                                        type: 'hidden'
                                                     }
                                                 ],
                                                 updateTable: function (el, cell, x, y, source, value, id) {
@@ -676,6 +685,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     data[19] = "";
                                                                     data[20] = "";
                                                                     data[21] = "";
+                                                                    data[22] = 0;
                                                                     obj.insertRow(data, parseInt(y), 1);
                                                                     obj.getCell(("B").concat(parseInt(y) + 1)).classList.add('typing-' + this.state.lang);
                                                                 }.bind(this)
@@ -708,6 +718,7 @@ class AddprogramPlanningUnit extends Component {
                                                                     data[19] = "";
                                                                     data[20] = "";
                                                                     data[21] = "";
+                                                                    data[22] = 0;
                                                                     obj.insertRow(data, parseInt(y));
                                                                     obj.getCell(("B").concat(parseInt(y) + 2)).classList.add('typing-' + this.state.lang);
                                                                 }.bind(this)
@@ -922,6 +933,7 @@ class AddprogramPlanningUnit extends Component {
         data[19] = "";
         data[20] = "";
         data[21] = "";
+        data[22] = 0;
         this.el.insertRow(
             data, 0, 1
         );
@@ -986,7 +998,7 @@ class AddprogramPlanningUnit extends Component {
                 }
             }
             if (data[i].x == 1) {
-                var index = (instance).getValue(`Q${parseInt(data[i].y) + 1}`, true);
+                var index = (instance).getValue(`W${parseInt(data[i].y) + 1}`, true);
                 if (index == 0) {
                     let temp = data[i].value.split(" | ");
                     let temp_obj = {
@@ -994,11 +1006,19 @@ class AddprogramPlanningUnit extends Component {
                         name: data[i].value
                     };
                     let temp_list = this.state.dropdownList;
-                    temp_list[data[i].y] = temp_obj;
+                    let index = temp_list.findIndex(c => c.id == temp_obj.id);
+
+                    if(index == -1) {
+                        //if new planning unit push to list
+                        temp_list.push(temp_obj);
+                    } 
+
+                    // temp_list[data[i].y] = temp_obj;
                     this.setState(
                         {
                             dropdownList: temp_list
                         }, () => {
+                            // (instance).setValueFromCoords(1, data[i].y, '', true);//temp added
                             (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
                         }
                     )
@@ -1102,7 +1122,7 @@ class AddprogramPlanningUnit extends Component {
      * @param {number} y - The y-coordinate of the changed cell.
      * @param {any} value - The new value of the changed cell.
      */
-    changed = function (instance, cell, x, y, value) {
+    changed = function (instance, cell, x, y, value) {        
         var valid = true;
         var rowData = this.el.getRowData(y);
         changed(instance, cell, x, y, value)
@@ -1439,6 +1459,7 @@ class AddprogramPlanningUnit extends Component {
         tr.children[13].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[15].classList.add('InfoTr');
         tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[4].classList.add('InfoTrAsteriskTheadtrTdImagePlanby');
     }
     /**
      * Exports the data to a CSV file.

@@ -35,13 +35,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
         ,
         approvedToShippedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -82,6 +78,7 @@ class AddProcurementAgentComponent extends Component {
                 approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
                 colorHtmlCode: '#F17013',
+                colorHtmlDarkCode: '#F17013',
                 procurementAgentType: {
                     id: ''
                 },
@@ -646,6 +643,7 @@ class AddProcurementAgentComponent extends Component {
                                         submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
                                         approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
+                                        colorHtmlDarkCode: this.state.procurementAgent.colorHtmlDarkCode,
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
                                         programId: this.state.procurementAgent.programList.id
                                     }}
@@ -847,34 +845,30 @@ class AddProcurementAgentComponent extends Component {
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="submittedToApprovedLeadTime"
                                                         id="submittedToApprovedLeadTime"
-                                                        valid={!errors.submittedToApprovedLeadTime && this.state.procurementAgent.submittedToApprovedLeadTime != ''}
+                                                        valid={!errors.submittedToApprovedLeadTime}
                                                         invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.submittedToApprovedLeadTime}
-                                                        min="0"
                                                     />
                                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="approvedToShippedLeadTime"
                                                         id="approvedToShippedLeadTime"
-                                                        valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
+                                                        valid={!errors.approvedToShippedLeadTime}
                                                         invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.approvedToShippedLeadTime}
-                                                        min="1"
                                                     />
                                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </FormGroup>
@@ -923,6 +917,7 @@ class AddProcurementAgentComponent extends Component {
         procurementAgent.submittedToApprovedLeadTime = ''
         procurementAgent.approvedToShippedLeadTime = ''
         procurementAgent.colorHtmlCode = ''
+        procurementAgent.colorHtmlDarkCode = ''
         this.setState({
             procurementAgent
         },

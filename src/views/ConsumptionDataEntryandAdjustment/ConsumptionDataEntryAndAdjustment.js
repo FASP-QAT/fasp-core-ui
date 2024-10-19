@@ -79,7 +79,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     super(props);
     var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
     this.state = {
-      isDarkMode:false,
+      isDarkMode: false,
       datasetList: [],
       datasetId: "",
       showInPlanningUnit: false,
@@ -3154,28 +3154,28 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         )
       }, this);
 
-      const { isDarkMode } = this.state;
-// const colourArray = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+    const { isDarkMode } = this.state;
+    // const colourArray = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     var chartOptions = {
       title: {
         display: true,
         text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
-        fontColor:fontColor
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
             labelString: this.state.selectedConsumptionUnitId > 0 ? getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : "",
-            fontColor:fontColor
+            fontColor: fontColor
           },
           stacked: true,
           ticks: {
             beginAtZero: true,
-            fontColor:fontColor,
+            fontColor: fontColor,
             callback: function (value) {
               return value.toLocaleString();
             }
@@ -3183,18 +3183,18 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
           gridLines: {
             drawBorder: true, lineWidth: 0,
             color: gridLineColor,
-    zeroLineColor: gridLineColor 
+            zeroLineColor: gridLineColor
           },
           position: 'left',
         }],
         xAxes: [{
           ticks: {
-            fontColor:fontColor,
+            fontColor: fontColor,
           },
           gridLines: {
             drawBorder: true, lineWidth: 0,
             color: gridLineColor,
-    zeroLineColor: gridLineColor 
+            zeroLineColor: gridLineColor
           },
         }]
       },
@@ -3224,7 +3224,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor:fontColor
+          fontColor: fontColor
         }
       }
     }
@@ -3396,7 +3396,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                             </FormGroup>
                           </div>
                           <div className="row">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
                               <FormGroup className="col-md-3 ">
                                 <div className="tab-ml-1 ml-lg-3">
                                   <Input
