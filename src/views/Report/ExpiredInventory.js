@@ -1329,12 +1329,12 @@ export default class ExpiredInventory extends Component {
                                         ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                             <tr>
                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
-                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.openingBalance : item.openingBalanceWps} /></td>
-                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
-                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
-                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.shipmentQty : item.shipmentQtyWps} />}</td>
-                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? (0 - Number(item.unallocatedQty)) : (0 - Number(item.unallocatedQtyWps))} /></td>
-                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.qty : item.qtyWps} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? item.qty : item.qtyWps} /></td>}
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.openingBalance,1) : roundARU(item.openingBalanceWps,1)} /></td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.consumptionQty,1)} /></td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentQty)} /></td>
+                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.shipmentQty,1) : roundARU(item.shipmentQtyWps,1)} />}</td>
+                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU((0 - Number(item.unallocatedQty)),1) : roundARU((0 - Number(item.unallocatedQtyWps)),1)} /></td>
+                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.qty,1) : roundARU(item.qtyWps,1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.qty) : roundARU(item.qtyWps)} /></td>}
                                             </tr>
                                         ))
                                     }
@@ -1342,7 +1342,7 @@ export default class ExpiredInventory extends Component {
                                 {this.state.ledgerForBatch.length > 0 && <tfoot>
                                     <tr>
                                         <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
+                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty,1)} /></b></td>
                                     </tr>
                                 </tfoot>}
                             </Table>
