@@ -1195,7 +1195,10 @@ class ForecastMetrics extends Component {
                 </div>
               </Form>
             </div>
-            <div className="ReportSearchMarginTop">
+            <div className="" style={{position: "relative"}}>
+            <ul className="legendcommitversion" style={{position: "absolute", top: "19px", left: "-40px", display: this.state.consumptions.length > 0 ? "block" : "none"}}>
+              <li className='DarkThColr'><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>
+            </ul>
               <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
               </div>
             </div>
