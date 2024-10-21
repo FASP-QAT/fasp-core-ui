@@ -2614,7 +2614,7 @@ class StockStatus extends Component {
                           />
                         </div>
                       </FormGroup>
-                      <FormGroup className="col-md-3" id="equivelencyUnitDiv">
+                      <FormGroup className="col-md-2" id="equivelencyUnitDiv">
                         <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
                         <div className="controls ">
                           <InputGroup>
@@ -2636,9 +2636,9 @@ class StockStatus extends Component {
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="col-md-3" >
+                      <FormGroup className="col-md-4" >
                         <div className='row MarginTopfieldsupply'>
-                        <FormGroup check inline className='PaddingLeftSupplyReport'>
+                        <FormGroup check inline className='PaddingLeftSupplyReport' style={{marginTop:'-4px'}}>
                           <Input
                             type="radio"
                             id="viewById"
@@ -2656,7 +2656,7 @@ class StockStatus extends Component {
                             {i18n.t('static.report.planningUnit')}
                           </Label>
                         </FormGroup>
-                        <FormGroup check inline className='PaddingLeftSupplyReport'>
+                        <FormGroup check inline className='PaddingLeftSupplyReport' style={{marginTop:'-4px'}}>
                           <Input
                             type="radio"
                             id="viewById"
@@ -2675,7 +2675,7 @@ class StockStatus extends Component {
                           </Label>
                         </FormGroup>
                         </div>
-                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop": "4px" }}>
+                        <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop": "8px" }}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
@@ -2709,7 +2709,7 @@ class StockStatus extends Component {
                             </InputGroup>}
                           </div>
                         </FormGroup>
-                        <FormGroup id="planningUnitDiv" style={{ "marginTop": "4px" }}>
+                        <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
                           <div className="controls">
                             {this.state.yaxisEquUnit != -1 && <MultiSelect
                               bsSize="sm"
