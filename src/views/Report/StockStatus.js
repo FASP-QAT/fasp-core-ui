@@ -1218,7 +1218,6 @@ class StockStatus extends Component {
             var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
             this.state.programId.map((e, i) => {
               reportingUnitList.map((r, j) => {
-                programCount += 1;
                 var viewBy = this.state.viewById;
                 var planningUnitId = "";
                 if (viewBy == 1) {
@@ -1228,6 +1227,7 @@ class StockStatus extends Component {
                   planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
                 }
                 if (ppuList.filter(c => c.programId == e.value && c.planningUnitId == planningUnitId).length > 0) {
+                  programCount += 1;
                   if (count >= 10) {
                     count = 0;
                   }
@@ -1334,8 +1334,7 @@ class StockStatus extends Component {
             });
           }
           if (programCount > 10) {
-            programCount = programCount - 10;
-            height = 400 + (2 * programCount);
+            height = 400 + (21 * programCount);
           }
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
@@ -2487,7 +2486,6 @@ class StockStatus extends Component {
         var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
         this.state.programId.map((e, i) => {
           reportingUnitList.map((r, j) => {
-            programCount += 1;
             var viewBy = this.state.viewById;
             var planningUnitId = "";
             if (viewBy == 1) {
@@ -2498,6 +2496,7 @@ class StockStatus extends Component {
             }
             var ppuList = this.state.ppuList;
             if (ppuList.filter(c => c.programId == e.value && c.planningUnitId == planningUnitId).length > 0) {
+              programCount += 1;
               if (count >= 10) {
                 count = 0;
               }
@@ -2526,9 +2525,9 @@ class StockStatus extends Component {
         })
       }
     }
+    console.log("Program Count Test@123",programCount)
     if (programCount > 10) {
-      programCount = programCount - 10;
-      height = 400 + (2 * programCount);
+      height = 400 + (21 * programCount);
     }
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
       datasets.push({
