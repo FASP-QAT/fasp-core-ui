@@ -6679,11 +6679,11 @@ export default class BuildTree extends Component {
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         row = row.concat("NA ")
                         row1 = row1.concat(" Subtotal")
-                    } else {
+                    } else if(items[i].payload.nodeType.id != 6) {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
                     }
-                    if (items[i].payload.nodeType.id != 1 && items[i].payload.nodeType.id != 2) {
+                    if (items[i].payload.nodeType.id != 1 && items[i].payload.nodeType.id != 2 && items[i].payload.nodeType.id != 6) {
                         dataArray.push(new Paragraph({
                             children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
                             spacing: {
