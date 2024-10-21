@@ -2615,7 +2615,7 @@ class StockStatus extends Component {
                           />
                         </div>
                       </FormGroup>
-                      <FormGroup className="col-md-3" id="equivelencyUnitDiv">
+                      <FormGroup className="col-md-2" id="equivelencyUnitDiv">
                         <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
                         <div className="controls ">
                           <InputGroup>
@@ -2637,7 +2637,7 @@ class StockStatus extends Component {
                         </div>
                       </FormGroup>
 
-                      <FormGroup className="col-md-3" >
+                      <FormGroup className="col-md-4" >
                         <div className='row MarginTopfieldsupply'>
                         <FormGroup check inline className='PaddingLeftSupplyReport'>
                           <Input
