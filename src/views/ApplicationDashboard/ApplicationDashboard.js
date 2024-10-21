@@ -1446,7 +1446,7 @@ class ApplicationDashboard extends Component {
     const { isDarkMode } = this.state;
     // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
     const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-    const gridLineColor = isDarkMode ? '#444' : '#fff';
+    const gridLineColor = isDarkMode ? '#444' : '#ddd';
 
 
     const checkOnline = localStorage.getItem('sessionType');
@@ -1520,17 +1520,17 @@ class ApplicationDashboard extends Component {
         {
           label: 'Overstock',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#edb944', // Dark Blue
+          backgroundColor: '#49A4A1', // Dark Blue
         },
         {
           label: 'Adequate',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
-          backgroundColor: '#118b70', // Green
+          backgroundColor: '#118B70', // Green
         },
         {
           label: 'Below Min',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#f48521', // Yellow
+          backgroundColor: '#EDB944', // Yellow
         },
         {
           label: 'Stockout',
@@ -1540,7 +1540,7 @@ class ApplicationDashboard extends Component {
         {
           label: 'NA',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#cfcdc9', // Red
+          backgroundColor: '#F48521', // Red
         }
       ]
     };
@@ -1555,6 +1555,11 @@ class ApplicationDashboard extends Component {
           ticks: {
             beginAtZero: true,
             display: false // Hide the X-axis values
+          },
+           gridLines: {
+            lineWidth: 1,
+            color: gridLineColor,
+            zeroLineColor: gridLineColor
           }
         }],
         yAxes: [{
@@ -1564,6 +1569,11 @@ class ApplicationDashboard extends Component {
             beginAtZero: true,
             display: false // Hide the Y-axis values
           },
+           gridLines: {
+            lineWidth: 1,
+            color: gridLineColor,
+            zeroLineColor: gridLineColor
+          }
         }]
       },
       legend: {
@@ -1645,19 +1655,19 @@ class ApplicationDashboard extends Component {
     }
 
     const darkModeColors = [
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#d4bbff'
+      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
+      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
+      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
+      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
+      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521'
     ];
     
     const lightModeColors = [
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C',
-      '#49A4A1','#118b70','#25A7FF','#A7C6ED','#0067B9','#002F6C'
+      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
+      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
+      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
+      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
+      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C'
     ];
     
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
@@ -1737,7 +1747,7 @@ class ApplicationDashboard extends Component {
       },
       pieceLabel: {
         render: function(d) { return d.value },
-        fontColor: '#000',
+        fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
         segment: false,
@@ -1777,7 +1787,7 @@ class ApplicationDashboard extends Component {
       },
       pieceLabel: {
         render: function(d) { return d.value },
-        fontColor: '#000',
+        fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
         segment: false,
@@ -1817,7 +1827,7 @@ class ApplicationDashboard extends Component {
       },
       pieceLabel: {
         render: function(d) { return d.value },
-        fontColor: '#000',
+        fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
         segment: false,
@@ -1861,7 +1871,7 @@ class ApplicationDashboard extends Component {
       },
       pieceLabel: {
         render: function(d) { return d.value },
-        fontColor: '#000',
+        fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
         segment: false,
@@ -2334,7 +2344,7 @@ class ApplicationDashboard extends Component {
                           labelledBy={i18n.t('static.common.regiontext')}
                         />
                       </FormGroup>
-                      <FormGroup className='col-md-3' style={{ marginTop: '29px' }}>
+                      <FormGroup className='col-md-2' style={{ marginTop: '29px' }}>
                         <div className="tab-ml-1 ml-lg-3">
                           <Input
                             className="form-check-input"
@@ -2351,7 +2361,7 @@ class ApplicationDashboard extends Component {
                           </Label>
                         </div>
                       </FormGroup>
-                      <FormGroup style={{ marginTop: '29px' }}>
+                      <FormGroup className='MarginLeftGobtn' style={{ marginTop: '24px'}}>
                         <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                       </FormGroup>
                     </div>
@@ -2464,7 +2474,7 @@ class ApplicationDashboard extends Component {
             </div>
           </div> */}
           <div className='row pl-lg-2 pr-lg-2'>
-            <div class="col-xl-12 mb-lg-3" style={{ background: '#fff', borderRadius: '0.25rem' }}>
+            <div class="col-xl-12 mb-lg-3 DashboardBg">
               <div className='row pt-lg-2'>
                 <div className='col-md-12'>
                   <div className='row'>
@@ -2529,7 +2539,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stock Status </div>
                         </div>
-                        <div class="card-body pt-lg-0">
+                        <div class="card-body pt-lg-1">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150}/>
                         </div>
                         <div class="card-header  justify-content-between">
@@ -2551,18 +2561,18 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>                    
                     {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
-                      <div className="card custom-card CustomHeight">
+                      <div className="card custom-card CustomHeight pb-lg-2">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
-                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden'}}>
+                        <div class="card-body px-1 py-2" style={{ overflow: 'hidden'}}>
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className='col-md-6'>
-                      <div className="card custom-card CustomHeight">
+                      <div className="card custom-card CustomHeight pb-lg-2">
                         <div class="card-header  justify-content-between">
                           <div class="card-title">Shipments </div>
                           <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the shipment <b>{shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
@@ -2595,7 +2605,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div className='col-md-6'>
-                              <div class="card-title"># of Shipments with funding TBD </div>
+                              <div class="card-title text-blackD"># of Shipments with funding TBD </div>
                               <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
                             </div>
                           </div>
@@ -2616,44 +2626,44 @@ class ApplicationDashboard extends Component {
                   </div>
                   <div className='row'>
                     <div className='col-md-6'>
-                      <div class="card custom-card CustomHeight1">
+                      <div class="card custom-card CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Data Quality (doesn't use date selector) </div>
                         </div>
                         <div class="card-body py-2">
-                          <div className='row pt-lg-4'>
-                            <div class="col-md-6 container1">
+                          <div className='row pt-lg-2'>
+                            <div class="col-6 container1">
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
-                                <div class="arc" data-value="24"></div>
+                                <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={150} />
-                                <center><span>{forecastConsumptionQplPuCount-forecastConsumptionQplCorrectCount} missing forecasts</span></center>
+                                <center><span className='text-blackD'>{forecastConsumptionQplPuCount-forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
-                            <div class="col-md-6 container1">
+                            <div class="col-6 container1">
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
-                                <div class="arc" data-value="24"></div>
+                                <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={150} />
-                                <center><span>{inventoryQplPuCount-inventoryQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD'>{inventoryQplPuCount-inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                           </div>
-                          <div className='row pt-lg-5'>
-                            <div class="col-md-6 container1">
+                          <div className='row pt-lg-2'>
+                            <div class="col-6 container1">
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
-                                <div class="arc" data-value="24"></div>
+                                <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={150} />
-                                <center><span>{actualConsumptionQplPuCount-actualConsumptionQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD'>{actualConsumptionQplPuCount-actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
-                            <div class="col-md-6 container1">
+                            <div class="col-6 container1">
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
-                                <div class="arc" data-value="24"></div>
+                                <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={150} />
-                                <center><span>{shipmentQplPuCount-shipmentQplCorrectCount} flagged dates</span></center>
+                                <center><span className='text-blackD'>{shipmentQplPuCount-shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
@@ -2663,12 +2673,12 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div className='row'>
                         <div class="col-md-12">
-                          <div class="card custom-card CustomHeight1">
+                          <div class="card custom-card CustomHeight pb-lg-2">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
                               <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>  
                             </div>
-                            <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
+                            <div class="card-body px-1 py-2" style={{ overflow: 'hidden' }}>
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
                               </div>
                             </div>
