@@ -2049,43 +2049,52 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     </option>
                 )
             }, this);
+            const darkModeColors1 = [
+                '#A7C6ED',
+                '#BA0C2F',
+            ];
+    
+            const lightModeColors1 = [
+                '#002F6C',  // Color 1 
+                '#BA0C2F',
+            ];
+            const backgroundColor1 = isDarkMode ? darkModeColors1 : lightModeColors1;
         const chartData = {
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.orderedShipmentQty)),
-                backgroundColor: '#0067B9',
+                backgroundColor: backgroundColor1[0],
                 borderWidth: 0
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
                 data: this.state.planningUnitSplit.map(ele => (ele.plannedShipmentQty)),
-                backgroundColor: '#A7C6ED',
+                backgroundColor: backgroundColor1[1],
                 borderWidth: 0,
             }
             ]
         };
         
         const darkModeColors = [
-            '#d4bbff', '#BA0C2F', '#A7C6ED', '#0067B9', '#A7C6ED',
-            '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#d4bbff', '#BA0C2F', '#A7C6ED', '#0067B9', '#A7C6ED',
-            '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#d4bbff', '#BA0C2F', '#A7C6ED', '#0067B9', '#A7C6ED',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
         
         const lightModeColors = [
-            '#002F6C', '#BA0C2F', '#6C6463', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#6C6463', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#6C6463', '#0067B9', '#A7C6ED',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
-        
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
         
         const chartDataForPie = {
