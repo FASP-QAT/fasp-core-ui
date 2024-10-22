@@ -108,8 +108,8 @@ class ApplicationDashboard extends Component {
       topTechnicalAreaId: [],
       bottomProgramId: localStorage.getItem('bottomProgramId'),
       displayBy: 1,
-      onlyDownloadedTopProgram: localStorage.getItem("topLocalProgram") == "false" ? false : true,
-      onlyDownloadedBottomProgram: localStorage.getItem("bottomLocalProgram") == "false" ? false : true,
+      onlyDownloadedTopProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true,
+      onlyDownloadedBottomProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true,
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -779,6 +779,7 @@ class ApplicationDashboard extends Component {
     } else {
       if (localStorage.getItem('sessionType') === 'Online') {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
+          console.log("hello", response.data)
           localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
           this.setState({
             dashboardTopList: response.data,
@@ -1242,8 +1243,8 @@ class ApplicationDashboard extends Component {
     }
   }
   /**
-     * Toggles info for confidence level
-     */
+   * Toggles info for confidence level
+   */
   togglepopoverOpenMa() {
     this.setState({
       popoverOpenMa: !this.state.popoverOpenMa,
@@ -1379,8 +1380,8 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < expiriesList.length; j++) {
         data = [];
         data[0] = expiriesList[j].planningUnit.label.label_en
-        data[1] = addCommas(roundARU(expiriesList[j].expiringQty, 1))
-        data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
+        data[1] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
+        data[2] = addCommas(roundARU(expiriesList[j].expiringQty, 1))
         data[3] = addCommas(roundARU(expiriesList[j].expiryAmt, 1))
         dataArray[count] = data;
         count++;
@@ -1402,13 +1403,13 @@ class ApplicationDashboard extends Component {
           readOnly: true
         },
         {
-          title: "Expired/Expiring Quanitity",
+          title: "Expiry Date",
           type: 'text',
           editable: false,
           readOnly: true
         },
         {
-          title: "Expiry Date",
+          title: "Expired/Expiring Quantity",
           type: 'text',
           editable: false,
           readOnly: true
@@ -2347,7 +2348,7 @@ class ApplicationDashboard extends Component {
                     <div class="row">
                       <div class="col-3">
                         <FormGroup className='FormGroupD'>
-                          <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
+                          <Label htmlFor="topProgramId">Program</Label>
                           <MultiSelect
                             name="topProgramId"
                             id="topProgramId"
@@ -2357,9 +2358,9 @@ class ApplicationDashboard extends Component {
                             options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
                             labelledBy={i18n.t('static.common.regiontext')}
                           />
-                           </FormGroup>
-                           </div>   
-                           <div style={{ gap: '20px',display:'flex' }}>
+                        </FormGroup>
+                      </div>
+                      <div style={{ gap: '20px', display: 'flex' }}>
                         <FormGroup style={{ marginTop: '29px' }}>
                           <div className="pl-lg-4">
                             <Input
@@ -2367,39 +2368,40 @@ class ApplicationDashboard extends Component {
                               type="checkbox"
                               id="onlyDownloadedTopProgram"
                               name="onlyDownloadedTopProgram"
+                              disabled={!(localStorage.getItem('sessionType') === 'Online')}
                               checked={this.state.onlyDownloadedTopProgram}
                               onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
                             />
                             <Label
                               className="form-check-label"
                               check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                              Only show local program
+                              Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                             </Label>
                           </div>
                         </FormGroup>
 
                         <FormGroup className='' style={{ marginTop: '24px' }}>
-                          <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
+                          <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
-                      
+
                       </div>
-                      <div class="col-6 pl-lg-3" style={{display:'flex'}}>
+                      <div class="col-6 pl-lg-3" style={{ display: 'flex' }}>
                         <div class="col">
                           <label>header1</label>
                           <div><span>Text</span></div>
-                          </div>
-                          <div class="col">
+                        </div>
+                        <div class="col">
                           <label>header2</label>
                           <div><span>Text</span></div>
-                          </div>
-                          <div class="col">
+                        </div>
+                        <div class="col">
                           <label>header3</label>
                           <div><span>Text</span></div>
-                          </div>
-                          <div class="col">
+                        </div>
+                        <div class="col">
                           <label>header4</label>
                           <div><span>Text</span></div>
-                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -2408,14 +2410,14 @@ class ApplicationDashboard extends Component {
                     {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
-                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action</th>}
-                          <th scope="col">Program</th>
-                          <th scope="col"># of active planning units</th>
-                          <th scope="col"># of products with stockouts</th>
-                          <th scope="col">Expiries*</th>
-                          <th scope='col'># of open QAT Problems​</th>
-                          <th scope='col'>Last updated date</th>
-                          <th scope='col'>Review​(looks at last final vers)</th>
+                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
+                          <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col"># of Active Planning Units <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.activePUTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col"># of Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col">Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'># of Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'>Last Updated Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.lastUpdatedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'>Review​(looks at last final version) <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
                         <tbody>
                           {this.state.dashboardTopList.map(d => {
@@ -2442,11 +2444,11 @@ class ApplicationDashboard extends Component {
                                   </div>
 
                                 </td>
-                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfStockOutPU}</td>
-                                <td style={{color: d.valueOfExpiredPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                <td style={{color: d.countOfOpenProblem > 0 ? "red": ""}}>{d.countOfOpenProblem}</td>
+                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.countOfStockOutPU}</td>
+                                <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
-                                <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} {d.latestFinalVersion ? "("+moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY')+")" : "No Historical Final Uploads"}</td>
+                                <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} {d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "No Historical Final Uploads"}</td>
                               </tr>)
                           })}
                         </tbody>
@@ -2534,7 +2536,24 @@ class ApplicationDashboard extends Component {
                         {bottomProgramList}
                       </Input>
                     </FormGroup>
-
+                    <FormGroup className='col-md-4' style={{ marginTop: '27px' }}>
+                      <div className="tab-ml-1 ml-lg-4">
+                        <Input
+                          className="form-check-input"
+                          type="checkbox"
+                          id="onlyDownloadedBottomProgram"
+                          name="onlyDownloadedBottomProgram"
+                          checked={this.state.onlyDownloadedBottomProgram}
+                          disabled={!(localStorage.getItem('sessionType') === 'Online')}
+                          onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                        />
+                        <Label
+                          className="form-check-label"
+                          check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                          Show only downloaded programs
+                        </Label>
+                      </div>
+                    </FormGroup>
                     {/* </div> */}
                     <FormGroup className='col-md-4 pl-lg-0 FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
@@ -2549,23 +2568,6 @@ class ApplicationDashboard extends Component {
                         >
                           <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
                         </Picker>
-                      </div>
-                    </FormGroup>
-                    <FormGroup className='col-md-4' style={{ marginTop: '27px' }}>
-                      <div className="tab-ml-1 ml-lg-4">
-                        <Input
-                          className="form-check-input"
-                          type="checkbox"
-                          id="onlyDownloadedBottomProgram"
-                          name="onlyDownloadedBottomProgram"
-                          checked={this.state.onlyDownloadedBottomProgram}
-                          onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
-                        />
-                        <Label
-                          className="form-check-label"
-                          check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                          Only show local program
-                        </Label>
                       </div>
                     </FormGroup>
                   </div>

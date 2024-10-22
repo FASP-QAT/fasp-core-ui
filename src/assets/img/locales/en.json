@@ -3470,5 +3470,14 @@
   "static.shipment.shipmentCostOverviewNotes": "No shipments found. Ensure that you have shipments within this time period. If “Report Based On Submitted Date” is selected, please ensure you have manually entered actual submitted dates by right clicking on shipment records and selecting “Show Shipment Dates”.",
   "static.supplyPlan.positiveAdjustmentFEFO":"Longest shelf life (+ adj)",
   "static.supplyPlan.negativeAdjustmentFEFO":"Shortest shelf life (- adj)",
-  "static.ticket.manageTickets" :"Manage my tickets"
+  "static.ticket.manageTickets":"Manage my tickets",
+  "static.dashboard.localTooltip":"If checked, only downloaded versions will appear in the dropdown. If unchecked, only server versions will appear in the dropdown.",
+  "static.dashboard.actionTooltip":"",
+  "static.dashboard.programTooltip":"",
+  "static.dashboard.activePUTooltip":"",
+  "static.dashboard.stockoutTooltip":"",
+  "static.dashboard.expiryTooltip":"",
+  "static.dashboard.qatProblemTooltip":"",
+  "static.dashboard.lastUpdatedDateTooltip":"",
+  "static.dashboard.reviewStatusTooltip":""
 }
