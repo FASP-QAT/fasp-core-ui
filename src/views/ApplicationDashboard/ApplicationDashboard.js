@@ -2415,10 +2415,10 @@ class ApplicationDashboard extends Component {
 
                                 </td>
                                 <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfStockOutPU}</td>
-                                <td style={{color: d.valueOfExpiredPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td style={{color: d.valueOfExpiredPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                                 <td style={{color: d.countOfOpenProblem > 0 ? "red": ""}}>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
-                                <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} ({d.latestFinalVersion ? moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') : ""})</td>
+                                <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} {d.latestFinalVersion ? "("+moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY')+")" : "No Historical Final Uploads"}</td>
                               </tr>)
                           })}
                         </tbody>
