@@ -361,9 +361,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             seasonality: event.target.checked ? 1 : 0,
             arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
-            arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "OnIline" ? false : true,
+            arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
         }, () => {
-            this.handleRangeDissmiss2(this.state.rangeValue1)
+            this.getDateDifference();
+            // this.handleRangeDissmiss2(this.state.rangeValue1)
         });
     }
     /**
@@ -5025,7 +5026,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </div>
                                                     </div>
                                                 </>}
-                                                {(this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                                {
+                                                    // (this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                                    (localStorage.getItem("sessionType") === "Offline") && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                                 <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                                     {this.state.showData &&
                                                         <>
