@@ -113,6 +113,7 @@ class ApplicationDashboard extends Component {
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+      topSubmitLoader: false
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -761,6 +762,9 @@ class ApplicationDashboard extends Component {
   }
 
   onTopSubmit() {
+    this.setState({
+      topSubmitLoader: true
+    })
     localStorage.setItem("topLocalProgram", this.state.onlyDownloadedTopProgram);
     localStorage.setItem("topProgramId", JSON.stringify(this.state.topProgramId))
     if(this.state.topProgramId.length == 0){
@@ -769,12 +773,20 @@ class ApplicationDashboard extends Component {
       })
     } else if (this.state.onlyDownloadedTopProgram) {
       Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
+      this.setState({
+        topSubmitLoader: false
+      })
     } else {
       if (localStorage.getItem('sessionType') === 'Online') {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
           localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
           this.setState({
-            dashboardTopList: response.data
+            dashboardTopList: response.data,
+            topSubmitLoader: false
+          })
+        }).catch(e => {
+          this.setState({
+            topSubmitLoader: false
           })
         })
       }
@@ -2361,7 +2373,7 @@ class ApplicationDashboard extends Component {
                           </Label>
                         </div>
                       </FormGroup>
-                      <FormGroup className='MarginLeftGobtn' style={{ marginTop: '24px'}}>
+                      <FormGroup className='col-md-2 MarginLeftGobtn' style={{ marginTop: '24px', display: this.state.topSubmitLoader ? "none" : "block"}} >
                         <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                       </FormGroup>
                     </div>
@@ -2403,8 +2415,8 @@ class ApplicationDashboard extends Component {
 
                                 </td>
                                 <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfStockOutPU}</td>
-                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfOpenProblem}</td>
+                                <td style={{color: d.valueOfExpiredPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td style={{color: d.countOfOpenProblem > 0 ? "red": ""}}>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
                                 <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} ({d.latestFinalVersion ? moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') : ""})</td>
                               </tr>)

@@ -14,6 +14,7 @@ import {
 } from '../../Constants.js';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
 import UserService from '../../api/UserService';
+import DashboardService from '../../api/DashboardService.js';
 import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
 import imgforcastmoduletabblue from '../../assets/img/forcastmoduleiconBlue.png';
 import i18n from '../../i18n';
@@ -620,6 +621,15 @@ class DefaultLayout extends Component {
         activeTab: defaultModuleId,
       },
         () => {
+          if (localStorage.getItem('sessionType') === 'Online') {
+            DashboardService.openIssues()
+              .then(response => {
+                this.setState({
+                  openIssues: response.data.openIssues,
+                  addressedIssues: response.data.addressedIssues
+                })
+              })
+          }
           if (this.state.activeTab == 2) {
           } else {
           }
@@ -955,7 +965,7 @@ class DefaultLayout extends Component {
           />
           <AppHeader fixed >
             <Suspense fallback={this.loading()}>
-              <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+              <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} openIssues={this.state.openIssues}/>
             </Suspense>
           </AppHeader>
           <div className="app-body">

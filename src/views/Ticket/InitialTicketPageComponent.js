@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Dropdown, ListGroup, ListGroupItem, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../Constants.js';
 import imageHelp from '../../assets/img/help-icon.png';
 import BranchTemplateTicketComponent from './BranchTemplateTicketComponent';
 import BudgetTicketComponent from './BudgetTicketComponent';
@@ -959,7 +960,17 @@ export default class InitialTicketPageComponent extends Component {
                     <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
           <ModalBody className="pb-0">
             {this.state.initialPage == 1 && <div className="col-md-12">
-              <div className='DarkThColr'><h4><b>{i18n.t('static.ticket.header')}</b></h4>{i18n.t('static.ticket.subheader')}</div><br></br>
+              <div className='DarkThColr'>
+                <div className="row">
+                  <div className='col-md-6'>
+                    <h4><b>{i18n.t('static.ticket.header')}</b></h4>
+                  </div>
+                  <div className='col-md-6 d-flex justify-content-end'>
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')}>{i18n.t('static.ticket.manageTickets')}</a>
+                  </div>
+                </div>
+                {i18n.t('static.ticket.subheader')}
+              </div><br></br>
               <div className="mt-2 mb-2">
                 <ListGroup>
                   <ListGroupItem className="list-group-item-help HelpdeskQATbg" tag="a" onClick={this.toggleUserMaster} action><i className="icon-note icons helpclickicon mr-2"></i> {i18n.t('static.ticket.addUpdateUser')}</ListGroupItem>
