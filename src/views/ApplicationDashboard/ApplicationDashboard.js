@@ -2579,7 +2579,7 @@ class ApplicationDashboard extends Component {
                         </div>
                         <div class="card-body pt-lg-1">
                           <div className='row'>
-                            <div className='col-md-6'>
+                            <div className='col-6'>
                               <div className='row'>
                                 <FormGroup className='col-md-11 pl-lg-2 FormGroupD'>
                                   <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
@@ -2604,7 +2604,7 @@ class ApplicationDashboard extends Component {
                                 </div>
                               </div>
                             </div>
-                            <div className='col-md-6'>
+                            <div className='col-6'>
                               <div class="card-title text-blackD"># of Shipments with funding TBD </div>
                               <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
                             </div>
