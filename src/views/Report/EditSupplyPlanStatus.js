@@ -4814,7 +4814,7 @@ class EditSupplyPlanStatus extends Component {
                                                                         name="programId"
                                                                         id="programId"
                                                                         bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
+                                                                        value={this.state.program.label.label_en +'~v'+ this.state.program.currentVersion.versionId}
                                                                         disabled />
                                                                 </InputGroup>
                                                             </div>
