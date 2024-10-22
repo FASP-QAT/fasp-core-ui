@@ -370,7 +370,7 @@ class ApplicationDashboard extends Component {
     if (localStorage.getItem("sessionType") === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DROPDOWN_SP') && this.state.topCountryId.length > 0) {
       DropdownService.getHealthAreaListByRealmCountryIds(this.state.topCountryId.map(x => x.value))
         .then(response => {
-          console.log("hello",response.data)
+          console.log("hello", response.data)
           var proList = []
           for (var i = 0; i < response.data.length; i++) {
             // var programJson = {
@@ -593,61 +593,61 @@ class ApplicationDashboard extends Component {
     let realmId = AuthenticationService.getRealmId();
     if (localStorage.getItem('sessionType') === 'Online') {
       DropdownService.getRealmCountryDropdownList(realmId)
-          .then(response => {
-              if (response.status == 200) {
-                  var listArray = response.data;
-                  listArray.sort((a, b) => {
-                      var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                      var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                      return itemLabelA > itemLabelB ? 1 : -1;
+        .then(response => {
+          if (response.status == 200) {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              countryList: listArray
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            })
+          }
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
                   });
+                  break;
+                case 412:
                   this.setState({
-                      countryList: listArray
-                  })
-              } else {
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
                   this.setState({
-                      message: response.data.messageCode
-                  })
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
               }
-          }).catch(
-              error => {
-                  if (error.message === "Network Error") {
-                      this.setState({
-                          message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                          loading: false
-                      });
-                  } else {
-                      switch (error.response ? error.response.status : "") {
-                          case 401:
-                              this.props.history.push(`/login/static.message.sessionExpired`)
-                              break;
-                          case 403:
-                              this.props.history.push(`/accessDenied`)
-                              break;
-                          case 500:
-                          case 404:
-                          case 406:
-                              this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false
-                              });
-                              break;
-                          case 412:
-                              this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false
-                              });
-                              break;
-                          default:
-                              this.setState({
-                                  message: 'static.unkownError',
-                                  loading: false
-                              });
-                              break;
-                      }
-                  }
-              }
-          );
+            }
+          }
+        );
     }
   }
   /**
@@ -656,72 +656,72 @@ class ApplicationDashboard extends Component {
   getHealthAreaList() {
     if (localStorage.getItem('sessionType') === 'Online') {
       ProgramService.getHealthAreaListByRealmCountryId(this.state.program.realmCountry.realmCountryId)
-          .then(response => {
-              if (response.status == 200) {
-                  var json = (response.data).filter(c => c.active == true);
-                  var regList = [];
-                  for (var i = 0; i < json.length; i++) {
-                      regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
-                  }
-                  var listArray = regList;
-                  listArray.sort((a, b) => {
-                      var itemLabelA = a.label.toUpperCase();
-                      var itemLabelB = b.label.toUpperCase();
-                      return itemLabelA > itemLabelB ? 1 : -1;
+        .then(response => {
+          if (response.status == 200) {
+            var json = (response.data).filter(c => c.active == true);
+            var regList = [];
+            for (var i = 0; i < json.length; i++) {
+              regList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
+            }
+            var listArray = regList;
+            listArray.sort((a, b) => {
+              var itemLabelA = a.label.toUpperCase();
+              var itemLabelB = b.label.toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            let { program } = this.state;
+            program.healthAreaArray = [];
+            this.setState({
+              healthAreaList: listArray,
+              healthAreaId: '',
+              program
+            }, (
+            ) => {
+            })
+          } else {
+            this.setState({
+              message: response.data.messageCode
+            })
+          }
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: error.response.data.messageCode,
+                    loading: false
                   });
-                  let { program } = this.state;
-                  program.healthAreaArray = [];
+                  break;
+                case 412:
                   this.setState({
-                      healthAreaList: listArray,
-                      healthAreaId: '',
-                      program
-                  }, (
-                  ) => {
-                  })
-              } else {
+                    message: error.response.data.messageCode,
+                    loading: false
+                  });
+                  break;
+                default:
                   this.setState({
-                      message: response.data.messageCode
-                  })
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
               }
-          }).catch(
-              error => {
-                  if (error.message === "Network Error") {
-                      this.setState({
-                          message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                          loading: false
-                      });
-                  } else {
-                      switch (error.response ? error.response.status : "") {
-                          case 401:
-                              this.props.history.push(`/login/static.message.sessionExpired`)
-                              break;
-                          case 403:
-                              this.props.history.push(`/accessDenied`)
-                              break;
-                          case 500:
-                          case 404:
-                          case 406:
-                              this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false
-                              });
-                              break;
-                          case 412:
-                              this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false
-                              });
-                              break;
-                          default:
-                              this.setState({
-                                  message: 'static.unkownError',
-                                  loading: false
-                              });
-                              break;
-                      }
-                  }
-              }
-          );
+            }
+          }
+        );
     }
   }
   /**
@@ -763,7 +763,7 @@ class ApplicationDashboard extends Component {
   onTopSubmit() {
     localStorage.setItem("topLocalProgram", this.state.onlyDownloadedTopProgram);
     localStorage.setItem("topProgramId", JSON.stringify(this.state.topProgramId))
-    if(this.state.topProgramId.length == 0){
+    if (this.state.topProgramId.length == 0) {
       this.setState({
         dashboardTopList: []
       })
@@ -966,7 +966,7 @@ class ApplicationDashboard extends Component {
         }
         if (this.state.onlyDownloadedTopProgram) {
           Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-        } else if(localStorage.getItem("dashboardTopList") && !this.state.onlyDownloadedTopProgram) {
+        } else if (localStorage.getItem("dashboardTopList") && !this.state.onlyDownloadedTopProgram) {
           this.setState({
             dashboardTopList: JSON.parse(localStorage.getItem("dashboardTopList"))
           })
@@ -1009,48 +1009,48 @@ class ApplicationDashboard extends Component {
           const ctx = chart.chart.ctx;
           const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseFloat(value), 0);
           chart.data.datasets.forEach((dataset, datasetIndex) => {
-              const meta = chart.getDatasetMeta(datasetIndex);
-              if (!meta.hidden) {
-                  meta.data.forEach((element, index) => {
-                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {                         
-                          const value = parseFloat(dataset.data[index]);
-                          const percentage = ((value / total) * 100).toFixed(2) + '%';
-                          ctx.fillStyle = 'white'; // Set text color
-                          ctx.font = 'bold 12px Arial'; // Set font
-                          ctx.textAlign = 'center'; // Horizontally align text to center
-                          ctx.textBaseline = 'middle';
-                          var meta1 = chart.getDatasetMeta(0).data[index]; 
-                          var centerPoint = meta1.tooltipPosition();
-                          // Draw the text at the center of each segment
-                          ctx.fillText(percentage, centerPoint.x, centerPoint.y);
-                      }
-                  });
-              }
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta.hidden) {
+              meta.data.forEach((element, index) => {
+                if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                  const value = parseFloat(dataset.data[index]);
+                  const percentage = ((value / total) * 100).toFixed(2) + '%';
+                  ctx.fillStyle = 'white'; // Set text color
+                  ctx.font = 'bold 12px Arial'; // Set font
+                  ctx.textAlign = 'center'; // Horizontally align text to center
+                  ctx.textBaseline = 'middle';
+                  var meta1 = chart.getDatasetMeta(0).data[index];
+                  var centerPoint = meta1.tooltipPosition();
+                  // Draw the text at the center of each segment
+                  ctx.fillText(percentage, centerPoint.x, centerPoint.y);
+                }
+              });
+            }
           });
-      }
-      // if(chart.config.type === 'pie') {
-      //     const ctx = chart.ctx;
-      //     const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
-      //     chart.data.datasets.forEach(function (dataset, i) {
-      //       const meta = chart.getDatasetMeta(i);
+        }
+        // if(chart.config.type === 'pie') {
+        //     const ctx = chart.ctx;
+        //     const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+        //     chart.data.datasets.forEach(function (dataset, i) {
+        //       const meta = chart.getDatasetMeta(i);
 
-      //       meta.data.forEach(function (element, index) {
-      //         // Get the percentage value
-      //         const dataValue = dataset.data[i];
-      //         const percentageText = ((dataValue / total) * 100).toFixed(2) + '%';
+        //       meta.data.forEach(function (element, index) {
+        //         // Get the percentage value
+        //         const dataValue = dataset.data[i];
+        //         const percentageText = ((dataValue / total) * 100).toFixed(2) + '%';
 
-      //         // Set text style
-      //         ctx.fillStyle = 'white'; // Set text color
-      //         ctx.font = 'bold 12px Arial'; // Set font
-      //         ctx.textAlign = 'center'; // Horizontally align text to center
-      //         ctx.textBaseline = 'middle'; // Vertically align text to middle
-      //         var meta1 = chart.getDatasetMeta(0).data[index]; 
-      //         var centerPoint = meta1.tooltipPosition();
-      //         // Draw the text at the center of each segment
-      //         ctx.fillText(percentageText, centerPoint.x, centerPoint.y);
-      //       });
-      //     });
-      //   }
+        //         // Set text style
+        //         ctx.fillStyle = 'white'; // Set text color
+        //         ctx.font = 'bold 12px Arial'; // Set font
+        //         ctx.textAlign = 'center'; // Horizontally align text to center
+        //         ctx.textBaseline = 'middle'; // Vertically align text to middle
+        //         var meta1 = chart.getDatasetMeta(0).data[index]; 
+        //         var centerPoint = meta1.tooltipPosition();
+        //         // Draw the text at the center of each segment
+        //         ctx.fillText(percentageText, centerPoint.x, centerPoint.y);
+        //       });
+        //     });
+        //   }
       }
     });
     if (localStorage.getItem('sessionType') === 'Online') {
@@ -1102,7 +1102,7 @@ class ApplicationDashboard extends Component {
       }
     }
     this.getPrograms();
-    if(this.state.topCountryId.length > 0) {
+    if (this.state.topCountryId.length > 0) {
       this.getHealthAreaListByRealmCountryIds();
     }
     this.getDataSetList();
@@ -1556,7 +1556,7 @@ class ApplicationDashboard extends Component {
             beginAtZero: true,
             display: false // Hide the X-axis values
           },
-           gridLines: {
+          gridLines: {
             lineWidth: 1,
             color: gridLineColor,
             zeroLineColor: gridLineColor
@@ -1569,7 +1569,7 @@ class ApplicationDashboard extends Component {
             beginAtZero: true,
             display: false // Hide the Y-axis values
           },
-           gridLines: {
+          gridLines: {
             lineWidth: 1,
             color: gridLineColor,
             zeroLineColor: gridLineColor
@@ -1655,21 +1655,21 @@ class ApplicationDashboard extends Component {
     }
 
     const darkModeColors = [
-      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
-      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
-      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
-      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521',
-      '#A7C6ED','#118b70','#BA0C2F','#EDB944','#49A4A1','#F48521'
+      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
+      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
+      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
+      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
+      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521'
     ];
-    
+
     const lightModeColors = [
-      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
-      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
-      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
-      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C',
-      '#49A4A1','#118b70','#BA0C2F','#F48521','#6C6463','#002F6C'
+      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
+      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
+      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
+      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
+      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C'
     ];
-    
+
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 
     const shipmentsPieData = {
@@ -1746,7 +1746,7 @@ class ApplicationDashboard extends Component {
         mode: null
       },
       pieceLabel: {
-        render: function(d) { return d.value },
+        render: function (d) { return d.value },
         fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
@@ -1786,7 +1786,7 @@ class ApplicationDashboard extends Component {
         mode: null
       },
       pieceLabel: {
-        render: function(d) { return d.value },
+        render: function (d) { return d.value },
         fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
@@ -1826,7 +1826,7 @@ class ApplicationDashboard extends Component {
         mode: null
       },
       pieceLabel: {
-        render: function(d) { return d.value },
+        render: function (d) { return d.value },
         fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
@@ -1870,7 +1870,7 @@ class ApplicationDashboard extends Component {
         mode: null
       },
       pieceLabel: {
-        render: function(d) { return d.value },
+        render: function (d) { return d.value },
         fontColor: fontColor,
         fontSize: 14,
         position: 'outside',
@@ -2307,8 +2307,8 @@ class ApplicationDashboard extends Component {
               <div class="col-xl-12 pl-lg-2 pr-lg-2">
                 <div class="card custom-card">
                   <div class="card-body px-2 py-2">
-                    <div className='row'>
-                      {/* <FormGroup className='col-md-3 FormGroupD'>
+                    {/* <div className='row'> */}
+                    {/* <FormGroup className='col-md-3 FormGroupD'>
                         <Label htmlFor="topProgramId">Country<span class="red Reqasterisk">*</span></Label>
                         <MultiSelect
                           name="topCountryId"
@@ -2332,39 +2332,67 @@ class ApplicationDashboard extends Component {
                           labelledBy={i18n.t('static.common.regiontext')}
                         />
                       </FormGroup> */}
-                      <FormGroup className='col-md-3 FormGroupD'>
-                        <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
-                        <MultiSelect
-                          name="topProgramId"
-                          id="topProgramId"
-                          bsSize="sm"
-                          value={this.state.topProgramId}
-                          onChange={(e) => { this.handleTopProgramIdChange(e) }}
-                          options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
-                          labelledBy={i18n.t('static.common.regiontext')}
-                        />
-                      </FormGroup>
-                      <FormGroup className='col-md-2' style={{ marginTop: '29px' }}>
-                        <div className="tab-ml-1 ml-lg-3">
-                          <Input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="onlyDownloadedTopProgram"
-                            name="onlyDownloadedTopProgram"
-                            checked={this.state.onlyDownloadedTopProgram}
-                            onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
+                    <div class="row">
+                      <div class="col-3">
+                        <FormGroup className='FormGroupD'>
+                          <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
+                          <MultiSelect
+                            name="topProgramId"
+                            id="topProgramId"
+                            bsSize="sm"
+                            value={this.state.topProgramId}
+                            onChange={(e) => { this.handleTopProgramIdChange(e) }}
+                            options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
+                            labelledBy={i18n.t('static.common.regiontext')}
                           />
-                          <Label
-                            className="form-check-label"
-                            check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                            Only show local program
-                          </Label>
-                        </div>
-                      </FormGroup>
-                      <FormGroup className='MarginLeftGobtn' style={{ marginTop: '24px'}}>
-                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
-                      </FormGroup>
+                        </FormGroup>
+                        </div>   
+                      <div style={{ gap: '20px',display:'flex' }}>
+                        <FormGroup style={{ marginTop: '29px' }}>
+                          <div className="pl-lg-4">
+                            <Input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="onlyDownloadedTopProgram"
+                              name="onlyDownloadedTopProgram"
+                              checked={this.state.onlyDownloadedTopProgram}
+                              onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
+                            />
+                            <Label
+                              className="form-check-label"
+                              check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              Only show local program
+                            </Label>
+                          </div>
+                        </FormGroup>
+
+                        <FormGroup className='' style={{ marginTop: '24px' }}>
+                          <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.onTopSubmit()}> Go</Button>
+                        </FormGroup>
+                      
+                      </div>
+                      <div class="col-6 pl-lg-3" style={{display:'flex'}}>
+                        <div class="col">
+                          <label>header1</label>
+                          <div><span>Text</span></div>
+                          </div>
+                          <div class="col">
+                          <label>header2</label>
+                          <div><span>Text</span></div>
+                          </div>
+                          <div class="col">
+                          <label>header3</label>
+                          <div><span>Text</span></div>
+                          </div>
+                          <div class="col">
+                          <label>header4</label>
+                          <div><span>Text</span></div>
+                          </div>
+                      </div>
                     </div>
+
+
+                    {/* </div> */}
                     {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
@@ -2382,10 +2410,10 @@ class ApplicationDashboard extends Component {
                             return (
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
-                                  <i class="fa fa-trash" style={{color:"danger"}} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="fa fa-refresh" style={{color:"info"}} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
+                                  <i class="fa fa-trash" style={{ color: "danger" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="fa fa-refresh" style={{ color: "info" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
-                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row" title="QAT Problem List" style={{color:"blue"}} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row" title="QAT Problem List" style={{ color: "blue" }} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code}​</td>}
                                 <td>
                                   <div id="example-1" class="examples">
@@ -2402,9 +2430,9 @@ class ApplicationDashboard extends Component {
                                   </div>
 
                                 </td>
-                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfStockOutPU}</td>
-                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                <td style={{color: d.countOfStockOutPU > 0 ? "red": ""}}>{d.countOfOpenProblem}</td>
+                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.countOfStockOutPU}</td>
+                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : ""} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
                                 <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} ({d.latestFinalVersion ? moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') : ""})</td>
                               </tr>)
@@ -2540,7 +2568,7 @@ class ApplicationDashboard extends Component {
                           <div class="card-title"> Stock Status </div>
                         </div>
                         <div class="card-body pt-lg-1">
-                          <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150}/>
+                          <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
                         </div>
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Stocked out Planning Units ({this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}) </div>
@@ -2559,13 +2587,13 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>                    
-                    {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
+                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
+                      {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
                       <div className="card custom-card CustomHeight pb-lg-2">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
-                        <div class="card-body px-1 py-2" style={{ overflow: 'hidden'}}>
+                        <div class="card-body px-1 py-2" style={{ overflow: 'hidden' }}>
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
@@ -2596,7 +2624,7 @@ class ApplicationDashboard extends Component {
                                     <option value="2">Procurement Agent</option>
                                     <option value="3">Status</option>
                                   </Input>
-                              </FormGroup>
+                                </FormGroup>
                               </div>
                               <div className='row'>
                                 <div className='d-flex align-items-center justify-content-center PieShipment'>
@@ -2637,7 +2665,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={150} />
-                                <center><span className='text-blackD'>{forecastConsumptionQplPuCount-forecastConsumptionQplCorrectCount} missing forecasts</span></center>
+                                <center><span className='text-blackD'>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-6 container1">
@@ -2645,7 +2673,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={150} />
-                                <center><span className='text-blackD'>{inventoryQplPuCount-inventoryQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD'>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                           </div>
@@ -2655,7 +2683,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={150} />
-                                <center><span className='text-blackD'>{actualConsumptionQplPuCount-actualConsumptionQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD'>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-6 container1">
@@ -2663,7 +2691,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={150} />
-                                <center><span className='text-blackD'>{shipmentQplPuCount-shipmentQplCorrectCount} flagged dates</span></center>
+                                <center><span className='text-blackD'>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
@@ -2676,7 +2704,7 @@ class ApplicationDashboard extends Component {
                           <div class="card custom-card CustomHeight pb-lg-2">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
-                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>  
+                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
                             <div class="card-body px-1 py-2" style={{ overflow: 'hidden' }}>
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
