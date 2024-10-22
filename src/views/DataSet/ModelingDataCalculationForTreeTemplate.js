@@ -779,7 +779,7 @@ export function calculateModelingDataForTreeTemplate(dataset, props, page, nodeI
                 }
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                    var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
+                    var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id && c.payload.nodeType.id != 6);
                     var monthList = [];
                     childNodeFlatList.map(d => {
                         if (d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList != undefined && d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList.length > 0) {
