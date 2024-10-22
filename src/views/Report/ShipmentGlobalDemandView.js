@@ -2146,7 +2146,6 @@ class ShipmentGlobalDemandView extends Component {
             '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
             '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
-        
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
         
         const chartDataForPie = {
