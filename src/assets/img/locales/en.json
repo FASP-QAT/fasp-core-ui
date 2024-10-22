@@ -3469,5 +3469,6 @@
   "static.common.accessDenied":"You do not access to view this resource",
   "static.shipment.shipmentCostOverviewNotes": "No shipments found. Ensure that you have shipments within this time period. If “Report Based On Submitted Date” is selected, please ensure you have manually entered actual submitted dates by right clicking on shipment records and selecting “Show Shipment Dates”.",
   "static.supplyPlan.positiveAdjustmentFEFO":"Longest shelf life (+ adj)",
-  "static.supplyPlan.negativeAdjustmentFEFO":"Shortest shelf life (- adj)"
+  "static.supplyPlan.negativeAdjustmentFEFO":"Shortest shelf life (- adj)",
+  "static.ticket.manageTickets" :"Manage my tickets"
 }

@@ -74,6 +74,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>}
           <DefaultHeaderDropdown mssgs />
+          {checkOnline==='Online' && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.openIssues}</span>}
           {checkOnline === 'Online' && this.props.activeModule == 2 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
