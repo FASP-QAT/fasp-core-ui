@@ -3119,7 +3119,7 @@ body {
   .tableFixHeadDash thead th {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 0;
     padding: 10px !important;
     vertical-align: middle;
     line-height: 1.462;
