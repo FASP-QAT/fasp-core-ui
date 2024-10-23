@@ -315,11 +315,42 @@ class Login extends Component {
                   </ButtonDropdown>
                 </div>
               </Col>
-              <Col md="12">
+              {/* <Col md="12">
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+              </Col> */}
+              <Row className='pb-lg-5'>
+                <Col md="3">
+                <div className="upper-logo logo-MarginTop">
+                  <img src={image1} className="img-fluid " />
+                </div>
+                </Col>
+                <Col md="8" lg="6">
+  <div style={{ marginBottom: '20px', marginTop:'-25px',fontSize:'14px' }}>
+    {this.state.lang === 'en' ?
+      <p>IMPORTANT! <strong style={{color:'#002f6c'}}>Please upload any unsaved Supply Planning data from your local computer to the server by <strong style={{color:'#002f6c'}}><u className='red'>EOD Friday, November 1st, 2024.</u></strong></strong>
+      Once you've uploaded your data, make sure to <strong style={{color:'#002f6c'}}><u>delete</u></strong> the current version of the 
+      Supply Planning program from QAT. This step is <strong style={{color:'#002f6c'}}><u>crucial</u></strong> to avoid any 
+      issues with using an outdated program. The updated Supply Planning program <strong style={{color:'#002f6c'}}><u>must be re-downloaded</u></strong> for continued use starting <strong style={{color:'#002f6c'}}><u>November 3rd, 2024.</u></strong> Thank you for your attention!</p>:
+      this.state.lang === 'sp' ?
+      <p>¡IMPORTANTE! <strong style={{color:'#002f6c'}}>Cargue todos los datos de planificación de suministro no guardados desde su computadora local al servidor antes del <strong style={{color:'#002f6c'}}><u className='red'>EOD viernes 1 de noviembre de 2024.</u></strong></strong>
+      Una vez que hayas subido tus datos, asegúrate de <strong style={{color:'#002f6c'}}><u>eliminar</u></strong> la versión actual del 
+      Programa de planificación de suministros de QAT. Este paso es <strong style={{color:'#002f6c'}}><u>crucial</u></strong> para evitar cualquier 
+      Problemas con el uso de un programa desactualizado. El programa actualizado de planificación de suministros <strong style={{color:'#002f6c'}}><u>debe volver a descargarse</u></strong> para su uso continuo a partir del <strong style={{color:'#002f6c'}}><u>3 de noviembre de 2024.</u></strong>¡Gracias por su atención!</p>:
+      this.state.lang === 'fr' ?
+      <p>IMPORTANT ! <strong style={{color:'#002f6c'}}>Veuillez télécharger toutes les données de planification des approvisionnements non enregistrées depuis votre ordinateur local vers le serveur en <strong style={{color:'#002f6c'}}><u className='red'>EOD vendredi 1er novembre 2024.</u></strong></strong>
+      Une fois que vous avez téléchargé vos données, assurez-vous de <strong style={{color:'#002f6c'}}><u>supprimer</u></strong> la version actuelle du 
+      Programme de planification des approvisionnements de QAT. Cette étape est <strong style={{color:'#002f6c'}}><u>cruciale</u></strong> pour éviter tout 
+      problèmes liés à l'utilisation d'un programme obsolète. Le programme de planification des approvisionnements mis à jour <strong style={{color:'#002f6c'}}><u>doit être retéléchargé</u></strong> pour une utilisation continue à partir du <strong style={{color:'#002f6c'}}><u>3 novembre 2024.</u></strong> Merci de votre attention !</p> :
+      <p>IMPORTANTE! <strong style={{color:'#002f6c'}}>Faça upload de todos os dados de planejamento de fornecimento não salvos do seu computador local para o servidor até <strong style={{color:'#002f6c'}}><u className='red'>EOD sexta-feira, 1º de novembro de 2024.</u></strong></strong>
+      Depois de fazer upload dos seus dados, certifique-se de <strong style={{color:'#002f6c'}}><u>excluir</u></strong> a versão atual do 
+      Programa de planejamento de suprimentos da QAT. Esta etapa é <strong style={{color:'#002f6c'}}><u>crucial</u></strong> para evitar qualquer 
+      problemas com o uso de um programa desatualizado. O programa de planejamento de suprimentos atualizado <strong style={{color:'#002f6c'}}><u>deve ser baixado novamente</u></strong> para uso contínuo a partir de <strong style={{color:'#002f6c'}}><u>3 de novembro de 2024.</u></strong> Obrigado pela sua atenção!</p>
+    }
+  </div>
               </Col>
+              </Row>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <div className="p-4 Login-card card-marginTop" >
