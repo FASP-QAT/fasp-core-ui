@@ -179,6 +179,7 @@ class EditSupplyPlanStatus extends Component {
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             shipmentStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             batchInfoInInventoryPopUp: [],
+            showBatchTable: 0,
             problemCategoryList: [],
             ledgerForBatch: [],
             showBatchSaveButton: false,
@@ -676,6 +677,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
+            showBatchTable:0
         })
         if (supplyPlanType == 'Consumption') {
             var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -1422,6 +1424,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
+            showBatchTable:0
         },
             () => {
                 var inputs = document.getElementsByClassName("submitBtn");
@@ -5051,7 +5054,7 @@ observer.observe(document.documentElement, {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable:1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -5059,7 +5062,7 @@ observer.observe(document.documentElement, {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
+                                    {this.state.showBatchTable == 1 &&
                                         <>
                                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                                 <thead>
@@ -5083,7 +5086,7 @@ observer.observe(document.documentElement, {
                                                     ))}
                                                 </tbody>
                                             </Table><br />
-                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
+                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable:0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
                                         </>
                                     }
                                     {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}

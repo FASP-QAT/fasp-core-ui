@@ -2495,7 +2495,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count,0) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={"hoverTd"} onClick={() => this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count,0)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
@@ -2518,7 +2518,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
-                                {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
                                     <>
                                         <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight bachTotaltDM"></div><br />
                                         <h6 style={{ "textAlign": "right" }} className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
@@ -2527,7 +2526,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         {this.state.actualInventoryChanged && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                         {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                     </>
-                                }
                                 {this.state.ledgerForBatch.length > 0 &&
                                     <>
                                         <br></br>
