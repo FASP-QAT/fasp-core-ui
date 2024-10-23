@@ -1842,7 +1842,7 @@ export default class TreeTable extends Component {
         tr.children[9].classList.add('InfoTr');
         tr.children[9].title = i18n.t('static.treeTable.nodeValueTooltip');
         tr.children[10].classList.add('InfoTr');
-        tr.children[10].title = "Available to be aggregated by funnel nodes";
+        tr.children[10].title = i18n.t('static.tree.availableToBeAggregated');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -2230,7 +2230,7 @@ export default class TreeTable extends Component {
         tr.children[4].classList.add('InfoTr');
         tr.children[4].title = i18n.t('static.tooltip.NodeTitle');
         tr.children[6].classList.add('InfoTr');
-        tr.children[6].title = "Available to be aggregated by funnel nodes";
+        tr.children[6].title = i18n.t('static.tree.availableToBeAggregated');
         tr.children[7].classList.add('InfoTr');
         tr.children[7].title = i18n.t('static.treeTable.nodeValueTooltip');
         var elInstance = instance.worksheets[0];
@@ -2656,7 +2656,7 @@ export default class TreeTable extends Component {
                 type: 'numeric',
             },
             {
-                title: "Source Node",
+                title: i18n.t('static.tree.sourceNode'),
                 type: 'checkbox',
                 width: 80
             },
@@ -3805,7 +3805,7 @@ export default class TreeTable extends Component {
             } else if (items[i].payload.nodeType.id == 1) {
                 nodeType = i18n.t("static.ManageTree.Aggregation")
             }else if (items[i].payload.nodeType.id == 6) {
-                nodeType = "Funnel Node"
+                nodeType = i18n.t('static.tree.funnelNode')
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
                 if (nodeType != "") {
@@ -3874,7 +3874,7 @@ export default class TreeTable extends Component {
                 type: 'dropdown',
             },
             {
-                title: 'Source Nodes',
+                title: i18n.t('static.tree.sourceNode'),
                 source: this.state.downwardAggregationList,
                 type: 'dropdown',
                 multiple: true,
@@ -6413,7 +6413,7 @@ export default class TreeTable extends Component {
                         align: 'center'
                     })
                 } else {
-                    doc.text(i18n.t('static.common.treeTable') + " - " + "Funnel Node", doc.internal.pageSize.width / 2, 50, {
+                    doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.tree.funnelNode'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
                 }
@@ -6834,7 +6834,7 @@ export default class TreeTable extends Component {
                                                                 active={this.state.activeTab1[0] === '3'}
                                                                 onClick={() => { this.toggleModal(0, '3'); }}
                                                             >
-                                                                Funnel Node
+                                                                {i18n.t('static.tree.funnelNode')}
                                                             </NavLink>
                                                         </NavItem>
                                                         <NavItem>

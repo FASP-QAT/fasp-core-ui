@@ -10854,11 +10854,11 @@ export default class BuildTree extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="downwardAggregationAllowed" style={{ fontSize: '12px' }}>
-                                                        <b>{'Source Node (available to be aggregated by Funnel Nodes)'}</b>
+                                                        <b>{i18n.t('static.tree.sourceNodeDesc')}</b>
                                                     </Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 6 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId"><b>Source</b> (Tree Name &gt; Scenario Name &gt; … Parent Name &gt; Node Name)</Label>
+                                                    <Label htmlFor="currencyId"><b>{i18n.t('static.tree.source')}</b> ({i18n.t('static.common.treeName')} &gt; {i18n.t('static.tree.scenarioName')} &gt; … {i18n.t('static.tree.parentName')} &gt; {i18n.t('static.tree.nodeName')})</Label>
                                                     <MultiSelect
                                                         name="downwardAggregationList"
                                                         id="downwardAggregationList"
@@ -10878,8 +10878,8 @@ export default class BuildTree extends Component {
                                                     ></Input>
                                                 </FormGroup>
                                                 {this.state.currentItemConfig.context.payload.downwardAggregationAllowed && <div className="col-md-6">
-                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>Aggregated by the following funnel nodes </b> (Tree Name &gt; Scenario Name &gt; … Parent Name &gt; Node Name)</>}
-                                                    {this.state.sourceNodeUsageList.length == 0 && <b className='red'>Not used by any nodes.</b>}<br></br>
+                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>{i18n.t('static.tree.aggregatedBy')} </b> ({i18n.t('static.common.treeName')} &gt; {i18n.t('static.tree.scenarioName')} &gt; … {i18n.t('static.tree.parentName')} &gt; {i18n.t('static.tree.nodeName')})</>}
+                                                    {this.state.sourceNodeUsageList.length == 0 && <b className='red'>{i18n.t('static.tree.notUsed')}</b>}<br></br>
                                                     {this.state.sourceNodeUsageList.map(sn => (<><u><a href={"/#/dataSet/buildTree/tree/" + sn.treeId + "/" + this.state.programId + "/" + "-1"} target="_blank">
                                                         {sn.treeName+(sn.isScenarioVisible.length > 1 ? (" > "+sn.scenarioName) : "")+" > ... "+sn.parentName+" > "+sn.nodeName}
                                                     </a></u><br></br></>))}
@@ -13744,7 +13744,7 @@ export default class BuildTree extends Component {
                                                         <Label
                                                             className="form-check-label"
                                                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                            <b>Hide Funnel node connections</b>
+                                                            <b>{i18n.t('static.tree.hideFunnel')}</b>
                                                         </Label>
                                                     </div>
                                                 </div>

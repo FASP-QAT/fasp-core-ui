@@ -3428,5 +3428,14 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.tree.sourceNodeDesc": "Source Node (available to be aggregated by Funnel Nodes)",
+  "static.tree.source": "Source",
+  "static.tree.parentName": "Parent Name",
+  "static.tree.aggregatedBy": "Aggregated by the following funnel nodes",
+  "static.tree.notUsed": "Not used by any nodes.",
+  "static.tree.hideFunnel": "Hide Funnel node connections",
+  "static.tree.funnelNode": "Funnel Node",
+  "static.tree.sourceNode": "Source Node",
+  "static.tree.availableToBeAggregated": "Available to be aggregated by funnel nodes"
 }
