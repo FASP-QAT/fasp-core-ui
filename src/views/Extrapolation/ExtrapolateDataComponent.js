@@ -310,6 +310,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             missingTESAndARIMA: false,
             regionValues: [],
             planningUnitValues: [],
+            missingPlanningUnitValues: [],
+            missingPlanningUnitMultiList: [],
             isDisabled: false,
             onlyDownloadedProgram: false,
             jsonDataMovingAvg: [],
@@ -358,9 +360,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             seasonality: event.target.checked ? 1 : 0,
             arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
-            arimaDisabled: (event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+            arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
         }, () => {
-            this.handleRangeDissmiss2(this.state.rangeValue1)
+            this.getDateDifference();
+            // this.handleRangeDissmiss2(this.state.rangeValue1)
         });
     }
     /**
@@ -392,8 +395,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         var isExtrapolation = localStorage.getItem("isExtrapolation")
         if (isExtrapolation == "true") {
             this.setState({
-                forecastProgramId: localStorage.getItem("sesDatasetId"),
-                versionId: localStorage.getItem("sesVersionId"),
                 messageColor: localStorage.getItem("messageColor"),
                 message: localStorage.getItem("message"),
                 isChanged1: false
@@ -556,8 +557,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         downloadedProgramData.push(forecastProgramJson);
                     }
                 }
-                var lang = this.state.lang;
                 if (proList.length == 1) {
+                    event.target.value = proList[0].id;
                     this.setState({
                         forecastProgramList: proList.sort(function (a, b) {
                             a = (a.name).toLowerCase();
@@ -572,8 +573,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     }, () => {
-                        this.filterVersion();
+                        this.setForecastProgramId(event);
                     })
+                } else if (localStorage.getItem("sesDatasetId") != "" && proList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                    event.target.value = localStorage.getItem("sesDatasetId");
+                    this.setForecastProgramId(event);
                 } else {
                     this.setState({
                         forecastProgramList: proList.sort(function (a, b) {
@@ -612,17 +616,57 @@ export default class ExtrapolateDataComponent extends React.Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                if (myResult != undefined && (myResult.region != "" || myResult.planningUnit != "")) {
+                if (myResult != undefined && (myResult.region != "" || myResult.planningUnit != "") && myResult.planningUnit.length != 0) {
                     this.setState({ showMissingTESANDARIMA: true });
                     if (myResult.region != "") {
                         this.setState({ regionValues: myResult.region });
                     }
                     if (myResult.planningUnit != "") {
-                        this.setState({ planningUnitValues: myResult.planningUnit })
+                        this.setState({
+                            planningUnitValues: myResult.planningUnit,
+                            missingPlanningUnitValues: myResult.planningUnit
+                        })
                     }
                 } else {
                     this.setState({ showMissingTESANDARIMA: false });
                 }
+            }.bind(this);
+        }.bind(this);
+    }
+
+    /**
+     * Deletes the saved PU for bulk extrapolation after calculations via Missing ARIMA and TES modal
+     */
+    deletesPUListForTesAndArimaExtrapolation = (puId) => {
+        // this.setState({ loading: true })
+        var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+            var planningUnitBulkExtrapolationTransaction = transaction.objectStore('planningUnitBulkExtrapolation');
+            var planningUnitBulkExtrapolationRequest = planningUnitBulkExtrapolationTransaction.get(tempForecastProgramId);
+            planningUnitBulkExtrapolationRequest.onerror = function (event) {
+            }.bind(this);
+            planningUnitBulkExtrapolationRequest.onsuccess = function (event) {
+                var myResult = planningUnitBulkExtrapolationRequest.result;
+                const puArray = myResult.planningUnit.filter(c => c !== Number(puId));
+                var obj = {
+                    region: myResult.region,
+                    planningUnit: puArray,
+                    programId: tempForecastProgramId
+                }
+                planningUnitBulkExtrapolationTransaction.put(obj);
+                planningUnitBulkExtrapolationTransaction.oncomplete = function (event) {
+                    if (puArray != "") {
+                        this.setState({
+                            missingPlanningUnitMultiList: this.state.planningUnitMultiList.filter(c => c.planningUnit.id !== puId),
+                            missingPlanningUnitValues: this.state.planningUnitValues.filter(c => c.value != puId)
+                        })
+                    }
+                }.bind(this);
             }.bind(this);
         }.bind(this);
     }
@@ -659,8 +703,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
                 })
             }, 0)
         })
@@ -711,7 +755,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     planningUnitMultiList: puObj,
                     regionMultiList: regionObj,
                     planningUnitValues: planningUnitValues,
-                    regionValues: regionValues
+                    regionValues: regionValues,
+                    missingPlanningUnitMultiList: puObj
                 })
             }, 0)
         })
@@ -833,17 +878,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
-                        type: this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? 'numeric' : 'hidden',
+                        type: this.state.movingAvgId && movingAvgDataFilter.length > 0 ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
-                        type: this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? 'numeric' : 'hidden',
+                        type: this.state.semiAvgId && semiAvgDataFilter.length > 0 ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
-                        type: this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? 'numeric' : 'hidden',
+                        type: this.state.linearRegressionId && linearRegressionDataFilter.length > 0 ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -853,7 +898,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
-                        type: this.state.smoothingId && (tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) ? 'numeric' : 'hidden',
+                        type: this.state.smoothingId && (tesDataFilter.length > 0) ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -863,7 +908,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
-                        type: this.state.arimaId && (arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null) ? 'numeric' : 'hidden',
+                        type: this.state.arimaId && (arimaDataFilter.length > 0) ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -1664,6 +1709,8 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     saveForecastConsumptionExtrapolation() {
         var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        localStorage.setItem("sesDatasetId", this.state.forecastProgramId);
+        localStorage.setItem("sesVersionId", this.state.versionId);
         if (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) {
             var cont = false;
             var cf = window.confirm(i18n.t("static.extrapolation.confirmmsg"));
@@ -1711,6 +1758,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                             (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexSemiAvg].notes = this.state.extrapolationNotes;
                         if (consumptionExtrapolationIndexMovingAvg != -1)
                             (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexMovingAvg].notes = this.state.extrapolationNotes;
+                        var pu = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)[0]
+                        this.deletesPUListForTesAndArimaExtrapolation(pu.planningUnit.id);
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
@@ -1967,6 +2016,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 extrapolateClicked: false,
                                 notesChanged: false
                             }, () => {
+                                this.deletesPUListForTesAndArimaExtrapolation(planningUnitObj.id);
                                 hideFirstComponent();
                                 this.componentDidMount()
                             })
@@ -2084,6 +2134,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var monthArray = [];
                 var curDate1 = startDate1;
                 var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                console.log("consumptionExtrapolationList1", consumptionExtrapolationList)
                 var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)
@@ -2162,7 +2213,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
                 var gamma = this.state.gamma;
-                if (consumptionExtrapolationTESM.length > 0) {
+                if (consumptionExtrapolationTESM.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevel = consumptionExtrapolationTESM[0].jsonProperties.confidenceLevel;
                     seasonality = consumptionExtrapolationTESM[0].jsonProperties.seasonality;
                     alpha = consumptionExtrapolationTESM[0].jsonProperties.alpha;
@@ -2174,7 +2225,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var p = this.state.p;
                 var d = this.state.d;
                 var q = this.state.q;
-                if (consumptionExtrapolationArima.length > 0) {
+                if (consumptionExtrapolationArima.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevelArima = consumptionExtrapolationArima[0].jsonProperties.confidenceLevel;
                     p = consumptionExtrapolationArima[0].jsonProperties.p;
                     d = consumptionExtrapolationArima[0].jsonProperties.d;
@@ -2262,8 +2313,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    arimaDisabled: (((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2))) && localStorage.getItem("sessionType") === "Online" ? false : true,
                     noDataMessage: "",
                     showDate: true,
                     minDate: minDate,
@@ -2311,8 +2362,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                         semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                         linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
-                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
-                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
+                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                        arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
                     }, () => {
                         this.getDateDifference();
                     })
@@ -2527,7 +2578,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     ExtrapolatedParameters(id, event) {
         event.stopPropagation();
         var regionList = this.state.regionValues;
-        var listOfPlanningUnits = this.state.planningUnitValues;
+        var listOfPlanningUnits = this.state.missingTESAndARIMA ? this.state.missingPlanningUnitValues : this.state.planningUnitValues;
         var puObj = [];
         var regionObj = []
         var count = 0;
@@ -2644,7 +2695,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 this.setState({
                     count: count,
                     totalExtrapolatedCount: count,
-                    estimatedTime: count * 3
+                    estimatedTime: count * 10
                 }, () => {
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
                     console.log("count3", count)
@@ -2869,7 +2920,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
                         for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                             for (var r = 0; r < regionList.length; r++) {
-                                var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)));
+                                if (!this.state.missingTESAndARIMAFlag) {
+                                    consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value)));
+                                } else {
+                                    consumptionExtrapolationList = consumptionExtrapolationList.filter(c =>
+                                        c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 2 && c.extrapolationMethod.id != 4)))
+                                    );
+                                }
                                 var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                                 var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
                                 var id = a > b ? a : b;
@@ -2972,7 +3029,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 }
                                 var data = [];
                                 var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
-                                if (jsonDataTesFilter.length > 0) {
+                                if (jsonDataTesFilter.length > 0 && localStorage.getItem("sessionType") === "Online") {
                                     var jsonDataTes = jsonDataTesFilter[0].data;
                                     for (var i = 0; i < jsonDataTes.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? Number(jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
@@ -3005,7 +3062,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 }
                                 var data = [];
                                 var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
-                                if (jsonDataArimaFilter.length > 0) {
+                                if (jsonDataArimaFilter.length > 0 && localStorage.getItem("sessionType") === "Online") {
                                     var jsonDataArima = jsonDataArimaFilter[0].data;
                                     for (var i = 0; i < jsonDataArima.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? Number(jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
@@ -3038,6 +3095,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 }
                             }
                         }
+                        // console.log("consumptionExtrapolationList", consumptionExtrapolationList)
                         datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
@@ -3045,6 +3103,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         putRequest.onerror = function (event) {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
+                            if (localStorage.getItem("sessionType") === "Online") {
+                                var list = this.state.planningUnitValues;
+                                for (var pu = 0; pu < list.length; pu++) {
+                                    this.deletesPUListForTesAndArimaExtrapolation(list[pu].value);
+                                }
+                            }
                             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
                             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
                             localStorage.setItem("messageColor", "green");
@@ -3578,6 +3642,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     handlePlanningUnitChange = (planningUnitIds) => {
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
+            missingPlanningUnitValues: planningUnitIds.map(ele => ele)
         })
     }
     /**
@@ -3828,8 +3893,13 @@ export default class ExtrapolateDataComponent extends React.Component {
             )
         }, this);
         const { planningUnitMultiList } = this.state;
+        const { missingPlanningUnitMultiList } = this.state;
         let planningUnitMultiLists = planningUnitMultiList.length > 0
             && planningUnitMultiList.map((item, i) => {
+                return ({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id })
+            }, this);
+        let missingPlanningUnitMultiLists = missingPlanningUnitMultiList.length > 0
+            && missingPlanningUnitMultiList.map((item, i) => {
                 return ({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id })
             }, this);
         const { regionList } = this.state;
@@ -4770,7 +4840,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                             type="checkbox"
                                                                             id="seasonality"
                                                                             name="seasonality"
-                                                                            disabled={this.state.isDisabled}
+                                                                            disabled={this.state.isDisabled || localStorage.getItem("sessionType") === "Offline"}
                                                                             checked={this.state.seasonality}
                                                                             onClick={(e) => { this.seasonalityCheckbox(e); }}
                                                                         />
@@ -4919,7 +4989,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </div>
                                                     </div>
                                                 </>}
-                                                {(this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                                {
+                                                    // (this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                                    (localStorage.getItem("sessionType") === "Offline") && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                                 <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                                     {this.state.showData &&
                                                         <>
@@ -5231,9 +5303,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 name="planningUnit"
                                                                 id="planningUnit"
                                                                 bsSize="sm"
-                                                                value={this.state.planningUnitValues}
+                                                                value={this.state.missingTESAndARIMA ? this.state.missingPlanningUnitValues : this.state.planningUnitValues}
                                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                options={planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : []}
+                                                                options={this.state.missingTESAndARIMA ? (missingPlanningUnitMultiLists && missingPlanningUnitMultiLists.length > 0 ? missingPlanningUnitMultiLists : []) :
+                                                                    (planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : [])}
                                                                 labelledBy={i18n.t('static.mt.selectPlanninfUnit')}
                                                             />
                                                         </div>

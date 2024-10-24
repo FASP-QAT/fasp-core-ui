@@ -79,6 +79,8 @@ class AnnualShipmentCost extends Component {
             fundingSourceTypes: [],
             fundingSourceTypeValues: [],
             fundingSourceTypeLabels: [],
+            view: 2,
+            allFiltersSet: 0
         };
         this.fetchData = this.fetchData.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -102,7 +104,8 @@ class AnnualShipmentCost extends Component {
         let shipmentStatusIds = this.state.statusValues.length == this.state.shipmentStatuses.length ? [] : this.state.statusValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
         this.setState({
-            outPutList: []
+            outPutList: [],
+            view: document.getElementById("view").value
         }, () => {
             let json = {
                 "programId": document.getElementById("programId").value,
@@ -121,6 +124,7 @@ class AnnualShipmentCost extends Component {
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             let reportbaseValue = document.getElementById("view").value;
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.procurementAgentValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.statusValues.length > 0) {
+                this.setState({ allFiltersSet: 1 });
                 if (versionId.includes('Local')) {
                     var db1;
                     getDatabase();
@@ -317,18 +321,18 @@ class AnnualShipmentCost extends Component {
                         );
                 }
             } else if (programId == 0) {
-                this.setState({ message: i18n.t('static.common.selectProgram'), data: [], outPutList: [] });
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: [], outPutList: [], allFiltersSet: 0 });
             } else if (versionId == 0) {
-                this.setState({ message: i18n.t('static.program.validversion'), data: [], outPutList: [] });
+                this.setState({ message: i18n.t('static.program.validversion'), data: [], outPutList: [], allFiltersSet: 0 });
             } else if (this.state.planningUnitValues.length == 0) {
-                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], outPutList: [] });
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: [], outPutList: [], allFiltersSet: 0 });
             } else if (this.state.procurementAgentValues.length == 0) {
-                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [], outPutList: [] })
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: [], outPutList: [], allFiltersSet: 0 })
             } else if (this.state.fundingSourceValues.length == 0) {
-                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [], outPutList: [] })
+                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: [], outPutList: [], allFiltersSet: 0 })
             }
             else {
-                this.setState({ message: i18n.t('static.report.validShipmentStatusText'), data: [], outPutList: [] });
+                this.setState({ message: i18n.t('static.report.validShipmentStatusText'), data: [], outPutList: [], allFiltersSet: 0 });
             }
         })
     }
@@ -1777,8 +1781,8 @@ class AnnualShipmentCost extends Component {
                                                             bsSize="sm"
                                                             onChange={this.fetchData}
                                                         >
-                                                            <option value="1">{i18n.t('static.supplyPlan.submittedDate')}</option>
                                                             <option value="2">{i18n.t('static.common.receivedate')}</option>
+                                                            <option value="1">{i18n.t('static.supplyPlan.submittedDate')}</option>
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
@@ -1934,6 +1938,12 @@ class AnnualShipmentCost extends Component {
                                 <Col md="12 pl-0">
                                     <div className="row" style={{ display: this.state.loading ? "none" : "block" }}>
                                         <div className="col-md-12 p-0" id="div_id">
+                                        {this.state.allFiltersSet == 1 && this.state.view == 1 && this.state.outPutList.length == 0 &&
+                                            <FormGroup className="col-md-12">
+                                            <span class="red " >
+                                                {i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.shipment.shipmentCostOverviewNotes')}</i>
+                                            </span>
+                                        </FormGroup>}
                                             {this.state.outPutList.length > 0 &&
                                                 <div className="col-md-12">
                                                     <button className="mr-1 float-right btn btn-info btn-md showdatabtn mt-1 mb-3" onClick={this.previewPDF}>{i18n.t('static.common.preview')}</button>

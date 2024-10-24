@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -60,7 +62,7 @@
 		<tr>
 			<td align="center" style="padding:0;">
 				<table role="presentation"
-					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
 							<table role="presentation"
@@ -102,12 +104,15 @@
 										<p style="font-size: 13px; font-weight: bold;"><span class="">Ações do nó
 												:</span></p>
 										<ul class="pl-lg-4" style="font-size: 13px;">
-											<li><i class="fa fa-trash-o" aria-hidden="true"></i> Excluir: Exclui o nó
+											<li><i class="fa fa-trash-o" aria-hidden="true"
+													style="color: rgb(0, 47, 108);"></i> Excluir: Exclui o nó
 												selecionado </li>
-											<li><i class="fa fa-clone" aria-hidden="true"></i> Duplicar: Duplica o nó
+											<li><i class="fa fa-clone" aria-hidden="true"
+													style="color: rgb(0, 47, 108);"></i> Duplicar: Duplica o nó
 												selecionado sob o mesmo pai </li>
-											<li><i class="fa fa-plus-square-o" aria-hidden="true"></i> Adicionar:
-												Adiciona um filho ao nó selecionado.</li>
+											<li><i class="fa fa-plus-square-o" aria-hidden="true"
+													style="color: rgb(0, 47, 108);"></i> Adicionar: Adiciona um filho ao
+												nó selecionado.</li>
 										</ul>
 										</p>
 										<p>
@@ -127,35 +132,35 @@
 													<tr>
 														<td class="BgLightBlue"><b>Agregação ∑</b></td>
 														<td>Soma de filhos</td>
-														<td><b style="color: rgb(0, 47, 108);">∑</b> ou Número</td>
+														<td><b style="color: rgb(0, 47, 108);">∑</b> ou #</td>
 														<td>-</td>
 													</tr>
 													<tr>
 														<td class="BgLightBlue"><b>Número #</b></td>
 														<td>Definido neste nó</td>
 														<td>% or <b
-																style="color: rgb(0, 47, 108); padding: 3px;"><i
+																style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
 																	class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90"
 																aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i
-																class="fa fa-line-chart"></i></td>
+																class="fa fa-line-chart"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
 													</tr>
 													<tr>
 														<td class="BgLightBlue"><b>Percentagem %</b></td>
-														<td>Definido como uma porcentagem do pai</td>
+														<td>Uma porcentagem do pai</td>
 														<td>% or <b
-																style="color: rgb(0, 47, 108); padding: 3px;"><i
+																style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
 																	class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90"
-																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+																aria-hidden="true"></i>,<i class="fa fa-link"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
 													</tr>
 													<tr>
 														<td class="BgDarkBlue"><b>Unidade de previsão <i
 																	class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td>Definido como uma porcentagem dos parâmetros da unidade pai
+														<td>Uma porcentagem dos parâmetros da unidade pai
 															e de previsão</td>
 														<td><b
-																style="color: rgb(0, 47, 108); padding: 3px;"><i
+																style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
 																	class="fa fa-cubes" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90"
 																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
@@ -169,13 +174,23 @@
 														<td><i class="fa fa-exchange fa-rotate-90"
 																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 													</tr>
+													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Funil <i><img src="../ShowGuidanceFiles/img/funnel1.png" width="18" height="18"/></i></b></td>
+														<td>Soma dos nós de origem vinculados <i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
+														<td>% or</td>
+														<td>-</td>
+													</tr>
 												</tbody>
 											</table>
 										</div>
 										</p>
 										<p style="font-size: 13px;">
 											<span style="font-size: 13px; font-weight: bold;">Mudanças ao longo do
-												tempo</span><br>Estrutura de árvore :
+												tempo</span>
+												<p>Embora a estrutura da árvore permaneça constante ao longo do tempo, as porcentagens e
+													os valores podem mudar com o tempo. Use o menu suspenso de data para visualizar a árvore a qualquer momento
+													mês. As três funcionalidades abaixo estão disponíveis em cada nó e permitem
+													o usuário controla como os nós mudam ao longo do tempo:</p>
 										<ul style="font-size: 13px;">
 											<li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>
 													Modelagem:</b> Permite que o usuário especifique a taxa exata de
