@@ -655,23 +655,27 @@ class CompareAndSelectScenario extends Component {
                 dataArr.push(data)
             }
             var monthArrayListWithoutFormat = this.state.calendarMonthList;
+
             for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
-                data1 = [];
-                data1[0] = monthArrayListWithoutFormat[m];
-                var total = 0;
-                var count = 0;
-                for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
-                    if (treeScenarioList[tsl].checked) {
-                        if (treeScenarioList[tsl].type == "T") {
-                            var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                            data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
-                        } else {
-                            var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                            data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                if(moment(monthArrayListWithoutFormat[m]) >= moment(this.state.forecastStartDate) && moment(monthArrayListWithoutFormat[m]) <= moment(this.state.forecastStopDate)){
+                    data1 = [];
+                    data1[0] = monthArrayListWithoutFormat[m];
+                    var total = 0;
+                    var count = 0;
+                    for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
+                        if (treeScenarioList[tsl].checked) {
+                            if (treeScenarioList[tsl].type == "T") {
+                                var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
+                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                            } else {
+                                var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
+                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                            }
                         }
                     }
+                    dataArr1.push(data1);
                 }
-                dataArr1.push(data1)
+
             }
             if (this.state.xAxisDisplayBy != 1) {
                 var displayBy = this.state.xAxisDisplayBy;
