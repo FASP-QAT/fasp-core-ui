@@ -334,7 +334,7 @@ class AuthenticationService {
                 userAclList.map(item => {
                     var programFilter = item.programList.filter(c => programIds.includes(c.toString()));
                     if (programFilter.length == [...new Set(programIds)].length) {
-                        var hasRole = decryptedUser.roleList.filter(c => c == roleId);
+                        var hasRole = decryptedUser.roleList.filter(c => c.roleId == roleId);
                         if (hasRole.length > 0) {
                             hasAccess = true;
                         }
