@@ -2744,9 +2744,8 @@ class StockStatus extends Component {
                             </InputGroup>}
                           </div>
                         </FormGroup>
-                      </FormGroup>
-                      <FormGroup style={{ "marginTop": "-10px" }}>
-                        <div className="col-md-12" style={{ "padding-left": "34px", "marginTop": "-25px !important" }}>
+                        <FormGroup style={{ "marginTop": "-10px" }}>
+                        <div className="col-md-12" style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
                           <Input
                             className="form-check-input"
                             type="checkbox"
@@ -2763,6 +2762,25 @@ class StockStatus extends Component {
                           </Label>
                         </div>
                       </FormGroup>
+                      </FormGroup>
+                      {/* <FormGroup style={{ "marginTop": "-10px" }}>
+                        <div className="col-md-12" style={{ "padding-left": "34px", "marginTop": "-25px !important" }}>
+                          <Input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="onlyShowAllPUs"
+                            name="onlyShowAllPUs"
+                            checked={this.state.onlyShowAllPUs}
+                            onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                            style={{marginTop:'2px'}}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                            {i18n.t('static.stockStatus.onlyShowPUsThatArePartOfAllPrograms')}
+                          </Label>
+                        </div>
+                      </FormGroup> */}
                     </div>
                   </div>
                 </Form>
