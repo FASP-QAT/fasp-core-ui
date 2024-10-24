@@ -545,18 +545,21 @@ export default class RealmCountryPlanningUnitList extends Component {
         {
           title: i18n.t("static.planningunit.countrysku"),
           type: "text",
-          required: true
+          required: true,
+          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
         },
         {
           title: i18n.t("static.procurementAgentProcurementUnit.skuCode"),
           type: "text",
-          required: true
+          required: true,
+          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
         },
         {
           title: i18n.t("static.unit.unit"),
           type: "autocomplete",
           source: unitArr,
-          required: true
+          required: true,
+          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
         },
         {
           title: i18n.t("static.unit.conversionMethod"),
@@ -580,6 +583,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         {
           title: i18n.t("static.checkbox.active"),
           type: "checkbox",
+          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
         },
         {
           title: "realmCountryId",
@@ -630,6 +634,7 @@ export default class RealmCountryPlanningUnitList extends Component {
       filters: true,
       search: true,
       columnSorting: true,
+      editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
       wordWrap: true,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
@@ -1277,9 +1282,7 @@ export default class RealmCountryPlanningUnitList extends Component {
           </CardBody>
           {this.state.allowAdd && (
             <CardFooter>
-              {AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()),
-                "ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"
-              ) && (
+              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT") && (
                   <FormGroup>
                     <Button
                       type="button"
