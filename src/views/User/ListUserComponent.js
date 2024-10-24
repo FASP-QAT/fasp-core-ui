@@ -143,7 +143,7 @@ class ListUserComponent extends Component {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
                 if (this.state.selUserList.length != 0 || this.state.userAclList.length != 0) {
-                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER')) {
+                    if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') && this.state.selUserList.filter(c => c.userId == this.el.getValueFromCoords(0, x))[0].roleList.map(r => this.state.currentUserRole.flatMap(x => x.canCreateRoleList.map(c => c.roleId)).includes(r.roleId)).every(v => v == true)) {
                         this.props.history.push({
                             pathname: `/user/editUser/${this.el.getValueFromCoords(0, x)}`,
                         });
@@ -376,6 +376,15 @@ class ListUserComponent extends Component {
                     }
                 }
             );
+        UserService.getRoleList()
+            .then((response) => {
+                console.log("Test@123",response.data)
+              if (response.status == 200) {
+                this.setState({
+                  currentUserRole: response.data,
+                });
+              }
+            })
     }
     /**
      * This function is used to toggle the tab for user list and user access control
