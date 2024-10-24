@@ -2299,6 +2299,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 let endDate = moment(rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate()).format("YYYY-MM");
                 const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
                 let tempMonthsDiff = Math.round(monthsDiff) + 1;
+
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     extrapolationNotes: (extrapolationNotes == "" || extrapolationNotes == undefined || extrapolationNotes == null) ? "" : extrapolationNotes,
