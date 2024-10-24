@@ -1597,12 +1597,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let currDate = Date.now();
     let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
     let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
-    let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.datasetId.toString()], "ROLE_FORECAST_VIEWER");
-    // AuthenticationService.getLoggedInUserRole().map(c => {
-    //   if (c.roleId == 'ROLE_FORECAST_VIEWER') {
-    //     hasRole = true;
-    //   }
-    // });
+    // let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.datasetId.toString()], "ROLE_FORECAST_VIEWER");
+    let hasRole = false;
+    AuthenticationService.getLoggedInUserRole().map(c => {
+      if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+        hasRole = true;
+      }
+    });
     this.setState({
       onlyDownloadedProgram: !hasRole,
       maxDate: maxDateTmp
@@ -3425,7 +3426,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </FormGroup>
                           </div>
                           <div className="row">
-                            {AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
                               <FormGroup className="col-md-3 ">
                                 <div className="tab-ml-1 ml-lg-3">
                                   <Input
