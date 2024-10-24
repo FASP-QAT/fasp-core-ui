@@ -2149,6 +2149,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var monthArray = [];
                 var curDate1 = startDate1;
                 var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                console.log("consumptionExtrapolationList1", consumptionExtrapolationList)
                 var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)
@@ -2298,6 +2299,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 let endDate = moment(rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate()).format("YYYY-MM");
                 const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
                 let tempMonthsDiff = Math.round(monthsDiff) + 1;
+
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     extrapolationNotes: (extrapolationNotes == "" || extrapolationNotes == undefined || extrapolationNotes == null) ? "" : extrapolationNotes,
@@ -2945,12 +2947,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
                         for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                             for (var r = 0; r < regionList.length; r++) {
-                                if (localStorage.getItem("sessionType") === "Offline") {
-                                    var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)));
+                                if (!this.state.missingTESAndARIMAFlag) {
+                                    consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value)));
                                 } else {
-                                    var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => this.state.missingTESAndARIMAFlag ?
+                                    consumptionExtrapolationList = consumptionExtrapolationList.filter(c =>
                                         c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 2 && c.extrapolationMethod.id != 4)))
-                                        : c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 5 && c.extrapolationMethod.id != 6 && c.extrapolationMethod.id != 7)));
+                                    );
                                 }
                                 var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                                 var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
@@ -3146,7 +3148,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 }
                             }
                         }
-                        console.log("consumptionExtrapolationList", consumptionExtrapolationList)
+                        // console.log("consumptionExtrapolationList", consumptionExtrapolationList)
                         datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
