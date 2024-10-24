@@ -992,78 +992,91 @@ class ApplicationDashboard extends Component {
       }.bind(this);
     }.bind(this);
     Chart.plugins.register({
-      afterDatasetsDraw: function (chart) {
-        if (chart.config.type === 'horizontalBar') {
-          const ctx = chart.ctx;
-          chart.data.datasets.forEach(function (dataset, i) {
-            const meta = chart.getDatasetMeta(i);
+      afterDraw: function (chart) {
+        if (chart.config.type === 'pie') {
+            const ctx = chart.chart.ctx;
+            const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
+            chart.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
+                if (!meta.hidden) {
+                    meta.data.forEach((element, index) => {
+                        if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                            // Draw the connecting lines
+                            ctx.save();
+                            const model = element._model;
+                            const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                            const startAngle = model.startAngle;
+                            const endAngle = model.endAngle;
+                            const midAngle = startAngle + (endAngle - startAngle) / 2;
 
-            meta.data.forEach(function (element, index) {
-              // Get the percentage value
-              const dataValue = dataset.data[index];
-              const percentageText = dataValue == 0 ? '' : `${dataValue}%`;
+                            const x = Math.cos(midAngle);
+                            const y = Math.sin(midAngle);
 
-              // Calculate position for centered text
-              const position = element.tooltipPosition();
-              const barWidth = element._model.x - element._model.base; // Get the width of the bar
-              const centerX = element._model.base + barWidth / 2; // Center horizontally in the bar segment
+                            // Calculate the end point for the line
+                            const lineX = model.x + x * model.outerRadius;
+                            const lineY = model.y + y * model.outerRadius;
+                            const labelX = model.x + x * (model.outerRadius + 10);
+                            const labelY = model.y + y * (model.outerRadius + 10);
 
-              // Set text style
-              ctx.fillStyle = 'white'; // Set text color
-              ctx.font = 'bold 12px Arial'; // Set font
-              ctx.textAlign = 'center'; // Horizontally align text to center
-              ctx.textBaseline = 'middle'; // Vertically align text to middle
-
-              // Draw the text at the center of each segment
-              ctx.fillText(percentageText, centerX, position.y);
-            });
-          });
-        } else if (chart.config.type === 'pie') {
-          const ctx = chart.chart.ctx;
-          const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseFloat(value), 0);
-          chart.data.datasets.forEach((dataset, datasetIndex) => {
-            const meta = chart.getDatasetMeta(datasetIndex);
-            if (!meta.hidden) {
-              meta.data.forEach((element, index) => {
-                if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
-                  const value = parseFloat(dataset.data[index]);
-                  const percentage = ((value / total) * 100).toFixed(2) + '%';
-                  ctx.fillStyle = 'white'; // Set text color
-                  ctx.font = 'bold 12px Arial'; // Set font
-                  ctx.textAlign = 'center'; // Horizontally align text to center
-                  ctx.textBaseline = 'middle';
-                  var meta1 = chart.getDatasetMeta(0).data[index];
-                  var centerPoint = meta1.tooltipPosition();
-                  // Draw the text at the center of each segment
-                  ctx.fillText(percentage, centerPoint.x, centerPoint.y);
+                            const label = chart.data.labels[index];
+                            const value = dataset.data[index];
+                            const percentage = ((value / total) * 100).toFixed(2) + '%';
+                            if (((value / total) * 100).toFixed(2) > 2) {
+                                ctx.beginPath();
+                                ctx.moveTo(model.x, model.y);
+                                ctx.lineTo(lineX, lineY);
+                                ctx.lineTo(labelX, labelY);
+                                ctx.strokeStyle = dataset.backgroundColor[index];
+                                ctx.stroke();
+                                ctx.textAlign = x >= 0 ? 'left' : 'right';
+                                ctx.font = 'bold 12px Arial';
+                                // ctx.textBaseline = 'middle';
+                                ctx.fillStyle = dataset.backgroundColor[index];
+                                ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
+                                ctx.restore();
+                            }
+                        }
+                    });
                 }
-              });
-            }
+            });
+        } else if (chart.config.type === 'doughnut') {
+          const ctx = chart.chart.ctx;
+          const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+              const meta = chart.getDatasetMeta(datasetIndex);
+              if (!meta.hidden) {
+                  meta.data.forEach((element, index) => {
+                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                          // Draw the connecting lines
+                          ctx.save();
+                          const model = element._model;
+                          const startAngle = model.startAngle;
+                          const endAngle = model.endAngle;
+                          const midAngle = startAngle + (endAngle - startAngle) / 2;
+
+                          const x = Math.cos(midAngle);
+                          const y = Math.sin(midAngle);
+
+                          const labelX = model.x + x * (model.outerRadius + 10);
+                          const labelY = model.y + y * (model.outerRadius + 10);
+
+                          const value = dataset.data[index];
+                          if (((value / total) * 100).toFixed(2) > 2) {
+                              ctx.beginPath();
+                              ctx.moveTo(model.x, model.y);
+                              ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
+                              ctx.stroke();
+                              ctx.textAlign = x >= 0 ? 'left' : 'right';
+                              ctx.font = 'bold 14px Arial';
+                              ctx.fillStyle =  "#000000" //dataset.backgroundColor[index];
+                              ctx.fillText(`${value}`, labelX - 4, labelY + 2);
+                              ctx.restore();
+                          }
+                      }
+                  });
+              }
           });
-        }
-        // if(chart.config.type === 'pie') {
-        //     const ctx = chart.ctx;
-        //     const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
-        //     chart.data.datasets.forEach(function (dataset, i) {
-        //       const meta = chart.getDatasetMeta(i);
-
-        //       meta.data.forEach(function (element, index) {
-        //         // Get the percentage value
-        //         const dataValue = dataset.data[i];
-        //         const percentageText = ((dataValue / total) * 100).toFixed(2) + '%';
-
-        //         // Set text style
-        //         ctx.fillStyle = 'white'; // Set text color
-        //         ctx.font = 'bold 12px Arial'; // Set font
-        //         ctx.textAlign = 'center'; // Horizontally align text to center
-        //         ctx.textBaseline = 'middle'; // Vertically align text to middle
-        //         var meta1 = chart.getDatasetMeta(0).data[index]; 
-        //         var centerPoint = meta1.tooltipPosition();
-        //         // Draw the text at the center of each segment
-        //         ctx.fillText(percentageText, centerPoint.x, centerPoint.y);
-        //       });
-        //     });
-        //   }
+      }
       }
     });
     if (localStorage.getItem('sessionType') === 'Online') {
@@ -1563,8 +1576,9 @@ class ApplicationDashboard extends Component {
       maintainAspectRatio: false,
       scales: {
         xAxes: [{
+          beginAtZero: true,  
           stacked: true,
-          maxBarThickness: 20,
+          maxBarThickness: 100,
           ticks: {
             beginAtZero: true,
             display: false // Hide the X-axis values
@@ -1576,8 +1590,9 @@ class ApplicationDashboard extends Component {
           }
         }],
         yAxes: [{
+          beginAtZero: true,  
           stacked: true,
-          maxBarThickness: 20,
+          maxBarThickness: 100,
           ticks: {
             beginAtZero: true,
             display: false // Hide the Y-axis values
@@ -1607,15 +1622,6 @@ class ApplicationDashboard extends Component {
             const label = dataset.label;
             return label + ': ' + currentValue + '%';
           }
-        }
-      },
-      plugins: {
-        datalabels: {
-          display: true,
-          color: 'white',
-          anchor: 'center',
-          align: 'center',
-          formatter: (value) => `${value}%`
         }
       }
     };
@@ -1695,6 +1701,11 @@ class ApplicationDashboard extends Component {
       }]
     };
     const shipmentsPieOptions = {
+      title: {
+        display: true,
+        text: "",
+        padding: 10
+      },
       tooltips: {
         callbacks: {
           label: function (tooltipItem, data) {
@@ -1711,15 +1722,6 @@ class ApplicationDashboard extends Component {
             }
             return "$ " + x1 + x2;
           }
-        }
-      },
-      plugins: {
-        datalabels: {
-          display: true,
-          color: 'white',
-          anchor: 'center',
-          align: 'center',
-          formatter: (value) => `${value}%`
         }
       },
       legend: {
@@ -1758,14 +1760,11 @@ class ApplicationDashboard extends Component {
       hover: {
         mode: null
       },
-      pieceLabel: {
-        render: function (d) { return d.value },
-        fontColor: fontColor,
-        fontSize: 14,
-        position: 'outside',
-        segment: false,
-        textMargin: 10
-      }
+      title: {
+        display: true,
+        text: "",
+        padding: 5
+      },
     }
 
     const actualInventoryData = {
@@ -1798,14 +1797,11 @@ class ApplicationDashboard extends Component {
       hover: {
         mode: null
       },
-      pieceLabel: {
-        render: function (d) { return d.value },
-        fontColor: fontColor,
-        fontSize: 14,
-        position: 'outside',
-        segment: false,
-        textMargin: 10
-      }
+      title: {
+        display: true,
+        text: "",
+        padding: 5
+      },
     }
 
     const actualConsumptionData = {
@@ -1838,14 +1834,11 @@ class ApplicationDashboard extends Component {
       hover: {
         mode: null
       },
-      pieceLabel: {
-        render: function (d) { return d.value },
-        fontColor: fontColor,
-        fontSize: 14,
-        position: 'outside',
-        segment: false,
-        textMargin: 10
-      }
+      title: {
+        display: true,
+        text: "",
+        padding: 5
+      },
     }
 
     const shipmentsData = {
@@ -1882,14 +1875,11 @@ class ApplicationDashboard extends Component {
       hover: {
         mode: null
       },
-      pieceLabel: {
-        render: function (d) { return d.value },
-        fontColor: fontColor,
-        fontSize: 14,
-        position: 'outside',
-        segment: false,
-        textMargin: 10
-      }
+      title: {
+        display: true,
+        text: "",
+        padding: 5
+      },
     }
     let topCountryList = []
     this.state.countryList.length > 0 &&
@@ -2417,7 +2407,7 @@ class ApplicationDashboard extends Component {
                           <th scope="col">Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'># of Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Last Updated Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.lastUpdatedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col'>Review​(looks at last final version) <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
                         <tbody>
                           {this.state.dashboardTopList.map(d => {
@@ -2566,7 +2556,7 @@ class ApplicationDashboard extends Component {
                           key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                           onDismiss={this.handleRangeDissmis}
                         >
-                          <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                          <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
                         </Picker>
                       </div>
                     </FormGroup>
@@ -2641,8 +2631,8 @@ class ApplicationDashboard extends Component {
                                 </FormGroup>
                               </div>
                               <div className='row'>
-                                <div className='d-flex align-items-center justify-content-center PieShipment'>
-                                  <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} />
+                                <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
+                                  <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={250} />
                                 </div>
                               </div>
                             </div>
@@ -2678,7 +2668,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={150} />
+                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
                                 <center><span className='text-blackD'>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
@@ -2686,7 +2676,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={150} />
+                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
                                 <center><span className='text-blackD'>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
@@ -2696,7 +2686,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={150} />
+                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
                                 <center><span className='text-blackD'>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
@@ -2704,7 +2694,7 @@ class ApplicationDashboard extends Component {
                               <div class="label-text text-center text-mutedDashboard"><h5><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={150} />
+                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
                                 <center><span className='text-blackD'>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>

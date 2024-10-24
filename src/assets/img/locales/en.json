@@ -3479,5 +3479,5 @@
   "static.dashboard.expiryTooltip":"",
   "static.dashboard.qatProblemTooltip":"",
   "static.dashboard.lastUpdatedDateTooltip":"",
-  "static.dashboard.reviewStatusTooltip":""
+  "static.dashboard.reviewStatusTooltip":"Status and date are based on the latest final version uploaded to the server"
 }
