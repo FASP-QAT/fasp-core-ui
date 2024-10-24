@@ -1232,7 +1232,7 @@ class StockStatus extends Component {
                     count = 0;
                   }
                   datasets.push({
-                    label: this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label),
+                    label: reportingUnitList.length>1?this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label):(e.label),
                     yAxisID: 'A',
                     stack: 1,
                     order: 1,
@@ -2501,7 +2501,7 @@ class StockStatus extends Component {
                 count = 0;
               }
               datasets.push({
-                label: this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label),
+                label: reportingUnitList.length>1?this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label):(e.label),
                 yAxisID: 'A',
                 stack: 1,
                 order: 1,

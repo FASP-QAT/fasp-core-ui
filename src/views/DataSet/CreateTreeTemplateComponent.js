@@ -10306,11 +10306,11 @@ export default class CreateTreeTemplate extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="downwardAggregationAllowed" style={{ fontSize: '12px' }}>
-                                                        <b>{'Source Node (available to be aggregated by Funnel Nodes)'}</b>
+                                                        <b>{i18n.t('static.tree.sourceNodeDesc')}</b>
                                                     </Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 6 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId"><b>Source</b> (Tree Name &gt; Scenario Name &gt; … Parent Name &gt; Node Name)</Label>
+                                                    <Label htmlFor="currencyId"><b>{i18n.t('static.tree.source')}</b> ({i18n.t('static.common.treeName')} &gt; {i18n.t('static.tree.scenarioName')} &gt; … {i18n.t('static.tree.parentName')} &gt; {i18n.t('static.tree.nodeName')})</Label>
                                                     <MultiSelect
                                                         name="downwardAggregationList"
                                                         id="downwardAggregationList"
@@ -10331,8 +10331,8 @@ export default class CreateTreeTemplate extends Component {
                                                     ></Input>
                                                 </FormGroup>
                                                 {this.state.currentItemConfig.context.payload.downwardAggregationAllowed && <div className="col-md-6">
-                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>Used by the following funnel nodes </b> (Node Name)</>}
-                                                    {this.state.sourceNodeUsageList.length == 0 && <b className='red'>Not used by any nodes.</b>}<br></br>
+                                                    {this.state.sourceNodeUsageList.length > 0 && <><b>{i18n.t('static.tree.aggregatedBy')} </b> ({i18n.t('static.tree.nodeName')})</>}
+                                                    {this.state.sourceNodeUsageList.length == 0 && <b className='red'>{i18n.t('static.tree.notUsed')}</b>}<br></br>
                                                     {this.state.sourceNodeUsageList.map(sn => (<>
                                                         {sn.nodeName}
                                                         <br></br></>))}
@@ -13338,7 +13338,7 @@ export default class CreateTreeTemplate extends Component {
                                                                             <Label
                                                                                 className="form-check-label"
                                                                                 check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                <b>Hide Funnel node connections</b>
+                                                                                <b>{i18n.t('static.tree.hideFunnel')}</b>
                                                                             </Label>
                                                                         </div>
                                                                     </div>
