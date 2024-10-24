@@ -16572,3 +16572,13 @@ label.arrow_label:before {
     padding-left: 236px;
   }
 }
+.ScrollLogin{
+  overflow-y: scroll;
+  height: 600px;
+ }
+ @media only screen and (min-width: 1920px) {
+  .ScrollLogin{
+    overflow-y: unset;
+    height: 600px;
+   }
+ }

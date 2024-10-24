@@ -292,7 +292,7 @@ class Login extends Component {
     return (
       <div className="main-content flex-row align-items-center bg-height">
         {/* <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}> */}
-        <div className="Login-component InnerBgImg" >
+        <div className="Login-component InnerBgImg ScrollLogin">
           <Container className="container-login">
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
