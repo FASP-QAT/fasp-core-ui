@@ -2385,8 +2385,60 @@ class ApplicationDashboard extends Component {
                         </FormGroup>
 
                       </div>
-                      <div class="col-6 pl-lg-3" style={{ display: 'flex' }}>
-                        <div class="col">
+                      {/* <div class="col-md-5 pt-lg-2" style={{border:'1px solid #000'}}>
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="border-start border-start-4 border-start-info px-3 mb-3">
+                            <div class="small text-body-secondary text-truncate" data-coreui-i18n="newClients">New Clients</div>
+                            <div class="fs-5 fw-semibold">9.123</div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-4">
+                          <div class="border-start border-start-4 border-start-danger px-3 mb-3">
+                            <div class="small text-body-secondary text-truncate" data-coreui-i18n="recurringClients">Recurring Clients</div>
+                            <div class="fs-5 fw-semibold">22.643</div>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div class="border-start border-start-4 border-start-danger px-3 mb-3">
+                            <div class="small text-body-secondary text-truncate" data-coreui-i18n="recurringClients">Recurring Clients</div>
+                            <div class="fs-5 fw-semibold">22.643</div>
+                          </div>
+                        </div>
+                       
+                       
+                      </div>
+                     
+                    </div> */}
+                      {/* <div class="col-5 pl-lg-3 pt-lg-1">
+                        <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
+    <div class="ms-2 me-auto">
+      <div class="fw-bold">header1</div>
+      text
+    </div>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
+    <div class="ms-2 me-auto">
+      <div class="fw-bold">header2</div>
+      text
+    </div>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
+    <div class="ms-2 me-auto">
+      <div class="fw-bold">header3</div>
+      text
+    </div>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
+    <div class="ms-2 me-auto">
+      <div class="fw-bold">header4</div>
+      text
+    </div>
+  </li>
+                        </ul>
+                        {/* <div class="col">
                           <label>header1</label>
                           <div><span>Text</span></div>
                         </div>
@@ -2401,8 +2453,8 @@ class ApplicationDashboard extends Component {
                         <div class="col">
                           <label>header4</label>
                           <div><span>Text</span></div>
-                        </div>
-                      </div>
+                        </div> */}
+                      {/* </div> */} 
                     </div>
 
 
